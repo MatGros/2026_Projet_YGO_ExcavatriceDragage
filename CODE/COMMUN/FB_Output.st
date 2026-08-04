@@ -1,80 +1,28 @@
 (* ═══════════════════════════════════════════════════════════════
-   📤 FB_Output — Sortie relais + feedback (brique réduite)
+   📤 FB_Output — Sortie relais (brique réduite, REX 2026-08-04)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2
-   🧭 Interface RÉDUITE (Partie3 §1bis) — relais de commande BAS NIVEAU :
-      transmet fidèlement `Command` (déjà résolu/rampé par le FB métier
-      appelant), ne décide JAMAIS lui-même d'un arrêt de mouvement.
-   🔁 Rôle : inversion NO/NC, option blink 1Hz, double vérification
-      commande/retour (contacteur collé/absent), diagnostic voie/carte.
-   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
-      d'architecture en attente — composition interne, remplacerait la
-      logique actuelle TonFwdFeedback/ST_ContactorCheck manuelle dans
-      FB_Winch/FB_Translation — vs FB_IO générique séparé). Ce fichier
-      ne fait QUE créer la brique elle-même.
+   📄 Doc métier : DOC/AF_Partie-03_Contrats_Composants_v2.0.md §Câblage
+   🧭 Interface RÉDUITE (validée utilisateur 2026-08-04) : relais de
+      commande BAS NIVEAU — transmet fidèlement `Command` (déjà
+      résolu/rampé par le FB métier appelant), ne décide JAMAIS lui-même
+      d'un arrêt de mouvement.
+   🔁 Rôle : inversion NO/NC uniquement.
+   🗑️ REX 2026-08-04 : partie FEEDBACK retirée (FeedbackRaw, UseFeedback,
+      Blink1Hz, FeedbackTimeout, ChannelOk, FeedbackOk, Error, ErrorId) —
+      jamais câblée (0 usage dans PRG_06, 15 instances Command→State).
+      Diagnostic contacteur déjà couvert au niveau métier par
+      FB_Safety_Winch (FwdRevSpeedFeedbackOff, BrakeFeedback).
    ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Output) ===
 
 FUNCTION_BLOCK PUBLIC FB_Output
 VAR_INPUT
-    Command         : BOOL;         // Ordre logique, déjà résolu/rampé par le FB métier appelant
-    InvertLogic     : BOOL;         // TRUE = NC
-    FeedbackRaw     : BOOL;         // Retour d'état actionneur (optionnel)
-    UseFeedback     : BOOL;         // Activer le contrôle de rétroaction
-    Blink1Hz        : BOOL;         // Option : clignotement 1 Hz (diagnostic/visu)
-    FeedbackTimeout : TIME := T#500ms; // Délai max cohérence cmd/retour
-    ChannelOk       : BOOL := TRUE;    // Diag voie/carte sortie OK — TRUE par défaut si pas de diag dispo
+    Command     : BOOL;   // Ordre logique, déjà résolu/rampé par le FB métier appelant
+    InvertLogic : BOOL;   // TRUE = câblage NC (inversion de la sortie)
 END_VAR
 VAR_OUTPUT
-    State       : BOOL;         // Vers la carte de sortie
-    FeedbackOk      : BOOL;         // Retour cohérent avec la commande
-    Error           : BOOL;
-    ErrorId         : WORD;         // bit0: "Feedback sortie incohérent" - feedback incohérent ; bit1: "Défaut matériel sortie (Carte HS)" - voie/carte HS
-END_VAR
-VAR
-    BlinkTimer      : TON;
-    BlinkState      : BOOL;
-    FeedbackTon     : TON;
+    State       : BOOL;   // Vers la carte de sortie
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Output) ===
 
-// 1. Inversion NO/NC
 State := Command XOR InvertLogic;
-
-// 2. Option blink 1 Hz (diagnostic/visualisation) — modulation à 500ms ON/500ms OFF
-IF Blink1Hz AND State THEN
-    BlinkTimer(IN := NOT BlinkTimer.Q, PT := T#500ms);
-    IF BlinkTimer.Q THEN
-        BlinkState := NOT BlinkState;
-    END_IF;
-    State := BlinkState;
-ELSE
-    BlinkTimer(IN := FALSE, PT := T#500ms);
-    BlinkState := FALSE;
-END_IF;
-
-// 3. Double vérification commande/retour (contacteur collé/ne colle pas)
-IF UseFeedback THEN
-    FeedbackTon(IN := (State <> FeedbackRaw), PT := FeedbackTimeout);
-    IF FeedbackTon.Q THEN
-        ErrorId := ErrorId OR 16#0001;
-        FeedbackOk := FALSE;
-    ELSE
-        ErrorId := ErrorId AND 16#FFFE;
-        FeedbackOk := TRUE;
-    END_IF;
-ELSE
-    FeedbackTon(IN := FALSE, PT := FeedbackTimeout);
-    FeedbackOk := TRUE;   // Pas de contrôle demandé — pas d'incohérence à signaler
-END_IF;
-
-// 4. Diagnostic voie/carte
-IF NOT ChannelOk THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSE
-    ErrorId := ErrorId AND 16#FFFD;
-END_IF;
-
-Error := (ErrorId <> 16#0000);

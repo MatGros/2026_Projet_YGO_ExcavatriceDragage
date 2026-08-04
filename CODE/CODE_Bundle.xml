@@ -14973,53 +14973,7 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE = NC</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="FeedbackRaw">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>Retour d'état actionneur (optionnel)</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="UseFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>Activer le contrôle de rétroaction</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="Blink1Hz">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>Option : clignotement 1 Hz (diagnostic/visu)</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="FeedbackTimeout">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#500ms" />
-              </initialValue>
-              <documentation>
-                <html:xhtml>Délai max cohérence cmd/retour</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="ChannelOk">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <html:xhtml>Diag voie/carte sortie OK — TRUE par défaut si pas de diag dispo</html:xhtml>
+                <html:xhtml>TRUE = câblage NC (inversion de la sortie)</html:xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -15032,62 +14986,23 @@ Done := FALSE;
                 <html:xhtml>Vers la carte de sortie</html:xhtml>
               </documentation>
             </variable>
-            <variable name="FeedbackOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>Retour cohérent avec la commande</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <html:xhtml>bit0: "Feedback sortie incohérent" - feedback incohérent ; bit1: "Défaut matériel sortie (Carte HS)" - voie/carte HS</html:xhtml>
-              </documentation>
-            </variable>
           </outputVars>
-          <localVars>
-            <variable name="BlinkTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="BlinkState">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="FeedbackTon">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-          </localVars>
           <documentation>
             <html:xhtml>═══════════════════════════════════════════════════════════════
-   📤 FB_Output — Sortie relais + feedback (brique réduite)
+   📤 FB_Output — Sortie relais (brique réduite, REX 2026-08-04)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2
-   🧭 Interface RÉDUITE (Partie3 §1bis) — relais de commande BAS NIVEAU :
-      transmet fidèlement `Command` (déjà résolu/rampé par le FB métier
-      appelant), ne décide JAMAIS lui-même d'un arrêt de mouvement.
-   🔁 Rôle : inversion NO/NC, option blink 1Hz, double vérification
-      commande/retour (contacteur collé/absent), diagnostic voie/carte.
-   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
-      d'architecture en attente — composition interne, remplacerait la
-      logique actuelle TonFwdFeedback/ST_ContactorCheck manuelle dans
-      FB_Winch/FB_Translation — vs FB_IO générique séparé). Ce fichier
-      ne fait QUE créer la brique elle-même.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Output) ===</html:xhtml>
+   📄 Doc métier : DOC/AF_Partie-03_Contrats_Composants_v2.0.md §Câblage
+   🧭 Interface RÉDUITE (validée utilisateur 2026-08-04) : relais de
+      commande BAS NIVEAU — transmet fidèlement `Command` (déjà
+      résolu/rampé par le FB métier appelant), ne décide JAMAIS lui-même
+      d'un arrêt de mouvement.
+   🔁 Rôle : inversion NO/NC uniquement.
+   🗑️ REX 2026-08-04 : partie FEEDBACK retirée (FeedbackRaw, UseFeedback,
+      Blink1Hz, FeedbackTimeout, ChannelOk, FeedbackOk, Error, ErrorId) —
+      jamais câblée (0 usage dans PRG_06, 15 instances Command→State).
+      Diagnostic contacteur déjà couvert au niveau métier par
+      FB_Safety_Winch (FwdRevSpeedFeedbackOff, BrakeFeedback).
+   ═══════════════════════════════════════════════════════════════</html:xhtml>
           </documentation>
         </interface>
         <body>
@@ -15096,44 +15011,7 @@ Done := FALSE;
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Output) ===
 
-// 1. Inversion NO/NC
 State := Command XOR InvertLogic;
-
-// 2. Option blink 1 Hz (diagnostic/visualisation) — modulation à 500ms ON/500ms OFF
-IF Blink1Hz AND State THEN
-    BlinkTimer(IN := NOT BlinkTimer.Q, PT := T#500ms);
-    IF BlinkTimer.Q THEN
-        BlinkState := NOT BlinkState;
-    END_IF;
-    State := BlinkState;
-ELSE
-    BlinkTimer(IN := FALSE, PT := T#500ms);
-    BlinkState := FALSE;
-END_IF;
-
-// 3. Double vérification commande/retour (contacteur collé/ne colle pas)
-IF UseFeedback THEN
-    FeedbackTon(IN := (State &lt;&gt; FeedbackRaw), PT := FeedbackTimeout);
-    IF FeedbackTon.Q THEN
-        ErrorId := ErrorId OR 16#0001;
-        FeedbackOk := FALSE;
-    ELSE
-        ErrorId := ErrorId AND 16#FFFE;
-        FeedbackOk := TRUE;
-    END_IF;
-ELSE
-    FeedbackTon(IN := FALSE, PT := FeedbackTimeout);
-    FeedbackOk := TRUE;   // Pas de contrôle demandé — pas d'incohérence à signaler
-END_IF;
-
-// 4. Diagnostic voie/carte
-IF NOT ChannelOk THEN
-    ErrorId := ErrorId OR 16#0002;
-ELSE
-    ErrorId := ErrorId AND 16#FFFD;
-END_IF;
-
-Error := (ErrorId &lt;&gt; 16#0000);
 </html:xhtml>
           </ST>
         </body>
@@ -27612,31 +27490,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="6">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="7">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="8">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="9">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="10">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
             <block localId="3" typeName="FB_Output" instanceName="instM1RelayFwd">
               <position x="0" y="0" />
               <inputVariables>
@@ -27650,51 +27503,11 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                     <connection refLocalId="5" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="6" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="7" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="8" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="9" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="10" />
-                  </connectionPointIn>
-                </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
                   <connectionPointOut />
-                </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
                 </variable>
               </outputVariables>
               <addData>
@@ -27703,7 +27516,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="11" negated="false" storage="none">
+            <coil localId="6" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="3" formalParameter="State" />
@@ -27711,13 +27524,13 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1RelayFwd</variable>
             </coil>
-            <comment localId="12" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="7" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Relais M1 Marche Arrière (Descente)</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="13">
+            <vendorElement localId="8">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27728,7 +27541,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="15" negated="false" storage="none" edge="none">
+            <contact localId="10" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27736,72 +27549,22 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1RelayRev</variable>
             </contact>
-            <inVariable localId="16">
+            <inVariable localId="11">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="17">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="18">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="19">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="20">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="21">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="14" typeName="FB_Output" instanceName="instM1RelayRev">
+            <block localId="9" typeName="FB_Output" instanceName="instM1RelayRev">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
                   <connectionPointIn>
-                    <connection refLocalId="15" />
+                    <connection refLocalId="10" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="16" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="17" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="18" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="19" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="20" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="21" />
+                    <connection refLocalId="11" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -27810,21 +27573,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <variable formalParameter="State">
                   <connectionPointOut />
                 </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
               </outputVariables>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
@@ -27832,21 +27580,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="22" negated="false" storage="none">
+            <coil localId="12" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="14" formalParameter="State" />
+                <connection refLocalId="9" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M1RelayRev</variable>
             </coil>
-            <comment localId="23" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="13" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Contacteur Vitesse M1-1</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="24">
+            <vendorElement localId="14">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27857,7 +27605,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="26" negated="false" storage="none" edge="none">
+            <contact localId="16" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27865,72 +27613,22 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1SpeedContactor1</variable>
             </contact>
-            <inVariable localId="27">
+            <inVariable localId="17">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="28">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="29">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="30">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="31">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="32">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="25" typeName="FB_Output" instanceName="instM1SpeedContactor1">
+            <block localId="15" typeName="FB_Output" instanceName="instM1SpeedContactor1">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
                   <connectionPointIn>
-                    <connection refLocalId="26" />
+                    <connection refLocalId="16" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="27" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="28" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="29" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="30" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="31" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="32" />
+                    <connection refLocalId="17" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -27939,21 +27637,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <variable formalParameter="State">
                   <connectionPointOut />
                 </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
               </outputVariables>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
@@ -27961,21 +27644,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="33" negated="false" storage="none">
+            <coil localId="18" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="25" formalParameter="State" />
+                <connection refLocalId="15" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M1SpeedContactor1</variable>
             </coil>
-            <comment localId="34" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="19" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Contacteur Vitesse M1-2</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="35">
+            <vendorElement localId="20">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27986,7 +27669,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="37" negated="false" storage="none" edge="none">
+            <contact localId="22" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27994,72 +27677,22 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1SpeedContactor2</variable>
             </contact>
-            <inVariable localId="38">
+            <inVariable localId="23">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="39">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="40">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="41">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="42">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="43">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="36" typeName="FB_Output" instanceName="instM1SpeedContactor2">
+            <block localId="21" typeName="FB_Output" instanceName="instM1SpeedContactor2">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
                   <connectionPointIn>
-                    <connection refLocalId="37" />
+                    <connection refLocalId="22" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="38" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="39" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="40" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="41" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="42" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="43" />
+                    <connection refLocalId="23" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -28068,21 +27701,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <variable formalParameter="State">
                   <connectionPointOut />
                 </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
               </outputVariables>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
@@ -28090,21 +27708,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="44" negated="false" storage="none">
+            <coil localId="24" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="36" formalParameter="State" />
+                <connection refLocalId="21" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M1SpeedContactor2</variable>
             </coil>
-            <comment localId="45" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="25" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Contacteur Vitesse M1-3</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="46">
+            <vendorElement localId="26">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28115,7 +27733,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="48" negated="false" storage="none" edge="none">
+            <contact localId="28" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28123,72 +27741,22 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1SpeedContactor3</variable>
             </contact>
-            <inVariable localId="49">
+            <inVariable localId="29">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="50">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="51">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="52">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="53">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="54">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="47" typeName="FB_Output" instanceName="instM1SpeedContactor3">
+            <block localId="27" typeName="FB_Output" instanceName="instM1SpeedContactor3">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
                   <connectionPointIn>
-                    <connection refLocalId="48" />
+                    <connection refLocalId="28" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="49" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="50" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="51" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="52" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="53" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="54" />
+                    <connection refLocalId="29" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -28197,21 +27765,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <variable formalParameter="State">
                   <connectionPointOut />
                 </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
               </outputVariables>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
@@ -28219,21 +27772,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="55" negated="false" storage="none">
+            <coil localId="30" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="47" formalParameter="State" />
+                <connection refLocalId="27" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M1SpeedContactor3</variable>
             </coil>
-            <comment localId="56" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="31" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Contacteur Vitesse M1-4</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="57">
+            <vendorElement localId="32">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28244,7 +27797,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="59" negated="false" storage="none" edge="none">
+            <contact localId="34" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28252,70 +27805,340 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M1SpeedContactor4</variable>
             </contact>
-            <inVariable localId="60">
+            <inVariable localId="35">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="61">
+            <block localId="33" typeName="FB_Output" instanceName="instM1SpeedContactor4">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Command">
+                  <connectionPointIn>
+                    <connection refLocalId="34" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="35" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <coil localId="36" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="33" formalParameter="State" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1SpeedContactor4</variable>
+            </coil>
+            <comment localId="37" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Frein M1</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="38">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="40" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1BrakeCmd</variable>
+            </contact>
+            <inVariable localId="41">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="62">
+            <block localId="39" typeName="FB_Output" instanceName="instM1BrakeCmd">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Command">
+                  <connectionPointIn>
+                    <connection refLocalId="40" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="41" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <coil localId="42" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="39" formalParameter="State" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1BrakeCmd</variable>
+            </coil>
+            <comment localId="43" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Relais M2 Marche Avant (Fermeture)</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="44">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="46" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2RelayFwd</variable>
+            </contact>
+            <inVariable localId="47">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="63">
+            <block localId="45" typeName="FB_Output" instanceName="instM2RelayFwd">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Command">
+                  <connectionPointIn>
+                    <connection refLocalId="46" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="47" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <coil localId="48" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="45" formalParameter="State" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2RelayFwd</variable>
+            </coil>
+            <comment localId="49" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Relais M2 Marche Arrière (Ouverture)</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="50">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="52" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2RelayRev</variable>
+            </contact>
+            <inVariable localId="53">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="64">
+            <block localId="51" typeName="FB_Output" instanceName="instM2RelayRev">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Command">
+                  <connectionPointIn>
+                    <connection refLocalId="52" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="53" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <coil localId="54" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="51" formalParameter="State" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2RelayRev</variable>
+            </coil>
+            <comment localId="55" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Contacteur Vitesse M2-1</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="56">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="58" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor1</variable>
+            </contact>
+            <inVariable localId="59">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
+            <block localId="57" typeName="FB_Output" instanceName="instM2SpeedContactor1">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Command">
+                  <connectionPointIn>
+                    <connection refLocalId="58" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="InvertLogic">
+                  <connectionPointIn>
+                    <connection refLocalId="59" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="State">
+                  <connectionPointOut />
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <coil localId="60" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="57" formalParameter="State" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor1</variable>
+            </coil>
+            <comment localId="61" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Contacteur Vitesse M2-2</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="62">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="64" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor2</variable>
+            </contact>
             <inVariable localId="65">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <block localId="58" typeName="FB_Output" instanceName="instM1SpeedContactor4">
+            <block localId="63" typeName="FB_Output" instanceName="instM2SpeedContactor2">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
                   <connectionPointIn>
-                    <connection refLocalId="59" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="InvertLogic">
-                  <connectionPointIn>
-                    <connection refLocalId="60" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="61" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="62" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="63" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
                     <connection refLocalId="64" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="ChannelOk">
+                <variable formalParameter="InvertLogic">
                   <connectionPointIn>
                     <connection refLocalId="65" />
                   </connectionPointIn>
@@ -28325,21 +28148,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <outputVariables>
                 <variable formalParameter="State">
                   <connectionPointOut />
-                </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
                 </variable>
               </outputVariables>
               <addData>
@@ -28351,15 +28159,15 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
             <coil localId="66" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="58" formalParameter="State" />
+                <connection refLocalId="63" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor4</variable>
+              <variable>M2SpeedContactor2</variable>
             </coil>
             <comment localId="67" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Frein M1</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-3</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="68">
@@ -28379,39 +28187,14 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1BrakeCmd</variable>
+              <variable>M2SpeedContactor3</variable>
             </contact>
             <inVariable localId="71">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="72">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="73">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="74">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="75">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="76">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="69" typeName="FB_Output" instanceName="instM1BrakeCmd">
+            <block localId="69" typeName="FB_Output" instanceName="instM2SpeedContactor3">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
@@ -28424,51 +28207,11 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                     <connection refLocalId="71" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="72" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="73" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="74" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="75" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="76" />
-                  </connectionPointIn>
-                </variable>
               </inputVariables>
               <inOutVariables />
               <outputVariables>
                 <variable formalParameter="State">
                   <connectionPointOut />
-                </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
                 </variable>
               </outputVariables>
               <addData>
@@ -28477,666 +28220,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="77" negated="false" storage="none">
+            <coil localId="72" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="69" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1BrakeCmd</variable>
-            </coil>
-            <comment localId="78" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Relais M2 Marche Avant (Fermeture)</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="79">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="81" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2RelayFwd</variable>
-            </contact>
-            <inVariable localId="82">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="83">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="84">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="85">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="86">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="87">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="80" typeName="FB_Output" instanceName="instM2RelayFwd">
-              <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="Command">
-                  <connectionPointIn>
-                    <connection refLocalId="81" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="InvertLogic">
-                  <connectionPointIn>
-                    <connection refLocalId="82" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="83" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="84" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="85" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="86" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="87" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="State">
-                  <connectionPointOut />
-                </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-              </outputVariables>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <coil localId="88" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="80" formalParameter="State" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2RelayFwd</variable>
-            </coil>
-            <comment localId="89" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Relais M2 Marche Arrière (Ouverture)</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="90">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="92" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2RelayRev</variable>
-            </contact>
-            <inVariable localId="93">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="94">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="95">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="96">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="97">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="98">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="91" typeName="FB_Output" instanceName="instM2RelayRev">
-              <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="Command">
-                  <connectionPointIn>
-                    <connection refLocalId="92" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="InvertLogic">
-                  <connectionPointIn>
-                    <connection refLocalId="93" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="94" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="95" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="96" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="97" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="98" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="State">
-                  <connectionPointOut />
-                </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-              </outputVariables>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <coil localId="99" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="91" formalParameter="State" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2RelayRev</variable>
-            </coil>
-            <comment localId="100" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Contacteur Vitesse M2-1</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="101">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="103" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2SpeedContactor1</variable>
-            </contact>
-            <inVariable localId="104">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="105">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="106">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="107">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="108">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="109">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="102" typeName="FB_Output" instanceName="instM2SpeedContactor1">
-              <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="Command">
-                  <connectionPointIn>
-                    <connection refLocalId="103" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="InvertLogic">
-                  <connectionPointIn>
-                    <connection refLocalId="104" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="105" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="106" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="107" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="108" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="109" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="State">
-                  <connectionPointOut />
-                </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-              </outputVariables>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <coil localId="110" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="102" formalParameter="State" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2SpeedContactor1</variable>
-            </coil>
-            <comment localId="111" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Contacteur Vitesse M2-2</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="112">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="114" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2SpeedContactor2</variable>
-            </contact>
-            <inVariable localId="115">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="116">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="117">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="118">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="119">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="120">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="113" typeName="FB_Output" instanceName="instM2SpeedContactor2">
-              <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="Command">
-                  <connectionPointIn>
-                    <connection refLocalId="114" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="InvertLogic">
-                  <connectionPointIn>
-                    <connection refLocalId="115" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="116" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="117" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="118" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="119" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="120" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="State">
-                  <connectionPointOut />
-                </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-              </outputVariables>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <coil localId="121" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="113" formalParameter="State" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2SpeedContactor2</variable>
-            </coil>
-            <comment localId="122" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Contacteur Vitesse M2-3</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="123">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="125" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2SpeedContactor3</variable>
-            </contact>
-            <inVariable localId="126">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="127">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="128">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="129">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="130">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="131">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="124" typeName="FB_Output" instanceName="instM2SpeedContactor3">
-              <position x="0" y="0" />
-              <inputVariables>
-                <variable formalParameter="Command">
-                  <connectionPointIn>
-                    <connection refLocalId="125" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="InvertLogic">
-                  <connectionPointIn>
-                    <connection refLocalId="126" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="127" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="128" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="129" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="130" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="131" />
-                  </connectionPointIn>
-                </variable>
-              </inputVariables>
-              <inOutVariables />
-              <outputVariables>
-                <variable formalParameter="State">
-                  <connectionPointOut />
-                </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-              </outputVariables>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
-                  <CallType xmlns="">functionblock</CallType>
-                </data>
-              </addData>
-            </block>
-            <coil localId="132" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="124" formalParameter="State" />
-              </connectionPointIn>
-              <connectionPointOut />
               <variable>M2SpeedContactor3</variable>
             </coil>
-            <comment localId="133" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="73" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Contacteur Vitesse M2-4</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="134">
+            <vendorElement localId="74">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29147,7 +28245,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="136" negated="false" storage="none" edge="none">
+            <contact localId="76" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29155,72 +28253,22 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2SpeedContactor4</variable>
             </contact>
-            <inVariable localId="137">
+            <inVariable localId="77">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="138">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="139">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="140">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="141">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="142">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="135" typeName="FB_Output" instanceName="instM2SpeedContactor4">
+            <block localId="75" typeName="FB_Output" instanceName="instM2SpeedContactor4">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
                   <connectionPointIn>
-                    <connection refLocalId="136" />
+                    <connection refLocalId="76" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="137" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="138" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="139" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="140" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="141" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="142" />
+                    <connection refLocalId="77" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -29229,21 +28277,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <variable formalParameter="State">
                   <connectionPointOut />
                 </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
               </outputVariables>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
@@ -29251,21 +28284,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="143" negated="false" storage="none">
+            <coil localId="78" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="135" formalParameter="State" />
+                <connection refLocalId="75" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M2SpeedContactor4</variable>
             </coil>
-            <comment localId="144" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="79" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Frein M2</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="145">
+            <vendorElement localId="80">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29276,7 +28309,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="147" negated="false" storage="none" edge="none">
+            <contact localId="82" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29284,72 +28317,22 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>M2BrakeCmd</variable>
             </contact>
-            <inVariable localId="148">
+            <inVariable localId="83">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="149">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="150">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="151">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="152">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="153">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="146" typeName="FB_Output" instanceName="instM2BrakeCmd">
+            <block localId="81" typeName="FB_Output" instanceName="instM2BrakeCmd">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
                   <connectionPointIn>
-                    <connection refLocalId="147" />
+                    <connection refLocalId="82" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="148" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="149" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="150" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="151" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="152" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="153" />
+                    <connection refLocalId="83" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -29358,21 +28341,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <variable formalParameter="State">
                   <connectionPointOut />
                 </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
               </outputVariables>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
@@ -29380,21 +28348,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="154" negated="false" storage="none">
+            <coil localId="84" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="146" formalParameter="State" />
+                <connection refLocalId="81" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M2BrakeCmd</variable>
             </coil>
-            <comment localId="155" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="85" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Frein Translation M3</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="156">
+            <vendorElement localId="86">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29405,7 +28373,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="158" negated="false" storage="none" edge="none">
+            <contact localId="88" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29413,72 +28381,22 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>TranslationBrakeCmd</variable>
             </contact>
-            <inVariable localId="159">
+            <inVariable localId="89">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression />
             </inVariable>
-            <inVariable localId="160">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="161">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="162">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="163">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <inVariable localId="164">
-              <position x="0" y="0" />
-              <connectionPointOut />
-              <expression />
-            </inVariable>
-            <block localId="157" typeName="FB_Output" instanceName="instTranslationBrakeCmd">
+            <block localId="87" typeName="FB_Output" instanceName="instTranslationBrakeCmd">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Command">
                   <connectionPointIn>
-                    <connection refLocalId="158" />
+                    <connection refLocalId="88" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="InvertLogic">
                   <connectionPointIn>
-                    <connection refLocalId="159" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackRaw">
-                  <connectionPointIn>
-                    <connection refLocalId="160" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="UseFeedback">
-                  <connectionPointIn>
-                    <connection refLocalId="161" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="Blink1Hz">
-                  <connectionPointIn>
-                    <connection refLocalId="162" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="FeedbackTimeout">
-                  <connectionPointIn>
-                    <connection refLocalId="163" />
-                  </connectionPointIn>
-                </variable>
-                <variable formalParameter="ChannelOk">
-                  <connectionPointIn>
-                    <connection refLocalId="164" />
+                    <connection refLocalId="89" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -29487,21 +28405,6 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <variable formalParameter="State">
                   <connectionPointOut />
                 </variable>
-                <variable formalParameter="FeedbackOk">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="Error">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="ErrorId">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
               </outputVariables>
               <addData>
                 <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
@@ -29509,21 +28412,21 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </block>
-            <coil localId="165" negated="false" storage="none">
+            <coil localId="90" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="157" formalParameter="State" />
+                <connection refLocalId="87" formalParameter="State" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>TranslationBrakeCmd</variable>
             </coil>
-            <comment localId="166" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="91" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="167">
+            <vendorElement localId="92">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29534,7 +28437,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="169" negated="false" storage="none" edge="none">
+            <contact localId="94" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29542,7 +28445,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>TRUE</variable>
             </contact>
-            <contact localId="170" negated="false" storage="none" edge="none">
+            <contact localId="95" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29550,7 +28453,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
             </contact>
-            <contact localId="171" negated="false" storage="none" edge="none">
+            <contact localId="96" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29558,7 +28461,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyArming</variable>
             </contact>
-            <contact localId="172" negated="false" storage="none" edge="none">
+            <contact localId="97" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29566,7 +28469,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>PRG_01_Inputs_LD.EmergencyChainClosed</variable>
             </contact>
-            <contact localId="173" negated="false" storage="none" edge="none">
+            <contact localId="98" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29574,7 +28477,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>PRG_01_Inputs_LD.PowerContactorEngaged</variable>
             </contact>
-            <contact localId="174" negated="false" storage="none" edge="none">
+            <contact localId="99" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29582,7 +28485,7 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>PowerCutOffReq</variable>
             </contact>
-            <contact localId="175" negated="false" storage="none" edge="none">
+            <contact localId="100" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29590,42 +28493,42 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
             </contact>
-            <block localId="168" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+            <block localId="93" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="169" />
+                    <connection refLocalId="94" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="170" />
+                    <connection refLocalId="95" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ArmRequest">
                   <connectionPointIn>
-                    <connection refLocalId="171" />
+                    <connection refLocalId="96" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
-                    <connection refLocalId="172" />
+                    <connection refLocalId="97" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="173" />
+                    <connection refLocalId="98" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerCutOffRequest">
                   <connectionPointIn>
-                    <connection refLocalId="174" />
+                    <connection refLocalId="99" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BtnEmergencyCutOff">
                   <connectionPointIn>
-                    <connection refLocalId="175" />
+                    <connection refLocalId="100" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
