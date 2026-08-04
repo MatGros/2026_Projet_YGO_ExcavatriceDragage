@@ -139,7 +139,9 @@ END_IF;
 
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled;
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
-GVL_IHM.Commun.HydraulicThermalFault     := FALSE;
+GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
+GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI;
+GVL_IHM.Commun.PhaseRotationFault        := NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;
 
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
@@ -147,13 +149,25 @@ GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.Bypass.SlackCable                 := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 
-GVL_IHM.M1TreuilRetenue.State.Position_M                 := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue);
-GVL_IHM.M1TreuilRetenue.State.Ready                    := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable;
-GVL_IHM.M2TreuilBenne.State.Position_M                 := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue);
-GVL_IHM.M2TreuilBenne.State.Ready                    := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable;
+GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.WinchM1StateHMI;
+GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.WinchM2StateHMI;
+GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.WinchM1SafetyHMI;
+GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.WinchM2SafetyHMI;
+GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.SyncStateHMI;
+GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.BucketStateHMI;
+GVL_IHM.TranslationM3.State := PRG_05_Translation.TranslationStateHMI;
+GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafetyHMI;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
-GVL_IHM.M1M2Sync.State.SyncActive := PRG_03_Modes_Cycle.Auth.SyncEnable;
+GVL_IHM.Modes.State.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
+GVL_IHM.Modes.State.PowerContactorOk := PRG_06_Outputs_LD.EmergencyState.ContactorOk;
+GVL_IHM.Modes.State.EmergencyChainOk := PRG_06_Outputs_LD.EmergencyState.ChainOk;
+GVL_IHM.Modes.State.EmergencyArmable := PRG_06_Outputs_LD.EmergencyState.Armable;
+GVL_IHM.Modes.State.EmergencyArmingBusy := PRG_06_Outputs_LD.EmergencyState.ArmingBusy;
+GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs_LD.EmergencyDiag.RedundancyTestFailed;
+GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs_LD.EmergencyDiag.ArmFailed;
+GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs_LD.EmergencyDiag.Error OR PRG_02_Acquisition.InputModuleFault;
+GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs_LD.PowerCutOffActive;
 
 GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;

@@ -10,6 +10,8 @@ PROGRAM PRG_05_Translation
 
 VAR_OUTPUT
     TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest;
+    TranslationStateHMI : ST_TranslationState;
+    TranslationSafetyHMI : ST_SafetyTranslation;
 END_VAR
 
 VAR
@@ -134,5 +136,39 @@ TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeR
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
+
+// === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
+TranslationStateHMI.FBState := instTranslationM3.State;
+TranslationStateHMI.Ready := instTranslationM3.Ready;
+TranslationStateHMI.Busy := instTranslationM3.Busy;
+TranslationStateHMI.Done := instTranslationM3.Done;
+TranslationStateHMI.Error := instTranslationM3.Error;
+TranslationStateHMI.ErrorId := instTranslationM3.ErrorId;
+TranslationStateHMI.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
+TranslationStateHMI.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
+TranslationStateHMI.PositionReached := instTranslationM3.TargetReached;
+TranslationStateHMI.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
+TranslationStateHMI.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
+TranslationStateHMI.ActiveDirection := M3_Direction_Active;
+TranslationStateHMI.ActiveSpeedRef_Pct := M3_SpeedRef_Active;
+TranslationStateHMI.PositionTremie := PRG_02_Acquisition.TranslationPosTremie;
+TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
+TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
+TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
+TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
+TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
+TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
+TranslationStateHMI.LimitSwitchFwd := PRG_02_Acquisition.M3_LimitSwitchFwd;
+TranslationStateHMI.LimitSwitchRev := PRG_02_Acquisition.M3_LimitSwitchRev;
+TranslationStateHMI.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
+TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalFeedback_DI;
+TranslationStateHMI.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
+TranslationStateHMI.SimulationModeActive := GVL_Simulation.SimulationModeActive;
+
+TranslationSafetyHMI.SafeStop := M3_SafeStop_Active;
+TranslationSafetyHMI.Error := instTranslationM3.Error;
+TranslationSafetyHMI.ErrorId := instTranslationM3.ErrorId;
+TranslationSafetyHMI.ErrorLimitSwitch := PRG_02_Acquisition.M3_LimitSwitchFwd OR PRG_02_Acquisition.M3_LimitSwitchRev;
+TranslationSafetyHMI.ErrorSensorIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
 
 END_PROGRAM
