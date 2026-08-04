@@ -106,6 +106,7 @@ def build_ld_body(
     instance_types: dict[str, str] | None = None,
     instance_input_types: dict[str, dict[str, str]] | None = None,
     instance_output_types: dict[str, list[str]] | None = None,
+    instance_output_type_map: dict[str, dict[str, str]] | None = None,
 ) -> ET.Element:
     """Convertit un PROGRAM ``PRG_*_LD`` en Ladder.
 
@@ -120,6 +121,7 @@ def build_ld_body(
     instance_types = instance_types or {}
     instance_input_types = instance_input_types or {}
     instance_output_types = instance_output_types or {}
+    instance_output_type_map = instance_output_type_map or {}
     body = ET.Element("body")
     ld = ET.SubElement(body, "LD")
 
@@ -131,6 +133,10 @@ def build_ld_body(
     c_out_rail.set("formalParameter", "none")
 
     local_id_counter = 1
+
+    # Mapping instance_name -> block_localId pour cable les outputs FB
+    # directement au bloc (REX 2026-08-04 : contact fantome -> IndexOutOfRangeException)
+    instance_block_map: dict[str, int] = {}
 
     raw_text = body_text or ""
     lines = raw_text.splitlines()
@@ -205,6 +211,11 @@ def build_ld_body(
 
     other_statements = []
 
+    # REX 2026-08-04 (oracle PRG_Oracle_Nested.xml) : les assignations d outputs
+    # FB (target := instName.outputName) vont DANS les <outputVariables> du bloc
+    # sous forme <expression>target</expression>, pas en coils separees.
+    fb_output_assignments: dict[str, dict[str, list[str]]] = {}
+
     for b_title, b_desc, stmt_comm, stmt_clean in statements_with_headers:
         if not stmt_clean:
             continue
@@ -236,6 +247,14 @@ def build_ld_body(
                 bt, bd, sc, cmd_v, all_params = fb_commands.pop(inst_name)
                 coil_mappings.append((bt or b_title, bd or b_desc, sc or stmt_comm, inst_name, cmd_v, coil_var, all_params))
                 continue
+
+        # REX 2026-08-04 : capturer les assignations d outputs FB (target := instName.output)
+        # pour les injecter dans les <outputVariables> du bloc (oracle PRG_Oracle_Nested.xml).
+        m_fb_out = re.match(r"^([A-Za-z_]\w*)\s*:=\s*(\w+)\.(\w+)$", stmt_clean)
+        if m_fb_out and m_fb_out.group(2) in instance_types:
+            _target, _inst, _output = m_fb_out.groups()
+            fb_output_assignments.setdefault(_inst, {}).setdefault(_output, []).append(_target)
+            continue  # Ne pas mettre dans other_statements (sera dans le bloc)
 
         other_statements.append((b_title, b_desc, stmt_comm, stmt_clean))
 
@@ -352,14 +371,30 @@ def build_ld_body(
             p_var_el.text = p_value
 
         # Le type du bloc doit correspondre à sa déclaration VAR réelle.
+        # REX 2026-08-04 (oracle PRG_06_Outputs_LD.xml) : TOUTES les sources
+        # (contacts ET inVariable pour inputs non connectes) doivent etre creees
+        # AVANT le bloc. Les inVariable apres le bloc -> IndexOutOfRangeException.
+        unconnected_sources: dict[str, int] = {}
+        for p_name in declared_inputs:
+            if p_name == main_input_param:
+                continue
+            if p_name not in extra_param_sources:
+                src_id = local_id_counter
+                local_id_counter += 2
+                input_var = ET.SubElement(ld, "inVariable")
+                input_var.set("localId", str(src_id))
+                ET.SubElement(input_var, "position", x="0", y="0")
+                ET.SubElement(input_var, "connectionPointOut")
+                ET.SubElement(input_var, "expression")
+                unconnected_sources[p_name] = src_id
+
         block = ET.SubElement(ld, "block")
         block.set("localId", str(block_id))
         block.set("typeName", instance_type)
         block.set("instanceName", inst_name)
+        instance_block_map[inst_name] = block_id
         ET.SubElement(block, "position", x="0", y="0")
 
-        # Émettre TOUS les paramètres d'entrée dans le bloc.
-        # Ordre : paramètre principal d'abord, puis les autres.
         in_vars = ET.SubElement(block, "inputVariables")
         var_in = ET.SubElement(in_vars, "variable")
         var_in.set("formalParameter", main_input_param)
@@ -369,13 +404,18 @@ def build_ld_body(
         for p_name in declared_inputs:
             if p_name == main_input_param:
                 continue
-            if p_name not in extra_param_sources:
-                continue
-            var_p = ET.SubElement(in_vars, "variable")
-            var_p.set("formalParameter", p_name)
-            c_in_p = ET.SubElement(var_p, "connectionPointIn")
-            c_ref_p = ET.SubElement(c_in_p, "connection")
-            c_ref_p.set("refLocalId", str(extra_param_sources[p_name]))
+            if p_name in extra_param_sources:
+                var_p = ET.SubElement(in_vars, "variable")
+                var_p.set("formalParameter", p_name)
+                c_in_p = ET.SubElement(var_p, "connectionPointIn")
+                c_ref_p = ET.SubElement(c_in_p, "connection")
+                c_ref_p.set("refLocalId", str(extra_param_sources[p_name]))
+            elif p_name in unconnected_sources:
+                var_p = ET.SubElement(in_vars, "variable")
+                var_p.set("formalParameter", p_name)
+                c_in_p = ET.SubElement(var_p, "connectionPointIn")
+                c_ref_p = ET.SubElement(c_in_p, "connection")
+                c_ref_p.set("refLocalId", str(unconnected_sources[p_name]))
 
         ET.SubElement(block, "inOutVariables")
 
@@ -453,9 +493,12 @@ def build_ld_body(
                 if p_val is None:
                     continue
                 formal_type = instance_input_types.get(inst_name, {}).get(p_name)
+                # REX 2026-08-04 (oracle PRG_Oracle_Nested.xml) : une variable BOOL
+                # qualifiee (ex. PRG_07_Supervision.FaultMachineReset_IHM) doit etre un
+                # CONTACT, pas un inVariable avec expression. Le filtre PRG_ precedent
+                # causait IndexOutOfRangeException (inVariable avec nom qualifie).
                 direct_identifier = (
                     p_val is not None
-                    and not p_val.startswith("PRG_")
                     and re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", p_val)
                 )
                 if p_val == "TRUE" or p_val == "FALSE" or formal_type != "BOOL" or not direct_identifier:
@@ -498,6 +541,7 @@ def build_ld_body(
             block.set("localId", str(block_id))
             block.set("typeName", instance_type)
             block.set("instanceName", inst_name)
+            instance_block_map[inst_name] = block_id
             ET.SubElement(block, "position", x="0", y="0")
 
             in_vars = ET.SubElement(block, "inputVariables")
@@ -512,11 +556,44 @@ def build_ld_body(
 
             ET.SubElement(block, "inOutVariables")
             out_vars = ET.SubElement(block, "outputVariables")
-            if instance_type == "FB_Output":
+            # Émettre TOUS les outputs déclarés du FB (alignement sur l'oracle CODESYS
+            # PRG_TestSafety_LD.xml). Une balise <outputVariables/> vide provoque une
+            # IndexOutOfRangeException à l'import CODESYS pour les FB composites.
+            # REX 2026-08-04 (régression commit af5566a).
+            #
+            # IMPORTANT — forme de <connectionPointOut> (oracle PRG_TestSafety_LD.xml) :
+            #   - Le **premier output** DOIT être en forme "câblée" <connectionPointOut/>
+            #     (SANS <expression/>), même si aucune coil n'est connectée. C'est la
+            #     convention CODESYS pour le "principal" output du bloc.
+            #   - Les autres outputs sont en forme "non-câblée"
+            #     <connectionPointOut><expression/></connectionPointOut>.
+            # Si TOUS les outputs sont en forme non-câblée, CODESYS lève
+            # IndexOutOfRangeException à l'import (REX 2026-08-04, bundles D/E/F/G/H).
+            # REX 2026-08-04 (oracle PRG_Oracle_Nested.xml) : assignations dans outputVariables
+            outputs = instance_output_types.get(inst_name, [])
+            out_assigns = fb_output_assignments.get(inst_name, {})
+            # Targets supplementaires (doublons) -> coils connectees au bloc
+            extra_out_targets: list[tuple[str, str]] = []
+            for idx, out_p in enumerate(outputs):
+                var_out = ET.SubElement(out_vars, "variable")
+                var_out.set("formalParameter", out_p)
+                c_out = ET.SubElement(var_out, "connectionPointOut")
+                if idx == 0:
+                    pass  # Premier output : forme cablee (pas d expression)
+                else:
+                    expr = ET.SubElement(c_out, "expression")
+                    if out_p in out_assigns:
+                        targets = out_assigns[out_p]
+                        expr.text = targets[0]  # Premier target dans le bloc
+                        # Targets supplementaires -> coils connectees au bloc
+                        for t in targets[1:]:
+                            extra_out_targets.append((out_p, t))
+            if not list(out_vars):
+                # FB sans output déclaré connu : on conserve au moins State en forme
+                # câblée (convention CODESYS pour le premier output).
                 var_out = ET.SubElement(out_vars, "variable")
                 var_out.set("formalParameter", "State")
                 ET.SubElement(var_out, "connectionPointOut")
-
 
             b_adddata = ET.SubElement(block, "addData")
             d_b = ET.SubElement(b_adddata, "data")
@@ -525,6 +602,26 @@ def build_ld_body(
             call_type = ET.SubElement(d_b, "CallType")
             call_type.set("xmlns", "")
             call_type.text = "functionblock"
+
+            # REX 2026-08-04 : coils pour les targets supplementaires (doublons d output).
+            # Oracle PRG_Oracle_Nested.xml : un output a un seul <expression> dans le bloc.
+            # Les targets supplementaires -> coils connectees au bloc avec formalParameter.
+            for out_p, target_var in extra_out_targets:
+                coil_id = local_id_counter
+                local_id_counter += 10
+                coil = ET.SubElement(ld, "coil")
+                coil.set("localId", str(coil_id))
+                coil.set("negated", "false")
+                coil.set("storage", "none")
+                ET.SubElement(coil, "position", x="0", y="0")
+                coil_in = ET.SubElement(coil, "connectionPointIn")
+                conn = ET.SubElement(coil_in, "connection")
+                conn.set("refLocalId", str(block_id))
+                conn.set("formalParameter", out_p)
+                ET.SubElement(coil, "connectionPointOut")
+                coil_variable = ET.SubElement(coil, "variable")
+                coil_variable.text = target_var
+
             continue
 
         # Expression AND
@@ -618,7 +715,62 @@ def build_ld_body(
             source_expression = parts[1].strip()
             direct_identifier = re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", source_expression)
 
+            # REX 2026-08-04 (PRG_06_Outputs_LD) : recopie BOOL d'un output de FB
+            # (ex. DummyReady := instSafety.Ready). La source pointée n'est pas dans
+            # boolean_identifiers (noms simples) → elle tombait dans le fallback
+            # inVariable → outVariable, qui provoque IndexOutOfRangeException à
+            # l'import CODESYS. On résout le type de l'output du FB via
+            # instance_output_type_map : si BOOL → contact → coil.
+            if (
+                direct_identifier
+                and not source_expression.startswith("PRG_")
+                and source_expression not in boolean_identifiers
+                and "." in source_expression
+            ):
+                inst_name, member_name = source_expression.split(".", 1)
+                # REX 2026-08-04 : les chemins nested (ex. instSafety.Diag.LockoutActive)
+                # ont plus d un point et ne peuvent pas etre des contacts LD valides.
+                # Seuls les outputs DIRECTS (ex. instSafety.Ready) peuvent etre des contacts.
+                if "." not in member_name:
+                    member_type = instance_output_type_map.get(inst_name, {}).get(member_name)
+                    if member_type == "BOOL":
+                        boolean_identifiers.add(source_expression)
+
             if direct_identifier and not source_expression.startswith("PRG_") and source_expression in boolean_identifiers:
+                # REX 2026-08-04 : si la source est un output d un bloc FB connu
+                # (ex. instSafety.MaintainA_RQ), on cable la coil DIRECTEMENT au bloc
+                # (refLocalId=block_id, formalParameter=member) au lieu de creer un
+                # contact fantome cable au rail gauche qui provoque IndexOutOfRangeException.
+                inst_name, _, member_name = source_expression.partition(".")
+                # REX 2026-08-04 : formalParameter ne peut pas contenir de point.
+                # Pour un output DIRECT (ex. MaintainA_RQ) -> coil cablee au bloc.
+                # Pour un membre de struct (ex. Diag.LockoutActive) -> le chemin nested
+                # n est pas un formalParameter valide -> fallback inVariable/outVariable.
+                is_direct_output = (
+                    inst_name in instance_block_map
+                    and member_name in instance_output_type_map.get(inst_name, {})
+                    and "." not in member_name
+                )
+                if is_direct_output:
+                    block_local_id = instance_block_map[inst_name]
+                    coil_id = local_id_counter
+                    local_id_counter += 10
+
+                    coil = ET.SubElement(ld, "coil")
+                    coil.set("localId", str(coil_id))
+                    coil.set("negated", "false")
+                    coil.set("storage", "none")
+                    ET.SubElement(coil, "position", x="0", y="0")
+                    coil_in = ET.SubElement(coil, "connectionPointIn")
+                    conn = ET.SubElement(coil_in, "connection")
+                    conn.set("refLocalId", str(block_local_id))
+                    conn.set("formalParameter", member_name)
+                    ET.SubElement(coil, "connectionPointOut")
+                    coil_variable = ET.SubElement(coil, "variable")
+                    coil_variable.text = target_var
+                    continue
+
+                # Sinon fallback : contact -> coil (variable BOOL simple)
                 contact_id = local_id_counter
                 coil_id = local_id_counter + 1
                 local_id_counter += 10

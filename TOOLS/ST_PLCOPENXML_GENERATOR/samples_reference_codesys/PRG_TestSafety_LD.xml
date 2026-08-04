@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-04T02:31:11.4754349" />
+  <contentHeader name="v0.5.4_.project" modificationDateTime="2026-08-04T02:30:39.8474785">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.5.4_</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="PRG_TestSafety_LD" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="instFB_Safety_EmergencyManagement_0">
+              <type>
+                <derived name="FB_Safety_EmergencyManagement" />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <LD>
+            <leftPowerRail localId="0">
+              <position x="0" y="0" />
+              <connectionPointOut formalParameter="none" />
+            </leftPowerRail>
+            <comment localId="1" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="2">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="4" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1M2_TopPositionFree_DI</variable>
+            </contact>
+            <contact localId="5" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M3_BrakeIsOpen_DI</variable>
+            </contact>
+            <contact localId="6" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2_BrakeIsOpen_DI</variable>
+            </contact>
+            <inVariable localId="7">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression />
+            </inVariable>
+            <inVariable localId="8">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression />
+            </inVariable>
+            <inVariable localId="9">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression />
+            </inVariable>
+            <inVariable localId="10">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression />
+            </inVariable>
+            <block localId="3" typeName="FB_Safety_EmergencyManagement" instanceName="instFB_Safety_EmergencyManagement_0">
+              <position x="0" y="0" />
+              <inputVariables>
+                <variable formalParameter="Enable">
+                  <connectionPointIn>
+                    <connection refLocalId="4" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="Reset">
+                  <connectionPointIn>
+                    <connection refLocalId="5" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="ArmRequest">
+                  <connectionPointIn>
+                    <connection refLocalId="6" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="EmergencyChainClosed">
+                  <connectionPointIn>
+                    <connection refLocalId="7" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PowerContactorEngaged">
+                  <connectionPointIn>
+                    <connection refLocalId="8" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="PowerCutOffRequest">
+                  <connectionPointIn>
+                    <connection refLocalId="9" />
+                  </connectionPointIn>
+                </variable>
+                <variable formalParameter="BtnEmergencyCutOff">
+                  <connectionPointIn>
+                    <connection refLocalId="10" />
+                  </connectionPointIn>
+                </variable>
+              </inputVariables>
+              <inOutVariables />
+              <outputVariables>
+                <variable formalParameter="Ready">
+                  <connectionPointOut />
+                </variable>
+                <variable formalParameter="Busy">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="Done">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="Error">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ErrorId">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="MaintainA_RQ">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="MaintainB_RQ">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ArmPulse_RQ">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="State">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="Diag">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="ArmingSeqStep">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="RedundancyTestFailed">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="EmergencyArmingFailed">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="EmergencyArmingLockoutActive">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+              </outputVariables>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+                  <CallType xmlns="">functionblock</CallType>
+                </data>
+              </addData>
+            </block>
+            <rightPowerRail localId="2147483646">
+              <position x="0" y="0" />
+              <connectionPointIn />
+            </rightPowerRail>
+          </LD>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8f405125-2dd9-41e0-850a-3dc7668f8c3b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="tmp_isolation">
+          <Object Name="PRG_TestSafety_LD" ObjectId="8f405125-2dd9-41e0-850a-3dc7668f8c3b" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

@@ -65,6 +65,16 @@ def main() -> int:
         if not generated.is_file():
             print("ERROR: deterministic bundle was not generated", file=sys.stderr)
             return 2
+
+        # Post-traitement oracle : appliquer sur le bundle temporaire aussi
+        # pour que la comparaison soit coherente (REX 2026-08-04)
+        oracle_script = generator_dir / "scripts" / "prg06_oracle_postprocess.py"
+        if oracle_script.is_file():
+            subprocess.run(
+                [sys.executable, str(oracle_script), str(generated)],
+                cwd=generator_dir, capture_output=True, text=True,
+            )
+
         if generated.read_bytes() != bundle.read_bytes():
             print("FAIL: CODE/CODE_Bundle.xml is stale")
             return 1

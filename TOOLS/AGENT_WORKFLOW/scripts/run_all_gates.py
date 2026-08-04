@@ -65,6 +65,7 @@ def main() -> int:
         ("GATE 3: Persistance config",                 [sys.executable, f"{S}/check_config_persistence.py", "."]),
         ("GATE 4: Fraicheur bundle",                   [sys.executable, f"{S}/check_bundle_freshness.py", "."]),
         ("GATE 4bis: Syntaxe ST du bundle (no terminator)", [sys.executable, f"{S}/check_bundle_st_syntax.py", "."]),
+        ("GATE 4ter: Invariants LD PRG_06 (REX 2026-08-04)", [sys.executable, f"{S}/check_ld_invariants.py", "."]),
         ("GATE 5: PyTest",                             [str(py313), "-m", "pytest",
                                                         "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
                                                         "TOOLS/AGENT_WORKFLOW/tests", "-q"]),

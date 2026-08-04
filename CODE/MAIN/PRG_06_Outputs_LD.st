@@ -122,9 +122,9 @@ PowerKeepAlive_B_RQ := instSafetyEmergencyManagement.MaintainB_RQ;
 EmergencyArming_RQ := instSafetyEmergencyManagement.ArmPulse_RQ;
 
 EmergencyArmingPulseActive := instSafetyEmergencyManagement.ArmPulse_RQ;
-EmergencyArmingLockoutActive := instSafetyEmergencyManagement.Diag.LockoutActive;
-ArmingSeqStep := instSafetyEmergencyManagement.State.Step;
-RedundancyTestFailed := instSafetyEmergencyManagement.Diag.RedundancyTestFailed;
-EmergencyArmingFailed := instSafetyEmergencyManagement.Diag.ArmFailed;
+EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
+ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
+RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;
+EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;
 
 END_PROGRAM

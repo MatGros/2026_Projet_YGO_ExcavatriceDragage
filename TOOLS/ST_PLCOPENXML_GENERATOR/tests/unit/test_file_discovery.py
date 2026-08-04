@@ -82,6 +82,31 @@ def test_standalone_ld_export_is_a_blocking_error(tmp_path):
     assert any("standalone LD export" in e for e in errors)
 
 
+def test_bundle_prefixed_xml_is_excluded(tmp_path):
+    """Un XML de test nommé Bundle_HB_*.xml (artefact de dichotomie, REX 2026-08)
+    ne doit JAMAIS être découvert comme POU XML natif : il contient un POU
+    FB_Safety_EmergencyManagement homonyme qui écraserait le vrai FB dans
+    objects_by_name → outputVariables vide → IndexOutOfRangeException CODESYS
+    à l'import (PRG_06_Outputs_LD, REX 2026-08-04)."""
+    _write(
+        tmp_path / "Bundle_HB_ArmSeqStep.xml",
+        '<project><pou name="FB_Safety_EmergencyManagement" pouType="functionBlock">'
+        '<interface /></pou></project>',
+    )
+    _write(
+        tmp_path / "FB_Safety_EmergencyManagement.st",
+        "FUNCTION_BLOCK FB_Safety_EmergencyManagement\nVAR_OUTPUT\n    Ready : BOOL;\nEND_VAR\n",
+    )
+
+    diag = DiagnosticCollector()
+    objects = discover_objects(tmp_path, diag)
+
+    # Le vrai FB .st est découvert ; le XML Bundle_* ne doit PAS générer de POU homonyme.
+    assert [o.name for o in objects] == ["FB_Safety_EmergencyManagement"]
+    assert objects[0].output_vars  # 1 output réel (Ready)
+    assert not diag.has_errors()
+
+
 def test_real_code_dir_dynamic_count_relationship():
     """CODE/ isn't a fixed number we hardcode here: recompute it from disk so
     this stays meaningful as files are added/removed.
@@ -90,7 +115,16 @@ def test_real_code_dir_dynamic_count_relationship():
     à côté de son .st (REX 2026-08) — un tel artefact serait une ERREUR, pas
     un POU à compter."""
     all_st_files = sorted(CODE_DIR.rglob("*.st"))
-    all_native_xml = [f for f in CODE_DIR.rglob("*.xml") if f.name != "CODE_Bundle.xml"]
+    # Même filtre que discover_objects : CODE_Bundle.xml et les artefacts
+    # Bundle_* (dichotomie REX 2026-08) ne comptent pas comme POU natifs.
+    all_native_xml = [
+        f
+        for f in CODE_DIR.rglob("*.xml")
+        if f.name != "CODE_Bundle.xml"
+        and "_Bundle" not in f.name
+        and not f.name.startswith("CODE_")
+        and not f.name.startswith("Bundle_")
+    ]
     decl_impl_files = [file for file in all_st_files if file.name.endswith("_Decl.st") or file.name.endswith("_Impl.st")]
 
     diag = DiagnosticCollector()
