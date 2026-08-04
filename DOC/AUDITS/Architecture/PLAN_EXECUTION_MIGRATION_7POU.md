@@ -157,7 +157,7 @@ configuration ou interlock. C'est le critère d'acceptation principal.
 
 ### M7 — Renumérotation *(C3, patch)*
 
-Renommage fichiers + POU vers `PRG_01_Inputs_LD` … `PRG_07_Supervision_CFC`.
+Renommage fichiers + POU vers `PRG_01_Inputs_LD` … `PRG_07_Supervision`.
 Contrainte structurelle : nom de fichier = nom de POU, suffixe = langage généré dans le bundle.
 
 **Précondition bloquante :** zéro cycle inter-programme prouvé.

@@ -3,7 +3,7 @@
 > Rôle : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, benne, barrière finale.
 > **Détail technique par FB** : voir les 9 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
-> Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_TREUILS_CFC.st` et `PRG_SAFETY_CFC.st` (tous deux ST actuels), `PRG_OUTPUTS_LD.st` (Ladder généré). Cible de migration CFC native : **une seule page** `PRG_04_Treuils_Benne_CFC.xml` — elle absorbe la partie M1/M2/benne de `PRG_SAFETY_CFC` (safety câblée en parallèle visible sur la même page). Aucune page safety séparée n'est une cible.
+> Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_TREUILS_CFC.st` et `PRG_SAFETY_CFC.st` (tous deux ST actuels), `PRG_OUTPUTS_LD.st` (Ladder généré). Cible de migration CFC native : **une seule page** `PRG_04_Treuils_Benne.xml` — elle absorbe la partie M1/M2/benne de `PRG_SAFETY_CFC` (safety câblée en parallèle visible sur la même page). Aucune page safety séparée n'est une cible.
 > 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
@@ -81,7 +81,7 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 
 | DUT | Producteur | Consommateur |
 |---|---|---|
-| `ST_WinchFinalInterlockRequest` | `PRG_TREUILS_CFC.st` actuel ; cible `PRG_04_Treuils_Benne_CFC.xml` absente | `PRG_OUTPUTS_LD.st` actuel ; cible `PRG_06_Outputs_LD` |
+| `ST_WinchFinalInterlockRequest` | `PRG_TREUILS_CFC.st` actuel ; cible `PRG_04_Treuils_Benne.xml` absente | `PRG_OUTPUTS_LD.st` actuel ; cible `PRG_06_Outputs_LD` |
 | `ST_SpeedStepTable` | config IHM/RETAIN | `FB_Winch`/`FB_SpeedStep` |
 | `ST_SafetyWinch` | `Supervision` (agrège) | IHM |
 | `ST_BypassWinch` | IHM RETAIN | `FB_Safety_Winch` |
@@ -111,13 +111,13 @@ Outputs Ladder (`PRG_OUTPUTS_LD.st`)      instWinchOutputInterlockM1/M2_LD (Q fi
 **Dépendances** : Joystick (`AxisCmdY`, `DeadmanArmed`), Modes (`JoystickWinchSelectArbitrated`,
 `InhibitM1/M2`, `SyncEnable`), Encodeurs (`CablePosM`, `Homed`, vitesse), Cycle (SEMI_AUTO).
 
-### 4.2 Cible — `PRG_04_Treuils_Benne_CFC` (rang 04 de la `MainTask`)
+### 4.2 Cible — `PRG_04_Treuils_Benne` (rang 04 de la `MainTask`)
 
 Découpage **par ensemble mécanique**. M1 (retenue) et M2 (benne) sont indissociables : la benne
 est suspendue entre les deux, et l'ouverture, la fermeture, la synchro et le câble mou dépendent
 de leur **combinaison**. Une seule page les porte, avec leur safety.
 
-| Ce qui migre dans `PRG_04_Treuils_Benne_CFC` | Provenance actuelle |
+| Ce qui migre dans `PRG_04_Treuils_Benne` | Provenance actuelle |
 |---|---|
 | Arbitrages M1/M2, benne, synchro, assistants plongée/extraction | `PRG_TREUILS_CFC` |
 | `instSafetyWinchM1/M2`, `instSpeedMonitorM1/M2`, `instLoadEstimatorM1/M2` | partie M1/M2/benne de `PRG_SAFETY_CFC` |
@@ -204,7 +204,7 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 
 **Objectif** : Identifier passivement si un décalage entre les deux treuils (M1 et M2) provient d'un retard d'automatisme/contacteur ou d'un problème mécanique/frein.
 
-**Métriques mesurées passivement (exécuté dans le ST actuel `PRG_TROUBLESHOOTING_CFC.st`, cible `PRG_07_Supervision_CFC` qui absorbe le troubleshooting en lecture seule stricte)** :
+**Métriques mesurées passivement (exécuté dans le ST actuel `PRG_TROUBLESHOOTING_CFC.st`, cible `PRG_07_Supervision` qui absorbe le troubleshooting en lecture seule stricte)** :
 - `DeltaStartDelay_Ms` : Écart de temps au démarrage des mouvements M1/M2.
 - `DeltaBrakeReleaseTime_Ms` & `DeltaBrakeApplyTime_Ms` : Écart de temps d'ouverture/fermeture effective des freins.
 - `DeltaStopTime_Ms` & `DeltaStopDistance_Mm` : Écart de temps et de distance parcourue lors de la phase d'arrêt.
@@ -230,4 +230,4 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 | AF06 | E/S physiques treuils |
 | AF09 | Codeurs — Homed, position, vitesse |
 | PLAN_TASK | Lot 4 (T87/T91/T93/T94/T95/T96) — décision non prise, étude terrain requise |
-| Code | `CODE/TREUILS/*.st`, `CODE/MAIN/PRG_04_Treuils_Benne.st` (ST actuel) ; cible `PRG_04_Treuils_Benne_CFC.xml` absente |
+| Code | `CODE/TREUILS/*.st`, `CODE/MAIN/PRG_04_Treuils_Benne.st` (ST actuel) ; cible `PRG_04_Treuils_Benne.xml` absente |

@@ -36,13 +36,13 @@ du procédé voit sur le même schéma : consigne → surveillance safety → co
 
 | Rang | POU cible | Contenu |
 |---|---|---|
-| 01 | `PRG_01_Inputs_LD` | Image qualifiée des E/S TOR. Lecture seule. |
-| 02 | `PRG_02_Acquisition_CFC` | Sélection réel/simulé, chaîne codeurs complète M1/M2/M3, joystick, diagnostics devices/bus, retours auxiliaires, **état AU qualifié**. |
-| 03 | `PRG_03_Modes_Cycle_CFC` | Modes, droits, autorisations, séquenceur `FB_Cycle`. |
-| 04 | `PRG_04_Treuils_Benne_CFC` | M1 + M2 + synchro + benne + assistants, **safety M1/M2 intégrée**. |
-| 05 | `PRG_05_Translation_CFC` | M3 + positionnement, **safety M3 intégrée**. |
+| 01 | `PRG_02_Acquisition` | Acquisition unique `HwReal`/`HwRealQualified`/`HwSim`/`HwIn`, chaîne codeurs complète M1/M2/M3, joystick, diagnostics devices/bus, retours auxiliaires, **état AU qualifié**. |
+| — | `PRG_01_Inputs_LD` | Couche historique retirée après remappage ; aucune nouvelle liaison. |
+| 03 | `PRG_03_Modes_Cycle` | Modes, droits, autorisations, séquenceur `FB_Cycle`. |
+| 04 | `PRG_04_Treuils_Benne` | M1 + M2 + synchro + benne + assistants, **safety M1/M2 intégrée**. |
+| 05 | `PRG_05_Translation` | M3 + positionnement, **safety M3 intégrée**. |
 | 06 | `PRG_06_Outputs_LD` | Barrières finales, sorties physiques, **agrégation `PowerCutOff`**, réarmement. |
-| 07 | `PRG_07_Supervision_CFC` | IHM, troubleshooting, bypass. Lecture seule stricte. |
+| 07 | `PRG_07_Supervision` | IHM, troubleshooting, bypass. Lecture seule stricte. |
 
 ### Pourquoi M1 et M2 ne sont pas dissociables
 
@@ -78,9 +78,9 @@ sorties, réalise l'agrégation finale et coupe.
 Une interdiction est portée par le procédé qui la **subit**, pas par les Modes.
 
 > Exemple : interdire la translation lorsque la benne est en position basse est une règle de
-> `PRG_05_Translation_CFC`, car c'est M3 qui est interdit.
+> `PRG_05_Translation`, car c'est M3 qui est interdit.
 
-Rôle des Modes clarifié : `PRG_03_Modes_Cycle_CFC` **distribue des autorisations**. Il ne porte
+Rôle des Modes clarifié : `PRG_03_Modes_Cycle` **distribue des autorisations**. Il ne porte
 pas la responsabilité des interdictions métier. Les commandes métier reçoivent l'autorisation
 ou non, et décident localement.
 
@@ -88,7 +88,7 @@ ou non, et décident localement.
 
 **Décision : option A.**
 
-L'état AU est un **fait d'entrée qualifié**, acquis dans `PRG_02_Acquisition_CFC` avec les autres
+L'état AU est un **fait d'entrée qualifié**, acquis dans `PRG_02_Acquisition` avec les autres
 entrées. Motif : visibilité immédiate pour la maintenance.
 
 ⚠️ Cela ne change rien à son action : le FB de gestion AU agit sur les sorties via la barrière

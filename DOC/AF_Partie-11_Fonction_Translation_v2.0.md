@@ -5,7 +5,7 @@
 > **Détail technique par FB** : voir les 4 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme — il ne recopie pas les interfaces/`TC-` des fiches.
 > Source code : `CODE/TRANSLATION/*.st` · instances dans `PRG_TRANSLATION_CFC.st`, `PRG_SAFETY_CFC.st`, `PRG_OUTPUTS_LD.st` (ST/Ladder actuels).
-> Cible de migration CFC native : **une seule page** `PRG_05_Translation_CFC.xml` — elle absorbe la partie M3 de `PRG_SAFETY_CFC`. Aucune page safety séparée n'est une cible.
+> Cible de migration CFC native : **une seule page** `PRG_05_Translation.xml` — elle absorbe la partie M3 de `PRG_SAFETY_CFC`. Aucune page safety séparée n'est une cible.
 > 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Translation_Extraction_Code_v1.0.md`.
 > v1.13 archivée : `ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v1.13.md`.
@@ -79,9 +79,9 @@ Frein à manque de courant. Sécurité par Méca A/B + butées extrêmes + incoh
 | `ST_HwTranslation` | `Acquisition (CFC)` | `Acquisition` (HwIn) |
 | `E_TranslationFinalInterlockReason` | `FB_TranslationOutputInterlock_LD` | IHM, Supervision (troubleshooting absorbé) |
 
-📌 Correspondance des POU : `Acquisition` → `PRG_02_Acquisition_CFC` · `Safety` M3 + `Translation`
-→ `PRG_05_Translation_CFC` · `Outputs` → `PRG_06_Outputs_LD` · `Supervision`/`Troubleshooting`
-→ `PRG_07_Supervision_CFC`.
+📌 Correspondance des POU : `Acquisition` → `PRG_02_Acquisition` · `Safety` M3 + `Translation`
+→ `PRG_05_Translation` · `Outputs` → `PRG_06_Outputs_LD` · `Supervision`/`Troubleshooting`
+→ `PRG_07_Supervision`.
 
 ---
 
@@ -97,12 +97,12 @@ Translation  instTranslationM3 → publie TranslationFinalInterlockRequest
 Outputs      instTranslationOutputInterlock_LD (Q finales PDO + frein)
 ```
 
-### 4.2 Cible — `PRG_05_Translation_CFC` (rang 05 de la `MainTask`)
+### 4.2 Cible — `PRG_05_Translation` (rang 05 de la `MainTask`)
 
 ```text
-02 PRG_02_Acquisition_CFC   instPositionDecoder (5 capteurs), instJoystick (AxisCmdX, DeadmanArmed)
-03 PRG_03_Modes_Cycle_CFC   MaintenanceM3TargetEnable (MAINT_N2), CmdTranslationM3_Start/Target (SEMI_AUTO)
-05 PRG_05_Translation_CFC   instSafetyTranslationM3 câblé EN PARALLÈLE VISIBLE de instTranslationM3
+02 PRG_02_Acquisition   instPositionDecoder (5 capteurs), instJoystick (AxisCmdX, DeadmanArmed)
+03 PRG_03_Modes_Cycle   MaintenanceM3TargetEnable (MAINT_N2), CmdTranslationM3_Start/Target (SEMI_AUTO)
+05 PRG_05_Translation   instSafetyTranslationM3 câblé EN PARALLÈLE VISIBLE de instTranslationM3
                             → publie TranslationFinalInterlockRequest + sa demande PowerCutOff M3
 06 PRG_06_Outputs_LD        instTranslationOutputInterlock_LD (Q finales PDO + frein), agrégation PowerCutOff
 ```

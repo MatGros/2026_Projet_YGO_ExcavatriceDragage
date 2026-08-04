@@ -4,7 +4,7 @@
 > Les FB diag publient des faits (`Online`, `Operational`, `State`, `ErrorId`).
 > Les FB Safety aval **décident** d'agir (SafeStop) — aucun FB diag ne coupe directement.
 > Source code : `CODE/DIAG/*.st` · instances dans `PRG_01_Diagnostics` et `PRG_TROUBLESHOOTING_CFC` (ST actuels).
-> Cible : les diagnostics devices/bus rejoignent `PRG_02_Acquisition_CFC`, les observateurs passifs rejoignent `PRG_07_Supervision_CFC` — voir §5.
+> Cible : les diagnostics devices/bus rejoignent `PRG_02_Acquisition`, les observateurs passifs rejoignent `PRG_07_Supervision` — voir §5.
 > Détail par FB : voir les fiches dédiées (§1).
 > 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 
@@ -102,10 +102,10 @@ observateur passif est de l'observation, donc il appartient a la supervision.
 
 | POU cible | Instances | Rôle |
 |---|---|---|
-| `PRG_02_Acquisition_CFC` | `instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat` | Acquisition brutes + appel FB diag bus/comm, **au meme endroit que le joystick et les codeurs qu'ils surveillent** |
-| `PRG_04_Treuils_Benne_CFC` | (consommateur) | `FB_Safety_Winch` M1/M2 y est instancie : il consomme directement `JoystickOnline/Operational` et `HeartbeatIhmOk` |
-| `PRG_05_Translation_CFC` | (consommateur) | `FB_Safety_Translation` y est instancie : il consomme `DriveOnline/Operational` et `HeartbeatIhmOk` |
-| `PRG_07_Supervision_CFC` | `instPreflight`, `instWinchSymmetry` + (consommateur) | Observateurs passifs et publication IHM. Lecture seule stricte : n'ecrit ni commande, ni configuration, ni interlock |
+| `PRG_02_Acquisition` | `instDiagCanOpen`, `instDiagEthercat`, `instIhmHeartbeat` | Acquisition brutes + appel FB diag bus/comm, **au meme endroit que le joystick et les codeurs qu'ils surveillent** |
+| `PRG_04_Treuils_Benne` | (consommateur) | `FB_Safety_Winch` M1/M2 y est instancie : il consomme directement `JoystickOnline/Operational` et `HeartbeatIhmOk` |
+| `PRG_05_Translation` | (consommateur) | `FB_Safety_Translation` y est instancie : il consomme `DriveOnline/Operational` et `HeartbeatIhmOk` |
+| `PRG_07_Supervision` | `instPreflight`, `instWinchSymmetry` + (consommateur) | Observateurs passifs et publication IHM. Lecture seule stricte : n'ecrit ni commande, ni configuration, ni interlock |
 
 ⚠️ **Aucune semantique diagnostic ne change** : les bits `ErrorId` du §6, les etats `E_Diag_State`,
 les seuils et les consommateurs restent identiques. Seule **l'affectation POU** change.
