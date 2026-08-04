@@ -9,8 +9,8 @@ spécifications actives et les tests du projet.
 
 - `DOC/CODE_QUALITY_STANDARDS.md` (déclaration, liaison, POO — référentiel propriétaire)
 - `DOC/NAMING_CONVENTION.md`
-- `DOC/AF_Partie-03_Contrats_Composants_v2.0.md`
-- `DOC/AF_Partie-02_Architecture_Programme_v3.0.md`
+- `DOC/AF_Partie-03_Contrats_Composants_v2.1.md`
+- `DOC/AF_Partie-02_Architecture_Programme_v3.1.md`
 - la spécification métier active concernée
 - les tests et le code des appelants impactés
 

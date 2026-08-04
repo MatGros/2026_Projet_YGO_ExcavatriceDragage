@@ -4,7 +4,7 @@
 > **Détail technique par FB** : voir les 9 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
 > Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_TREUILS_CFC.st` et `PRG_SAFETY_CFC.st` (tous deux ST actuels), `PRG_OUTPUTS_LD.st` (Ladder généré). Cible de migration CFC native : **une seule page** `PRG_04_Treuils_Benne_CFC.xml` — elle absorbe la partie M1/M2/benne de `PRG_SAFETY_CFC` (safety câblée en parallèle visible sur la même page). Aucune page safety séparée n'est une cible.
-> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2 et §4.
+> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
 

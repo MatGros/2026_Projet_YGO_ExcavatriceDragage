@@ -2,7 +2,7 @@
    🎚️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
-                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.1.md
    🔌 FB STANDARD : pas un FB de mouvement, pas de StartStop/SafeStop.
    🎯 Rôle : Source unique du mode arbitré + bus d'autorisations.
       - Arbitrage mode (DISABLE/N1/N2/SEMI_AUTO) + garde-fou codeur.

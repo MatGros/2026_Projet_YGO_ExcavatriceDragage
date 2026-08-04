@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📥 PRG_01_Inputs_LD — ACQUISITION & QUALIFICATION DES ENTRÉES (LADDER)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §1/§4
+   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §1/§4
    ⚙️ Exécuté par la tâche PLC en position 1 (premier programme).
    🎯 Lit les 22 TOR réelles depuis leurs symboles bruts mappés (CSV
        Device_IO_20260729.csv), applique un filtre anti-rebond 20 ms et

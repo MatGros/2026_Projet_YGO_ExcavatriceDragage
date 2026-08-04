@@ -2,7 +2,7 @@
    🕹️ FB_Joystick — Acquisition & traitement Hall (Homme-mort ISO 13850)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.1.md
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
       Pipeline par axe : FB_AxisScale → FB_Filter_PT1 → Homme-Mort → ST_Joystick_AxisCmd.
       Les rampes d'accélération/décélération sont gérées exclusivement par les

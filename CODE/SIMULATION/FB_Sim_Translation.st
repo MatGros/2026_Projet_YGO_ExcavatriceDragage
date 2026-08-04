@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
+   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.1.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
       instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
@@ -20,7 +20,7 @@
    📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
    📤 PosTremie/PosPV/PosP2/PosP1/PosMaintenance : TRUE quand la cible (ou le point de
       ralentissement PV) correspondante est atteinte — à OR'er sur le `InputRaw` du capteur
-      réel correspondant (PRG_01_Inputs_LD).
+      réel correspondant (`PRG_02_Acquisition.HwIn`).
    ⏱️ Changement de cible (`TargetNum`) → trajet remis à zéro (redémarre du début).
       Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
    ═══════════════════════════════════════════════════════════════ *)

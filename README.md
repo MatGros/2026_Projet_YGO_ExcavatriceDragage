@@ -18,8 +18,8 @@ Point d'entrée agents (guardrails, workflow, délégation) : **[AGENTS.md](AGEN
 |---|---|
 | Nommage (PascalCase, préfixes, unités, polarité) | [DOC/NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) |
 | Déclaration, liaison, POO, non-régression | [DOC/CODE_QUALITY_STANDARDS.md](DOC/CODE_QUALITY_STANDARDS.md) |
-| Architecture programme (CFC, Ladder, tâches) | [DOC/AF_Partie-02_Architecture_Programme_v3.0.md](DOC/AF_Partie-02_Architecture_Programme_v3.0.md) |
-| Contrats FB, DUT et CFC | [DOC/AF_Partie-03_Contrats_Composants_v2.0.md](DOC/AF_Partie-03_Contrats_Composants_v2.0.md) |
+| Architecture programme (CFC, Ladder, tâches) | [ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md](ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md) |
+| Contrats FB, DUT et CFC | [ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md](ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md) |
 | Fonctions métier (une par FB, 08+) | Joystick · Encoder/Homing · Treuils (Benne incluse) · Translation · Simulation · Troubleshooting — voir [DOC/README.md](DOC/README.md) |
 | Pilotage projet (tâches, reliquats, TBD) | [DOC/PLAN_TASK_v1.0.md](DOC/PLAN_TASK_v1.0.md) |
 
@@ -114,7 +114,7 @@ restitution bloquante).
 |---------|-----------|
 | **Nommage** | Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) d'abord — aucun hongrois, PascalCase strict |
 | **Tâches** | EtherCAT 4 ms → CAN 20 ms → Main 10 ms ; surveillance périodicité = fonction système CODESYS (200 ms) |
-| **FB Standard** | Tous les FB métier respectent le contrat [AF_Partie-03](DOC/AF_Partie-03_Contrats_Composants_v2.0.md) (profils selon catégorie, §1bis) |
+| **FB Standard** | Tous les FB métier respectent le contrat [AF_Partie-03](ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md) (profils selon catégorie, §1bis) |
 | **Sécurité** | `Enable` > `SafeStop` (par métier, rampe rapide) > `StartStop` (rampe normale) ; AU matériel = seul arrêt brutal + `PowerCutOff` ; `Reset` = front |
 | **Cycle** | Semi-auto : `E_CycleStep` ([AF_Partie-04](DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md)) |
 

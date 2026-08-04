@@ -14,8 +14,8 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 |---|---|---|
 | 1 | [CODE_QUALITY_STANDARDS](DOC/CODE_QUALITY_STANDARDS.md) | **Déclaration, liaison, POO, non-régression** — référentiel universel |
 | 2 | [NAMING_CONVENTION](DOC/NAMING_CONVENTION.md) | Nommage (PascalCase, préfixes, unités, polarité) |
-| 3 | [AF_Partie-03](DOC/AF_Partie-03_Contrats_Composants_v2.0.md) | Contrats FB, DUT et CFC |
-| 4 | [AF_Partie-02](DOC/AF_Partie-02_Architecture_Programme_v3.0.md) | Architecture CFC, tâches et flux |
+| 3 | [AF_Partie-03](DOC/AF_Partie-03_Contrats_Composants_v2.1.md) | Contrats FB, DUT et CFC |
+| 4 | [AF_Partie-02](DOC/AF_Partie-02_Architecture_Programme_v3.1.md) | Architecture CFC, tâches et flux |
 | 5 | La spec métier concernée | `AF_Partie-08` à `-14` (une par fonction) |
 
 🚫 `ARCHIVES/` n'est **jamais** une source active.

@@ -42,13 +42,12 @@ dans sa propre page, visible à côté des blocs métier.
 
 | Rang | POU cible |
 |---|---|
-| 01 | `PRG_01_Inputs_LD` |
-| 02 | `PRG_02_Acquisition` — absorbe codéurs, diagnostics, auxiliaires, état AU (ST pur) |
-| 03 | `PRG_03_Modes_Cycle` — (ST pur) |
-| 04 | `PRG_04_Treuils_Benne` — safety M1/M2 intégrée (ST pur) |
-| 05 | `PRG_05_Translation` — safety M3 intégrée (ST pur) |
-| 06 | `PRG_06_Outputs_LD` — agrège `PowerCutOff` |
-| 07 | `PRG_07_Supervision` — absorbe le troubleshooting, lecture seule stricte (ST pur) |
+| 01 | `PRG_02_Acquisition` — acquisition unique, HwReal/HwSim/HwIn, codéurs, diagnostics, auxiliaires, état AU (ST pur) |
+| 02 | `PRG_03_Modes_Cycle` — (ST pur) |
+| 03 | `PRG_04_Treuils_Benne` — safety M1/M2 intégrée (ST pur) |
+| 04 | `PRG_05_Translation` — safety M3 intégrée (ST pur) |
+| 05 | `PRG_06_Outputs_LD` — agrège `PowerCutOff` |
+| 06 | `PRG_07_Supervision` — absorbe le troubleshooting, lecture seule stricte (ST pur) |
 
 🚫 **Vocabulaire abandonné** — ces POU n'existent pas dans la cible et ne doivent pas être
 reconstruits : `PRG_SAFETY_CFC` (ou toute page safety séparée), `PRG_01_Diagnostics`,
@@ -86,5 +85,7 @@ Les résultats d'exécution restent hors AF : scripts ST→Python, checklists si
 
 - **Une seule** version par Partie sous `DOC/` — l'ancienne part dans `../ARCHIVES/Doc/`
   (contrôlé automatiquement : `check_doc_links.py` avertit si deux versions coexistent).
+- La version v2.1 de l'acquisition décrit la cible documentaire ; le code reste en phase transitoire
+  jusqu'à validation humaine du remappage et du filtrage.
 - Jamais d'écrasement : nouvelle version = nouveau fichier `_vX.Y`.
 - Aucune fusion d'ancienne version n'est autorisée.

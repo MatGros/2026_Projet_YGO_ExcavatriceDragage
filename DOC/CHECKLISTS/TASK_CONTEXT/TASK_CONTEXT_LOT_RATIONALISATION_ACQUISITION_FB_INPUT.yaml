@@ -1,0 +1,124 @@
+# Contrat orchestrateur — rationalisation acquisition et retrait PRG_01/FB_Input
+contract:
+  task_id: LOT_RATIONALISATION_ACQUISITION_FB_INPUT
+  criticality: C3
+  strategy: rebuild
+  objective: >
+    Faire de PRG_02_Acquisition l'unique producteur qualifié de l'image des entrées,
+    supprimer les doubles chemins PRG_01/FB_Input uniquement après remappage prouvé,
+    et conserver les réactions de sécurité, polarités, simulation et diagnostics.
+  acceptance:
+    - id: AC1
+      statement: >
+        L'inventaire actif CODE/DOC/TOOLS distingue toutes les références réellement
+        consommées de PRG_01_Inputs_LD, FB_Input, ST_InputsQualified et ChannelOk.
+      verified_by: >-
+        grep -RInE --exclude-dir=ARCHIVES --exclude=Device.export
+        'FB_Input|PRG_01_Inputs_LD|ST_InputsQualified|ChannelOk' CODE DOC TOOLS
+        + tableau de remappage dans le rapport.
+    - id: AC2
+      statement: >
+        Les documents actifs décrivent une architecture unique et cohérente où
+        PRG_02_Acquisition possède HwReal/HwSim/HwIn et le diagnostic module.
+      verified_by: >-
+        grep documentaire sans référence active contradictoire à PRG_01/FB_Input,
+        contrôle manuel AF02/AF06/AF13/AF14/diagramme, versions x.1 tracées.
+    - id: AC3
+      statement: >
+        Chaque consommateur actif de PRG_01 est remappé vers une sortie PRG_02 ou
+        supprimé avec justification, sans producteur double ni lien cassé.
+      verified_by: >-
+        grep des consommateurs avant/après, check_linkage.py --report,
+        check_code_structure.py et inspection du diff.
+    - id: AC4
+      statement: >
+        La qualification retenue (polarité et filtrage) est explicitement conservée,
+        déplacée ou abandonnée avec preuve de configuration matérielle et validation humaine.
+      verified_by: >-
+        tableau de conservation, preuve de filtre matériel ou code de filtrage PRG_02,
+        revue manuelle des 22 TOR et polarités.
+    - id: AC5
+      statement: >
+        Aucun appel GetDeviceState ne subsiste dans PRG_01/LD et les trois diagnostics
+        module restent exécutés une seule fois dans PRG_02.
+      verified_by: >-
+        grep exact des appels, génération bundle et compilation CODESYS sans C0032.
+    - id: AC6
+      statement: >-
+        Les scénarios AU, freins, thermiques, limites, simulation réel/simulé,
+        SafeStop M1/M2/M3 et absence de redémarrage automatique restent couverts.
+      verified_by: >-
+        matrice de tests mise à jour, inspection manuelle CODESYS et checklist SAT.
+    - id: AC7
+      statement: >-
+        Le bundle final est frais, la liaison ne régresse pas et les gates structurels
+        passent ; les défauts préexistants sont séparés des régressions du lot.
+      verified_by: >-
+        generate_codesys_bundle.py, check_linkage.py --report, run_all_gates.py,
+        comparaison avec baseline enregistrée.
+    - id: AC8
+      statement: >-
+        Device.export n'est pas modifié et aucun commit/push supplémentaire n'est fait
+        sans validation humaine explicite après revue du diff final.
+      verified_by: git status --short -- PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+    - id: AC9
+      statement: >-
+        Tout fichier source de POU modifié conserve un nom de fichier identique au nom
+        du POU déclaré.
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
+    - id: AC10
+      statement: >-
+        Le suffixe du fichier source est égal au langage généré dans le bundle PLCopenXML.
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
+  scope:
+    allowed:
+      - DOC/AF_Partie-02_Architecture_Programme_v3.0.md
+      - DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+      - DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md
+      - DOC/AF_Partie-06_Fonction_Acquisition_Qualification_IO/
+      - DOC/AF_Partie-13_Fonction_Simulation_v2.0.md
+      - DOC/AF_Partie-14_Fonction_Troubleshooting_v1.0.md
+      - DOC/AUDITS/Architecture/DIAGRAMME_ARCHITECTURE_CFC_TARGET.md
+      - DOC/CHECKLISTS/
+      - CODE/MAIN/PRG_01_Inputs_LD.st
+      - CODE/MAIN/PRG_02_Acquisition.st
+      - CODE/COMMUN/FB_DigitalInputFilter.st
+      - CODE/MAIN/PRG_06_Outputs_LD.st
+      - CODE/MAIN/PRG_07_Supervision.st
+      - TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py
+      - TOOLS/AGENT_WORKFLOW/tests/test_input_layer_retirement.py
+      - CODE/COMMUN/FB_Input.st
+      - CODE/SUPERVISION/_TYPES/ST_InputsQualified*.st
+      - CODE/CODE_Bundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+      - toute modification de sécurité non exigée par le remappage sans alerte et validation
+  conservation:
+    must_survive:
+      - Filtrage des 22 TOR avant usage métier, porté par `FB_DigitalInputFilter` dans `PRG_02`
+      - Image brute `HwReal` conservée séparément de l'image filtrée
+      - Polarités métier et noms de signaux documentés
+      - Sélection réel/simulation par domaine via HwReal/HwSim/HwIn
+      - Diagnostic GetDeviceState des trois modules DI et InputModuleFault
+      - Chaîne AU, contacteur puissance, freins, thermiques, limites et SafeStop
+      - IHM et table de dépannage acquisition
+      - Producteur unique et ordre d'exécution MainTask
+    dropped_on_purpose:
+      - Double acquisition PRG_01/PRG_02
+      - FB_Input et ST_InputsQualified seulement après preuve d'absence de consommateurs
+      - Couche Ladder d'affichage/qualification des entrées si remappage complet
+  evidence_required:
+    - grep_inventory
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_review
+    - device_export_unchanged
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Tout problème constaté, notamment perte de filtrage, incohérence de polarité,
+    référence CODESYS non visible dans CODE, défaut safety ou ambiguïté de tâche,
+    est remonté immédiatement et ne doit jamais être masqué par une suppression.

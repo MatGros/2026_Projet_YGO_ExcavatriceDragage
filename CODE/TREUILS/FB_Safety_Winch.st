@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md,
                    DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §7
-                    (contrat : DOC/AF_Partie-03_Contrats_Composants_v2.0.md §2/§3)
+                    (contrat : DOC/AF_Partie-03_Contrats_Composants_v2.1.md §2/§3)
    🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
       un FB métier à part entière (pas une brique réduite).
    📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch
@@ -128,10 +128,10 @@ VAR_INPUT
     HeartbeatIhmOk      : BOOL;        // 💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
     EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
     EncoderFaultBypass  : BOOL;        // 🔧 Autorisation maintenance sans codeur ; effective uniquement en MAINT_N2
-    ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — TRUE = surchauffe (NOT PRG_01_Inputs_LD.M1ThermalFeedback / M2ThermalFeedback)
-    BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein COMMUN M1/M2/M3 (NC, câblé identiquement sur les 3 instances) — TRUE = surchauffe/perte (NOT PRG_01_Inputs_LD.BrakeThermalFeedback)
+    ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — source normalisée par PRG_02_Acquisition.HwIn
+    BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein commun — source normalisée par PRG_02_Acquisition.HwIn
     SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si NOT SyncEnable
-    PhaseRotationOk     : BOOL;        // PRG_01_Inputs_LD.PhaseRotationOk (commun) — TRUE = rotation phases correcte
+    PhaseRotationOk     : BOOL;        // PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI — TRUE = rotation phases correcte
     TopPositionSensor   : BOOL;        // Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte
     InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
     CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)

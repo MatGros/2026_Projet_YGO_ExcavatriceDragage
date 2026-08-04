@@ -11,7 +11,7 @@
 |---|---|
 | Comment on **nomme** | `DOC/NAMING_CONVENTION.md` |
 | Comment on **déclare, encapsule, relie** | **ce document** |
-| Contrats FB, DUT et CFC | `DOC/AF_Partie-03_Contrats_Composants_v2.0.md` |
+| Contrats FB, DUT et CFC | `DOC/AF_Partie-03_Contrats_Composants_v2.1.md` |
 | Ce que fait la machine | `DOC/` — voir `DOC/README.md` pour l'index complet |
 | Comment on exécute une modif | `.claude/skills/codesys-workflow.md` |
 
@@ -241,14 +241,17 @@ Règles obligatoires pour tout programme d'orchestration ST :
 1. **Sections structurées avec emojis** : Chaque programme ST d'orchestration doit obligatoirement découper son flux de haut en bas avec des bannières commentées explicites (ex: `// === 📥 §1 ACQUISITION ===`, `// === 🛡️ §2 SÉCURITÉ ===`, `// === 🔀 §3 ARBITRAGE ===`).
 2. **Aucune logique métier inline** : Le POU ST ne contient aucun `IF` complexe ni calcul métier — uniquement des instanciations et des appels de FB avec liaison par structures DUT publiques (`ST_*`).
 3. **Producteur unique par bus DUT** : Les échanges inter-programmes passent par des structures typées dédiées (`Auth`, `Qualified`, `Measurements`).
-4. **Conservation du Ladder Diagram (`_LD.st`)** : Les barrières d'E/S physiques TOR (`PRG_01_Inputs_LD.st` et `PRG_06_Outputs_LD.st`) restent exclusivement en Ladder Diagram (`<LD>`).
+4. **Conservation du Ladder Diagram (`_LD.st`)** : La barrière finale des sorties physiques TOR
+   (`PRG_06_Outputs_LD.st`) reste exclusivement en Ladder Diagram (`<LD>`). `PRG_01_Inputs_LD`
+   et `FB_Input` sont des composants historiques en retrait ; aucune nouvelle page Ladder d'entrée
+   ne doit être créée.
 
 ## 11. Règles de génération Ladder (`_LD.st` → `<LD>`) — REX 2026-08
 
-> 🚩 Trois bugs d'import CODESYS sur `PRG_01_Inputs_LD` ont révélé que le générateur
+> 🚩 Trois bugs d'import CODESYS sur l'ancien `PRG_01_Inputs_LD` ont révélé que le générateur
 > ST→LD (`TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`) produisait du
-> PLCopenXML invalide. Les règles ci-dessous sont **obligatoires** pour toute
-> source `_LD.st` et sont vérifiées par `test_ld_import_guard.py`.
+> PLCopenXML invalide. Les règles ci-dessous restent obligatoires pour toute
+> source `_LD.st` active, notamment `PRG_06_Outputs_LD`, et sont vérifiées par `test_ld_import_guard.py`.
 
 ### Structure d'un rung LD complet
 
@@ -265,8 +268,8 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 
 | FB | Contact principal | Sortie → coil |
 |---|---|---|
-| `FB_Input` | `InputRaw` (contact) | `.State` → coil |
 | `FB_Output` | `Command` (contact) | `.State` → coil |
+| `FB_Input` historique | Aucun nouveau câblage | Retrait contrôlé, pas de nouveau rung |
 
 - Le **contact principal** (`InputRaw` ou `Command`) est relié au
   `leftPowerRail` puis au `formalParameter` du block.
@@ -288,7 +291,7 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 
 - **`NOT var` ne produit jamais d'`inVariable`/`outVariable`** pour un signal
   BOOL. Un `inVariable` en page LD BOOL pure est un bug d'import.
-- Une page `_LD` de type BOOL pur (ex. `PRG_01_Inputs_LD`) ne doit contenir
+- Une page `_LD` de type BOOL pur (notamment `PRG_06_Outputs_LD`) ne doit contenir
   **aucun** `inVariable` ni `outVariable` — uniquement des `contact`, `coil`,
   `block` et `comment`.
 
@@ -298,8 +301,9 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 python -m pytest TOOLS/AGENT_WORKFLOW/tests/test_ld_import_guard.py -v
 ```
 
-Les 6 tests couvrent : rung FB_Input complet, contact inversé NOT, page BOOL
-pure sans inVariable/outVariable, coil reliée à .State pour chaque block.
+Les tests couvrent les rungs LD actifs, les contacts inversés, l'absence d'inVariable/outVariable
+sur les pages BOOL et la coil reliée à `.State` pour chaque block actif. `FB_Input` historique ne
+fait plus partie des nouveaux contrats LD.
 
 ## 12. Checklist de restitution (bloquante)
 

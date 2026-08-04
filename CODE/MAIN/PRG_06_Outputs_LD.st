@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📤 PRG_06_Outputs_LD — Écriture des SORTIES physiques (PROGRAMME LADDER)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §5
+   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §5
    ⚙️ Exécuté par la tâche PLC en position 6 (après PRG_05_Translation).
    📄 Converti automatiquement en Ladder Diagram (<LD>) dans CODESYS.
    ═══════════════════════════════════════════════════════════════ *)
@@ -111,8 +111,8 @@ instSafetyEmergencyManagement(
     Enable := TRUE,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     ArmRequest := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
-    EmergencyChainClosed := PRG_01_Inputs_LD.EmergencyChainClosed,
-    PowerContactorEngaged := PRG_01_Inputs_LD.PowerContactorEngaged,
+    EmergencyChainClosed := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
+    PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffRequest := PowerCutOffReq,
     BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
 );

@@ -1,19 +1,21 @@
 (* ═══════════════════════════════════════════════════════════════
    📡 PRG_02_Acquisition — Programme d'Acquisition et Qualification I/O
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2
-   ⚙️ Exécuté par MainTask en position 2 (après PRG_01_Inputs_LD).
-   🎯 Rôle unique : Produire l'image matérielle HwIn, acquérir et traiter les
-      mesures codeurs (M1/M2), décoder M3, traiter le joystick et publier les retours.
+   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2
+   ⚙️ Exécuté en tête de la chaîne métier (après les initialisations système).
+   🎯 Rôle unique : Produire les images HwReal/HwRealQualified/HwSim/HwIn,
+      acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
+      et publier les retours.
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_02_Acquisition
 
 VAR_OUTPUT
-    HwReal                   : ST_HardwareImage;  (* Image matérielle brute lue sur le terrain *)
-    HwSim                    : ST_HardwareImage;  (* Image produite par le banc de simulation *)
-    HwIn                     : ST_HardwareImage;  (* Image aiguillée réel/simulé *)
-    WinchInputSourceChanged  : BOOL;              (* Pulse 1 cycle sur bascule réel/simulé domaine Winch *)
+    HwReal                   : ST_HardwareImage;  (* Image brute réelle ; TRUE = état physique lu *)
+    HwRealQualified          : ST_HardwareImage;  (* Image réelle TOR filtrée ; TRUE = état stable *)
+    HwSim                    : ST_HardwareImage;  (* Image simulée ; TRUE = état modèle normalisé *)
+    HwIn                     : ST_HardwareImage;  (* Image utilisée ; TRUE = état logique métier *)
+    WinchInputSourceChanged  : BOOL;              (* TRUE pendant 1 cycle si source Winch change *)
 
     TranslationPosTremie      : BOOL;   (* TRUE = translation en position Trémie *)
     TranslationPosPV          : BOOL;   (* TRUE = translation en zone pré-ralentissement PV *)
@@ -21,13 +23,13 @@ VAR_OUTPUT
     TranslationPosP1          : BOOL;   (* TRUE = translation en position P1 *)
     TranslationPosMaintenance : BOOL;   (* TRUE = translation en position Maintenance *)
 
-    M3_StatusWord_Filtered        : UINT;
-    M3_ActualFrequencyHz_Filtered : UINT;
+    M3_StatusWord_Filtered        : UINT; (* WORD/UINT d'état variateur filtré *)
+    M3_ActualFrequencyHz_Filtered : UINT; (* UINT fréquence M3 filtrée, unité : 0,01 Hz *)
 
-    M3_LimitSwitchFwd          : BOOL;
-    M3_LimitSwitchRev          : BOOL;
-    M3_SensorWordIncoherent    : BOOL;
-    M3_SensorsWord             : BYTE;
+    M3_LimitSwitchFwd          : BOOL; (* TRUE = limite avant active *)
+    M3_LimitSwitchRev          : BOOL; (* TRUE = limite arrière active *)
+    M3_SensorWordIncoherent    : BOOL; (* TRUE = mot capteurs incohérent *)
+    M3_SensorsWord             : BYTE; (* BYTE mot capteurs M3 *)
 
     (* 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (§1bis).
        Granularité MODULE, pas canal : GetDeviceState() est un état de carte. *)
@@ -38,6 +40,30 @@ VAR_OUTPUT
 END_VAR
 
 VAR
+    (* ── Filtrage temporel des 22 TOR réelles ── *)
+    instFilterPowerContactor      : FB_DigitalInputFilter;
+    instFilterEmergencyChain      : FB_DigitalInputFilter;
+    instFilterPhaseRotation       : FB_DigitalInputFilter;
+    instFilterBrakeThermal        : FB_DigitalInputFilter;
+    instFilterM1Brake              : FB_DigitalInputFilter;
+    instFilterM2Brake              : FB_DigitalInputFilter;
+    instFilterM3Brake              : FB_DigitalInputFilter;
+    instFilterM1Contactors         : FB_DigitalInputFilter;
+    instFilterM1Thermal            : FB_DigitalInputFilter;
+    instFilterM2Contactors         : FB_DigitalInputFilter;
+    instFilterM2Thermal            : FB_DigitalInputFilter;
+    instFilterTensionedCable       : FB_DigitalInputFilter;
+    instFilterKobold               : FB_DigitalInputFilter;
+    instFilterM3Thermal            : FB_DigitalInputFilter;
+    instFilterTopPosition          : FB_DigitalInputFilter;
+    instFilterPosTremie            : FB_DigitalInputFilter;
+    instFilterPosPV                : FB_DigitalInputFilter;
+    instFilterPosP2                : FB_DigitalInputFilter;
+    instFilterPosP1                : FB_DigitalInputFilter;
+    instFilterPosMaintenance       : FB_DigitalInputFilter;
+    instFilterHydraulicThermal     : FB_DigitalInputFilter;
+    instFilterConveyorReady        : FB_DigitalInputFilter;
+
     (* ── Blocs complexes ── *)
     instSimBench             : FB_SimBench;
     instJoystick             : FB_Joystick;
@@ -110,6 +136,59 @@ HwReal.Machine.PhaseRotationOk_DI         := PhaseRotationOk_DI;
 HwReal.Machine.BrakeThermalOk_DI          := BrakeThermalOk_DI;
 HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
 HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
+HwReal.Machine.ConveyorInfeedReady_DI     := ConveyorInfeedReady_DI;
+
+// === 🧰 §1bis FILTRAGE TOR RÉEL ===
+// HwReal reste brut pour le diagnostic. HwRealQualified porte la même image
+// après filtrage temporel ; aucune inversion ni information de santé carte ici.
+HwRealQualified := HwReal;
+
+instFilterPowerContactor(InputRaw := HwReal.Machine.PowerContactorEngaged_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.PowerContactorEngaged_DI := instFilterPowerContactor.State;
+instFilterEmergencyChain(InputRaw := HwReal.Machine.EmergencyChainClosed_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.EmergencyChainClosed_DI := instFilterEmergencyChain.State;
+instFilterPhaseRotation(InputRaw := HwReal.Machine.PhaseRotationOk_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.PhaseRotationOk_DI := instFilterPhaseRotation.State;
+instFilterBrakeThermal(InputRaw := HwReal.Machine.BrakeThermalOk_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.BrakeThermalOk_DI := instFilterBrakeThermal.State;
+instFilterKobold(InputRaw := HwReal.Machine.M1_M2_KoboldContactFond_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.M1_M2_KoboldContactFond_DI := instFilterKobold.State;
+instFilterHydraulicThermal(InputRaw := HwReal.Machine.HydraulicThermalOk_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.HydraulicThermalOk_DI := instFilterHydraulicThermal.State;
+instFilterConveyorReady(InputRaw := HwReal.Machine.ConveyorInfeedReady_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.ConveyorInfeedReady_DI := instFilterConveyorReady.State;
+
+instFilterM1Contactors(InputRaw := HwReal.Winch.M1_ContactorsReleased_DI, FilterTime := T#20MS);
+HwRealQualified.Winch.M1_ContactorsReleased_DI := instFilterM1Contactors.State;
+instFilterM1Thermal(InputRaw := HwReal.Winch.M1_ThermalOk_DI, FilterTime := T#20MS);
+HwRealQualified.Winch.M1_ThermalOk_DI := instFilterM1Thermal.State;
+instFilterM1Brake(InputRaw := HwReal.Winch.M1_BrakeIsOpen_DI, FilterTime := T#20MS);
+HwRealQualified.Winch.M1_BrakeIsOpen_DI := instFilterM1Brake.State;
+instFilterM2Contactors(InputRaw := HwReal.Winch.M2_ContactorsReleased_DI, FilterTime := T#20MS);
+HwRealQualified.Winch.M2_ContactorsReleased_DI := instFilterM2Contactors.State;
+instFilterM2Thermal(InputRaw := HwReal.Winch.M2_ThermalOk_DI, FilterTime := T#20MS);
+HwRealQualified.Winch.M2_ThermalOk_DI := instFilterM2Thermal.State;
+instFilterM2Brake(InputRaw := HwReal.Winch.M2_BrakeIsOpen_DI, FilterTime := T#20MS);
+HwRealQualified.Winch.M2_BrakeIsOpen_DI := instFilterM2Brake.State;
+instFilterTensionedCable(InputRaw := HwReal.Winch.M2_TensionedCable_DI, FilterTime := T#20MS);
+HwRealQualified.Winch.M2_TensionedCable_DI := instFilterTensionedCable.State;
+instFilterTopPosition(InputRaw := HwReal.Winch.M1M2_TopPositionFree_DI, FilterTime := T#20MS);
+HwRealQualified.Winch.M1M2_TopPositionFree_DI := instFilterTopPosition.State;
+
+instFilterM3Brake(InputRaw := HwReal.Translation.M3_BrakeIsOpen_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_BrakeIsOpen_DI := instFilterM3Brake.State;
+instFilterM3Thermal(InputRaw := HwReal.Translation.M3_ThermalFeedback_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_ThermalFeedback_DI := instFilterM3Thermal.State;
+instFilterPosTremie(InputRaw := HwReal.Translation.M3_PosTremie_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_PosTremie_DI := instFilterPosTremie.State;
+instFilterPosPV(InputRaw := HwReal.Translation.M3_PosPV_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_PosPV_DI := instFilterPosPV.State;
+instFilterPosP2(InputRaw := HwReal.Translation.M3_PosP2_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_PosP2_DI := instFilterPosP2.State;
+instFilterPosP1(InputRaw := HwReal.Translation.M3_PosP1_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_PosP1_DI := instFilterPosP1.State;
+instFilterPosMaintenance(InputRaw := HwReal.Translation.M3_PosMaintenance_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_PosMaintenance_DI := instFilterPosMaintenance.State;
 
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING => module opérationnel. Pas de bypass simulation ici :
@@ -183,13 +262,13 @@ ELSE
 END_IF;
 
 IF WinchInputSourceSimulated
-    THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwReal.Winch;             END_IF;
+    THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwRealQualified.Winch;             END_IF;
 IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive
-    THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwReal.Translation; END_IF;
+    THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwRealQualified.Translation; END_IF;
 IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive
     THEN HwIn.Operator := instSimBench.Operator;       ELSE HwIn.Operator := HwReal.Operator;       END_IF;
 IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
-    THEN HwIn.Machine := instSimBench.Machine;         ELSE HwIn.Machine := HwReal.Machine;         END_IF;
+    THEN HwIn.Machine := instSimBench.Machine;         ELSE HwIn.Machine := HwRealQualified.Machine;         END_IF;
 
 
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
