@@ -295,6 +295,38 @@ Les consommateurs decident ensuite :
 separee : c'est ce qui supprime le cycle prouve `Acquisition ↔ Diagnostics` et la duplication de
 `instJoystick`. Les FB et leurs seuils sont inchanges (Partie 12).
 
+### 🩺 3bis. Diagnostic carte des modules DI (22 TOR reelles)
+
+> ✅ Tranche 2026-08-04 (utilisateur, confirme sur les 3 modules) : les 22 TOR d'entree (§4) sont
+> portees par 3 supports materiels distincts, chacun exposant `GetDeviceState()` :
+
+| Module | TOR portees (§4) | Domaine |
+|---|---|---|
+| `Local_Digital_IO` | #8-15 (8 TOR) | Winch, Machine (Kobold) |
+| `VH_0800END` | #1-7 (7 TOR) | Machine (AU, phases, thermiques), freins M1/M2/M3 |
+| `VH_0808ETP` | #16-22 (7 TOR) | Translation (positions M3), Machine (hydraulique, crible) |
+
+**Granularite MODULE, pas canal.** `GetDeviceState()` renseigne la sante d'une carte, pas d'une
+voie individuelle : un module en defaut ne dit pas *quelle* TOR ment, seulement qu'aucune de ses
+TOR n'est fiable. `FB_Input.ChannelOk` (§1 rappel) n'a donc **pas** de source par canal disponible
+aujourd'hui — limitation materielle assumee, pas un oubli.
+
+**Producteur** : `PRG_02_Acquisition` (3 appels `GetDeviceState()`, publies `LocalDigitalIoOk`,
+`Vh0800EndOk`, `Vh0808EtpOk`, `InputModuleFault` agrege OR).
+
+**Consommateurs** :
+- `PRG_04_Treuils_Benne` : `InputModuleFault` force `SafeStop` M1 **et** M2 (VH_0800END et
+  Local_Digital_IO portent les retours frein/thermique/contacteurs/fin de course des deux treuils
+  — pas de discrimination possible par treuil) ;
+- `PRG_05_Translation` : `InputModuleFault` force `SafeStop` M3 (VH_0808ETP/VH_0800END portent
+  positions, frein et thermique M3) ;
+- IHM : `GVL_IHM.Network.InputModules` (`ST_InputModuleDiagHMI`) — memes reflexes de lecture que
+  `GVL_IHM.Network.Bus*`/`*Error`.
+
+**Choix explicite** : `SafeStop` (rampe rapide, `Enable` maintenu), pas coupure seche — coherent
+avec le traitement `EncoderFault` deja en place (§2ter). Aucun bypass simulation sur ce diagnostic :
+un module DI absent en simulation banc reste un fait materiel reel, jamais un choix modelise.
+
 ---
 
 ## 🔌 4. TOR d'entrée — liste exhaustive (squelette de `ST_InputsQualified`)
@@ -400,6 +432,9 @@ Cible : `PRG_07_Supervision_CFC`, qui absorbe le troubleshooting en lecture seul
 
 - Durees de filtrage par signal apres qualification terrain.
 - Statut definitif de `FB_Output` non instancie.
+- Diagnostic par canal (`FB_Input.ChannelOk`) : non disponible avec le materiel actuel
+  (`GetDeviceState()` = etat carte, pas etat voie) — a revisiter si un module diagnostiquant
+  chaque canal individuellement est installe.
 - ~~Contrat exact des structures de publication internes vers les pages CFC.~~ ✅ **Résolu** — §2ter : `ST_HardwareImage` (HwReal/HwSim/HwIn), `ST_InputsQualified` (producteur `PRG_01_Inputs_LD`, lecteur `PRG_02_Acquisition_CFC` seul), `ST_EncoderMeasurements` (M1/M2, lecteurs Treuils/Modes/Supervision).
 
 ## 📚 Documents lies

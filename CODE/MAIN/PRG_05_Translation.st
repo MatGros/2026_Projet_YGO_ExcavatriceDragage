@@ -23,6 +23,8 @@ VAR
 
     SelTarget       : INT;
     FreqPct                 : REAL;
+
+    M3_SafeStop_Active      : BOOL;
 END_VAR
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
@@ -81,6 +83,10 @@ IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THE
     SelTarget := 0;
 END_IF;
 
+// 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
+// les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
+M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
+
 CASE SelTarget OF
     1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie;
     2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP2;
@@ -99,7 +105,7 @@ instTranslationM3(
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
     StartStop               := M3_StartStop_Active,
-    SafeStop                := FALSE,
+    SafeStop                := M3_SafeStop_Active,
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
@@ -123,7 +129,7 @@ instTranslationM3(
 TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE);
 TranslationFinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
-TranslationFinalInterlockRequest.SafeStop := FALSE;
+TranslationFinalInterlockRequest.SafeStop := M3_SafeStop_Active;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;

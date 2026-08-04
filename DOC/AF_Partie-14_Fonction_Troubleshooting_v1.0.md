@@ -34,3 +34,52 @@ Le contenu fonctionnel des 5 fonctions machine ci-dessus, ses seuils et ses obse
 Fiches : `AF_Partie-06` (Preflight) et `AF_Partie-10` (Symmetry).
 
 📌 Lot de migration : **M6** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C2, patch).
+
+---
+
+## 2. 🩺 Table de visu — dépannage de l'acquisition DI
+
+> **Proposition de support IHM / Watch CODESYS.** Cette table est en lecture seule : elle observe
+> l'acquisition et ses conséquences, mais n'écrit ni commande, ni Reset, ni bypass.
+> Les valeurs doivent être comparées dans l'ordre **module → agrégat → procédé → entrée**.
+
+### 2.1 Ordre de diagnostic
+
+1. Vérifier l'état des trois modules (`GetDeviceState()` traduit en `*Ok`).
+2. Vérifier l'agrégat `InputModuleFault` / `Network.InputModules.Fault`.
+3. Identifier les `SafeStop` actifs sur M1, M2 et M3.
+4. Contrôler ensuite les valeurs `HwIn` des entrées concernées et leur polarité.
+5. Corriger la cause matérielle ou de simulation, puis acquitter par un appui conscient.
+6. Vérifier qu'aucun mouvement ne redémarre automatiquement.
+
+### 2.2 Table opérateur/automaticien
+
+| Observable à afficher | Valeur nominale | Si défaut | Cause probable | Action sûre | Interdit |
+|---|---|---|---|---|---|
+| `PRG_02_Acquisition.LocalDigitalIoOk` | `TRUE` | `FALSE` | `Local_Digital_IO` absent, non opérationnel ou non présent sur le banc | Vérifier alimentation, bus et présence du module | Forcer à `TRUE` |
+| `PRG_02_Acquisition.Vh0800EndOk` | `TRUE` | `FALSE` | `VH_0800END` absent ou non opérationnel | Vérifier module, bus et configuration CODESYS | Forcer à `TRUE` |
+| `PRG_02_Acquisition.Vh0808EtpOk` | `TRUE` | `FALSE` | `VH_0808ETP` absent ou non opérationnel | Vérifier module, bus et configuration CODESYS | Forcer à `TRUE` |
+| `PRG_02_Acquisition.InputModuleFault` | `FALSE` | `TRUE` | Au moins une carte DI en défaut ; défaut global actuel | Relever les trois états individuels, corriger la cause, Reset conscient | Forcer à `FALSE` |
+| `GVL_IHM.Network.InputModules.Fault` | `FALSE` | `TRUE` | Recopie IHM de l'agrégat acquisition | Comparer à `InputModuleFault` | Utiliser l'IHM comme preuve unique |
+| `PRG_04_Treuils_Benne.SafeStopM1_Raw` | `FALSE` au repos sain | `TRUE` | Défaut module, synchro ou glissement selon code actuel | Identifier la cause avant Reset | Forcer à `FALSE` |
+| `PRG_04_Treuils_Benne.SafeStopM2_Raw` | `FALSE` au repos sain | `TRUE` | Défaut module ou synchro selon code actuel | Identifier la cause avant Reset | Forcer à `FALSE` |
+| `PRG_05_Translation.M3_SafeStop_Active` | `FALSE` au repos sain | `TRUE` | `InputModuleFault` selon implémentation actuelle | Vérifier les cartes DI et la rampe SafeStop | Forcer à `FALSE` |
+| `PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI` | Selon position réelle/simulée | Valeur incohérente | Capteur, polarité ou modèle de simulation | Comparer `HwReal` / `HwSim` / `HwIn` | Conclure à la santé de la carte |
+| `PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI` | Selon position réelle/simulée | Valeur incohérente | Capteur, polarité ou modèle de simulation | Comparer `HwReal` / `HwSim` / `HwIn` | Conclure à la santé de la carte |
+| `PRG_04_Treuils_Benne.ForbidAscentM1_Raw` | Selon limite haute validée | À confirmer | Liaison limite haute à vérifier | Bloquer l'essai de montée limite tant que non validé | Déclarer le test conforme sans preuve |
+| `PRG_04_Treuils_Benne.ForbidAscentM2_Raw` | Selon limite haute validée | À confirmer | Liaison limite haute à vérifier | Bloquer l'essai de montée limite tant que non validé | Déclarer le test conforme sans preuve |
+| `GVL_IHM.Modes.Cmd.BtnFaultReset` | Appui bref / front | Maintenu ou sans effet | Cause encore présente ou traitement Reset à vérifier | Relâcher, corriger la cause, générer un nouvel appui | Utiliser un niveau maintenu comme bypass |
+
+### 2.3 Règle d'interprétation
+
+Un bit TOR qui change prouve que le programme reçoit une valeur logique ; il ne prouve pas que
+la carte est saine. La santé carte est donnée par `*Ok`. Inversement, un module `*Ok = TRUE` ne
+prouve pas que chaque capteur est correctement câblé ou mécaniquement fonctionnel.
+
+Sur un banc sans modules physiques, `GetDeviceState()` peut rester différent de `RUNNING` et
+maintenir `InputModuleFault = TRUE`. Ce cas doit être affiché comme **indisponibilité matérielle
+de la simulation**, pas comme panne d'un canal et pas comme défaut à contourner sans décision
+safety formelle.
+
+> ⚠️ Cette table ne valide pas les fonctions de limite haute, de frein, d'AU ou de SafeStop. Elle
+> indique les observations à relever ; chaque fonction nécessite encore sa recette dédiée.

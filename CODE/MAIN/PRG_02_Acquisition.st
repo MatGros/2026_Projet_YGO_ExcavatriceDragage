@@ -28,6 +28,13 @@ VAR_OUTPUT
     M3_LimitSwitchRev          : BOOL;
     M3_SensorWordIncoherent    : BOOL;
     M3_SensorsWord             : BYTE;
+
+    (* 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (§1bis).
+       Granularité MODULE, pas canal : GetDeviceState() est un état de carte. *)
+    LocalDigitalIoOk           : BOOL;   (* TRUE = module Local_Digital_IO opérationnel *)
+    Vh0800EndOk                : BOOL;   (* TRUE = module VH_0800END opérationnel (freins/thermiques/AU) *)
+    Vh0808EtpOk                : BOOL;   (* TRUE = module VH_0808ETP opérationnel (positions M3/hydraulique/crible) *)
+    InputModuleFault           : BOOL;   (* TRUE = au moins un des 3 modules DI hors service *)
 END_VAR
 
 VAR
@@ -103,6 +110,14 @@ HwReal.Machine.PhaseRotationOk_DI         := PhaseRotationOk_DI;
 HwReal.Machine.BrakeThermalOk_DI          := BrakeThermalOk_DI;
 HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
 HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
+
+// 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
+// GetDeviceState() = RUNNING => module opérationnel. Pas de bypass simulation ici :
+// un module DI absent en simulation banc reste un fait matériel réel, pas un choix modélisé.
+LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
+Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
+Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
+InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
 
 
 // === 🎭 §2 SIMULATION & AIGUILLAGE (HwIn) ===

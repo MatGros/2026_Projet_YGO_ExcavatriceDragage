@@ -111,8 +111,8 @@ instDiveSearch(
     MotionDirection := MaintenanceMotionDirection,
     BucketIsOpen := _BucketState.IsOpen,
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI,
-    M1Position_M := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
-    M2Position_M := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    M1Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
+    M2Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     PositionsValid := TRUE,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
@@ -133,8 +133,8 @@ instExtractionSequence(
     BucketBusy := instBucket.Busy,
     BucketError := instBucket.Error,
     WinchSyncError := instWinchSync.Error,
-    M1Position_M := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
-    M2Position_M := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    M1Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
+    M2Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     M1MeasuredSpeedValid := TRUE,
     M2MeasuredSpeedValid := TRUE,
     PositionsValid := TRUE,
@@ -170,8 +170,8 @@ instBucket(
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection     := MaintenanceMotionDirection,
-    CablePosM1          := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
-    CablePosM2          := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    CablePosM1          := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
+    CablePosM2          := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     HomedM1             := TRUE,
     HomedM2             := TRUE,
     M1_Busy             := instWinchM1.Busy,
@@ -265,8 +265,8 @@ instWinchSync(
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode            := PRG_03_Modes_Cycle.Auth.Mode,
-    CablePosM1      := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
-    CablePosM2      := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    CablePosM1      := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
+    CablePosM2      := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     HomedM1         := TRUE,
     HomedM2         := TRUE,
     SyncEnable      := PRG_03_Modes_Cycle.Auth.SyncEnable,
@@ -319,8 +319,11 @@ END_IF;
 BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
 BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
 
-SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR instBucket.M1SlipDetected;
-SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000);
+// 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
+// les retours frein/thermique/contacteurs/fin de course des DEUX treuils (VH_0800END,
+// Local_Digital_IO) — pas de granularité par treuil possible, donc SafeStop des DEUX.
+SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.InputModuleFault;
+SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR PRG_02_Acquisition.InputModuleFault;
 
 ForbidDescentM1_Raw := GVL_IHM.M1TreuilRetenue.Bypass.Global;
 ForbidDescentM2_Raw := GVL_IHM.M2TreuilBenne.Bypass.Global;
@@ -363,7 +366,7 @@ instWinchM1(
     CfgRampDecelFastRate    := _WinchM1CfgPersist.CfgRampDecelFastRate,
     Homed                   := TRUE,
     HomingSuspect           := FALSE,
-    CablePosM               := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
+    CablePosM               := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
     TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -397,7 +400,7 @@ instWinchM2(
     CfgRampDecelFastRate    := _WinchM2CfgPersist.CfgRampDecelFastRate,
     Homed                   := TRUE,
     HomingSuspect           := FALSE,
-    CablePosM               := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    CablePosM               := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,

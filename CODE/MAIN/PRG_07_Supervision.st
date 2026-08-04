@@ -146,9 +146,9 @@ GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.Bypass.SlackCable                 := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 
-GVL_IHM.M1TreuilRetenue.State.Position_M                 := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue;
+GVL_IHM.M1TreuilRetenue.State.Position_M                 := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue);
 GVL_IHM.M1TreuilRetenue.State.Ready                    := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable;
-GVL_IHM.M2TreuilBenne.State.Position_M                 := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue;
+GVL_IHM.M2TreuilBenne.State.Position_M                 := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue);
 GVL_IHM.M2TreuilBenne.State.Ready                    := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
@@ -162,5 +162,12 @@ GVL_IHM.Network.EncoderM2   := instDiagEthercat.DeviceEncoderM2;
 GVL_IHM.Network.VariateurM3 := instDiagEthercat.DeviceVariateur;
 GVL_IHM.Network.EcatError   := instDiagEthercat.Error;
 GVL_IHM.Network.EcatErrorId := instDiagEthercat.ErrorId;
+
+// 🩺 Diagnostic carte des 3 modules DI TOR réelles (AF06 §3bis) — lecture seule, calculé
+// dans PRG_02_Acquisition, simple recopie ici pour l'IHM (même patron que Network.*).
+GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigitalIoOk;
+GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
+GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
+GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.InputModuleFault;
 
 END_PROGRAM
