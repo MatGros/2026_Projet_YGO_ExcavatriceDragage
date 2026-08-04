@@ -23973,6 +23973,36 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
             </variable>
+            <variable name="WinchM1StateHMI">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+            </variable>
+            <variable name="WinchM2StateHMI">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+            </variable>
+            <variable name="WinchM1SafetyHMI">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+            </variable>
+            <variable name="WinchM2SafetyHMI">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+            </variable>
+            <variable name="SyncStateHMI">
+              <type>
+                <derived name="ST_SyncState" />
+              </type>
+            </variable>
+            <variable name="BucketStateHMI">
+              <type>
+                <derived name="ST_BucketHMIState" />
+              </type>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="StubMachineEnableN1">
@@ -24591,6 +24621,86 @@ WinchM2FinalInterlockRequest.RequestedContactor2 := instWinchM2.Contactor2;
 WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
+
+// === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
+WinchM1StateHMI.Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwIn.Winch.COD1_PosValue);
+WinchM1StateHMI.SpeedRef_Pct := M1_SpeedRef_Active;
+WinchM1StateHMI.StepNumber := instWinchM1.StepNumber;
+WinchM1StateHMI.FBState := instWinchM1.State;
+WinchM1StateHMI.Ready := instWinchM1.Ready;
+WinchM1StateHMI.Busy := instWinchM1.Busy;
+WinchM1StateHMI.Done := instWinchM1.Done;
+WinchM1StateHMI.Error := instWinchM1.Error;
+WinchM1StateHMI.ErrorId := instWinchM1.ErrorId;
+WinchM1StateHMI.RelayFwd := instWinchM1.RelayFwd;
+WinchM1StateHMI.RelayRev := instWinchM1.RelayRev;
+WinchM1StateHMI.Contactor1 := instWinchM1.Contactor1;
+WinchM1StateHMI.Contactor2 := instWinchM1.Contactor2;
+WinchM1StateHMI.Contactor3 := instWinchM1.Contactor3;
+WinchM1StateHMI.Contactor4 := instWinchM1.Contactor4;
+WinchM1StateHMI.BrakeCmd := instWinchM1.BrakeCmd;
+WinchM1StateHMI.BrakeCommandOpenConfirmed := instWinchM1.BrakeCommandOpenConfirmed;
+WinchM1StateHMI.FinalAuthorizedStep := instWinchM1.RequestedStep;
+WinchM1StateHMI.ContactorsCheck := instWinchM1.ContactorsCheck;
+WinchM1StateHMI.BrakeContactorCheck := instWinchM1.BrakeContactorCheck;
+
+WinchM2StateHMI.Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwIn.Winch.COD2_PosValue);
+WinchM2StateHMI.SpeedRef_Pct := M2_SpeedRef_Active;
+WinchM2StateHMI.StepNumber := instWinchM2.StepNumber;
+WinchM2StateHMI.FBState := instWinchM2.State;
+WinchM2StateHMI.Ready := instWinchM2.Ready;
+WinchM2StateHMI.Busy := instWinchM2.Busy;
+WinchM2StateHMI.Done := instWinchM2.Done;
+WinchM2StateHMI.Error := instWinchM2.Error;
+WinchM2StateHMI.ErrorId := instWinchM2.ErrorId;
+WinchM2StateHMI.RelayFwd := instWinchM2.RelayFwd;
+WinchM2StateHMI.RelayRev := instWinchM2.RelayRev;
+WinchM2StateHMI.Contactor1 := instWinchM2.Contactor1;
+WinchM2StateHMI.Contactor2 := instWinchM2.Contactor2;
+WinchM2StateHMI.Contactor3 := instWinchM2.Contactor3;
+WinchM2StateHMI.Contactor4 := instWinchM2.Contactor4;
+WinchM2StateHMI.BrakeCmd := instWinchM2.BrakeCmd;
+WinchM2StateHMI.BrakeCommandOpenConfirmed := instWinchM2.BrakeCommandOpenConfirmed;
+WinchM2StateHMI.FinalAuthorizedStep := instWinchM2.RequestedStep;
+WinchM2StateHMI.ContactorsCheck := instWinchM2.ContactorsCheck;
+WinchM2StateHMI.BrakeContactorCheck := instWinchM2.BrakeContactorCheck;
+
+WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
+WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;
+WinchM1SafetyHMI.ForbidDescent := ForbidDescentM1_Active;
+WinchM1SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
+WinchM1SafetyHMI.Error := instWinchM1.Error;
+WinchM1SafetyHMI.ErrorId := instWinchM1.ErrorId;
+WinchM2SafetyHMI.SafeStop := SafeStopM2_Active;
+WinchM2SafetyHMI.ForbidAscent := ForbidAscentM2_Active;
+WinchM2SafetyHMI.ForbidDescent := ForbidDescentM2_Active;
+WinchM2SafetyHMI.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
+WinchM2SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
+WinchM2SafetyHMI.Error := instWinchM2.Error;
+WinchM2SafetyHMI.ErrorId := instWinchM2.ErrorId;
+
+SyncStateHMI.DeltaPos_M := instWinchSync.SignedDeltaPosM;
+SyncStateHMI.SyncActive := instWinchSync.SyncActive;
+SyncStateHMI.SyncWarn := instWinchSync.SyncWarn;
+SyncStateHMI.Ready := instWinchSync.Ready;
+SyncStateHMI.Error := instWinchSync.Error;
+SyncStateHMI.ErrorId := instWinchSync.ErrorId;
+SyncStateHMI.FBState := instWinchSync.State;
+
+BucketStateHMI.MechState := _BucketState;
+BucketStateHMI.FBState := instBucket.State;
+BucketStateHMI.ActiveOffset_M := instBucket.ActiveOffsetM;
+BucketStateHMI.M2StartStop := instBucket.M2_StartStop;
+BucketStateHMI.M2Direction := instBucket.M2_Direction;
+BucketStateHMI.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
+BucketStateHMI.Ready := instBucket.Ready;
+BucketStateHMI.Busy := instBucket.Busy;
+BucketStateHMI.Done := instBucket.Done;
+BucketStateHMI.Error := instBucket.Error;
+BucketStateHMI.ErrorId := instBucket.ErrorId;
+BucketStateHMI.RemainingTravel_M := instBucket.RemainingTravelM;
+BucketStateHMI.CloseActive := instBucket.CloseReq;
+BucketStateHMI.OpenActive := instBucket.OpenReq;
 </html:xhtml>
           </ST>
         </body>
@@ -24607,6 +24717,16 @@ WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
             <variable name="TranslationFinalInterlockRequest">
               <type>
                 <derived name="ST_TranslationFinalInterlockRequest" />
+              </type>
+            </variable>
+            <variable name="TranslationStateHMI">
+              <type>
+                <derived name="ST_TranslationState" />
+              </type>
+            </variable>
+            <variable name="TranslationSafetyHMI">
+              <type>
+                <derived name="ST_SafetyTranslation" />
               </type>
             </variable>
           </outputVars>
@@ -24778,6 +24898,40 @@ TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeR
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
+
+// === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
+TranslationStateHMI.FBState := instTranslationM3.State;
+TranslationStateHMI.Ready := instTranslationM3.Ready;
+TranslationStateHMI.Busy := instTranslationM3.Busy;
+TranslationStateHMI.Done := instTranslationM3.Done;
+TranslationStateHMI.Error := instTranslationM3.Error;
+TranslationStateHMI.ErrorId := instTranslationM3.ErrorId;
+TranslationStateHMI.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
+TranslationStateHMI.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
+TranslationStateHMI.PositionReached := instTranslationM3.TargetReached;
+TranslationStateHMI.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
+TranslationStateHMI.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
+TranslationStateHMI.ActiveDirection := M3_Direction_Active;
+TranslationStateHMI.ActiveSpeedRef_Pct := M3_SpeedRef_Active;
+TranslationStateHMI.PositionTremie := PRG_02_Acquisition.TranslationPosTremie;
+TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
+TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
+TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
+TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
+TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
+TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
+TranslationStateHMI.LimitSwitchFwd := PRG_02_Acquisition.M3_LimitSwitchFwd;
+TranslationStateHMI.LimitSwitchRev := PRG_02_Acquisition.M3_LimitSwitchRev;
+TranslationStateHMI.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
+TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalFeedback_DI;
+TranslationStateHMI.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
+TranslationStateHMI.SimulationModeActive := GVL_Simulation.SimulationModeActive;
+
+TranslationSafetyHMI.SafeStop := M3_SafeStop_Active;
+TranslationSafetyHMI.Error := instTranslationM3.Error;
+TranslationSafetyHMI.ErrorId := instTranslationM3.ErrorId;
+TranslationSafetyHMI.ErrorLimitSwitch := PRG_02_Acquisition.M3_LimitSwitchFwd OR PRG_02_Acquisition.M3_LimitSwitchRev;
+TranslationSafetyHMI.ErrorSensorIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
 </html:xhtml>
           </ST>
         </body>
@@ -26364,7 +26518,9 @@ END_IF;
 
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled;
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
-GVL_IHM.Commun.HydraulicThermalFault     := FALSE;
+GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
+GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI;
+GVL_IHM.Commun.PhaseRotationFault        := NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;
 
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
@@ -26372,13 +26528,25 @@ GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.Bypass.SlackCable                 := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 
-GVL_IHM.M1TreuilRetenue.State.Position_M                 := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue);
-GVL_IHM.M1TreuilRetenue.State.Ready                    := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable;
-GVL_IHM.M2TreuilBenne.State.Position_M                 := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue);
-GVL_IHM.M2TreuilBenne.State.Ready                    := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable;
+GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.WinchM1StateHMI;
+GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.WinchM2StateHMI;
+GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.WinchM1SafetyHMI;
+GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.WinchM2SafetyHMI;
+GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.SyncStateHMI;
+GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.BucketStateHMI;
+GVL_IHM.TranslationM3.State := PRG_05_Translation.TranslationStateHMI;
+GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafetyHMI;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
-GVL_IHM.M1M2Sync.State.SyncActive := PRG_03_Modes_Cycle.Auth.SyncEnable;
+GVL_IHM.Modes.State.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
+GVL_IHM.Modes.State.PowerContactorOk := PRG_06_Outputs_LD.EmergencyState.ContactorOk;
+GVL_IHM.Modes.State.EmergencyChainOk := PRG_06_Outputs_LD.EmergencyState.ChainOk;
+GVL_IHM.Modes.State.EmergencyArmable := PRG_06_Outputs_LD.EmergencyState.Armable;
+GVL_IHM.Modes.State.EmergencyArmingBusy := PRG_06_Outputs_LD.EmergencyState.ArmingBusy;
+GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs_LD.EmergencyDiag.RedundancyTestFailed;
+GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs_LD.EmergencyDiag.ArmFailed;
+GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs_LD.EmergencyDiag.Error OR PRG_02_Acquisition.InputModuleFault;
+GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs_LD.PowerCutOffActive;
 
 GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;

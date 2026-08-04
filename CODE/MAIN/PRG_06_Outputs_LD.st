@@ -17,6 +17,9 @@ VAR_OUTPUT
     ArmingSeqStep                : INT;
     RedundancyTestFailed         : BOOL;
     EmergencyArmingFailed        : BOOL;
+    EmergencyState               : ST_Safety_Emergency_State;
+    EmergencyDiag                : ST_Safety_Emergency_Diag;
+    PowerCutOffActive            : BOOL; (* TRUE = demande de coupure finale active *)
 END_VAR
 
 VAR
@@ -126,5 +129,8 @@ EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLoc
 ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
 RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;
 EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;
+EmergencyState := instSafetyEmergencyManagement.State;
+EmergencyDiag := instSafetyEmergencyManagement.Diag;
+PowerCutOffActive := PowerCutOffReq;
 
 END_PROGRAM

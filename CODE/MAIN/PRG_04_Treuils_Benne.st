@@ -12,6 +12,12 @@ VAR_OUTPUT
     WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest;
     WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest;
     KoboldContactorCmdArbitrated : BOOL;
+    WinchM1StateHMI : ST_WinchState;
+    WinchM2StateHMI : ST_WinchState;
+    WinchM1SafetyHMI : ST_SafetyWinch;
+    WinchM2SafetyHMI : ST_SafetyWinch;
+    SyncStateHMI : ST_SyncState;
+    BucketStateHMI : ST_BucketHMIState;
 END_VAR
 
 VAR
@@ -440,5 +446,85 @@ WinchM2FinalInterlockRequest.RequestedContactor2 := instWinchM2.Contactor2;
 WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
+
+// === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
+WinchM1StateHMI.Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwIn.Winch.COD1_PosValue);
+WinchM1StateHMI.SpeedRef_Pct := M1_SpeedRef_Active;
+WinchM1StateHMI.StepNumber := instWinchM1.StepNumber;
+WinchM1StateHMI.FBState := instWinchM1.State;
+WinchM1StateHMI.Ready := instWinchM1.Ready;
+WinchM1StateHMI.Busy := instWinchM1.Busy;
+WinchM1StateHMI.Done := instWinchM1.Done;
+WinchM1StateHMI.Error := instWinchM1.Error;
+WinchM1StateHMI.ErrorId := instWinchM1.ErrorId;
+WinchM1StateHMI.RelayFwd := instWinchM1.RelayFwd;
+WinchM1StateHMI.RelayRev := instWinchM1.RelayRev;
+WinchM1StateHMI.Contactor1 := instWinchM1.Contactor1;
+WinchM1StateHMI.Contactor2 := instWinchM1.Contactor2;
+WinchM1StateHMI.Contactor3 := instWinchM1.Contactor3;
+WinchM1StateHMI.Contactor4 := instWinchM1.Contactor4;
+WinchM1StateHMI.BrakeCmd := instWinchM1.BrakeCmd;
+WinchM1StateHMI.BrakeCommandOpenConfirmed := instWinchM1.BrakeCommandOpenConfirmed;
+WinchM1StateHMI.FinalAuthorizedStep := instWinchM1.RequestedStep;
+WinchM1StateHMI.ContactorsCheck := instWinchM1.ContactorsCheck;
+WinchM1StateHMI.BrakeContactorCheck := instWinchM1.BrakeContactorCheck;
+
+WinchM2StateHMI.Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwIn.Winch.COD2_PosValue);
+WinchM2StateHMI.SpeedRef_Pct := M2_SpeedRef_Active;
+WinchM2StateHMI.StepNumber := instWinchM2.StepNumber;
+WinchM2StateHMI.FBState := instWinchM2.State;
+WinchM2StateHMI.Ready := instWinchM2.Ready;
+WinchM2StateHMI.Busy := instWinchM2.Busy;
+WinchM2StateHMI.Done := instWinchM2.Done;
+WinchM2StateHMI.Error := instWinchM2.Error;
+WinchM2StateHMI.ErrorId := instWinchM2.ErrorId;
+WinchM2StateHMI.RelayFwd := instWinchM2.RelayFwd;
+WinchM2StateHMI.RelayRev := instWinchM2.RelayRev;
+WinchM2StateHMI.Contactor1 := instWinchM2.Contactor1;
+WinchM2StateHMI.Contactor2 := instWinchM2.Contactor2;
+WinchM2StateHMI.Contactor3 := instWinchM2.Contactor3;
+WinchM2StateHMI.Contactor4 := instWinchM2.Contactor4;
+WinchM2StateHMI.BrakeCmd := instWinchM2.BrakeCmd;
+WinchM2StateHMI.BrakeCommandOpenConfirmed := instWinchM2.BrakeCommandOpenConfirmed;
+WinchM2StateHMI.FinalAuthorizedStep := instWinchM2.RequestedStep;
+WinchM2StateHMI.ContactorsCheck := instWinchM2.ContactorsCheck;
+WinchM2StateHMI.BrakeContactorCheck := instWinchM2.BrakeContactorCheck;
+
+WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
+WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;
+WinchM1SafetyHMI.ForbidDescent := ForbidDescentM1_Active;
+WinchM1SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
+WinchM1SafetyHMI.Error := instWinchM1.Error;
+WinchM1SafetyHMI.ErrorId := instWinchM1.ErrorId;
+WinchM2SafetyHMI.SafeStop := SafeStopM2_Active;
+WinchM2SafetyHMI.ForbidAscent := ForbidAscentM2_Active;
+WinchM2SafetyHMI.ForbidDescent := ForbidDescentM2_Active;
+WinchM2SafetyHMI.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
+WinchM2SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
+WinchM2SafetyHMI.Error := instWinchM2.Error;
+WinchM2SafetyHMI.ErrorId := instWinchM2.ErrorId;
+
+SyncStateHMI.DeltaPos_M := instWinchSync.SignedDeltaPosM;
+SyncStateHMI.SyncActive := instWinchSync.SyncActive;
+SyncStateHMI.SyncWarn := instWinchSync.SyncWarn;
+SyncStateHMI.Ready := instWinchSync.Ready;
+SyncStateHMI.Error := instWinchSync.Error;
+SyncStateHMI.ErrorId := instWinchSync.ErrorId;
+SyncStateHMI.FBState := instWinchSync.State;
+
+BucketStateHMI.MechState := _BucketState;
+BucketStateHMI.FBState := instBucket.State;
+BucketStateHMI.ActiveOffset_M := instBucket.ActiveOffsetM;
+BucketStateHMI.M2StartStop := instBucket.M2_StartStop;
+BucketStateHMI.M2Direction := instBucket.M2_Direction;
+BucketStateHMI.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
+BucketStateHMI.Ready := instBucket.Ready;
+BucketStateHMI.Busy := instBucket.Busy;
+BucketStateHMI.Done := instBucket.Done;
+BucketStateHMI.Error := instBucket.Error;
+BucketStateHMI.ErrorId := instBucket.ErrorId;
+BucketStateHMI.RemainingTravel_M := instBucket.RemainingTravelM;
+BucketStateHMI.CloseActive := instBucket.CloseReq;
+BucketStateHMI.OpenActive := instBucket.OpenReq;
 
 END_PROGRAM
