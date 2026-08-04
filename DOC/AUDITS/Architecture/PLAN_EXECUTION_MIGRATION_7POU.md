@@ -1,7 +1,7 @@
 # Plan d'exécution — Migration vers l'architecture 7 POU
 
 > **Décision source :** `DOC/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md` (actée).
-> **Architecture cible :** `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2 et §4.
+> **Architecture cible :** `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 > **Statut :** plan de pilotage. Chaque lot exige la validation utilisateur avant lancement.
 
 ---

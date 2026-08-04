@@ -8,7 +8,7 @@
 > ce n'est pas du code legacy à migrer) · instances dans `PRG_02_Encoders.st` (POU ST actuel).
 > Cible : la chaîne codéurs complète rejoint `PRG_02_Acquisition_CFC` (rang 02) — voir §4.2.
 > ⚠️ **Point d'arbitrage ouvert pour le lot M1** : le homing lit le mode de marche — voir §4bis.
-> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.0.md` §2 et §4.
+> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 > Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md`.
 > v2.0 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md`.
 > v1.11 archivée : `ARCHIVES/Doc/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md`.

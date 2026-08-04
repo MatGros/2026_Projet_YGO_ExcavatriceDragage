@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    📡 FB_Diag_Ethercat — Diagnostic bus EtherCAT (3 esclaves)
    ───────────────────────────────────────────────────────────────
-   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.0.md
-              DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §3
+   📄 Docs : DOC/AF_Partie-02_Architecture_Programme_v3.1.md
+              DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §3
    🎯 Rôle : Décide Online/Operational pour variateur M3 + codeurs M1/M2.
       Publie ST_Diag_Device par device + state global.
    ═══════════════════════════════════════════════════════════════ *)

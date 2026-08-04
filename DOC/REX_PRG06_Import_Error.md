@@ -123,7 +123,7 @@ Règles tirées des oracles `PRG_06_Outputs_LD.xml` / `PRG_Oracle_Nested.xml` :
 
 - Oracles CODESYS : `TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_06_Outputs_LD.xml`, `PRG_Oracle_Nested.xml`
 - Tests dichotomiques : `CODE/CODE_Bundle_{6invar,2networks,3networks,nocoil180,minimal}.xml`
-- Spec PLCopenXML : `DOC/AF_Partie-03_Contrats_Composants.md`
+- Spec PLCopenXML : `DOC/AF_Partie-03_Contrats_Composants_v2.1.md`
 
 ---
 

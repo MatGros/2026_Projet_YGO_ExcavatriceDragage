@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📥 FB_Input — Entrée TOR conditionnée (brique réduite)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §1
+   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §1
    🧭 Interface RÉDUITE (Partie3 §1bis) : pas de contrat FB standard
       complet (pas d'Enable/StartStop/Mode/State/StateAtError) — brique
       de conditionnement bas niveau, à instancier en tableau (§3) ou

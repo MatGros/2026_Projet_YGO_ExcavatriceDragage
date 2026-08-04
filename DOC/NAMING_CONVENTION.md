@@ -41,14 +41,15 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 | Suffixe | Langage bundle | Source versionnee | Rôle | Exemple |
 |---------|----------------|-------------------|------|---------|
 | (sans suffixe) | Structured Text (`<ST>`) | `.st` | Orchestration ST par procédé, câblage d'instances FB par bus DUT | `PRG_02_Acquisition.st`, `PRG_04_Treuils_Benne.st` |
-| `_LD` | Ladder Diagram (`<LD>`) | `.st`, converti automatiquement en Ladder dans le bundle | Barrières finales, E/S physiques TOR qualifiées | `PRG_01_Inputs_LD.st`, `PRG_06_Outputs_LD.st` |
+| `_LD` | Ladder Diagram (`<LD>`) | `.st`, converti automatiquement en Ladder dans le bundle | Barrière finale des sorties physiques TOR | `PRG_06_Outputs_LD.st` |
 
 **Règles :**
 - Tout programme est préfixé `PRG_XX_` : la numérotation fixe l'ordre exact d'exécution dans la `MainTask` (décidé dans `AF_Partie-02`).
 - Les programmes d'orchestration procédés sont rédigés en **Texte Structuré ST (`.st`)** pour maximiser la vitesse d'implémentation et la lisibilité textuelle.
 - **Organisation en sections commentées avec emojis dans le ST** : Chaque programme ST d'orchestration doit structurer son flux de manière limpide de haut en bas (ex: `// === 📥 §1 ACQUISITION ===`, `// === 🛡️ §2 SÉCURITÉ ===`, `// === 🔀 §3 ARBITRAGE ===`).
 - **Aucune logique métier inline** dans les POU `PRG_` ST : l'orchestration ne contient ni `IF` complexe ni calcul métier — uniquement des instanciations de FB et des câblages par bus DUT (`ST_*`).
-- Les programmes `_LD.st` restent convertis automatiquement en `<LD>` dans le bundle pour les barrières d'E/S physiques TOR (`PRG_01_Inputs_LD.st` et `PRG_06_Outputs_LD.st`).
+- Les programmes `_LD.st` restent convertis automatiquement en `<LD>` pour la barrière finale des sorties
+  (`PRG_06_Outputs_LD.st`). `PRG_01_Inputs_LD.st` est une couche historique en retrait.
 
 ### Noms cibles des programmes — aucun renommage sans lot dedie
 
@@ -59,8 +60,9 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 
 | Rang | Nom cible | Langage / source |
 |---|---|---|
-| 01 | `PRG_01_Inputs_LD` | `.st` converti en `<LD>` (Ladder TOR) |
-| 02 | `PRG_02_Acquisition` | `.st` ST pur (Orchestration Acquisition) |
+| 01 | `PRG_02_Acquisition` | `.st` ST pur (acquisition unique HwReal/HwSim/HwIn) |
+| — | `PRG_01_Inputs_LD` | `.st` converti en `<LD>` historique, retrait contrôlé |
+| 02 | `PRG_03_Modes_Cycle` | `.st` ST pur (Orchestration Modes & Cycle) |
 | 03 | `PRG_03_Modes_Cycle` | `.st` ST pur (Orchestration Modes & Cycle) |
 | 04 | `PRG_04_Treuils_Benne` | `.st` ST pur (Orchestration Levage/Treuils) |
 | 05 | `PRG_05_Translation` | `.st` ST pur (Orchestration Translation) |
@@ -79,7 +81,7 @@ Aucun n'est un nom cible : ils sont absorbes par la page du procede correspondan
 
 | POU actuel | Absorbe par |
 |---|---|
-| `PRG_INPUTS_LD` | `PRG_01_Inputs_LD` |
+| `PRG_INPUTS_LD` | retrait contrôlé : qualification absorbée par `PRG_02_Acquisition` |
 | `PRG_ACQUISITION_CFC`, `PRG_01_Diagnostics`, `PRG_02_Encoders`, `PRG_AUXILIARY_CFC` | `PRG_02_Acquisition` |
 | `PRG_MODES_CFC`, `PRG_05_Cycle` | `PRG_03_Modes_Cycle` |
 | `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne` |

@@ -2,7 +2,7 @@
    🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus EtherCAT)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §3/§6
-                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.1.md
    🎯 Accès bus EtherCAT, statut esclave, extraction positions brutes
       et séquence de Preset SDO (PresetTriggerCmd := 2).
    🧊 Principe « geler sur doute » (§6) : RawPos/AngleRaw/TurnCount

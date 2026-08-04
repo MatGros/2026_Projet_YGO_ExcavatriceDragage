@@ -4,6 +4,13 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `DOC_RATIONALISATION_ACQUISITION_FB_INPUT` — 2026-08-04 — documentation préalable
+- AF02 v3.1, AF03 v2.1, AF06 v2.1, AF13 v2.1, AF14 v1.1 et fiches associées : `PRG_02_Acquisition` devient la frontière unique `HwReal/HwSim/HwIn`.
+- `PRG_01_Inputs_LD`, `FB_Input` et `ST_InputsQualified` passent en retrait contrôlé ; aucun code supprimé dans cette phase.
+- PRG06/PRG07 remappés vers `PRG_02_Acquisition.HwIn` ; filtrage des 22 TOR déplacé dans `FB_DigitalInputFilter` via `HwRealQualified`.
+- Pré-requis code : validation humaine C3 et essais réels/simulés des polarités, filtres et SafeStop.
+- `Device.export` interdit de modification ; revue autonome à faire avant tout lot code.
+
 ### `FIX_PRG06_IMPORT_MULTICAUSES` — 2026-08-04
 - **Bug import CODESYS** : `PRG_06_Outputs_LD` échouait à l'import (`IndexOutOfRangeException`) puis à l'ouverture (`ArgumentNullException`)
 - **Causes racines (5, empilées)** : ① parasites `Bundle_H*.xml` découverts comme POU ; ② `localId` bloc > sources ; ③ motif `inVariable→outVariable` ; ④ coils `_DQ` non déclarées (Device) ; ⑤ coil doublon sur output déjà assigné

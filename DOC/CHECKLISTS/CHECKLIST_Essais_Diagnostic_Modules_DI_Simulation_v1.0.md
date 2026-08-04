@@ -5,7 +5,7 @@
 > 📅 2026-08-04 · Version v1.0
 > 🔗 Code concerné : `PRG_02_Acquisition`, `PRG_04_Treuils_Benne`, `PRG_05_Translation`,
 > `PRG_07_Supervision`
-> 📖 Référence : `DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md` §3bis
+> 📖 Référence : `DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md` §3bis
 
 ---
 

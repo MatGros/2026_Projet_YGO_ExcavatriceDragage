@@ -93,21 +93,24 @@ contournée.
 
 ## 4. 🔍 Savoir quand basculer un domaine en réel
 
-Les trois images ont **les mêmes champs** et sont lisibles côte à côte en vue instance CODESYS :
+Les quatre images ont **les mêmes champs** et sont lisibles côte à côte en vue instance CODESYS :
 
 ```
-   HwReal  ── ce que dit le matériel
-   HwSim   ── ce que le banc attend
-   HwIn    ── ce que le programme utilise
+   HwReal            ── ce que dit le matériel, brut
+   HwRealQualified   ── ce que dit le matériel, filtré
+   HwSim             ── ce que le banc attend
+   HwIn              ── ce que le programme utilise
 ```
 
 **Méthode**, capteur par capteur :
 
 1. Câbler physiquement le capteur, machine **à l'arrêt**
-2. Ouvrir `PRG_00_Inputs` en vue instance et comparer `HwReal.<domaine>.<signal>` à
-   `HwSim.<domaine>.<signal>`
-3. **Valeurs identiques** → le réel dit déjà ce que le modèle attend → bascule sûre
-4. **Valeurs opposées** → le fil est absent **ou la polarité est inversée** → à instruire
+2. Ouvrir `PRG_02_Acquisition` en vue instance et comparer `HwReal.<domaine>.<signal>`,
+   `HwRealQualified.<domaine>.<signal>` et `HwSim.<domaine>.<signal>`.
+3. Vérifier que `HwRealQualified` suit `HwReal` après la temporisation de filtrage ; puis
+   comparer `HwIn` à la source active.
+4. **Valeurs identiques** → le réel dit déjà ce que le modèle attend → bascule sûre
+5. **Valeurs opposées** → le fil est absent **ou la polarité est inversée** → à instruire
    *avant* de couper la simulation du domaine
 
 ⚠️ Ne comparer que les **grandeurs logiques** (retours contacteurs, freins, capteurs TOR, états

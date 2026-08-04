@@ -8,7 +8,7 @@
       — jamais appelée hors du composite.
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+              DOC/AF_Partie-03_Contrats_Composants_v2.1.md
 *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput

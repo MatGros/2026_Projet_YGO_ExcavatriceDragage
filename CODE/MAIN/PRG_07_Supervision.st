@@ -137,7 +137,7 @@ END_IF;
 // === 📊 §3 PROJECTIONS IHM ET MAPPING ===
 
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled;
-GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_01_Inputs_LD.TopPositionSensor;
+GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_IHM.Commun.HydraulicThermalFault     := FALSE;
 
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;

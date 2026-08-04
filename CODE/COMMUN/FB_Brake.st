@@ -27,7 +27,7 @@ VAR_INPUT
     Enable              : BOOL;                     // Contexte général (comme tout FB) — FALSE = frein collé (sûr)
     Reset               : BOOL;                     // Acquittement défaut (front)
     MovementRequested   : BOOL;                      // TRUE = FB_Winch demande un mouvement (sens+palier actifs)
-    ContactorFeedback   : BOOL;                      // Retour frein (PRG_01_Inputs_LD) : TRUE = frein OUVERT (desserré)
+    ContactorFeedback   : BOOL;                      // Retour frein (`PRG_02_Acquisition.HwIn`) : TRUE = frein OUVERT (desserré)
                                                        // 🆕 REX 2026-08-03 : même sens que BrakeCmd (TRUE = relâché)
                                                        // → en marche normale les deux sont ÉGAUX ; c'est leur
                                                        //   DIFFÉRENCE qui trahit un contacteur collé (voir §4).

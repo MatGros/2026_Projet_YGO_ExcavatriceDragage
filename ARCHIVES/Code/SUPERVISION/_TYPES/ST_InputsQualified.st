@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🏗️ ST_InputsQualified — TOR réelles qualifiées (squelette 22 entrées)
    ───────────────────────────────────────────────────────────────
-   📄 Lot M1 · Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §2ter/§4
+   📄 Lot M1 · Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2ter/§4
    🎨 Une entrée BOOL par TOR réelle qualifiée, organisée par domaine
       (Winch 8 · Translation 7 · Machine 7 = 22).
    🔗 Producteur : PRG_01_Inputs_LD (Ladder, FB_Input) — écrivain unique.

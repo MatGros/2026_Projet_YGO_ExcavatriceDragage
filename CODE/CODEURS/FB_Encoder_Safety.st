@@ -2,7 +2,7 @@
    🛡️ FB_Encoder_Safety — Bornage physique & relais incohérence redémarrage
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §3.6/§3.7
-                   DOC/AF_Partie-03_Contrats_Composants_v2.0.md
+                   DOC/AF_Partie-03_Contrats_Composants_v2.1.md
    🎯 Rôle :
       - Bornage absolu [-99.00 ; +99.00] m (CablePosMSafe gelée sur dernière valeur plausible).
       - Relais de HomingSuspect (ErrorId bit1).

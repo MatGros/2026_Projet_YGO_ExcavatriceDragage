@@ -68,8 +68,8 @@ FB_SAFETY_INPUT_SOURCES = [
     ("Enable", "TRUE", True),
     ("Reset", "PRG_07_Supervision.FaultMachineReset_IHM", False),
     ("ArmRequest", "GVL_IHM.Modes.Cmd.BtnEmergencyArming", False),
-    ("EmergencyChainClosed", "PRG_01_Inputs_LD.EmergencyChainClosed", False),
-    ("PowerContactorEngaged", "PRG_01_Inputs_LD.PowerContactorEngaged", False),
+    ("EmergencyChainClosed", "PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI", False),
+    ("PowerContactorEngaged", "PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI", False),
     ("PowerCutOffRequest", "PowerCutOffReq", False),
     ("BtnEmergencyCutOff", "GVL_IHM.Modes.Cmd.BtnEmergencyCutOff", False),
 ]
