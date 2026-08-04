@@ -221,7 +221,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T16 | ✅ Vestige `PRG_JOY1` retiré des instructions actives ; programme réel `PRG_01_Diagnostics`, filtre `FB_Filter_PT1` | Projet | AF_Partie-08 §6bis |
 | T17 | 🟠 Checklist Joystick rédigée ; exécution terrain et verdict signé restant à réaliser. Limitations de robustesse ajoutées sur `FB_AxisScale`, `FB_Ramp` et la consigne finale M3 | Projet / Terrain | `CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.1.md`, AF_Partie-08 §8 |
 | T18 | ✅ GVL d'échange IHM créée et structurée par métier (modes, Translation M3, cycle, diagnostics) | Projet | `GVL_IHM` + Partie 7 v1.5 |
-| T19 | Mapping `ChannelOk` carte/voie E-S (diagnostic carte non exploité) à définir si besoin confirmé | Projet | AF_Partie-06 §4 |
+| T19 | Mapping `ChannelOk` carte/voie E-S : ⛔ **tranché par la réduction FB_Output (2026-08-04)** — diagnostic carte non exploité, variable retirée (0 usage) ; réintroduisible si besoin confirmé | Projet | AF_Partie-06 §4 |
 | T20 | Sélecteur treuil IHM (visu/physique) — variable rapatriée dans `GVL_IHM.Modes.JoystickWinchSelect` (2026-07-19, ex-`GVL_IHM.IHM_MANU`) ; widget visu physique restant à faire. Arbitrage MAINT_N2 fait, cf. AF_Partie-05 v1.6 | Projet | AF_Partie-05 §2, AF_Partie-09 §1 |
 | T21 | Checklist validation Winch v1.7 non réalisée (inhibition, HomingApproachEnable, Méca B/D, diagnostics IHM, simulation) | Terrain | AF_Partie-09 §8 |
 | T22 | Tolérance de calibration `TopSensorPositionM` (contrôle visuel) à fixer sur site | Terrain | AF_Partie-10 §7bis |
