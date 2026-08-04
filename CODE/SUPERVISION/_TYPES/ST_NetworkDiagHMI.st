@@ -16,7 +16,9 @@ STRUCT
     VariateurM3         : ST_Diag_Device;  (* ↔️ Diagnostics esclave AC600 *)
     EcatError           : BOOL;           (* ⚠️ Anomalie EtherCAT *)
     EcatErrorId         : WORD;           (* ❌ Code anomalie EtherCAT *)
-    
+
+    InputModules        : ST_InputModuleDiagHMI; (* 🩺 Diagnostic carte des 3 modules DI TOR réelles *)
+
     (* 🌐 Bypass réseau global *)
     Bypass              : ST_BypassNetwork;
 END_STRUCT

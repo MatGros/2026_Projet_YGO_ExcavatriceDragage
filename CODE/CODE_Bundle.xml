@@ -4218,6 +4218,60 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
    ═══════════════════════════════════════════════════════════════</html:xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_InputModuleDiagHMI">
+        <baseType>
+          <struct>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = module Local_Digital_IO opérationnel (8 TOR Winch/Machine)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = module VH_0800END opérationnel (7 TOR freins/thermiques/AU)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = module VH_0808ETP opérationnel (7 TOR positions M3/hydraulique/crible)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = au moins un des 3 modules DI hors service</html:xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>305fe275-43ac-5096-abc4-7a46cf78f5f9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <html:xhtml>═══════════════════════════════════════════════════════════════
+   🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.0.md §3bis
+   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
+      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
+      TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
+   🔗 Producteur : PRG_02_Acquisition (3 appels GetDeviceState()).
+   ═══════════════════════════════════════════════════════════════</html:xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_InputsQualified">
         <baseType>
           <struct>
@@ -5093,6 +5147,14 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
               </type>
               <documentation>
                 <html:xhtml>❌ Code anomalie EtherCAT</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModules">
+              <type>
+                <derived name="ST_InputModuleDiagHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>🩺 Diagnostic carte des 3 modules DI TOR réelles</html:xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -14006,9 +14068,15 @@ END_IF;
       de conditionnement bas niveau, à instancier en tableau (§3) ou
       composée directement dans un FB métier.
    🔁 Rôle : inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte.
-   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
-      d'architecture en attente — composition interne vs FB_IO générique
-      séparé). Ce fichier ne fait QUE créer la brique elle-même.
+   ✅ TRANCHÉ 2026-08-04 : diagnostic carte disponible au niveau MODULE (pas canal) via
+      `GetDeviceState()` sur les 3 supports DI (`Local_Digital_IO`, `VH_0800END`, `VH_0808ETP`).
+      `ChannelOk` reste à sa valeur par défaut `TRUE` (pas de source par canal individuel
+      disponible matériellement) — le diagnostic module est porté séparément par
+      `PRG_02_Acquisition` (voir AF06 §3bis), pas par cette brique. Limitation assumée,
+      pas un oubli : documentation à revoir si un module diagnostiquant chaque canal est
+      installé.
+      Intégration dans Winch/Translation : composition directe dans `PRG_04`/`PRG_05` via
+      `InputModuleFault` → `SafeStop`, pas de FB_IO générique séparé.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Input) ===</html:xhtml>
           </documentation>
@@ -25960,6 +26028,40 @@ PreviousQualified := Qualified;
                 <BYTE />
               </type>
             </variable>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (§1bis).
+       Granularité MODULE, pas canal : GetDeviceState() est un état de carte.
+TRUE = module Local_Digital_IO opérationnel</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = module VH_0800END opérationnel (freins/thermiques/AU)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = module VH_0808ETP opérationnel (positions M3/hydraulique/crible)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModuleFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = au moins un des 3 modules DI hors service</html:xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="instSimBench">
@@ -26112,6 +26214,14 @@ HwReal.Machine.PhaseRotationOk_DI         := PhaseRotationOk_DI;
 HwReal.Machine.BrakeThermalOk_DI          := BrakeThermalOk_DI;
 HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
 HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
+
+// 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
+// GetDeviceState() = RUNNING =&gt; module opérationnel. Pas de bypass simulation ici :
+// un module DI absent en simulation banc reste un fait matériel réel, pas un choix modélisé.
+LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
+Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
+Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
+InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
 
 
 // === 🎭 §2 SIMULATION &amp; AIGUILLAGE (HwIn) ===
@@ -26729,8 +26839,8 @@ instDiveSearch(
     MotionDirection := MaintenanceMotionDirection,
     BucketIsOpen := _BucketState.IsOpen,
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI,
-    M1Position_M := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
-    M2Position_M := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    M1Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
+    M2Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     PositionsValid := TRUE,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
@@ -26751,8 +26861,8 @@ instExtractionSequence(
     BucketBusy := instBucket.Busy,
     BucketError := instBucket.Error,
     WinchSyncError := instWinchSync.Error,
-    M1Position_M := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
-    M2Position_M := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    M1Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
+    M2Position_M := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     M1MeasuredSpeedValid := TRUE,
     M2MeasuredSpeedValid := TRUE,
     PositionsValid := TRUE,
@@ -26788,8 +26898,8 @@ instBucket(
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection     := MaintenanceMotionDirection,
-    CablePosM1          := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
-    CablePosM2          := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    CablePosM1          := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
+    CablePosM2          := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     HomedM1             := TRUE,
     HomedM2             := TRUE,
     M1_Busy             := instWinchM1.Busy,
@@ -26883,8 +26993,8 @@ instWinchSync(
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode            := PRG_03_Modes_Cycle.Auth.Mode,
-    CablePosM1      := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
-    CablePosM2      := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    CablePosM1      := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
+    CablePosM2      := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     HomedM1         := TRUE,
     HomedM2         := TRUE,
     SyncEnable      := PRG_03_Modes_Cycle.Auth.SyncEnable,
@@ -26937,8 +27047,11 @@ END_IF;
 BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
 BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
 
-SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected;
-SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000);
+// 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
+// les retours frein/thermique/contacteurs/fin de course des DEUX treuils (VH_0800END,
+// Local_Digital_IO) — pas de granularité par treuil possible, donc SafeStop des DEUX.
+SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.InputModuleFault;
+SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.InputModuleFault;
 
 ForbidDescentM1_Raw := GVL_IHM.M1TreuilRetenue.Bypass.Global;
 ForbidDescentM2_Raw := GVL_IHM.M2TreuilBenne.Bypass.Global;
@@ -26981,7 +27094,7 @@ instWinchM1(
     CfgRampDecelFastRate    := _WinchM1CfgPersist.CfgRampDecelFastRate,
     Homed                   := TRUE,
     HomingSuspect           := FALSE,
-    CablePosM               := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue,
+    CablePosM               := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue),
     TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -27015,7 +27128,7 @@ instWinchM2(
     CfgRampDecelFastRate    := _WinchM2CfgPersist.CfgRampDecelFastRate,
     Homed                   := TRUE,
     HomingSuspect           := FALSE,
-    CablePosM               := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue,
+    CablePosM               := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue),
     TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -27115,6 +27228,11 @@ WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
                 <REAL />
               </type>
             </variable>
+            <variable name="M3_SafeStop_Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <html:xhtml>═══════════════════════════════════════════════════════════════
@@ -27186,6 +27304,10 @@ IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THE
     SelTarget := 0;
 END_IF;
 
+// 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
+// les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
+M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
+
 CASE SelTarget OF
     1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie;
     2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP2;
@@ -27204,7 +27326,7 @@ instTranslationM3(
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
     StartStop               := M3_StartStop_Active,
-    SafeStop                := FALSE,
+    SafeStop                := M3_SafeStop_Active,
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
@@ -27228,7 +27350,7 @@ instTranslationM3(
 TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE);
 TranslationFinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
-TranslationFinalInterlockRequest.SafeStop := FALSE;
+TranslationFinalInterlockRequest.SafeStop := M3_SafeStop_Active;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
@@ -28822,9 +28944,9 @@ GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.Bypass.SlackCable                 := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 
-GVL_IHM.M1TreuilRetenue.State.Position_M                 := PRG_02_Acquisition.HwReal.Winch.COD1_PosValue;
+GVL_IHM.M1TreuilRetenue.State.Position_M                 := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD1_PosValue);
 GVL_IHM.M1TreuilRetenue.State.Ready                    := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable;
-GVL_IHM.M2TreuilBenne.State.Position_M                 := PRG_02_Acquisition.HwReal.Winch.COD2_PosValue;
+GVL_IHM.M2TreuilBenne.State.Position_M                 := UDINT_TO_REAL(PRG_02_Acquisition.HwReal.Winch.COD2_PosValue);
 GVL_IHM.M2TreuilBenne.State.Ready                    := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
@@ -28838,6 +28960,13 @@ GVL_IHM.Network.EncoderM2   := instDiagEthercat.DeviceEncoderM2;
 GVL_IHM.Network.VariateurM3 := instDiagEthercat.DeviceVariateur;
 GVL_IHM.Network.EcatError   := instDiagEthercat.Error;
 GVL_IHM.Network.EcatErrorId := instDiagEthercat.ErrorId;
+
+// 🩺 Diagnostic carte des 3 modules DI TOR réelles (AF06 §3bis) — lecture seule, calculé
+// dans PRG_02_Acquisition, simple recopie ici pour l'IHM (même patron que Network.*).
+GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigitalIoOk;
+GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
+GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
+GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.InputModuleFault;
 </html:xhtml>
           </ST>
         </body>
@@ -29678,6 +29807,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
             <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
             <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+            <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
             <Object Name="ST_InputsQualified" ObjectId="51fe3024-b436-5705-ba0a-b23eeb8d81c1" />
             <Object Name="ST_InputsQualifiedMachine" ObjectId="18b0977f-c616-5397-a6cd-1b0771318664" />
             <Object Name="ST_InputsQualifiedTranslation" ObjectId="34d6e72e-3e64-5692-a402-88c6f9b34cc1" />

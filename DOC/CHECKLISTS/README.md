@@ -19,6 +19,7 @@ Checklists de mise en service et de validation terrain.
 |---|---|
 | `CHECKLIST_MiseEnRoute_Simulation_v1.0.md` | Activation et test du banc de simulation, domaine par domaine |
 | `CHECKLIST_Essais_Persistance_Bypass_Frein_v1.0.md` | 11 défaillances + 3 protocoles — support de **T92** et **T72** |
+| `CHECKLIST_Essais_Diagnostic_Modules_DI_Simulation_v1.0.md` | Mémo général : simulation, modes, 22 TOR, diagnostic cartes DI et réactions SafeStop |
 
 ---
 

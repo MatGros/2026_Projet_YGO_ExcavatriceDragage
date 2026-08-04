@@ -7,9 +7,15 @@
       de conditionnement bas niveau, à instancier en tableau (§3) ou
       composée directement dans un FB métier.
    🔁 Rôle : inversion NO/NC, filtrage anti-rebond, diagnostic voie/carte.
-   🔴 INTÉGRATION dans Winch/Translation/etc. : PAS encore décidée (choix
-      d'architecture en attente — composition interne vs FB_IO générique
-      séparé). Ce fichier ne fait QUE créer la brique elle-même.
+   ✅ TRANCHÉ 2026-08-04 : diagnostic carte disponible au niveau MODULE (pas canal) via
+      `GetDeviceState()` sur les 3 supports DI (`Local_Digital_IO`, `VH_0800END`, `VH_0808ETP`).
+      `ChannelOk` reste à sa valeur par défaut `TRUE` (pas de source par canal individuel
+      disponible matériellement) — le diagnostic module est porté séparément par
+      `PRG_02_Acquisition` (voir AF06 §3bis), pas par cette brique. Limitation assumée,
+      pas un oubli : documentation à revoir si un module diagnostiquant chaque canal est
+      installé.
+      Intégration dans Winch/Translation : composition directe dans `PRG_04`/`PRG_05` via
+      `InputModuleFault` → `SafeStop`, pas de FB_IO générique séparé.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Input) ===
