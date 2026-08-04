@@ -1,0 +1,79 @@
+contract:
+  task_id: FIX_JOYSTICK_WINCH_SELECT_ZERO_COUPLED
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rendre la valeur 0 le couplage nominal M1+M2 de SelJoystickWinch, conserver 1=M1 seul
+    et 2=M2 seul, et aligner toutes les conditions code/documentation sans modifier la sécurité
+    ni introduire de coupure.
+  acceptance:
+    - id: AC1
+      statement: >
+        La convention unique est 0=M1+M2 couplés, 1=M1 seul, 2=M2 seul dans la commande IHM,
+        le bus Auth, FB_Modes et les documents actifs.
+      verified_by: grep global CODE/DOC hors ARCHIVES + revue des commentaires.
+    - id: AC2
+      statement: >
+        Le mode MAINT_N1 et tous les modes non MAINT_N2 forcent la sélection arbitrée à 0.
+      verified_by: grep des affectations Auth.JoystickWinchSelectArbitrated et lecture FB_Modes.
+    - id: AC3
+      statement: >
+        En MAINT_N2, 1 et 2 restent les seules sélections unitaires et 0 reste le couplage.
+      verified_by: inspection FB_Modes, PRG_02_Acquisition et PRG_04_Treuils_Benne.
+    - id: AC4
+      statement: >
+        Aucun test actif ne compare encore la sélection couplée à 3 et aucune valeur 3 n'est
+        documentée comme couplage dans les specs actives.
+      verified_by: grep CODE/DOC hors ARCHIVES.
+    - id: AC5
+      statement: >
+        Le bundle est frais, les tests/gates structurels passent et le nombre de KO liaison
+        ne régresse pas.
+      verified_by: generate_codesys_bundle.py, pytest ciblé, check_linkage.py, check_code_structure.py.
+    - id: AC6
+      statement: >
+        Device.export n'est pas modifié et aucun commit/push n'est réalisé sans validation humaine.
+      verified_by: git status --short -- PRJ_CODESYS/PROJ_Full_ImportExport/Device.export.
+    - id: AC7
+      statement: >
+        Le nom de fichier est égal au nom de POU pour PRG_02_Acquisition et PRG_04_Treuils_Benne.
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
+    - id: AC8
+      statement: >
+        Le suffixe est égal au langage généré dans le bundle PLCopenXML pour PRG_02_Acquisition et PRG_04_Treuils_Benne.
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
+  scope:
+    allowed:
+      - CODE/SUPERVISION/_TYPES/ST_ModesCmd.st
+      - CODE/SUPERVISION/_TYPES/ST_Modes_Autorisations.st
+      - CODE/MODES/FB_Modes.st
+      - CODE/MAIN/PRG_02_Acquisition.st
+      - CODE/MAIN/PRG_04_Treuils_Benne.st
+      - DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
+      - DOC/AF_Partie-09_Fonction_Encoder_v2.1.md
+      - DOC/PLAN_TASK_v1.0.md
+      - CODE/CODE_Bundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+  conservation:
+    must_survive:
+      - 1=M1 seul
+      - 2=M2 seul
+      - MAINT_N2 requis pour une sélection unitaire
+      - MAINT_N1 reste couplé nominal
+      - aucune modification de SafeStop, Enable, AU ou PowerCutOff
+    dropped_on_purpose:
+      - 3 comme valeur de couplage
+  evidence_required:
+    - grep_inventory
+    - bundle
+    - check_linkage
+    - diff_review
+    - device_export_unchanged
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute occurrence active de 3 utilisée pour le couplage, toute sélection unitaire autorisée
+    hors MAINT_N2 ou toute modification safety hors scope doit être signalée immédiatement.

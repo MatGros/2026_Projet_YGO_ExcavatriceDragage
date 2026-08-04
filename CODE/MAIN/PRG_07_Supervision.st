@@ -25,6 +25,7 @@ VAR
     instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg;
     instDiagCanOpen : FB_Diag_CanOpen;
     instDiagEthercat : FB_Diag_Ethercat;
+    instTroubleshootingView : FB_TroubleshootingView;
 END_VAR
 
 // === 🧩 §1 HORLOGE & RESET MACHINE ===
@@ -169,5 +170,31 @@ GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigital
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
 GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.InputModuleFault;
+
+
+// === 🕵️♂️ §4 VUE DÉPANNAGE (lecture seule stricte) ===
+
+instTroubleshootingView(
+    Enable               := TRUE,
+    HwIn                 := PRG_02_Acquisition.HwIn,
+    HwReal               := PRG_02_Acquisition.HwReal,
+    HwRealQualified      := PRG_02_Acquisition.HwRealQualified,
+    InputModuleFault     := PRG_02_Acquisition.InputModuleFault,
+    LocalDigitalIoOk     := PRG_02_Acquisition.LocalDigitalIoOk,
+    Vh0800EndOk          := PRG_02_Acquisition.Vh0800EndOk,
+    Vh0808EtpOk          := PRG_02_Acquisition.Vh0808EtpOk,
+    Auth                 := PRG_03_Modes_Cycle.Auth,
+    SimulationModeActive := GVL_Simulation.SimulationModeActive,
+    SimWinchActive       := GVL_Simulation.SimWinchActive,
+    SimTranslationActive := GVL_Simulation.SimTranslationActive,
+    SimOperatorActive    := GVL_Simulation.SimOperatorActive,
+    SimMachineActive     := GVL_Simulation.SimMachineActive,
+    WinchM1              := GVL_IHM.M1TreuilRetenue,
+    WinchM2              := GVL_IHM.M2TreuilBenne,
+    Sync                 := GVL_IHM.M1M2Sync,
+    Translation          := GVL_IHM.TranslationM3,
+    Commun               := GVL_IHM.Commun,
+    Network              := GVL_IHM.Network
+);
 
 END_PROGRAM

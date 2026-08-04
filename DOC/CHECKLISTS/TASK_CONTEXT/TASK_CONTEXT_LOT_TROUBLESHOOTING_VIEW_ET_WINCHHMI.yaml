@@ -1,0 +1,125 @@
+# Contrat orchestrateur — FB_TroubleshootingView + réorganisation ST_WinchHMI (Homing/Bucket)
+contract:
+  task_id: LOT_TROUBLESHOOTING_VIEW_ET_WINCHHMI
+  criticality: C2
+  strategy: patch
+  objective: >
+    Implémenter FB_TroubleshootingView (lecture seule, alimente GVL_Troubleshooting depuis
+    PRG_07_Supervision) selon la fiche déjà rédigée, et déplacer dans ST_WinchState les 9 champs
+    Homing* vers State.Encoder, et retirer Bucket de ST_WinchHMI (M1) pour ne le garder que côté
+    M2 — sans renommer Cmd/State/Cfg/Safety/Bypass ni casser un consommateur existant.
+  acceptance:
+    - id: AC1
+      statement: >
+        FB_TroubleshootingView n'a aucune VAR_OUTPUT de commande, écrit uniquement
+        GVL_Troubleshooting.*, et chaque champ écrit a un producteur documenté dans la fiche
+        DOC/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.0.md §5.
+      verified_by: >-
+        Lecture interface CODE/DEPANNAGE/FB_TroubleshootingView.st (aucun VAR_OUTPUT hors Ready) +
+        comparaison champ par champ avec la table §5 de la fiche.
+    - id: AC2
+      statement: >
+        FB_TroubleshootingView est instancié une seule fois, dans PRG_07_Supervision, après la
+        section §3 Projections IHM (donc après que tous les domaines aient publié GVL_IHM).
+      verified_by: "grep -c 'instTroubleshootingView(' CODE/MAIN/PRG_07_Supervision.st -> exactement 1, position après GVL_IHM.Network.InputModules.Fault"
+    - id: AC3
+      statement: >
+        Aucun champ TBD listé en fiche §6 n'affiche une valeur laissant croire à une mesure
+        réelle : soit non écrit (reste à l'init), soit écrit avec un commentaire explicite
+        "non câblé / TBD" à côté.
+      verified_by: "Lecture manuelle du corps de FB_TroubleshootingView.st, un commentaire par champ TBD."
+    - id: AC4
+      statement: >
+        ST_WinchState ne contient plus les 9 champs Homing* à sa racine ; ST_EncoderHMI les
+        contient à la place, sans renommage des autres champs de State (Position_M,
+        MeasuredSpeed_Mps, RelayFwd, Contactor1-4, BrakeCmd, FinalInterlock*, etc. inchangés).
+      verified_by: >-
+        grep -n 'Homed\|HomingBusy\|HomingDone\|HomingError\|HomingState\|HomingSuspect\|HomingRefRaw'
+        CODE/SUPERVISION/_TYPES/ST_WinchState.st -> 0 résultat ;
+        même grep sur CODE/SUPERVISION/_TYPES/ST_EncoderHMI.st -> 9 résultats.
+    - id: AC5
+      statement: >
+        ST_WinchHMI ne porte plus Bucket : ST_BucketHMI (structure partagée M1/M2). GVL_IHM.st
+        declare M2TreuilBenne avec un type distinct ST_WinchBenneHMI (compose ST_WinchHMI plus
+        Bucket) afin que M2TreuilBenne.Bucket.Cmd/.Cfg/.Bypass restent lisibles sans modifier
+        PRG_04_Treuils_Benne.st ni PRG_07_Supervision.st (les chemins d'acces ne changent pas).
+        M1TreuilRetenue reste de type ST_WinchHMI (sans Bucket).
+      verified_by: >-
+        grep -n 'Bucket' CODE/SUPERVISION/_TYPES/ST_WinchHMI.st -> 0 resultat ;
+        grep -n 'M2TreuilBenne' CODE/SUPERVISION/GVL_IHM.st -> type ST_WinchBenneHMI ;
+        check_linkage.py --report ne signale aucune reference cassee a M2TreuilBenne.Bucket.*
+    - id: AC6
+      statement: >
+        Cmd, State, Cfg, Safety, Bypass restent les noms de sous-structures de ST_WinchHMI ;
+        aucun champ autre que les 9 Homing* et Bucket n'est renommé, déplacé ou supprimé.
+      verified_by: "git diff CODE/SUPERVISION/_TYPES/ST_WinchHMI.st CODE/SUPERVISION/_TYPES/ST_WinchState.st -> aucune autre ligne modifiée que les déplacements Homing*/Bucket."
+    - id: AC7
+      statement: >
+        Le bundle est frais, la liaison ne régresse pas par rapport à la baseline avant ce lot,
+        et les gates structurels (structure, LD, CFC) passent.
+      verified_by: >-
+        python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . ;
+        python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report (comparer nombre de KO à la
+        baseline relevée avant modification) ;
+        python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py ;
+        python TOOLS/AGENT_WORKFLOW/scripts/check_ld_invariants.py . --report
+    - id: AC8
+      statement: >-
+        Device.export n'est pas modifié et aucun commit/push n'est fait par l'agent sans
+        validation humaine explicite après revue du diff par l'orchestrateur.
+      verified_by: "git status --short -- PRJ_CODESYS/PROJ_Full_ImportExport/Device.export -> vide"
+    - id: AC9
+      statement: >-
+        Le fichier CODE/MAIN/PRG_07_Supervision.st garde un nom de fichier identique au nom du
+        POU PRG_07_Supervision qu'il declare ; aucun nouveau PROGRAM cree par ce lot
+        (FB_TroubleshootingView est un FB, pas un POU MainTask, donc hors regle de suffixe LD/CFC).
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
+    - id: AC10
+      statement: >-
+        Le suffixe du fichier source PRG_07_Supervision est egal au langage genere dans le bundle PLCopenXML (ST, sans suffixe _LD/_CFC).
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
+  scope:
+    allowed:
+      - CODE/DEPANNAGE/FB_TroubleshootingView.st
+      - CODE/DEPANNAGE/GVL_Troubleshooting.st
+      - CODE/SUPERVISION/_TYPES/ST_WinchState.st
+      - CODE/SUPERVISION/_TYPES/ST_WinchHMI.st
+      - CODE/SUPERVISION/_TYPES/ST_EncoderHMI.st
+      - CODE/SUPERVISION/_TYPES/ST_WinchBenneHMI.st
+      - CODE/SUPERVISION/GVL_IHM.st
+      - CODE/MAIN/PRG_07_Supervision.st
+      - CODE/CODE_Bundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+      - CODE/SUPERVISION/_TYPES/ST_WinchCmd.st
+      - CODE/SUPERVISION/_TYPES/ST_WinchCfg.st
+      - CODE/SUPERVISION/_TYPES/ST_SafetyWinch.st
+      - CODE/SUPERVISION/_TYPES/ST_BypassWinch.st
+      - CODE/SUPERVISION/_TYPES/ST_BucketHMI.st
+      - toute logique métier, SafeStop, mode ou commande — ce lot est strictement observation
+  conservation:
+    must_survive:
+      - Noms des sous-structures Cmd/State/Cfg/Safety/Bypass de ST_WinchHMI
+      - Tous les champs de ST_WinchState hors les 9 Homing* déplacés (Position_M, MeasuredSpeed_Mps,
+        RelayFwd, Contactor1-4, BrakeCmd, FinalInterlock*, ContactorsCheck, BrakeContactorCheck...)
+      - Accès M2TreuilBenne.Bucket.Cmd/.Cfg/.Bypass depuis PRG_04_Treuils_Benne.st
+      - Lecture seule stricte de PRG_07_Supervision (aucune écriture commande/config/interlock)
+      - Producteur unique par champ GVL_IHM déjà publié ailleurs (pas de second producteur)
+    dropped_on_purpose:
+      - Bucket sur M1TreuilRetenue (jamais utilisé, documenté "inerte" depuis son ajout 70377f5)
+      - Ancien PRG_11_Troubleshooting et ses POU legacy cités dans les ST_Chain* (non recréés)
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_review
+    - device_export_unchanged
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Tout champ ST_Chain* sans producteur réel identifiable (fiche §6 TBD), toute référence
+    cassée à Bucket ou Homing* trouvée en cours de route, ou tout consommateur non prévu par
+    cette liste, est remonté immédiatement à l'orchestrateur — jamais masqué par une valeur
+    inventée ou un producteur ajouté hors scope.

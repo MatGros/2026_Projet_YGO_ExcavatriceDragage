@@ -94,7 +94,7 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 | `Mode` | Mode arbitré (DISABLE/N1/N2/SEMI_AUTO) |
 | `SyncEnable` | Synchro M1/M2 (logique positive) |
 | `InhibitM1/2` | Inhibition treuil M1/M2 (MAINT_N2 only) |
-| `JoystickWinchSelectArbitrated` | 1=M1, 2=M2, 3=Couplé (N2 only) |
+| `JoystickWinchSelectArbitrated` | 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2 uniquement) |
 | `HomingApproachEnable` | Dépassement butée haut (N2) |
 | `MaintenanceM3TargetEnable` | Cible Translation Maintenance (N2 only) |
 

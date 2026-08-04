@@ -167,10 +167,10 @@ Seule **l'affectation POU** change.
 | Ligne | Port alimenté | Expression exacte lue dans le code |
 |---|---|---|
 | `:72` | `Mode` (M1) | `PRG_MODES_CFC.Auth.Mode` |
-| `:74-75` | `UnitaryMode` (M1) | `(PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated <> 3)` |
+| `:74-75` | `UnitaryMode` (M1) | `(PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated <> 0)` |
 | `:76` | `WinchSelected` (M1) | `(PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 1)` |
 | `:122` | `Mode` (M2) | `PRG_MODES_CFC.Auth.Mode` |
-| `:124-125` | `UnitaryMode` (M2) | `(PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated <> 3)` |
+| `:124-125` | `UnitaryMode` (M2) | `(PRG_MODES_CFC.Auth.Mode = E_Mode.MAINT_N2) AND (PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated <> 0)` |
 | `:126` | `WinchSelected` (M2) | `(PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated = 2)` |
 
 La même lecture existe sur les étages voisins de la chaîne : `instEncoderAbsM1/M2` (`:55`, `:105`)
@@ -186,7 +186,7 @@ Or dans l'architecture cible, l'acquisition est au **rang 02** et les modes au *
 
 ```text
 02 PRG_02_Acquisition   ← devrait contenir instHomingM1/M2
-03 PRG_03_Modes_Cycle   ← produit Auth.Mode et Auth.JoystickWinchSelectArbitrated
+03 PRG_03_Modes_Cycle   ← produit Auth.Mode et Auth.JoystickWinchSelectArbitrated (0=couplé, 1=M1, 2=M2)
 ```
 
 Le consommateur s'exécuterait donc **avant** son producteur. La règle d'ordonnancement
