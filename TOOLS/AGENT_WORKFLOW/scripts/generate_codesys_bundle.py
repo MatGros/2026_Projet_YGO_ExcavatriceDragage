@@ -56,6 +56,17 @@ def main() -> int:
     if result.returncode:
         return result.returncode
 
+    # Post-traitement oracle : remplacer PRG_06_Outputs_LD par l'oracle CODESYS
+    # (REX 2026-08-04 : ld_builder.py produit un LD non importable)
+    oracle_script = generator_dir / "scripts" / "prg06_oracle_postprocess.py"
+    bundle_path = code_dir / "CODE_Bundle.xml"
+    result_oracle = subprocess.run(
+        [sys.executable, str(oracle_script), str(bundle_path)],
+        cwd=generator_dir,
+    )
+    if result_oracle.returncode:
+        print("WARNING: oracle post-processing failed for PRG_06_Outputs_LD", file=sys.stderr)
+
     return subprocess.run([sys.executable, str(freshness), str(root)]).returncode
 
 

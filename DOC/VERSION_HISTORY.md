@@ -4,6 +4,14 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `FIX_PRG06_IMPORT_INDEXOUTOFRANGE` — 2026-08-04
+- **Bug import CODESYS** : `PRG_06_Outputs_LD` échouait avec `IndexOutOfRangeException`
+- **Cause racine** : convention CODESYS non documentée — le **premier output** d'un bloc FB en LD doit être en forme "câblée" `<connectionPointOut />` (SANS `<expression/>`), même si aucune coil n'est connectée
+- **Oracle** : `PRG_TestSafety_LD.xml` (export CODESYS réel) confirme la convention
+- **Correction** : `ld_builder.py` chemin multi-paramètres émet maintenant le premier output en forme câblée, les autres en forme non-câblée
+- **Tests** : 372 tests passent, garde anti-régression ajoutée (`test_ld_multi_param_fb_first_output_cabled_form`)
+- **REX** : `DOC/REX_PRG06_Import_Error.md` (investigation complète avec dichotomie A→H)
+
 ### `M0BIS_ALIGNEMENT_DOC_7POU` — 2026-08 (documentation seule)
 - Architecture actée : **7 POU par ensemble mécanique**, chaque procédé portant sa safety dans sa page
 - `PRG_01_Inputs_LD` · `PRG_02_Acquisition` · `PRG_03_Modes_Cycle` · `PRG_04_Treuils_Benne` · `PRG_05_Translation` · `PRG_06_Outputs_LD` · `PRG_07_Supervision`

@@ -90,7 +90,12 @@ def discover_objects(code_dir: Path, diagnostics: DiagnosticCollector) -> list[S
     # 🧱 Découverte des POU XML natifs (ex. PRG_GLOBAL_CFC.xml, PRG_AU_Acquisition_CFC.xml)
     all_xml_files = sorted(code_dir.rglob("*.xml"))
     for f in all_xml_files:
-        if "_Bundle" in f.name or f.name.startswith("CODE_"):
+        # Exclure les bundles générés (CODE_Bundle.xml) ET les artefacts de test
+        # de dichotomie (Bundle_H*.xml) : ces derniers contiennent des POU
+        # homonymes (ex. FB_Safety_EmergencyManagement) qui ÉCRASENT le vrai FB
+        # dans objects_by_name → outputVariables vide → IndexOutOfRangeException
+        # CODESYS à l'import (REX 2026-08-04, PRG_06_Outputs_LD).
+        if "_Bundle" in f.name or f.name.startswith("CODE_") or f.name.startswith("Bundle_"):
             continue
         rel = f.relative_to(code_dir).as_posix()
         rel_parent = f.parent.relative_to(code_dir)

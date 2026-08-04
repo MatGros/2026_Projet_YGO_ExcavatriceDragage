@@ -96,3 +96,59 @@ def test_ld_body_creates_standalone_banner_networks():
     banner_comment = comments[0].find(".//xhtml").text
     assert "// === [TREUIL M1] ===" in banner_comment
     assert "// Description générale M1" in banner_comment
+
+
+def test_ld_multi_param_fb_emits_all_declared_outputs():
+    """Garde anti-régression : un FB multi-params composite (ex. FB_Safety)
+    doit émettre TOUS ses outputs déclarés dans <outputVariables>. Une balise
+    <outputVariables/> vide provoque une IndexOutOfRangeException à l'import
+    CODESYS (REX 2026-08-04, régression commit af5566a)."""
+    st_code = """
+    instSafety(Enable := TRUE, Reset := Reset, ArmRequest := Arm);
+    Out := instSafety.State;
+    """
+    ld_xml = build_ld_body(
+        st_code,
+        instance_types={"instSafety": "FB_Safety_EmergencyManagement"},
+        instance_input_types={"instSafety": {"Enable": "BOOL", "Reset": "BOOL", "ArmRequest": "BOOL"}},
+        instance_output_types={"instSafety": ["Ready", "Busy", "Done", "Error", "ErrorId", "MaintainA_RQ", "MaintainB_RQ", "ArmPulse_RQ", "State", "Diag", "ArmingSeqStep", "RedundancyTestFailed", "EmergencyArmingFailed", "EmergencyArmingLockoutActive"]},
+    )
+    blocks = [b for b in ld_xml.findall(".//block") if b.get("instanceName") == "instSafety"]
+    assert len(blocks) == 1
+    out_vars = blocks[0].find("outputVariables")
+    out_fps = [v.get("formalParameter") for v in out_vars.findall("variable")]
+    assert out_fps == ["Ready", "Busy", "Done", "Error", "ErrorId", "MaintainA_RQ", "MaintainB_RQ", "ArmPulse_RQ", "State", "Diag", "ArmingSeqStep", "RedundancyTestFailed", "EmergencyArmingFailed", "EmergencyArmingLockoutActive"]
+
+
+def test_ld_multi_param_fb_first_output_cabled_form():
+    """Garde anti-régression REX 2026-08-04 (PRG_06_Outputs_LD) :
+    Dans le chemin multi-params (instSafety(...)), le **premier output** DOIT
+    être en forme 'câblée' <connectionPointOut/> (SANS <expression/>), même si
+    aucune coil n'est connectée. C'est la convention CODESYS pour le 'principal'
+    output du bloc (oracle PRG_TestSafety_LD.xml).
+    
+    Si TOUS les outputs sont en forme non-câblée <connectionPointOut><expression/>,
+    CODESYS lève IndexOutOfRangeException à l'import (REX 2026-08-04, bundles D/E/F/G/H)."""
+    st_code = """
+    instSafety(Enable := TRUE, Reset := Reset, ArmRequest := Arm);
+    Out := instSafety.State;
+    """
+    ld_xml = build_ld_body(
+        st_code,
+        instance_types={"instSafety": "FB_Safety_EmergencyManagement"},
+        instance_input_types={"instSafety": {"Enable": "BOOL", "Reset": "BOOL", "ArmRequest": "BOOL"}},
+        instance_output_types={"instSafety": ["Ready", "State", "Error"]},
+    )
+    blk = [b for b in ld_xml.findall(".//block") if b.get("instanceName") == "instSafety"][0]
+    out_vars = blk.find("outputVariables").findall("variable")
+    
+    # Premier output : forme câblée (SANS <expression/>)
+    first_var = out_vars[0]
+    assert first_var.get("formalParameter") == "Ready"
+    first_cpo = first_var.find("connectionPointOut")
+    assert first_cpo.find("expression") is None, "Le premier output doit être en forme câblée (sans expression)"
+    
+    # Autres outputs : forme non-câblée (AVEC <expression/>)
+    for var in out_vars[1:]:
+        cpo = var.find("connectionPointOut")
+        assert cpo.find("expression") is not None, f"{var.get('formalParameter')} doit être en forme non-câblée (avec expression)"

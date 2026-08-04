@@ -226,6 +226,19 @@ def _build_pou(
         # declared input types so TIME/INT/WORD/REAL use `<inVariable>`.
         instance_input_types: dict[str, dict[str, str]] = {}
         instance_output_types: dict[str, list[str]] = {}
+        instance_output_type_map: dict[str, dict[str, str]] = {}
+        # Carte des types de membres de structs pour résoudre les chemins nested
+        # (ex. instSafety.Diag.LockoutActive → ST_Safety_Emergency_Diag.LockoutActive : BOOL)
+        struct_member_types: dict[str, dict[str, str]] = {
+            o.name: {v.name: getattr(v.type, 'name', None) for v in o.struct_fields}
+            for o in objects_by_name.values()
+            if o.kind == "struct"
+        }
+        # Ignorer les membres sans type nommé (StringType, ArrayType, etc.)
+        struct_member_types = {
+            s: {m: t for m, t in members.items() if t is not None}
+            for s, members in struct_member_types.items()
+        }
         for variable in variables:
             if not isinstance(variable.type, DerivedType):
                 continue
@@ -235,13 +248,28 @@ def _build_pou(
             instance_input_types[variable.name] = {
                 input_var.name: input_var.type.name
                 for input_var in called_fb.input_vars
-                if isinstance(input_var.type, BaseType)
             }
             instance_output_types[variable.name] = [
                 output_var.name
                 for output_var in called_fb.output_vars
-                if isinstance(output_var.type, BaseType)
             ]
+            instance_output_type_map[variable.name] = {
+                output_var.name: output_var.type.name
+                for output_var in called_fb.output_vars
+            }
+
+        # Résoudre les chemins nested (struct → membre BOOL) en ajoutant les membres
+        # BOOL des structs à la carte des types d'outputs. Ex. instSafety.Diag : struct
+        # → instSafety.Diag.LockoutActive : BOOL (membre de ST_Safety_Emergency_Diag).
+        # REX 2026-08-04 (PRG_06_Outputs_LD) : recopies BOOL nested étaient rendues en
+        # inVariable → outVariable (IndexOutOfRangeException à l'import CODESYS).
+        for inst_name, out_map in list(instance_output_type_map.items()):
+            for out_name, out_type in list(out_map.items()):
+                if out_type in struct_member_types:
+                    for member_name, member_type in struct_member_types[out_type].items():
+                        nested_key = f"{out_name}.{member_name}"
+                        if nested_key not in out_map:
+                            out_map[nested_key] = member_type
         pou.append(
             build_ld_body(
                 obj.body_text or "",
@@ -249,6 +277,7 @@ def _build_pou(
                 instance_types,
                 instance_input_types,
                 instance_output_types,
+                instance_output_type_map,
             )
         )
     else:
