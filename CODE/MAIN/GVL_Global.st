@@ -38,9 +38,11 @@ VAR_GLOBAL
     EmergencyArmingPulseActive   : BOOL;
     EmergencyArmingLockoutActive: BOOL;
     ArmingSeqStep                : INT;
-
-    // Diagnostic Interlocks de sortie (recopie de PRG_10_Outputs_LD)
-    instWinchOutputInterlockM1_LD     : FB_WinchOutputInterlock_LD;
-    instWinchOutputInterlockM2_LD     : FB_WinchOutputInterlock_LD;
-    instTranslationOutputInterlock_LD : FB_TranslationOutputInterlock_LD;
 END_VAR
+(* 🗑️ REX LOT_STRUCTURE_INTERLOCKS_LD (2026-08) : instWinchOutputInterlockM1_LD /
+   M2_LD / instTranslationOutputInterlock_LD retirés d'ici — c'étaient des
+   instances FB déclarées mais JAMAIS appelées (orphelines, check_linkage L13-FB).
+   Les instances réelles vivent maintenant dans PRG_06_Outputs_LD (seul
+   producteur), qui publie déjà leurs sorties utiles (M1RelayFwd...) recopiées
+   ci-dessus. Une deuxième instance ici aurait dupliqué l'état sans jamais
+   être appelée : source de confusion, pas de valeur ajoutée. *)

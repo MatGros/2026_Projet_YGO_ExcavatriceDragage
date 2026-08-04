@@ -1,7 +1,7 @@
 # 🔬 REX — Bug import CODESYS PRG_06_Outputs_LD (multi-causes)
 
-**Date** : 2026-08-04  
-**Version** : v1.0  
+**Date** : 2026-08-04 (mis à jour 2026-08, LOT_STRUCTURE_INTERLOCKS_LD)  
+**Version** : v1.1  
 **Statut** : ✅ Résolu (import + ouverture + simulation OK)
 
 ---
@@ -92,6 +92,45 @@ Règles tirées des oracles `PRG_06_Outputs_LD.xml` / `PRG_Oracle_Nested.xml` :
 - ✅ Ouverture PRG_06 : réseaux LD visibles, commentaires affichés
 - ✅ Simulation PRG_01 + PRG_06 : OK
 - ✅ Bundle frais : `python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .` → PASS
+
+---
+
+## 🆕 Cause #6 (2026-08, LOT_STRUCTURE_INTERLOCKS_LD) — Contact externe mal référencé sur broche de sortie de bloc
+
+**Contexte** : ajout des barrières finales `FB_WinchOutputInterlock_LD` (×2) et
+`FB_TranslationOutputInterlock_LD` visibles en réseaux LD séparés, avec tentative
+de rendre chaque sortie physique (`RelayFwd`, `BrakeCmd`...) visible via un
+réseau extérieur dédié (contact sur la broche de sortie du bloc → coil),
+séparément du bloc lui-même.
+
+**Symptome** : import CODESYS échoué, `«référence de l'objet non définie»`.
+
+**Cause racine** : un `<contact>` câblé sur une broche de sortie précise d'un
+bloc (`connection refLocalId=<block_id> formalParameter=<Output>`) DOIT porter
+une `<variable>` dont le texte correspond **exactement** à la référence source
+attendue par CODESYS pour cette connexion (ex. `instWinchOutputInterlockM1.RelayFwd`),
+et non un simple alias local (`M1RelayFwd`). Un mismatch entre le libellé
+affiché du contact et sa connexion réelle casse la résolution d'opérande à
+l'ouverture/import, même si la structure XML est par ailleurs valide
+(localId croissant, pas de doublon, etc. — les règles 1-5 ci-dessus passaient).
+
+**Correctif retenu (règle #6, définitive)** : ne JAMAIS câbler un contact
+externe directement sur une broche de sortie de bloc (`formalParameter`) pour
+«ré-exposer» une sortie. Assigner la sortie **directement par `<expression>`
+dans le bloc lui-même** (`outputVariables/variable/connectionPointOut/expression`
+→ variable locale du POU). La variable locale reste ensuite consultable/visible
+via son propre réseau séparé (ex. coil de recopie `GVL_Global.*`), jamais via un
+contact pointé sur la broche du bloc producteur.
+
+**Fichier concerné** : `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py`
+(fonctions `_build_winch_interlock_network` / `_build_translation_interlock_network`
+— assignation directe par expression ; la fonction intermédiaire
+`_build_interlock_output_networks` / `_make_contact_from_block_output`, source
+du bug, a été retirée).
+
+**Preuve de non-régression** : vérifier après toute génération qu'aucun
+`<contact>` du bundle ne porte `connection[@formalParameter]` pointant vers un
+`<block>` (recherche automatisable — zéro occurrence attendue pour PRG_06).
 
 ---
 

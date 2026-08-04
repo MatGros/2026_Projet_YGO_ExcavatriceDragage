@@ -124,6 +124,28 @@ def check_bundle(bundle: Path, report: bool = False) -> tuple[list[str], list[st
             f"[REX: IndexOutOfRangeException]"
         )
 
+    # --- 5. Pas de contact câblé sur une broche de sortie de bloc ---
+    # REX 2026-08 (LOT_STRUCTURE_INTERLOCKS_LD, DOC/REX_PRG06_Import_Error.md cause #6) :
+    # un <contact> connecte(refLocalId=<block>, formalParameter=<Output>) casse la
+    # résolution d'opérande CODESYS («référence de l'objet non définie») dès que son
+    # libellé <variable> n'est pas EXACTEMENT la référence source attendue. Règle :
+    # une sortie de bloc s'assigne UNIQUEMENT par <expression> dans le bloc lui-même,
+    # jamais via un contact externe pointé sur sa broche de sortie.
+    for contact in ld.findall("pou:contact", NS):
+        conn = contact.find("pou:connectionPointIn/pou:connection", NS)
+        if conn is not None and conn.get("formalParameter") and conn.get("refLocalId") in all_ids:
+            ref_el = all_ids.get(conn.get("refLocalId"))
+            if ref_el is not None and _tag(ref_el) == "block":
+                var = contact.find("pou:variable", NS)
+                errors.append(
+                    f"contact localId={contact.get('localId')} variable "
+                    f"'{var.text if var is not None else '?'}' câblé sur la broche de "
+                    f"sortie '{conn.get('formalParameter')}' du bloc localId={conn.get('refLocalId')} "
+                    f"[REX: référence de l'objet non définie à l'import/ouverture, "
+                    f"DOC/REX_PRG06_Import_Error.md cause #6 — assigner par <expression> "
+                    f"dans le bloc, jamais via contact externe]"
+                )
+
     return errors, warnings
 
 
