@@ -1,0 +1,82 @@
+contract:
+  task_id: LOT_STRUCTURE_INTERLOCKS_LD
+  criticality: C4
+  strategy: patch
+  objective: >
+    Rendre visibles dans PRG_06_Outputs_LD les barrières finales M1/M2/M3 et leurs conditions
+    d'interdiction, tout en maintenant SafetyStructureNotValidated à TRUE afin qu'aucune sortie
+    physique ne soit autorisée avant le raccordement safety complet.
+  acceptance:
+    - id: AC1
+      statement: >
+        Le bundle PRG_06 contient un réseau LD distinct pour l'interlock final M1, M2 et M3,
+        avec les blocs FB_WinchOutputInterlock_LD et FB_TranslationOutputInterlock_LD visibles.
+      verified_by: grep bundle des trois typeName + check_ld_invariants.py.
+    - id: AC2
+      statement: >
+        Les interlocks reçoivent les demandes publiques ST_WinchFinalInterlockRequest et
+        ST_TranslationFinalInterlockRequest, sans lire de variables internes de FB.
+      verified_by: inspection gen_prg06_oracle.py et bundle XML.
+    - id: AC3
+      statement: >
+        SafetyStructureNotValidated est initialisé TRUE et la chaîne finale maintient les sorties
+        physiques à FALSE tant que ce garde-fou n'est pas explicitement retiré dans un lot safety validé.
+      verified_by: grep exact dans source/oracle + test manuel CODESYS sans téléchargement production.
+    - id: AC4
+      statement: >
+        Les commandes physiques restent derrière les sorties des interlocks finaux ; aucun FB_Output
+        ne reçoit directement une demande moteur non interlockée.
+      verified_by: inspection du graphe LD généré et check_linkage.py.
+    - id: AC5
+      statement: >
+        Le code existant de sécurité AU et les polarités PowerKeepAlive ne sont pas modifiés.
+      verified_by: git diff ciblé PRG06/oracle + revue manuelle.
+    - id: AC6
+      statement: >
+        Bundle frais, gates structurels passent, et aucun nouveau KO liaison n'est introduit.
+      verified_by: generate_codesys_bundle.py, check_linkage.py, check_code_structure.py, check_ld_invariants.py.
+    - id: AC7
+      statement: >
+        Device.export n'est pas modifié et aucun commit/push n'est effectué sans validation humaine.
+      verified_by: git status --short -- PRJ_CODESYS/PROJ_Full_ImportExport/Device.export.
+    - id: AC8
+      statement: >
+        Le nom de fichier est égal au nom de POU pour PRG_06_Outputs_LD.
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
+    - id: AC9
+      statement: >
+        Le suffixe est égal au langage généré dans le bundle PLCopenXML pour PRG_06_Outputs_LD.
+      verified_by: python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_06_Outputs_LD.st
+      - CODE/MAIN/GVL_Global.st
+      - TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py
+      - CODE/CODE_Bundle.xml
+      - DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+      - DOC/AF_Partie-11_Fonction_Translation_v2.0.md
+      - DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT_STRUCTURE_INTERLOCKS_LD.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+      - toute modification des paramètres safety ou des FB_Safety métier dans ce lot
+  conservation:
+    must_survive:
+      - Barrière AU physique et FB_Safety_EmergencyManagement
+      - Polarité PowerKeepAlive TRUE=maintien sain
+      - SafeStop = rampe rapide, pas coupure sèche
+      - demandes publiques des procédés
+    dropped_on_purpose:
+      - Aucun comportement physique activé : garde-fou SafetyStructureNotValidated reste TRUE
+  evidence_required:
+    - bundle
+    - check_linkage
+    - check_ld_invariants
+    - diff_review
+    - device_export_unchanged
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute connexion provisoire qui pourrait autoriser une sortie physique, toute entrée safety
+    manquante ou toute modification de polarité doit être signalée immédiatement et bloquée.
