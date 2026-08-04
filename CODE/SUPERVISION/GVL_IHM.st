@@ -6,7 +6,7 @@
    ═══════════════════════════════════════════════════════════════ *)
 VAR_GLOBAL RETAIN
     M1TreuilRetenue : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Retenue (M1) *)
-    M2TreuilBenne : ST_WinchHMI;  (* 🛗 Variables d'échange IHM Treuil Benne (M2) *)
+    M2TreuilBenne : ST_WinchBenneHMI;  (* 🛞️ Variables d'échange IHM Treuil Benne (M2) — type dédié avec Bucket (2026-08) *)
     M1M2Sync : ST_SyncHMI;  (* ⚖️ Variables d'échange IHM Surveillance de synchro *)
     JOY1Joystick : ST_JoystickHMI; (* 🕹️ Variables d'échange IHM Joystick (noeud CANopen JOY1) *)
     Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)

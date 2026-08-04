@@ -46,16 +46,7 @@ STRUCT
     FinalStepDelayElapsed    : TIME;            (* ⏱️ Écoulé entre paliers 1s250 *)
     
     (* 🛡️ Sécurités & Diagnostics *)
-    Homed                   : BOOL;             (* 🎯 Prise d'origine (Homing) validée *)
-    HomingBusy              : BOOL;             (* ⏳ Référencement en cours *)
-    HomingDone              : BOOL;             (* ✅ Pulse de référencement réussi *)
-    HomingError             : BOOL;             (* 🔴 Défaut de référencement *)
-    HomingErrorId           : WORD;             (* ❌ Bitfield défaut homing *)
-    HomingState             : E_State;          (* 🤖 État FB_Encoder_Homing *)
-    HomingStateAtError      : E_State;          (* 🧭 État lors du défaut *)
-    HomingSuspect           : BOOL;             (* ⚠️ Référence à confirmer *)
-    HomingRefRaw            : UDINT;            (* 📐 Référence brute appliquée *)
-    Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur *)
+    Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (déplacés 2026-08, voir ST_EncoderHMI) *)
     
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
     ContactorsCheck         : ST_ContactorCheck; (* 🔌 Coherence contacteurs sens+vitesse *)

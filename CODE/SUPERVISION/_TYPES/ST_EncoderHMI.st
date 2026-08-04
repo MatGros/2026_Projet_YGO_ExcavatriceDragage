@@ -13,5 +13,16 @@ STRUCT
     PresetValueOut   : UDINT; (* 📐 Valeur de preset envoyée au codeur *)
     Error            : BOOL;  (* 🔴 Codeur en défaut (liaison EtherCAT ou preset) *)
     ErrorId          : WORD;  (* ❌ Code défaut codeur *)
+
+    (* 🎯 Homing — déplacés depuis ST_WinchState racine (2026-08, réorganisation ST_WinchHMI/Homing) *)
+    Homed                   : BOOL;             (* 🎯 Prise d'origine (Homing) validée *)
+    HomingBusy              : BOOL;             (* ⏳ Référencement en cours *)
+    HomingDone              : BOOL;             (* ✅ Pulse de référencement réussi *)
+    HomingError             : BOOL;             (* 🔴 Défaut de référencement *)
+    HomingErrorId           : WORD;             (* ❌ Bitfield défaut homing *)
+    HomingState             : E_State;          (* 🤖 État FB_Encoder_Homing *)
+    HomingStateAtError      : E_State;          (* 🧭 État lors du défaut *)
+    HomingSuspect           : BOOL;             (* ⚠️ Référence à confirmer *)
+    HomingRefRaw            : UDINT;            (* 📐 Référence brute appliquée *)
 END_STRUCT
 END_TYPE

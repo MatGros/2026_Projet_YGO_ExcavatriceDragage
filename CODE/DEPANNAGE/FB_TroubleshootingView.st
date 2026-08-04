@@ -1,0 +1,235 @@
+(* ═══════════════════════════════════════════════════════════════
+   🕵️♂️ FB_TroubleshootingView — Mise en forme lecture seule pour dépannage
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.0.md
+   🔗 Producteur unique de GVL_Troubleshooting.* — instancié UNE SEULE FOIS,
+      dans PRG_07_Supervision, après §3 Projections IHM.
+   🔒 Lecture seule stricte : aucune VAR_OUTPUT de commande, aucun calcul métier,
+      aucune fusion de source — pure recopie de faits déjà publiés ailleurs.
+   ⚠️ WinchM2 est typé ST_WinchBenneHMI (pas ST_WinchHMI comme WinchM1) : ce lot
+      (LOT_TROUBLESHOOTING_VIEW_ET_WINCHHMI) a introduit ST_WinchBenneHMI pour porter
+      Bucket côté M2 uniquement (GVL_IHM.M2TreuilBenne) — adaptation du port fiche §3
+      nécessaire suite à AC5 (Bucket retiré de ST_WinchHMI commun M1/M2).
+   🔧 REX écriture GVL directe : seule exception au principe "pas de GVL comme bus de
+      commande" (AF_Partie-03 §5) — GVL_Troubleshooting n'est jamais relue par un FB
+      métier, uniquement par Watch CODESYS / export SCADA dépannage (fiche §3/§7).
+   ⚠️ Idx201_JoystickSelected (ContexteMachineGlobal) lit GVL_IHM.Modes.Cmd.TglJoystickMaster
+      directement (variable globale IEC 61131-3, visible sans passage par VAR_INPUT) — ce
+      port n'est pas dans la table fiche §3 mais le producteur exact est documenté fiche §5.1.
+   ═══════════════════════════════════════════════════════════════ *)
+FUNCTION_BLOCK PUBLIC FB_TroubleshootingView
+VAR_INPUT
+    Enable                   : BOOL; (* TRUE en permanence — fiche §3, aucune condition de scan *)
+
+    (* 📡 PRG_02_Acquisition *)
+    HwIn                     : ST_HardwareImage;
+    HwReal                   : ST_HardwareImage;
+    HwRealQualified          : ST_HardwareImage;
+    InputModuleFault         : BOOL;
+    LocalDigitalIoOk         : BOOL; (* Mirroir Network.InputModules — pas de champ ST_Chain* dédié ce lot *)
+    Vh0800EndOk              : BOOL; (* idem *)
+    Vh0808EtpOk              : BOOL; (* idem *)
+
+    (* 🎚️ PRG_03_Modes_Cycle *)
+    Auth                     : ST_Modes_Autorisations;
+
+    (* 🎭 GVL_Simulation *)
+    SimulationModeActive     : BOOL;
+    SimWinchActive           : BOOL;
+    SimTranslationActive     : BOOL;
+    SimOperatorActive        : BOOL;
+    SimMachineActive         : BOOL;
+
+    (* 🛗 GVL_IHM — images publiques déjà produites *)
+    WinchM1                  : ST_WinchHMI;      (* GVL_IHM.M1TreuilRetenue *)
+    WinchM2                  : ST_WinchBenneHMI; (* GVL_IHM.M2TreuilBenne — porte Bucket *)
+    Sync                     : ST_SyncHMI;       (* GVL_IHM.M1M2Sync *)
+    Translation              : ST_TranslationHMI;(* GVL_IHM.TranslationM3 *)
+    Commun                   : ST_CommunHMI;     (* GVL_IHM.Commun *)
+    Network                  : ST_NetworkDiagHMI;(* GVL_IHM.Network *)
+END_VAR
+VAR_OUTPUT
+    Ready                    : BOOL; (* Diagnostic interne minimal — fiche §3 *)
+END_VAR
+
+// 🛑 GATE — neutralisation ; aucune écriture GVL_Troubleshooting si Enable=FALSE
+IF NOT Enable THEN
+    Ready := FALSE;
+    RETURN;
+END_IF;
+Ready := TRUE;
+
+// === 🌐 0. ContexteMachineGlobal : ST_ChainContextGlobal (fiche §5.1) ===
+GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive        := Auth.Mode;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled := SimulationModeActive;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk    := NOT Network.CanError;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected  := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal := Network.Bypass.Global;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal := FALSE; // TBD non câblé - voir fiche §6 (agrégat multi-domaine à définir)
+GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx302_PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
+// Agrégat simple OR de faits déjà publiés (fiche §5.1) — pas un nouveau calcul métier
+GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny := WinchM1.Safety.SafeStop OR WinchM2.Safety.SafeStop OR Translation.Safety.SafeStop;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := FALSE; // TBD non câblé - voir fiche §6 : ST_SafetyWinch n'expose pas PowerCutOff (seul Translation.Safety.PowerCutOff existe), agrégat M1/M2/M3 impossible sans modifier ST_SafetyWinch (hors scope.allowed ce lot)
+GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk    := Commun.HeartbeatIhmOk;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy     := FALSE; // TBD non câblé - voir fiche §6 (champ exact à confirmer côté GVL_IHM.Cycle)
+
+// === 🛗 1. LevageSynchroniseM1M2 : ST_ChainWinchSync (fiche §5.2) ===
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx101_M1_CablePos_M  := WinchM1.State.Position_M;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx102_M2_CablePos_M  := WinchM2.State.Position_M;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx103_SyncDelta_M    := Sync.State.DeltaPos_M;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx202_SyncEnabled_IHM := Sync.Cmd.SelSyncEnable;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx302_SyncFaultActive := Sync.State.Error;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.State.RelayFwd;
+// Idx201_JoyYRaw_Pct / Idx203_ArbitratedSpeed_Pct / Idx303-304_ForbidAscent / Idx401_SyncMotionAllowed /
+// Idx402-403_SetpointSpeed : non câblés — fiche §5.2 "(reste) champs à revoir un par un", laissés à
+// leur valeur d'initialisation, pas de calcul inventé (fiche §7).
+
+// === 🛗 2. LevageUnitaireM1 / LevageUnitaireM2 : ST_ChainWinch (fiche §5.3) ===
+// --- M1 ---
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos := 0; // TBD non câblé - voir fiche §6 (aucun producteur public actuel)
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx102_CablePos_M := WinchM1.State.Position_M;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI := HwIn.Winch.M1_ContactorsReleased_DI;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied := NOT HwIn.Winch.M1_BrakeIsOpen_DI;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M1_ThermalOk_DI;
+
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA := 0; // TBD non câblé - voir fiche §6 (pas de producteur par axe identifiable)
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := 0.0; // TBD non câblé - idem
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM1.Cmd.BtnUp;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM1.Cmd.BtnDown;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := 0.0; // TBD non câblé - voir fiche §6 (pas de sortie Cycle publiée pour ce champ)
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := 0.0; // TBD non câblé - voir fiche §6 (Idx208/209, consigne interne PRG_04 non publiée en VAR_OUTPUT)
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := 0; // TBD non câblé - idem
+
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := FALSE; // TBD non câblé - voir fiche §6 (ST_SafetyWinch n'expose pas PowerCutOff, hors scope.allowed)
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_ForbidAscentEffective := WinchM1.Safety.ForbidAscent;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx309_ForbidDescentEffective := WinchM1.Safety.ForbidDescent;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx310_MecaFaultMask := WinchM1.Safety.ErrorId;
+
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx401_MotionAllowed := WinchM1.State.Ready;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated := WinchM1.State.StepNumber;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx403_SpeedRamp_Pct := WinchM1.State.SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized := WinchM1.State.BrakeCmd;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx405_FinalInterlockState := WinchM1.State.FinalInterlockState;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason := WinchM1.State.FinalInterlockReason;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep := WinchM1.State.FinalAuthorizedStep;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirmed := WinchM1.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx409_BrakeTimeoutElapsed := WinchM1.State.FinalBrakeTimeoutElapsed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx410_RestartDelayElapsed := WinchM1.State.FinalRestartDelayElapsed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed := WinchM1.State.FinalStepDelayElapsed;
+
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx501_CmdRelayFwd_Up_DQ := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx502_CmdRelayRev_Down_DQ := WinchM1.State.RelayRev;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM1.State.Contactor1;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM1.State.Contactor4;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM1.State.BrakeCmd;
+
+// --- M2 (même patron, source WinchM2) ---
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos := 0; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx102_CablePos_M := WinchM2.State.Position_M;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI := HwIn.Winch.M2_ContactorsReleased_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied := NOT HwIn.Winch.M2_BrakeIsOpen_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M2_ThermalOk_DI;
+
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA := 0; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := 0.0; // TBD non câblé - idem
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM2.Cmd.BtnUp;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM2.Cmd.BtnDown;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := 0.0; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx206_ModeActive := Auth.Mode;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm := WinchM2.Bypass.OperatorComm;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct := 0.0; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection := 0; // TBD non câblé - idem
+
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2.Safety.SafeStop;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := FALSE; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_ForbidAscentEffective := WinchM2.Safety.ForbidAscent;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := HwIn.Winch.M2_TensionedCable_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx309_ForbidDescentEffective := WinchM2.Safety.ForbidDescent;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx310_MecaFaultMask := WinchM2.Safety.ErrorId;
+
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx401_MotionAllowed := WinchM2.State.Ready;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated := WinchM2.State.StepNumber;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx403_SpeedRamp_Pct := WinchM2.State.SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized := WinchM2.State.BrakeCmd;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx405_FinalInterlockState := WinchM2.State.FinalInterlockState;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason := WinchM2.State.FinalInterlockReason;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep := WinchM2.State.FinalAuthorizedStep;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirmed := WinchM2.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx409_BrakeTimeoutElapsed := WinchM2.State.FinalBrakeTimeoutElapsed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx410_RestartDelayElapsed := WinchM2.State.FinalRestartDelayElapsed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed := WinchM2.State.FinalStepDelayElapsed;
+
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx501_CmdRelayFwd_Up_DQ := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx502_CmdRelayRev_Down_DQ := WinchM2.State.RelayRev;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM2.State.Contactor1;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
+
+// === 🪣 3. BenneOuvertureFermeture : ST_ChainBucket (fiche §5.4, source WinchM2.Bucket) ===
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen := WinchM2.Bucket.State.MechState.IsOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed := WinchM2.Bucket.State.MechState.IsClosed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx103_OffsetPos_M := WinchM2.Bucket.State.ActiveOffset_M;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := FALSE; // TBD non câblé - voir fiche §6 (pas de sortie Cycle Open publiée)
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive := WinchM2.Bucket.State.Error;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
+
+// === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI := Translation.State.PositionPV;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx103_PosP2_DI := Translation.State.PositionP2;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx104_PosP1_DI := Translation.State.PositionP1;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI := Translation.State.PositionMaintenance;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz := Translation.State.DriveActualFreq_Hz;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord := HwIn.Translation.M3_StatusWord;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied := NOT Translation.State.BrakeFeedback;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk := Translation.State.DriveThermalOk;
+
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA := HwIn.Operator.JoyXRaw_ANA1;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := Translation.State.JoystickDeflection_Pct;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd := Translation.Cmd.BtnFwd;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev := Translation.Cmd.BtnRev;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition := Translation.Cmd.SelTarget;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition := 0; // TBD non câblé - voir fiche §6 (pas de cible Cycle distincte publiée)
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive := Auth.Mode;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive := Translation.Bypass.Global;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := Translation.State.ActiveSpeedRef_Pct;
+
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx302_SafeStopActive := Translation.Safety.SafeStop;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx303_PowerCutOffActive := Translation.Safety.PowerCutOff;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchFwdActive := Translation.State.LimitSwitchFwd;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx305_LimitSwitchRevActive := Translation.State.LimitSwitchRev;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch := Translation.Bypass.LimitSwitch;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent := Translation.State.SensorWordIncoherent;
+
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqRef_Hz;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx403_DriveControlWord := Translation.State.DriveControlWord;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx404_FinalInterlockState := Translation.State.FinalInterlockState;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx405_FinalInterlockReason := Translation.State.FinalInterlockReason;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed := Translation.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := Translation.State.FinalBrakeTimeoutElapsed;
+
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := Translation.State.DriveControlWord;
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqRef_Hz en REAL Hz existe)
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;

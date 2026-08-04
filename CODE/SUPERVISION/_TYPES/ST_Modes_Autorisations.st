@@ -14,7 +14,7 @@ STRUCT
     SyncEnable                  : BOOL;       // Synchro M1/M2 (logique positive)
     InhibitM1                   : BOOL;       // Inhibition M1 (MAINT_N2 only)
     InhibitM2                   : BOOL;       // Inhibition M2 (MAINT_N2 only)
-    JoystickWinchSelectArbitrated : INT;      // 1=M1, 2=M2, 3=Couplé (N2 only)
+    JoystickWinchSelectArbitrated : INT;      // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)
     HomingApproachEnable        : BOOL;       // Dépassement butée haut (N2)
     MaintenanceM3TargetEnable   : BOOL;       // Cible Translation Maintenance (N2 only)
 END_STRUCT

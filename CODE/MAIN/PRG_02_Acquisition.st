@@ -321,7 +321,7 @@ instHomingM1(
     Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 3),
+                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 0),
     WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1),
     CfgHomingTargetM        := _WinchM1CfgPersist.CfgHomingTarget_M,
     BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
@@ -367,7 +367,7 @@ instHomingM2(
     Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
     Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 3),
+                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 0),
     WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
     CfgHomingTargetM        := _WinchM2CfgPersist.CfgHomingTarget_M,
     BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,

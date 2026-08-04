@@ -3585,6 +3585,79 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <html:xhtml>❌ Code défaut codeur</html:xhtml>
               </documentation>
             </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🎯 Homing — déplacés depuis ST_WinchState racine (2026-08, réorganisation ST_WinchHMI/Homing)
+🎯 Prise d'origine (Homing) validée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>⏳ Référencement en cours</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>✅ Pulse de référencement réussi</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🔴 Défaut de référencement</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <html:xhtml>❌ Bitfield défaut homing</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingState">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <html:xhtml>🤖 État FB_Encoder_Homing</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingStateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <html:xhtml>🧭 État lors du défaut</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>⚠️ Référence à confirmer</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <html:xhtml>📐 Référence brute appliquée</html:xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -4545,10 +4618,13 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
               <type>
                 <INT />
               </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
               <documentation>
                 <html:xhtml>🔧 REX 2026-07-19 : rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
-sélection treuil au joystick, arbitrée par FB_Modes (MAINT_N2 uniquement, forcé à 3=Couplé sinon)
-🕹️ 1=M1 seul, 2=M2 seul, 3=Couplé — voir PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated</html:xhtml>
+sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
+🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</html:xhtml>
               </documentation>
             </variable>
             <variable name="TglJoystickMaster">
@@ -4743,7 +4819,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <INT />
               </type>
               <documentation>
-                <html:xhtml>1=M1, 2=M2, 3=Couplé (N2 only)</html:xhtml>
+                <html:xhtml>0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</html:xhtml>
               </documentation>
             </variable>
             <variable name="HomingApproachEnable">
@@ -6396,6 +6472,76 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ═══════════════════════════════════════════════════════════════</html:xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_WinchBenneHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_WinchCmd" />
+              </type>
+              <documentation>
+                <html:xhtml>🎮 Commandes opérateur</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <html:xhtml>🚦 États, retours et mesures</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_WinchCfg" />
+              </type>
+              <documentation>
+                <html:xhtml>🔧 Configurations et limites</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <html:xhtml>🛡️ Sécurité (FB_Safety_Winch)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Bypass">
+              <type>
+                <derived name="ST_BypassWinch" />
+              </type>
+              <documentation>
+                <html:xhtml>🔧 Bypass maintenance</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Bucket">
+              <type>
+                <derived name="ST_BucketHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>🪣 Benne — pertinent uniquement pour M2 (M2TreuilBenne.Bucket)</html:xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>734a14b6-6b4b-50b8-8bce-737b6c3fa07b</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <html:xhtml>═══════════════════════════════════════════════════════════════
+   ⚙️ ST_WinchBenneHMI — Données d'échange IHM pour le treuil Benne (M2 uniquement)
+   ───────────────────────────────────────────────────────────────
+   🎨 Composition dupliquée de ST_WinchHMI (Cmd/State/Cfg/Safety/Bypass) + Bucket.
+   📄 IEC 61131-3 n'offre pas d'héritage de struct : cette duplication de la liste
+      de champs est assumée pour garder M1TreuilRetenue (ST_WinchHMI, sans Bucket)
+      strictement distinct de M2TreuilBenne (ce type, avec Bucket) — décision
+      DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT_TROUBLESHOOTING_VIEW_ET_WINCHHMI.yaml AC5.
+   ═══════════════════════════════════════════════════════════════</html:xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_WinchCfg">
         <baseType>
           <struct>
@@ -6763,14 +6909,6 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               </type>
               <documentation>
                 <html:xhtml>🔧 Bypass maintenance</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="Bucket">
-              <type>
-                <derived name="ST_BucketHMI" />
-              </type>
-              <documentation>
-                <html:xhtml>🪣 Benne — pertinent uniquement pour M2 (M2TreuilBenne.Bucket), M1 ne l'utilise pas — voir §1</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -7180,85 +7318,13 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <html:xhtml>⏱️ Écoulé entre paliers 1s250</html:xhtml>
               </documentation>
             </variable>
-            <variable name="Homed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>🛡️ Sécurités &amp; Diagnostics
-🎯 Prise d'origine (Homing) validée</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingBusy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>⏳ Référencement en cours</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>✅ Pulse de référencement réussi</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingError">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>🔴 Défaut de référencement</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <html:xhtml>❌ Bitfield défaut homing</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingState">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <html:xhtml>🤖 État FB_Encoder_Homing</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingStateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <html:xhtml>🧭 État lors du défaut</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingSuspect">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>⚠️ Référence à confirmer</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingRefRaw">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <html:xhtml>📐 Référence brute appliquée</html:xhtml>
-              </documentation>
-            </variable>
             <variable name="Encoder">
               <type>
                 <derived name="ST_EncoderHMI" />
               </type>
               <documentation>
-                <html:xhtml>🧲 Données d'échange et diagnostic du codeur</html:xhtml>
+                <html:xhtml>🛡️ Sécurités &amp; Diagnostics
+🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (déplacés 2026-08, voir ST_EncoderHMI)</html:xhtml>
               </documentation>
             </variable>
             <variable name="ContactorsCheck">
@@ -14434,7 +14500,7 @@ Done := NOT Error;
                 <INT />
               </type>
               <documentation>
-                <html:xhtml>1=M1, 2=M2, 3=Couplé (brut IHM)</html:xhtml>
+                <html:xhtml>0=M1+M2 couplés nominal, 1=M1, 2=M2 (brut IHM)</html:xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -14543,7 +14609,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.InhibitM1 := FALSE;
     Auth.InhibitM2 := FALSE;
     Auth.HomingApproachEnable := FALSE;
-    Auth.JoystickWinchSelectArbitrated := 3;  // Couplé par défaut
+    Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
     Auth.MaintenanceM3TargetEnable := FALSE;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
@@ -14637,7 +14703,7 @@ Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproach
 IF Auth.Mode = E_Mode.MAINT_N2 THEN
     Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
 ELSE
-    Auth.JoystickWinchSelectArbitrated := 3;  // Couplé forcé
+    Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
 END_IF;
 
 // 5quinquies. CIBLE TRANSLATION MAINTENANCE
@@ -14650,7 +14716,7 @@ IF Auth.Mode &lt;&gt; E_Mode.MAINT_N2 THEN
     Auth.InhibitM2 := FALSE;
     Auth.HomingApproachEnable := FALSE;
     Auth.MaintenanceM3TargetEnable := FALSE;
-    Auth.JoystickWinchSelectArbitrated := 3;
+    Auth.JoystickWinchSelectArbitrated := 0;
 END_IF;
 
 // 6. SORTIES ÉTAT
@@ -20515,6 +20581,376 @@ TranslationPosMaintenance := SensorMaintenance;
           </data>
         </addData>
       </pou>
+      <pou name="FB_TroubleshootingView" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE en permanence — fiche §3, aucune condition de scan</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <html:xhtml>📡 PRG_02_Acquisition</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwReal">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+            </variable>
+            <variable name="HwRealQualified">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+            </variable>
+            <variable name="InputModuleFault">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Mirroir Network.InputModules — pas de champ ST_Chain* dédié ce lot</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>idem</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>idem</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_Modes_Autorisations" />
+              </type>
+              <documentation>
+                <html:xhtml>🎚️ PRG_03_Modes_Cycle</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimulationModeActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🎭 GVL_Simulation</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimWinchActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimTranslationActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimOperatorActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SimMachineActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WinchM1">
+              <type>
+                <derived name="ST_WinchHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>🛗 GVL_IHM — images publiques déjà produites
+GVL_IHM.M1TreuilRetenue</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2">
+              <type>
+                <derived name="ST_WinchBenneHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>GVL_IHM.M2TreuilBenne — porte Bucket</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Sync">
+              <type>
+                <derived name="ST_SyncHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>GVL_IHM.M1M2Sync</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Translation">
+              <type>
+                <derived name="ST_TranslationHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>GVL_IHM.TranslationM3</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Commun">
+              <type>
+                <derived name="ST_CommunHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>GVL_IHM.Commun</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Network">
+              <type>
+                <derived name="ST_NetworkDiagHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>GVL_IHM.Network</html:xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Diagnostic interne minimal — fiche §3</html:xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <html:xhtml>═══════════════════════════════════════════════════════════════
+   🕵️♂️ FB_TroubleshootingView — Mise en forme lecture seule pour dépannage
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.0.md
+   🔗 Producteur unique de GVL_Troubleshooting.* — instancié UNE SEULE FOIS,
+      dans PRG_07_Supervision, après §3 Projections IHM.
+   🔒 Lecture seule stricte : aucune VAR_OUTPUT de commande, aucun calcul métier,
+      aucune fusion de source — pure recopie de faits déjà publiés ailleurs.
+   ⚠️ WinchM2 est typé ST_WinchBenneHMI (pas ST_WinchHMI comme WinchM1) : ce lot
+      (LOT_TROUBLESHOOTING_VIEW_ET_WINCHHMI) a introduit ST_WinchBenneHMI pour porter
+      Bucket côté M2 uniquement (GVL_IHM.M2TreuilBenne) — adaptation du port fiche §3
+      nécessaire suite à AC5 (Bucket retiré de ST_WinchHMI commun M1/M2).
+   🔧 REX écriture GVL directe : seule exception au principe "pas de GVL comme bus de
+      commande" (AF_Partie-03 §5) — GVL_Troubleshooting n'est jamais relue par un FB
+      métier, uniquement par Watch CODESYS / export SCADA dépannage (fiche §3/§7).
+   ⚠️ Idx201_JoystickSelected (ContexteMachineGlobal) lit GVL_IHM.Modes.Cmd.TglJoystickMaster
+      directement (variable globale IEC 61131-3, visible sans passage par VAR_INPUT) — ce
+      port n'est pas dans la table fiche §3 mais le producteur exact est documenté fiche §5.1.
+   ═══════════════════════════════════════════════════════════════</html:xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <html:xhtml>
+
+// 🛑 GATE — neutralisation ; aucune écriture GVL_Troubleshooting si Enable=FALSE
+IF NOT Enable THEN
+    Ready := FALSE;
+    RETURN;
+END_IF;
+Ready := TRUE;
+
+// === 🌐 0. ContexteMachineGlobal : ST_ChainContextGlobal (fiche §5.1) ===
+GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive        := Auth.Mode;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled := SimulationModeActive;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx103_JoystickCommOk    := NOT Network.CanError;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx201_JoystickSelected  := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx202_BypassNetworkGlobal := Network.Bypass.Global;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx203_BypassSensorsGlobal := FALSE; // TBD non câblé - voir fiche §6 (agrégat multi-domaine à définir)
+GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx302_PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
+// Agrégat simple OR de faits déjà publiés (fiche §5.1) — pas un nouveau calcul métier
+GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny := WinchM1.Safety.SafeStop OR WinchM2.Safety.SafeStop OR Translation.Safety.SafeStop;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := FALSE; // TBD non câblé - voir fiche §6 : ST_SafetyWinch n'expose pas PowerCutOff (seul Translation.Safety.PowerCutOff existe), agrégat M1/M2/M3 impossible sans modifier ST_SafetyWinch (hors scope.allowed ce lot)
+GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk    := Commun.HeartbeatIhmOk;
+GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy     := FALSE; // TBD non câblé - voir fiche §6 (champ exact à confirmer côté GVL_IHM.Cycle)
+
+// === 🛗 1. LevageSynchroniseM1M2 : ST_ChainWinchSync (fiche §5.2) ===
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx101_M1_CablePos_M  := WinchM1.State.Position_M;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx102_M2_CablePos_M  := WinchM2.State.Position_M;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx103_SyncDelta_M    := Sync.State.DeltaPos_M;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx202_SyncEnabled_IHM := Sync.Cmd.SelSyncEnable;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx302_SyncFaultActive := Sync.State.Error;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.State.RelayFwd;
+// Idx201_JoyYRaw_Pct / Idx203_ArbitratedSpeed_Pct / Idx303-304_ForbidAscent / Idx401_SyncMotionAllowed /
+// Idx402-403_SetpointSpeed : non câblés — fiche §5.2 "(reste) champs à revoir un par un", laissés à
+// leur valeur d'initialisation, pas de calcul inventé (fiche §7).
+
+// === 🛗 2. LevageUnitaireM1 / LevageUnitaireM2 : ST_ChainWinch (fiche §5.3) ===
+// --- M1 ---
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos := 0; // TBD non câblé - voir fiche §6 (aucun producteur public actuel)
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx102_CablePos_M := WinchM1.State.Position_M;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx103_ContactorsReleased_DI := HwIn.Winch.M1_ContactorsReleased_DI;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied := NOT HwIn.Winch.M1_BrakeIsOpen_DI;
+GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M1_ThermalOk_DI;
+
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA := 0; // TBD non câblé - voir fiche §6 (pas de producteur par axe identifiable)
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := 0.0; // TBD non câblé - idem
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM1.Cmd.BtnUp;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM1.Cmd.BtnDown;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := 0.0; // TBD non câblé - voir fiche §6 (pas de sortie Cycle publiée pour ce champ)
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := 0.0; // TBD non câblé - voir fiche §6 (Idx208/209, consigne interne PRG_04 non publiée en VAR_OUTPUT)
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := 0; // TBD non câblé - idem
+
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := FALSE; // TBD non câblé - voir fiche §6 (ST_SafetyWinch n'expose pas PowerCutOff, hors scope.allowed)
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_ForbidAscentEffective := WinchM1.Safety.ForbidAscent;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx309_ForbidDescentEffective := WinchM1.Safety.ForbidDescent;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx310_MecaFaultMask := WinchM1.Safety.ErrorId;
+
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx401_MotionAllowed := WinchM1.State.Ready;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated := WinchM1.State.StepNumber;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx403_SpeedRamp_Pct := WinchM1.State.SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx404_BrakeReleaseAuthorized := WinchM1.State.BrakeCmd;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx405_FinalInterlockState := WinchM1.State.FinalInterlockState;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx406_FinalInterlockReason := WinchM1.State.FinalInterlockReason;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx407_FinalAuthorizedStep := WinchM1.State.FinalAuthorizedStep;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirmed := WinchM1.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx409_BrakeTimeoutElapsed := WinchM1.State.FinalBrakeTimeoutElapsed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx410_RestartDelayElapsed := WinchM1.State.FinalRestartDelayElapsed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed := WinchM1.State.FinalStepDelayElapsed;
+
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx501_CmdRelayFwd_Up_DQ := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx502_CmdRelayRev_Down_DQ := WinchM1.State.RelayRev;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM1.State.Contactor1;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM1.State.Contactor4;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM1.State.BrakeCmd;
+
+// --- M2 (même patron, source WinchM2) ---
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx101_EncoderRawPos := 0; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx102_CablePos_M := WinchM2.State.Position_M;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx103_ContactorsReleased_DI := HwIn.Winch.M2_ContactorsReleased_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied := NOT HwIn.Winch.M2_BrakeIsOpen_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M2_ThermalOk_DI;
+
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA := 0; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := 0.0; // TBD non câblé - idem
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM2.Cmd.BtnUp;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM2.Cmd.BtnDown;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := 0.0; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx206_ModeActive := Auth.Mode;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm := WinchM2.Bypass.OperatorComm;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct := 0.0; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection := 0; // TBD non câblé - idem
+
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2.Safety.SafeStop;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := FALSE; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_ForbidAscentEffective := WinchM2.Safety.ForbidAscent;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := HwIn.Winch.M2_TensionedCable_DI;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx309_ForbidDescentEffective := WinchM2.Safety.ForbidDescent;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx310_MecaFaultMask := WinchM2.Safety.ErrorId;
+
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx401_MotionAllowed := WinchM2.State.Ready;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated := WinchM2.State.StepNumber;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx403_SpeedRamp_Pct := WinchM2.State.SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx404_BrakeReleaseAuthorized := WinchM2.State.BrakeCmd;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx405_FinalInterlockState := WinchM2.State.FinalInterlockState;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx406_FinalInterlockReason := WinchM2.State.FinalInterlockReason;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx407_FinalAuthorizedStep := WinchM2.State.FinalAuthorizedStep;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirmed := WinchM2.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx409_BrakeTimeoutElapsed := WinchM2.State.FinalBrakeTimeoutElapsed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx410_RestartDelayElapsed := WinchM2.State.FinalRestartDelayElapsed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed := WinchM2.State.FinalStepDelayElapsed;
+
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx501_CmdRelayFwd_Up_DQ := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx502_CmdRelayRev_Down_DQ := WinchM2.State.RelayRev;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM2.State.Contactor1;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
+
+// === 🪣 3. BenneOuvertureFermeture : ST_ChainBucket (fiche §5.4, source WinchM2.Bucket) ===
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen := WinchM2.Bucket.State.MechState.IsOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed := WinchM2.Bucket.State.MechState.IsClosed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx103_OffsetPos_M := WinchM2.Bucket.State.ActiveOffset_M;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := FALSE; // TBD non câblé - voir fiche §6 (pas de sortie Cycle Open publiée)
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive := WinchM2.Bucket.State.Error;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
+
+// === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI := Translation.State.PositionPV;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx103_PosP2_DI := Translation.State.PositionP2;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx104_PosP1_DI := Translation.State.PositionP1;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx105_PosMaintenance_DI := Translation.State.PositionMaintenance;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx106_DriveActualFreq_Hz := Translation.State.DriveActualFreq_Hz;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx107_DriveStatusWord := HwIn.Translation.M3_StatusWord;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx108_BrakeApplied := NOT Translation.State.BrakeFeedback;
+GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk := Translation.State.DriveThermalOk;
+
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA := HwIn.Operator.JoyXRaw_ANA1;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := Translation.State.JoystickDeflection_Pct;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd := Translation.Cmd.BtnFwd;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev := Translation.Cmd.BtnRev;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition := Translation.Cmd.SelTarget;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition := 0; // TBD non câblé - voir fiche §6 (pas de cible Cycle distincte publiée)
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive := Auth.Mode;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive := Translation.Bypass.Global;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := Translation.State.ActiveSpeedRef_Pct;
+
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx302_SafeStopActive := Translation.Safety.SafeStop;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx303_PowerCutOffActive := Translation.Safety.PowerCutOff;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchFwdActive := Translation.State.LimitSwitchFwd;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx305_LimitSwitchRevActive := Translation.State.LimitSwitchRev;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch := Translation.Bypass.LimitSwitch;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent := Translation.State.SensorWordIncoherent;
+
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqRef_Hz;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx403_DriveControlWord := Translation.State.DriveControlWord;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx404_FinalInterlockState := Translation.State.FinalInterlockState;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx405_FinalInterlockReason := Translation.State.FinalInterlockReason;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx406_BrakeCommandOpenConfirmed := Translation.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := Translation.State.FinalBrakeTimeoutElapsed;
+
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := Translation.State.DriveControlWord;
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqRef_Hz en REAL Hz existe)
+GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;
+</html:xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8681430a-0c7a-5f33-90d9-9615a5f55572</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Winch" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -23330,7 +23766,7 @@ instHomingM1(
     Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
     Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 3),
+                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 0),
     WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1),
     CfgHomingTargetM        := _WinchM1CfgPersist.CfgHomingTarget_M,
     BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
@@ -23376,7 +23812,7 @@ instHomingM2(
     Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
     Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 3),
+                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 0),
     WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
     CfgHomingTargetM        := _WinchM2CfgPersist.CfgHomingTarget_M,
     BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
@@ -23790,7 +24226,7 @@ Auth := instModes.Auth;
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     MaintenanceMotionDirection := PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;
     MaintenanceMotionRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
-                                     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 3);
+                                     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
     MaintenanceMotionSpeed_Pct := 100.0;
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
@@ -25793,6 +26229,11 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
                 <derived name="FB_Diag_Ethercat" />
               </type>
             </variable>
+            <variable name="instTroubleshootingView">
+              <type>
+                <derived name="FB_TroubleshootingView" />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <html:xhtml>═══════════════════════════════════════════════════════════════
@@ -25951,6 +26392,32 @@ GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigital
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
 GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.InputModuleFault;
+
+
+// === 🕵️♂️ §4 VUE DÉPANNAGE (lecture seule stricte) ===
+
+instTroubleshootingView(
+    Enable               := TRUE,
+    HwIn                 := PRG_02_Acquisition.HwIn,
+    HwReal               := PRG_02_Acquisition.HwReal,
+    HwRealQualified      := PRG_02_Acquisition.HwRealQualified,
+    InputModuleFault     := PRG_02_Acquisition.InputModuleFault,
+    LocalDigitalIoOk     := PRG_02_Acquisition.LocalDigitalIoOk,
+    Vh0800EndOk          := PRG_02_Acquisition.Vh0800EndOk,
+    Vh0808EtpOk          := PRG_02_Acquisition.Vh0808EtpOk,
+    Auth                 := PRG_03_Modes_Cycle.Auth,
+    SimulationModeActive := GVL_Simulation.SimulationModeActive,
+    SimWinchActive       := GVL_Simulation.SimWinchActive,
+    SimTranslationActive := GVL_Simulation.SimTranslationActive,
+    SimOperatorActive    := GVL_Simulation.SimOperatorActive,
+    SimMachineActive     := GVL_Simulation.SimMachineActive,
+    WinchM1              := GVL_IHM.M1TreuilRetenue,
+    WinchM2              := GVL_IHM.M2TreuilBenne,
+    Sync                 := GVL_IHM.M1M2Sync,
+    Translation          := GVL_IHM.TranslationM3,
+    Commun               := GVL_IHM.Commun,
+    Network              := GVL_IHM.Network
+);
 </html:xhtml>
           </ST>
         </body>
@@ -26212,10 +26679,10 @@ Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERV
         </variable>
         <variable name="M2TreuilBenne">
           <type>
-            <derived name="ST_WinchHMI" />
+            <derived name="ST_WinchBenneHMI" />
           </type>
           <documentation>
-            <html:xhtml>🛗 Variables d'échange IHM Treuil Benne (M2)</html:xhtml>
+            <html:xhtml>🛞️ Variables d'échange IHM Treuil Benne (M2) — type dédié avec Bucket (2026-08)</html:xhtml>
           </documentation>
         </variable>
         <variable name="M1M2Sync">
@@ -26732,10 +27199,13 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>
+        <Folder Name="DEPANNAGE">
+          <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
+        </Folder>
         <Folder Name="MAIN">
           <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
           <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
-          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
           <Object Name="PRG_02_Acquisition" ObjectId="212fd0f8-509e-536e-99de-b75543d86add" />
           <Object Name="PRG_03_Modes_Cycle" ObjectId="93d4e8d3-42c7-55b2-97a6-95726c0b028f" />
           <Object Name="PRG_04_Treuils_Benne" ObjectId="8dae74a3-6bd7-5bdb-8b05-9ae37b0ffd4d" />
@@ -26811,6 +27281,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_TranslationFinalInterlockRequest" ObjectId="3d90836c-bd65-54ca-b2e2-f3d1ef3a1bd3" />
             <Object Name="ST_TranslationHMI" ObjectId="d6558eac-730d-54eb-ad2f-d618dc359506" />
             <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
+            <Object Name="ST_WinchBenneHMI" ObjectId="734a14b6-6b4b-50b8-8bce-737b6c3fa07b" />
             <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
             <Object Name="ST_WinchCmd" ObjectId="c71b5360-d47d-51c7-a74c-66d1cdd622f0" />
             <Object Name="ST_WinchFinalInterlockRequest" ObjectId="1a0be5b9-7748-52ea-86e2-35102e49b3f8" />

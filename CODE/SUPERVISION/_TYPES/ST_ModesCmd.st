@@ -12,8 +12,8 @@ STRUCT
     BtnEmergencyCutOff : BOOL;   (* 🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance) *)
 
     // 🔧 REX 2026-07-19 : rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
-    // sélection treuil au joystick, arbitrée par FB_Modes (MAINT_N2 uniquement, forcé à 3=Couplé sinon)
-    SelJoystickWinch   : INT;    (* 🕹️ 1=M1 seul, 2=M2 seul, 3=Couplé — voir PRG_MODES_CFC.Auth.JoystickWinchSelectArbitrated *)
+    // sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
+    SelJoystickWinch   : INT := 0; (* 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement *)
 
     // 🆕 REX (session WINCH-BTN-01) — bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
     // SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de

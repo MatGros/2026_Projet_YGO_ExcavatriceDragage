@@ -78,7 +78,7 @@ END_VAR
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     MaintenanceMotionDirection := PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;
     MaintenanceMotionRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
-                                     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 3);
+                                     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
     MaintenanceMotionSpeed_Pct := 100.0;
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN

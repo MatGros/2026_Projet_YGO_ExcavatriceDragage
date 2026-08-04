@@ -24,7 +24,7 @@ VAR_INPUT
     InhibitM2Request    : BOOL;        // Bouton IHM inhibition M2
     SelHomingApproachEnable : BOOL;    // Case IHM autorisant dépassement arrêt haut
     EncoderFaultPresent : BOOL;        // Défaut codeur (agrégat M1/M2, 1 cycle retard)
-    JoystickWinchSelectRequest : INT;  // 1=M1, 2=M2, 3=Couplé (brut IHM)
+    JoystickWinchSelectRequest : INT;  // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (brut IHM)
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -52,7 +52,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.InhibitM1 := FALSE;
     Auth.InhibitM2 := FALSE;
     Auth.HomingApproachEnable := FALSE;
-    Auth.JoystickWinchSelectArbitrated := 3;  // Couplé par défaut
+    Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
     Auth.MaintenanceM3TargetEnable := FALSE;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
@@ -146,7 +146,7 @@ Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproach
 IF Auth.Mode = E_Mode.MAINT_N2 THEN
     Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
 ELSE
-    Auth.JoystickWinchSelectArbitrated := 3;  // Couplé forcé
+    Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
 END_IF;
 
 // 5quinquies. CIBLE TRANSLATION MAINTENANCE
@@ -159,7 +159,7 @@ IF Auth.Mode <> E_Mode.MAINT_N2 THEN
     Auth.InhibitM2 := FALSE;
     Auth.HomingApproachEnable := FALSE;
     Auth.MaintenanceM3TargetEnable := FALSE;
-    Auth.JoystickWinchSelectArbitrated := 3;
+    Auth.JoystickWinchSelectArbitrated := 0;
 END_IF;
 
 // 6. SORTIES ÉTAT
