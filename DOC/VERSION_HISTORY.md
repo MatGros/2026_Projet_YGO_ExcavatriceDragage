@@ -4,13 +4,18 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
-### `FIX_PRG06_IMPORT_INDEXOUTOFRANGE` — 2026-08-04
-- **Bug import CODESYS** : `PRG_06_Outputs_LD` échouait avec `IndexOutOfRangeException`
-- **Cause racine** : convention CODESYS non documentée — le **premier output** d'un bloc FB en LD doit être en forme "câblée" `<connectionPointOut />` (SANS `<expression/>`), même si aucune coil n'est connectée
-- **Oracle** : `PRG_TestSafety_LD.xml` (export CODESYS réel) confirme la convention
-- **Correction** : `ld_builder.py` chemin multi-paramètres émet maintenant le premier output en forme câblée, les autres en forme non-câblée
-- **Tests** : 372 tests passent, garde anti-régression ajoutée (`test_ld_multi_param_fb_first_output_cabled_form`)
-- **REX** : `DOC/REX_PRG06_Import_Error.md` (investigation complète avec dichotomie A→H)
+### `FIX_PRG06_IMPORT_MULTICAUSES` — 2026-08-04
+- **Bug import CODESYS** : `PRG_06_Outputs_LD` échouait à l'import (`IndexOutOfRangeException`) puis à l'ouverture (`ArgumentNullException`)
+- **Causes racines (5, empilées)** : ① parasites `Bundle_H*.xml` découverts comme POU ; ② `localId` bloc > sources ; ③ motif `inVariable→outVariable` ; ④ coils `_DQ` non déclarées (Device) ; ⑤ coil doublon sur output déjà assigné
+- **Correction** : script `gen_prg06_oracle.py` + postprocess (ObjectId conservé) + `file_discovery.py` filtre `Bundle_*`
+- **Garde-fou** : `check_ld_invariants.py` (GATE 4ter) — localId bloc < sources, pas de double assignement, coils déclarées, pas d'outVariable
+- **REX** : `DOC/REX_PRG06_Import_Error.md` v1.0 (l'ancienne cause "premier output câblé" était FAUSSE/insuffisante)
+
+### `REDUCE_FB_OUTPUT` — 2026-08-04
+- **Réduction** : `FB_Output` amputé de la partie FEEDBACK (validé utilisateur) — 7 inputs + 4 outputs → **2 inputs + 1 output**
+- **Retirés** : `FeedbackRaw`, `UseFeedback`, `Blink1Hz`, `FeedbackTimeout`, `ChannelOk`, `FeedbackOk`, `Error`, `ErrorId` (0 usage — 15 instances PRG_06 connectent `Command`→`.State`)
+- **Gain** : réseau LD PRG_06 passe de 1 contact + 6 inVariable à 1 contact + 1 inVariable (bloc ~2× plus compact)
+- **Diagnostic contacteur** : reste couvert par `FB_Safety_Winch` (`FwdRevSpeedFeedbackOff`, `BrakeFeedback`)
 
 ### `M0BIS_ALIGNEMENT_DOC_7POU` — 2026-08 (documentation seule)
 - Architecture actée : **7 POU par ensemble mécanique**, chaque procédé portant sa safety dans sa page

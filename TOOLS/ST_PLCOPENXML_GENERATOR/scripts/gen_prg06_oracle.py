@@ -39,9 +39,10 @@ FB_OUTPUT_NETWORKS = [
     ("instTranslationBrakeCmd", "TranslationBrakeCmd", "TranslationBrakeCmd", "Frein Translation M3"),
 ]
 
-# Inputs de FB_Output (ordre de déclaration)
-FB_OUTPUT_INPUTS = ["Command", "InvertLogic", "FeedbackRaw", "UseFeedback", "Blink1Hz", "FeedbackTimeout", "ChannelOk"]
-FB_OUTPUT_OUTPUTS = ["State", "FeedbackOk", "Error", "ErrorId"]
+# Inputs de FB_Output (ordre de déclaration) — REX 2026-08-04 : réduit,
+# partie feedback retirée (validé utilisateur)
+FB_OUTPUT_INPUTS = ["Command", "InvertLogic"]
+FB_OUTPUT_OUTPUTS = ["State"]
 
 # Inputs de FB_Safety (ordre de déclaration)
 FB_SAFETY_INPUTS = ["Enable", "Reset", "ArmRequest", "EmergencyChainClosed", "PowerContactorEngaged", "PowerCutOffRequest", "BtnEmergencyCutOff"]
@@ -289,14 +290,14 @@ def build_prg06_ld():
         # que ses sources. On réserve le block_id AVANT de créer les sources.
         block_id = _new_id(counter)
 
-        # Sources : 1 contact (Command) + 6 inVariable (inputs non connectés)
+        # Sources : 1 contact (Command) + inVariable pour les inputs non connectés
         input_source_ids = []
         # Contact pour Command
         cmd_contact_id = _new_id(counter)
         _make_contact(ld, cmd_contact_id, cmd_var)
         input_source_ids.append(cmd_contact_id)
-        # inVariable vides pour les 6 autres inputs
-        for _ in range(6):
+        # inVariable vides pour les autres inputs
+        for _ in range(len(FB_OUTPUT_INPUTS) - 1):
             iv_id = _new_id(counter)
             _make_invariable_empty(ld, iv_id)
             input_source_ids.append(iv_id)

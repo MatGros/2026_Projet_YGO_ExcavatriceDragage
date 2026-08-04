@@ -271,7 +271,7 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 - Le **contact principal** (`InputRaw` ou `Command`) est relié au
   `leftPowerRail` puis au `formalParameter` du block.
 - La **coil** est reliée à la sortie `State` du block (`formalParameter="State"`).
-- Les paramètres supplémentaires (`FilterTime`, `InvertLogic`, `ChannelOk`)
+- Les paramètres supplémentaires (`FilterTime`, `InvertLogic`)
   ne sont **pas** représentés en LD — seuls les paramètres BOOL sont câblés
   comme contacts ; les paramètres typés (TIME, INT…) restent des `inVariable`
   dans la section multi-paramètres du générateur.
