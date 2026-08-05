@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🕵️‍♂️ GVL_Troubleshooting — GVL Globale de Recherche de Pannes (Orientée Fonctions & Contexte)
    ───────────────────────────────────────────────────────────────
-   ⚙️ Emplacement : CODE/MAIN/GVL_Troubleshooting.st
+   ⚙️ Emplacement : CODE/DEPANNAGE/GVL_Troubleshooting.st
    🎨 Structurée par CONTEXTE GLOBAL MACHINE + FONCTIONS MÉTIER (Utilisation Opérateur).
    💬 Permet de localiser en 3 secondes l'environnement et le blocage d'une action.
    ═══════════════════════════════════════════════════════════════ *)

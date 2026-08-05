@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:html="http://www.w3.org/1999/xhtml">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-30T13:13:23.737466" />
-  <contentHeader name="ExcavatriceDragage.project" modificationDateTime="2026-07-30T13:13:23.737466">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-05T06:47:04.693731" />
+  <contentHeader name="ExcavatriceDragage.project" modificationDateTime="2026-08-05T06:47:04.693731">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6657,7 +6657,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
-      doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
+      doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
    ═══════════════════════════════════════════════════════════════</html:xhtml>
         </documentation>
       </dataType>
@@ -16904,7 +16904,7 @@ Status diagnostic communication EtherCAT (Online)</html:xhtml>
             <html:xhtml>═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -20389,7 +20389,7 @@ Filtrage capteur de position cible</html:xhtml>
             <html:xhtml>═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -25463,7 +25463,7 @@ BucketStateHMI.OpenActive := instBucket.OpenReq;
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5 (après PRG_04_Treuils_Benne).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Docs : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
    ═══════════════════════════════════════════════════════════════</html:xhtml>
           </documentation>
         </interface>
@@ -28326,7 +28326,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <html:xhtml>═══════════════════════════════════════════════════════════════
    🧪 GVL_Translation_M3_Stub — Entrées de simulation M3 restantes
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.0.md §7
+   📄 Doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md §7
    🧹 REX 2026-07-18 : ancien mode relais `DEGRADED_IO` retiré. Les sorties relais,
       retours contacteurs, défaut TOR et cible générique sans consommateur sont supprimés.
       Restent uniquement PV (entrée réelle à mapper) et le sélecteur de trajet simulé.
@@ -28462,7 +28462,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <html:xhtml>═══════════════════════════════════════════════════════════════
    🕵️‍♂️ GVL_Troubleshooting — GVL Globale de Recherche de Pannes (Orientée Fonctions &amp; Contexte)
    ───────────────────────────────────────────────────────────────
-   ⚙️ Emplacement : CODE/MAIN/GVL_Troubleshooting.st
+   ⚙️ Emplacement : CODE/DEPANNAGE/GVL_Troubleshooting.st
    🎨 Structurée par CONTEXTE GLOBAL MACHINE + FONCTIONS MÉTIER (Utilisation Opérateur).
    💬 Permet de localiser en 3 secondes l'environnement et le blocage d'une action.
    ═══════════════════════════════════════════════════════════════</html:xhtml>

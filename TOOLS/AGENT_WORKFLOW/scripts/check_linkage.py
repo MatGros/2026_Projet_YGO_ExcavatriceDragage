@@ -85,6 +85,61 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
         "jamais raccorde), mais HORS perimetre de ce lot — suppression a valider "
         "explicitement par l'utilisateur avant tout retrait"
     ),
+    # 2026-08-05 — orphelins constates lors de l'audit Translation M3 (session
+    # M3, aucun n'a ete introduit par cette session : lecture seule des
+    # domaines Winch/Cycle/Encodeurs). Surfacent ici uniquement parce que
+    # c'est la premiere fois qu'un fichier CODE/*.st est touche sous ce hook
+    # depuis leur apparition — pas une regression de ce lot.
+    "FB_Safety_Translation": (
+        "safety M3 ecrite (8 mecanismes) mais jamais instanciee — audit "
+        "2026-08-05, PLAN_TASK T104, contrat pret : "
+        "DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_M4_TRANSLATION_SAFETY.yaml — "
+        "retirer de cette liste des que ce lot est execute"
+    ),
+    "FB_Diag_IhmHeartbeat": (
+        "producteur de HeartbeatIhmOk jamais instancie (lu par FB_Cycle, "
+        "FB_Safety_Winch et FB_Safety_Translation) — audit 2026-08-05, "
+        "PLAN_TASK T107, contrat pret : "
+        "DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT0_DIAG_IHM_HEARTBEAT.yaml — "
+        "retirer de cette liste des que ce lot est execute"
+    ),
+    "FB_Safety_Winch": (
+        "meme classe de bug que FB_Safety_Translation, deja documentee dans "
+        "l'en-tete CODE/MAIN/PRG_06_Outputs_LD.st avant cette session — hors "
+        "perimetre M3, PLAN_TASK lot 5 'Reliquats safety' (T72-T74) — "
+        "suppression/cablage a trancher par l'utilisateur"
+    ),
+    "FB_Cycle": (
+        "orpheline constatee 2026-08-05 en creusant l'audit M3 (sequenceur "
+        "SEMI_AUTO complet jamais instancie) — hors perimetre de la session "
+        "M3, non investiguee en detail, necessite un audit dedie avant toute "
+        "decision"
+    ),
+    "FB_Acquisition_Preflight": (
+        "orpheline revelee 2026-08-05 par le premier passage du hook Stop sur "
+        "CODE/*.st depuis son introduction — non investiguee, hors perimetre "
+        "de la session M3, necessite un audit dedie"
+    ),
+    "FB_Encoder_Safety": (
+        "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
+        "— non investiguee, hors perimetre M3, necessite un audit dedie"
+    ),
+    "FB_Encoder_SpeedMeasure": (
+        "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
+        "— non investiguee, hors perimetre M3, necessite un audit dedie"
+    ),
+    "FB_Encoder_SpeedMonitor": (
+        "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
+        "— non investiguee, hors perimetre M3, necessite un audit dedie"
+    ),
+    "FB_WinchLoadEstimator": (
+        "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
+        "— non investiguee, hors perimetre M3, necessite un audit dedie"
+    ),
+    "FB_Winch_Symmetry": (
+        "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
+        "— non investiguee, hors perimetre M3, necessite un audit dedie"
+    ),
 }
 
 # Sections de declaration dont le contenu est une interface, pas une instance
