@@ -19,6 +19,7 @@ END_VAR
 VAR
     instTranslationM3           : FB_Translation;
     instSafetyTranslationM3     : FB_Safety_Translation;
+    instPosEstimatorM3          : FB_Translation_PositionEstimator;
 
     M3_StartStop_Active     : BOOL;
     M3_Direction_Active     : INT;
@@ -61,7 +62,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     ELSIF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
         M3_Direction_Active := -1;
     ELSIF GVL_IHM.TranslationM3.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := 0;
+        M3_Direction_Active := PRG_02_Acquisition.JoystickDirectionX;
     ELSE
         M3_Direction_Active := 0;
     END_IF;
@@ -70,15 +71,17 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
     M3_StartStop_Active := (M3_Direction_Active <> 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
-                                OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
+                                OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
+                                OR GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
                            AND PRG_02_Acquisition.JoystickDeadmanArmed;
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz > 0.0,
-                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / _TranslationMaxFreq_Hz) * 100.0,
-                  30.0);
+                  100.0,
+                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz > 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
+    // 🕹️ Si TglJoystickMaster = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
     M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.Cmd.TglJoystickMaster,
                               FreqPct,
-                              0.0);
+                              (PRG_02_Acquisition.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
     M3_PositioningActive := FALSE;
     SelTarget    := 0;
@@ -175,10 +178,30 @@ instTranslationM3(
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
     CfgRampDecelNormalRate  := _TranslationRampDecelNormal_Pct,
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
+    ApproachSpeedHz         := GVL_PERSISTENT._TranslationApproachSpeed_Hz,
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
+);
+
+// 📐 Estimateur de position continue M3 (odométrie + recalage 5 capteurs)
+instPosEstimatorM3(
+    Enable               := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE),
+    Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
+    DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
+    Direction            := M3_Direction_Active,
+    SensorMaintenance    := PRG_02_Acquisition.TranslationPosMaintenance,
+    SensorP1             := PRG_02_Acquisition.TranslationPosP1,
+    SensorP2             := PRG_02_Acquisition.TranslationPosP2,
+    SensorPV             := PRG_02_Acquisition.TranslationPosPV,
+    SensorTremie         := PRG_02_Acquisition.TranslationPosTremie,
+    PosMaintenanceM      := GVL_PERSISTENT._TranslationPosMaintenance_M,
+    PosP1M               := GVL_PERSISTENT._TranslationPosP1_M,
+    PosP2M               := GVL_PERSISTENT._TranslationPosP2_M,
+    PosPVM               := GVL_PERSISTENT._TranslationPosPV_M,
+    PosTremieM           := GVL_PERSISTENT._TranslationPosTremie_M,
+    GainMetersPerHzSec   := GVL_PERSISTENT._TranslationGainMetersPerHzSec
 );
 
 
@@ -213,12 +236,13 @@ TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
 TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
+TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
 TranslationStateHMI.LimitSwitchFwd := PRG_02_Acquisition.M3_LimitSwitchFwd;
 TranslationStateHMI.LimitSwitchRev := PRG_02_Acquisition.M3_LimitSwitchRev;
 TranslationStateHMI.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
-TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalFeedback_DI;
+TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationStateHMI.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
 TranslationStateHMI.FinalInterlockState := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State;
 TranslationStateHMI.FinalInterlockReason := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason;

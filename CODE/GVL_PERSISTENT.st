@@ -77,12 +77,21 @@ VAR_GLOBAL PERSISTENT RETAIN
     _BucketState : ST_BucketState; // État mécanique mémorisé (ouvert/fermé)
 
     // ↔️ TRANSLATION (M3)
-    _TranslationMaxFreq_Hz        : REAL := 60.0; // Fréquence max absolue M3 (Hz) — source unique
+    _TranslationMaxFreq_Hz          : REAL := 50.0; // Fréquence max absolue M3 (Hz) — source unique
+    _TranslationApproachSpeed_Hz    : REAL := 10.0; // Vitesse de ralentissement PV en Hz (approche Trémie)
     _TranslationRampAccelRate_Pct   : REAL := 20.0;  // Accélération translation (%/s)
     _TranslationRampDecelNormal_Pct : REAL := 40.0;  // Décélération normale (%/s)
     _TranslationRampDecelFast_Pct   : REAL := 100.0; // Décélération rapide SafeStop (%/s)
     _TranslationAutoSpeedCap_Pct    : REAL := 40.0;  // Plafond vitesse SEMI_AUTO (%)
     _TranslationSetFreq_Hz          : REAL := 0.0;   // 🚦 Consigne fréquence manuelle opérateur (Hz) — protégée depuis Lot 4
+
+    // 📏 Positions calibrées repère Translation M3 (mètres)
+    _TranslationPosMaintenance_M    : REAL := 0.0;   // Position origine (Maintenance)
+    _TranslationPosP1_M             : REAL := 6.0;   // Position P1
+    _TranslationPosP2_M             : REAL := 14.0;  // Position P2
+    _TranslationPosPV_M             : REAL := 21.0;  // Position PV (Pré-ralentissement)
+    _TranslationPosTremie_M         : REAL := 25.0;  // Position Trémie (Extrême gauche)
+    _TranslationGainMetersPerHzSec  : REAL := 0.008333; // Ratio m/s par Hz (ex: 50 Hz = 0.416 m/s)
 
     // 🕹️ JOYSTICK
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)

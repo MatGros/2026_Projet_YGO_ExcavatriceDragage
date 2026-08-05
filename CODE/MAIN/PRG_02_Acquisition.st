@@ -19,6 +19,9 @@ VAR_OUTPUT
 
     JoystickDeadmanArmed      : BOOL;   (* TRUE = geste homme-mort joystick armé (FB_Joystick.DeadmanArmed, AF08 §4/§6) *)
     JoystickYNeutral          : BOOL;   (* 🆕 2026-08-05 : TRUE = axe Y joystick au neutre — armement Méca B (FB_Safety_Winch) *)
+    JoystickDirectionX        : INT;    (* -1 = Gauche/Rev, 0 = Neutre, +1 = Droite/Fwd *)
+    JoystickSpeedPctX         : REAL;   (* Magnitude déviation axe X en % (0..100) *)
+    JoystickXNeutral          : BOOL;   (* TRUE = axe X joystick au neutre *)
 
     TranslationPosTremie      : BOOL;   (* TRUE = translation en position Trémie *)
     TranslationPosPV          : BOOL;   (* TRUE = translation en zone pré-ralentissement PV *)
@@ -54,6 +57,12 @@ VAR_OUTPUT
     M2_Speed_Mps               : REAL;
     M2_SignedSpeed_Mps         : REAL;
     M2_SpeedValid              : BOOL;
+END_VAR
+
+VAR_INPUT
+    (* 🔌 Entrées variateur AC600 EtherCAT M3 *)
+    M3_StatusWord              : WORD;  (* Status Word 0x3102 (%IW8) *)
+    M3_ActualFrequencyHz       : UINT;  (* Actual Frequency 0x3103 (%IW9, x100) *)
 END_VAR
 
 VAR
@@ -138,7 +147,7 @@ HwReal.Translation.M3_PosP2_DI          := M3_PosP2_DI;
 HwReal.Translation.M3_PosP1_DI          := M3_PosP1_DI;
 HwReal.Translation.M3_PosMaintenance_DI := M3_PosMaintenance_DI;
 HwReal.Translation.M3_BrakeIsOpen_DI    := M3_BrakeIsOpen_DI;
-HwReal.Translation.M3_ThermalFeedback_DI:= M3_ThermalFeedback_DI;
+HwReal.Translation.M3_ThermalOK_DI       := M3_ThermalOK_DI;
 HwReal.Translation.M3_StatusWord        := M3_StatusWord;
 HwReal.Translation.M3_ActualFrequencyHz := M3_ActualFrequencyHz;
 HwReal.Translation.AC600_DeviceState    := AC600_ECAT_Drive.GetDeviceState();
@@ -198,8 +207,8 @@ HwRealQualified.Winch.M1M2_TopPositionFree_DI := instFilterTopPosition.State;
 
 instFilterM3Brake(InputRaw := HwReal.Translation.M3_BrakeIsOpen_DI, FilterTime := T#20MS);
 HwRealQualified.Translation.M3_BrakeIsOpen_DI := instFilterM3Brake.State;
-instFilterM3Thermal(InputRaw := HwReal.Translation.M3_ThermalFeedback_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_ThermalFeedback_DI := instFilterM3Thermal.State;
+instFilterM3Thermal(InputRaw := HwReal.Translation.M3_ThermalOK_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_ThermalOK_DI := instFilterM3Thermal.State;
 instFilterPosTremie(InputRaw := HwReal.Translation.M3_PosTremie_DI, FilterTime := T#20MS);
 HwRealQualified.Translation.M3_PosTremie_DI := instFilterPosTremie.State;
 instFilterPosPV(InputRaw := HwReal.Translation.M3_PosPV_DI, FilterTime := T#20MS);
@@ -332,6 +341,9 @@ instJoystick(
 // exigé par Translation/Winch/Cycle en aval (T106, audit M3 2026-08-05).
 JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prérequis FB_Safety_Winch Méca B
+JoystickDirectionX := instJoystick.DirectionX;
+JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
+JoystickXNeutral := (instJoystick.DirectionX = 0);
 
 
 // === 🧲 §4 CODEURS & HOMING (M1 / M2) ===

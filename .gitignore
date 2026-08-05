@@ -74,7 +74,9 @@ node_modules/
 
 
 # Artefacts de sous-agents Pi (transcripts regenerables, ~26 Mo)
-.pi-subagents/artifacts/
+# 2026-08-05 : anciens artefacts archives (93 Mo) — le gate de routage ne scanne plus
+# que les artefacts vivants .pi-subagents/artifacts/.
+.pi-subagents/artifacts*/
 
 # Scratchs d'agent a la racine (fichiers de travail temporaires, jamais du livrable).
 # Ajoute apres deux fuites accidentelles dans des commits (2026-08).

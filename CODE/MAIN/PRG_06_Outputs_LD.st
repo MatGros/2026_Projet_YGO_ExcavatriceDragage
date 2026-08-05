@@ -53,6 +53,30 @@ VAR_OUTPUT
     M1InterlockEnable            : BOOL; (* Gate finale M1 : structure validée AND WinchM1...Enable *)
     M2InterlockEnable            : BOOL; (* Gate finale M2 : structure validée AND WinchM2...Enable *)
     M3InterlockEnable            : BOOL; (* Gate finale M3 : structure validée AND TranslationRequest.Enable *)
+
+    (* 🔌 Sorties actionneurs publiques PRG_06_Outputs_LD *)
+    M1_RelayFwd_Up_DQ            : BOOL;
+    M1_RelayRev_Down_DQ          : BOOL;
+    M1_SpeedContactor_1_DQ       : BOOL;
+    M1_SpeedContactor_2_DQ       : BOOL;
+    M1_SpeedContactor_3_DQ       : BOOL;
+    M1_SpeedContactor_4_DQ       : BOOL;
+    M1_BrakeRelease_RQ           : BOOL;
+
+    M2_RelayFwd_Up_Close_DQ      : BOOL;
+    M2_RelayRev_Down_Open_DQ     : BOOL;
+    M2_SpeedContactor_1_DQ       : BOOL;
+    M2_SpeedContactor_2_DQ       : BOOL;
+    M2_SpeedContactor_3_DQ       : BOOL;
+    M2_SpeedContactor_4_DQ       : BOOL;
+    M2_BrakeRelease_RQ           : BOOL;
+
+    M3_BrakeRelease_RQ           : BOOL;
+    TranslationBrakeCmd          : BOOL; (* Miroir fonctionnel *)
+    M3_DriveControlWord          : WORD; (* Mot de commande variateur M3 (0x3101) *)
+    M3_DriveFreqRefWord          : WORD; (* Consigne fréquence variateur M3 (0x3100, x100) *)
+    M3_CommandWord               : WORD; (* Miroir mot de commande 0x3101 *)
+    M3_SetpointFrequencyHz       : WORD; (* Miroir consigne fréquence 0x3100 *)
 END_VAR
 
 VAR
@@ -74,9 +98,6 @@ VAR
     M2SpeedContactor3   : BOOL;
     M2SpeedContactor4   : BOOL;
     M2BrakeCmd          : BOOL;
-    TranslationBrakeCmd : BOOL;
-    M3_DriveControlWord : WORD; // 🆕 LOT2 : mot commande AC600 (0x3101, %QW6)
-    M3_DriveFreqRefWord : WORD; // 🆕 LOT2 : consigne fréquence AC600 (0x3100, %QW7, ×100)
     KoboldContactorCmd  : BOOL;
     PowerCutOffReq      : BOOL;
 
@@ -195,10 +216,8 @@ M2_SpeedContactor_4_DQ    := M2SpeedContactor4;
 M2_BrakeRelease_RQ        := M2BrakeCmd;
 
 M3_BrakeRelease_RQ        := TranslationBrakeCmd;
-// ⚠️ Contrat fonctionnel (référence documentaire uniquement — mêmes contraintes
-// Device.export que ci-dessus) :
-//   M3_CommandWord         := M3_DriveControlWord;   // 0x3101 Command,  %QW6
-//   M3_SetpointFrequencyHz := M3_DriveFreqRefWord;    // 0x3100 Frequency, %QW7
+M3_CommandWord         := M3_DriveControlWord;   // 0x3101 Command,  %QW6
+M3_SetpointFrequencyHz := M3_DriveFreqRefWord;    // 0x3100 Frequency, %QW7
 // 🔧 NOTE D'APPLICATION UTILISATEUR (geste manuel CODESYS, hors périmètre bundle) :
 // dans l'onglet mapping E/S du Device AC600_ECAT_Drive, associer M3_CommandWord et
 // M3_SetpointFrequencyHz aux variables locales M3_DriveControlWord / M3_DriveFreqRefWord

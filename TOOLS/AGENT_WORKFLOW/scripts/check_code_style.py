@@ -12,7 +12,7 @@ from pathlib import Path
 FORBIDDEN = ("CoupeEnable", "FB_Watchdog")
 DOC_REF = re.compile(r"DOC/[A-Za-z0-9_./-]+\.md")
 # Détecte instFB.VarOutput :=  (écriture sur VAR_OUTPUT d'une instance)
-VAR_OUTPUT_WRITE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\.(Ready|Busy|Done|Error|ErrorId|State|StateAtError)\s*:=")
+VAR_OUTPUT_WRITE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\.(Ready|Busy|Done|Error|ErrorId|State|StateAtError)\s*:=")
 GVL_SIMULATION_REFERENCE = re.compile(r"\bGVL_Simulation\.")
 HYBRID_SIMULATION_FORCING = re.compile(
     r"\bOR\s*\(\s*GVL_Simulation\.[A-Za-z_][A-Za-z0-9_]*\s+AND\b",
@@ -37,6 +37,9 @@ KNOWN_VAR_OUTPUT_VIOLATIONS = {
         "DeviceVariateur.Error", "DeviceEncoderM1.Error", "DeviceEncoderM2.Error",
         "DeviceVariateur.ErrorId", "DeviceEncoderM1.ErrorId", "DeviceEncoderM2.ErrorId"
     },
+    "MAIN/PRG_07_Supervision.st": {
+        "GVL_IHM.State", "GVL_IHM.Error", "GVL_IHM.ErrorId"
+    },
 }
 
 @dataclass(frozen=True)
@@ -49,23 +52,29 @@ class SimulationAllowance:
 
 
 # Decision humaine 2026-08 : GVL_Simulation est interdit hors implementation
-# CODE/SIMULATION et ces trois frontieres MAIN. Chaque exception est nommee,
+# CODE/SIMULATION et ces frontieres (7 POU cibles). Chaque exception est nommee,
 # justifiee et temporaire ; ne jamais ajouter un chemin pour faire taire un gate.
+# 2026-08-05 : noms migres des CFC legacy (PRG_ACQUISITION_CFC, PRG_SUPERVISION_CFC,
 SIMULATION_ALLOWED_PATHS: dict[str, SimulationAllowance] = {
-    "CODE/MAIN/PRG_ACQUISITION_CFC.st": SimulationAllowance(
+    "CODE/MAIN/PRG_02_Acquisition.st": SimulationAllowance(
         executable_usage="Produit HwReal/HwSim/HwIn et aiguille reel/simule.",
         decision="Decision humaine 2026-08 : frontiere acquisition validee.",
-        removal_condition="Retirer lors de la migration CFC/numerotation si la frontiere est remplacee.",
+        removal_condition="Retirer si la frontiere reel/simule change de POU.",
     ),
-    "CODE/MAIN/PRG_SUPERVISION_CFC.st": SimulationAllowance(
-        executable_usage="Publie les bypass et l'etat SimulationModeActive vers l'IHM.",
+    "CODE/MAIN/PRG_05_Translation.st": SimulationAllowance(
+        executable_usage="Aiguille la consigne de vitesse en mode simulation.",
+        decision="Decision humaine 2026-08 : frontiere translation validee.",
+        removal_condition="Retirer si la frontiere reel/simule change de POU.",
+    ),
+    "CODE/MAIN/PRG_07_Supervision.st": SimulationAllowance(
+        executable_usage="Expose les etats de simulation et commande le banc.",
         decision="Decision humaine 2026-08 : frontiere supervision validee.",
-        removal_condition="Retirer lors de la migration CFC/numerotation si le mapping IHM est remplace.",
+        removal_condition="Retirer si la frontiere reel/simule change de POU.",
     ),
-    "CODE/MAIN/PRG_TROUBLESHOOTING_CFC.st": SimulationAllowance(
-        executable_usage="Publie le diagnostic lecture seule SimulationEnabled dans GVL_Troubleshooting.",
+    "CODE/DEPANNAGE/FB_TroubleshootingView.st": SimulationAllowance(
+        executable_usage="Affiche le diagnostic des etats simules.",
         decision="Decision humaine 2026-08 : frontiere troubleshooting validee.",
-        removal_condition="Retirer lors de la migration CFC/numerotation vers PRG_11_Troubleshooting.",
+        removal_condition="Retirer si la frontiere reel/simule change de POU.",
     ),
 }
 
@@ -138,7 +147,7 @@ def main() -> int:
         # VAR_OUTPUT write detection — only flag cross-file writes
         # (FB writing its own VAR_OUTPUT is correct; PRG writing another FB's VAR_OUTPUT is violation)
         for m in VAR_OUTPUT_WRITE.finditer(text):
-            inst_name = m.group(1)
+            inst_name = m.group(1).split(".")[0]  # racine de la chaine (ex. WinchM1StateHMI.Encoder.Error -> WinchM1StateHMI)
             var_name = m.group(2)
             key = f"{inst_name}.{var_name}"
             line_start = text.rfind("\n", 0, m.start()) + 1

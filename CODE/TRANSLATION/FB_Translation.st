@@ -38,7 +38,7 @@ VAR_INPUT
     DirectionInterlockDelay      : TIME := T#200ms; // Délai avant d'autoriser un changement de sens à l'arrêt
 
     // Réglages ETHERCAT uniquement (RETAIN)
-    ApproachSpeedPct             : REAL := 20.0;    // Vitesse réduite d'approche (piloté par SlowdownSensor/PV)
+    ApproachSpeedHz              : REAL := 10.0;    // Vitesse réduite d'approche en Hz (piloté par SlowdownSensor/PV)
     DriveFreqScaleMaxHz          : REAL := 60.0;    // Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)
 
     // Réglages communs
@@ -139,15 +139,27 @@ END_IF;
 // Trémie (Direction=1) — décision client (AF_Partie-02 v2.12 §3bis) : PV n'assure le
 // ralentissement qu'avant Trémie, jamais dans le sens Maintenance.
 IF (Direction = 1) AND SlowdownSensor THEN
-    RampTargetPct := LIMIT(0.0, RampTargetPct, ApproachSpeedPct);
+    // 🔌 Ralentissement PV exprimé directement en Hz (converti en % de l'échelle max Hz)
+    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedHz / SEL(DriveFreqScaleMaxHz > 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
 END_IF;
 
-// 🎯 4ter. ARRÊT EXACT SUR CAPTEUR (verrouille le sens tant que le capteur cible reste actif)
+// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie & Maintenance)
+// Dès qu'on touche le capteur d'extrémité (TargetReached), le sens d'arrivée (DirectionAtArrival)
+// est MÉMORISÉ et BLOQUÉ. Même si la benne oscille/clignote et perd temporairement le capteur,
+// l'automate refuse de ré-avancer tant que l'opérateur n'a pas relâché le manche au neutre (Direction = 0)
+// ou demandé le sens inverse (dégagement).
 ArrivalEdge(CLK := TargetReached);
 IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
-ArrivalLock := TargetReached AND (Direction = DirectionAtArrival) AND (DirectionAtArrival <> 0);
+
+// Libération du verrou uniquement au neutre ou en changement de sens
+IF (Direction = 0) OR (Direction <> DirectionAtArrival) THEN
+    DirectionAtArrival := 0;
+END_IF;
+
+// Bloque la consigne à 0 tant que l'ordre demande d'insister dans le sens d'arrivée verrouillé
+ArrivalLock := (DirectionAtArrival <> 0) AND (Direction = DirectionAtArrival);
 IF ArrivalLock THEN
     RampTargetPct := 0.0;
 END_IF;
@@ -239,12 +251,12 @@ END_IF;
 IF BypassLimitSwitch THEN
     ErrorId := ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
 ELSE
-    IF LimitSwitchFwd OR LimitSwitchRev THEN
+    // Activé UNIQUEMENT en cas de tentative d'avancer DANS la butée active (libéré si dégagement en sens inverse)
+    IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
         ErrorId := ErrorId OR 16#0040;
+    ELSE
+        ErrorId := ErrorId AND 16#FFBF;
     END_IF;
-END_IF;
-IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFBF;   // Reset normal (complémentaire)
 END_IF;
 
 Error := (ErrorId <> 16#0000);

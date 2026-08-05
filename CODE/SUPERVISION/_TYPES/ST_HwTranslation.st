@@ -12,7 +12,7 @@ STRUCT
     M3_PosP1_DI          : BOOL;         (* Capteur position P1 *)
     M3_PosMaintenance_DI : BOOL;         (* Capteur position maintenance *)
     M3_BrakeIsOpen_DI    : BOOL;         (* Retour frein M3 (1 = ouvert) *)
-    M3_ThermalFeedback_DI: BOOL;         (* 🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même *)
+    M3_ThermalOK_DI      : BOOL;         (* 🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même *)
     M3_StatusWord        : WORD;         (* Status word variateur AC600 *)
     M3_ActualFrequencyHz : UINT;         (* Fréquence réelle variateur AC600 (x100) *)
     AC600_DeviceState    : DEVICE_STATE; (* État device AC600 (GetDeviceState) *)
