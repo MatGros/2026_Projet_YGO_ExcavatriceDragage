@@ -36,6 +36,11 @@ END_VAR
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
+    // ⚠️ T106 : SelTarget forcé à 0 et jamais réarbitré par un séquenceur (FB_Cycle n'est pas
+    // instancié — audit M3 2026-08-05) → M3_StartStop_Active reste FALSE en pratique. Le
+    // AND PRG_02_Acquisition.JoystickDeadmanArmed exigé par AF08 §6 devra être ajouté ici
+    // au moment où le cycle SEMI_AUTO M3 sera réellement câblé, pas avant (rien à protéger
+    // aujourd'hui, ne pas figer une condition sur du code mort).
     M3_PositioningActive  := TRUE;
     SelTarget    := 0;
     M3_StartStop_Active  := FALSE;
@@ -61,9 +66,12 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
         M3_Direction_Active := 0;
     END_IF;
 
+    // 🔫 T106 (audit M3 2026-08-05) : homme-mort exigé même pour boutons IHM en MAINT_N1/N2
+    // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
     M3_StartStop_Active := (M3_Direction_Active <> 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
-                                OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster);
+                                OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
+                           AND PRG_02_Acquisition.JoystickDeadmanArmed;
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz > 0.0,
                   (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / _TranslationMaxFreq_Hz) * 100.0,
