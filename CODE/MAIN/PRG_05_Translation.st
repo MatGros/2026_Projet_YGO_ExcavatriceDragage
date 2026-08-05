@@ -3,7 +3,9 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5 (après PRG_04_Treuils_Benne).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v2.1.md
+   🛡️ Sécurité : instSafetyTranslationM3 (FB_Safety_Translation) câblée en parallèle
+      de instTranslationM3 depuis le 2026-08-05 (lot M4) — SafeStop/PowerCutOff réels.
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_05_Translation
@@ -16,6 +18,7 @@ END_VAR
 
 VAR
     instTranslationM3           : FB_Translation;
+    instSafetyTranslationM3     : FB_Safety_Translation;
 
     M3_StartStop_Active     : BOOL;
     M3_Direction_Active     : INT;
@@ -26,7 +29,8 @@ VAR
     SelTarget       : INT;
     FreqPct                 : REAL;
 
-    M3_SafeStop_Active      : BOOL;
+    M3_SafeStop_Active      : BOOL; // Cause historique : InputModuleFault (AF06 §3bis)
+    M3_SafeStop_Aggregate   : BOOL; // 🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)
 END_VAR
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
@@ -99,6 +103,50 @@ ELSE
 END_CASE;
 
 
+// === 🛡️ §1bis SÉCURITÉ M3 (FB_Safety_Translation, câblée en parallèle visible) ===
+// ⚠️ Ordre d'appel volontaire : la safety lit ici le BrakeReleaseRequest et le
+// BrakeCmd du SCAN PRÉCÉDENT d'instTranslationM3 (elle est appelée avant), exactement
+// le même retard d'un scan que documenté en AF_Partie-11 §5 alerte 4 pour l'ancien
+// code CFC — non éliminé par ce lot (nécessite la fusion CFC complète, lot M4 migration
+// 7 POU, hors périmètre). Bénin : BrakeReleaseRequest ne change pas plus vite qu'un
+// scan MainTask 10 ms sur une commande frein.
+instSafetyTranslationM3(
+    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE),
+    Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
+    JoystickOnline          := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational     := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
+    PhaseRotationOk         := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
+    BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    DriveOnline             := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Online,
+    DriveOperational        := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Operational,
+    DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
+    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
+    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
+    BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
+    Direction               := M3_Direction_Active,
+    LimitSwitchFwd          := PRG_02_Acquisition.M3_LimitSwitchFwd,
+    LimitSwitchRev          := PRG_02_Acquisition.M3_LimitSwitchRev,
+    SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,
+    BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
+    BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
+    BypassDriveComm         := GVL_IHM.TranslationM3.Bypass.DriveComm,
+    BypassPhaseRotation     := GVL_IHM.TranslationM3.Bypass.PhaseRotation,
+    BypassBrakeThermal      := GVL_IHM.TranslationM3.Bypass.BrakeThermal,
+    BypassMecaB             := GVL_IHM.TranslationM3.Bypass.MecaB,
+    BypassMecaA             := GVL_IHM.TranslationM3.Bypass.MecaA,
+    BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.LimitSwitch,
+    BypassSensorIncoherent  := GVL_IHM.TranslationM3.Bypass.SensorIncoherent,
+    BypassSafety            := GVL_IHM.TranslationM3.Bypass.Safety,
+    BypassProcess           := GVL_IHM.TranslationM3.Bypass.Process
+);
+
+// SafeStop réellement appliqué au mouvement = agrégat InputModuleFault (historique)
+// OR safety M3 (8 mécanismes) — aucune des deux causes ne doit être perdue.
+M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
+
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
 instTranslationM3(
@@ -107,7 +155,7 @@ instTranslationM3(
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
     StartStop               := M3_StartStop_Active,
-    SafeStop                := M3_SafeStop_Active,
+    SafeStop                := M3_SafeStop_Aggregate,
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
@@ -131,7 +179,8 @@ instTranslationM3(
 TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE);
 TranslationFinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
-TranslationFinalInterlockRequest.SafeStop := M3_SafeStop_Active;
+TranslationFinalInterlockRequest.SafeStop := M3_SafeStop_Aggregate;
+TranslationFinalInterlockRequest.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
@@ -173,10 +222,23 @@ TranslationStateHMI.DrivePowerReady := (PRG_02_Acquisition.M3_StatusWord_Filtere
 TranslationStateHMI.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
 TranslationStateHMI.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 
-TranslationSafetyHMI.SafeStop := M3_SafeStop_Active;
-TranslationSafetyHMI.Error := instTranslationM3.Error;
-TranslationSafetyHMI.ErrorId := instTranslationM3.ErrorId;
-TranslationSafetyHMI.ErrorLimitSwitch := PRG_02_Acquisition.M3_LimitSwitchFwd OR PRG_02_Acquisition.M3_LimitSwitchRev;
-TranslationSafetyHMI.ErrorSensorIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
+// 🛡️ Producteur unique (CODE_QUALITY_STANDARDS §5) : la safety M3 (instSafetyTranslationM3)
+// est désormais la source de tous les diagnostics de sécurité — ErrorLimitSwitch/
+// ErrorSensorIncoherent ne sont plus recalculés ici (ancien calcul ignorait les bypass,
+// pouvait afficher un défaut alors qu'il était sciemment bypassé). Les erreurs propres au
+// mouvement (frein, variateur AC600) restent sur TranslationStateHMI.ErrorId ci-dessus,
+// bitfield différent, jamais mélangé.
+TranslationSafetyHMI.SafeStop := M3_SafeStop_Aggregate;
+TranslationSafetyHMI.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
+TranslationSafetyHMI.Error := instSafetyTranslationM3.Error;
+TranslationSafetyHMI.ErrorId := instSafetyTranslationM3.ErrorId;
+TranslationSafetyHMI.ErrorOperatorComm := instSafetyTranslationM3.ErrorOperatorComm;
+TranslationSafetyHMI.ErrorDriveComm := instSafetyTranslationM3.ErrorDriveComm;
+TranslationSafetyHMI.ErrorPhaseRotation := instSafetyTranslationM3.ErrorPhaseRotation;
+TranslationSafetyHMI.ErrorBrakeThermal := instSafetyTranslationM3.ErrorBrakeThermal;
+TranslationSafetyHMI.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
+TranslationSafetyHMI.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
+TranslationSafetyHMI.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
+TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
 
 END_PROGRAM
