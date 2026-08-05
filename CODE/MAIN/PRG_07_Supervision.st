@@ -25,6 +25,7 @@ VAR
     instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg;
     instDiagCanOpen : FB_Diag_CanOpen;
     instDiagEthercat : FB_Diag_Ethercat;
+    instDiagIhmHeartbeat : FB_Diag_IhmHeartbeat;
     instTroubleshootingView : FB_TroubleshootingView;
 END_VAR
 
@@ -56,6 +57,15 @@ instDiagEthercat(
     DeviceEncoderM2StateRaw  := PRG_02_Acquisition.HwReal.Winch.COD2_DeviceState,
     DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
     NetworkBypassActive      := GVL_IHM.Network.Bypass.Global
+);
+
+// 💓 T83 (décision CK6) : tant que l'IHM n'implémente pas le toggle réel
+// (GVL_IHM.Network.Bypass.IhmHeartbeat := TRUE, défaut sécurisé), le front
+// est simulé par le clignotant PLC 1 Hz pour ne jamais latcher un timeout
+// artificiel. Repasser le bypass à FALSE côté IHM active la vraie surveillance.
+instDiagIhmHeartbeat(
+    Enable          := TRUE,
+    TglHeartbeatIhm := SEL(GVL_IHM.Network.Bypass.IhmHeartbeat, GVL_IHM.Commun.TglHeartbeatIhm, GVL_Global.BlinkClock)
 );
 
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
@@ -168,6 +178,12 @@ GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1
 GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI;
 GVL_IHM.Commun.PhaseRotationFault        := NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;
+
+// 💓 Publication heartbeat IHM↔PLC (T83, LOT0_DIAG_IHM_HEARTBEAT 2026-08-05)
+GVL_IHM.Commun.HeartbeatIhmOk            := instDiagIhmHeartbeat.HeartbeatIhmOk;
+GVL_IHM.Commun.HeartbeatIhmTimeout       := instDiagIhmHeartbeat.HeartbeatIhmTimeout;
+GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdge;
+GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc;
 
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
