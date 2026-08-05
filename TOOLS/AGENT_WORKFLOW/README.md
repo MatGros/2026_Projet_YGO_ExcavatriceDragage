@@ -60,7 +60,7 @@ check-code-style CODE/TREUILS/FB_Winch.st
 
 # Pre-edit gate : spécifications lues ?
 pre-edit-gate --check CODE/TRANSLATION/FB_Translation.st
-pre-edit-gate --mark-read ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
+pre-edit-gate --mark-read DOC/AF_Partie-11_Fonction_Translation_v2.1.md
 
 # Validation compilation CODESYS
 check-codesys-compile --log build.log --strict

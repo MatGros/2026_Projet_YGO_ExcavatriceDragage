@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5 (après PRG_04_Treuils_Benne).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : DOC/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Docs : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_05_Translation
