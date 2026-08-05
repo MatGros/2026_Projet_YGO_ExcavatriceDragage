@@ -11,6 +11,9 @@
    ⏱️ Watchdog fixe T#500ms, démarré uniquement par BrakeReleaseRequest.
    🔑 Après timeout, RestartInhibit exige : Reset avec cause disparue,
       demande neutre explicite (mot 0), puis nouvelle demande 1 ou 2.
+   🔧 REX 2026-08-05 : Reset du watchdog frein reconstruit en pattern Cause/Ack
+      (CODE_QUALITY_STANDARDS §9) — plus jamais conditionné par un état externe
+      instantané (audit sécurité M3, même classe que l'incident EmergencyArmingFailed).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_TranslationOutputInterlock_LD
@@ -47,6 +50,10 @@ VAR
     MovementRequested            : BOOL;
     NeutralRequestSeen           : BOOL;
     ResetRequired                : BOOL; // Timeout : front Reset obligatoire avant toute nouvelle marche
+    // 🔧 REX 2026-08-05 : pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) — voir §2 ci-dessous
+    BrakeTimeoutCause             : BOOL;
+    BrakeTimeoutAck               : BOOL := TRUE;
+    BrakeTimeoutCauseEdge         : R_TRIG;
 END_VAR
 VAR CONSTANT
     // 🆕 LOT2 2026-08-05 : échelle confirmée terrain (utilisateur) sur le registre 0x3100
@@ -87,18 +94,37 @@ MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWo
 // ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
 // Pendant RestartInhibit, BrakeCmd reste coupé : l'ordre amont n'est donc plus
 // effectif et le watchdog ne doit pas créer une nouvelle faute en boucle.
+// 🔧 REX 2026-08-05 : pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) — l'ancien
+// "ELSIF ResetEdge.Q AND BrakeCommandOpenConfirmed" pouvait perdre silencieusement
+// un front Reset si BrakeCommandOpenConfirmed rebondissait à FALSE exactement au
+// scan du Reset (même classe que l'incident EmergencyArmingFailed). Le Reset est
+// désormais TOUJOURS effectif sur l'acquittement (BrakeTimeoutAck) ; l'interlock de
+// sécurité (RestartInhibit, §3) reste basé sur la cause brute (BrakeTimeoutCause /
+// Error), jamais sur l'acquittement seul — l'acquittement n'ouvre jamais l'interlock.
 BrakeTimeout(IN := BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed
                    AND NOT RestartInhibit, PT := T#500ms);
 BrakeTimeoutElapsed := BrakeTimeout.ET;
 IF BrakeTimeout.Q THEN
-    ErrorId := ErrorId OR 16#0001;
+    BrakeTimeoutCause := TRUE;
+ELSIF BrakeCommandOpenConfirmed THEN
+    BrakeTimeoutCause := FALSE;   // cause réellement disparue (retour desserrage confirmé)
+END_IF;
+BrakeTimeoutCauseEdge(CLK := BrakeTimeoutCause);
+IF BrakeTimeoutCauseEdge.Q THEN
+    BrakeTimeoutAck := FALSE;    // nouvelle occurrence -> ré-alarme, ack remis à zéro
     RestartInhibit := TRUE;
     ResetRequired := TRUE;
     NeutralRequestSeen := FALSE;
     Reason := E_TranslationFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED;
-ELSIF ResetEdge.Q AND BrakeCommandOpenConfirmed THEN
-    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+IF ResetEdge.Q THEN
+    BrakeTimeoutAck := TRUE;     // toujours effectif, sans condition externe
     ResetRequired := FALSE;
+END_IF;
+IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
+    ErrorId := ErrorId OR 16#0001;
+ELSE
+    ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
 Error := (ErrorId <> 16#0000);
