@@ -263,11 +263,11 @@ instSimBench(
     M3_SpeedRefPct           := PRG_05_Translation.M3_SpeedRef_Active,
     M3_BrakeCmd              := GVL_Global.TranslationBrakeCmd,
     M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
-    PowerKeepAlive_A         := PRG_06_Outputs_LD.PowerKeepAlive_A_RQ,
-    PowerKeepAlive_B         := PRG_06_Outputs_LD.PowerKeepAlive_B_RQ,
+    PowerKeepAlive_A         := PRG_06_Outputs_LD.PowerKeepAliveACmd,
+    PowerKeepAlive_B         := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
     // inter-POU ArmPulse est observée avec un cycle de retard dans la tâche.
-    EmergencyArming_RQ       := PRG_06_Outputs_LD.EmergencyArming_RQ
+    EmergencyArming_RQ       := PRG_06_Outputs_LD.EmergencyArmingCmd
                                  OR (PRG_06_Outputs_LD.ArmingSeqStep = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,

@@ -75,6 +75,40 @@ Une restitution sans ce bloc est incomplète, quel que soit l'agent qui l'écrit
 
 ---
 
+## 3bis. Collision de nom avec une variable matérielle (REX 2026-08-05)
+
+> 🚨 **Incident vécu** : `PRG_06_Outputs_LD` déclarait `M3_BrakeRelease_RQ` (et l'équivalent
+> M1/M2) en `VAR_OUTPUT` **avec le même nom exact** que la variable globale que CODESYS crée
+> lors du mapping E/S physique du device. Un identificateur **local masque toujours un global
+> homonyme** (IEC 61131-3) : toute écriture dans ce POU résolvait vers la sortie locale, jamais
+> vers la globale réellement mappée au matériel. **Aucune erreur de compilation ni d'import ne
+> signale ce piège** — le contacteur frein M3 ne s'est simplement jamais activé, plusieurs
+> heures de diagnostic terrain avant identification. Le même schéma touchait aussi la
+> **chaîne AU** (`PowerKeepAlive_A_RQ`/`PowerKeepAlive_B_RQ`/`EmergencyArming_RQ`, confirmé
+> câblé réel par l'utilisateur) — corrigé dans le même lot. Détail complet et fix :
+> `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py` (`_build_actuator_network`
+> et `FB_SAFETY_OUTPUT_ASSIGNS`).
+
+**Règle** : un `PROGRAM` ne déclare **jamais** de variable (`VAR`/`VAR_INPUT`/`VAR_OUTPUT`)
+portant le **nom exact** d'un point matériel du mapping E/S (`TOOLS/AGENT_WORKFLOW/config/
+Device_IO_20260729.csv`, colonne `Mapped variable`) — sauf `PRG_02_Acquisition`, seul POU dont
+le rôle architectural est de porter ces noms bruts en `VAR_INPUT` (AF_Partie-06 §1/§4).
+
+Un `FUNCTION_BLOCK` n'est pas concerné : ses paramètres sont toujours référencés via une
+instance (`instXxx.Param`), jamais par un nom nu — pas le même risque de collision de portée.
+
+**Raccordement physique correct** : le mapping E/S CODESYS cible le **chemin qualifié**
+(`PRG_06_Outputs_LD.TranslationBrakeCmd`, `PRG_06_Outputs_LD.M1RelayFwd`...), jamais un nom nu
+qui recréerait la collision.
+
+🤖 **Vérification automatique** :
+```powershell
+python TOOLS/AGENT_WORKFLOW/scripts/check_hw_name_collision.py .
+```
+Intégré à `run_all_gates.py` (GATE 2quinquies). Toute nouvelle collision est bloquante (`ERROR`).
+
+---
+
 ## 4. Code et variables mortes (base MISRA)
 
 - Toute variable déclarée est **lue au moins une fois** hors de son initialisation.
@@ -310,6 +344,7 @@ fait plus partie des nouveaux contrats LD.
 ```text
 [ ] check_linkage.py --report = PASS, bloc collé dans la restitution
 [ ] check_doc_links.py = PASS (aucun lien mort, aucune version périmée)
+[ ] check_hw_name_collision.py = PASS (aucune variable PRG_* homonyme d'un point Device_IO, §3bis)
 [ ] Nommage conforme DOC/NAMING_CONVENTION.md
 [ ] Aucune variable/instance déclarée non utilisée
 [ ] Aucun nombre magique ; constantes nommées

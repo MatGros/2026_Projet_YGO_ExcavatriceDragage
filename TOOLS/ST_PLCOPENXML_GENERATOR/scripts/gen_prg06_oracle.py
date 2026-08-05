@@ -101,8 +101,14 @@ FB_SAFETY_INPUTS = ["Enable", "Reset", "ArmRequest", "EmergencyChainClosed", "Po
 FB_SAFETY_OUTPUTS = ["Ready", "Busy", "Done", "Error", "ErrorId", "MaintainA_RQ", "MaintainB_RQ", "ArmPulse_RQ", "State", "Diag", "ArmingSeqStep", "RedundancyTestFailed", "EmergencyArmingFailed", "EmergencyArmingLockoutActive"]
 
 FB_SAFETY_OUTPUT_ASSIGNS = {
-    "MaintainA_RQ": "PowerKeepAlive_A_RQ",
-    "MaintainB_RQ": "PowerKeepAlive_B_RQ",
+    # 🐛 FIX 2026-08-05 (confirmé câblé réel par l'utilisateur, même bug que M1/M2/M3) :
+    # PowerKeepAlive_A_RQ/PowerKeepAlive_B_RQ/EmergencyArming_RQ sont des noms Device
+    # bruts (Device_IO CSV) — un coil dessus crée une collision de portée avec la
+    # globale homonyme créée par le mapping E/S CODESYS. Renommés en *Cmd (variables
+    # locales, cf. local_vars ci-dessous) ; le mapping E/S doit cibler le chemin
+    # qualifié PRG_06_Outputs_LD.PowerKeepAliveACmd / BCmd / EmergencyArmingCmd.
+    "MaintainA_RQ": "PowerKeepAliveACmd",
+    "MaintainB_RQ": "PowerKeepAliveBCmd",
     "ArmPulse_RQ": "EmergencyArmingPulseActive",
     "ArmingSeqStep": "ArmingSeqStep",
     "RedundancyTestFailed": "RedundancyTestFailed",
@@ -390,9 +396,18 @@ def _build_actuator_network(ld, counter, source_var, dq_var, gvl_field, comment_
     gvl_coil_id = _new_id(counter)
     _make_coil(ld, gvl_coil_id, contact_id, f"GVL_Global.{gvl_field}")
 
-    if dq_var:
-        dq_coil_id = _new_id(counter)
-        _make_coil(ld, dq_coil_id, contact_id, dq_var)
+    # 🐛 FIX 2026-08-05 (audit terrain M3, contacteur frein jamais piloté) : un coil câblé
+    # directement sur dq_var (ex. M3_BrakeRelease_RQ) ne plante plus l'import (dq_var est
+    # déclaré en VAR_OUTPUT ci-dessous), mais CRÉE UNE COLLISION DE PORTÉE : CODESYS crée
+    # aussi une variable GLOBALE de même nom lors du mapping E/S du device (Device.export).
+    # Un identificateur local masque toujours un identificateur global de même nom (IEC
+    # 61131-3) : toute écriture ICI dans PRG_06_Outputs_LD résout vers la sortie LOCALE du
+    # POU, jamais vers la globale réellement mappée au matériel — la sortie physique ne
+    # bouge donc jamais, sans aucune erreur d'import ni de compilation pour le signaler.
+    # Confirmé en test terrain (2026-08-05) : écrire dq_var depuis un AUTRE POU pilote bien
+    # le HW ; l'écrire depuis PRG_06_Outputs_LD ne pilote rien. Coil supprimé : le mapping
+    # E/S CODESYS doit cibler le chemin qualifié PRG_06_Outputs_LD.<source_var> (variable
+    # locale ci-dessus, ex. TranslationBrakeCmd), jamais le nom nu dq_var.
 
 
 def _make_fb_safety_block(ld, lid, instance_name, input_source_ids):
@@ -576,6 +591,26 @@ def build_prg06_ld():
 
     _make_fb_safety_block(ld, safety_block_id, "instSafetyEmergencyManagement", safety_input_ids)
 
+    # 🐛 FIX 2026-08-05 : EmergencyArmingCmd (cible réelle du mapping E/S, confirmée câblée
+    # par l'utilisateur) n'était écrit nulle part dans le bundle — seul EmergencyArmingPulseActive
+    # (miroir diagnostic) recevait ArmPulse_RQ via FB_SAFETY_OUTPUT_ASSIGNS. Recopie explicite.
+    _make_comment(ld, _new_id(counter), "🔔 EmergencyArmingCmd — cible mapping E/S (miroir EmergencyArmingPulseActive)")
+    _make_vendor_element(ld, _new_id(counter))
+    arm_contact_id = _new_id(counter)
+    _make_contact(ld, arm_contact_id, "EmergencyArmingPulseActive")
+    arm_coil_id = _new_id(counter)
+    arm_coil = ET.SubElement(ld, "coil")
+    arm_coil.set("localId", str(arm_coil_id))
+    arm_coil.set("negated", "false")
+    arm_coil.set("storage", "none")
+    _pos(arm_coil)
+    arm_cpi = ET.SubElement(arm_coil, "connectionPointIn")
+    arm_conn = ET.SubElement(arm_cpi, "connection")
+    arm_conn.set("refLocalId", str(arm_contact_id))
+    ET.SubElement(arm_coil, "connectionPointOut")
+    arm_var = ET.SubElement(arm_coil, "variable")
+    arm_var.text = "EmergencyArmingCmd"
+
     rpr = ET.SubElement(ld, "rightPowerRail")
     rpr.set("localId", "2147483646")
     _pos(rpr)
@@ -594,9 +629,9 @@ def build_prg06_pou():
 
     out_vars = ET.SubElement(iface, "outputVars")
     for name, typ in [
-        ("PowerKeepAlive_A_RQ", "BOOL"),
-        ("PowerKeepAlive_B_RQ", "BOOL"),
-        ("EmergencyArming_RQ", "BOOL"),
+        # 🐛 FIX 2026-08-05 : PowerKeepAlive_A_RQ/B_RQ/EmergencyArming_RQ retirés d'ici
+        # (collision de portée, voir FB_SAFETY_OUTPUT_ASSIGNS) — remplacés par les VAR
+        # locales PowerKeepAliveACmd/BCmd/EmergencyArmingCmd (voir local_vars).
         ("EmergencyArmingPulseActive", "BOOL"),
         ("EmergencyArmingLockoutActive", "BOOL"),
         ("ArmingSeqStep", "INT"),
@@ -623,15 +658,15 @@ def build_prg06_pou():
             sv = ET.SubElement(iv, "simpleValue")
             sv.set("value", "TRUE")
 
-    # REX 2026-07-29 : l'oracle câble des coils sur les sorties actionneurs _DQ/_RQ
-    # (voir ACTUATOR_NETWORKS) — une coil référençant une variable absente de
-    # l'interface du POU provoque une ArgumentNullException GetOperandDeclarationInfo
-    # à l'import CODESYS. Chaque sortie est donc déclarée ici, en BOOL.
-    for _, dq_var, _, _ in ACTUATOR_NETWORKS:
-        v = ET.SubElement(out_vars, "variable")
-        v.set("name", dq_var)
-        t = ET.SubElement(v, "type")
-        ET.SubElement(t, "BOOL")
+    # 🐛 FIX 2026-08-05 (audit terrain M3) : les VAR_OUTPUT dq_var (M1_RelayFwd_Up_DQ,
+    # M3_BrakeRelease_RQ, ...) ne sont plus déclarées ici — plus aucun coil ne les cible
+    # (voir _build_actuator_network), donc plus rien ne les référence dans le bundle.
+    # Les déclarer créait une collision de portée avec la variable GLOBALE de même nom
+    # créée par le mapping E/S CODESYS (Device.export) : un identificateur local masque
+    # toujours un global homonyme (IEC 61131-3), donc toute écriture locale ne pilotait
+    # jamais le matériel réel. Le mapping E/S doit désormais cibler le chemin qualifié
+    # PRG_06_Outputs_LD.<source_var> (ex. TranslationBrakeCmd, M1RelayFwd — VAR locales
+    # déclarées ci-dessous), jamais un nom nu dq_var.
 
     local_vars = ET.SubElement(iface, "localVars")
     for name, typ in [
@@ -648,6 +683,9 @@ def build_prg06_pou():
         ("M3_DriveFreqRefWord", "WORD"),
         ("KoboldContactorCmd", "BOOL"),
         ("PowerCutOffReq", "BOOL"),
+        ("PowerKeepAliveACmd", "BOOL"),
+        ("PowerKeepAliveBCmd", "BOOL"),
+        ("EmergencyArmingCmd", "BOOL"),
     ]:
         v = ET.SubElement(local_vars, "variable")
         v.set("name", name)
