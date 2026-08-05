@@ -25,6 +25,11 @@
       2026-08-04, feedback déjà retiré). Coils câblées directement sur
       les sorties des interlocks finaux — élimine 15 blocs sans valeur
       ajoutée et simplifie la lecture maintenance.
+   🆕 LOT2 (2026-08-05) : sortie moteur AC600 M3 raccordée. DriveControlWord
+      (mot commande 0x3101) et DriveFreqRefWord (consigne fréquence WORD,
+      registre 0x3100, échelle ×100 confirmée terrain — WORD 5000 = 50,00 Hz)
+      capturés en variables locales M3_DriveControlWord / M3_DriveFreqRefWord.
+      Mapping E/S CODESYS (Device.export) manuel restant — voir §2 ci-dessous.
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_06_Outputs_LD
@@ -70,6 +75,8 @@ VAR
     M2SpeedContactor4   : BOOL;
     M2BrakeCmd          : BOOL;
     TranslationBrakeCmd : BOOL;
+    M3_DriveControlWord : WORD; // 🆕 LOT2 : mot commande AC600 (0x3101, %QW6)
+    M3_DriveFreqRefWord : WORD; // 🆕 LOT2 : consigne fréquence AC600 (0x3100, %QW7, ×100)
     KoboldContactorCmd  : BOOL;
     PowerCutOffReq      : BOOL;
 
@@ -156,6 +163,8 @@ instTranslationOutputInterlockM3(
 );
 
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
+M3_DriveControlWord := instTranslationOutputInterlockM3.DriveControlWord;
+M3_DriveFreqRefWord := instTranslationOutputInterlockM3.DriveFreqRefWord;
 
 // === ⚡ §2 ÉCRITURE DES SORTIES PHYSIQUES Q (M1 / M2 / M3) ===
 // Coils câblées directement sur la sortie de l'interlock : plus aucune
@@ -186,6 +195,15 @@ M2_SpeedContactor_4_DQ    := M2SpeedContactor4;
 M2_BrakeRelease_RQ        := M2BrakeCmd;
 
 M3_BrakeRelease_RQ        := TranslationBrakeCmd;
+// ⚠️ Contrat fonctionnel (référence documentaire uniquement — mêmes contraintes
+// Device.export que ci-dessus) :
+//   M3_CommandWord         := M3_DriveControlWord;   // 0x3101 Command,  %QW6
+//   M3_SetpointFrequencyHz := M3_DriveFreqRefWord;    // 0x3100 Frequency, %QW7
+// 🔧 NOTE D'APPLICATION UTILISATEUR (geste manuel CODESYS, hors périmètre bundle) :
+// dans l'onglet mapping E/S du Device AC600_ECAT_Drive, associer M3_CommandWord et
+// M3_SetpointFrequencyHz aux variables locales M3_DriveControlWord / M3_DriveFreqRefWord
+// de ce POU — identique au geste déjà fait pour M1_RelayFwd_Up_DQ etc. Sans ce mapping,
+// le variateur M3 reste sans consigne même une fois SafetyStructureNotValidated levé.
 
 // === 🌐 Recopie GVL_Global (lecture publique diagnostic/simulation) ===
 // GVL_Global.M1RelayFwd..TranslationBrakeCmd sont consommés par FB_SimBench

@@ -14,6 +14,14 @@ PRG_06_Outputs_LD.xml (samples_reference_codesys). Contourne les bugs de ld_buil
 - FB_Output retiré (inverseur pur, jamais utilisé avec InvertLogic<>FALSE,
   REX 2026-08-04) : coils Q câblées directement sur la sortie des interlocks.
 
+🆕 LOT2 (2026-08-05) : DriveControlWord et DriveFreqRefWord (sorties WORD de
+FB_TranslationOutputInterlock_LD) capturés en variables locales M3_DriveControlWord /
+M3_DriveFreqRefWord (même pattern <expression> interne au bloc que TranslationBrakeCmd).
+Échelle DriveFreqRefWord confirmée terrain (utilisateur) : WORD=5000 -> 50,00 Hz sur le
+registre PDO 0x3100. Le mapping E/S CODESYS (Device.export, jamais modifié ici) reste à
+faire manuellement par l'utilisateur : M3_CommandWord (0x3101, %QW6) <- M3_DriveControlWord,
+M3_SetpointFrequencyHz (0x3100, %QW7) <- M3_DriveFreqRefWord.
+
 Structure conforme à l'oracle CODESYS (contraintes structurelles découvertes
 par REX, voir check_ld_invariants.py) :
 - TRUE -> contact <variable>TRUE</variable> (PAS inVariable expr=1)
@@ -65,7 +73,8 @@ TRANSLATION_REQUEST_WORD_REAL_FIELDS = ["RequestedDriveControlWord", "RequestedD
 
 TRANSLATION_INTERLOCK_OUTPUTS = [
     "Ready", "Busy", "Done", "Error", "ErrorId", "State", "StateAtError", "Reason",
-    "BrakeTimeoutElapsed", "RestartInhibit", "DriveControlWord", "DriveFreqRefHz", "BrakeCmd",
+    "BrakeTimeoutElapsed", "RestartInhibit", "DriveControlWord", "DriveFreqRefHz",
+    "DriveFreqRefWord", "BrakeCmd",
 ]
 
 # Actionneurs Q physiques : (source_var_locale, dq_var_device, gvl_global_field, commentaire)
@@ -486,7 +495,15 @@ def build_prg06_ld():
         "PRG_05_Translation.TranslationFinalInterlockRequest.Enable",
         "M3InterlockEnable",
     )
-    m3_targets = {"BrakeCmd": "TranslationBrakeCmd"}
+    # 🆕 LOT2 2026-08-05 : DriveControlWord/DriveFreqRefWord (WORD) capturés en variables
+    # locales par <expression> interne au bloc (même pattern sûr que BrakeCmd) — le
+    # mapping E/S CODESYS (hors périmètre, jamais modifié ici) les pointe manuellement
+    # sur M3_CommandWord (0x3101, %QW6) et M3_SetpointFrequencyHz (0x3100, %QW7).
+    m3_targets = {
+        "BrakeCmd": "TranslationBrakeCmd",
+        "DriveControlWord": "M3_DriveControlWord",
+        "DriveFreqRefWord": "M3_DriveFreqRefWord",
+    }
     m3_block_id = _build_translation_interlock_network(
         ld, counter,
         "🛡️ Barrière finale M3 (Translation AC600) — FB_TranslationOutputInterlock_LD",
@@ -576,6 +593,8 @@ def build_prg06_pou():
         ("M2SpeedContactor3", "BOOL"), ("M2SpeedContactor4", "BOOL"),
         ("M2BrakeCmd", "BOOL"),
         ("TranslationBrakeCmd", "BOOL"),
+        ("M3_DriveControlWord", "WORD"),
+        ("M3_DriveFreqRefWord", "WORD"),
         ("KoboldContactorCmd", "BOOL"),
         ("PowerCutOffReq", "BOOL"),
     ]:
