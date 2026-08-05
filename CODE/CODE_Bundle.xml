@@ -20632,11 +20632,23 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <html:xhtml>🔧 REX 2026-08-05 (audit sécurité) : volontairement non lu ci-dessous —</html:xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <html:xhtml>SafeStop est une rampe rapide gérée en amont par FB_Translation
+(Enable maintenu, AGENTS.md "SafeStop = rampe rapide"). Cette barrière
+ne coupe qu'après la retombée effective de la demande à zéro, sauf
+gate dur/timeout/défaut final (§4) — couper ici immédiatement sur
+SafeStop dupliquerait la rampe en un arrêt brutal, contraire au
+comportement spécifié. Entrée conservée pour interface standard
+complète (AF_Partie-03 §1bis), pas un oubli.</html:xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeCommandOpenConfirmed">
               <type>
@@ -22835,11 +22847,23 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <html:xhtml>🔧 REX 2026-08-05 (audit sécurité) : volontairement non lu ci-dessous —</html:xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <html:xhtml>SafeStop est une rampe rapide gérée en amont par FB_Winch
+(Enable maintenu, AGENTS.md "SafeStop = rampe rapide"). Cette barrière
+ne coupe qu'après la retombée effective de la demande à zéro, sauf
+gate dur/timeout/défaut final (§5) — couper ici immédiatement sur
+SafeStop dupliquerait la rampe en un arrêt brutal, contraire au
+comportement spécifié. Entrée conservée pour interface standard
+complète (AF_Partie-03 §1bis), pas un oubli.</html:xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeCommandOpenConfirmed">
               <type>
@@ -27502,7 +27526,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
             <comment localId="121" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
+                <html:xhtml>🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M3 seul câblé à ce jour)</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="122">
@@ -27516,7 +27540,40 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="124" negated="false" storage="none" edge="none">
+            <contact localId="123" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</variable>
+            </contact>
+            <coil localId="124" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="123" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PowerCutOffReq</variable>
+            </coil>
+            <comment localId="125" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="126">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="128" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27524,7 +27581,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>TRUE</variable>
             </contact>
-            <contact localId="125" negated="false" storage="none" edge="none">
+            <contact localId="129" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27532,7 +27589,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
             </contact>
-            <contact localId="126" negated="false" storage="none" edge="none">
+            <contact localId="130" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27540,7 +27597,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyArming</variable>
             </contact>
-            <contact localId="127" negated="false" storage="none" edge="none">
+            <contact localId="131" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27548,7 +27605,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</variable>
             </contact>
-            <contact localId="128" negated="false" storage="none" edge="none">
+            <contact localId="132" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27556,7 +27613,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</variable>
             </contact>
-            <contact localId="129" negated="false" storage="none" edge="none">
+            <contact localId="133" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27564,7 +27621,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PowerCutOffReq</variable>
             </contact>
-            <contact localId="130" negated="false" storage="none" edge="none">
+            <contact localId="134" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27572,42 +27629,42 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
             </contact>
-            <block localId="123" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+            <block localId="127" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="124" />
+                    <connection refLocalId="128" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="125" />
+                    <connection refLocalId="129" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ArmRequest">
                   <connectionPointIn>
-                    <connection refLocalId="126" />
+                    <connection refLocalId="130" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
-                    <connection refLocalId="127" />
+                    <connection refLocalId="131" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="128" />
+                    <connection refLocalId="132" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerCutOffRequest">
                   <connectionPointIn>
-                    <connection refLocalId="129" />
+                    <connection refLocalId="133" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BtnEmergencyCutOff">
                   <connectionPointIn>
-                    <connection refLocalId="130" />
+                    <connection refLocalId="134" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
