@@ -6,6 +6,14 @@
       standard. Précédence Enable > SafeStop > StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
    🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
+   ⚠️ CORRECTIF (retour terrain 2026-08-05) : une inversion de sens PLUS RAPIDE que le
+      temps de décélération réel bloquait indéfiniment `CommandedDirection` (la translation
+      ne s'arrêtait jamais, continuait dans l'ancien sens) — la cible de rampe suivait la
+      magnitude joystick en continu, sans garantie de croiser le seuil d'arrêt qui
+      autorise l'interlock changement de sens (§5). Même bug déjà corrigé sur `FB_Winch`
+      (REX 2026-07-02), jamais porté ici. Corrigé : `DirectionChangePending` FORCE
+      désormais la cible à 0.0 dès qu'un changement de sens est en attente, de façon
+      déterministe et indépendante du joystick (voir §4 dans le corps ST).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Translation
@@ -71,6 +79,7 @@ VAR
     ErrorEdge            : R_TRIG;
     DirectionChangeDelay : TON;            // Interlock changement de sens
     CommandedDirection   : INT;            // Sens réellement appliqué
+    DirectionChangePending : BOOL;         // 🆕 2026-08-05 : force la rampe à 0 pendant une inversion de sens en attente
     RampTargetPct        : REAL;
     CaptorDebounceTon     : TON;
     ArrivalEdge            : R_TRIG;
@@ -122,8 +131,15 @@ CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 
 // ⚙️ 4. CORE — arbitrage rampe : Enable > SafeStop > StartStop
+// 🆕 2026-08-05 : DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de
+// sens est en attente — sans ça, la cible suit la magnitude joystick en continu et ne
+// croise jamais le seuil d'arrêt (0.1%) qui autorise l'interlock §5 à basculer
+// CommandedDirection. Une inversion plus rapide que la décélération réelle bloquait donc
+// indéfiniment le mouvement dans l'ancien sens (même bug que FB_Winch, REX 2026-07-02).
+DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirection <> 0);
+
 RampTargetPct := 0.0;
-IF NOT SafeStop AND StartStop THEN
+IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     // Si butée fin de course extrême atteinte dans le sens de marche demandé, consigne forcée à 0
     // 🌐 BypassLimitSwitch = TRUE → ignore cette protection
     IF NOT BypassLimitSwitch AND ((Direction = 1 AND LimitSwitchFwd) OR (Direction = -1 AND LimitSwitchRev)) THEN
