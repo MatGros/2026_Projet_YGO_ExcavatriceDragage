@@ -226,7 +226,13 @@ GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
 
-PowerCutOffReq := FALSE;
+// 🆕 REX 2026-08-05 (audit sécurité, trouvé après LOT2) : PowerCutOffReq était figé à FALSE en dur —
+// instSafetyTranslationM3.PowerCutOff (5 mécanismes/8 : thermique frein, Méca A/B, butées, incohérence
+// capteurs) était donc calculé mais totalement inerte, sans aucune coupure amont réelle possible
+// (seul le frein mécanique réagissait via SafeStop). Agrégation OU strict par procédé (M5, A-04) —
+// M1/M2 (FB_Safety_Winch, pas encore instanciée) rejoindront ce OU dès leur safety câblée, aucune
+// demande vraie ne doit jamais être masquée par l'absence d'une autre source.
+PowerCutOffReq := PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
 instSafetyEmergencyManagement(
     Enable := TRUE,

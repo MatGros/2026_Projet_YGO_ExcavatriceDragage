@@ -21,7 +21,14 @@ VAR_INPUT
     Enable                       : BOOL;
     Reset                        : BOOL;
     PowerContactorEngaged              : BOOL;
-    SafeStop                     : BOOL;
+    SafeStop                     : BOOL; // 🔧 REX 2026-08-05 (audit sécurité) : volontairement non lu ci-dessous —
+                                          // SafeStop est une rampe rapide gérée en amont par FB_Translation
+                                          // (Enable maintenu, AGENTS.md "SafeStop = rampe rapide"). Cette barrière
+                                          // ne coupe qu'après la retombée effective de la demande à zéro, sauf
+                                          // gate dur/timeout/défaut final (§4) — couper ici immédiatement sur
+                                          // SafeStop dupliquerait la rampe en un arrêt brutal, contraire au
+                                          // comportement spécifié. Entrée conservée pour interface standard
+                                          // complète (AF_Partie-03 §1bis), pas un oubli.
     BrakeReleaseRequest          : BOOL;
     BrakeCommandOpenConfirmed    : BOOL;
     RequestedDriveControlWord    : WORD; // 0=None, 1=Fwd, 2=Rev, 7=Reset AC600

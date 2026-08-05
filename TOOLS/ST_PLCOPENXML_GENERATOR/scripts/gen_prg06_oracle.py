@@ -520,6 +520,24 @@ def build_prg06_ld():
         _build_actuator_network(ld, counter, source_var, dq_var, gvl_field, comment_text)
 
     # ═══════════════════════════════════════════════════════════
+    # Section 2bis : Agrégation PowerCutOffReq (M5, A-04 — OU strict par procédé)
+    # ═══════════════════════════════════════════════════════════
+    # 🆕 REX 2026-08-05 (audit sécurité) : PowerCutOffReq était une variable locale jamais
+    # écrite dans ce POU (ni en ST documentaire, ni dans le bundle réellement importé) —
+    # instSafetyTranslationM3.PowerCutOff (lot M4) était donc calculé mais totalement inerte,
+    # sans coupure amont réelle possible. Contact->coil direct depuis la demande publique M3
+    # (jamais une lecture d'instance interne, AC3 du contrat M5). M1/M2 (FB_Safety_Winch, pas
+    # encore instanciée) rejoindront ce OU par des contacts supplémentaires en parallèle dès
+    # que leur safety publiera PowerCutOff — jamais une demande vraie masquée par l'absence
+    # d'une autre source (M5, A-04).
+    _make_comment(ld, _new_id(counter), "🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M3 seul câblé à ce jour)")
+    _make_vendor_element(ld, _new_id(counter))
+    powercutoff_contact_id = _new_id(counter)
+    _make_contact(ld, powercutoff_contact_id, "PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff")
+    powercutoff_coil_id = _new_id(counter)
+    _make_coil(ld, powercutoff_coil_id, powercutoff_contact_id, "PowerCutOffReq")
+
+    # ═══════════════════════════════════════════════════════════
     # Section 3 : Sécurité & Coupure Puissance Amont (FB_Safety) — inchangé (AC5)
     # ═══════════════════════════════════════════════════════════
     _make_comment(ld, _new_id(counter), "🛡️ Sécurité & Coupure Puissance Amont")
