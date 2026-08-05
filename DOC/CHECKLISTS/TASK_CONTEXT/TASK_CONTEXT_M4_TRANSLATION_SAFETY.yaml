@@ -1,84 +1,120 @@
 contract:
+  # ── Identification ────────────────────────────────────────────────────────
   task_id: M4_TRANSLATION_SAFETY
   criticality: C4
   strategy: rebuild
   human_validation_required: true
 
-  objective: >
-    Réunir Translation et safety M3 au rang 05 pour supprimer leur cycle,
-    conserver les protections de déplacement et publier une demande finale sûre vers Outputs.
+  # 🔁 2026-08-05 : contrat RÉÉCRIT. La version précédente référençait des
+  # fichiers qui n'existent plus (PRG_TRANSLATION_CFC, PRG_SAFETY_CFC,
+  # PRG_05_Translation_CFC.xml, FB_TranslationArbiter, FB_TranslationRequestPublisher)
+  # — vestiges d'un plan CFC XML antérieur à la renumérotation 7 POU actuelle.
+  # Architecture réelle aujourd'hui : PRG_05_Translation.st (ST), un seul
+  # FB_Translation déjà instancié, FB_Safety_Translation écrit mais jamais
+  # appelé. Pas d'arbiter/publisher séparés — inutiles dans cette architecture.
 
+  # ── 1. Objectif métier ────────────────────────────────────────────────────
+  objective: >
+    Donner à la Translation M3 une sécurité mouvement réelle : SafeStop et
+    PowerCutOff calculés par les 8 mécanismes de FB_Safety_Translation
+    (perte comm opérateur, perte comm EtherCAT, rotation phase, thermique
+    frein, Méca A, Méca B, butées extrêmes, incohérence capteurs) — pas
+    seulement InputModuleFault comme aujourd'hui — câblés en parallèle
+    visible de FB_Translation dans PRG_05_Translation.
+
+  # ── 2. Critères testables ─────────────────────────────────────────────────
   acceptance:
     - id: AC1
-      statement: "PRG_05_Translation_CFC câble localement FB_Safety_Translation, FB_Translation, FB_TranslationArbiter et FB_TranslationRequestPublisher, avec une unique ST_TranslationFinalInterlockRequest et une demande PowerCutOff M3."
-      verified_by: "check_cfc_wiring.py --report + check_linkage.py --report"
+      statement: >
+        instSafetyTranslationM3 (FB_Safety_Translation) est instancié dans
+        PRG_05_Translation.st, en parallèle de instTranslationM3, chaque
+        entrée câblée sur un producteur réel déjà existant :
+        JoystickOnline/JoystickOperational depuis
+        PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online/.Operational ;
+        HeartbeatIhmOk depuis GVL_IHM.Commun.HeartbeatIhmOk (dépend de
+        LOT0_DIAG_IHM_HEARTBEAT) ; PhaseRotationOk depuis
+        PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI ;
+        BrakeThermalFeedback := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI
+        (polarité inversée, même pattern que PRG_07_Supervision.Commun.BrakeThermalFault) ;
+        DriveOnline/DriveOperational depuis
+        PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Online/.Operational ;
+        DriveStatusWord, DriveActualFreqHz, BrakeFeedback, BrakeCmd, Direction,
+        LimitSwitchFwd/Rev, SensorWordIncoherent réutilisent EXACTEMENT les
+        mêmes variables locales déjà câblées vers instTranslationM3 (pas de
+        second calcul) ; les 12 champs de GVL_IHM.TranslationM3.Bypass
+        câblés en entier (aujourd'hui seuls Global/ContactorFeedback/LimitSwitch
+        le sont, les 9 autres sont orphelins côté IHM).
+      verified_by: "revue du diff + check_linkage.py --report"
     - id: AC2
-      statement: "Méca A/B M3, bit 6 butées extrêmes, bit 7 incohérence mot capteurs, ralentissement PV, homme-mort auto/maintenance, inversion de sens et refus cible Maintenance hors MAINT_N2 sont conservés."
-      verified_by: "tests PLC safety M3 + essai CODESYS humain pour chaque capteur, sens et cible"
+      statement: >
+        TranslationFinalInterlockRequest.SafeStop := instSafetyTranslationM3.SafeStop
+        (remplace l'actuel M3_SafeStop_Active := InputModuleFault seul —
+        InputModuleFault reste une cause parmi les 8, pas supprimée sans
+        preuve). Une sortie PowerCutOff M3 existe et est publiée en
+        VAR_OUTPUT de PRG_05_Translation vers l'extérieur (nouveau champ
+        documenté dans le diff — décision explicite, jamais improvisée
+        silencieusement).
+      verified_by: "check_linkage.py --report + inspection du diff sur ST_TranslationFinalInterlockRequest / nouvelle VAR_OUTPUT"
     - id: AC3
-      statement: "Chaque capteur M3 consommé provient de ST_AcquisitionQualified et non d'une E/S brute, avec polarité, filtrage et valeur dégradée conservés."
-      verified_by: "revue des contrats et du câblage XML + watch CODESYS humain des signaux M3"
+      statement: >
+        Chaque mécanisme (Méca A, Méca B, bit6 butées extrêmes, bit7
+        incohérence capteurs, chacun des 12 bypass) a un effet vérifiable
+        en forçage CODESYS, un par un, avec note écrite par mécanisme.
+      verified_by: "vérification manuelle CODESYS (Watch/forçage), consignée dans human_validation_notes"
     - id: AC4
-      statement: "Aucun cycle inter-programme Safety↔Translation ni producteur safety M3 historique ne subsiste; SafeStop et PowerCutOff ne prennent aucun scan de retard supplémentaire."
-      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report + test PLC de coupure M3"
+      statement: >
+        Aucun redémarrage automatique après SafeStop/PowerCutOff M3 : Reset
+        exige un front IHM conscient, cause disparue au préalable.
+      verified_by: "vérification manuelle CODESYS + relecture ResetEdge dans FB_Safety_Translation.st (non modifié par ce lot)"
     - id: AC5
-      statement: "La lecture historique BrakeCmd de la barrière Outputs est conservée strictement telle quelle, avec sa dette et son retard documentés; le lot est BLOCK si sa sémantique doit changer."
-      verified_by: "diff de la liaison BrakeCmd + REGISTRE_ARBITRAGES_MIGRATION.md A-07 + validation humaine safety"
-    - id: AC6
-      statement: "Le nom de fichier est identique au nom de POU: PRG_05_Translation_CFC.xml / PRG_05_Translation_CFC."
+      statement: "Nom de fichier identique au nom de POU pour PRG_05_Translation.st (PRG_05_Translation)."
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
-    - id: AC7
-      statement: "Le suffixe correspond au langage CFC généré dans le bundle: .xml pour PRG_05_Translation_CFC."
+    - id: AC6
+      statement: "Suffixe de langage égal au langage généré dans le bundle pour PRG_05_Translation (.st = ST)."
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py + inspection CODE/CODE_Bundle.xml"
 
+  # ── 3. Périmètre ──────────────────────────────────────────────────────────
   scope:
     allowed:
-      - CODE/MAIN/PRG_TRANSLATION_CFC.st
-      - CODE/MAIN/PRG_SAFETY_CFC.st
-      - CODE/MAIN/PRG_05_Translation_CFC.xml
-      - CODE/TRANSLATION/ST_TranslationSafetyState.st
-      - CODE/TRANSLATION/ST_TranslationProcessState.st
-      - CODE/TRANSLATION/FB_TranslationArbiter.st
-      - CODE/TRANSLATION/FB_TranslationRequestPublisher.st
-      - CODE/COMMUN/ST_AcquisitionQualified.st
-      - DOC/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md
+      - CODE/MAIN/PRG_05_Translation.st
+      - CODE/SUPERVISION/_TYPES/ST_TranslationFinalInterlockRequest.st   # ajout éventuel PowerCutOff, si retenu comme option AC2
       - CODE/CODE_Bundle.xml
     forbidden:
-      - CODE/MAIN/PRG_TREUILS_CFC.st
-      - CODE/MAIN/PRG_OUTPUTS_LD.st
-      - CODE/MAIN/PRG_SUPERVISION_CFC.st
+      - CODE/MAIN/PRG_06_Outputs_LD.st        # consommation du PowerCutOff M3 par Outputs = lot séparé (M5), pas ce lot
+      - CODE/TRANSLATION/FB_Safety_Translation.st   # déjà écrit et correct ; ne pas réécrire sa logique interne sans bug prouvé
+      - CODE/TREUILS/*
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - .git/
 
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
   conservation:
     must_survive:
-      - "Les huit champs de ST_TranslationFinalInterlockRequest."
-      - "Méca A/B, bits 6/7, frein, limites, temporisations, ErrorId et polarités M3."
-      - "L'action physique reste exclusivement dans Outputs; Translation ne publie que demandes et interlock."
-      - "Reset est détecté sur front et un défaut ne redémarre jamais Translation automatiquement."
-      - "La dette BrakeCmd A-07 reste explicitement conservée, sans substitution par retour mécanique."
+      - "Les 8 champs actuels de ST_TranslationFinalInterlockRequest (Enable, Reset, PowerContactorEngaged, SafeStop, BrakeReleaseRequest, BrakeCommandOpenConfirmed, RequestedDriveControlWord, RequestedDriveFreqHz)."
+      - "Méca A/B, bits 6/7, seuils et polarités identiques à FB_Safety_Translation.st actuel (non modifié par ce lot)."
+      - "SafetyStructureNotValidated reste TRUE dans PRG_06_Outputs_LD : ce lot NE lève PAS ce garde-fou global — c'est un lot séparé et validé indépendamment."
+      - "Reset détecté sur front uniquement."
     dropped_on_purpose:
-      - "PRG_TRANSLATION_CFC et la partie M3 restante de PRG_SAFETY_CFC après remappage total."
-      - "Lectures croisées Safety↔Translation remplacées par câblage local et contrats publics."
+      - "Le calcul actuel `M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault` en tant que SEULE cause de SafeStop (remplacé par le SafeStop à 8 causes ; InputModuleFault doit être vérifié comme rentrant bien dans une des 8 causes existantes, pas juste supprimé)."
 
-  decision_references:
-    - "A-05: Translation porte les interdictions qu'elle subit."
-    - "A-07: BrakeCmd interne Outputs est une dette bloquante, conservée sans arbitrage safety."
-    - "A-11: safety transverse sans VAR_OUTPUT supprimée au profit d'une safety locale."
-
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
   evidence_required:
-    - check_code_structure
     - check_linkage
-    - check_cfc_wiring
-    - bundle
     - run_all_gates
-    - task_tests
+    - bundle
     - human_validation_notes
 
+  # ── 6. Modèles autorisés ──────────────────────────────────────────────────
   models_allowed:
-    - "omni/cx/gpt-5.6-terra"
     - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
 
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
   alert_duty: >
-    Toute nécessité de choisir entre BrakeCmd calculé et retour physique frein
-    est une décision safety non autorisée: arrêter le lot et remonter A-07.
+    Ce lot ne lève PAS SafetyStructureNotValidated ni ne câble la sortie
+    physique moteur AC600 (LOT2_TRANSLATION_M3_AC600_OUTPUT, séparé) : à
+    l'issue de ce lot, M3 reste mécaniquement incapable de bouger, c'est
+    attendu. Si LOT0_DIAG_IHM_HEARTBEAT n'est pas fait avant, HeartbeatIhmOk
+    doit être câblé sur sa vraie source dans CE lot et documenté comme tel
+    — jamais laissé sur une valeur non câblée. Tout doute sur le calcul
+    PowerCutOff (nouveau champ vs réutilisation d'un existant) est remonté
+    à l'orchestrateur avant d'écrire, pas décidé seul.
