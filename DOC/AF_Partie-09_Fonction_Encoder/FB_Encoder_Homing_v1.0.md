@@ -88,19 +88,6 @@ transmet au télégramme EtherCAT, puis renvoie `PresetAck` ou `PresetNak`. Apr�
 
 ---
 
-## 3. Conditions d'exécution et vérifications
-
-Pour qu'un ordre de homing nominal soit accepté :
-1. **Autorisation de mode** : `MAINT_N1` (nominal) ou `MAINT_N2` + `WinchSelected` (unitaire).
-2. **Arrêt mécanique impératif** (`FwdRevSpeedFeedbackOff = TRUE` et `BrakeFeedback = TRUE`),
-   sauf `BypassGlobal = TRUE`.
-3. **Capteur haut confirmé**, sauf `BypassGlobal = TRUE`, `UnitaryMode = TRUE` ou cible `0.0` m.
-4. **Cible bornée** dans l'intervalle valide `[-99.0 ; +99.0]` mètres.
-
-🔴 **Polarité `TopPositionSensor` (fail-safe, `NAMING_CONVENTION.md` §"Capteur de sécurité")** :
-famille sécurité, `TRUE` = état sain/nominal. `NAMING_CONVENTION.md` documente explicitement cet
-exact capteur : *« `TopPositionSensor` (sain si non atteint) »*. Donc `TRUE` = capteur **non
-atteint** (chariot pas encore en haut), `FALSE` = capteur **atteint/déclenché**. Le homing nominal
 exige d'être physiquement au contact du capteur haut, donc **`TopPositionSensor = FALSE`** pour
 que la condition soit remplie — le code lève `ErrorId` bit4 *(« capteur position haute non
 confirmé »)* précisément quand `TopPositionSensor = TRUE` (chariot pas encore arrivé).

@@ -37,6 +37,9 @@ VAR_OUTPUT
     Vh0800EndOk                : BOOL;   (* TRUE = module VH_0800END opérationnel (freins/thermiques/AU) *)
     Vh0808EtpOk                : BOOL;   (* TRUE = module VH_0808ETP opérationnel (positions M3/hydraulique/crible) *)
     InputModuleFault           : BOOL;   (* TRUE = au moins un des 3 modules DI hors service *)
+    (* 🧲 Positions câbles calculées en mètres (mises à l'échelle après homing) *)
+    CablePosM1                 : REAL;   (* Position câble M1 en mètres *)
+    CablePosM2                 : REAL;   (* Position câble M2 en mètres *)
 END_VAR
 
 VAR
@@ -191,11 +194,17 @@ instFilterPosMaintenance(InputRaw := HwReal.Translation.M3_PosMaintenance_DI, Fi
 HwRealQualified.Translation.M3_PosMaintenance_DI := instFilterPosMaintenance.State;
 
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
-// GetDeviceState() = RUNNING => module opérationnel. Pas de bypass simulation ici :
-// un module DI absent en simulation banc reste un fait matériel réel, pas un choix modélisé.
-LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
-Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
-Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
+// GetDeviceState() = RUNNING => module opérationnel. Si la simulation globale/machine est active,
+// les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive THEN
+    LocalDigitalIoOk := TRUE;
+    Vh0800EndOk      := TRUE;
+    Vh0808EtpOk      := TRUE;
+ELSE
+    LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
+END_IF;
 InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
 
 
@@ -349,6 +358,7 @@ instEncoderScaleM1(
     CableM_PerRev   := 2.0,
     PointsPerRev    := 8192
 );
+CablePosM1 := instEncoderScaleM1.CablePosM;
 
 instEncoderAbsM2(
     Enable              := TRUE,
@@ -395,6 +405,7 @@ instEncoderScaleM2(
     CableM_PerRev   := 2.0,
     PointsPerRev    := 8192
 );
+CablePosM2 := instEncoderScaleM2.CablePosM;
 
 
 // === ↔️ §5 DÉCODAGE POSITION TRANSLATION (M3) ===

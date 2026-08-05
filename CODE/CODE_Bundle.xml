@@ -5086,6 +5086,140 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    ═══════════════════════════════════════════════════════════════</html:xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_MotionChecklist">
+        <baseType>
+          <struct>
+            <variable name="Step1_PowerEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1. Puissance &amp; Mode
+TRUE = Contacteur principal sous tension (PowerContactorEngaged_DI) ➔ Armer puissance via Reset</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2_ModeAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = Mode MAINT_N1 ou N2 actif (pas DISABLE) ➔ Commutateur Mode IHM</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3_NotBusyOtherTask">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = Pas d'autre séquence en cours (Homing, Benne busy, etc.)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4_MotionRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>2. Intention &amp; Demande
+TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster doit être à 0 !</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <html:xhtml>+1 = Montée, -1 = Descente, 0 = Repos</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedSpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>0..100 % consigne demandée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step5_NoSafetyFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>3. Chaîne de Sécurité &amp; Verrous
+TRUE = Pas de SafeStop ni AU actif sur cet axe</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step6_DirectionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = Sens non interdit (ForbidAscent/ForbidDescent)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step7_BrakeReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = Commande frein activée &amp; retour frein OK</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step8_OutputInterlockOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = Étage de sortie LD débloqué (pas d'interlock actif)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllConditionsMet">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>4. Bilan &amp; Exécution Physiques
+🟢 TRUE = TOUTES LES CONDITIONS SONT REMPLIES, LES RELAIS DOIVENT COLLER !</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwdActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🛗 Relais Montée physiquement commandé</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🛗 Relais Descente physiquement commandé</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedContactor1Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🔌 Contacteur de vitesse Palier 1 commandé</html:xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6d9cfeb3-7f24-5c22-8bb6-161cefc2f0eb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <html:xhtml>═══════════════════════════════════════════════════════════════
+   ⚙️ ST_MotionChecklist — Diagnostic chronologique de commande de mouvement
+   ───────────────────────────────────────────────────────────────
+   🎨 Permet de voir en un coup d'œil pourquoi un ordre de mouvement ne fait pas coller les relais.
+   ═══════════════════════════════════════════════════════════════</html:xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_NetworkDiagHMI">
         <baseType>
           <struct>
@@ -21148,8 +21282,8 @@ GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown :=
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := 0.0; // TBD non câblé - voir fiche §6 (pas de sortie Cycle publiée pour ce champ)
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := 0.0; // TBD non câblé - voir fiche §6 (Idx208/209, consigne interne PRG_04 non publiée en VAR_OUTPUT)
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := 0; // TBD non câblé - idem
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := WinchM1.State.SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := SEL(WinchM1.State.RelayFwd, SEL(WinchM1.State.RelayRev, 0, -1), 1);
 
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
@@ -21356,7 +21490,57 @@ GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMa
 GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
 
-// === 📥 9. Image Complète des Entrées Réelles / Simulées (Inputs) ===
+// === ⚙️ 9. Diagnostic Chronologique Mouvement Treuil M1 (MotionM1) ===
+GVL_Troubleshooting.MotionM1.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.MotionM1.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.MotionM1.Step3_NotBusyOtherTask   := NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM2.Bucket.State.FBState = E_State.BUSY);
+GVL_Troubleshooting.MotionM1.Step4_MotionRequested    := WinchM1.State.Busy OR (WinchM1.State.SpeedRef_Pct &gt; 0.0);
+GVL_Troubleshooting.MotionM1.RequestedDirection       := SEL(WinchM1.State.RelayFwd, SEL(WinchM1.State.RelayRev, 0, -1), 1);
+GVL_Troubleshooting.MotionM1.RequestedSpeedPct        := WinchM1.State.SpeedRef_Pct;
+GVL_Troubleshooting.MotionM1.Step5_NoSafetyFault      := NOT WinchM1.Safety.SafeStop AND NOT WinchM1.Safety.ThermalFault;
+GVL_Troubleshooting.MotionM1.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.MotionM1.RequestedDirection = 1, NOT WinchM1.Safety.ForbidDescent, NOT WinchM1.Safety.ForbidAscent);
+GVL_Troubleshooting.MotionM1.Step7_BrakeReleased      := WinchM1.State.BrakeCmd AND WinchM1.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.MotionM1.Step8_OutputInterlockOk  := NOT WinchM1.State.FinalInterlockError;
+
+GVL_Troubleshooting.MotionM1.AllConditionsMet := GVL_Troubleshooting.MotionM1.Step1_PowerEngaged
+                                              AND GVL_Troubleshooting.MotionM1.Step2_ModeAuthorized
+                                              AND GVL_Troubleshooting.MotionM1.Step3_NotBusyOtherTask
+                                              AND GVL_Troubleshooting.MotionM1.Step4_MotionRequested
+                                              AND GVL_Troubleshooting.MotionM1.Step5_NoSafetyFault
+                                              AND GVL_Troubleshooting.MotionM1.Step6_DirectionAllowed
+                                              AND GVL_Troubleshooting.MotionM1.Step7_BrakeReleased
+                                              AND GVL_Troubleshooting.MotionM1.Step8_OutputInterlockOk;
+
+GVL_Troubleshooting.MotionM1.RelayFwdActive        := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.MotionM1.RelayRevActive        := WinchM1.State.RelayRev;
+GVL_Troubleshooting.MotionM1.SpeedContactor1Active := WinchM1.State.Contactor1;
+
+// === ⚙️ 10. Diagnostic Chronologique Mouvement Treuil M2 (MotionM2) ===
+GVL_Troubleshooting.MotionM2.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.MotionM2.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.MotionM2.Step3_NotBusyOtherTask   := NOT WinchM2.State.Encoder.HomingBusy;
+GVL_Troubleshooting.MotionM2.Step4_MotionRequested    := WinchM2.State.Busy OR (WinchM2.State.SpeedRef_Pct &gt; 0.0);
+GVL_Troubleshooting.MotionM2.RequestedDirection       := SEL(WinchM2.State.RelayFwd, SEL(WinchM2.State.RelayRev, 0, -1), 1);
+GVL_Troubleshooting.MotionM2.RequestedSpeedPct        := WinchM2.State.SpeedRef_Pct;
+GVL_Troubleshooting.MotionM2.Step5_NoSafetyFault      := NOT WinchM2.Safety.SafeStop AND NOT WinchM2.Safety.ThermalFault AND NOT WinchM2.Safety.SlackCable;
+GVL_Troubleshooting.MotionM2.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.MotionM2.RequestedDirection = 1, NOT WinchM2.Safety.ForbidDescent, NOT WinchM2.Safety.ForbidAscent);
+GVL_Troubleshooting.MotionM2.Step7_BrakeReleased      := WinchM2.State.BrakeCmd AND WinchM2.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.MotionM2.Step8_OutputInterlockOk  := NOT WinchM2.State.FinalInterlockError;
+
+GVL_Troubleshooting.MotionM2.AllConditionsMet := GVL_Troubleshooting.MotionM2.Step1_PowerEngaged
+                                              AND GVL_Troubleshooting.MotionM2.Step2_ModeAuthorized
+                                              AND GVL_Troubleshooting.MotionM2.Step3_NotBusyOtherTask
+                                              AND GVL_Troubleshooting.MotionM2.Step4_MotionRequested
+                                              AND GVL_Troubleshooting.MotionM2.Step5_NoSafetyFault
+                                              AND GVL_Troubleshooting.MotionM2.Step6_DirectionAllowed
+                                              AND GVL_Troubleshooting.MotionM2.Step7_BrakeReleased
+                                              AND GVL_Troubleshooting.MotionM2.Step8_OutputInterlockOk;
+
+GVL_Troubleshooting.MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
+GVL_Troubleshooting.MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
+
+// === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
 GVL_Troubleshooting.Inputs := HwIn;
 
 
@@ -24985,7 +25169,7 @@ instWinchM1(
     HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback           := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
-    BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global,
+    BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
     CfgRampAccelRate        := _WinchM1CfgPersist.CfgRampAccelRate,
     CfgRampDecelNormalRate  := _WinchM1CfgPersist.CfgRampDecelNormalRate,
     CfgRampDecelFastRate    := _WinchM1CfgPersist.CfgRampDecelFastRate,
@@ -25019,7 +25203,7 @@ instWinchM2(
     HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback           := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
-    BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global,
+    BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
     CfgRampAccelRate        := _WinchM2CfgPersist.CfgRampAccelRate,
     CfgRampDecelNormalRate  := _WinchM2CfgPersist.CfgRampDecelNormalRate,
     CfgRampDecelFastRate    := _WinchM2CfgPersist.CfgRampDecelFastRate,
@@ -25379,7 +25563,7 @@ instTranslationM3(
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
-    BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global,
+    BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
 
@@ -28232,6 +28416,30 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <html:xhtml>🕹️ Diagnostic chronologique Bus CANopen &amp; Homme-Mort Joystick</html:xhtml>
           </documentation>
         </variable>
+        <variable name="MotionM1">
+          <type>
+            <derived name="ST_MotionChecklist" />
+          </type>
+          <documentation>
+            <html:xhtml>⚙️ Diagnostic chronologique Mouvement M1 (Treuil Retenue)</html:xhtml>
+          </documentation>
+        </variable>
+        <variable name="MotionM2">
+          <type>
+            <derived name="ST_MotionChecklist" />
+          </type>
+          <documentation>
+            <html:xhtml>⚙️ Diagnostic chronologique Mouvement M2 (Treuil Benne)</html:xhtml>
+          </documentation>
+        </variable>
+        <variable name="MotionM3">
+          <type>
+            <derived name="ST_MotionChecklist" />
+          </type>
+          <documentation>
+            <html:xhtml>⚙️ Diagnostic chronologique Mouvement M3 (Translation)</html:xhtml>
+          </documentation>
+        </variable>
         <variable name="Inputs">
           <type>
             <derived name="ST_HardwareImage" />
@@ -28435,6 +28643,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
             <Object Name="ST_ModesState" ObjectId="607d2d07-1efc-59e2-9ca9-53d413d7cf77" />
             <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+            <Object Name="ST_MotionChecklist" ObjectId="6d9cfeb3-7f24-5c22-8bb6-161cefc2f0eb" />
             <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
             <Object Name="ST_OperatorAction" ObjectId="6e6d9b5d-226e-566e-908c-f3aa313a7e26" />
             <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
