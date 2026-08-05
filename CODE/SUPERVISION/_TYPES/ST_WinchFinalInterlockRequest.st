@@ -23,5 +23,6 @@ STRUCT
     RequestedContactor3          : BOOL;
     RequestedContactor4          : BOOL;
     RequestedStep                : INT;
+    PowerCutOff                  : BOOL; // 🆕 2026-08-05 : demande coupure puissance (FB_Safety_Winch), agrégée par PRG_06 (M5, A-04)
 END_STRUCT
 END_TYPE

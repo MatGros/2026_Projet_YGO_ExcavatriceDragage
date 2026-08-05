@@ -25,6 +25,8 @@ VAR
 
     instWinchSync : FB_WinchSync;
     instBucket   : FB_Bucket;
+    instSafetyWinchM1 : FB_Safety_Winch;   // 🆕 2026-08-05 : audit sécurité M3 — M1/M2 avaient 0 mécanisme actif
+    instSafetyWinchM2 : FB_Safety_Winch;
     instWinchM1   : FB_Winch;
     instWinchM2   : FB_Winch;
     instDiveSearch : FB_DiveSearch;
@@ -221,7 +223,8 @@ ELSE
         END_IF;
         M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
-                                     OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)));
+                                     OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
+                                AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
         M1_SpeedRef_Active  := 100.0;
     END_IF;
 END_IF;
@@ -250,7 +253,8 @@ ELSE
             END_IF;
             M2_StartStop_Active := (M2_Direction_Active <> 0)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
-                                         OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)));
+                                         OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)))
+                                    AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
             M2_SpeedRef_Active := 100.0;
         END_IF;
     END_IF;
@@ -335,6 +339,114 @@ ForbidDescentM1_Raw := GVL_IHM.M1TreuilRetenue.Bypass.Global;
 ForbidDescentM2_Raw := GVL_IHM.M2TreuilBenne.Bypass.Global;
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketCfgPersist.Config.OffsetCloseM);
+
+// 🆕 2026-08-05 (audit sécurité M3) : FB_Safety_Winch M1/M2 — 0 mécanisme actif avant ce lot.
+// Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
+// (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
+instSafetyWinchM1(
+    Enable                 := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
+    SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
+    JoystickOnline         := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational    := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
+    EncoderAvailable       := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable,
+    EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
+    ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
+    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
+    PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
+    TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    InReferencingMode      := PRG_02_Acquisition.instHomingM1.Busy,
+    CablePosM              := PRG_02_Acquisition.CablePosM1,
+    CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
+    Direction              := M1_Direction_Active,
+    MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
+    Homed                  := PRG_02_Acquisition.instHomingM1.Homed,
+    HomingSuspect          := PRG_02_Acquisition.instHomingM1.HomingSuspect,
+    TopLimitM              := _WinchM1CfgPersist.CfgCableLimitAscent_M,
+    FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+    BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
+    JoystickYNeutral       := PRG_02_Acquisition.JoystickYNeutral,
+    BenneHoldStillActive   := instBucket.Busy,
+    ExpectedOtherWinchPosM := PRG_02_Acquisition.CablePosM2 - instBucket.ActiveOffsetM,
+    BenneBusy              := instBucket.Busy,
+    OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM2,
+    MeasuredSpeedMps       := PRG_02_Acquisition.M1_Speed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Acquisition.M1_SignedSpeed_Mps,
+    MeasuredSpeedValid     := PRG_02_Acquisition.M1_SpeedValid,
+    BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
+    BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
+    BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
+    BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch,
+    BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch,
+    BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
+    BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
+    BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
+    BypassMecaA            := GVL_IHM.M1TreuilRetenue.Bypass.MecaA,
+    BypassMecaB            := GVL_IHM.M1TreuilRetenue.Bypass.MecaB,
+    BypassMecaC            := GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
+    BypassMecaD            := GVL_IHM.M1TreuilRetenue.Bypass.MecaD,
+    BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE
+);
+
+instSafetyWinchM2(
+    Enable                 := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
+    SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
+    JoystickOnline         := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational    := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
+    EncoderAvailable       := PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable,
+    EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
+    ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
+    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
+    PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
+    TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    InReferencingMode      := PRG_02_Acquisition.instHomingM2.Busy,
+    CablePosM              := PRG_02_Acquisition.CablePosM2,
+    CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
+    Direction              := M2_Direction_Active,
+    MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
+    Homed                  := PRG_02_Acquisition.instHomingM2.Homed,
+    HomingSuspect          := PRG_02_Acquisition.instHomingM2.HomingSuspect,
+    TopLimitM              := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+    FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+    BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
+    JoystickYNeutral       := PRG_02_Acquisition.JoystickYNeutral,
+    BenneHoldStillActive   := FALSE,
+    ExpectedOtherWinchPosM := PRG_02_Acquisition.CablePosM1 + instBucket.ActiveOffsetM,
+    BenneBusy              := instBucket.Busy,
+    OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM1,
+    MeasuredSpeedMps       := PRG_02_Acquisition.M2_Speed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Acquisition.M2_SignedSpeed_Mps,
+    MeasuredSpeedValid     := PRG_02_Acquisition.M2_SpeedValid,
+    BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
+    BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
+    BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
+    BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch,
+    BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch,
+    BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
+    BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
+    BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
+    BypassMecaA            := GVL_IHM.M2TreuilBenne.Bypass.MecaA,
+    BypassMecaB            := GVL_IHM.M2TreuilBenne.Bypass.MecaB,
+    BypassMecaC            := GVL_IHM.M2TreuilBenne.Bypass.MecaC,
+    BypassMecaD            := GVL_IHM.M2TreuilBenne.Bypass.MecaD,
+    BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE
+);
+
+SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
+SafeStopM2_Raw := SafeStopM2_Raw OR instSafetyWinchM2.SafeStop;
+ForbidDescentM1_Raw := ForbidDescentM1_Raw OR instSafetyWinchM1.ForbidDescent;
+ForbidDescentM2_Raw := ForbidDescentM2_Raw OR instSafetyWinchM2.ForbidDescent;
+ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent;
+ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent;
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -431,6 +543,7 @@ WinchM1FinalInterlockRequest.RequestedContactor2 := instWinchM1.Contactor2;
 WinchM1FinalInterlockRequest.RequestedContactor3 := instWinchM1.Contactor3;
 WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
+WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
 
 WinchM2FinalInterlockRequest.Enable := StubMachineEnableN1;
 WinchM2FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
@@ -446,6 +559,7 @@ WinchM2FinalInterlockRequest.RequestedContactor2 := instWinchM2.Contactor2;
 WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
+WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
 WinchM1StateHMI.Position_M := PRG_02_Acquisition.CablePosM1;

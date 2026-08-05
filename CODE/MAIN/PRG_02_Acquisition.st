@@ -18,6 +18,7 @@ VAR_OUTPUT
     WinchInputSourceChanged  : BOOL;              (* TRUE pendant 1 cycle si source Winch change *)
 
     JoystickDeadmanArmed      : BOOL;   (* TRUE = geste homme-mort joystick armé (FB_Joystick.DeadmanArmed, AF08 §4/§6) *)
+    JoystickYNeutral          : BOOL;   (* 🆕 2026-08-05 : TRUE = axe Y joystick au neutre — armement Méca B (FB_Safety_Winch) *)
 
     TranslationPosTremie      : BOOL;   (* TRUE = translation en position Trémie *)
     TranslationPosPV          : BOOL;   (* TRUE = translation en zone pré-ralentissement PV *)
@@ -330,6 +331,7 @@ instJoystick(
 // 🔫 AF08 §6 : DeadmanArmed jusqu'ici jamais publié hors instJoystick (instance privée) —
 // exigé par Translation/Winch/Cycle en aval (T106, audit M3 2026-08-05).
 JoystickDeadmanArmed := instJoystick.DeadmanArmed;
+JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prérequis FB_Safety_Winch Méca B
 
 
 // === 🧲 §4 CODEURS & HOMING (M1 / M2) ===
