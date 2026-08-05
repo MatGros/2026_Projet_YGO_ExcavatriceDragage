@@ -56,6 +56,24 @@
 
 ---
 
+### MES-015 — 📉 Translation M3 : ralentissement PV en **Hz fixe** au lieu d'un **%**
+- 📅 **Date** : 2026-08-05 | 📍 **Lieu** : Terrain | 🏷️ **Version** : `v0.4.27_ConfigPersistence_TranslationSupervisionSuite`
+- 🎯 **Périmètre** : Ralentissement PV (`FB_Translation.st` §4bis, `ApproachSpeedHz`), `PRG_05_Translation.st:181` (`GVL_PERSISTENT._TranslationApproachSpeed_Hz`)
+- 🚦 **Statut** : 🟡 **Constat — décision à prendre** (garde en Hz ou passage en %)
+- 🔍 **Constat** : Le ralentissement PV est exprimé en **Hz fixe** (`ApproachSpeedHz := 10.0`), converti en % de l'échelle max au vol (`FB_Translation.st:142-143`). Moins parlant pour la maintenance que la consigne vitesse (en %) utilisée partout ailleurs.
+- 🛠️ **Décision** : À trancher pendant la MES (cohérence IHM/maintenance).
+
+### 🧭 Relevés à prendre — Calibration vitesse Translation M3 (Hz ↔ m/s)
+> Objectif : relier fréquence variateur (Hz) ↔ vitesse réelle du pont (m/s) à partir de **temps de déplacement mesurés** sur une **distance connue** entre capteurs (Trémie | PV | P2 | P1 | Maintenance).
+
+| # | Sens (Fwd/Rev) | Trajet capteurs | Distance (m) | Temps mesuré (s) | Vitesse (m/s) | Hz variateur | Consigne % | Commentaire |
+|---|---|---|---|---|---|---|---|---|
+| 1 |  |  |  |  |  |  |  |  |
+| 2 |  |  |  |  |  |  |  |  |
+| 3 |  |  |  |  |  |  |  |  |
+
+---
+
 ## 3. 📄 Modèle à Dupliquer
 
 ```md

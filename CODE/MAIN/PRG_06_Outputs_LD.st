@@ -35,9 +35,10 @@
 PROGRAM PRG_06_Outputs_LD
 
 VAR_OUTPUT
-    PowerKeepAlive_A_RQ          : BOOL;
-    PowerKeepAlive_B_RQ          : BOOL;
-    EmergencyArming_RQ           : BOOL;
+    (* 🐛 FIX 2026-08-05 (confirmé câblé réel par l'utilisateur) : PowerKeepAlive_A_RQ/
+       PowerKeepAlive_B_RQ/EmergencyArming_RQ retirés d'ici — même collision de portée
+       que M1/M2/M3 (voir §2). Cibles renommées : PowerKeepAliveACmd/BCmd/
+       EmergencyArmingCmd, déclarées en VAR locale ci-dessous. *)
     EmergencyArmingPulseActive   : BOOL;
     EmergencyArmingLockoutActive : BOOL;
     ArmingSeqStep                : INT;
@@ -54,29 +55,14 @@ VAR_OUTPUT
     M2InterlockEnable            : BOOL; (* Gate finale M2 : structure validée AND WinchM2...Enable *)
     M3InterlockEnable            : BOOL; (* Gate finale M3 : structure validée AND TranslationRequest.Enable *)
 
-    (* 🔌 Sorties actionneurs publiques PRG_06_Outputs_LD *)
-    M1_RelayFwd_Up_DQ            : BOOL;
-    M1_RelayRev_Down_DQ          : BOOL;
-    M1_SpeedContactor_1_DQ       : BOOL;
-    M1_SpeedContactor_2_DQ       : BOOL;
-    M1_SpeedContactor_3_DQ       : BOOL;
-    M1_SpeedContactor_4_DQ       : BOOL;
-    M1_BrakeRelease_RQ           : BOOL;
-
-    M2_RelayFwd_Up_Close_DQ      : BOOL;
-    M2_RelayRev_Down_Open_DQ     : BOOL;
-    M2_SpeedContactor_1_DQ       : BOOL;
-    M2_SpeedContactor_2_DQ       : BOOL;
-    M2_SpeedContactor_3_DQ       : BOOL;
-    M2_SpeedContactor_4_DQ       : BOOL;
-    M2_BrakeRelease_RQ           : BOOL;
-
-    M3_BrakeRelease_RQ           : BOOL;
-    TranslationBrakeCmd          : BOOL; (* Miroir fonctionnel *)
-    M3_DriveControlWord          : WORD; (* Mot de commande variateur M3 (0x3101) *)
-    M3_DriveFreqRefWord          : WORD; (* Consigne fréquence variateur M3 (0x3100, x100) *)
-    M3_CommandWord               : WORD; (* Miroir mot de commande 0x3101 *)
-    M3_SetpointFrequencyHz       : WORD; (* Miroir consigne fréquence 0x3100 *)
+    (* 🐛 FIX 2026-08-05 : les noms Device bruts (*_DQ/*_RQ, ex. M1_RelayFwd_Up_DQ,
+       M3_BrakeRelease_RQ) NE SONT PLUS déclarés ici — les déclarer créait une collision
+       de portée avec la variable GLOBALE homonyme créée par le mapping E/S CODESYS
+       (Device.export), qui masquait silencieusement le pilotage matériel réel (voir §2
+       plus bas pour le détail et la liste des chemins qualifiés à mapper). *)
+    TranslationBrakeCmd          : BOOL; (* Demande frein M3 arbitrée — cible du mapping E/S *)
+    M3_DriveControlWord          : WORD; (* Mot de commande variateur M3 (0x3101) — cible du mapping E/S *)
+    M3_DriveFreqRefWord          : WORD; (* Consigne fréquence variateur M3 (0x3100, x100) — cible du mapping E/S *)
 END_VAR
 
 VAR
@@ -100,6 +86,10 @@ VAR
     M2BrakeCmd          : BOOL;
     KoboldContactorCmd  : BOOL;
     PowerCutOffReq      : BOOL;
+
+    PowerKeepAliveACmd  : BOOL; (* Maintien puissance voie A — cible du mapping E/S *)
+    PowerKeepAliveBCmd  : BOOL; (* Maintien puissance voie B — cible du mapping E/S *)
+    EmergencyArmingCmd  : BOOL; (* Impulsion réarmement — cible du mapping E/S *)
 
     instSafetyEmergencyManagement : FB_Safety_EmergencyManagement;
 END_VAR
@@ -187,42 +177,39 @@ TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
 M3_DriveControlWord := instTranslationOutputInterlockM3.DriveControlWord;
 M3_DriveFreqRefWord := instTranslationOutputInterlockM3.DriveFreqRefWord;
 
-// === ⚡ §2 ÉCRITURE DES SORTIES PHYSIQUES Q (M1 / M2 / M3) ===
-// Coils câblées directement sur la sortie de l'interlock : plus aucune
-// commande moteur/frein n'atteint la carte de sortie sans être passée
-// par sa barrière finale (voir §1).
-// ⚠️ Source ST (référence documentaire) : ces affectations expriment le contrat
-// fonctionnel. Le LD réellement importé dans CODESYS (généré par
-// gen_prg06_oracle.py) ne câble PAS de coil direct sur ces noms *_DQ/*_RQ :
-// ce sont des variables auto-créées par le mapping E/S de Device.export,
-// absentes du bundle isolé — un coil dessus fait planter l'import CODESYS
-// (REX 2026-08-04, ArgumentNullException). Le raccordement physique reste au
-// mapping E/S CODESYS (Device.export, jamais modifié par ce lot) pointé sur
-// la variable locale (M1RelayFwd...), déjà pilotée par la barrière finale.
-M1_RelayFwd_Up_DQ         := M1RelayFwd;
-M1_RelayRev_Down_DQ       := M1RelayRev;
-M1_SpeedContactor_1_DQ    := M1SpeedContactor1;
-M1_SpeedContactor_2_DQ    := M1SpeedContactor2;
-M1_SpeedContactor_3_DQ    := M1SpeedContactor3;
-M1_SpeedContactor_4_DQ    := M1SpeedContactor4;
-M1_BrakeRelease_RQ        := M1BrakeCmd;
-
-M2_RelayFwd_Up_Close_DQ   := M2RelayFwd;
-M2_RelayRev_Down_Open_DQ  := M2RelayRev;
-M2_SpeedContactor_1_DQ    := M2SpeedContactor1;
-M2_SpeedContactor_2_DQ    := M2SpeedContactor2;
-M2_SpeedContactor_3_DQ    := M2SpeedContactor3;
-M2_SpeedContactor_4_DQ    := M2SpeedContactor4;
-M2_BrakeRelease_RQ        := M2BrakeCmd;
-
-M3_BrakeRelease_RQ        := TranslationBrakeCmd;
-M3_CommandWord         := M3_DriveControlWord;   // 0x3101 Command,  %QW6
-M3_SetpointFrequencyHz := M3_DriveFreqRefWord;    // 0x3100 Frequency, %QW7
-// 🔧 NOTE D'APPLICATION UTILISATEUR (geste manuel CODESYS, hors périmètre bundle) :
-// dans l'onglet mapping E/S du Device AC600_ECAT_Drive, associer M3_CommandWord et
-// M3_SetpointFrequencyHz aux variables locales M3_DriveControlWord / M3_DriveFreqRefWord
-// de ce POU — identique au geste déjà fait pour M1_RelayFwd_Up_DQ etc. Sans ce mapping,
-// le variateur M3 reste sans consigne même une fois SafetyStructureNotValidated levé.
+// === ⚡ §2 SORTIES PHYSIQUES (M1 / M2 / M3) — MAPPING E/S CODESYS OBLIGATOIRE ===
+// 🐛 FIX 2026-08-05 (audit terrain M3, contacteur frein jamais piloté) : ce POU
+// NE DÉCLARE PLUS et NE CÂBLE PLUS de coil sur les noms Device bruts (*_DQ/*_RQ,
+// ex. M1_RelayFwd_Up_DQ, M3_BrakeRelease_RQ). Un coil dessus faisait planter
+// l'import CODESYS (ArgumentNullException, REX 2026-08-04) ; le fix appliqué
+// alors (les déclarer en VAR_OUTPUT du POU) évitait le crash mais créait une
+// COLLISION DE PORTÉE avec la variable GLOBALE homonyme créée par le mapping
+// E/S du device (Device.export) : un identificateur local masque toujours un
+// global de même nom (IEC 61131-3) — toute écriture ICI ne pilotait donc
+// JAMAIS le matériel réel, sans aucune erreur pour le signaler (confirmé par
+// test terrain : écrire le même nom depuis un AUTRE POU pilotait bien le HW).
+//
+// 🔧 NOTE D'APPLICATION UTILISATEUR OBLIGATOIRE (mapping E/S CODESYS, hors
+// périmètre bundle) : dans l'onglet Mapping E/S de chaque device, chaque canal
+// physique doit être associé au CHEMIN QUALIFIÉ PRG_06_Outputs_LD.<variable
+// locale> ci-dessous — jamais à un nom nu qui recréerait la collision :
+//   M1_RelayFwd_Up_DQ        <- PRG_06_Outputs_LD.M1RelayFwd
+//   M1_RelayRev_Down_DQ      <- PRG_06_Outputs_LD.M1RelayRev
+//   M1_SpeedContactor_1..4_DQ<- PRG_06_Outputs_LD.M1SpeedContactor1..4
+//   M1_BrakeRelease_RQ       <- PRG_06_Outputs_LD.M1BrakeCmd
+//   M2_RelayFwd_Up_Close_DQ  <- PRG_06_Outputs_LD.M2RelayFwd
+//   M2_RelayRev_Down_Open_DQ <- PRG_06_Outputs_LD.M2RelayRev
+//   M2_SpeedContactor_1..4_DQ<- PRG_06_Outputs_LD.M2SpeedContactor1..4
+//   M2_BrakeRelease_RQ       <- PRG_06_Outputs_LD.M2BrakeCmd
+//   M3_BrakeRelease_RQ       <- PRG_06_Outputs_LD.TranslationBrakeCmd
+//   M3_CommandWord           <- PRG_06_Outputs_LD.M3_DriveControlWord   (0x3101, %QW6)
+//   M3_SetpointFrequencyHz   <- PRG_06_Outputs_LD.M3_DriveFreqRefWord   (0x3100, %QW7)
+//   PowerKeepAlive_A_RQ      <- PRG_06_Outputs_LD.PowerKeepAliveACmd
+//   PowerKeepAlive_B_RQ      <- PRG_06_Outputs_LD.PowerKeepAliveBCmd
+//   EmergencyArming_RQ       <- PRG_06_Outputs_LD.EmergencyArmingCmd
+// Sans ce mapping (re)fait sur CHAQUE canal, aucune sortie moteur/frein M1/M2/M3 ni
+// la chaîne AU (maintien puissance/réarmement) ne bouge, même une fois
+// SafetyStructureNotValidated levé.
 
 // === 🌐 Recopie GVL_Global (lecture publique diagnostic/simulation) ===
 // GVL_Global.M1RelayFwd..TranslationBrakeCmd sont consommés par FB_SimBench
@@ -272,9 +259,9 @@ instSafetyEmergencyManagement(
     BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
 );
 
-PowerKeepAlive_A_RQ := instSafetyEmergencyManagement.MaintainA_RQ;
-PowerKeepAlive_B_RQ := instSafetyEmergencyManagement.MaintainB_RQ;
-EmergencyArming_RQ := instSafetyEmergencyManagement.ArmPulse_RQ;
+PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;
+PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;
+EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;
 
 EmergencyArmingPulseActive := instSafetyEmergencyManagement.ArmPulse_RQ;
 EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;

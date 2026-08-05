@@ -62,6 +62,7 @@ def main() -> int:
         ("GATE 2bis-bis: Cablage CFC natif",           [sys.executable, f"{S}/check_cfc_wiring.py"]),
         ("GATE 2ter: Routage modele",                  [sys.executable, f"{S}/check_model_routing.py"]),
         ("GATE 2quater: Liens documentaires",          [sys.executable, f"{S}/check_doc_links.py"]),
+        ("GATE 2quinquies: Collision noms HW (REX 2026-08-05)", [sys.executable, f"{S}/check_hw_name_collision.py", "."]),
         ("GATE 3: Persistance config",                 [sys.executable, f"{S}/check_config_persistence.py", "."]),
         ("GATE 4: Fraicheur bundle",                   [sys.executable, f"{S}/check_bundle_freshness.py", "."]),
         ("GATE 4bis: Syntaxe ST du bundle (no terminator)", [sys.executable, f"{S}/check_bundle_st_syntax.py", "."]),
