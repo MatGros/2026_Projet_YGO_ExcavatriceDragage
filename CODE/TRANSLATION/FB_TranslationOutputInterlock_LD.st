@@ -2,7 +2,10 @@
    🛡️ FB_TranslationOutputInterlock_LD — Barrière finale frein / AC600 M3
    ───────────────────────────────────────────────────────────────
    📥 Reçoit exclusivement les demandes métier de FB_Translation.
-   📤 Produit seul les commandes AC600 et frein vers PRG_10_Outputs_LD.
+   📤 Produit seul les commandes AC600 et frein vers PRG_06_Outputs_LD.
+   🆕 LOT2 2026-08-05 : DriveFreqRefWord (WORD, échelle ×100 confirmée terrain)
+      ajouté en sortie — seule forme exploitable par le mapping E/S CODESYS du
+      registre PDO 0x3100 (DriveFreqRefHz en REAL reste disponible, IHM/diag).
    🔒 BrakeCommandOpenConfirmed confirme le contacteur/bobine de desserrage,
       jamais la position mécanique du frein.
    ⏱️ Watchdog fixe T#500ms, démarré uniquement par BrakeReleaseRequest.
@@ -34,6 +37,7 @@ VAR_OUTPUT
     RestartInhibit               : BOOL; // TRUE : neutralisation puis nouvelle demande exigées après défaut
     DriveControlWord             : WORD;
     DriveFreqRefHz               : REAL;
+    DriveFreqRefWord             : WORD; // 🆕 LOT2 2026-08-05 : DriveFreqRefHz mis à l'échelle registre PDO 0x3100 (WORD, écriture EtherCAT)
     BrakeCmd                     : BOOL;
 END_VAR
 VAR
@@ -43,6 +47,16 @@ VAR
     MovementRequested            : BOOL;
     NeutralRequestSeen           : BOOL;
     ResetRequired                : BOOL; // Timeout : front Reset obligatoire avant toute nouvelle marche
+END_VAR
+VAR CONSTANT
+    // 🆕 LOT2 2026-08-05 : échelle confirmée terrain (utilisateur) sur le registre 0x3100
+    // AC600 (M3_SetpointFrequencyHz, %QW7) — WORD=5000 correspond à 50,00 Hz, même
+    // résolution 0,01 Hz que le retour mesuré 0x3102 (M3_ActualFrequencyHz_Filtered).
+    DriveFreqWordScale            : REAL := 100.0;
+    // Borne haute avant conversion : marge large sous le plafond WORD (655,35 Hz à l'échelle
+    // ci-dessus) tout en restant très au-dessus de _TranslationMaxFreq_Hz (60,0 Hz nominal) —
+    // protège uniquement contre un débordement WORD, pas une limite métier (déjà bornée en amont).
+    DriveFreqWordMaxHz            : REAL := 600.0;
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -56,6 +70,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     DriveControlWord := 0;
     DriveFreqRefHz := 0.0;
+    DriveFreqRefWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -108,6 +123,7 @@ END_IF;
 // ── 4. Décision finale : zéro couple utile sans confirmation frein ──────
 DriveControlWord := 0;
 DriveFreqRefHz := 0.0;
+DriveFreqRefWord := 0;
 // SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
 // maintenu. La commande/frein suivent cette rampe jusqu'à demande nulle ; seul
 // un gate dur, timeout ou défaut final impose ici la coupure immédiate.
@@ -140,3 +156,8 @@ ELSIF MovementRequested THEN
         State := E_State.INIT;
     END_IF;
 END_IF;
+
+// ── 5. Mise à l'échelle finale REAL Hz -> WORD registre PDO 0x3100 ──────
+// 🆕 LOT2 2026-08-05 : conversion unique en sortie de chaîne, quelle que soit la branche
+// qui a fixé DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).
+DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) * DriveFreqWordScale);
