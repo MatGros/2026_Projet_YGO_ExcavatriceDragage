@@ -38,13 +38,24 @@ instBlink1Hz(
 GVL_Global.BlinkClock := instBlink1Hz.OUT;
 
 instDiagCanOpen(
-    Enable := TRUE,
-    Reset  := GVL_IHM.Modes.Cmd.BtnFaultReset
+    Enable                 := TRUE,
+    Reset                  := GVL_IHM.Modes.Cmd.BtnFaultReset,
+    CANbusStateRaw         := PRG_02_Acquisition.HwReal.Operator.CanBusState,
+    DeviceJoystickStateRaw := PRG_02_Acquisition.HwReal.Operator.JOY1_DeviceState,
+    SimBypassActive        := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive,
+    NetworkBypassActive    := GVL_IHM.Network.Bypass.Global
 );
 
 instDiagEthercat(
-    Enable := TRUE,
-    Reset  := GVL_IHM.Modes.Cmd.BtnFaultReset
+    Enable                   := TRUE,
+    Reset                    := GVL_IHM.Modes.Cmd.BtnFaultReset,
+    DeviceVariateurStateRaw  := PRG_02_Acquisition.HwReal.Translation.AC600_DeviceState,
+    DeviceVariateurSimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive,
+    DeviceEncoderM1StateRaw  := PRG_02_Acquisition.HwReal.Winch.COD1_DeviceState,
+    DeviceEncoderM1SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
+    DeviceEncoderM2StateRaw  := PRG_02_Acquisition.HwReal.Winch.COD2_DeviceState,
+    DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
+    NetworkBypassActive      := GVL_IHM.Network.Bypass.Global
 );
 
 StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
@@ -124,6 +135,18 @@ IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
 END_IF;
 
+// 🔧 REX 2026-08 : GVL_BypassRetain.BypassSyncGlobal (RETAIN) et
+// ST_BypassSync.Initialized existaient tous les deux, mais aucun bloc de
+// restauration boot ne les reliait (contrairement à Translation/M1/M2 ci-dessus)
+// — Initialized restait bloqué à FALSE indéfiniment, bypass synchro jamais
+// restauré après redémarrage. Ajouté ici, même pattern que les 3 autres domaines.
+IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
+    IF BypassSyncGlobal THEN
+        GVL_IHM.M1M2Sync.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.M1M2Sync.Bypass.Initialized := TRUE;
+END_IF;
+
 IF GVL_IHM.TranslationM3.Bypass.Global <> BypassTranslationGlobal THEN
     BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
 END_IF;
@@ -132,6 +155,9 @@ IF GVL_IHM.M1TreuilRetenue.Bypass.Global <> BypassWinchM1Global THEN
 END_IF;
 IF GVL_IHM.M2TreuilBenne.Bypass.Global <> BypassWinchM2Global THEN
     BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
+END_IF;
+IF GVL_IHM.M1M2Sync.Bypass.Global <> BypassSyncGlobal THEN
+    BypassSyncGlobal := GVL_IHM.M1M2Sync.Bypass.Global;
 END_IF;
 
 
@@ -171,6 +197,7 @@ GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs_LD.PowerCutOffActive;
 
 GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;
+GVL_IHM.Network.Joystick    := instDiagCanOpen.DeviceJoystick;
 GVL_IHM.Network.BusEthercat := instDiagEthercat.DeviceEthercatMaster;
 GVL_IHM.Network.EncoderM1   := instDiagEthercat.DeviceEncoderM1;
 GVL_IHM.Network.EncoderM2   := instDiagEthercat.DeviceEncoderM2;

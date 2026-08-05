@@ -121,7 +121,7 @@ instTranslationM3(
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
-    BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global,
+    BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
 );
 
@@ -162,6 +162,14 @@ TranslationStateHMI.LimitSwitchFwd := PRG_02_Acquisition.M3_LimitSwitchFwd;
 TranslationStateHMI.LimitSwitchRev := PRG_02_Acquisition.M3_LimitSwitchRev;
 TranslationStateHMI.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalFeedback_DI;
+TranslationStateHMI.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
+TranslationStateHMI.FinalInterlockState := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State;
+TranslationStateHMI.FinalInterlockReason := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason;
+TranslationStateHMI.FinalInterlockError := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Error;
+TranslationStateHMI.FinalInterlockErrorId := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.ErrorId;
+TranslationStateHMI.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
+TranslationStateHMI.DriveCommReady := (PRG_02_Acquisition.M3_StatusWord_Filtered AND 16#0080) <> 0;
+TranslationStateHMI.DrivePowerReady := (PRG_02_Acquisition.M3_StatusWord_Filtered AND 16#0001) <> 0;
 TranslationStateHMI.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
 TranslationStateHMI.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 

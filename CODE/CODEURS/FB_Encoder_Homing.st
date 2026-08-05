@@ -148,8 +148,6 @@ IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
         ErrorId := ErrorId OR 16#0004;        // bit2 : arrêt non confirmé (contacteurs/frein)
     ELSIF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
         ErrorId := ErrorId OR 16#0010;        // bit4 : cible nominale/unitaire hors limites
-    ELSIF NOT BypassGlobal AND NOT UnitaryMode AND (TargetPositionM <> 0.0) AND TopPositionSensor THEN
-        ErrorId := ErrorId OR 16#0010;        // bit4 : capteur position haute non confirmé
     ELSE
         // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
         ErrorId := ErrorId AND 16#FFC0;       // Nettoie les erreurs de rejet 0..5

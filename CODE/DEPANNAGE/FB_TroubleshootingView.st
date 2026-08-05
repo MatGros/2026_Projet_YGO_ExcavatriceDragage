@@ -102,8 +102,8 @@ GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown :=
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := 0.0; // TBD non câblé - voir fiche §6 (pas de sortie Cycle publiée pour ce champ)
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := 0.0; // TBD non câblé - voir fiche §6 (Idx208/209, consigne interne PRG_04 non publiée en VAR_OUTPUT)
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := 0; // TBD non câblé - idem
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := WinchM1.State.SpeedRef_Pct;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := SEL(WinchM1.State.RelayFwd, SEL(WinchM1.State.RelayRev, 0, -1), 1);
 
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
@@ -233,3 +233,135 @@ GVL_Troubleshooting.TranslationPontM3.Control_400.Idx407_BrakeTimeoutElapsed := 
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := Translation.State.DriveControlWord;
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqRef_Hz en REAL Hz existe)
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;
+
+// === 🎯 6. Diagnostic Chronologique Homing (HomingM1 & HomingM2) ===
+// --- M1 ---
+GVL_Troubleshooting.HomingM1.Step1_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.HomingM1.Step2_WinchSelected      := (Auth.Mode <> E_Mode.MAINT_N2) OR (Auth.JoystickWinchSelectArbitrated = 1);
+GVL_Troubleshooting.HomingM1.Step3_EncoderAvailable   := Network.EncoderM1.Operational AND NOT InputModuleFault;
+GVL_Troubleshooting.HomingM1.Step4_ContactorsReleased := HwIn.Winch.M1_ContactorsReleased_DI;
+GVL_Troubleshooting.HomingM1.Step5_BrakeApplied       := NOT HwIn.Winch.M1_BrakeIsOpen_DI;
+GVL_Troubleshooting.HomingM1.TopPositionSensorActive  := Commun.TopPositionSensorActive;
+GVL_Troubleshooting.HomingM1.BucketIsOpen             := WinchM2.Bucket.State.MechState.IsOpen;
+
+GVL_Troubleshooting.HomingM1.AllConditionsMet := GVL_Troubleshooting.HomingM1.Step1_ModeAuthorized
+                                              AND GVL_Troubleshooting.HomingM1.Step2_WinchSelected
+                                              AND GVL_Troubleshooting.HomingM1.Step3_EncoderAvailable
+                                              AND GVL_Troubleshooting.HomingM1.Step4_ContactorsReleased
+                                              AND GVL_Troubleshooting.HomingM1.Step5_BrakeApplied;
+
+GVL_Troubleshooting.HomingM1.HomingBusy      := WinchM1.State.Encoder.HomingBusy;
+GVL_Troubleshooting.HomingM1.HomingDone      := WinchM1.State.Encoder.HomingDone;
+GVL_Troubleshooting.HomingM1.HomingHomed     := WinchM1.State.Encoder.Homed;
+GVL_Troubleshooting.HomingM1.HomingSuspect   := WinchM1.State.Encoder.HomingSuspect;
+GVL_Troubleshooting.HomingM1.RejectErrorMask := WinchM1.State.Encoder.HomingErrorId;
+
+// --- M2 ---
+GVL_Troubleshooting.HomingM2.Step1_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.HomingM2.Step2_WinchSelected      := (Auth.Mode <> E_Mode.MAINT_N2) OR (Auth.JoystickWinchSelectArbitrated = 2);
+GVL_Troubleshooting.HomingM2.Step3_EncoderAvailable   := Network.EncoderM2.Operational AND NOT InputModuleFault;
+GVL_Troubleshooting.HomingM2.Step4_ContactorsReleased := HwIn.Winch.M2_ContactorsReleased_DI;
+GVL_Troubleshooting.HomingM2.Step5_BrakeApplied       := NOT HwIn.Winch.M2_BrakeIsOpen_DI;
+GVL_Troubleshooting.HomingM2.TopPositionSensorActive  := Commun.TopPositionSensorActive;
+GVL_Troubleshooting.HomingM2.BucketIsOpen             := WinchM2.Bucket.State.MechState.IsOpen;
+
+GVL_Troubleshooting.HomingM2.AllConditionsMet := GVL_Troubleshooting.HomingM2.Step1_ModeAuthorized
+                                              AND GVL_Troubleshooting.HomingM2.Step2_WinchSelected
+                                              AND GVL_Troubleshooting.HomingM2.Step3_EncoderAvailable
+                                              AND GVL_Troubleshooting.HomingM2.Step4_ContactorsReleased
+                                              AND GVL_Troubleshooting.HomingM2.Step5_BrakeApplied;
+
+GVL_Troubleshooting.HomingM2.HomingBusy      := WinchM2.State.Encoder.HomingBusy;
+GVL_Troubleshooting.HomingM2.HomingDone      := WinchM2.State.Encoder.HomingDone;
+GVL_Troubleshooting.HomingM2.HomingHomed     := WinchM2.State.Encoder.Homed;
+GVL_Troubleshooting.HomingM2.HomingSuspect   := WinchM2.State.Encoder.HomingSuspect;
+GVL_Troubleshooting.HomingM2.RejectErrorMask := WinchM2.State.Encoder.HomingErrorId;
+
+// === 🛡️ 7. Diagnostic Chronologique Chaîne de Sécurité & AU (Safety) ===
+GVL_Troubleshooting.Safety.Step1_InputModulesOk        := NOT InputModuleFault;
+GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut    := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
+GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed  := HwIn.Machine.EmergencyChainClosed_DI;
+GVL_Troubleshooting.Safety.Step4_ContactorRedundancyOk := GVL_IHM.Modes.State.PowerContactorOk;
+GVL_Troubleshooting.Safety.Step5_ArmingAllowed         := GVL_IHM.Modes.State.EmergencyArmable;
+
+GVL_Troubleshooting.Safety.ArmingPulseActive     := GVL_IHM.Modes.State.EmergencyArmingBusy;
+GVL_Troubleshooting.Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.Safety.AllConditionsMet      := GVL_Troubleshooting.Safety.Step1_InputModulesOk
+                                                AND GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut
+                                                AND GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed
+                                                AND GVL_Troubleshooting.Safety.Step4_ContactorRedundancyOk
+                                                AND GVL_Troubleshooting.Safety.PowerContactorEngaged;
+
+GVL_Troubleshooting.Safety.SafetyError          := GVL_IHM.Modes.State.AnyFaultActive;
+GVL_Troubleshooting.Safety.RedundancyTestFailed := GVL_IHM.Modes.State.RedundancyTestFailed;
+GVL_Troubleshooting.Safety.ArmingFailed         := GVL_IHM.Modes.State.EmergencyArmingFailed;
+
+// === 🕹️ 8. Diagnostic Chronologique Bus CAN & Joystick (Joystick) ===
+GVL_Troubleshooting.Joystick.Step1_CanBusActive        := NOT Network.CanError;
+GVL_Troubleshooting.Joystick.Step2_JoystickOperational := Network.Joystick.Operational;
+GVL_Troubleshooting.Joystick.Step3_DeadmanPressed      := (HwIn.Operator.JoyBtnRaw OR GVL_Simulation.SimJoystickRawButton);
+GVL_Troubleshooting.Joystick.Step4_NeutralAcquired     := TRUE; // Sûreté acquise dès sélection
+
+GVL_Troubleshooting.Joystick.AllConditionsMet := GVL_Troubleshooting.Joystick.Step1_CanBusActive
+                                              AND GVL_Troubleshooting.Joystick.Step2_JoystickOperational
+                                              AND GVL_Troubleshooting.Joystick.Step3_DeadmanPressed;
+
+GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
+GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
+
+// === ⚙️ 9. Diagnostic Chronologique Mouvement Treuil M1 (MotionM1) ===
+GVL_Troubleshooting.MotionM1.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.MotionM1.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.MotionM1.Step3_NotBusyOtherTask   := NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM2.Bucket.State.FBState = E_State.BUSY);
+GVL_Troubleshooting.MotionM1.Step4_MotionRequested    := WinchM1.State.Busy OR (WinchM1.State.SpeedRef_Pct > 0.0);
+GVL_Troubleshooting.MotionM1.RequestedDirection       := SEL(WinchM1.State.RelayFwd, SEL(WinchM1.State.RelayRev, 0, -1), 1);
+GVL_Troubleshooting.MotionM1.RequestedSpeedPct        := WinchM1.State.SpeedRef_Pct;
+GVL_Troubleshooting.MotionM1.Step5_NoSafetyFault      := NOT WinchM1.Safety.SafeStop AND NOT WinchM1.Safety.ThermalFault;
+GVL_Troubleshooting.MotionM1.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.MotionM1.RequestedDirection = 1, NOT WinchM1.Safety.ForbidDescent, NOT WinchM1.Safety.ForbidAscent);
+GVL_Troubleshooting.MotionM1.Step7_BrakeReleased      := WinchM1.State.BrakeCmd AND WinchM1.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.MotionM1.Step8_OutputInterlockOk  := NOT WinchM1.State.FinalInterlockError;
+
+GVL_Troubleshooting.MotionM1.AllConditionsMet := GVL_Troubleshooting.MotionM1.Step1_PowerEngaged
+                                              AND GVL_Troubleshooting.MotionM1.Step2_ModeAuthorized
+                                              AND GVL_Troubleshooting.MotionM1.Step3_NotBusyOtherTask
+                                              AND GVL_Troubleshooting.MotionM1.Step4_MotionRequested
+                                              AND GVL_Troubleshooting.MotionM1.Step5_NoSafetyFault
+                                              AND GVL_Troubleshooting.MotionM1.Step6_DirectionAllowed
+                                              AND GVL_Troubleshooting.MotionM1.Step7_BrakeReleased
+                                              AND GVL_Troubleshooting.MotionM1.Step8_OutputInterlockOk;
+
+GVL_Troubleshooting.MotionM1.RelayFwdActive        := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.MotionM1.RelayRevActive        := WinchM1.State.RelayRev;
+GVL_Troubleshooting.MotionM1.SpeedContactor1Active := WinchM1.State.Contactor1;
+
+// === ⚙️ 10. Diagnostic Chronologique Mouvement Treuil M2 (MotionM2) ===
+GVL_Troubleshooting.MotionM2.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.MotionM2.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.MotionM2.Step3_NotBusyOtherTask   := NOT WinchM2.State.Encoder.HomingBusy;
+GVL_Troubleshooting.MotionM2.Step4_MotionRequested    := WinchM2.State.Busy OR (WinchM2.State.SpeedRef_Pct > 0.0);
+GVL_Troubleshooting.MotionM2.RequestedDirection       := SEL(WinchM2.State.RelayFwd, SEL(WinchM2.State.RelayRev, 0, -1), 1);
+GVL_Troubleshooting.MotionM2.RequestedSpeedPct        := WinchM2.State.SpeedRef_Pct;
+GVL_Troubleshooting.MotionM2.Step5_NoSafetyFault      := NOT WinchM2.Safety.SafeStop AND NOT WinchM2.Safety.ThermalFault AND NOT WinchM2.Safety.SlackCable;
+GVL_Troubleshooting.MotionM2.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.MotionM2.RequestedDirection = 1, NOT WinchM2.Safety.ForbidDescent, NOT WinchM2.Safety.ForbidAscent);
+GVL_Troubleshooting.MotionM2.Step7_BrakeReleased      := WinchM2.State.BrakeCmd AND WinchM2.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.MotionM2.Step8_OutputInterlockOk  := NOT WinchM2.State.FinalInterlockError;
+
+GVL_Troubleshooting.MotionM2.AllConditionsMet := GVL_Troubleshooting.MotionM2.Step1_PowerEngaged
+                                              AND GVL_Troubleshooting.MotionM2.Step2_ModeAuthorized
+                                              AND GVL_Troubleshooting.MotionM2.Step3_NotBusyOtherTask
+                                              AND GVL_Troubleshooting.MotionM2.Step4_MotionRequested
+                                              AND GVL_Troubleshooting.MotionM2.Step5_NoSafetyFault
+                                              AND GVL_Troubleshooting.MotionM2.Step6_DirectionAllowed
+                                              AND GVL_Troubleshooting.MotionM2.Step7_BrakeReleased
+                                              AND GVL_Troubleshooting.MotionM2.Step8_OutputInterlockOk;
+
+GVL_Troubleshooting.MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
+GVL_Troubleshooting.MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
+
+// === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
+GVL_Troubleshooting.Inputs := HwIn;
+
+
+
