@@ -90,12 +90,6 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
     # domaines Winch/Cycle/Encodeurs). Surfacent ici uniquement parce que
     # c'est la premiere fois qu'un fichier CODE/*.st est touche sous ce hook
     # depuis leur apparition — pas une regression de ce lot.
-    "FB_Safety_Translation": (
-        "safety M3 ecrite (8 mecanismes) mais jamais instanciee — audit "
-        "2026-08-05, PLAN_TASK T104, contrat pret : "
-        "DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_M4_TRANSLATION_SAFETY.yaml — "
-        "retirer de cette liste des que ce lot est execute"
-    ),
     "FB_Safety_Winch": (
         "meme classe de bug que FB_Safety_Translation, deja documentee dans "
         "l'en-tete CODE/MAIN/PRG_06_Outputs_LD.st avant cette session — hors "
