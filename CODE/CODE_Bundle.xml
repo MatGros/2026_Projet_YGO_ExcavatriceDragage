@@ -24095,7 +24095,9 @@ TRUE = module Local_Digital_IO opérationnel</html:xhtml>
                 <REAL />
               </type>
               <documentation>
-                <html:xhtml>🧲 Positions câbles calculées en mètres (mises à l'échelle après homing)
+                <html:xhtml>🧲 Positions câbles calculées en mètres (mises à l'échelle après homing, bornées et
+       gelées sur doute par FB_Encoder_Safety — CablePosM1/M2 ne sont PLUS la sortie brute
+       FB_Encoder_Scale depuis le 2026-08-05, voir §4bis)
 Position câble M1 en mètres</html:xhtml>
               </documentation>
             </variable>
@@ -24106,6 +24108,59 @@ Position câble M1 en mètres</html:xhtml>
               <documentation>
                 <html:xhtml>Position câble M2 en mètres</html:xhtml>
               </documentation>
+            </variable>
+            <variable name="M1_EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-05 : TRUE = position hors plage ±99m OU homing suspect (FB_Encoder_Safety)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-05 : vitesse câble mesurée (FB_Encoder_SpeedMeasure), prérequis FB_Safety_Winch Méca A/F/G
+Vitesse absolue M1, m/s</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>Vitesse signée M1 (+ montée / - descente), m/s</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE après 6 échantillons couvrant ≥50ms, position saine</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M2_SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedValid">
+              <type>
+                <BOOL />
+              </type>
             </variable>
           </outputVars>
           <localVars>
@@ -24250,6 +24305,22 @@ Position câble M1 en mètres</html:xhtml>
                 <derived name="FB_Encoder_Homing" />
               </type>
             </variable>
+            <variable name="instEncoderSafetyM1">
+              <type>
+                <derived name="FB_Encoder_Safety" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-05</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEncoderSpeedMeasureM1">
+              <type>
+                <derived name="FB_Encoder_SpeedMeasure" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-05</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="instEncoderAbsM2">
               <type>
                 <derived name="FB_Encoder_Abs" />
@@ -24264,6 +24335,22 @@ Position câble M1 en mètres</html:xhtml>
               <type>
                 <derived name="FB_Encoder_Homing" />
               </type>
+            </variable>
+            <variable name="instEncoderSafetyM2">
+              <type>
+                <derived name="FB_Encoder_Safety" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-05</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEncoderSpeedMeasureM2">
+              <type>
+                <derived name="FB_Encoder_SpeedMeasure" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-05</html:xhtml>
+              </documentation>
             </variable>
             <variable name="instPosDecoderM3">
               <type>
@@ -24596,7 +24683,37 @@ instEncoderScaleM1(
     CableM_PerRev   := 2.0,
     PointsPerRev    := 8192
 );
-CablePosM1 := instEncoderScaleM1.CablePosM;
+
+// 🆕 2026-08-05 : bornage physique ±99m + gel sur doute (audit sécurité M3) — CablePosM1
+// (producteur unique position, consommé machine entière) n'était protégé par AUCUN étage
+// avant ce lot, contrairement à ce qu'affirmait AF_Partie-09 §4.1 (écart doc/code trouvé
+// par l'audit). Sémantique inchangée en fonctionnement normal (position dans la plage) ;
+// seul un doute (hors plage ou homing suspect) fige désormais la valeur au lieu de la
+// laisser divaguer.
+instEncoderSafetyM1(
+    Enable                := TRUE,
+    Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
+    CablePosM             := instEncoderScaleM1.CablePosM,
+    HomingSuspect         := instHomingM1.HomingSuspect,
+    BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global
+);
+CablePosM1 := instEncoderSafetyM1.CablePosMSafe;
+M1_EncoderIncoherent := instEncoderSafetyM1.EncoderIncoherent;
+
+// 🆕 2026-08-05 : vitesse câble mesurée — prérequis FB_Safety_Winch Méca A/F/G (audit sécurité M3).
+// PositionValid combine disponibilité codeur ET cohérence position (gel sur doute ci-dessus) :
+// une position figée par FB_Encoder_Safety ne doit jamais alimenter un calcul de vitesse réel.
+instEncoderSpeedMeasureM1(
+    Enable        := TRUE,
+    Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
+    Position_M    := instEncoderSafetyM1.CablePosMSafe,
+    PositionValid := instEncoderAbsM1.EncoderAvailable AND NOT instEncoderSafetyM1.EncoderIncoherent
+);
+M1_Speed_Mps       := instEncoderSpeedMeasureM1.Speed_Mps;
+M1_SignedSpeed_Mps := instEncoderSpeedMeasureM1.SignedSpeed_Mps;
+M1_SpeedValid      := instEncoderSpeedMeasureM1.Valid;
 
 instEncoderAbsM2(
     Enable              := TRUE,
@@ -24643,7 +24760,30 @@ instEncoderScaleM2(
     CableM_PerRev   := 2.0,
     PointsPerRev    := 8192
 );
-CablePosM2 := instEncoderScaleM2.CablePosM;
+
+// 🆕 2026-08-05 : bornage physique ±99m + gel sur doute (audit sécurité M3) — voir M1 ci-dessus.
+instEncoderSafetyM2(
+    Enable                := TRUE,
+    Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
+    CablePosM             := instEncoderScaleM2.CablePosM,
+    HomingSuspect         := instHomingM2.HomingSuspect,
+    BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global
+);
+CablePosM2 := instEncoderSafetyM2.CablePosMSafe;
+M2_EncoderIncoherent := instEncoderSafetyM2.EncoderIncoherent;
+
+// 🆕 2026-08-05 : vitesse câble mesurée — prérequis FB_Safety_Winch Méca A/F/G (audit sécurité M3).
+instEncoderSpeedMeasureM2(
+    Enable        := TRUE,
+    Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
+    Position_M    := instEncoderSafetyM2.CablePosMSafe,
+    PositionValid := instEncoderAbsM2.EncoderAvailable AND NOT instEncoderSafetyM2.EncoderIncoherent
+);
+M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
+M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
+M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
 
 
 // === ↔️ §5 DÉCODAGE POSITION TRANSLATION (M3) ===
