@@ -7,9 +7,9 @@
 2. Initialized guard: every ST_*Cfg struct, and every ST_Bypass* struct that carries
    a persisted `Global` bit (backed by GVL_BypassRetain), must declare `Initialized`.
    ST_BypassCommun is deliberately excluded: its 2 fields are recomputed every scan
-   from simulation state (PRG_09_Supervision.st), never restored/saved, so it has no
+   from simulation state (PRG_07_Supervision.st), never restored/saved, so it has no
    `Global` field and no GVL_BypassRetain counterpart -- Initialized would be meaningless.
-3. No `= 0.0`-style sentinel guards in PRG_09_Supervision.st -- the whole chantier
+3. No `= 0.0`-style sentinel guards in PRG_07_Supervision.st -- the whole chantier
    replaced this fragile pattern with a dedicated `Initialized` flag (see REX
    2026-07-23 in that file); a new sentinel would be a regression.
 4. No obviously volatile/momentary signal persisted in GVL_PERSISTENT.st (state-machine
@@ -25,7 +25,7 @@ from pathlib import Path
 
 TYPES_DIR = Path("CODE/SUPERVISION/_TYPES")
 PERSISTENT_FILE = Path("CODE/GVL_PERSISTENT.st")
-SUPERVISION_FILE = Path("CODE/MAIN/PRG_SUPERVISION_CFC.st")
+SUPERVISION_FILE = Path("CODE/MAIN/PRG_07_Supervision.st")
 
 TYPE_DECL_RE = re.compile(r"TYPE\s+(ST_\w+)\s*:", re.IGNORECASE)
 STRUCT_BODY_RE = re.compile(r"STRUCT(.*?)END_STRUCT", re.DOTALL | re.IGNORECASE)
@@ -114,7 +114,7 @@ def check_no_sentinel(root: Path, errors: list[str]) -> None:
     for m in SENTINEL_RE.finditer(source):
         lineno = source.count("\n", 0, m.start()) + 1
         errors.append(
-            f"PRG_09_Supervision.st:{lineno}: obsolete '= 0.0 THEN' sentinel "
+            f"PRG_07_Supervision.st:{lineno}: obsolete '= 0.0 THEN' sentinel "
             "(use a dedicated Initialized flag instead)"
         )
 

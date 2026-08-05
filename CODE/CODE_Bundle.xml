@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:html="http://www.w3.org/1999/xhtml">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-05T06:47:04.693731" />
-  <contentHeader name="ExcavatriceDragage.project" modificationDateTime="2026-08-05T06:47:04.693731">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-30T13:13:23.737466" />
+  <contentHeader name="ExcavatriceDragage.project" modificationDateTime="2026-07-30T13:13:23.737466">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -4223,7 +4223,7 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</html:xhtml>
                 <html:xhtml>Retour frein M3 (1 = ouvert)</html:xhtml>
               </documentation>
             </variable>
-            <variable name="M3_ThermalFeedback_DI">
+            <variable name="M3_ThermalOK_DI">
               <type>
                 <BOOL />
               </type>
@@ -6895,6 +6895,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               <type>
                 <BOOL />
               </type>
+            </variable>
+            <variable name="EstimatedPosM3_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>📏 Position continue estimée en mètres (0.0 m Maint -&gt; +X m Trémie)</html:xhtml>
+              </documentation>
             </variable>
             <variable name="SensorsWord">
               <type>
@@ -16894,6 +16902,19 @@ Status diagnostic communication EtherCAT (Online)</html:xhtml>
                 <html:xhtml>Sécurité mouvement non commandé (Méca A)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="TonLimitSwitchOverrun">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 Surveillance poussée anormale / escalade fin de course</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="OverrunCondition">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="PostRampTimeout">
               <type>
                 <TIME />
@@ -16951,6 +16972,7 @@ IF NOT Enable THEN
     ErrorSensorIncoherent := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
+    TonLimitSwitchOverrun(IN := FALSE);
     State := E_State.DISABLED;
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     RETURN;
@@ -17041,16 +17063,27 @@ IF NOT BypassGlobal THEN
     END_IF;
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFDF; END_IF;
 
-    // 🔍 3sexies. DÉPASSEMENT FINS DE COURSE EXTRÊMES (bit6)
+    // 🔍 3sexies. SURVEILLANCE ESCALADE FIN DE COURSE (bit6)
     IF (BypassSafety OR BypassLimitSwitch) THEN
-        // Nettoye le bit 6 résiduel (posé avant activation du bypass)
+        // Nettoie le bit 6 résiduel (posé avant activation du bypass)
         ErrorId := ErrorId AND 16#FFBF;
+        TonLimitSwitchOverrun(IN := FALSE);
     ELSE
-        IF LimitSwitchFwd OR LimitSwitchRev THEN
-            ErrorId := ErrorId OR 16#0040;
+        // 🧱 L'erreur 64 (escalade / poussée anormale en butée) ne s'active QUE SI :
+        // 1. On est sur le capteur Trémie (LimitSwitchFwd) ET qu'on continue d'insister en Marche Avant (Direction = 1) avec vitesse/commande variateur active.
+        // 2. OU qu'on est sur le capteur Maintenance (LimitSwitchRev) ET qu'on continue d'insister en Marche Arrière (Direction = -1) avec vitesse/commande variateur active.
+        OverrunCondition := (LimitSwitchFwd AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchRev AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
+
+        TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
+
+        IF TonLimitSwitchOverrun.Q THEN
+            ErrorId := ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
+        ELSE
+            // Si la poussée dans le mauvais sens cesse (ou si on repart en arrière), le défaut s'auto-efface
+            ErrorId := ErrorId AND 16#FFBF;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFBF; END_IF;
 
     // 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
     IF (BypassSafety OR BypassSensorIncoherent) THEN
@@ -18782,7 +18815,7 @@ END_IF;
 Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
 
 // 🆕 T96 : thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
-Translation.M3_ThermalFeedback_DI := TRUE;
+Translation.M3_ThermalOK_DI      := TRUE;
 
 // Simulation StatusWord AC600 : Bit 0 (Power Ready) = 1, Bit 7 (Comm Ready) = 1 -&gt; 16#0081
 IF (M3_Direction &lt;&gt; 0) THEN
@@ -20145,16 +20178,16 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</html:xhtml>
                 <html:xhtml>Délai avant d'autoriser un changement de sens à l'arrêt</html:xhtml>
               </documentation>
             </variable>
-            <variable name="ApproachSpeedPct">
+            <variable name="ApproachSpeedHz">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="20" />
+                <simpleValue value="10" />
               </initialValue>
               <documentation>
                 <html:xhtml>Réglages ETHERCAT uniquement (RETAIN)
-Vitesse réduite d'approche (piloté par SlowdownSensor/PV)</html:xhtml>
+Vitesse réduite d'approche en Hz (piloté par SlowdownSensor/PV)</html:xhtml>
               </documentation>
             </variable>
             <variable name="DriveFreqScaleMaxHz">
@@ -20478,15 +20511,27 @@ END_IF;
 // Trémie (Direction=1) — décision client (AF_Partie-02 v2.12 §3bis) : PV n'assure le
 // ralentissement qu'avant Trémie, jamais dans le sens Maintenance.
 IF (Direction = 1) AND SlowdownSensor THEN
-    RampTargetPct := LIMIT(0.0, RampTargetPct, ApproachSpeedPct);
+    // 🔌 Ralentissement PV exprimé directement en Hz (converti en % de l'échelle max Hz)
+    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedHz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
 END_IF;
 
-// 🎯 4ter. ARRÊT EXACT SUR CAPTEUR (verrouille le sens tant que le capteur cible reste actif)
+// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie &amp; Maintenance)
+// Dès qu'on touche le capteur d'extrémité (TargetReached), le sens d'arrivée (DirectionAtArrival)
+// est MÉMORISÉ et BLOQUÉ. Même si la benne oscille/clignote et perd temporairement le capteur,
+// l'automate refuse de ré-avancer tant que l'opérateur n'a pas relâché le manche au neutre (Direction = 0)
+// ou demandé le sens inverse (dégagement).
 ArrivalEdge(CLK := TargetReached);
 IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
-ArrivalLock := TargetReached AND (Direction = DirectionAtArrival) AND (DirectionAtArrival &lt;&gt; 0);
+
+// Libération du verrou uniquement au neutre ou en changement de sens
+IF (Direction = 0) OR (Direction &lt;&gt; DirectionAtArrival) THEN
+    DirectionAtArrival := 0;
+END_IF;
+
+// Bloque la consigne à 0 tant que l'ordre demande d'insister dans le sens d'arrivée verrouillé
+ArrivalLock := (DirectionAtArrival &lt;&gt; 0) AND (Direction = DirectionAtArrival);
 IF ArrivalLock THEN
     RampTargetPct := 0.0;
 END_IF;
@@ -20578,12 +20623,12 @@ END_IF;
 IF BypassLimitSwitch THEN
     ErrorId := ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
 ELSE
-    IF LimitSwitchFwd OR LimitSwitchRev THEN
+    // Activé UNIQUEMENT en cas de tentative d'avancer DANS la butée active (libéré si dégagement en sens inverse)
+    IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
         ErrorId := ErrorId OR 16#0040;
+    ELSE
+        ErrorId := ErrorId AND 16#FFBF;
     END_IF;
-END_IF;
-IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFBF;   // Reset normal (complémentaire)
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
@@ -21166,6 +21211,283 @@ TranslationPosMaintenance := SensorMaintenance;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Translation_PositionEstimator" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Active le calcul</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Front d'acquittement / réinitialisation</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveActualFreqHz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>Fréquence réelle variateur en Hz (ex: 5.0 Hz)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <html:xhtml>Sens effectif : +1 = Fwd (vers Trémie), -1 = Rev (vers Maint), 0 = Arrêt</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>5 Capteurs de position fixes
+Capteur 0 : Maintenance (0.0 m)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Capteur 1 : P1 (ex: 6.0 m)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Capteur 2 : P2 (ex: 14.0 m)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Capteur 3 : PV (ex: 21.0 m)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensorTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Capteur 4 : Trémie (ex: 25.0 m)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="PosMaintenanceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Positions de référence calibrées (mètres) depuis GVL_PERSISTENT</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="PosP1M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+            </variable>
+            <variable name="PosP2M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="14" />
+              </initialValue>
+            </variable>
+            <variable name="PosPVM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="21" />
+              </initialValue>
+            </variable>
+            <variable name="PosTremieM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="25" />
+              </initialValue>
+            </variable>
+            <variable name="GainMetersPerHzSec">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.008333" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Gain de vitesse : mètres parcourus par Hz par seconde (ex: 50 Hz = 0.416 m/s =&gt; Gain = 0.008333 m/Hz.s)</html:xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PositionEstimatedM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>Position continue estimée en mètres</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Recalibrated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Pulse 1 cycle lors d'un recalage sur capteur</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="RecalibratedSensorId">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <html:xhtml>0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun</html:xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="TrigTremie">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="TrigPV">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="TrigP2">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="TrigP1">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="TrigMaintenance">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="CycleTimeCalc">
+              <type>
+                <derived name="FB_CycleTime" />
+              </type>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <html:xhtml>═══════════════════════════════════════════════════════════════
+   ↔️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.1.md §3
+   🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
+      la position estimée continue en mètres (0.0 m à la Maintenance -&gt; +X m à la Trémie),
+      avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
+   ═══════════════════════════════════════════════════════════════</html:xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <html:xhtml>
+
+// === IMPLEMENTATION ===
+
+IF NOT Enable THEN
+    Recalibrated := FALSE;
+    RecalibratedSensorId := -1;
+    RETURN;
+END_IF;
+
+CycleTimeCalc(DefaultValueS := 0.010);
+Recalibrated := FALSE;
+
+// 1. Détection des fronts montants sur franchissement des capteurs fixes
+TrigTremie(CLK := SensorTremie);
+TrigPV(CLK := SensorPV);
+TrigP2(CLK := SensorP2);
+TrigP1(CLK := SensorP1);
+TrigMaintenance(CLK := SensorMaintenance);
+
+// 2. Recalage absolu prioritaire sur contact capteur
+IF TrigMaintenance.Q THEN
+    PositionEstimatedM := PosMaintenanceM;
+    Recalibrated := TRUE;
+    RecalibratedSensorId := 0;
+ELSIF TrigP1.Q THEN
+    PositionEstimatedM := PosP1M;
+    Recalibrated := TRUE;
+    RecalibratedSensorId := 1;
+ELSIF TrigP2.Q THEN
+    PositionEstimatedM := PosP2M;
+    Recalibrated := TRUE;
+    RecalibratedSensorId := 2;
+ELSIF TrigPV.Q THEN
+    PositionEstimatedM := PosPVM;
+    Recalibrated := TRUE;
+    RecalibratedSensorId := 3;
+ELSIF TrigTremie.Q THEN
+    PositionEstimatedM := PosTremieM;
+    Recalibrated := TRUE;
+    RecalibratedSensorId := 4;
+ELSE
+    // Initialisation au tout premier démarrage sur le premier capteur actif vu
+    IF NOT Initialized THEN
+        IF SensorTremie THEN PositionEstimatedM := PosTremieM; Initialized := TRUE;
+        ELSIF SensorPV THEN PositionEstimatedM := PosPVM; Initialized := TRUE;
+        ELSIF SensorP2 THEN PositionEstimatedM := PosP2M; Initialized := TRUE;
+        ELSIF SensorP1 THEN PositionEstimatedM := PosP1M; Initialized := TRUE;
+        ELSIF SensorMaintenance THEN PositionEstimatedM := PosMaintenanceM; Initialized := TRUE;
+        END_IF;
+    END_IF;
+
+    // 3. Intégration temporelle continue (Odométrie cycle par cycle)
+    // dX = Direction * (FreqHz * Gain) * dt
+    IF Direction &lt;&gt; 0 AND DriveActualFreqHz &gt; 0.1 THEN
+        PositionEstimatedM := PositionEstimatedM + (INT_TO_REAL(Direction) * DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+    END_IF;
+END_IF;
+
+// Bornage de sécurité pour éviter la dérive infinie hors rail
+PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremieM + 0.5);
+</html:xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>17c88093-da61-51d7-ad4f-b07c5ebb2eb5</ObjectId>
           </data>
         </addData>
       </pou>
@@ -23926,7 +24248,25 @@ PreviousQualified := Qualified;
       </pou>
       <pou name="PRG_02_Acquisition" pouType="program">
         <interface>
-          <inputVars />
+          <inputVars>
+            <variable name="M3_StatusWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <html:xhtml>🔌 Entrées variateur AC600 EtherCAT M3
+Status Word 0x3102 (%IW8)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ActualFrequencyHz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <html:xhtml>Actual Frequency 0x3103 (%IW9, x100)</html:xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
           <outputVars>
             <variable name="HwReal">
               <type>
@@ -23982,6 +24322,30 @@ PreviousQualified := Qualified;
               </type>
               <documentation>
                 <html:xhtml>🆕 2026-08-05 : TRUE = axe Y joystick au neutre — armement Méca B (FB_Safety_Winch)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickDirectionX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <html:xhtml>-1 = Gauche/Rev, 0 = Neutre, +1 = Droite/Fwd</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickSpeedPctX">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>Magnitude déviation axe X en % (0..100)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickXNeutral">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>TRUE = axe X joystick au neutre</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosTremie">
@@ -24457,7 +24821,7 @@ HwReal.Translation.M3_PosP2_DI          := M3_PosP2_DI;
 HwReal.Translation.M3_PosP1_DI          := M3_PosP1_DI;
 HwReal.Translation.M3_PosMaintenance_DI := M3_PosMaintenance_DI;
 HwReal.Translation.M3_BrakeIsOpen_DI    := M3_BrakeIsOpen_DI;
-HwReal.Translation.M3_ThermalFeedback_DI:= M3_ThermalFeedback_DI;
+HwReal.Translation.M3_ThermalOK_DI       := M3_ThermalOK_DI;
 HwReal.Translation.M3_StatusWord        := M3_StatusWord;
 HwReal.Translation.M3_ActualFrequencyHz := M3_ActualFrequencyHz;
 HwReal.Translation.AC600_DeviceState    := AC600_ECAT_Drive.GetDeviceState();
@@ -24517,8 +24881,8 @@ HwRealQualified.Winch.M1M2_TopPositionFree_DI := instFilterTopPosition.State;
 
 instFilterM3Brake(InputRaw := HwReal.Translation.M3_BrakeIsOpen_DI, FilterTime := T#20MS);
 HwRealQualified.Translation.M3_BrakeIsOpen_DI := instFilterM3Brake.State;
-instFilterM3Thermal(InputRaw := HwReal.Translation.M3_ThermalFeedback_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_ThermalFeedback_DI := instFilterM3Thermal.State;
+instFilterM3Thermal(InputRaw := HwReal.Translation.M3_ThermalOK_DI, FilterTime := T#20MS);
+HwRealQualified.Translation.M3_ThermalOK_DI := instFilterM3Thermal.State;
 instFilterPosTremie(InputRaw := HwReal.Translation.M3_PosTremie_DI, FilterTime := T#20MS);
 HwRealQualified.Translation.M3_PosTremie_DI := instFilterPosTremie.State;
 instFilterPosPV(InputRaw := HwReal.Translation.M3_PosPV_DI, FilterTime := T#20MS);
@@ -24651,6 +25015,9 @@ instJoystick(
 // exigé par Translation/Winch/Cycle en aval (T106, audit M3 2026-08-05).
 JoystickDeadmanArmed := instJoystick.DeadmanArmed;
 JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prérequis FB_Safety_Winch Méca B
+JoystickDirectionX := instJoystick.DirectionX;
+JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
+JoystickXNeutral := (instJoystick.DirectionX = 0);
 
 
 // === 🧲 §4 CODEURS &amp; HOMING (M1 / M2) ===
@@ -25879,6 +26246,11 @@ BucketStateHMI.OpenActive := instBucket.OpenReq;
                 <derived name="FB_Safety_Translation" />
               </type>
             </variable>
+            <variable name="instPosEstimatorM3">
+              <type>
+                <derived name="FB_Translation_PositionEstimator" />
+              </type>
+            </variable>
             <variable name="M3_StartStop_Active">
               <type>
                 <BOOL />
@@ -25975,7 +26347,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     ELSIF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
         M3_Direction_Active := -1;
     ELSIF GVL_IHM.TranslationM3.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := 0;
+        M3_Direction_Active := PRG_02_Acquisition.JoystickDirectionX;
     ELSE
         M3_Direction_Active := 0;
     END_IF;
@@ -25984,15 +26356,17 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
     M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
-                                OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
+                                OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
+                                OR GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
                            AND PRG_02_Acquisition.JoystickDeadmanArmed;
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
-                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / _TranslationMaxFreq_Hz) * 100.0,
-                  30.0);
+                  100.0,
+                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz &gt; 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
+    // 🕹️ Si TglJoystickMaster = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
     M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.Cmd.TglJoystickMaster,
                               FreqPct,
-                              0.0);
+                              (PRG_02_Acquisition.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
     M3_PositioningActive := FALSE;
     SelTarget    := 0;
@@ -26089,10 +26463,30 @@ instTranslationM3(
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
     CfgRampDecelNormalRate  := _TranslationRampDecelNormal_Pct,
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
+    ApproachSpeedHz         := GVL_PERSISTENT._TranslationApproachSpeed_Hz,
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
+);
+
+// 📐 Estimateur de position continue M3 (odométrie + recalage 5 capteurs)
+instPosEstimatorM3(
+    Enable               := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE),
+    Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
+    DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
+    Direction            := M3_Direction_Active,
+    SensorMaintenance    := PRG_02_Acquisition.TranslationPosMaintenance,
+    SensorP1             := PRG_02_Acquisition.TranslationPosP1,
+    SensorP2             := PRG_02_Acquisition.TranslationPosP2,
+    SensorPV             := PRG_02_Acquisition.TranslationPosPV,
+    SensorTremie         := PRG_02_Acquisition.TranslationPosTremie,
+    PosMaintenanceM      := GVL_PERSISTENT._TranslationPosMaintenance_M,
+    PosP1M               := GVL_PERSISTENT._TranslationPosP1_M,
+    PosP2M               := GVL_PERSISTENT._TranslationPosP2_M,
+    PosPVM               := GVL_PERSISTENT._TranslationPosPV_M,
+    PosTremieM           := GVL_PERSISTENT._TranslationPosTremie_M,
+    GainMetersPerHzSec   := GVL_PERSISTENT._TranslationGainMetersPerHzSec
 );
 
 
@@ -26127,12 +26521,13 @@ TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
 TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
+TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
 TranslationStateHMI.LimitSwitchFwd := PRG_02_Acquisition.M3_LimitSwitchFwd;
 TranslationStateHMI.LimitSwitchRev := PRG_02_Acquisition.M3_LimitSwitchRev;
 TranslationStateHMI.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
-TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalFeedback_DI;
+TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationStateHMI.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
 TranslationStateHMI.FinalInterlockState := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State;
 TranslationStateHMI.FinalInterlockReason := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason;
@@ -26248,6 +26643,81 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               </type>
             </variable>
             <variable name="M3InterlockEnable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_RelayFwd_Up_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_RelayRev_Down_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_1_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_2_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_3_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_4_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayFwd_Up_Close_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayRev_Down_Open_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_1_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_2_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_3_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_4_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_BrakeRelease_RQ">
               <type>
                 <BOOL />
               </type>
@@ -27285,7 +27755,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </variable>
                 <variable formalParameter="DriveControlWord">
                   <connectionPointOut>
-                    <expression>M3_DriveControlWord</expression>
+                    <expression>M3_CommandWord</expression>
                   </connectionPointOut>
                 </variable>
                 <variable formalParameter="DriveFreqRefHz">
@@ -27295,7 +27765,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </variable>
                 <variable formalParameter="DriveFreqRefWord">
                   <connectionPointOut>
-                    <expression>M3_DriveFreqRefWord</expression>
+                    <expression>M3_SetpointFrequencyHz</expression>
                   </connectionPointOut>
                 </variable>
                 <variable formalParameter="BrakeCmd">
@@ -27343,13 +27813,21 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>GVL_Global.M1RelayFwd</variable>
             </coil>
-            <comment localId="65" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <coil localId="65" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="63" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1_RelayFwd_Up_DQ</variable>
+            </coil>
+            <comment localId="66" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Relais M1 Marche Arrière (Descente)</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="66">
+            <vendorElement localId="67">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27360,7 +27838,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="67" negated="false" storage="none" edge="none">
+            <contact localId="68" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27368,21 +27846,29 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>M1RelayRev</variable>
             </contact>
-            <coil localId="68" negated="false" storage="none">
+            <coil localId="69" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="67" />
+                <connection refLocalId="68" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1RelayRev</variable>
             </coil>
-            <comment localId="69" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <coil localId="70" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="68" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1_RelayRev_Down_DQ</variable>
+            </coil>
+            <comment localId="71" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Contacteur Vitesse M1-1</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="70">
+            <vendorElement localId="72">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27393,7 +27879,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="71" negated="false" storage="none" edge="none">
+            <contact localId="73" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27401,21 +27887,29 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>M1SpeedContactor1</variable>
             </contact>
-            <coil localId="72" negated="false" storage="none">
+            <coil localId="74" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="71" />
+                <connection refLocalId="73" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1SpeedContactor1</variable>
             </coil>
-            <comment localId="73" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <coil localId="75" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="73" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1_SpeedContactor_1_DQ</variable>
+            </coil>
+            <comment localId="76" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Contacteur Vitesse M1-2</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="74">
+            <vendorElement localId="77">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27426,7 +27920,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="75" negated="false" storage="none" edge="none">
+            <contact localId="78" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27434,51 +27928,26 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>M1SpeedContactor2</variable>
             </contact>
-            <coil localId="76" negated="false" storage="none">
+            <coil localId="79" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="75" />
+                <connection refLocalId="78" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1SpeedContactor2</variable>
             </coil>
-            <comment localId="77" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Contacteur Vitesse M1-3</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="78">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="79" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1SpeedContactor3</variable>
-            </contact>
             <coil localId="80" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="79" />
+                <connection refLocalId="78" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor3</variable>
+              <variable>M1_SpeedContactor_2_DQ</variable>
             </coil>
             <comment localId="81" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-4</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-3</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="82">
@@ -27498,7 +27967,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor4</variable>
+              <variable>M1SpeedContactor3</variable>
             </contact>
             <coil localId="84" negated="false" storage="none">
               <position x="0" y="0" />
@@ -27506,15 +27975,23 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="83" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor4</variable>
+              <variable>GVL_Global.M1SpeedContactor3</variable>
             </coil>
-            <comment localId="85" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <coil localId="85" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="83" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1_SpeedContactor_3_DQ</variable>
+            </coil>
+            <comment localId="86" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Frein M1</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-4</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="86">
+            <vendorElement localId="87">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27525,7 +28002,48 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="87" negated="false" storage="none" edge="none">
+            <contact localId="88" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1SpeedContactor4</variable>
+            </contact>
+            <coil localId="89" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="88" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M1SpeedContactor4</variable>
+            </coil>
+            <coil localId="90" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="88" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1_SpeedContactor_4_DQ</variable>
+            </coil>
+            <comment localId="91" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Frein M1</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="92">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="93" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27533,21 +28051,29 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>M1BrakeCmd</variable>
             </contact>
-            <coil localId="88" negated="false" storage="none">
+            <coil localId="94" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="87" />
+                <connection refLocalId="93" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M1BrakeCmd</variable>
             </coil>
-            <comment localId="89" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <coil localId="95" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="93" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1_BrakeRelease_RQ</variable>
+            </coil>
+            <comment localId="96" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>Relais M2 Marche Avant (Fermeture)</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="90">
+            <vendorElement localId="97">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27558,7 +28084,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="91" negated="false" storage="none" edge="none">
+            <contact localId="98" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27566,84 +28092,26 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>M2RelayFwd</variable>
             </contact>
-            <coil localId="92" negated="false" storage="none">
+            <coil localId="99" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="91" />
+                <connection refLocalId="98" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2RelayFwd</variable>
             </coil>
-            <comment localId="93" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Relais M2 Marche Arrière (Ouverture)</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="94">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="95" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2RelayRev</variable>
-            </contact>
-            <coil localId="96" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="95" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M2RelayRev</variable>
-            </coil>
-            <comment localId="97" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Contacteur Vitesse M2-1</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="98">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="99" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2SpeedContactor1</variable>
-            </contact>
             <coil localId="100" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="99" />
+                <connection refLocalId="98" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor1</variable>
+              <variable>M2_RelayFwd_Up_Close_DQ</variable>
             </coil>
             <comment localId="101" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-2</html:xhtml>
+                <html:xhtml>Relais M2 Marche Arrière (Ouverture)</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="102">
@@ -27663,7 +28131,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor2</variable>
+              <variable>M2RelayRev</variable>
             </contact>
             <coil localId="104" negated="false" storage="none">
               <position x="0" y="0" />
@@ -27671,15 +28139,23 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="103" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor2</variable>
+              <variable>GVL_Global.M2RelayRev</variable>
             </coil>
-            <comment localId="105" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <coil localId="105" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="103" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2_RelayRev_Down_Open_DQ</variable>
+            </coil>
+            <comment localId="106" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-3</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-1</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="106">
+            <vendorElement localId="107">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27690,7 +28166,89 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="107" negated="false" storage="none" edge="none">
+            <contact localId="108" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor1</variable>
+            </contact>
+            <coil localId="109" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="108" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2SpeedContactor1</variable>
+            </coil>
+            <coil localId="110" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="108" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2_SpeedContactor_1_DQ</variable>
+            </coil>
+            <comment localId="111" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Contacteur Vitesse M2-2</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="112">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="113" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor2</variable>
+            </contact>
+            <coil localId="114" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="113" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2SpeedContactor2</variable>
+            </coil>
+            <coil localId="115" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="113" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2_SpeedContactor_2_DQ</variable>
+            </coil>
+            <comment localId="116" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Contacteur Vitesse M2-3</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="117">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="118" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27698,117 +28256,26 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>M2SpeedContactor3</variable>
             </contact>
-            <coil localId="108" negated="false" storage="none">
+            <coil localId="119" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="107" />
+                <connection refLocalId="118" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>GVL_Global.M2SpeedContactor3</variable>
             </coil>
-            <comment localId="109" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Contacteur Vitesse M2-4</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="110">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="111" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2SpeedContactor4</variable>
-            </contact>
-            <coil localId="112" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="111" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor4</variable>
-            </coil>
-            <comment localId="113" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Frein M2</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="114">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="115" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2BrakeCmd</variable>
-            </contact>
-            <coil localId="116" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="115" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M2BrakeCmd</variable>
-            </coil>
-            <comment localId="117" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Frein Translation M3</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="118">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="119" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>TranslationBrakeCmd</variable>
-            </contact>
             <coil localId="120" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="119" />
+                <connection refLocalId="118" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.TranslationBrakeCmd</variable>
+              <variable>M2_SpeedContactor_3_DQ</variable>
             </coil>
             <comment localId="121" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M5, A-04)</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-4</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="122">
@@ -27828,41 +28295,31 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff</variable>
+              <variable>M2SpeedContactor4</variable>
             </contact>
-            <contact localId="124" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff</variable>
-            </contact>
-            <contact localId="125" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</variable>
-            </contact>
-            <coil localId="126" negated="false" storage="none">
+            <coil localId="124" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="123" />
-                <connection refLocalId="124" />
-                <connection refLocalId="125" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PowerCutOffReq</variable>
+              <variable>GVL_Global.M2SpeedContactor4</variable>
             </coil>
-            <comment localId="127" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <coil localId="125" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="123" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2_SpeedContactor_4_DQ</variable>
+            </coil>
+            <comment localId="126" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
+                <html:xhtml>Frein M2</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="128">
+            <vendorElement localId="127">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -27873,7 +28330,140 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="130" negated="false" storage="none" edge="none">
+            <contact localId="128" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2BrakeCmd</variable>
+            </contact>
+            <coil localId="129" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="128" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2BrakeCmd</variable>
+            </coil>
+            <coil localId="130" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="128" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2_BrakeRelease_RQ</variable>
+            </coil>
+            <comment localId="131" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>Frein Translation M3</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="132">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="133" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>TranslationBrakeCmd</variable>
+            </contact>
+            <coil localId="134" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="133" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.TranslationBrakeCmd</variable>
+            </coil>
+            <coil localId="135" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="133" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M3_BrakeRelease_RQ</variable>
+            </coil>
+            <comment localId="136" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M5, A-04)</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="137">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="138" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff</variable>
+            </contact>
+            <contact localId="139" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff</variable>
+            </contact>
+            <contact localId="140" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</variable>
+            </contact>
+            <coil localId="141" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="138" />
+                <connection refLocalId="139" />
+                <connection refLocalId="140" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PowerCutOffReq</variable>
+            </coil>
+            <comment localId="142" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="143">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="145" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27881,7 +28471,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>TRUE</variable>
             </contact>
-            <contact localId="131" negated="false" storage="none" edge="none">
+            <contact localId="146" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27889,7 +28479,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
             </contact>
-            <contact localId="132" negated="false" storage="none" edge="none">
+            <contact localId="147" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27897,7 +28487,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyArming</variable>
             </contact>
-            <contact localId="133" negated="false" storage="none" edge="none">
+            <contact localId="148" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27905,7 +28495,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</variable>
             </contact>
-            <contact localId="134" negated="false" storage="none" edge="none">
+            <contact localId="149" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27913,7 +28503,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</variable>
             </contact>
-            <contact localId="135" negated="false" storage="none" edge="none">
+            <contact localId="150" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27921,7 +28511,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PowerCutOffReq</variable>
             </contact>
-            <contact localId="136" negated="false" storage="none" edge="none">
+            <contact localId="151" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -27929,42 +28519,42 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
             </contact>
-            <block localId="129" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+            <block localId="144" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="130" />
+                    <connection refLocalId="145" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="131" />
+                    <connection refLocalId="146" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ArmRequest">
                   <connectionPointIn>
-                    <connection refLocalId="132" />
+                    <connection refLocalId="147" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
-                    <connection refLocalId="133" />
+                    <connection refLocalId="148" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="134" />
+                    <connection refLocalId="149" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerCutOffRequest">
                   <connectionPointIn>
-                    <connection refLocalId="135" />
+                    <connection refLocalId="150" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BtnEmergencyCutOff">
                   <connectionPointIn>
-                    <connection refLocalId="136" />
+                    <connection refLocalId="151" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -28330,6 +28920,20 @@ GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs_LD.EmergencyDiag.Redu
 GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs_LD.EmergencyDiag.ArmFailed;
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs_LD.EmergencyDiag.Error OR PRG_02_Acquisition.InputModuleFault;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs_LD.PowerCutOffActive;
+
+// 🕹️ Publication état Joystick IHM (GVL_IHM.JOY1Joystick.State)
+GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwReal.Operator.JoyXRaw_ANA1;
+GVL_IHM.JOY1Joystick.State.RawY := PRG_02_Acquisition.HwReal.Operator.JoyYRaw_ANA2;
+GVL_IHM.JOY1Joystick.State.RawButton := PRG_02_Acquisition.HwReal.Operator.JoyBtnRaw;
+GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.instJoystick.AxisCmdX;
+GVL_IHM.JOY1Joystick.State.AxisCmdY := PRG_02_Acquisition.instJoystick.AxisCmdY;
+GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;
+GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;
+GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.JoystickDeadmanArmed;
+GVL_IHM.JOY1Joystick.State.Online := instDiagCanOpen.DeviceJoystick.Online;
+GVL_IHM.JOY1Joystick.State.Operational := instDiagCanOpen.DeviceJoystick.Operational;
+GVL_IHM.JOY1Joystick.State.Error := instDiagCanOpen.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId := instDiagCanOpen.ErrorId;
 
 GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;
@@ -29140,6 +29744,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
           <Object Name="FB_TranslationOutputInterlock_LD" ObjectId="6d2c6c5a-239b-575a-b564-e6b87c13e1a9" />
           <Object Name="FB_Translation_PositionDecoder" ObjectId="2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3" />
+          <Object Name="FB_Translation_PositionEstimator" ObjectId="17c88093-da61-51d7-ad4f-b07c5ebb2eb5" />
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
           <Object Name="ST_TranslationCmdDemand" ObjectId="0b5f8faa-764b-51e3-b87f-be2bae8212ac" />
         </Folder>

@@ -19,6 +19,7 @@ WORKFLOW_DIRS = {
     "config",
     "reports",
     "tests",
+    "tasks",
 }
 
 DOC_FILE_PATTERNS = (
@@ -28,7 +29,9 @@ DOC_FILE_PATTERNS = (
     re.compile(r"^AUDIT_.+_v\d+\.\d+\.md$"),
     re.compile(r"^CHECKLIST_.+_v\d+\.\d+\.md$"),
     re.compile(r"^NAMING_CONVENTION\.md$"),
+    re.compile(r"^REGISTRE_.+_v\d+\.\d+\.md$"),
     re.compile(r"^.+_Journal_Modifications\.md$"),
+    re.compile(r"^(CODE_QUALITY_STANDARDS|PI_SOUND_NOTIFICATION|README|REX_.+)\.md$"),
 )
 
 
@@ -69,9 +72,11 @@ def check_doc(root: Path, errors: list[str], warnings: list[str]) -> None:
         return
 
     allowed_doc_dirs = {"AUDITS", "CHECKLISTS", "DIAGRAMS", "NAVBOARDS"}
+    fiche_folder = re.compile(r"^AF_Partie-\d{2}_")
     for entry in doc.iterdir():
         if entry.is_dir():
-            if entry.name not in allowed_doc_dirs:
+            if entry.name not in allowed_doc_dirs and not fiche_folder.match(entry.name) \
+                    and entry.name != "ARCHIVES":
                 errors.append(f"unexpected DOC subdirectory: {entry.name}")
             continue
         if entry.suffix.lower() != ".md":

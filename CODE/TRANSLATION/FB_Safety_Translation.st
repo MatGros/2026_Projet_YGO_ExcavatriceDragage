@@ -68,6 +68,8 @@ VAR
     ErrorEdge           : R_TRIG;
     TonMecaB            : TON;         // Sécurité à l'arrêt (Méca B)
     TonMecaA            : TON;         // Sécurité mouvement non commandé (Méca A)
+    TonLimitSwitchOverrun : TON;       // 🆕 Surveillance poussée anormale / escalade fin de course
+    OverrunCondition    : BOOL;
     PostRampTimeout     : TIME := T#3S;
     UncommandedActiveB  : BOOL;
     UncommandedActiveA  : BOOL;
@@ -92,6 +94,7 @@ IF NOT Enable THEN
     ErrorSensorIncoherent := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
+    TonLimitSwitchOverrun(IN := FALSE);
     State := E_State.DISABLED;
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     RETURN;
@@ -182,16 +185,27 @@ IF NOT BypassGlobal THEN
     END_IF;
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFDF; END_IF;
 
-    // 🔍 3sexies. DÉPASSEMENT FINS DE COURSE EXTRÊMES (bit6)
+    // 🔍 3sexies. SURVEILLANCE ESCALADE FIN DE COURSE (bit6)
     IF (BypassSafety OR BypassLimitSwitch) THEN
-        // Nettoye le bit 6 résiduel (posé avant activation du bypass)
+        // Nettoie le bit 6 résiduel (posé avant activation du bypass)
         ErrorId := ErrorId AND 16#FFBF;
+        TonLimitSwitchOverrun(IN := FALSE);
     ELSE
-        IF LimitSwitchFwd OR LimitSwitchRev THEN
-            ErrorId := ErrorId OR 16#0040;
+        // 🧱 L'erreur 64 (escalade / poussée anormale en butée) ne s'active QUE SI :
+        // 1. On est sur le capteur Trémie (LimitSwitchFwd) ET qu'on continue d'insister en Marche Avant (Direction = 1) avec vitesse/commande variateur active.
+        // 2. OU qu'on est sur le capteur Maintenance (LimitSwitchRev) ET qu'on continue d'insister en Marche Arrière (Direction = -1) avec vitesse/commande variateur active.
+        OverrunCondition := (LimitSwitchFwd AND (Direction = 1) AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchRev AND (Direction = -1) AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0));
+
+        TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
+
+        IF TonLimitSwitchOverrun.Q THEN
+            ErrorId := ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
+        ELSE
+            // Si la poussée dans le mauvais sens cesse (ou si on repart en arrière), le défaut s'auto-efface
+            ErrorId := ErrorId AND 16#FFBF;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFBF; END_IF;
 
     // 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
     IF (BypassSafety OR BypassSensorIncoherent) THEN

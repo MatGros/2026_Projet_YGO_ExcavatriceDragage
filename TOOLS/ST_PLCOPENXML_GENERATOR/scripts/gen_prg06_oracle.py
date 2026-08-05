@@ -390,6 +390,10 @@ def _build_actuator_network(ld, counter, source_var, dq_var, gvl_field, comment_
     gvl_coil_id = _new_id(counter)
     _make_coil(ld, gvl_coil_id, contact_id, f"GVL_Global.{gvl_field}")
 
+    if dq_var:
+        dq_coil_id = _new_id(counter)
+        _make_coil(ld, dq_coil_id, contact_id, dq_var)
+
 
 def _make_fb_safety_block(ld, lid, instance_name, input_source_ids):
     block = ET.SubElement(ld, "block")
@@ -501,8 +505,8 @@ def build_prg06_ld():
     # sur M3_CommandWord (0x3101, %QW6) et M3_SetpointFrequencyHz (0x3100, %QW7).
     m3_targets = {
         "BrakeCmd": "TranslationBrakeCmd",
-        "DriveControlWord": "M3_DriveControlWord",
-        "DriveFreqRefWord": "M3_DriveFreqRefWord",
+        "DriveControlWord": "M3_CommandWord",
+        "DriveFreqRefWord": "M3_SetpointFrequencyHz",
     }
     m3_block_id = _build_translation_interlock_network(
         ld, counter,
@@ -618,6 +622,16 @@ def build_prg06_pou():
             iv = ET.SubElement(v, "initialValue")
             sv = ET.SubElement(iv, "simpleValue")
             sv.set("value", "TRUE")
+
+    # REX 2026-07-29 : l'oracle câble des coils sur les sorties actionneurs _DQ/_RQ
+    # (voir ACTUATOR_NETWORKS) — une coil référençant une variable absente de
+    # l'interface du POU provoque une ArgumentNullException GetOperandDeclarationInfo
+    # à l'import CODESYS. Chaque sortie est donc déclarée ici, en BOOL.
+    for _, dq_var, _, _ in ACTUATOR_NETWORKS:
+        v = ET.SubElement(out_vars, "variable")
+        v.set("name", dq_var)
+        t = ET.SubElement(v, "type")
+        ET.SubElement(t, "BOOL")
 
     local_vars = ET.SubElement(iface, "localVars")
     for name, typ in [

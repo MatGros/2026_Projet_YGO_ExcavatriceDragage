@@ -39,6 +39,7 @@ STRUCT
     PositionP2              : BOOL;
     PositionP1              : BOOL;
     PositionMaintenance     : BOOL;
+    EstimatedPosM3_M        : REAL;    (* 📏 Position continue estimée en mètres (0.0 m Maint -> +X m Trémie) *)
     SensorsWord             : BYTE;    (* bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance *)
     SensorWordIncoherent    : BOOL;
     LimitSwitchFwd          : BOOL;

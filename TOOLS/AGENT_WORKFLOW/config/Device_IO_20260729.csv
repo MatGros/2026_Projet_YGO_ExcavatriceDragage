@@ -15,7 +15,7 @@ M1_RelayFwd_Up_DQ;Bit0@1;;+1 Sens ENROULAGE MONTEE EXTRACTION;%QX0.0;Local_Digit
 M1_RelayRev_Down_DQ;Bit1@1;;-1 Sens DEROULAGE DESCENTE PLONGEE;%QX0.1;Local_Digital_IO
 M2_RelayFwd_Up_Close_DQ;Bit2@1;;+1 Sens ENROULAGE MONTEE EXTRACTION - FERMETURE GRAPPIN;%QX0.2;Local_Digital_IO
 M2_RelayRev_Down_Open_DQ;Bit3@1;;-1 Sens DEROULAGE DESCENTE PLONGEE - OUVERTURE GRAPPIN;%QX0.3;Local_Digital_IO
-;Bit4@1;;;%QX0.4;Local_Digital_IO
+PRG_06_Outputs_LD.TranslationBrakeCmd;Bit4@1;;Commande ouverture frein translation M3;%QX0.4;Local_Digital_IO
 ;Bit5@1;;;%QX0.5;Local_Digital_IO
 ;Bit6@1;;;%QX0.6;Local_Digital_IO
 ;Bit7@1;;;%QX0.7;Local_Digital_IO
@@ -187,7 +187,7 @@ COD1_AccValue;Acceleration value channel 1;;Acceleration value channel 1;%IW7;CO
 ;Bit13@7;;Acceleration value channel 1;%IX15.5;COD1_CODEUR
 ;Bit14@7;;Acceleration value channel 1;%IX15.6;COD1_CODEUR
 ;Bit15@7;;Acceleration value channel 1;%IX15.7;COD1_CODEUR
-M3_CommandWord;0x3101 Command;;0x3101 Command;%QW6;AC600_ECAT_Drive
+PRG_06_Outputs_LD.M3_DriveControlWord;0x3101 Command;;0x3101 Command;%QW6;AC600_ECAT_Drive
 ;Bit0;;0x3101 Command;%QX12.0;AC600_ECAT_Drive
 ;Bit1;;0x3101 Command;%QX12.1;AC600_ECAT_Drive
 ;Bit2;;0x3101 Command;%QX12.2;AC600_ECAT_Drive
@@ -204,7 +204,7 @@ M3_CommandWord;0x3101 Command;;0x3101 Command;%QW6;AC600_ECAT_Drive
 ;Bit13;;0x3101 Command;%QX13.5;AC600_ECAT_Drive
 ;Bit14;;0x3101 Command;%QX13.6;AC600_ECAT_Drive
 ;Bit15;;0x3101 Command;%QX13.7;AC600_ECAT_Drive
-M3_SetpointFrequencyHz;0x3100 Frequency;;0x3100 Frequency;%QW7;AC600_ECAT_Drive
+PRG_06_Outputs_LD.M3_DriveFreqRefWord;0x3100 Frequency;;0x3100 Frequency;%QW7;AC600_ECAT_Drive
 ;Bit0@1;;0x3100 Frequency;%QX14.0;AC600_ECAT_Drive
 ;Bit1@1;;0x3100 Frequency;%QX14.1;AC600_ECAT_Drive
 ;Bit2@1;;0x3100 Frequency;%QX14.2;AC600_ECAT_Drive

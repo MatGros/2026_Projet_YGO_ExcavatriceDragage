@@ -211,6 +211,20 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs_LD.EmergencyDiag.Arm
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs_LD.EmergencyDiag.Error OR PRG_02_Acquisition.InputModuleFault;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs_LD.PowerCutOffActive;
 
+// 🕹️ Publication état Joystick IHM (GVL_IHM.JOY1Joystick.State)
+GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwReal.Operator.JoyXRaw_ANA1;
+GVL_IHM.JOY1Joystick.State.RawY := PRG_02_Acquisition.HwReal.Operator.JoyYRaw_ANA2;
+GVL_IHM.JOY1Joystick.State.RawButton := PRG_02_Acquisition.HwReal.Operator.JoyBtnRaw;
+GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.instJoystick.AxisCmdX;
+GVL_IHM.JOY1Joystick.State.AxisCmdY := PRG_02_Acquisition.instJoystick.AxisCmdY;
+GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;
+GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;
+GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.JoystickDeadmanArmed;
+GVL_IHM.JOY1Joystick.State.Online := instDiagCanOpen.DeviceJoystick.Online;
+GVL_IHM.JOY1Joystick.State.Operational := instDiagCanOpen.DeviceJoystick.Operational;
+GVL_IHM.JOY1Joystick.State.Error := instDiagCanOpen.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId := instDiagCanOpen.ErrorId;
+
 GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;
 GVL_IHM.Network.Joystick    := instDiagCanOpen.DeviceJoystick;

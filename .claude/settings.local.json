@@ -119,7 +119,8 @@
       "Bash(grep -n \"ERROR\" /tmp_report.txt)",
       "Bash(mkdir -p \"C:\\\\Users\\\\ZEDVICTUS\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage\\\\3b121974-6c26-4832-b143-729d9c757e1c\\\\scratchpad\")",
       "Bash(python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report)",
-      "Read(//c/Users/ZEDVICTUS/AppData/Local/Temp/claude/C---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage/3b121974-6c26-4832-b143-729d9c757e1c/scratchpad/**)"
+      "Read(//c/Users/ZEDVICTUS/AppData/Local/Temp/claude/C---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage/3b121974-6c26-4832-b143-729d9c757e1c/scratchpad/**)",
+      "Bash(grep *)"
     ],
     "ask": [
       "Bash(git reset *)",
