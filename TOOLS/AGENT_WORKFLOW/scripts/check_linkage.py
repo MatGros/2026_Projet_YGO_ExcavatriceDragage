@@ -96,13 +96,6 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
         "DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_M4_TRANSLATION_SAFETY.yaml — "
         "retirer de cette liste des que ce lot est execute"
     ),
-    "FB_Diag_IhmHeartbeat": (
-        "producteur de HeartbeatIhmOk jamais instancie (lu par FB_Cycle, "
-        "FB_Safety_Winch et FB_Safety_Translation) — audit 2026-08-05, "
-        "PLAN_TASK T107, contrat pret : "
-        "DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT0_DIAG_IHM_HEARTBEAT.yaml — "
-        "retirer de cette liste des que ce lot est execute"
-    ),
     "FB_Safety_Winch": (
         "meme classe de bug que FB_Safety_Translation, deja documentee dans "
         "l'en-tete CODE/MAIN/PRG_06_Outputs_LD.st avant cette session — hors "
