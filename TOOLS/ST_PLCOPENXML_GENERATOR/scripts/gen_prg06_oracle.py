@@ -530,12 +530,31 @@ def build_prg06_ld():
     # encore instanciée) rejoindront ce OU par des contacts supplémentaires en parallèle dès
     # que leur safety publiera PowerCutOff — jamais une demande vraie masquée par l'absence
     # d'une autre source (M5, A-04).
-    _make_comment(ld, _new_id(counter), "🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M3 seul câblé à ce jour)")
+    # 🆕 2026-08-05 : M1/M2 (FB_Safety_Winch) désormais câblés — OR à 3 contacts parallèles vers
+    # une même coil, pattern confirmé par export CODESYS réel (samples_reference_codesys/
+    # PRG_10_LD_Commentaires.xml, réseau instSafetyWinchM1/M2/instSafetyTranslationM3 -> PowerCutOffReq :
+    # <connectionPointIn> d'une coil peut porter plusieurs <connection>, une par contact parallèle).
+    _make_comment(ld, _new_id(counter), "🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M5, A-04)")
     _make_vendor_element(ld, _new_id(counter))
-    powercutoff_contact_id = _new_id(counter)
-    _make_contact(ld, powercutoff_contact_id, "PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff")
-    powercutoff_coil_id = _new_id(counter)
-    _make_coil(ld, powercutoff_coil_id, powercutoff_contact_id, "PowerCutOffReq")
+    pc_m1_id = _new_id(counter)
+    _make_contact(ld, pc_m1_id, "PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff")
+    pc_m2_id = _new_id(counter)
+    _make_contact(ld, pc_m2_id, "PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff")
+    pc_m3_id = _new_id(counter)
+    _make_contact(ld, pc_m3_id, "PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff")
+    pc_coil_id = _new_id(counter)
+    pc_coil = ET.SubElement(ld, "coil")
+    pc_coil.set("localId", str(pc_coil_id))
+    pc_coil.set("negated", "false")
+    pc_coil.set("storage", "none")
+    _pos(pc_coil)
+    pc_cpi = ET.SubElement(pc_coil, "connectionPointIn")
+    for src_id in (pc_m1_id, pc_m2_id, pc_m3_id):
+        conn = ET.SubElement(pc_cpi, "connection")
+        conn.set("refLocalId", str(src_id))
+    ET.SubElement(pc_coil, "connectionPointOut")
+    pc_var = ET.SubElement(pc_coil, "variable")
+    pc_var.text = "PowerCutOffReq"
 
     # ═══════════════════════════════════════════════════════════
     # Section 3 : Sécurité & Coupure Puissance Amont (FB_Safety) — inchangé (AC5)

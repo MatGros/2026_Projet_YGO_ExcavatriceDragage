@@ -232,6 +232,15 @@ GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
 // (seul le frein mécanique réagissait via SafeStop). Agrégation OU strict par procédé (M5, A-04) —
 // M1/M2 (FB_Safety_Winch, pas encore instanciée) rejoindront ce OU dès leur safety câblée, aucune
 // demande vraie ne doit jamais être masquée par l'absence d'une autre source.
+// 🆕 2026-08-05 : M1/M2 (FB_Safety_Winch) + M3 câblés — OU strict (M5, A-04).
+// ⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD est
+// intégralement généré par l'oracle Python (gen_prg06_oracle.py), jamais par la conversion
+// .st->LD générique (qui plante sur une variable réassignée en OU chaîné — bug pré-existant du
+// générateur générique, hors périmètre de ce lot). Contrat réel, câblé dans l'oracle (3 contacts
+// parallèles sur la même coil PowerCutOffReq, voir section PowerCutOffReq du script) :
+//   PowerCutOffReq = WinchM1FinalInterlockRequest.PowerCutOff
+//                  OR WinchM2FinalInterlockRequest.PowerCutOff
+//                  OR TranslationFinalInterlockRequest.PowerCutOff
 PowerCutOffReq := PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
 instSafetyEmergencyManagement(
