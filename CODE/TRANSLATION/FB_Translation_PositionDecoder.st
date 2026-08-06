@@ -41,7 +41,7 @@ VAR_OUTPUT
     TranslationAtTremie      : BOOL;   // TRUE uniquement si SensorsWord = 11111
     TranslationAtPV          : BOOL;   // TRUE uniquement si SensorsWord = 01111
     TranslationAtP2          : BOOL;   // TRUE uniquement si SensorsWord = 00111
-    TranslationAtP1          : BOOL;   // TRUE uniquement si SensorsWord = 00001
+    TranslationAtP1          : BOOL;   // TRUE uniquement si SensorsWord = 00011
     TranslationAtMaintenance : BOOL;   // TRUE uniquement si SensorsWord = 00000
 END_VAR
 
@@ -80,5 +80,5 @@ TranslationPosMaintenance := SensorMaintenance;
 TranslationAtTremie      := (SensorsWord = 2#11111);
 TranslationAtPV          := (SensorsWord = 2#01111);
 TranslationAtP2          := (SensorsWord = 2#00111);
-TranslationAtP1          := (SensorsWord = 2#00001);
+TranslationAtP1          := (SensorsWord = 2#00011);
 TranslationAtMaintenance := (SensorsWord = 2#00000);
