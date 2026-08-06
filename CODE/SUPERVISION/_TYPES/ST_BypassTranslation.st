@@ -16,6 +16,7 @@ STRUCT
     (* 🚧 2. Limites physiques et Positionnement *)
     LimitSwitch       : BOOL; (* 🚧 Bypass fins de course physiques avant/arrière *)
     SensorIncoherent  : BOOL; (* 🧭 Bypass incohérence mot capteurs de position *)
+    MinHeight         : BOOL; (* 🆕 2026-08-06 : Bypass interlock hauteur mini M1/M2 requise pour translation *)
 
     (* ⚙️ 3. Sécurité Mécanique (Méca A-B) *)
     MecaA             : BOOL; (* 🔄 Bypass Méca A : mouvement non commandé à l'arrêt *)

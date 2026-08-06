@@ -1,0 +1,73 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — LOT_M4_TRANSLATION_HEIGHT_INTERLOCK
+# Retour terrain 2026-08-05/06 : risque de collision benne/structure si la
+# translation M3 est utilisée pendant que M1 ou M2 est encore bas.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: LOT_M4_TRANSLATION_HEIGHT_INTERLOCK
+  criticality: C3            # sécurité machine (anti-collision), pas de mouvement non désiré à l'arrêt
+  strategy: patch
+
+  objective: >
+    La translation M3 (StartStop) ne doit être autorisée que si M1 ET M2 sont
+    au-dessus d'une hauteur mini paramétrable (6.0 m par défaut), afin d'éviter
+    une collision benne/structure pendant un déplacement de translation ;
+    un bypass dédié (MAINT_N2, doctrine ST_BypassTranslation) permet de lever
+    l'interlock pour la maintenance.
+
+  acceptance:
+    - id: AC1
+      statement: "M3_StartStop_Active est FALSE si CablePosM1 < 6.0 m OU CablePosM2 < 6.0 m, hors bypass."
+      verified_by: "lecture PRG_05_Translation.st §0 + §1 (M3_HeightInterlockOk intégré au AND de M3_StartStop_Active, branche MAINT_N1/N2)"
+    - id: AC2
+      statement: "Le seuil 6.0 m est paramétrable sans recompilation (GVL_PERSISTENT, pas de littéral en dur)."
+      verified_by: "GVL_PERSISTENT._TranslationMinHeightM1M2_M déclarée PERSISTENT RETAIN"
+    - id: AC3
+      statement: "Bypass.MinHeight (par axe) OU Bypass.Global lève l'interlock sans autre condition."
+      verified_by: "lecture PRG_05_Translation.st:42-46 — OR explicite avant le calcul de hauteur"
+    - id: AC4
+      statement: "L'IHM peut afficher que l'interlock bloque le mouvement (diagnostic terrain)."
+      verified_by: "ST_TranslationState.HeightInterlockBlocking peuplé (TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk)"
+    - id: AC5
+      statement: "Aucune référence croisée orpheline (CablePosM1/M2 doivent exister à l'endroit référencé)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report -> 0 erreur"
+    - id: AC6
+      statement: "Tous les gates projet restent au vert après la modification."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py -> ALL GATES PASSED"
+    - id: AC7
+      statement: "Le nom de fichier (sans extension) correspond au nom de POU déclaré : PRG_05_Translation dans les deux cas"
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+    - id: AC8
+      statement: "Le suffixe de fichier (absence de _LD) correspond au langage bundle généré pour ce POU (ST, pas de conversion LD pour PRG_05_Translation)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_05_Translation.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/SUPERVISION/_TYPES/ST_BypassTranslation.st
+      - CODE/SUPERVISION/_TYPES/ST_TranslationState.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+      - CODE/TRANSLATION/FB_Translation.st   # logique interne FB non concernée, interlock arbitré en amont dans PRG_05
+
+  conservation:
+    must_survive:
+      - "Homme-mort joystick (JoystickDeadmanArmed) reste une condition ET, pas remplacée."
+      - "Arbitrage direction/positionnement (§1) inchangé pour SEMI_AUTO et hors MAINT_N1/N2."
+    dropped_on_purpose:
+      - "Aucun — ajout pur, pas de suppression de comportement existant."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, bug préexistant,
+    risque hors scope) est remonté immédiatement, pas seulement en fin de tâche.
