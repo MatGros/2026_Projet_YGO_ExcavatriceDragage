@@ -69,6 +69,9 @@ VAR
     RequestedStepClamped         : INT;
     StepDelayTarget              : INT;  // Cible mémorisée : tout changement annule le temps en cours
     MotorRequest                 : BOOL;
+    // 🆕 2026-08-06 (retour terrain, anti-retombée) : retour physique contacteur(s) sens/vitesse
+    // réellement engagés — jamais desserrer le frein sans cette confirmation (voir §2bis/§5).
+    ContactorEngaged              : BOOL;
     // 🔧 REX 2026-08-05 : pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) — voir §2 ci-dessous
     BrakeTimeoutCause             : BOOL;
     BrakeTimeoutAck               : BOOL := TRUE;
@@ -105,6 +108,15 @@ RequestedStepClamped := LIMIT(0, RequestedStep, 5);
 // ne coupe qu'après sa retombée effective à zéro, sauf gate dur ou défaut final.
 MotorRequest := (RequestedStepClamped > 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
 
+// ── 2bis. Retour contacteur sens/vitesse engagé (anti-retombée) ─────────
+// 🆕 2026-08-06 (retour terrain) : AVANT ce correctif, BrakeCmd suivait BrakeReleaseRequest
+// IMMÉDIATEMENT (ligne ~168) alors que RelayFwd/RelayRev restaient à FALSE jusqu'à
+// BrakeCommandOpenConfirmed (§5) — le frein se desserrait donc AVANT que le contacteur de sens
+// ne soit engagé (plusieurs secondes d'écart observées en direct), sans aucun couple moteur
+// appliqué pendant l'écart. FwdRevSpeedFeedbackOff (retour physique "contacteurs relâchés")
+// inversé donne la confirmation d'engagement réel — jamais desserrer le frein sans elle.
+ContactorEngaged := NOT FwdRevSpeedFeedbackOff;
+
 // ── 2. Watchdog final : uniquement après ordre effectif de desserrage ───
 // Pendant l'inhibition post-timeout, BrakeCmd reste coupé : aucune nouvelle faute
 // en boucle ne peut être créée par une demande métier encore maintenue.
@@ -115,7 +127,9 @@ MotorRequest := (RequestedStepClamped > 0) AND (RequestedRelayFwd XOR RequestedR
 // désormais TOUJOURS effectif sur l'acquittement (BrakeTimeoutAck) ; l'interlock de
 // sécurité (RestartInhibit, §3) reste basé sur la cause brute (BrakeTimeoutCause /
 // Error), jamais sur l'acquittement seul — l'acquittement n'ouvre jamais l'interlock.
-BrakeTimeout(IN := BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed
+// 🆕 2026-08-06 : ET ContactorEngaged — le watchdog ne démarre qu'une fois le contacteur
+// confirmé (le frein n'est commandé à s'ouvrir qu'à partir de là désormais, voir §5/§6).
+BrakeTimeout(IN := BrakeReleaseRequest AND ContactorEngaged AND NOT BrakeCommandOpenConfirmed
                AND NOT RestartInhibit, PT := T#500ms);
 BrakeTimeoutElapsed := BrakeTimeout.ET;
 IF BrakeTimeout.Q THEN
@@ -165,7 +179,9 @@ END_IF;
 
 // Le frein garde la demande métier, y compris durant la rampe SafeStop ;
 // FB_Brake le serre uniquement après la retombée effective du mouvement.
-BrakeCmd := BrakeReleaseRequest AND NOT Error AND NOT RestartInhibit;
+// 🆕 2026-08-06 (anti-retombée) : ET ContactorEngaged — ne JAMAIS desserrer le frein sans
+// confirmation physique que le contacteur de sens/vitesse est déjà engagé (§2bis).
+BrakeCmd := BrakeReleaseRequest AND ContactorEngaged AND NOT Error AND NOT RestartInhibit;
 
 // ── 4. Mémorisation de l'arrêt : le prochain départ attend la retombée + 900 ms ──
 IF NOT MotorRequest THEN
@@ -204,13 +220,6 @@ ELSIF NOT MotorRequest THEN
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.READY;
-ELSIF NOT BrakeCommandOpenConfirmed THEN
-    StepDelay(IN := FALSE, PT := T#1s250ms);
-    StepDelayElapsed := StepDelay.ET;
-    StepDelayTarget := 0;
-    AuthorizedStep := 0;
-    State := E_WinchFinalInterlockState.WAIT_BRAKE_COMMAND_CONFIRMATION;
-    Busy := TRUE;
 ELSIF RestartRequired THEN
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;
@@ -219,13 +228,18 @@ ELSIF RestartRequired THEN
     State := E_WinchFinalInterlockState.WAIT_RESTART_DELAY;
     Busy := TRUE;
 ELSE
+    // 🆕 2026-08-06 (anti-retombée) : contacteur sens/vitesse engagé DÈS que la demande est
+    // valide — ne dépend plus de BrakeCommandOpenConfirmed (avant : le frein se desserrait
+    // AVANT le contacteur, plusieurs secondes d'écart, aucun couple moteur appliqué pendant
+    // que le frein était déjà ouvert). Le frein (§ci-dessus) attend maintenant ContactorEngaged,
+    // pas l'inverse. État WAIT_BRAKE_COMMAND_CONFIRMATION conservé pour le diagnostic IHM tant
+    // que le retour frein n'a pas confirmé, mais la puissance moteur n'attend plus dessus.
     // ⚡ Progression de palier directe : la temporisation (1,5s) est gérée par le métier (FB_Winch).
     // La barrière finale transmet directement la consigne sans micro-coupure des contacteurs.
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := RequestedStepClamped;
-    State := E_WinchFinalInterlockState.READY;
 
     IF (AuthorizedStep > 0) OR (RequestedStepClamped > 0) THEN
         RelayFwd := RequestedRelayFwd;
@@ -234,5 +248,12 @@ ELSE
         Contactor2 := RequestedContactor2;
         Contactor3 := RequestedContactor3;
         Contactor4 := RequestedContactor4;
+    END_IF;
+
+    IF NOT BrakeCommandOpenConfirmed THEN
+        State := E_WinchFinalInterlockState.WAIT_BRAKE_COMMAND_CONFIRMATION;
+        Busy := TRUE;
+    ELSE
+        State := E_WinchFinalInterlockState.READY;
     END_IF;
 END_IF;
