@@ -27221,13 +27221,17 @@ TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
 TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
-// 🆕 Stable (verrou §0quater), pas le front brut PRG_02_Acquisition.TranslationAtXxx (1 cycle,
-// invisible sur IHM) — cohérent avec ce qui pilote réellement M3_PositionSensorTarget ci-dessus.
-TranslationStateHMI.AtTremie := M3_AtTremieStable;
-TranslationStateHMI.AtPV := M3_AtPVStable;
-TranslationStateHMI.AtP2 := M3_AtP2Stable;
-TranslationStateHMI.AtP1 := M3_AtP1Stable;
-TranslationStateHMI.AtMaintenance := M3_AtMaintenanceStable;
+// 🆕 2026-08-06 (retour terrain) : affichage IHM = calcul INSTANTANÉ (zone courante réelle, sans
+// mémoire) — PAS M3_AtXxxStable (verrou mémoire §0quater, réservé au pilotage interne de
+// M3_PositionSensorTarget ci-dessus, qui doit lui rester tenu jusqu'au prochain front). Demande
+// opérateur : "je dois perdre P2 dès que je le quitte, peu importe le sens". Partition exclusive
+// des 6 mots valides en 5 zones à partir des capteurs cumulatifs (TranslationPosXxx) :
+// Trémie=11111, PV=01111, P2=00111, P1=00011, Maintenance=00001 ou 00000.
+TranslationStateHMI.AtTremie := PRG_02_Acquisition.TranslationPosTremie;
+TranslationStateHMI.AtPV := PRG_02_Acquisition.TranslationPosPV AND NOT PRG_02_Acquisition.TranslationPosTremie;
+TranslationStateHMI.AtP2 := PRG_02_Acquisition.TranslationPosP2 AND NOT PRG_02_Acquisition.TranslationPosPV;
+TranslationStateHMI.AtP1 := PRG_02_Acquisition.TranslationPosP1 AND NOT PRG_02_Acquisition.TranslationPosP2;
+TranslationStateHMI.AtMaintenance := NOT PRG_02_Acquisition.TranslationPosP1;
 TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
