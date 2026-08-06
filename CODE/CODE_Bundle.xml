@@ -6492,6 +6492,14 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="TglMaintenanceZoneAccess">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -15001,6 +15009,14 @@ Done := NOT Error;
                 <html:xhtml>0=M1+M2 couplés nominal, 1=M1, 2=M2 (brut IHM)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="SelMaintenanceZoneAccess">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : bit IHM dédié, autorisation CONSCIENTE zone Maintenance M3 (GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess) — MAINT_N2 seul ne suffit plus</html:xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -15205,8 +15221,10 @@ ELSE
 END_IF;
 
 // 5quinquies. CIBLE TRANSLATION MAINTENANCE
-// Autorisée uniquement en MAINT_N2. PRG_TRANSLATION_CFC consomme ce bit.
-Auth.MaintenanceM3TargetEnable := (Auth.Mode = E_Mode.MAINT_N2);
+// 🆕 2026-08-06 (retour terrain) : MAINT_N2 seul ne suffit plus — bit IHM dédié
+// (SelMaintenanceZoneAccess) exigé EN PLUS, action consciente distincte du simple
+// changement de mode. PRG_TRANSLATION_CFC consomme ce bit.
+Auth.MaintenanceM3TargetEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelMaintenanceZoneAccess;
 
 // GATE — désactivation inhibitions/sync si mode change (sortie N2)
 IF Auth.Mode &lt;&gt; E_Mode.MAINT_N2 THEN
@@ -25470,7 +25488,8 @@ instModes(
     InhibitM2Request        := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit,
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState &lt;&gt; 8) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState &lt;&gt; 8),
-    JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch
+    JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
+    SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess
 );
 
 

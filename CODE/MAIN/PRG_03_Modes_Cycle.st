@@ -28,7 +28,8 @@ instModes(
     InhibitM2Request        := GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit,
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState <> 8) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState <> 8),
-    JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch
+    JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
+    SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess
 );
 
 

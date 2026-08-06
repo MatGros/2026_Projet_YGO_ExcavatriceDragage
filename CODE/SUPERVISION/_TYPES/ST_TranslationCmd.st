@@ -15,6 +15,7 @@ STRUCT
     // 🔀 2026-08-06 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
     // GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
     InvertDirection    : BOOL;    (* 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service) *)
+    TglMaintenanceZoneAccess : BOOL; (* 🆕 2026-08-06 : autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable) *)
     Initialized        : BOOL := FALSE; (* 🚦 TRUE = SetFreq_Hz restauré depuis GVL_PERSISTENT ce boot *)
 END_STRUCT
 END_TYPE
