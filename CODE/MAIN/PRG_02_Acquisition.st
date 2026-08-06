@@ -23,11 +23,19 @@ VAR_OUTPUT
     JoystickSpeedPctX         : REAL;   (* Magnitude déviation axe X en % (0..100) *)
     JoystickXNeutral          : BOOL;   (* TRUE = axe X joystick au neutre *)
 
-    TranslationPosTremie      : BOOL;   (* TRUE = translation en position Trémie *)
-    TranslationPosPV          : BOOL;   (* TRUE = translation en zone pré-ralentissement PV *)
-    TranslationPosP2          : BOOL;   (* TRUE = translation en position P2 *)
-    TranslationPosP1          : BOOL;   (* TRUE = translation en position P1 *)
-    TranslationPosMaintenance : BOOL;   (* TRUE = translation en position Maintenance *)
+    TranslationPosTremie      : BOOL;   (* TRUE = translation en position Trémie — CUMULATIF, ralentissement uniquement *)
+    TranslationPosPV          : BOOL;   (* TRUE = translation en zone pré-ralentissement PV — CUMULATIF *)
+    TranslationPosP2          : BOOL;   (* TRUE = translation en position P2 — CUMULATIF *)
+    TranslationPosP1          : BOOL;   (* TRUE = translation en position P1 — CUMULATIF *)
+    TranslationPosMaintenance : BOOL;   (* TRUE = translation en position Maintenance — CUMULATIF *)
+
+    (* 🆕 2026-08-06 : mot EXACT — détection d'arrivée/cible et coupure dure UNIQUEMENT,
+       jamais le ralentissement (zone trop étroite). Voir FB_Translation_PositionDecoder.st *)
+    TranslationAtTremie      : BOOL;
+    TranslationAtPV          : BOOL;
+    TranslationAtP2          : BOOL;
+    TranslationAtP1          : BOOL;
+    TranslationAtMaintenance : BOOL;
 
     M3_StatusWord_Filtered        : UINT; (* WORD/UINT d'état variateur filtré *)
     M3_ActualFrequencyHz_Filtered : UINT; (* UINT fréquence M3 filtrée, unité : 0,01 Hz *)
@@ -511,6 +519,11 @@ TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
 TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
 TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
 TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
+TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
+TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
+TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
+TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
+TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
 M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;

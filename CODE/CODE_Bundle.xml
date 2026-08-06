@@ -20458,14 +20458,6 @@ Filtrage capteur de position cible</html:xhtml>
                 <derived name="R_TRIG" />
               </type>
             </variable>
-            <variable name="ArrivalNeutralTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <html:xhtml>🆕 2026-08-06 : anti-rebond retour au neutre (verrou anti-rebond)</html:xhtml>
-              </documentation>
-            </variable>
             <variable name="DirectionAtArrival">
               <type>
                 <INT />
@@ -20595,29 +20587,29 @@ IF (Direction = -1) AND SlowdownSensorP1 THEN
     RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedP1Hz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
 END_IF;
 
-// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1 &amp; Maintenance)
-// 🆕 2026-08-06 (retour terrain) : élargi à P1 (arrêt travail), pas seulement les 2 extrémités.
-// Dès qu'on touche un capteur d'arrêt (TargetReached), le sens d'arrivée (DirectionAtArrival)
-// est MÉMORISÉ et BLOQUÉ. Même si le capteur rebondit/clignote quelques ms et qu'on le perd
-// temporairement alors que le joystick reste enclenché, l'automate refuse de ré-avancer dans le
-// MÊME sens tant que l'opérateur n'a pas relâché le manche au neutre de façon SOUTENUE
-// (ArrivalNeutralTimer, pas un simple blip) ou demandé le sens inverse (dégagement, instantané)
-// — évite l'à-coup avant/re-stop sur rebond capteur ET sur relâchement joystick transitoire.
-ArrivalEdge(CLK := TargetReached);
+// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1, Maintenance, Fdc extrêmes)
+// 🆕 2026-08-06 (retour terrain + revue) : élargi à P1 (arrêt travail), pas seulement les 2
+// extrémités. Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de
+// course dur (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même
+// brève arme le même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ.
+// 🔧 REX 2026-08-06 (revue) : LimitSwitchFwd/Rev ne passaient PAS par ce verrou — un Fdc qui
+// s'ouvre quelques ms pendant le freinage laissait le §5bis relâcher SA coupure directe sans que
+// rien ne prenne le relais, la rampe (encore haute en interne) revenait en sortie -&gt; ré-accélération.
+// Désormais toute activation, même un instant, arme DirectionAtArrival comme un TargetReached.
+ArrivalEdge(CLK := TargetReached
+                 OR (LimitSwitchFwd AND (CommandedDirection = 1))
+                 OR (LimitSwitchRev AND (CommandedDirection = -1)));
 IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
 
-// 🆕 2026-08-06 (retour terrain, à-coup persistant malgré le verrou) : un retour au neutre
-// n'a AUCUN anti-rebond, contrairement au capteur (CaptorDebounceTon ci-dessus) — un
-// `Direction=0` d'un seul scan (bruit joystick, micro-relâchement involontaire à l'arrivée,
-// ou tout autre blip) efface `DirectionAtArrival` immédiatement et lève le verrou. L'opérateur
-// réappuie ensuite dans le MÊME sens (pensant n'avoir jamais lâché) → redémarrage vers la butée.
-// Un changement de sens FRANC (dégagement volontaire, sans ambiguïté) reste instantané, jamais
-// retardé — seul le retour au neutre est débounced, même principe que NeutralHoldTimer côté
-// homme-mort (FB_Joystick.st).
-ArrivalNeutralTimer(IN := (Direction = 0) AND (DirectionAtArrival &lt;&gt; 0), PT := CaptorDebounce);
-IF (Direction = DirectionAtArrival * (-1)) OR ArrivalNeutralTimer.Q THEN
+// 🔧 REX 2026-08-06 (revue) : un retour au neutre, même SOUTENU (&gt;100ms), ne doit JAMAIS lever
+// le verrou — seul un vrai changement de sens (dégagement volontaire, sans ambiguïté) le fait.
+// Sinon : neutre 100ms+ puis réappui dans le MÊME sens (le capteur/Fdc étant resté au niveau
+// haut en continu, TargetReached ne montre plus de front) contournait le verrou et M3 repartait
+// vers la butée. Conforme à la demande d'origine : "on doit repartir dans l'AUTRE sens", jamais
+// juste relâcher-réappuyer pareil. Instantané, jamais retardé (le dégagement doit rester rapide).
+IF Direction = DirectionAtArrival * (-1) THEN
     DirectionAtArrival := 0;
 END_IF;
 
@@ -24531,7 +24523,7 @@ Status Word 0x3102 (%IW8)</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE = translation en position Trémie</html:xhtml>
+                <html:xhtml>TRUE = translation en position Trémie — CUMULATIF, ralentissement uniquement</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosPV">
@@ -24539,7 +24531,7 @@ Status Word 0x3102 (%IW8)</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE = translation en zone pré-ralentissement PV</html:xhtml>
+                <html:xhtml>TRUE = translation en zone pré-ralentissement PV — CUMULATIF</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosP2">
@@ -24547,7 +24539,7 @@ Status Word 0x3102 (%IW8)</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE = translation en position P2</html:xhtml>
+                <html:xhtml>TRUE = translation en position P2 — CUMULATIF</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosP1">
@@ -24555,7 +24547,7 @@ Status Word 0x3102 (%IW8)</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE = translation en position P1</html:xhtml>
+                <html:xhtml>TRUE = translation en position P1 — CUMULATIF</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosMaintenance">
@@ -24563,8 +24555,37 @@ Status Word 0x3102 (%IW8)</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE = translation en position Maintenance</html:xhtml>
+                <html:xhtml>TRUE = translation en position Maintenance — CUMULATIF</html:xhtml>
               </documentation>
+            </variable>
+            <variable name="TranslationAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : mot EXACT — détection d'arrivée/cible et coupure dure UNIQUEMENT,
+       jamais le ralentissement (zone trop étroite). Voir FB_Translation_PositionDecoder.st</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtPV">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TranslationAtP2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TranslationAtP1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TranslationAtMaintenance">
+              <type>
+                <BOOL />
+              </type>
             </variable>
             <variable name="M3_StatusWord_Filtered">
               <type>
@@ -25363,6 +25384,11 @@ TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
 TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
 TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
 TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
+TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
+TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
+TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
+TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
+TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
 M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
@@ -26619,11 +26645,13 @@ M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 // ci-dessous tombait toujours en ELSE=FALSE et le verrou anti-rebond §4ter de FB_Translation
 // (DirectionAtArrival) ne s'armait jamais en usage réel. Repli explicite hors sélection
 // SEMI_AUTO : n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance) arme le verrou.
+// 🆕 2026-08-06 : mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
+// franc à l'arrivée quel que soit le sens de venue (voir FB_Translation_PositionDecoder.st).
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie;
-    2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP2;
-    3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP1;
-    4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosMaintenance;
+    1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie;
+    2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP2;
+    3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP1;
+    4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtMaintenance;
 ELSE
     // 🆕 2026-08-06 (retour terrain) : zone Maintenance interdite (MaintenanceM3TargetEnable=
     // FALSE) -&gt; P2 devient l'arrêt terminal (garde-fou avant la zone interdite), remplace P1/
@@ -26631,12 +26659,12 @@ ELSE
     // est autorisée. Le ralentissement d'approche P2 existe déjà (SlowdownSensorP1, Direction=-1,
     // FB_Translation §4bis) : même vitesse réutilisée (ApproachSpeedP1Hz), pas de 4e vitesse créée.
     IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
-        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
-                                    OR PRG_02_Acquisition.TranslationPosP1
-                                    OR PRG_02_Acquisition.TranslationPosMaintenance;
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie
+                                    OR PRG_02_Acquisition.TranslationAtP1
+                                    OR PRG_02_Acquisition.TranslationAtMaintenance;
     ELSE
-        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
-                                    OR PRG_02_Acquisition.TranslationPosP2;
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie
+                                    OR PRG_02_Acquisition.TranslationAtP2;
     END_IF;
 END_CASE;
 
