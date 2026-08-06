@@ -23,6 +23,7 @@ VAR
     instCfgPersistBridgeBucket : FB_CfgPersistBridge_BucketCfg;
     instCfgPersistBridgeWinchM1 : FB_CfgPersistBridge_WinchCfg;
     instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg;
+    instCfgPersistBridgeTranslation : FB_CfgPersistBridge_TranslationCfg; // 🆕 2026-08-06 : Translation n'avait pas de slot Cfg
     instDiagCanOpen : FB_Diag_CanOpen;
     instDiagEthercat : FB_Diag_Ethercat;
     instDiagIhmHeartbeat : FB_Diag_IhmHeartbeat;
@@ -90,6 +91,11 @@ END_IF;
 
 instCfgPersistBridgeSync(Hmi := GVL_IHM.M1M2Sync.Cfg, Persist := _SyncCfgPersist);
 IF instCfgPersistBridgeSync.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeTranslation(Hmi := GVL_IHM.TranslationM3.Cfg, Persist := _TranslationCfgPersist);
+IF instCfgPersistBridgeTranslation.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
