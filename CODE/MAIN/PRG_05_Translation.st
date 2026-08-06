@@ -90,41 +90,22 @@ ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEna
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
-// 🔒 §0quater MÉMORISATION BISTABLE DES POSITIONS CIBLES (front → verrou, doctrine §0ter)
-// PositionDecoder n'émet plus qu'un front transitoire (1 cycle) par capteur (REX décalage came,
-// voir FB_Translation_PositionDecoder.st) — mémorisé ici jusqu'à un mouvement effectif dans le
-// sens de dégagement, pour tenir le niveau nécessaire au débounce (100ms) + verrou anti-rebond
-// (§4ter DirectionAtArrival) de FB_Translation. Trémie/PV : atteints en Marche Avant (+1),
-// dégagement en Marche Arrière (-1). P2/P1/Maintenance : atteints en Marche Arrière (-1),
-// dégagement en Marche Avant (+1).
+// 🔒 §0quater MÉMORISATION DU DERNIER POINT ATTEINT (front → jeton unique, retour terrain)
+// PositionDecoder n'émet qu'un front transitoire (1 cycle) par capteur (REX décalage came, voir
+// FB_Translation_PositionDecoder.st) — mémorisé ici pour tenir le niveau nécessaire au débounce
+// (100ms) + verrou anti-rebond (§4ter DirectionAtArrival) de FB_Translation. 🆕 2026-08-06 (REX
+// terrain) : MUTUELLEMENT EXCLUSIFS — un nouveau front RAZ tous les autres (jeton "dernier point
+// franchi" unique, jamais deux points vrais en même temps, quel que soit le sens de venue).
 IF PRG_02_Acquisition.TranslationAtTremie THEN
-    M3_AtTremieStable := TRUE;
-ELSIF M3_Direction_Active = -1 THEN
-    M3_AtTremieStable := FALSE;
-END_IF;
-
-IF PRG_02_Acquisition.TranslationAtPV THEN
-    M3_AtPVStable := TRUE;
-ELSIF M3_Direction_Active = -1 THEN
-    M3_AtPVStable := FALSE;
-END_IF;
-
-IF PRG_02_Acquisition.TranslationAtP2 THEN
-    M3_AtP2Stable := TRUE;
-ELSIF M3_Direction_Active = 1 THEN
-    M3_AtP2Stable := FALSE;
-END_IF;
-
-IF PRG_02_Acquisition.TranslationAtP1 THEN
-    M3_AtP1Stable := TRUE;
-ELSIF M3_Direction_Active = 1 THEN
-    M3_AtP1Stable := FALSE;
-END_IF;
-
-IF PRG_02_Acquisition.TranslationAtMaintenance THEN
-    M3_AtMaintenanceStable := TRUE;
-ELSIF M3_Direction_Active = 1 THEN
-    M3_AtMaintenanceStable := FALSE;
+    M3_AtTremieStable := TRUE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+ELSIF PRG_02_Acquisition.TranslationAtPV THEN
+    M3_AtPVStable := TRUE; M3_AtTremieStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+ELSIF PRG_02_Acquisition.TranslationAtP2 THEN
+    M3_AtP2Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+ELSIF PRG_02_Acquisition.TranslationAtP1 THEN
+    M3_AtP1Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+ELSIF PRG_02_Acquisition.TranslationAtMaintenance THEN
+    M3_AtMaintenanceStable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
 END_IF;
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
