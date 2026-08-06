@@ -103,6 +103,12 @@ VAR
     ArrivalLock             : BOOL;        // Arrêt exact sur capteur cible
     MovementRequested      : BOOL;         // Pilote FB_Brake
     FirstScanDone          : BOOL;
+    // 🆕 2026-08-06 (revue sécurité) : garde-fou watchdog — DriveActualFreqHz est un passthrough
+    // EtherCAT SANS contrôle de fraîcheur (PRG_02_Acquisition, TimeConst=0ms). Si la comm variateur
+    // se fige (perte EtherCAT) sur une dernière valeur ≥1.0 Hz, plus rien ne referme le frein tant
+    // que ce garde-fou n'existe pas — même si SafeStop a déjà ramené la rampe théorique à 0. Force
+    // le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise DriveActualFreqHz.
+    TonBrakeRealFreqTimeout : TON;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -245,8 +251,15 @@ END_IF;
 // 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
 // OU que la fréquence réelle mesurée du variateur M3 est >= 1.0 Hz.
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
+// 🆕 2026-08-06 (revue sécurité) : borné par un garde-fou 2s — DriveActualFreqHz n'a aucun
+// contrôle de fraîcheur EtherCAT ; si la comm se fige sur une valeur ≥1.0 Hz (perte réseau en
+// mouvement), rien d'autre en aval ne referme le frein (FB_TranslationOutputInterlock_LD ignore
+// volontairement SafeStop par conception). Le garde-fou force la fermeture du frein 2s après la
+// fin de la rampe THÉORIQUE, quoi que dise la mesure réelle — combine attente réelle (évite un
+// serrage sur arbre encore tournant) et certitude de fermeture (n'attend jamais indéfiniment).
+TonBrakeRealFreqTimeout(IN := NOT ((CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1)), PT := T#2s);
 MovementRequested := ((CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1))
-                     OR (ABS(DriveActualFreqHz) >= 1.0);
+                     OR (ABS(DriveActualFreqHz) >= 1.0 AND NOT TonBrakeRealFreqTimeout.Q);
 
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
 RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
