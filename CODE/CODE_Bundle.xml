@@ -27160,13 +27160,14 @@ instTranslationM3(
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
-    SlowdownSensorMaintenance  := PRG_02_Acquisition.TranslationPosMaintenance AND NOT PRG_02_Acquisition.TranslationPosP2,
-    // 🆕 2026-08-06 (retour terrain, URGENT) : AND NOT TranslationPosP1 manquant — TranslationPosP2
-    // est cumulatif depuis la Trémie (code thermomètre, voir FB_Translation_PositionDecoder.st) et
-    // reste vrai jusqu'à P2, pas juste dans la zone P2→P1. Sans cette exclusion (même doctrine que
-    // SlowdownSensorMaintenance ci-dessus), le ralentissement "approche P1" (10Hz) se déclenchait
-    // dès le départ de la Trémie au lieu de juste avant P1.
-    SlowdownSensorP1           := PRG_02_Acquisition.TranslationPosP2 AND NOT PRG_02_Acquisition.TranslationPosP1,
+    // 🆕 2026-08-06 (retour terrain, URGENT, correction d'une erreur de calcul du commit précédent) :
+    // les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
+    // FB_Translation_PositionDecoder.st). Chaque zone est délimitée par "capteur PRÉCÉDENT retombé
+    // à 0" ET "capteur de la zone encore à 1" — zone P2→P1 = NOT PosP2 AND PosP1 (mot 00011) ;
+    // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
+    // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
+    SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.TranslationPosP1) AND PRG_02_Acquisition.TranslationPosMaintenance,
+    SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
