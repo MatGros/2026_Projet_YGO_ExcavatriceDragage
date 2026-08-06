@@ -220,11 +220,15 @@ ELSE
     ELSIF M3_Direction_Active = -1 THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -> arrêt sur Maintenance
-        // - Si Maintenance interdite -> arrêt sur P1
+        // - Si Maintenance interdite -> PAS d'arrêt logiciel automatique sur P1 (retiré ce soir,
+        //   retour terrain 2026-08-06) : M3_AtP1Stable s'arme trop tôt (dès la perte de P2, avant
+        //   la vraie marque P1 — calibration mot binaire à vérifier sur site avant réactivation).
+        //   Bloquait le mouvement réel avant d'atteindre P1. Arrêt manuel opérateur (jog MAINT_N1)
+        //   + coupure dure indépendante du sens (§0bis, mot 00001, non affectée) en secours.
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
             M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
-            M3_PositionSensorTarget := M3_AtP1Stable;
+            M3_PositionSensorTarget := FALSE;
         END_IF;
     ELSE
         M3_PositionSensorTarget := FALSE;
