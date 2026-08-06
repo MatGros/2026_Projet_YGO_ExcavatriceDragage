@@ -36,21 +36,33 @@ VAR_OUTPUT
     TranslationPosP1          : BOOL;   // TRUE = capteur P1 actif
     TranslationPosMaintenance : BOOL;   // TRUE = capteur Maintenance actif
 
-    // 🆕 2026-08-06 (REX décalage came) : mot EXACT (5 bits combinés) ABANDONNÉ pour la détection
-    // d'arrivée/cible — un capteur individuel décalé de quelques mm suffisait à sauter le mot
-    // cible (ex: 00011 jamais atteint, saut direct à 00001, déjà DANS la zone interdite suivante,
-    // laissant la translation continuer au-delà du point d'arrêt réel avant toute coupure).
-    // Détection par FRONT (montant OU descendant) du capteur PROPRE à chaque position : ne dépend
-    // plus des 4 autres capteurs, robuste au décalage mécanique. ⚠️ Signal TRANSITOIRE (1 cycle) —
-    // distingue "être ENTRE 2 capteurs" (zone, niveau, TranslationPosXxx cumulatif ci-dessus) de
-    // "être À la position d'UN capteur" (point, front, ci-dessous). L'appelant (PRG_05_Translation
-    // §0quater) le mémorise en verrou bistable (doctrine M3_LimitSwitchFwd/RevStable §0ter) pour
-    // tenir le niveau nécessaire au débounce/verrou anti-rebond de FB_Translation.
-    TranslationAtTremie      : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorTremie
-    TranslationAtPV          : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorPV
-    TranslationAtP2          : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorP2
-    TranslationAtP1          : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorP1
-    TranslationAtMaintenance : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorMaintenance
+    // 🆕 2026-08-06 (REX décalage came + REX modèle capteur) : mot EXACT (5 bits combinés)
+    // ABANDONNÉ pour la détection d'arrivée/cible — un capteur individuel décalé de quelques mm
+    // suffisait à sauter le mot cible. Détection par FRONT — mais PAS "front du capteur du même
+    // nom" (erreur de conception initiale, corrigée) : les 5 capteurs sont un CODE THERMOMÈTRE
+    // cumulatif côté Trémie (bit à 1 tant qu'on n'a pas dépassé SON PROPRE seuil en venant de
+    // Trémie) :
+    //   Mot :         11111  01111  00111  00011  00001  00000
+    //   Trémie  :       1      0      0      0      0      0
+    //   PV      :       1      1      0      0      0      0
+    //   P2      :       1      1      1      0      0      0
+    //   P1      :       1      1      1      1      0      0
+    //   Maintenance:    1      1      1      1      1      0
+    // → l'arrivée à un point Xi EN VENANT DE TRÉMIE (Direction=-1) est marquée par le front
+    // DESCENDANT du capteur PRÉCÉDENT (plus proche de Trémie), PAS par le capteur Xi lui-même
+    // (qui ne bouge pas à cette transition) ; l'arrivée EN VENANT DE MAINTENANCE (Direction=+1)
+    // est marquée par le front MONTANT du capteur Xi lui-même. Trémie et Maintenance sont les 2
+    // bouts de la chaîne : un seul sens d'arrivée possible chacun (pas de "précédent"/"suivant").
+    // ⚠️ Signal TRANSITOIRE (1 cycle) — distingue "être ENTRE 2 capteurs" (zone, niveau,
+    // TranslationPosXxx cumulatif ci-dessus) de "être À la position d'UN capteur" (point, front,
+    // ci-dessous). L'appelant (PRG_05_Translation §0quater) le mémorise en verrou bistable
+    // (doctrine M3_LimitSwitchFwd/RevStable §0ter) pour tenir le niveau nécessaire au débounce/
+    // verrou anti-rebond de FB_Translation.
+    TranslationAtTremie      : BOOL;   // TRUE 1 cycle : front montant SensorTremie (arrivée venant de Maintenance uniquement)
+    TranslationAtPV          : BOOL;   // TRUE 1 cycle : front descendant SensorTremie (venant Trémie) OU front montant SensorPV (venant Maintenance)
+    TranslationAtP2          : BOOL;   // TRUE 1 cycle : front descendant SensorPV (venant Trémie) OU front montant SensorP2 (venant Maintenance)
+    TranslationAtP1          : BOOL;   // TRUE 1 cycle : front descendant SensorP2 (venant Trémie) OU front montant SensorP1 (venant Maintenance)
+    TranslationAtMaintenance : BOOL;   // TRUE 1 cycle : front descendant SensorMaintenance (arrivée venant de Trémie uniquement)
 END_VAR
 
 VAR
@@ -104,8 +116,10 @@ EdgeUpP2(CLK := SensorP2);                   EdgeDnP2(CLK := SensorP2);
 EdgeUpP1(CLK := SensorP1);                   EdgeDnP1(CLK := SensorP1);
 EdgeUpMaintenance(CLK := SensorMaintenance); EdgeDnMaintenance(CLK := SensorMaintenance);
 
-TranslationAtTremie      := EdgeUpTremie.Q OR EdgeDnTremie.Q;
-TranslationAtPV          := EdgeUpPV.Q OR EdgeDnPV.Q;
-TranslationAtP2          := EdgeUpP2.Q OR EdgeDnP2.Q;
-TranslationAtP1          := EdgeUpP1.Q OR EdgeDnP1.Q;
-TranslationAtMaintenance := EdgeUpMaintenance.Q OR EdgeDnMaintenance.Q;
+// 🆕 Chaîne thermomètre — voir modèle en déclaration. Arrivée venant de Trémie = front descendant
+// du capteur PRÉCÉDENT ; arrivée venant de Maintenance = front montant du capteur PROPRE.
+TranslationAtTremie      := EdgeUpTremie.Q;
+TranslationAtPV          := EdgeDnTremie.Q OR EdgeUpPV.Q;
+TranslationAtP2          := EdgeDnPV.Q OR EdgeUpP2.Q;
+TranslationAtP1          := EdgeDnP2.Q OR EdgeUpP1.Q;
+TranslationAtMaintenance := EdgeDnMaintenance.Q;
