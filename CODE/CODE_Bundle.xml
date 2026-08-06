@@ -24201,7 +24201,7 @@ BrakeCmd := BrakeReleaseRequest AND ContactorEngaged AND NOT Error AND NOT Resta
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND FwdRevSpeedFeedbackOff AND NOT RestartInhibit, PT := T#500ms);
+RestartDelay(IN := RestartRequired AND FwdRevSpeedFeedbackOff AND NOT RestartInhibit, PT := T#1000ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;
