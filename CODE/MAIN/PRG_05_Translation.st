@@ -277,8 +277,13 @@ instPosEstimatorM3(
     PosP2M               := GVL_PERSISTENT._TranslationPosP2_M,
     PosPVM               := GVL_PERSISTENT._TranslationPosPV_M,
     PosTremieM           := GVL_PERSISTENT._TranslationPosTremie_M,
-    GainMetersPerHzSec   := GVL_PERSISTENT._TranslationGainMetersPerHzSec
+    GainMetersPerHzSec   := GVL_PERSISTENT._TranslationGainMetersPerHzSec,
+    PersistedPositionM   := GVL_PERSISTENT._TranslationPosEstimated_M,
+    PersistedInitialized := GVL_PERSISTENT._TranslationPosEstimatedInitialized
 );
+// 🆕 Recopie continue (reprise après reboot, doctrine _TranslationSetFreq_Hz) — pas de bridge dédié.
+GVL_PERSISTENT._TranslationPosEstimated_M := instPosEstimatorM3.PositionEstimatedM;
+GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initialized;
 
 
 // === 📤 §3 PUBLICATION DEMANDE BRUTE TRANSLATION ===
@@ -312,6 +317,11 @@ TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
 TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
+TranslationStateHMI.AtTremie := PRG_02_Acquisition.TranslationAtTremie;
+TranslationStateHMI.AtPV := PRG_02_Acquisition.TranslationAtPV;
+TranslationStateHMI.AtP2 := PRG_02_Acquisition.TranslationAtP2;
+TranslationStateHMI.AtP1 := PRG_02_Acquisition.TranslationAtP1;
+TranslationStateHMI.AtMaintenance := PRG_02_Acquisition.TranslationAtMaintenance;
 TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;

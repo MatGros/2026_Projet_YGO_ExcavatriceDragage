@@ -96,7 +96,7 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 | `InhibitM1/2` | Inhibition treuil M1/M2 (MAINT_N2 only) |
 | `JoystickWinchSelectArbitrated` | 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2 uniquement) |
 | `HomingApproachEnable` | Dépassement butée haut (N2) |
-| `MaintenanceM3TargetEnable` | Cible Translation Maintenance — N2 **ET** bit IHM dédié `TglMaintenanceZoneAccess` (🆕 2026-08-06, autorisation consciente, MAINT_N2 seul ne suffit plus) |
+| `MaintenanceM3TargetEnable` | Cible Translation Maintenance — (N1 **OU** N2) **ET** bit IHM dédié `TglMaintenanceZoneAccess` (🆕 2026-08-06, autorisation consciente, le mode seul ne suffit jamais) |
 
 Ce bus est consommé par Cycle, Safety, Treuils, Translation, Supervision, Acquisition.
 
