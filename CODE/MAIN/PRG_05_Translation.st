@@ -45,6 +45,15 @@ VAR
     M3_AtP2Stable          : BOOL;
     M3_AtP1Stable          : BOOL;
     M3_AtMaintenanceStable : BOOL;
+
+    // 🆕 2026-08-06 (retour terrain) : anti-rebond COURT (pas mémoire indéfinie) pour l'affichage
+    // IHM AtXxx — le capteur retombe à 0 juste après avoir arrêté la machine dessus (comportement
+    // normal du capteur), sans filtre l'affichage bascule aussitôt sur la zone voisine (faux).
+    TofPosTremie      : TOF;
+    TofPosPV          : TOF;
+    TofPosP2          : TOF;
+    TofPosP1          : TOF;
+    TofPosMaintenance : TOF;
 END_VAR
 
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
@@ -355,16 +364,24 @@ TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
 // 🆕 2026-08-06 (retour terrain) : affichage IHM = calcul INSTANTANÉ (zone courante réelle, sans
-// mémoire) — PAS M3_AtXxxStable (verrou mémoire §0quater, réservé au pilotage interne de
+// mémoire indéfinie) — PAS M3_AtXxxStable (verrou §0quater, réservé au pilotage interne de
 // M3_PositionSensorTarget ci-dessus, qui doit lui rester tenu jusqu'au prochain front). Demande
 // opérateur : "je dois perdre P2 dès que je le quitte, peu importe le sens". Partition exclusive
-// des 6 mots valides en 5 zones à partir des capteurs cumulatifs (TranslationPosXxx) :
-// Trémie=11111, PV=01111, P2=00111, P1=00011, Maintenance=00001 ou 00000.
-TranslationStateHMI.AtTremie := PRG_02_Acquisition.TranslationPosTremie;
-TranslationStateHMI.AtPV := PRG_02_Acquisition.TranslationPosPV AND NOT PRG_02_Acquisition.TranslationPosTremie;
-TranslationStateHMI.AtP2 := PRG_02_Acquisition.TranslationPosP2 AND NOT PRG_02_Acquisition.TranslationPosPV;
-TranslationStateHMI.AtP1 := PRG_02_Acquisition.TranslationPosP1 AND NOT PRG_02_Acquisition.TranslationPosP2;
-TranslationStateHMI.AtMaintenance := NOT PRG_02_Acquisition.TranslationPosP1;
+// des 6 mots valides en 5 zones à partir des capteurs cumulatifs (TranslationPosXxx).
+// 🆕 Anti-rebond COURT (TOF 300ms) sur chaque capteur brut avant le calcul de zone : un capteur
+// point (ex Trémie) retombe à 0 juste après avoir arrêté la machine dessus (normal) — sans ce
+// filtre, l'affichage basculait aussitôt sur la zone voisine alors que la machine n'a pas bougé.
+TofPosTremie(IN := PRG_02_Acquisition.TranslationPosTremie, PT := T#300ms);
+TofPosPV(IN := PRG_02_Acquisition.TranslationPosPV, PT := T#300ms);
+TofPosP2(IN := PRG_02_Acquisition.TranslationPosP2, PT := T#300ms);
+TofPosP1(IN := PRG_02_Acquisition.TranslationPosP1, PT := T#300ms);
+TofPosMaintenance(IN := PRG_02_Acquisition.TranslationPosMaintenance, PT := T#300ms);
+
+TranslationStateHMI.AtTremie := TofPosTremie.Q;
+TranslationStateHMI.AtPV := TofPosPV.Q AND NOT TofPosTremie.Q;
+TranslationStateHMI.AtP2 := TofPosP2.Q AND NOT TofPosPV.Q;
+TranslationStateHMI.AtP1 := TofPosP1.Q AND NOT TofPosP2.Q;
+TranslationStateHMI.AtMaintenance := NOT TofPosP1.Q;
 TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
