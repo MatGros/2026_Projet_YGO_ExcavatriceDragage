@@ -186,9 +186,13 @@ ELSE
     M3_SpeedRef_Active   := 0.0;
 END_IF;
 
-IF GVL_IHM.TranslationM3.Cmd.InvertDirection THEN
-    M3_Direction_Active := M3_Direction_Active * (-1);
-END_IF;
+// 🆕 2026-08-06 (retour terrain, REX câblage) : InvertDirection NE s'applique PLUS ici. Appliqué
+// en amont sur M3_Direction_Active, il désaccordait TOUTE la logique sécurité/ralentissement
+// appariée aux vrais capteurs physiques (LimitSwitchFwd/Rev, SlowdownSensorXxx, verrous §0quater)
+// dès que le câblage moteur réel l'exigeait à TRUE — seule la coupure dure indépendante du sens
+// (§0bis) arrêtait encore la machine, le verrou d'arrivée logiciel ne s'armait jamais. Compensation
+// déplacée dans FB_Translation (InvertDriveDirection), appliquée UNIQUEMENT au mot de commande
+// variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
 
 M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
 
@@ -285,6 +289,7 @@ instTranslationM3(
     StartStop               := M3_StartStop_Active,
     SafeStop                := M3_SafeStop_Aggregate,
     Direction               := M3_Direction_Active,
+    InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,

@@ -20333,6 +20333,21 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</html:xhtml>
                 <html:xhtml>Retour physique direct : TRUE = frein OUVERT (desserré)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="InvertDriveDirection">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 (retour terrain, REX câblage) : compense le câblage moteur (U/V inversés) —
+UNIQUEMENT sur le mot de commande variateur en sortie (§5bis). Direction/CommandedDirection
+reste partout ailleurs le sens SÉMANTIQUE réel (+1 = physiquement vers Trémie), pour rester
+apparié aux vrais capteurs (LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.
+⚠️ AVANT ce correctif, l'inversion était appliquée en amont (PRG_05, sur M3_Direction_Active
+lui-même) : avec le câblage réel de la machine, ça désaccordait TOUTE la logique sécurité/
+ralentissement appariée aux capteurs physiques (seule la coupure dure indépendante du sens,
+§0bis PRG_05, arrêtait encore la machine — le verrou d'arrivée logiciel ne s'armait jamais).</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgRampAccelRate">
               <type>
                 <REAL />
@@ -20624,6 +20639,14 @@ Filtrage capteur de position cible</html:xhtml>
                 <html:xhtml>🆕 2026-08-05 : force la rampe à 0 pendant une inversion de sens en attente</html:xhtml>
               </documentation>
             </variable>
+            <variable name="PhysicalDriveDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="RampTargetPct">
               <type>
                 <REAL />
@@ -20828,6 +20851,10 @@ MovementRequested := (CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current)
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
 RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
 
+// 🆕 2026-08-06 : compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
+// CommandedDirection (sécurité/capteurs juste au-dessus, §4/§4bis/§4ter) reste le sens réel.
+PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, CommandedDirection * (-1));
+
 // Pilotage nominal Given Command 1 (0x3101) :
 // 0: None, 1: Forward, 2: Reverse, 7: Reset
 IF Reset THEN
@@ -20835,9 +20862,9 @@ IF Reset THEN
 ELSIF Error THEN
     RequestedDriveControlWord := 0; // Arrêt sur défaut
 ELSIF MovementRequested THEN
-    IF CommandedDirection = 1 THEN
+    IF PhysicalDriveDirection = 1 THEN
         RequestedDriveControlWord := 1; // Marche avant
-    ELSIF CommandedDirection = -1 THEN
+    ELSIF PhysicalDriveDirection = -1 THEN
         RequestedDriveControlWord := 2; // Marche arrière
     ELSE
         RequestedDriveControlWord := 0;
@@ -27012,9 +27039,13 @@ ELSE
     M3_SpeedRef_Active   := 0.0;
 END_IF;
 
-IF GVL_IHM.TranslationM3.Cmd.InvertDirection THEN
-    M3_Direction_Active := M3_Direction_Active * (-1);
-END_IF;
+// 🆕 2026-08-06 (retour terrain, REX câblage) : InvertDirection NE s'applique PLUS ici. Appliqué
+// en amont sur M3_Direction_Active, il désaccordait TOUTE la logique sécurité/ralentissement
+// appariée aux vrais capteurs physiques (LimitSwitchFwd/Rev, SlowdownSensorXxx, verrous §0quater)
+// dès que le câblage moteur réel l'exigeait à TRUE — seule la coupure dure indépendante du sens
+// (§0bis) arrêtait encore la machine, le verrou d'arrivée logiciel ne s'armait jamais. Compensation
+// déplacée dans FB_Translation (InvertDriveDirection), appliquée UNIQUEMENT au mot de commande
+// variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
 
 M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
 
@@ -27111,6 +27142,7 @@ instTranslationM3(
     StartStop               := M3_StartStop_Active,
     SafeStop                := M3_SafeStop_Aggregate,
     Direction               := M3_Direction_Active,
+    InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
