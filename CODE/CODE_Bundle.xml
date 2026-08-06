@@ -20807,6 +20807,10 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
         RampTargetPct := 0.0;
     ELSE
         RampTargetPct := ABS(SpeedRefPct);
+        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedRefPct &gt; 0.0), la consigne est au moins égale à 1.0 Hz
+        IF RampTargetPct &gt; 0.0 THEN
+            RampTargetPct := MAX(RampTargetPct, (1.0 / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+        END_IF;
     END_IF;
 END_IF;
 
@@ -20883,7 +20887,11 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
-MovementRequested := (CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1);
+// 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
+// OU que la fréquence réelle mesurée du variateur M3 est &gt;= 1.0 Hz.
+// Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
+MovementRequested := ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1))
+                     OR (ABS(DriveActualFreqHz) &gt;= 1.0);
 
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
 RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
@@ -26295,16 +26303,21 @@ ELSE
     ELSE
         IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
             M1_Direction_Active := 1;
+            M1_SpeedRef_Active  := 100.0;
         ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
             M1_Direction_Active := -1;
+            M1_SpeedRef_Active  := 100.0;
+        ELSIF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
+            M1_Direction_Active := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+            M1_SpeedRef_Active  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
         ELSE
             M1_Direction_Active := 0;
+            M1_SpeedRef_Active  := 0.0;
         END_IF;
         M1_StartStop_Active := (M1_Direction_Active &lt;&gt; 0) AND NOT instBucket.Busy
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
                                 AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
-        M1_SpeedRef_Active  := 100.0;
     END_IF;
 END_IF;
 
@@ -26325,16 +26338,21 @@ ELSE
         ELSE
             IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
                 M2_Direction_Active := 1;
+                M2_SpeedRef_Active  := 100.0;
             ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
                 M2_Direction_Active := -1;
+                M2_SpeedRef_Active  := 100.0;
+            ELSIF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
+                M2_Direction_Active := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+                M2_SpeedRef_Active  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
             ELSE
                 M2_Direction_Active := 0;
+                M2_SpeedRef_Active  := 0.0;
             END_IF;
             M2_StartStop_Active := (M2_Direction_Active &lt;&gt; 0)
                                     AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                          OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)))
                                     AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
-            M2_SpeedRef_Active := 100.0;
         END_IF;
     END_IF;
 END_IF;
@@ -26414,8 +26432,8 @@ BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
 SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.InputModuleFault;
 SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.InputModuleFault;
 
-ForbidDescentM1_Raw := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-ForbidDescentM2_Raw := GVL_IHM.M2TreuilBenne.Bypass.Global;
+ForbidDescentM1_Raw := FALSE;
+ForbidDescentM2_Raw := FALSE;
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketCfgPersist.Config.OffsetCloseM);
 
