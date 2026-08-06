@@ -246,7 +246,7 @@ ELSE
     M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
-                            AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
+                            AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
 END_IF;
 
 IF instBucket.Busy THEN
@@ -285,7 +285,7 @@ ELSE
         M2_StartStop_Active := (M2_Direction_Active <> 0)
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)))
-                                AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
+                                AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
     END_IF;
 END_IF;
 
