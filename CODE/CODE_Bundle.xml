@@ -28874,6 +28874,12 @@ IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
     GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
+// 🆕 2026-08-06 (retour terrain, mise en service) : jusqu'ici _TranslationSetFreq_Hz
+// n'était JAMAIS réécrit après sa déclaration — la restauration au boot rejouait donc
+// toujours la valeur par défaut compilée (0.0), jamais le dernier réglage opérateur.
+// Recopie continue (après restauration) : toute consigne changée en session survit au
+// prochain boot/reset chaud, pas seulement le défaut d'usine.
+_TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
 
 instAckConfigRestored(CLK := GVL_IHM.Commun.BtnAckConfigRestored);
 IF instAckConfigRestored.Q THEN
