@@ -209,29 +209,33 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     M1_StartStop_Active := FALSE;
     M1_SpeedRef_Active  := 0.0;
 ELSE
-    IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-        M1_Direction_Active := 0;
-        M1_StartStop_Active := FALSE;
-        M1_SpeedRef_Active  := 0.0;
-    ELSE
+    IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
+        // Mode Boutons IHM
         IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
             M1_Direction_Active := 1;
             M1_SpeedRef_Active  := 100.0;
         ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
             M1_Direction_Active := -1;
             M1_SpeedRef_Active  := 100.0;
-        ELSIF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
+        ELSE
+            M1_Direction_Active := 0;
+            M1_SpeedRef_Active  := 0.0;
+        END_IF;
+    ELSE
+        // Mode Joystick Maître
+        IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
             M1_Direction_Active := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
             M1_SpeedRef_Active  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
         ELSE
             M1_Direction_Active := 0;
             M1_SpeedRef_Active  := 0.0;
         END_IF;
-        M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
-                                AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
-                                     OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
-                                AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
     END_IF;
+
+    M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
+                            AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
+                                 OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
+                            AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
 END_IF;
 
 IF instBucket.Busy THEN
@@ -244,29 +248,33 @@ ELSE
         M2_StartStop_Active := FALSE;
         M2_SpeedRef_Active  := 0.0;
     ELSE
-        IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-            M2_Direction_Active := 0;
-            M2_StartStop_Active := FALSE;
-            M2_SpeedRef_Active := 0.0;
-        ELSE
+        IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
+            // Mode Boutons IHM
             IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
                 M2_Direction_Active := 1;
                 M2_SpeedRef_Active  := 100.0;
             ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
                 M2_Direction_Active := -1;
                 M2_SpeedRef_Active  := 100.0;
-            ELSIF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
+            ELSE
+                M2_Direction_Active := 0;
+                M2_SpeedRef_Active  := 0.0;
+            END_IF;
+        ELSE
+            // Mode Joystick Maître
+            IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
                 M2_Direction_Active := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
                 M2_SpeedRef_Active  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
             ELSE
                 M2_Direction_Active := 0;
                 M2_SpeedRef_Active  := 0.0;
             END_IF;
-            M2_StartStop_Active := (M2_Direction_Active <> 0)
-                                    AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
-                                         OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)))
-                                    AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
         END_IF;
+
+        M2_StartStop_Active := (M2_Direction_Active <> 0)
+                                AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
+                                     OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)))
+                                AND PRG_02_Acquisition.JoystickDeadmanArmed;   // 🆕 2026-08-05 : audit sécurité M3
     END_IF;
 END_IF;
 
