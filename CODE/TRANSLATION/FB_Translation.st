@@ -42,6 +42,15 @@ VAR_INPUT
     BypassContactorCheck         : BOOL;       // 🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)
     BypassLimitSwitch            : BOOL;       // 🚧 TRUE = ignore les fins de course extrêmes
     BrakeFeedback                : BOOL;       // Retour physique direct : TRUE = frein OUVERT (desserré)
+    // 🆕 2026-08-06 (retour terrain, REX câblage) : compense le câblage moteur (U/V inversés) —
+    // UNIQUEMENT sur le mot de commande variateur en sortie (§5bis). Direction/CommandedDirection
+    // reste partout ailleurs le sens SÉMANTIQUE réel (+1 = physiquement vers Trémie), pour rester
+    // apparié aux vrais capteurs (LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.
+    // ⚠️ AVANT ce correctif, l'inversion était appliquée en amont (PRG_05, sur M3_Direction_Active
+    // lui-même) : avec le câblage réel de la machine, ça désaccordait TOUTE la logique sécurité/
+    // ralentissement appariée aux capteurs physiques (seule la coupure dure indépendante du sens,
+    // §0bis PRG_05, arrêtait encore la machine — le verrou d'arrivée logiciel ne s'armait jamais).
+    InvertDriveDirection          : BOOL;
 
     // Réglages rampe (RETAIN)
     CfgRampAccelRate                : REAL := 20.0;    // %/s — accélération
@@ -86,6 +95,7 @@ VAR
     DirectionChangeDelay : TON;            // Interlock changement de sens
     CommandedDirection   : INT;            // Sens réellement appliqué
     DirectionChangePending : BOOL;         // 🆕 2026-08-05 : force la rampe à 0 pendant une inversion de sens en attente
+    PhysicalDriveDirection : INT;          // 🆕 2026-08-06 : CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur
     RampTargetPct        : REAL;
     CaptorDebounceTon     : TON;
     ArrivalEdge            : R_TRIG;
@@ -233,6 +243,10 @@ MovementRequested := (CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
 RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
 
+// 🆕 2026-08-06 : compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
+// CommandedDirection (sécurité/capteurs juste au-dessus, §4/§4bis/§4ter) reste le sens réel.
+PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, CommandedDirection * (-1));
+
 // Pilotage nominal Given Command 1 (0x3101) :
 // 0: None, 1: Forward, 2: Reverse, 7: Reset
 IF Reset THEN
@@ -240,9 +254,9 @@ IF Reset THEN
 ELSIF Error THEN
     RequestedDriveControlWord := 0; // Arrêt sur défaut
 ELSIF MovementRequested THEN
-    IF CommandedDirection = 1 THEN
+    IF PhysicalDriveDirection = 1 THEN
         RequestedDriveControlWord := 1; // Marche avant
-    ELSIF CommandedDirection = -1 THEN
+    ELSIF PhysicalDriveDirection = -1 THEN
         RequestedDriveControlWord := 2; // Marche arrière
     ELSE
         RequestedDriveControlWord := 0;
