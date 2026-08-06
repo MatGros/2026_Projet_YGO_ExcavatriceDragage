@@ -159,8 +159,12 @@ M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 M2BrakeCmd        := instWinchOutputInterlockM2.BrakeCmd;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
+// 🛡️ 2026-08-06 (demande maintenance) : déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
+// M3InterlockEnable s'appuie désormais directement sur la sécurité dynamique de M3 (PowerCutOff / Error)
+// publiée sur PRG_05_Translation.TranslationSafetyHMI, rendant les motifs de coupure lisibles en direct.
 M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
-                      AND NOT SafetyStructureNotValidated;
+                      AND NOT PRG_05_Translation.TranslationSafetyHMI.PowerCutOff
+                      AND NOT PRG_05_Translation.TranslationSafetyHMI.Error;
 
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,

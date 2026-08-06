@@ -105,6 +105,20 @@
 
 ---
 
+### MES-019 — ⚙️ Paramétrage variateur AC600 M3 (moteur + décélération)
+- 📅 **Date** : 2026-08-05 | 📍 **Lieu** : Terrain | 🏷️ **Version** : `v0.4.27_ConfigPersistence_TranslationSupervisionSuite`
+- 🎯 **Périmètre** : Variateur AC600 M3 — paramétrage moteur & rampes
+- 🚦 **Statut** : 🟡 **Paramètres posés — à compléter/vérifier en essai**
+- 🔍 **Paramètres** :
+  - **F10.54** + **F2.xx** → **paramétrage moteur** *(valeurs exactes à préciser)*
+  - **F01.22/23 rampes variateur** (valeurs finales) : **Accel = 1,5 s** · **Decel = 2 s**
+  - **Rampes PLC** (`FB_Translation` %/s) : **Accel = 40 %/s** · **Decel = 50 %/s**
+- 🛠️ **Cohérence** : rampe variateur + rampe logicielle PLC en **série** → c'est la plus lente qui domine. Vérifier l'effet réel à l'essai (allure/arrêt).
+- ⚠️ **Repo `v0.5.9`** : les défauts `GVL_PERSISTENT.st:89-91` sont **accel 20 / decel 40** — tes valeurs terrain (40/50) ne sont pas encore dans le repo. Confirmer si elles doivent y être portées.
+- 📌 **Action** : Compléter les valeurs `F2.xx`/`F10.54` (U/f, courant, vitesse nominale…).
+
+---
+
 ## 3. 📄 Modèle à Dupliquer
 
 ```md
