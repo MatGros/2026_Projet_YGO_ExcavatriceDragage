@@ -158,7 +158,6 @@ ELSE
     // FB_Translation §4bis) : même vitesse réutilisée (ApproachSpeedP1Hz), pas de 4e vitesse créée.
     IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
         M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie
-                                    OR PRG_02_Acquisition.TranslationAtP1
                                     OR PRG_02_Acquisition.TranslationAtMaintenance;
     ELSE
         M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie
