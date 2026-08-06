@@ -2,10 +2,11 @@
    ↔️ FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
    ───────────────────────────────────────────────────────────────
     📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.1.md §3
-   🧩 Brique réduite (Partie3 §1bis) : pure logique combinatoire, pas de
+   🧩 Brique technique (AF_Partie-03 §2) : contrat minimal, pas de
       StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
-      Maintenance) en mot de progression, dérive les 2 limites extrêmes et
-      détecte toute combinaison incohérente (défense en profondeur M3).
+      Maintenance) en mot de progression, dérive les 2 limites extrêmes,
+      détecte toute combinaison incohérente (défense en profondeur M3) et
+      les fronts individuels par capteur (arrivée/cible, robuste décalage came).
    🎯 Mot valide : progression monotone de 11111 (extrême Trémie) à 00000
       (extrême Maintenance) : 11111→01111→00111→00011→00001→00000.
       Tout autre mot = incohérence câblage/mécanique (capteur collé/HS).
@@ -35,14 +36,34 @@ VAR_OUTPUT
     TranslationPosP1          : BOOL;   // TRUE = capteur P1 actif
     TranslationPosMaintenance : BOOL;   // TRUE = capteur Maintenance actif
 
-    // 🆕 2026-08-06 : mot EXACT (pas cumulatif) — dédié détection d'arrivée/cible (front franc
-    // à l'arrivée, peu importe le sens de venue) et coupure dure. Ne PAS utiliser pour le
-    // ralentissement (zone trop étroite, ne tiendrait pas la durée de l'approche).
-    TranslationAtTremie      : BOOL;   // TRUE uniquement si SensorsWord = 11111
-    TranslationAtPV          : BOOL;   // TRUE uniquement si SensorsWord = 01111
-    TranslationAtP2          : BOOL;   // TRUE uniquement si SensorsWord = 00111
-    TranslationAtP1          : BOOL;   // TRUE si SensorsWord = 00011 ou 00001 (zone P1 avec tolérance décalage came)
-    TranslationAtMaintenance : BOOL;   // TRUE uniquement si SensorsWord = 00000
+    // 🆕 2026-08-06 (REX décalage came) : mot EXACT (5 bits combinés) ABANDONNÉ pour la détection
+    // d'arrivée/cible — un capteur individuel décalé de quelques mm suffisait à sauter le mot
+    // cible (ex: 00011 jamais atteint, saut direct à 00001, déjà DANS la zone interdite suivante,
+    // laissant la translation continuer au-delà du point d'arrêt réel avant toute coupure).
+    // Détection par FRONT (montant OU descendant) du capteur PROPRE à chaque position : ne dépend
+    // plus des 4 autres capteurs, robuste au décalage mécanique. ⚠️ Signal TRANSITOIRE (1 cycle) —
+    // distingue "être ENTRE 2 capteurs" (zone, niveau, TranslationPosXxx cumulatif ci-dessus) de
+    // "être À la position d'UN capteur" (point, front, ci-dessous). L'appelant (PRG_05_Translation
+    // §0quater) le mémorise en verrou bistable (doctrine M3_LimitSwitchFwd/RevStable §0ter) pour
+    // tenir le niveau nécessaire au débounce/verrou anti-rebond de FB_Translation.
+    TranslationAtTremie      : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorTremie
+    TranslationAtPV          : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorPV
+    TranslationAtP2          : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorP2
+    TranslationAtP1          : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorP1
+    TranslationAtMaintenance : BOOL;   // TRUE 1 cycle sur front (montant ou descendant) de SensorMaintenance
+END_VAR
+
+VAR
+    EdgeUpTremie      : R_TRIG;
+    EdgeDnTremie      : F_TRIG;
+    EdgeUpPV          : R_TRIG;
+    EdgeDnPV          : F_TRIG;
+    EdgeUpP2          : R_TRIG;
+    EdgeDnP2          : F_TRIG;
+    EdgeUpP1          : R_TRIG;
+    EdgeDnP1          : F_TRIG;
+    EdgeUpMaintenance : R_TRIG;
+    EdgeDnMaintenance : F_TRIG;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -75,10 +96,16 @@ TranslationPosP2          := SensorP2;
 TranslationPosP1          := SensorP1;
 TranslationPosMaintenance := SensorMaintenance;
 
-// 🆕 2026-08-06 (retour terrain, décodage réel des positions machine) : mot EXACT, réservé
-// détection d'arrivée/cible et coupure dure — voir avertissement en déclaration.
-TranslationAtTremie      := (SensorsWord = 2#11111);
-TranslationAtPV          := (SensorsWord = 2#01111);
-TranslationAtP2          := (SensorsWord = 2#00111);
-TranslationAtP1          := (SensorsWord = 2#00011) OR (SensorsWord = 2#00001);
-TranslationAtMaintenance := (SensorsWord = 2#00000);
+// 🆕 2026-08-06 (REX décalage came) : front individuel par capteur — voir avertissement en
+// déclaration. Transitoire (1 cycle), mémorisé par l'appelant.
+EdgeUpTremie(CLK := SensorTremie);           EdgeDnTremie(CLK := SensorTremie);
+EdgeUpPV(CLK := SensorPV);                   EdgeDnPV(CLK := SensorPV);
+EdgeUpP2(CLK := SensorP2);                   EdgeDnP2(CLK := SensorP2);
+EdgeUpP1(CLK := SensorP1);                   EdgeDnP1(CLK := SensorP1);
+EdgeUpMaintenance(CLK := SensorMaintenance); EdgeDnMaintenance(CLK := SensorMaintenance);
+
+TranslationAtTremie      := EdgeUpTremie.Q OR EdgeDnTremie.Q;
+TranslationAtPV          := EdgeUpPV.Q OR EdgeDnPV.Q;
+TranslationAtP2          := EdgeUpP2.Q OR EdgeDnP2.Q;
+TranslationAtP1          := EdgeUpP1.Q OR EdgeDnP1.Q;
+TranslationAtMaintenance := EdgeUpMaintenance.Q OR EdgeDnMaintenance.Q;
