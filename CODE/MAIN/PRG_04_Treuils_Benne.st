@@ -198,8 +198,17 @@ SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) <> 16#0000;
 SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM > 0.0);
 SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM < 0.0);
 
-EffectiveMaxStepAscent   := _CommunCfgPersist.WinchMaxStepAscent;
-EffectiveMaxStepDescente := _CommunCfgPersist.WinchMaxStepDescente;
+IF _CommunCfgPersist.WinchMaxStepAscent <= 0 THEN
+    EffectiveMaxStepAscent := 5;
+ELSE
+    EffectiveMaxStepAscent := _CommunCfgPersist.WinchMaxStepAscent;
+END_IF;
+
+IF _CommunCfgPersist.WinchMaxStepDescente <= 0 THEN
+    EffectiveMaxStepDescente := 3;
+ELSE
+    EffectiveMaxStepDescente := _CommunCfgPersist.WinchMaxStepDescente;
+END_IF;
 
 
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
