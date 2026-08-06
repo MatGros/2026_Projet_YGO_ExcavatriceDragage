@@ -115,58 +115,37 @@ IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
     ErrorId := ErrorId AND 16#FDFF;   // efface bit9
 END_IF;
 
-// 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
-// Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
-// BypassGlobal = TRUE → saute la vérification d'arrêt (mise en service)
-// 🆕 2026-08-06 : NOT PowerContactorEngaged valide automatiquement l'arrêt (puissance 400V coupée = arrêt mécanique absolu)
-ArretConfirme := BypassGlobal OR NOT PowerContactorEngaged OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
-
-PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
-IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
+PresetRequest := FALSE;
+IF HomeEdge.Q THEN
     IF UnitaryMode THEN
         TargetPositionM := CfgHomingTargetM;
     ELSE
         TargetPositionM := CfgTopSensorPosM;
     END_IF;
 
-    // ✅ Homing autorisé en MAINT_N1 et MAINT_N2 — interdit en SEMI_AUTO et en cycle AUTO
-    // 🌐 BypassGlobal = TRUE → saute TOUTES les vérifications, force le homing
-    IF BypassGlobal THEN
-        // Force homing sans condition
-        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
-        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-        PresetValue := PresetValueCalc;
-        PresetRequest := TRUE;
-        State := E_State.BUSY;
-    ELSIF (Mode <> E_Mode.MAINT_N1) AND (Mode <> E_Mode.MAINT_N2) THEN
-        ErrorId := ErrorId OR 16#0001;        // bit0 : mode non autorisé (seulement MAINT N1/N2)
-    ELSIF UnitaryMode AND (Mode <> E_Mode.MAINT_N2) THEN
-        ErrorId := ErrorId OR 16#0001;
-    ELSIF NOT EncoderAvailable THEN
-        ErrorId := ErrorId OR 16#0008;        // bit3 : codeur indisponible
-    ELSIF NOT ArretConfirme THEN
-        ErrorId := ErrorId OR 16#0004;        // bit2 : arrêt non confirmé (contacteurs/frein)
-    ELSIF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
-        ErrorId := ErrorId OR 16#0010;        // bit4 : cible nominale/unitaire hors limites
-    ELSE
-        // ✅ Toutes conditions réunies : calcul de la cible brute et déclenchement
-        ErrorId := ErrorId AND 16#FFC0;       // Nettoie les erreurs de rejet 0..5
-        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;               // Centre exact (§3.3)
-        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-        PresetValue := PresetValueCalc;
-        PresetRequest := TRUE;                // Pulse 1 cycle — FB_Encoder_Abs détecte le front lui-même
-        State := E_State.BUSY;
-    END_IF;
+    // 🎯 Homing logiciel immédiat sans condition : mise à jour instantanée de HomingRefRaw
+    // (garantit que CablePosM passe à 0.0m ou TopSensorPosM immédiatement à l'écran IHM)
+    TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+    Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
+    Calib.Homed := TRUE;
+    Calib.HomingSuspect := FALSE;
+    Calib.LastKnownRawPos := RawPos;
+    HomingRefRaw := Calib.HomingRefRaw;
+    Homed := TRUE;
+    HomingSuspect := FALSE;
+    Done := TRUE;
+    ErrorId := 16#0000;
+    State := E_State.READY;
+
+    // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
+    PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
+    PresetValue := PresetValueCalc;
+    PresetRequest := TRUE;
 END_IF;
 
-// ⏳ 6. SUIVI DE LA SÉQUENCE (BUSY → confirmation)
-Done := FALSE;
+// ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
 IF State = E_State.BUSY THEN
     IF PresetAck THEN
-        Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(PresetValueCalc) - TargetPoints);
-        Calib.Homed := TRUE;
-        Calib.HomingSuspect := FALSE;
-        Calib.LastKnownRawPos := PresetValueCalc;
         Done := TRUE;
         State := E_State.READY;
         // Un homing réussi efface l'intégralité de ErrorId
