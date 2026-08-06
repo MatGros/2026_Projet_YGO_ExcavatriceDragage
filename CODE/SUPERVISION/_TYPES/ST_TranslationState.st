@@ -47,5 +47,6 @@ STRUCT
     DriveThermalOk          : BOOL;    (* 🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même *)
     MaintenanceTargetEnable : BOOL;    (* 🔓 TRUE = Autorise le déplacement vers la cible 4 (Maintenance) ; actif uniquement en mode MAINT_N2 *)
     SimulationModeActive    : BOOL;
+    HeightInterlockBlocking : BOOL;    (* 🆕 2026-08-06 : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise *)
 END_STRUCT
 END_TYPE

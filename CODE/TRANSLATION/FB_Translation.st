@@ -27,7 +27,11 @@ VAR_INPUT
     Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)
     SpeedRefPct                 : REAL;        // Magnitude de la consigne (de 0 à 100%)
     PositionSensorTarget        : BOOL;        // Capteur position cible courante
-    SlowdownSensor              : BOOL;        // 🆕 REX 2026-07-18 : capteur PV — ralentissement avant Trémie (remplace ApproachTime)
+    // 🆕 2026-08-06 : 3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
+    // (même principe que PV→Trémie, généralisé — voir §4bis dans le corps ST)
+    SlowdownSensorTremie         : BOOL;        // Capteur PV — ralentissement avant Trémie (Direction=1)
+    SlowdownSensorMaintenance    : BOOL;        // Capteur P1 — ralentissement avant Maintenance (Direction=-1)
+    SlowdownSensorP1             : BOOL;        // Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)
     LimitSwitchFwd              : BOOL;        // Fin de course extrême avant
     LimitSwitchRev              : BOOL;        // Fin de course extrême arrière
 
@@ -46,7 +50,9 @@ VAR_INPUT
     DirectionInterlockDelay      : TIME := T#200ms; // Délai avant d'autoriser un changement de sens à l'arrêt
 
     // Réglages ETHERCAT uniquement (RETAIN)
-    ApproachSpeedHz              : REAL := 10.0;    // Vitesse réduite d'approche en Hz (piloté par SlowdownSensor/PV)
+    ApproachSpeedTremieHz        : REAL := 10.0;    // Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)
+    ApproachSpeedMaintenanceHz   : REAL := 10.0;    // Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)
+    ApproachSpeedP1Hz            : REAL := 10.0;    // Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)
     DriveFreqScaleMaxHz          : REAL := 60.0;    // Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)
 
     // Réglages communs
@@ -149,21 +155,31 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     END_IF;
 END_IF;
 
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur PV, remplace le timer)
+// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur, remplace le timer)
 // 🔧 REX 2026-07-18 : ApproachTime (timer générique, toute direction confondue) remplacé par un
-// capteur dédié (SlowdownSensor = PV) qui ne déclenche le ralentissement QU'à l'approche de
-// Trémie (Direction=1) — décision client (AF_Partie-02 v2.12 §3bis) : PV n'assure le
-// ralentissement qu'avant Trémie, jamais dans le sens Maintenance.
-IF (Direction = 1) AND SlowdownSensor THEN
-    // 🔌 Ralentissement PV exprimé directement en Hz (converti en % de l'échelle max Hz)
-    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedHz / SEL(DriveFreqScaleMaxHz > 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+// capteur dédié qui ne déclenche le ralentissement QU'à l'approche de sa cible, jamais l'inverse.
+// 🆕 2026-08-06 : généralisé à 3 paires capteur/cible indépendantes — chaque capteur "un cran
+// avant" la cible finale déclenche SA propre vitesse réduite, dans SON sens de marche uniquement :
+//   PV       + Direction=1  → approche Trémie
+//   P1       + Direction=-1 → approche Maintenance
+//   P2       + Direction=-1 → approche P1 (arrêt propre pour travail)
+IF (Direction = 1) AND SlowdownSensorTremie THEN
+    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedTremieHz / SEL(DriveFreqScaleMaxHz > 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+END_IF;
+IF (Direction = -1) AND SlowdownSensorMaintenance THEN
+    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedMaintenanceHz / SEL(DriveFreqScaleMaxHz > 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+END_IF;
+IF (Direction = -1) AND SlowdownSensorP1 THEN
+    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedP1Hz / SEL(DriveFreqScaleMaxHz > 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
 END_IF;
 
-// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie & Maintenance)
-// Dès qu'on touche le capteur d'extrémité (TargetReached), le sens d'arrivée (DirectionAtArrival)
-// est MÉMORISÉ et BLOQUÉ. Même si la benne oscille/clignote et perd temporairement le capteur,
-// l'automate refuse de ré-avancer tant que l'opérateur n'a pas relâché le manche au neutre (Direction = 0)
-// ou demandé le sens inverse (dégagement).
+// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1 & Maintenance)
+// 🆕 2026-08-06 (retour terrain) : élargi à P1 (arrêt travail), pas seulement les 2 extrémités.
+// Dès qu'on touche un capteur d'arrêt (TargetReached), le sens d'arrivée (DirectionAtArrival)
+// est MÉMORISÉ et BLOQUÉ. Même si le capteur rebondit/clignote quelques ms et qu'on le perd
+// temporairement alors que le joystick reste enclenché, l'automate refuse de ré-avancer dans le
+// MÊME sens tant que l'opérateur n'a pas relâché le manche au neutre (Direction = 0) ou demandé
+// le sens inverse (dégagement) — évite l'à-coup avant/re-stop sur rebond capteur.
 ArrivalEdge(CLK := TargetReached);
 IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;

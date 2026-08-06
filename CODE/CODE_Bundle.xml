@@ -1201,6 +1201,14 @@
                 <html:xhtml>🧭 Bypass incohérence mot capteurs de position</html:xhtml>
               </documentation>
             </variable>
+            <variable name="MinHeight">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : Bypass interlock hauteur mini M1/M2 requise pour translation</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="MecaA">
               <type>
                 <BOOL />
@@ -6947,6 +6955,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
               <type>
                 <BOOL />
               </type>
+            </variable>
+            <variable name="HeightInterlockBlocking">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</html:xhtml>
+              </documentation>
             </variable>
           </struct>
         </baseType>
@@ -20068,12 +20084,30 @@ END_CASE;
                 <html:xhtml>Capteur position cible courante</html:xhtml>
               </documentation>
             </variable>
-            <variable name="SlowdownSensor">
+            <variable name="SlowdownSensorTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>🆕 REX 2026-07-18 : capteur PV — ralentissement avant Trémie (remplace ApproachTime)</html:xhtml>
+                <html:xhtml>🆕 2026-08-06 : 3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
+(même principe que PV→Trémie, généralisé — voir §4bis dans le corps ST)
+Capteur PV — ralentissement avant Trémie (Direction=1)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownSensorMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Capteur P1 — ralentissement avant Maintenance (Direction=-1)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownSensorP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)</html:xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchFwd">
@@ -20178,7 +20212,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</html:xhtml>
                 <html:xhtml>Délai avant d'autoriser un changement de sens à l'arrêt</html:xhtml>
               </documentation>
             </variable>
-            <variable name="ApproachSpeedHz">
+            <variable name="ApproachSpeedTremieHz">
               <type>
                 <REAL />
               </type>
@@ -20187,7 +20221,29 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</html:xhtml>
               </initialValue>
               <documentation>
                 <html:xhtml>Réglages ETHERCAT uniquement (RETAIN)
-Vitesse réduite d'approche en Hz (piloté par SlowdownSensor/PV)</html:xhtml>
+Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="ApproachSpeedMaintenanceHz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="ApproachSpeedP1Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)</html:xhtml>
               </documentation>
             </variable>
             <variable name="DriveFreqScaleMaxHz">
@@ -20528,21 +20584,31 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     END_IF;
 END_IF;
 
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur PV, remplace le timer)
+// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur, remplace le timer)
 // 🔧 REX 2026-07-18 : ApproachTime (timer générique, toute direction confondue) remplacé par un
-// capteur dédié (SlowdownSensor = PV) qui ne déclenche le ralentissement QU'à l'approche de
-// Trémie (Direction=1) — décision client (AF_Partie-02 v2.12 §3bis) : PV n'assure le
-// ralentissement qu'avant Trémie, jamais dans le sens Maintenance.
-IF (Direction = 1) AND SlowdownSensor THEN
-    // 🔌 Ralentissement PV exprimé directement en Hz (converti en % de l'échelle max Hz)
-    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedHz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+// capteur dédié qui ne déclenche le ralentissement QU'à l'approche de sa cible, jamais l'inverse.
+// 🆕 2026-08-06 : généralisé à 3 paires capteur/cible indépendantes — chaque capteur "un cran
+// avant" la cible finale déclenche SA propre vitesse réduite, dans SON sens de marche uniquement :
+//   PV       + Direction=1  → approche Trémie
+//   P1       + Direction=-1 → approche Maintenance
+//   P2       + Direction=-1 → approche P1 (arrêt propre pour travail)
+IF (Direction = 1) AND SlowdownSensorTremie THEN
+    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedTremieHz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+END_IF;
+IF (Direction = -1) AND SlowdownSensorMaintenance THEN
+    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedMaintenanceHz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+END_IF;
+IF (Direction = -1) AND SlowdownSensorP1 THEN
+    RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedP1Hz / SEL(DriveFreqScaleMaxHz &gt; 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
 END_IF;
 
-// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie &amp; Maintenance)
-// Dès qu'on touche le capteur d'extrémité (TargetReached), le sens d'arrivée (DirectionAtArrival)
-// est MÉMORISÉ et BLOQUÉ. Même si la benne oscille/clignote et perd temporairement le capteur,
-// l'automate refuse de ré-avancer tant que l'opérateur n'a pas relâché le manche au neutre (Direction = 0)
-// ou demandé le sens inverse (dégagement).
+// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1 &amp; Maintenance)
+// 🆕 2026-08-06 (retour terrain) : élargi à P1 (arrêt travail), pas seulement les 2 extrémités.
+// Dès qu'on touche un capteur d'arrêt (TargetReached), le sens d'arrivée (DirectionAtArrival)
+// est MÉMORISÉ et BLOQUÉ. Même si le capteur rebondit/clignote quelques ms et qu'on le perd
+// temporairement alors que le joystick reste enclenché, l'automate refuse de ré-avancer dans le
+// MÊME sens tant que l'opérateur n'a pas relâché le manche au neutre (Direction = 0) ou demandé
+// le sens inverse (dégagement) — évite l'à-coup avant/re-stop sur rebond capteur.
 ArrivalEdge(CLK := TargetReached);
 IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
@@ -26325,6 +26391,14 @@ BucketStateHMI.OpenActive := instBucket.OpenReq;
                 <html:xhtml>🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="M3_HeightInterlockOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)</html:xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <html:xhtml>═══════════════════════════════════════════════════════════════
@@ -26341,6 +26415,22 @@ BucketStateHMI.OpenActive := instBucket.OpenReq;
         <body>
           <ST>
             <html:xhtml>
+
+// === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
+// PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 &lt; 05) : lecture
+// du même scan, aucun retard. Bypass = maintenance consciente, doctrine ST_BypassTranslation.
+// ⚠️ Revue 2026-08-06 : une position encodeur incohérente (hors plage OU homing suspect,
+// FB_Encoder_Safety) ne doit PAS pouvoir se lire comme "≥ seuil" par accident — fail-safe :
+// hauteur non confirmée = interlock actif (comme une hauteur insuffisante), sauf bypass.
+// 🔒 Décision 2026-08-06 : Bypass.Global NE lève PLUS cet interlock (contrairement aux autres
+// causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
+// générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
+M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
+                        OR (NOT PRG_02_Acquisition.M1_EncoderIncoherent
+                            AND NOT PRG_02_Acquisition.M2_EncoderIncoherent
+                            AND (PRG_02_Acquisition.CablePosM1 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
+                            AND (PRG_02_Acquisition.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
+TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
@@ -26381,7 +26471,8 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
                                 OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
                                 OR GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
-                           AND PRG_02_Acquisition.JoystickDeadmanArmed;
+                           AND PRG_02_Acquisition.JoystickDeadmanArmed
+                           AND M3_HeightInterlockOk; // 🆕 2026-08-06 : hauteur mini M1/M2 (risque collision)
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
                   100.0,
@@ -26412,13 +26503,20 @@ END_IF;
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
 M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 
+// 🆕 2026-08-06 (retour terrain, anti-rebond arrêt) : SelTarget reste à 0 en mode manuel
+// (MAINT_N1/N2, T106 — aucun séquenceur SEMI_AUTO ne le réarbitre à ce jour), donc la CASE
+// ci-dessous tombait toujours en ELSE=FALSE et le verrou anti-rebond §4ter de FB_Translation
+// (DirectionAtArrival) ne s'armait jamais en usage réel. Repli explicite hors sélection
+// SEMI_AUTO : n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance) arme le verrou.
 CASE SelTarget OF
     1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie;
     2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP2;
     3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP1;
     4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosMaintenance;
 ELSE
-    M3_PositionSensorTarget := FALSE;
+    M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
+                                OR PRG_02_Acquisition.TranslationPosP1
+                                OR PRG_02_Acquisition.TranslationPosMaintenance;
 END_CASE;
 
 
@@ -26478,7 +26576,9 @@ instTranslationM3(
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensor          := PRG_02_Acquisition.TranslationPosPV,
+    SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
+    SlowdownSensorMaintenance  := PRG_02_Acquisition.TranslationPosP1,
+    SlowdownSensorP1           := PRG_02_Acquisition.TranslationPosP2,
     LimitSwitchFwd          := PRG_02_Acquisition.M3_LimitSwitchFwd,
     LimitSwitchRev          := PRG_02_Acquisition.M3_LimitSwitchRev,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
@@ -26486,7 +26586,9 @@ instTranslationM3(
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
     CfgRampDecelNormalRate  := _TranslationRampDecelNormal_Pct,
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
-    ApproachSpeedHz         := GVL_PERSISTENT._TranslationApproachSpeed_Hz,
+    ApproachSpeedTremieHz       := GVL_PERSISTENT._TranslationApproachSpeedTremie_Hz,
+    ApproachSpeedMaintenanceHz  := GVL_PERSISTENT._TranslationApproachSpeedMaintenance_Hz,
+    ApproachSpeedP1Hz           := GVL_PERSISTENT._TranslationApproachSpeedP1_Hz,
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,

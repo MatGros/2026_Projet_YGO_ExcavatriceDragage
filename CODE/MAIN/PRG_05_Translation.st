@@ -32,7 +32,25 @@ VAR
 
     M3_SafeStop_Active      : BOOL; // Cause historique : InputModuleFault (AF06 §3bis)
     M3_SafeStop_Aggregate   : BOOL; // 🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)
+
+    M3_HeightInterlockOk    : BOOL; // 🆕 2026-08-06 : TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)
 END_VAR
+
+// === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
+// PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 < 05) : lecture
+// du même scan, aucun retard. Bypass = maintenance consciente, doctrine ST_BypassTranslation.
+// ⚠️ Revue 2026-08-06 : une position encodeur incohérente (hors plage OU homing suspect,
+// FB_Encoder_Safety) ne doit PAS pouvoir se lire comme "≥ seuil" par accident — fail-safe :
+// hauteur non confirmée = interlock actif (comme une hauteur insuffisante), sauf bypass.
+// 🔒 Décision 2026-08-06 : Bypass.Global NE lève PLUS cet interlock (contrairement aux autres
+// causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
+// générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
+M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
+                        OR (NOT PRG_02_Acquisition.M1_EncoderIncoherent
+                            AND NOT PRG_02_Acquisition.M2_EncoderIncoherent
+                            AND (PRG_02_Acquisition.CablePosM1 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
+                            AND (PRG_02_Acquisition.CablePosM2 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
+TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
@@ -73,7 +91,8 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
                                 OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
                                 OR GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
-                           AND PRG_02_Acquisition.JoystickDeadmanArmed;
+                           AND PRG_02_Acquisition.JoystickDeadmanArmed
+                           AND M3_HeightInterlockOk; // 🆕 2026-08-06 : hauteur mini M1/M2 (risque collision)
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz > 0.0,
                   100.0,
@@ -104,13 +123,20 @@ END_IF;
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
 M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 
+// 🆕 2026-08-06 (retour terrain, anti-rebond arrêt) : SelTarget reste à 0 en mode manuel
+// (MAINT_N1/N2, T106 — aucun séquenceur SEMI_AUTO ne le réarbitre à ce jour), donc la CASE
+// ci-dessous tombait toujours en ELSE=FALSE et le verrou anti-rebond §4ter de FB_Translation
+// (DirectionAtArrival) ne s'armait jamais en usage réel. Repli explicite hors sélection
+// SEMI_AUTO : n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance) arme le verrou.
 CASE SelTarget OF
     1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie;
     2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP2;
     3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP1;
     4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosMaintenance;
 ELSE
-    M3_PositionSensorTarget := FALSE;
+    M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
+                                OR PRG_02_Acquisition.TranslationPosP1
+                                OR PRG_02_Acquisition.TranslationPosMaintenance;
 END_CASE;
 
 
@@ -170,7 +196,9 @@ instTranslationM3(
     Direction               := M3_Direction_Active,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensor          := PRG_02_Acquisition.TranslationPosPV,
+    SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
+    SlowdownSensorMaintenance  := PRG_02_Acquisition.TranslationPosP1,
+    SlowdownSensorP1           := PRG_02_Acquisition.TranslationPosP2,
     LimitSwitchFwd          := PRG_02_Acquisition.M3_LimitSwitchFwd,
     LimitSwitchRev          := PRG_02_Acquisition.M3_LimitSwitchRev,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
@@ -178,7 +206,9 @@ instTranslationM3(
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
     CfgRampDecelNormalRate  := _TranslationRampDecelNormal_Pct,
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
-    ApproachSpeedHz         := GVL_PERSISTENT._TranslationApproachSpeed_Hz,
+    ApproachSpeedTremieHz       := GVL_PERSISTENT._TranslationApproachSpeedTremie_Hz,
+    ApproachSpeedMaintenanceHz  := GVL_PERSISTENT._TranslationApproachSpeedMaintenance_Hz,
+    ApproachSpeedP1Hz           := GVL_PERSISTENT._TranslationApproachSpeedP1_Hz,
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,

@@ -78,7 +78,15 @@ VAR_GLOBAL PERSISTENT RETAIN
 
     // ↔️ TRANSLATION (M3)
     _TranslationMaxFreq_Hz          : REAL := 50.0; // Fréquence max absolue M3 (Hz) — source unique
-    _TranslationApproachSpeed_Hz    : REAL := 10.0; // Vitesse de ralentissement PV en Hz (approche Trémie)
+    // 🆕 2026-08-06 : 3 vitesses de ralentissement indépendantes, une par capteur déclencheur
+    // "un cran avant" la cible (même principe que PV→Trémie, généralisé) :
+    _TranslationApproachSpeedTremie_Hz      : REAL := 10.0; // Capteur PV actif + Direction=1 → approche Trémie
+    _TranslationApproachSpeedMaintenance_Hz : REAL := 10.0; // Capteur P1 actif + Direction=-1 → approche Maintenance
+    _TranslationApproachSpeedP1_Hz          : REAL := 10.0; // Capteur P2 actif + Direction=-1 → approche P1 (arrêt propre pour travail)
+    // 🆕 2026-08-06 (retour terrain, risque collision) : hauteur mini M1/M2 requise pour
+    // autoriser la translation — actuellement 6,0 m (≈ CfgTopSensorPos_M 8,0 m - 2,0 m de marge),
+    // réglage indépendant de la calibration homing : à revoir si CfgTopSensorPos_M change.
+    _TranslationMinHeightM1M2_M     : REAL := 6.0;   // Hauteur mini M1 ET M2 pour autoriser translation (m)
     _TranslationRampAccelRate_Pct   : REAL := 20.0;  // Accélération translation (%/s)
     _TranslationRampDecelNormal_Pct : REAL := 40.0;  // Décélération normale (%/s)
     _TranslationRampDecelFast_Pct   : REAL := 100.0; // Décélération rapide SafeStop (%/s)
