@@ -123,6 +123,14 @@ sorties axes à 0, `DeadmanArmed=FALSE`, timers deadman reset, `RETURN`.
 > libre **sans surveillance du bouton** → retour au neutre 500 ms désarme → rappuyer pour un nouveau
 > mouvement. La reconfirmation périodique reste disponible en paramètre (`DeadmanReconfEnable := TRUE`,
 > réactivation par recompilation uniquement).
+>
+> 🔧 **2026-08-06 — Décision utilisateur, ANNULE partiellement la grâce ci-dessus** : le "temps
+> illimité pour démarrer après armement" (`LeftNeutralSinceArm`) créait un armement qui ne se
+> désarmait JAMAIS si le joystick restait au neutre sans qu'aucun mouvement ne soit démarré —
+> `DeadmanArmed` pouvait rester collé à `TRUE` d'une session à l'autre. Retour terrain : un
+> bouton IHM (Mode Boutons) se déclenchait sans toucher le joystick à cause de cet armement
+> résiduel. Décision : neutre tenu `NeutralHoldTime` désarme désormais **toujours**, qu'un
+> mouvement ait été démarré depuis l'armement ou non. `LeftNeutralSinceArm` retiré du code.
 
 ### Paramètres
 
@@ -139,13 +147,27 @@ Front bouton **et** `ScaleX.OutPct=0` **et** `ScaleY.OutPct=0` (après deadband,
 | Cause | Condition |
 |---|---|
 | Gate | Enable / AU / CAN / device |
-| Neutre tenu | Après avoir quitté le neutre une fois (`LeftNeutralSinceArm`), neutre ≥ 500 ms |
+| Neutre tenu | `NeutralHoldTime` (500 ms) au neutre, **que le geste ait démarré un mouvement ou non** (🔧 2026-08-06 — avant : uniquement après avoir quitté le neutre au moins une fois) |
 | Timeout présence | Uniquement si `DeadmanReconfEnable=TRUE` : armé + hors neutre + bouton **relâché** ≥ 10 s |
 | Changement mode | `Mode <> LastMode` |
 | Fin benne | Front descendant `BenneBusy` **si** `NOT PreserveArmingAfterBucket` |
 
 Avec reconfirmation (`TRUE`) : maintenir le bouton **ou** le réappuyer en mouvement remet le timer
 10 s (niveau, pas seulement front). Sans (`FALSE`, défaut) : aucun désarmement lié au bouton en mouvement.
+
+### 4bis. Mode Boutons IHM : pas d'homme-mort joystick (🔧 2026-08-06)
+
+`PRG_04_Treuils_Benne.st` (`M1_StartStop_Active`/`M2_StartStop_Active`) n'exige `DeadmanArmed`
+que si `GVL_IHM.Modes.Cmd.TglJoystickMaster=TRUE` (Mode Joystick Maître) :
+```
+AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
+```
+**Décision utilisateur** : en Mode Boutons IHM (`TglJoystickMaster=FALSE`), le consentement
+continu est déjà assuré par le maintien du bouton IHM lui-même (`BtnUp`/`BtnDown` : appui
+maintenu = mouvement, confirmé terrain) — pas besoin d'un second homme-mort physique sur le
+joystick, qui n'est de toute façon pas utilisé pour piloter dans ce mode ("si pas joystick on
+est en manu donc pas d'homme mort"). L'homme-mort du joystick physique reste exigé **uniquement**
+en Mode Joystick Maître, où il a un sens (main sur le manche = présence confirmée).
 
 ### Exception Extraction (documentée)
 `PreserveArmingAfterBucket` évite le désarmement en fin de fermeture auto pour enchaîner palier 1
