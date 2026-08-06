@@ -74,6 +74,7 @@ VAR
     UncommandedActiveB  : BOOL;
     UncommandedActiveA  : BOOL;
     FirstScanDone       : BOOL;
+    TonStartupWarmup    : TON;         // ⏱️ Inhibition 3s au boot + effacement auto coms
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -95,6 +96,7 @@ IF NOT Enable THEN
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
+    TonStartupWarmup(IN := FALSE);
     State := E_State.DISABLED;
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     RETURN;
@@ -121,21 +123,30 @@ END_IF;
 // ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
 // On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
 IF NOT BypassGlobal THEN
-    // ResetEdge clearing est fait dans chaque bloc individuel ci-dessous.
+    // ⏱️ Temporisation 3s de mise en route des bus de terrain au boot (EtherCAT / CANopen / Modbus IHM)
+    TonStartupWarmup(IN := Enable, PT := T#3s);
 
     // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
-    IF NOT (BypassProcess OR BypassOperatorComm) THEN
+    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
         IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
             ErrorId := ErrorId OR 16#0001;
+        ELSE
+            ErrorId := ErrorId AND 16#FFFE; (* Effacement auto si la com repasse saine *)
         END_IF;
+    ELSIF NOT TonStartupWarmup.Q THEN
+        ErrorId := ErrorId AND 16#FFFE; (* Inhibition pendant l'initialisation boot *)
     END_IF;
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFE; END_IF;
 
     // 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
-    IF NOT (BypassProcess OR BypassDriveComm) THEN
+    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassDriveComm) THEN
         IF (NOT DriveOnline OR NOT DriveOperational) THEN
             ErrorId := ErrorId OR 16#0002;
+        ELSE
+            ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si l'EtherCAT variateur M3 repasse sain *)
         END_IF;
+    ELSIF NOT TonStartupWarmup.Q THEN
+        ErrorId := ErrorId AND 16#FFFD; (* Inhibition pendant l'initialisation boot *)
     END_IF;
     IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFD; END_IF;
 

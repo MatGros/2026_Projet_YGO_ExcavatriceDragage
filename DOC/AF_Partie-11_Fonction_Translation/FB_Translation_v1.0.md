@@ -11,12 +11,13 @@
 1. Rôle et profil
 2. Interface
 3. Pipeline commande
-4. Ralentissement PV
+4. Ralentissement d'approche (3 zones)
 5. Arrêt exact sur capteur
 6. Interlock de sens
 7. Mot AC600
+7bis. InvertDriveDirection — compensation câblage moteur
 8. ErrorId
-9. Réglages RETAIN
+9. Réglages RETAIN / persistants
 10. Alertes et écarts
 11. Documents liés
 
@@ -49,13 +50,16 @@ contrairement aux treuils à contacteurs discrets).
 |---|---|---|
 | `Enable/Reset/PowerContactorEngaged/Mode` | — | Standard |
 | `StartStop/SafeStop` | BOOL | Standard mouvement |
-| `Direction` | INT | -1/0/+1 (source d'autorité du sens) |
+| `Direction` | INT | -1/0/+1 (sens **sémantique réel** — +1=vers Trémie, -1=vers Maintenance, quel que soit le câblage moteur) |
 | `SpeedRefPct` | REAL | Magnitude 0..100% |
-| `PositionSensorTarget` | BOOL | Capteur position cible courante |
-| `SlowdownSensor` | BOOL | Capteur PV — ralentissement avant Trémie |
-| `LimitSwitchFwd`/`LimitSwitchRev` | BOOL | Butées extrêmes (depuis PositionDecoder) |
+| `PositionSensorTarget` | BOOL | Capteur position cible courante (verrou bistable §0quater PRG_05, voir fiche PositionDecoder §3bis) |
+| `SlowdownSensorTremie` | BOOL | Capteur PV — ralentissement avant Trémie (`Direction=1`) |
+| `SlowdownSensorMaintenance` | BOOL | 🆕 Zone P1→Maintenance — ralentissement avant Maintenance (`Direction=-1`) |
+| `SlowdownSensorP1` | BOOL | 🆕 Zone P2→P1 — ralentissement avant P1 (`Direction=-1`), **gaté par le mode côté PRG_05** (désactivé si zone Maintenance autorisée — P1 n'est alors plus un point d'arrêt, 100% vitesse) |
+| `LimitSwitchFwd`/`LimitSwitchRev` | BOOL | Butées extrêmes (depuis PositionDecoder, verrou bistable anti-rebond §0ter PRG_05) |
 | `DriveStatusWord` | WORD | Mot état AC600 (EtherCAT) |
 | `DriveActualFreqHz` | REAL | Fréquence réelle mesurée (Hz) |
+| `InvertDriveDirection` | BOOL | 🆕 2026-08-06 : compense le câblage moteur réel (U/V inversés) — appliqué **uniquement** au mot de commande variateur en sortie (§7bis), jamais à `Direction`/`CommandedDirection` qui reste partout ailleurs le sens sémantique réel apparié aux capteurs physiques |
 | `BypassContactorCheck`/`BypassLimitSwitch` | BOOL | Bypass simulation/mise en service |
 | `BrakeFeedback` | BOOL | Retour physique direct (TRUE=ouvert/desserré) |
 
@@ -84,13 +88,27 @@ applique le gate double condition.
 
 ---
 
-## 4. Ralentissement PV
+## 4. Ralentissement d'approche — 3 zones indépendantes (🆕 2026-08-06)
 
-**Seulement** `Direction=1` (vers Trémie) **ET** `SlowdownSensor=TRUE` →
-`RampTargetPct := LIMIT(0, RampTargetPct, ApproachSpeedPct)`.
+Généralisé de 1 à 3 paires capteur/cible indépendantes, chacune sa propre vitesse configurable
+(`GVL_IHM.TranslationM3.Cfg.CfgApproachSpeedXxx_Hz`, persistante, voir §9) :
 
-⚠️ **Jamais en sens Maintenance** (Direction=-1) — décision client REX 2026-07-18 :
-PV n'assure le ralentissement qu'avant Trémie.
+| Capteur | Sens | Cible ralentie | Formule (calculée dans PRG_05, cumulative — pas un mot exact) |
+|---|---|---|---|
+| `SlowdownSensorTremie` (=PV) | `Direction=1` | Approche Trémie | `TranslationPosPV` |
+| `SlowdownSensorP1` | `Direction=-1` | Approche P1 (si P1 = point d'arrêt) | `NOT TranslationPosP2 AND TranslationPosP1 AND NOT MaintenanceM3TargetEnable` |
+| `SlowdownSensorMaintenance` | `Direction=-1` | Approche Maintenance | `NOT TranslationPosP1 AND TranslationPosMaintenance` |
+
+`RampTargetPct := LIMIT(0, RampTargetPct, ApproachSpeedXxxHz-based%)` pour chaque zone active.
+
+⚠️ **Design opérateur confirmé terrain 2026-08-06** : en zone Maintenance **autorisée**, la zone
+P2→P1 reste à 100% (P1 n'est plus un point d'arrêt, on continue jusqu'à Maintenance) — d'où le
+gate `AND NOT MaintenanceM3TargetEnable` sur `SlowdownSensorP1`, appliqué côté `PRG_05`, pas
+dans ce FB (qui reste agnostique du mode).
+
+⚠️ **REX 2026-08-06** : la formule initiale de `SlowdownSensorP1`/`SlowdownSensorMaintenance`
+manquait l'exclusion de la zone suivante (`AND NOT TranslationPosXxx`) — le ralentissement se
+déclenchait dès la Trémie au lieu de juste avant la cible. Corrigé (`ced1df9`).
 
 ---
 
@@ -123,6 +141,24 @@ Fréquence : `RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFr
 
 ---
 
+## 7bis. `InvertDriveDirection` — compensation câblage moteur (🆕 2026-08-06)
+
+**REX sécurité terrain** : avant ce lot, la compensation câblage (`GVL_IHM.TranslationM3.Cmd.InvertDirection`)
+était appliquée en amont dans `PRG_05_Translation.st`, directement sur `M3_Direction_Active` — le
+sens **sémantique** consommé par TOUTE la logique appariée aux capteurs physiques réels
+(ralentissement §4, coupure dure Fdc §5/§7, verrou d'arrivée §5). Avec le câblage moteur réel de
+la machine (compensation nécessaire en permanence), ça désaccordait cette logique : le
+ralentissement/verrou d'arrivée pouvait s'armer dans le mauvais sens ou jamais, seule la coupure
+dure indépendante du sens (§0bis `PRG_05`) protégeait encore la machine.
+
+**Corrigé** : `InvertDriveDirection` compense **uniquement** au point de génération du mot de
+commande variateur (`PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection,
+CommandedDirection * (-1))`, utilisé **seulement** pour `RequestedDriveControlWord`). `Direction`/
+`CommandedDirection` reste partout ailleurs le sens sémantique réel (+1=vers Trémie physiquement),
+apparié correctement aux capteurs quel que soit le câblage.
+
+---
+
 ## 8. ErrorId
 
 | Bit | Cause |
@@ -133,20 +169,32 @@ Fréquence : `RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFr
 
 ---
 
-## 9. Réglages RETAIN
+## 9. Réglages RETAIN / persistants
 
-**Réellement câblés depuis GVL_PERSISTENT** (via `FB_CfgPersistBridge_TranslationCfg.st` / `ST_TranslationCfg`) :
+**Câblés directement depuis GVL_PERSISTENT** (scalaires, recopie continue ou valeur fixe) :
 ```
-_TranslationMaxFreq_Hz=60.0
-_TranslationRampAccelRate_Pct=20.0
-_TranslationRampDecelNormal_Pct=40.0
+_TranslationMaxFreq_Hz=50.0
+_TranslationRampAccelRate_Pct=40.0   (défaut usine)
+_TranslationRampDecelNormal_Pct=50.0 (défaut usine)
 _TranslationRampDecelFast_Pct=100.0
 _TranslationAutoSpeedCap_Pct=40.0
-_TranslationSetFreq_Hz=20.0 (défaut IHM)
-CfgApproachSpeedTremie_Hz=15.0
-CfgApproachSpeedMaintenance_Hz=15.0
-CfgApproachSpeedP1_Hz=15.0
+_TranslationSetFreq_Hz=20.0 (défaut IHM, recopie continue depuis PRG_07_Supervision)
 ```
+
+**Câblés via `GVL_IHM.TranslationM3.Cfg` (`ST_TranslationCfg`), pont `FB_CfgPersistBridge_TranslationCfg`
+vers `GVL_PERSISTENT._TranslationCfgPersist`** (🆕 2026-08-06 — réglable en direct IHM, persistant) :
+```
+CfgApproachSpeedTremie_Hz=10.0
+CfgApproachSpeedMaintenance_Hz=10.0
+CfgApproachSpeedP1_Hz=10.0
+```
+⚠️ `GVL_PERSISTENT` est exclue du bundle PLCopenXML par conception (RETAIN géré par CODESYS) —
+toute nouvelle variable persistante doit être ajoutée **manuellement** dans le projet CODESYS live.
+
+**Position estimée continue (odométrie)** — 🆕 2026-08-06 : `FB_Translation_PositionEstimator`
+reprend sa dernière position connue au redémarrage via `GVL_PERSISTENT._TranslationPosEstimated_M`
+/`_TranslationPosEstimatedInitialized` (recopie continue, pas de bridge dédié — même doctrine que
+`_TranslationSetFreq_Hz`), pour ne pas perdre l'estimation à chaque coupure/Online Change.
 
 **Restent au défaut du FB** :
 - `CaptorDebounce` = T#100ms
@@ -160,6 +208,8 @@ CfgApproachSpeedP1_Hz=15.0
 |---|---|---|---|
 | 1 | P2 | `ApproachSpeedPct`/`CaptorDebounce`/`DirectionInterlockDelay` non câblés RETAIN (doc legacy disait le contraire) | Corrigé §9 |
 | 2 | info | `SetFreq_Hz=0` → défaut 30% codé en dur (mode MAINT) | Vestige mise en service |
+| 3 | ✅ résolu | **`InvertDriveDirection` déplacé de l'arbitrage amont (`PRG_05`) vers ce FB** (2026-08-06) — voir §7bis. Désaccordait toute la logique de ralentissement/verrou d'arrivée avec le câblage moteur réel | REX terrain 2026-08-06 |
+| 4 | ✅ résolu | Ralentissement généralisé à 3 zones indépendantes + gate mode Maintenance sur `SlowdownSensorP1` (§4) | REX terrain 2026-08-06 |
 
 ---
 

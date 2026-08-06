@@ -36,7 +36,7 @@ chapô (transverses Modes/terrain).
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P11-012 | Cible Maintenance refusée hors MAINT_N2 | `⚡ AUTO_PLC` |
+| TC-P11-012 | Cible Maintenance refusée si Mode∉{MAINT_N1,MAINT_N2} OU bit IHM dédié non coché (🆕 2026-08-06) | `⚡ AUTO_PLC` |
 | TC-P11-015 | Terrain : 5 capteurs réels, watchdog 500ms mesuré, temps réponse variateur | `🟢 SITE` |
 
 ---
@@ -127,8 +127,14 @@ Contrat agent prêt (réécrit 2026-08-05) : `DOC/CHECKLISTS/TASK_CONTEXT/TASK_C
 **Arbitrage Translation** :
 - **SEMI_AUTO** : cible/vitesse depuis Cycle, `StartStop` exige `DeadmanArmed AND AxisCmdX.StartStop`
 - **MAINT_N1/N2** : boutons IHM OU joystick (`TglJoystickMaster`) — `DeadmanArmed` exigé **même pour boutons IHM**
-- Cible Maintenance (4) refusée hors MAINT_N2
-- `InvertDirection` inverse le sens après arbitrage, tous modes
+- Cible Maintenance (4) refusée si `MaintenanceM3TargetEnable=FALSE` — 🆕 2026-08-06 : ce bit
+  exige désormais (Mode=MAINT_N1 **OU** MAINT_N2) **ET** un bit IHM dédié conscient
+  `TglMaintenanceZoneAccess` (`GVL_IHM.TranslationM3.Cmd`) — le mode seul ne suffit plus, et N1
+  est désormais autorisé (élargi, décision opérateur confirmée 2026-08-06). Voir AF05 §Bus autorisations.
+- `InvertDirection` (câblage moteur réel) compense **uniquement le mot de commande variateur en
+  sortie** (`FB_Translation` §7bis) — 🆕 2026-08-06, corrigé après REX terrain : appliqué en amont
+  sur le sens arbitré, il désaccordait toute la logique de ralentissement/verrou d'arrivée
+  appariée aux capteurs physiques réels (jamais inversés, eux).
 
 ⚠️ Le point « `DeadmanArmed` exigé même pour boutons IHM » ci-dessus est la **cible**, pas
 l'état actuel : voir §5 alerte 7, code réel constaté 2026-08-05.

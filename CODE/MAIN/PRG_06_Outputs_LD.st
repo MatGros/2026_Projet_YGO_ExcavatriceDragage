@@ -100,7 +100,7 @@ END_VAR
 
 // ── Interlock final M1 (Treuil Retenue) ──────────────────────────────────
 M1InterlockEnable := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.PowerCutOff
+                      AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop
                       AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error;
 
 instWinchOutputInterlockM1(
@@ -130,7 +130,7 @@ M1BrakeCmd        := instWinchOutputInterlockM1.BrakeCmd;
 
 // ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
 M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.PowerCutOff
+                      AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop
                       AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error;
 
 instWinchOutputInterlockM2(
@@ -160,10 +160,11 @@ M2BrakeCmd        := instWinchOutputInterlockM2.BrakeCmd;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 // 🛡️ 2026-08-06 (demande maintenance) : déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
-// M3InterlockEnable s'appuie désormais directement sur la sécurité dynamique de M3 (PowerCutOff / Error)
+// M3InterlockEnable s'appuie désormais directement sur la sécurité dynamique de M3 (PowerCutOff / SafeStop / Error)
 // publiée sur PRG_05_Translation.TranslationSafetyHMI, rendant les motifs de coupure lisibles en direct.
 M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
                       AND NOT PRG_05_Translation.TranslationSafetyHMI.PowerCutOff
+                      AND NOT PRG_05_Translation.TranslationSafetyHMI.SafeStop
                       AND NOT PRG_05_Translation.TranslationSafetyHMI.Error;
 
 instTranslationOutputInterlockM3(

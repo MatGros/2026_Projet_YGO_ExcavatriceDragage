@@ -232,6 +232,7 @@ VAR
     TonNoMovement         : TON;
     OppositeDirectionActive : BOOL;
     EncoderAvailableEffective : BOOL;   // Codeur valide OU bypass individuel autorisé en MAINT_N2
+    TonStartupWarmup      : TON;        // ⏱️ Inhibition 3s au boot + effacement auto coms
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
@@ -257,6 +258,7 @@ IF NOT Enable THEN
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
+    TonStartupWarmup(IN := FALSE);
     RETURN;
 END_IF;
 
@@ -298,11 +300,21 @@ END_IF;
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
 IF NOT BypassGlobal THEN
 
-    IF NOT (BypassProcess OR BypassOperatorComm) AND (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-    ErrorId := ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
-END_IF;
+    // ⏱️ Temporisation 3s de mise en route des bus de terrain au boot (CANopen / Modbus IHM)
+    TonStartupWarmup(IN := Enable, PT := T#3s);
+
+    IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
+        IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
+            ErrorId := ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
+        ELSE
+            ErrorId := ErrorId AND 16#FFFE;      // Effacement auto si la com repasse saine
+        END_IF;
+    ELSIF NOT TonStartupWarmup.Q THEN
+        ErrorId := ErrorId AND 16#FFFE;          // Inhibition pendant l'initialisation boot
+    END_IF;
+    IF ResetEdge.Q THEN
+        ErrorId := ErrorId AND 16#FFFE;
+    END_IF;
 
 // 🔍 3bis. PERTE CODEUR DE CE TREUIL (câblé — lot Codeur 2026-07-02)
 // 🔧 WINCH-CORE-01 : le fonctionnement sans codeur reste interdit par défaut.
