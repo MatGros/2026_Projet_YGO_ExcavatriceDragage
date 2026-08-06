@@ -195,7 +195,7 @@ END_IF;
 // haut en continu, TargetReached ne montre plus de front) contournait le verrou et M3 repartait
 // vers la butée. Conforme à la demande d'origine : "on doit repartir dans l'AUTRE sens", jamais
 // juste relâcher-réappuyer pareil. Instantané, jamais retardé (le dégagement doit rester rapide).
-IF Direction = DirectionAtArrival * (-1) THEN
+IF (Direction = DirectionAtArrival * (-1)) OR (NOT TargetReached AND NOT LimitSwitchFwd AND NOT LimitSwitchRev) THEN
     DirectionAtArrival := 0;
 END_IF;
 
