@@ -240,14 +240,24 @@ une instance, gate fail-safe.
 > `FB_Translation`. Section de suivi ; décision et code dans un lot dédié, contrat de tâche requis
 > (C3/C4 — accélération/décélération treuil = sécurité machine).
 
-### 8bis.1 Filtre PT1 par défaut
+### 8bis.1 Filtre PT1 par défaut — réduit (retour terrain 2026-08-06)
 
-`_JoystickFilterTime := T#100ms` (`GVL_PERSISTENT`) — a peu d'effet en régime établi mais
-introduit un **retard perceptible** au démarrage de chaque mouvement. Demande utilisateur :
-réduire ce défaut pour un ressenti plus réactif. **TBD** : valeur cible à confirmer terrain
-(pas de calcul théorique substituable à un essai réel sur le joystick physique).
+`_JoystickFilterTime` : `T#100ms` → **`T#50ms`** (`GVL_PERSISTENT` + défaut `FB_Joystick.st`),
+décidé sur retour terrain après le lot tempo palier (AF10 §6) : délai joystick→contacteur de
+sens toujours perceptible même une fois `RestartDelay`/tempo palier hors cause (pause > 1s).
+Contrepartie assumée : moins de lissage du bruit capteur Hall — à surveiller (chatter contacteur
+sur signal bruité). Pas de calcul théorique substitué à l'essai terrain qui a validé la valeur.
 
-### 8bis.2 Double rampe en cascade (constat vérifié)
+### 8bis.2 Double rampe en cascade — ⚠️ constat périmé (code déjà sans `FB_Ramp` côté joystick)
+
+> Vérifié 2026-08-06 : `FB_Joystick.st` actuel n'instancie **aucun** `FB_Ramp` (pipeline réel :
+> `FB_AxisScale` → `FB_Filter_PT1` → homme-mort, voir §2). `_JoystickAccelRate_Pct`/
+> `_JoystickDecelRate_Pct` (`GVL_PERSISTENT`) sont **orphelins** — plus référencés nulle part
+> dans `CODE/`. Le TBD ci-dessous décrivait un état du code antérieur à cette vérification ;
+> conservé pour mémoire mais **la double rampe qu'il décrit n'existe plus**. Nettoyage des
+> RETAIN orphelins non fait dans ce lot (hors périmètre demandé).
+
+Constat historique (au moment de la rédaction initiale) :
 
 ```text
 FB_Joystick : Scale → Filter PT1 → FB_Ramp (Accel 50%/s, Decel 150%/s, RETAIN _JoystickAccelRate_Pct/_JoystickDecelRate_Pct)
