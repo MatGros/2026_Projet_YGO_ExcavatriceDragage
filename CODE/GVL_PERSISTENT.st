@@ -78,11 +78,10 @@ VAR_GLOBAL PERSISTENT RETAIN
 
     // ↔️ TRANSLATION (M3)
     _TranslationMaxFreq_Hz          : REAL := 50.0; // Fréquence max absolue M3 (Hz) — source unique
-    // 🆕 2026-08-06 : 3 vitesses de ralentissement indépendantes, une par capteur déclencheur
-    // "un cran avant" la cible (même principe que PV→Trémie, généralisé) :
-    _TranslationApproachSpeedTremie_Hz      : REAL := 10.0; // Capteur PV actif + Direction=1 → approche Trémie
-    _TranslationApproachSpeedMaintenance_Hz : REAL := 10.0; // Capteur P1 actif + Direction=-1 → approche Maintenance
-    _TranslationApproachSpeedP1_Hz          : REAL := 10.0; // Capteur P2 actif + Direction=-1 → approche P1 (arrêt propre pour travail)
+    // 🆕 2026-08-06 : ST_TranslationCfg — Translation n'avait pas de slot Cfg (contrairement à
+    // ST_WinchHMI), les 3 vitesses de ralentissement n'étaient réglables qu'en dur ici (constat
+    // terrain). Pont FB_CfgPersistBridge_TranslationCfg (Hmi := GVL_IHM.TranslationM3.Cfg).
+    _TranslationCfgPersist : ST_TranslationCfg; // 🌉 Pont FB_CfgPersistBridge_TranslationCfg
     // 🆕 2026-08-06 (retour terrain, risque collision) : hauteur mini M1/M2 requise pour
     // autoriser la translation — actuellement 6,0 m (≈ CfgTopSensorPos_M 8,0 m - 2,0 m de marge),
     // réglage indépendant de la calibration homing : à revoir si CfgTopSensorPos_M change.

@@ -13,6 +13,9 @@ STRUCT
     (* 🚦 États & diagnostics *)
     State                   : ST_TranslationState;
 
+    (* 🔧 Configurations et limites — 🆕 2026-08-06, manquait (contrairement à ST_WinchHMI) *)
+    Cfg                     : ST_TranslationCfg;
+
     (* 🔧 Bypass maintenance *)
     Bypass                  : ST_BypassTranslation;
 

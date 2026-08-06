@@ -6439,6 +6439,72 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
    ═══════════════════════════════════════════════════════════════</html:xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_TranslationCfg">
+        <baseType>
+          <struct>
+            <variable name="CfgApproachSpeedTremie_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgApproachSpeedMaintenance_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgApproachSpeedP1_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🐛 Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
+🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</html:xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>2d4e63ef-38b4-5f0c-b42d-ccf25658d58a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <html:xhtml>═══════════════════════════════════════════════════════════════
+   🔧 ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
+   📄 2026-08-06 : créé suite constat terrain — Translation n'avait pas de slot Cfg
+   (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
+   n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
+   ═══════════════════════════════════════════════════════════════</html:xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_TranslationCmd">
         <baseType>
           <struct>
@@ -6658,6 +6724,14 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
               </type>
               <documentation>
                 <html:xhtml>🚦 États &amp; diagnostics</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_TranslationCfg" />
+              </type>
+              <documentation>
+                <html:xhtml>🔧 Configurations et limites — 🆕 2026-08-06, manquait (contrairement à ST_WinchHMI)</html:xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -9736,6 +9810,67 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>13a2c158-675a-51ae-9722-c0aab6c4c8b0</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_CfgPersistBridge_TranslationCfg" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="JustRestored">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🔔 TRUE pendant le scan de restauration</html:xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <derived name="ST_TranslationCfg" />
+              </type>
+              <documentation>
+                <html:xhtml>🖥️ Struct exposé à l'IHM</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Persist">
+              <type>
+                <derived name="ST_TranslationCfg" />
+              </type>
+              <documentation>
+                <html:xhtml>💾 Mémoire PERSISTENT</html:xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <html:xhtml>═══════════════════════════════════════════════════════════════
+   🌉 FB_CfgPersistBridge_TranslationCfg — Pont persistance générique pour ST_TranslationCfg
+   ───────────────────────────────────────────────────────────────
+   🎯 Instance unique : TranslationM3.Cfg (un seul axe M3, contrairement à M1/M2).
+   Restaure Persist → Hmi au boot si nécessaire, puis sauvegarde Hmi → Persist.
+   ═══════════════════════════════════════════════════════════════</html:xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <html:xhtml>
+
+JustRestored := FALSE;
+IF NOT Hmi.Initialized THEN
+    Hmi := Persist;
+    Hmi.Initialized := TRUE;
+    JustRestored := TRUE;
+ELSE
+    Persist := Hmi;
+END_IF;
+</html:xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>38d43e50-d468-567a-8c85-9b295bf88c4c</ObjectId>
           </data>
         </addData>
       </pou>
@@ -26754,9 +26889,9 @@ instTranslationM3(
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
     CfgRampDecelNormalRate  := _TranslationRampDecelNormal_Pct,
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
-    ApproachSpeedTremieHz       := GVL_PERSISTENT._TranslationApproachSpeedTremie_Hz,
-    ApproachSpeedMaintenanceHz  := GVL_PERSISTENT._TranslationApproachSpeedMaintenance_Hz,
-    ApproachSpeedP1Hz           := GVL_PERSISTENT._TranslationApproachSpeedP1_Hz,
+    ApproachSpeedTremieHz       := GVL_IHM.TranslationM3.Cfg.CfgApproachSpeedTremie_Hz,
+    ApproachSpeedMaintenanceHz  := GVL_IHM.TranslationM3.Cfg.CfgApproachSpeedMaintenance_Hz,
+    ApproachSpeedP1Hz           := GVL_IHM.TranslationM3.Cfg.CfgApproachSpeedP1_Hz,
     DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,
@@ -28867,6 +29002,14 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <derived name="FB_CfgPersistBridge_WinchCfg" />
               </type>
             </variable>
+            <variable name="instCfgPersistBridgeTranslation">
+              <type>
+                <derived name="FB_CfgPersistBridge_TranslationCfg" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : Translation n'avait pas de slot Cfg</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="instDiagCanOpen">
               <type>
                 <derived name="FB_Diag_CanOpen" />
@@ -28964,6 +29107,11 @@ END_IF;
 
 instCfgPersistBridgeSync(Hmi := GVL_IHM.M1M2Sync.Cfg, Persist := _SyncCfgPersist);
 IF instCfgPersistBridgeSync.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
+instCfgPersistBridgeTranslation(Hmi := GVL_IHM.TranslationM3.Cfg, Persist := _TranslationCfgPersist);
+IF instCfgPersistBridgeTranslation.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -29901,6 +30049,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
           <Object Name="FB_CfgPersistBridge_DredgingAssistCfg" ObjectId="01900664-1243-5018-b595-4c32b467d2c5" />
           <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
+          <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
           <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_DigitalInputFilter" ObjectId="127981b6-b363-5819-9fb6-c0bf2b6d50a4" />
@@ -30057,6 +30206,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
             <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
             <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
+            <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
             <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
             <Object Name="ST_TranslationFinalInterlockRequest" ObjectId="3d90836c-bd65-54ca-b2e2-f3d1ef3a1bd3" />
             <Object Name="ST_TranslationHMI" ObjectId="d6558eac-730d-54eb-ad2f-d618dc359506" />
