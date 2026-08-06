@@ -87,17 +87,17 @@ VAR_INPUT
     BypassContactorCheck    : BOOL;   // 🧪 TRUE = désactive StuckClosed (axe simulé,
                                        // voir GVL_Simulation.SensorMxContactorFeedbackIsReal — TOUJOURS FALSE réel)
     BypassGlobal            : BOOL;   // 🌐 TRUE = force ErrorId=0, ignore toutes les erreurs du FB
-    CfgRampAccelRate           : REAL := 50.0;
-    CfgRampDecelNormalRate     : REAL := 150.0;
-    CfgRampDecelFastRate       : REAL := 400.0;
     SpeedStepHystMargin     : REAL := 2.0;
-    // 🆕 2026-08-06 (retour terrain) : interlock changement de sens asymétrique — descente sans
-    // effort (pas de charge résistante, on peut réengager vite), montée = charge en traction
-    // (délai plus long avant réengagement). Remplace DirectionInterlockDelay unique (200ms).
-    // ⚠️ Valeurs fixées volontairement SOUS les réglages de décélération paramétrables par
-    // l'utilisateur (CfgRampDecelNormalRate → ~500ms descente / ~1000ms montée pour décélérer)
-    // afin que cet interlock ne soit normalement JAMAIS le facteur limitant : la rampe elle-même
-    // a déjà ramené la vitesse à 0 avant que ce délai n'expire, dans un fonctionnement normal.
+    // 🆕 2026-08-06 (décision validée, retour terrain) : rampe %/s (CfgRampAccelRate/
+    // DecelNormalRate/DecelFastRate, FB_Ramp) RETIRÉE — remplacée par une temporisation FIXE
+    // par palier, asymétrique montée/descente. Cible documentée
+    // DOC/AF_Partie-10_Fonction_Winch_v2.0.md §6.2 (montée en charge = plus prudente, descente
+    // sans effort = plus rapide).
+    // 🆕 2026-08-06 (simplification demandée) : interlock changement de sens asymétrique —
+    // descente sans effort (pas de charge résistante, réengagement rapide), montée = charge en
+    // traction (délai plus long). La temporisation par palier se DÉDUIT de cet interlock
+    // (+100ms) plutôt que d'être un réglage séparé — garantit par construction qu'elle reste
+    // toujours au-dessus, jamais besoin de les tenir synchronisés à la main.
     DirectionInterlockDelayDescent : TIME := T#400ms;  // Réengagement en descente (CommandedDirection=-1)
     DirectionInterlockDelayAscent  : TIME := T#900ms;  // Réengagement en montée (CommandedDirection=1)
     ContactorFeedbackTimeout: TIME := T#500ms;
@@ -137,7 +137,7 @@ VAR_OUTPUT
     Contactor4          : BOOL;
     RequestedStep       : INT;             // Palier brut calculé par FB_SpeedStep avant tempo métier
     StepNumber          : INT;             // Palier métier temporisé, transmis à l'interlock final
-    BusinessStepDelayElapsed : TIME;       // Écoulé de la tempo métier fixe T#1s500ms
+    BusinessStepDelayElapsed : TIME;       // Écoulé de la tempo métier (EffectiveStepDelay, asymétrique montée/descente)
     SpeedGuardLimited   : BOOL;
     BrakeCmd            : BOOL;
     BrakeCommandOpenConfirmed : BOOL;  // TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)
@@ -148,11 +148,13 @@ VAR
     SpeedStep           : FB_SpeedStep;
     Brake               : FB_Brake;
     CycleTimeCalc       : FB_CycleTime;
-    SpeedRamp           : FB_Ramp;
+    // 🆕 2026-08-06 : SpeedRamp (FB_Ramp) retiré — RampTargetPct alimente directement
+    // FB_SpeedStep, la progressivité vient de la temporisation par palier (StepDelay ci-dessous).
     ResetEdge           : R_TRIG;
     ErrorEdge           : R_TRIG;
     DirectionChangeDelay: TON;
     EffectiveDirectionInterlockDelay : TIME; // 🆕 2026-08-06 : DirectionInterlockDelayDescent/Ascent selon le sens ENTRANT (Direction)
+    EffectiveStepDelay  : TIME; // 🆕 2026-08-06 : déduit d'EffectiveDirectionInterlockDelay + T#100ms
     CommandedDirection  : INT;
     TonContactorsDropped: TON;   // 🔧 REX 2026-07-07 : remplace TonFwdFeedback/TonRevFeedback
     BusinessStepDelay    : TON;   // 🪜 Tempo métier nominale entre hausses de palier
@@ -181,7 +183,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeContactorCheck := Brake.ContactorCheck;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelayAscent);
-    SpeedRamp(Target := 0.0, AccelRate := CfgRampAccelRate, DecelRate := CfgRampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     Error := FALSE;
@@ -234,24 +235,21 @@ IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     END_IF;
 END_IF;
 
-SpeedRamp(Target := RampTargetPct,
-          AccelRate := CfgRampAccelRate,
-          DecelRate := SEL(EffectiveSafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
-          CycleTimeS := CycleTimeCalc.CycleTimeS);
-
 // 🆕 2026-08-06 : délai asymétrique selon le sens ENTRANT (Direction) — descente sans effort
-// (câble mou/gravité favorable) réengage plus vite que montée (charge en traction).
+// (câble mou/gravité favorable) réengage plus vite que montée (charge en traction). La tempo
+// palier se DÉDUIT de cet interlock (+100ms) : jamais besoin de resynchroniser deux réglages.
 IF Direction = -1 THEN
     EffectiveDirectionInterlockDelay := DirectionInterlockDelayDescent;
 ELSE
     EffectiveDirectionInterlockDelay := DirectionInterlockDelayAscent;
 END_IF;
+EffectiveStepDelay := EffectiveDirectionInterlockDelay + T#100ms;
 
 IF Direction <> CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction <> 0 THEN
         CommandedDirection := Direction;
         DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
-    ELSIF ABS(SpeedRamp.Current) < 0.1 THEN
+    ELSIF StepNumber = 0 THEN
         DirectionChangeDelay(IN := TRUE, PT := EffectiveDirectionInterlockDelay);
         IF DirectionChangeDelay.Q THEN
             CommandedDirection := Direction;
@@ -283,24 +281,25 @@ ELSE
     ActiveMaxStep := 5;
 END_IF;
 
-SpeedStep(Enable := (ABS(SpeedRamp.Current) > 0.1), SpeedRefPct := ABS(SpeedRamp.Current),
+SpeedStep(Enable := (RampTargetPct > 0.1), SpeedRefPct := RampTargetPct,
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
           MaxStepNumber := ActiveMaxStep,
           MeasuredSpeedBand := MeasuredSpeedBand,
           SpeedGuardEnable := SpeedGuardEnable,
           SpeedGuardReady := SpeedGuardReady);
-// 🪜 Tempo métier nominale : toute hausse exige T#1s500ms et progresse par pas
-// adjacents. Toute baisse reste immédiate pour ne jamais retarder un arrêt/safety.
+// 🪜 Tempo métier nominale : toute hausse exige EffectiveStepDelay (interlock + 100ms,
+// asymétrique montée/descente) et progresse par pas adjacents. Toute baisse reste immédiate
+// pour ne jamais retarder un arrêt/safety.
 RequestedStep := SpeedStep.StepNumber;
 IF RequestedStep > StepNumber THEN
-    BusinessStepDelay(IN := TRUE, PT := T#1s500ms);
+    BusinessStepDelay(IN := TRUE, PT := EffectiveStepDelay);
     BusinessStepDelayElapsed := BusinessStepDelay.ET;
     IF BusinessStepDelay.Q THEN
         StepNumber := StepNumber + 1;
-        BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
+        BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
     END_IF;
 ELSE
-    BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
+    BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
     BusinessStepDelayElapsed := BusinessStepDelay.ET;
     StepNumber := RequestedStep;
 END_IF;
@@ -423,9 +422,9 @@ IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
 
-IF (NOT StartStop OR EffectiveSafeStop OR DirectionChangePending) AND ABS(SpeedRamp.Current) > 0.1 THEN
+IF (NOT StartStop OR EffectiveSafeStop OR DirectionChangePending) AND StepNumber > 0 THEN
     State := E_State.STOPPING;
-ELSIF ABS(SpeedRamp.Current) > 0.1 THEN
+ELSIF StepNumber > 0 THEN
     State := E_State.BUSY;
 ELSE
     State := E_State.READY;
