@@ -154,10 +154,10 @@ END_IF;
 // 🆕 2026-08-06 (retour terrain) : MAINT_N2 seul ne suffit plus — bit IHM dédié
 // (SelMaintenanceZoneAccess) exigé EN PLUS, action consciente distincte du simple
 // changement de mode. PRG_TRANSLATION_CFC consomme ce bit.
-Auth.MaintenanceM3TargetEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelMaintenanceZoneAccess;
+Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
 
-// GATE — désactivation inhibitions/sync si mode change (sortie N2)
-IF Auth.Mode <> E_Mode.MAINT_N2 THEN
+// GATE — désactivation inhibitions/sync si mode change (sortie N1/N2)
+IF (Auth.Mode <> E_Mode.MAINT_N2) AND (Auth.Mode <> E_Mode.MAINT_N1) THEN
     Auth.InhibitM1 := FALSE;
     Auth.InhibitM2 := FALSE;
     Auth.HomingApproachEnable := FALSE;
