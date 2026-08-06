@@ -524,15 +524,15 @@ ELSE
     SafeStop := (ErrorId AND 16#FF9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
-// ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé
-ForbidDescent := (ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged;
+// ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé (bypasser si BypassGlobal ou BypassCableLimitSwitch)
+ForbidDescent := ((ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch);
 
-// ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (récupération mou câble : montée interdite même en récup)
-// 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement,
-// même si l'alarme IHM (bit5) a été acquittée pour permettre la descente.
-ForbidAscent := (ErrorId AND 16#0020) <> 16#0000
+// ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (bypasser si BypassGlobal ou BypassTopLimitSwitch)
+// 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement
+ForbidAscent := ((ErrorId AND 16#0020) <> 16#0000
              OR (NOT TopPositionSensor AND NOT InReferencingMode)
-             OR ((ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable);
+             OR ((ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable))
+             AND NOT (BypassGlobal OR BypassTopLimitSwitch);
 
 // 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
