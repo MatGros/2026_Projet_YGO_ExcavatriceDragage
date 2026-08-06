@@ -35,6 +35,8 @@ VAR
 
     M3_HeightInterlockOk    : BOOL; // 🆕 2026-08-06 : TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)
     M3_LimitSwitchRevEffective : BOOL; // 🆕 2026-08-06 : coupure dure §5bis — bascule sur P1 si Maintenance interdite
+    M3_LimitSwitchFwdStable : BOOL; // 🆕 2026-08-06 : verrou bistable Fdc Trémie (mémorisé stable contre les rebonds)
+    M3_LimitSwitchRevStable : BOOL; // 🆕 2026-08-06 : verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)
 END_VAR
 
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
@@ -64,6 +66,21 @@ TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
                                    NOT PRG_02_Acquisition.TranslationPosP1 AND PRG_02_Acquisition.TranslationPosMaintenance,
                                    PRG_02_Acquisition.M3_LimitSwitchRev);
+
+// 🔒 §0ter STABILISATION BISTABLE FINS DE COURSE EXTRÊMES (Trémie & Maintenance/P1)
+// Maintient la détection stable à 1 même si le capteur physique vibre ou saute brièvement.
+// Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
+IF PRG_02_Acquisition.M3_LimitSwitchFwd THEN
+    M3_LimitSwitchFwdStable := TRUE;
+ELSIF M3_Direction_Active = -1 THEN
+    M3_LimitSwitchFwdStable := FALSE;
+END_IF;
+
+IF M3_LimitSwitchRevEffective THEN
+    M3_LimitSwitchRevStable := TRUE;
+ELSIF M3_Direction_Active = 1 THEN
+    M3_LimitSwitchRevStable := FALSE;
+END_IF;
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
@@ -190,8 +207,8 @@ instSafetyTranslationM3(
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
     Direction               := M3_Direction_Active,
-    LimitSwitchFwd          := PRG_02_Acquisition.M3_LimitSwitchFwd,
-    LimitSwitchRev          := M3_LimitSwitchRevEffective,
+    LimitSwitchFwd          := M3_LimitSwitchFwdStable,
+    LimitSwitchRev          := M3_LimitSwitchRevStable,
     SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
@@ -225,8 +242,8 @@ instTranslationM3(
     SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
     SlowdownSensorMaintenance  := PRG_02_Acquisition.TranslationPosMaintenance AND NOT PRG_02_Acquisition.TranslationPosP2,
     SlowdownSensorP1           := PRG_02_Acquisition.TranslationPosP2,
-    LimitSwitchFwd          := PRG_02_Acquisition.M3_LimitSwitchFwd,
-    LimitSwitchRev          := M3_LimitSwitchRevEffective,
+    LimitSwitchFwd          := M3_LimitSwitchFwdStable,
+    LimitSwitchRev          := M3_LimitSwitchRevStable,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
@@ -295,8 +312,8 @@ TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMain
 TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
-TranslationStateHMI.LimitSwitchFwd := PRG_02_Acquisition.M3_LimitSwitchFwd;
-TranslationStateHMI.LimitSwitchRev := M3_LimitSwitchRevEffective;
+TranslationStateHMI.LimitSwitchFwd := M3_LimitSwitchFwdStable;
+TranslationStateHMI.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationStateHMI.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationStateHMI.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
