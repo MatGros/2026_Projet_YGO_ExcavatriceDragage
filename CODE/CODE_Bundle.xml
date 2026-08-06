@@ -22708,13 +22708,34 @@ GVL_Troubleshooting.Inputs := HwIn;
                 <simpleValue value="2" />
               </initialValue>
             </variable>
-            <variable name="DirectionInterlockDelay">
+            <variable name="DirectionInterlockDelayDescent">
               <type>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#200ms" />
+                <simpleValue value="TIME#400ms" />
               </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 (retour terrain) : interlock changement de sens asymétrique — descente sans
+effort (pas de charge résistante, on peut réengager vite), montée = charge en traction
+(délai plus long avant réengagement). Remplace DirectionInterlockDelay unique (200ms).
+⚠️ Valeurs fixées volontairement SOUS les réglages de décélération paramétrables par
+l'utilisateur (CfgRampDecelNormalRate → ~500ms descente / ~1000ms montée pour décélérer)
+afin que cet interlock ne soit normalement JAMAIS le facteur limitant : la rampe elle-même
+a déjà ramené la vitesse à 0 avant que ce délai n'expire, dans un fonctionnement normal.
+Réengagement en descente (CommandedDirection=-1)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionInterlockDelayAscent">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#900ms" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Réengagement en montée (CommandedDirection=1)</html:xhtml>
+              </documentation>
             </variable>
             <variable name="ContactorFeedbackTimeout">
               <type>
@@ -22729,15 +22750,22 @@ GVL_Troubleshooting.Inputs := HwIn;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#100ms" />
+                <simpleValue value="TIME#0ms" />
               </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 (retour terrain) : plus d'attente fixe à chaque démarrage — le desserrage
+frein attend désormais la confirmation PHYSIQUE réelle du contacteur (ContactorEngaged,
+FB_WinchOutputInterlock_LD §2bis), pas un délai artificiel identique à chaque fois. Seule
+l'inversion de sens rapide reste protégée par un délai dédié (DirectionInterlockDelay
+Descent/Ascent ci-dessus) — ce n'est pas la même protection, ne pas réintroduire ici.</html:xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeDelayMagnetise">
               <type>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#300ms" />
+                <simpleValue value="TIME#0ms" />
               </initialValue>
             </variable>
             <variable name="BrakeDelayMotorDecel">
@@ -23022,6 +23050,14 @@ GVL_Troubleshooting.Inputs := HwIn;
                 <derived name="TON" />
               </type>
             </variable>
+            <variable name="EffectiveDirectionInterlockDelay">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : DirectionInterlockDelayDescent/Ascent selon le sens ENTRANT (Direction)</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="CommandedDirection">
               <type>
                 <INT />
@@ -23237,21 +23273,29 @@ SpeedRamp(Target := RampTargetPct,
           DecelRate := SEL(EffectiveSafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
+// 🆕 2026-08-06 : délai asymétrique selon le sens ENTRANT (Direction) — descente sans effort
+// (câble mou/gravité favorable) réengage plus vite que montée (charge en traction).
+IF Direction = -1 THEN
+    EffectiveDirectionInterlockDelay := DirectionInterlockDelayDescent;
+ELSE
+    EffectiveDirectionInterlockDelay := DirectionInterlockDelayAscent;
+END_IF;
+
 IF Direction &lt;&gt; CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
         CommandedDirection := Direction;
-        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+        DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
     ELSIF ABS(SpeedRamp.Current) &lt; 0.1 THEN
-        DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
+        DirectionChangeDelay(IN := TRUE, PT := EffectiveDirectionInterlockDelay);
         IF DirectionChangeDelay.Q THEN
             CommandedDirection := Direction;
-            DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+            DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
         END_IF;
     ELSE
-        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+        DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
     END_IF;
 ELSE
-    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
 END_IF;
 
 // 🆕 Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,

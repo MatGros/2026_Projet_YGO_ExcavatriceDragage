@@ -91,10 +91,23 @@ VAR_INPUT
     CfgRampDecelNormalRate     : REAL := 150.0;
     CfgRampDecelFastRate       : REAL := 400.0;
     SpeedStepHystMargin     : REAL := 2.0;
-    DirectionInterlockDelay : TIME := T#200ms;
+    // 🆕 2026-08-06 (retour terrain) : interlock changement de sens asymétrique — descente sans
+    // effort (pas de charge résistante, on peut réengager vite), montée = charge en traction
+    // (délai plus long avant réengagement). Remplace DirectionInterlockDelay unique (200ms).
+    // ⚠️ Valeurs fixées volontairement SOUS les réglages de décélération paramétrables par
+    // l'utilisateur (CfgRampDecelNormalRate → ~500ms descente / ~1000ms montée pour décélérer)
+    // afin que cet interlock ne soit normalement JAMAIS le facteur limitant : la rampe elle-même
+    // a déjà ramené la vitesse à 0 avant que ce délai n'expire, dans un fonctionnement normal.
+    DirectionInterlockDelayDescent : TIME := T#400ms;  // Réengagement en descente (CommandedDirection=-1)
+    DirectionInterlockDelayAscent  : TIME := T#900ms;  // Réengagement en montée (CommandedDirection=1)
     ContactorFeedbackTimeout: TIME := T#500ms;
-    BrakeDelayContactClose  : TIME := T#100ms;
-    BrakeDelayMagnetise     : TIME := T#300ms;
+    // 🆕 2026-08-06 (retour terrain) : plus d'attente fixe à chaque démarrage — le desserrage
+    // frein attend désormais la confirmation PHYSIQUE réelle du contacteur (ContactorEngaged,
+    // FB_WinchOutputInterlock_LD §2bis), pas un délai artificiel identique à chaque fois. Seule
+    // l'inversion de sens rapide reste protégée par un délai dédié (DirectionInterlockDelay
+    // Descent/Ascent ci-dessus) — ce n'est pas la même protection, ne pas réintroduire ici.
+    BrakeDelayContactClose  : TIME := T#0ms;
+    BrakeDelayMagnetise     : TIME := T#0ms;
     BrakeDelayMotorDecel    : TIME := T#500ms;
     BrakeFeedbackTimeout    : TIME := T#300ms; // Strictement sous watchdog final 500 ms
     Homed                   : BOOL;             // 🆕 État de référencement du treuil
@@ -139,6 +152,7 @@ VAR
     ResetEdge           : R_TRIG;
     ErrorEdge           : R_TRIG;
     DirectionChangeDelay: TON;
+    EffectiveDirectionInterlockDelay : TIME; // 🆕 2026-08-06 : DirectionInterlockDelayDescent/Ascent selon le sens ENTRANT (Direction)
     CommandedDirection  : INT;
     TonContactorsDropped: TON;   // 🔧 REX 2026-07-07 : remplace TonFwdFeedback/TonRevFeedback
     BusinessStepDelay    : TON;   // 🪜 Tempo métier nominale entre hausses de palier
@@ -225,21 +239,29 @@ SpeedRamp(Target := RampTargetPct,
           DecelRate := SEL(EffectiveSafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
+// 🆕 2026-08-06 : délai asymétrique selon le sens ENTRANT (Direction) — descente sans effort
+// (câble mou/gravité favorable) réengage plus vite que montée (charge en traction).
+IF Direction = -1 THEN
+    EffectiveDirectionInterlockDelay := DirectionInterlockDelayDescent;
+ELSE
+    EffectiveDirectionInterlockDelay := DirectionInterlockDelayAscent;
+END_IF;
+
 IF Direction <> CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction <> 0 THEN
         CommandedDirection := Direction;
-        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+        DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
     ELSIF ABS(SpeedRamp.Current) < 0.1 THEN
-        DirectionChangeDelay(IN := TRUE, PT := DirectionInterlockDelay);
+        DirectionChangeDelay(IN := TRUE, PT := EffectiveDirectionInterlockDelay);
         IF DirectionChangeDelay.Q THEN
             CommandedDirection := Direction;
-            DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+            DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
         END_IF;
     ELSE
-        DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+        DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
     END_IF;
 ELSE
-    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
 END_IF;
 
 // 🆕 Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
