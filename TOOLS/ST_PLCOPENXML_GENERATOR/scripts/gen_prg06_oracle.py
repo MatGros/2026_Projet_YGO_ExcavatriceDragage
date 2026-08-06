@@ -288,20 +288,28 @@ def _make_block(ld, lid, type_name, instance_name, input_specs, output_specs):
     return block
 
 
-def _build_interlock_gate_network(ld, counter, title, request_enable_var, coil_var):
-    """Réseau AND(RequestEnable, NOT SafetyStructureNotValidated) -> coil InterlockEnable.
+def _build_interlock_gate_network(ld, counter, title, request_enable_var, coil_var, safety_vars=None):
+    """Réseau AND(RequestEnable, NOT safety_var1, NOT safety_var2, ...) -> coil InterlockEnable.
 
-    Rend visible EN CLAIR le garde-fou structurel : tant que
-    SafetyStructureNotValidated=TRUE, InterlockEnable reste FALSE quel que soit
-    RequestEnable — AUCUNE sortie physique n'est autorisée.
+    Rend visible EN CLAIR le garde-fou structurel / sécurité machine.
     """
     _network_header(ld, counter, title)
     c1_id = _new_id(counter)
     _make_contact(ld, c1_id, request_enable_var, source_local_id=0)
-    c2_id = _new_id(counter)
-    _make_contact(ld, c2_id, "SafetyStructureNotValidated", negated=True, source_local_id=c1_id)
+
+    if safety_vars is None:
+        safety_vars = ["SafetyStructureNotValidated"]
+    elif isinstance(safety_vars, str):
+        safety_vars = [safety_vars]
+
+    prev_id = c1_id
+    for var in safety_vars:
+        c_id = _new_id(counter)
+        _make_contact(ld, c_id, var, negated=True, source_local_id=prev_id)
+        prev_id = c_id
+
     coil_id = _new_id(counter)
-    _make_coil(ld, coil_id, c2_id, coil_var)
+    _make_coil(ld, coil_id, prev_id, coil_var)
 
 
 def _build_winch_interlock_network(ld, counter, title, instance_name, enable_var,
@@ -502,6 +510,10 @@ def build_prg06_ld():
         "🛡️ Interlock M1 — Autorisation (structure validée AND demande Enable)",
         "PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable",
         "M1InterlockEnable",
+        [
+            "PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop",
+            "PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error",
+        ],
     )
     m1_targets = {
         "RelayFwd": "M1RelayFwd", "RelayRev": "M1RelayRev",
@@ -523,6 +535,10 @@ def build_prg06_ld():
         "🛡️ Interlock M2 — Autorisation (structure validée AND demande Enable)",
         "PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable",
         "M2InterlockEnable",
+        [
+            "PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop",
+            "PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error",
+        ],
     )
     m2_targets = {
         "RelayFwd": "M2RelayFwd", "RelayRev": "M2RelayRev",
@@ -544,6 +560,11 @@ def build_prg06_ld():
         "🛡️ Interlock M3 — Autorisation (structure validée AND demande Enable)",
         "PRG_05_Translation.TranslationFinalInterlockRequest.Enable",
         "M3InterlockEnable",
+        [
+            "PRG_05_Translation.TranslationSafetyHMI.PowerCutOff",
+            "PRG_05_Translation.TranslationSafetyHMI.SafeStop",
+            "PRG_05_Translation.TranslationSafetyHMI.Error",
+        ],
     )
     # 🆕 LOT2 2026-08-05 : DriveControlWord/DriveFreqRefWord (WORD) capturés en variables
     # locales par <expression> interne au bloc (même pattern sûr que BrakeCmd) — le
@@ -693,7 +714,7 @@ def build_prg06_pou():
         if name == "SafetyStructureNotValidated":
             iv = ET.SubElement(v, "initialValue")
             sv = ET.SubElement(iv, "simpleValue")
-            sv.set("value", "TRUE")
+            sv.set("value", "FALSE")
 
     # 🐛 FIX 2026-08-05 (audit terrain M3) : les VAR_OUTPUT dq_var (M1_RelayFwd_Up_DQ,
     # M3_BrakeRelease_RQ, ...) ne sont plus déclarées ici — plus aucun coil ne les cible
