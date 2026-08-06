@@ -78,6 +78,7 @@ Frein à manque de courant. Sécurité par Méca A/B + butées extrêmes + incoh
 | `ST_BypassTranslation` | IHM RETAIN | `Safety`, `Translation` |
 | `ST_HwTranslation` | `Acquisition (CFC)` | `Acquisition` (HwIn) |
 | `E_TranslationFinalInterlockReason` | `FB_TranslationOutputInterlock_LD` | IHM, Supervision (troubleshooting absorbé) |
+| `ST_TranslationCfg` (`GVL_IHM.TranslationM3.Cfg`) | IHM | `PRG_05_Translation` (3 vitesses d'approche) — 🆕 2026-08-06, pont `FB_CfgPersistBridge_TranslationCfg` vers `GVL_PERSISTENT._TranslationCfgPersist`, même doctrine que `ST_WinchCfg` |
 
 📌 Correspondance des POU : `Acquisition` → `PRG_02_Acquisition` · `Safety` M3 + `Translation`
 → `PRG_05_Translation` · `Outputs` → `PRG_06_Outputs_LD` · `Supervision`/`Troubleshooting`
@@ -154,6 +155,7 @@ l'état actuel : voir §5 alerte 7, code réel constaté 2026-08-05.
 | 7 | ✅ résolu | **`DeadmanArmed` lu par `PRG_05_Translation.st` (lot LOT3 2026-08-05)** — `PRG_02_Acquisition` publie `JoystickDeadmanArmed`, `M3_StartStop_Active` (branches MAINT_N1/N2) l'exige désormais. Écart Winch M1/M2 non traité, hors périmètre de ce lot | PLAN_TASK T106 |
 | 8 | ✅ résolu | **`FB_Diag_IhmHeartbeat` instancié (lot LOT0 2026-08-05)** dans `PRG_07_Supervision.st:28,66`, publie `GVL_IHM.Commun.HeartbeatIhmOk` et champs associés — prérequis de l'alerte 5 levé | PLAN_TASK T107 |
 | 9 | ✅ résolu | **Inversion de sens rapide bloquait `CommandedDirection` dans l'ancien sens (retour terrain 2026-08-05)** — la cible de rampe suivait la magnitude joystick en continu sans jamais croiser le seuil d'arrêt (0.1%) qui autorise l'interlock changement de sens. Même bug déjà corrigé sur `FB_Winch` (REX 2026-07-02), jamais porté sur `FB_Translation`. Corrigé : `DirectionChangePending` force la cible de rampe à 0.0 dès qu'une inversion est en attente. Garde-fou `check_direction_change_interlock.py` ajouté (GATE 2sexies). **Vérification manuelle terrain requise avant validation** (inversion rapide Fwd↔Rev au joystick) | REX 2026-08-05 |
+| 10 | ✅ résolu | **Session terrain complète 2026-08-06** — position estimée persistante (reprise reboot), capteurs `AtXxx` exposés IHM avec verrou bistable (armé sur front du capteur PROPRE à chaque position — 2 conceptions intermédiaires abandonnées en direct, voir `FB_Translation_PositionDecoder` §3bis), libéré sur mouvement réel confirmé ≥1.5s. `InvertDirection` déplacé vers le mot de commande variateur uniquement (§7bis `FB_Translation`). Ralentissement généralisé à 3 zones avec gate mode Maintenance. `MaintenanceM3TargetEnable` élargi à MAINT_N1 OU MAINT_N2 + bit IHM dédié. Détail complet : commits `076377e`..`a9b016f` | REX terrain 2026-08-06 |
 
 ---
 
