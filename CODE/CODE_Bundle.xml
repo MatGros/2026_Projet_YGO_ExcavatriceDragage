@@ -20762,7 +20762,7 @@ END_IF;
 // haut en continu, TargetReached ne montre plus de front) contournait le verrou et M3 repartait
 // vers la butée. Conforme à la demande d'origine : "on doit repartir dans l'AUTRE sens", jamais
 // juste relâcher-réappuyer pareil. Instantané, jamais retardé (le dégagement doit rester rapide).
-IF (Direction = DirectionAtArrival * (-1)) OR ResetEdge.Q THEN
+IF (Direction = DirectionAtArrival * (-1)) OR ResetEdge.Q OR (NOT TargetReached AND NOT LimitSwitchFwd AND NOT LimitSwitchRev) THEN
     DirectionAtArrival := 0;
 END_IF;
 
@@ -26748,7 +26748,7 @@ END_IF;
 
 IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 THEN
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.M3_LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
