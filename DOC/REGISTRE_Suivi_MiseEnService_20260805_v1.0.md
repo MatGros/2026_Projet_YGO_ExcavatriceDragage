@@ -119,6 +119,13 @@
 
 ---
 
+### 📌 À faire — Ajouter les **In/Out (entrées/sorties) dans l'IHM** pour la maintenance
+- 🎯 **Demande** : Rendre visibles dans l'IHM les **entrées/sorties physiques** (état réel) en vue maintenance — utile pour la MES, le test I/O (`v0.5.9_IOTest`) et le diagnostic câblage (polarité NO/NC, sens).
+- 🚦 **Statut** : ⚪ **Non traité — à planifier**
+- 📌 **Action différée** : Créer une ligne `Txx` dans `PLAN_TASK` §3 (proposé ; pas modifié sans ta validation).
+
+---
+
 ## 3. 📄 Modèle à Dupliquer
 
 ```md

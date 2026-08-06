@@ -162,6 +162,10 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
         RampTargetPct := 0.0;
     ELSE
         RampTargetPct := ABS(SpeedRefPct);
+        // 🎚️ Consigne minimale joystick (1.0 Hz) : si un mouvement est demandé (SpeedRefPct > 0.0), la consigne est au moins égale à 1.0 Hz
+        IF RampTargetPct > 0.0 THEN
+            RampTargetPct := MAX(RampTargetPct, (1.0 / SEL(DriveFreqScaleMaxHz > 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
+        END_IF;
     END_IF;
 END_IF;
 
@@ -238,7 +242,11 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
-MovementRequested := (CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1);
+// 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
+// OU que la fréquence réelle mesurée du variateur M3 est >= 1.0 Hz.
+// Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
+MovementRequested := ((CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1))
+                     OR (ABS(DriveActualFreqHz) >= 1.0);
 
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
 RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
