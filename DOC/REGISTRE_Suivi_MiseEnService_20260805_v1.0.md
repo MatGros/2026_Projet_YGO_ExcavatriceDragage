@@ -85,6 +85,26 @@
 
 ---
 
+### MES-017 — 🎯 Ajout : référencement codeurs absolus **sans condition via IHM**
+- 📅 **Date** : 2026-08-05 | 📍 **Lieu** : Terrain | 🏷️ **Version** : `v0.4.27_ConfigPersistence_TranslationSupervisionSuite`
+- 🎯 **Périmètre** : Codeurs absolus M1/M2, référencement via IHM (`FB_Encoder_Homing`, homing unitaire/nominal)
+- 🚦 **Statut** : 🟢 **Ajouté — à valider en essai**
+- 🔍 **Constat** : Avant, le référencement était **conditionné** (modes MAINT_N1/N2, sélection treuil, codeur opérationnel, contacteurs relâchés, frein appliqué — cf. `GVL_Troubleshooting.HomingM1/M2` Step1-5).
+- 🛠️ **Ajout** : Possibilité de **référencement sans condition via IHM** — preset logiciel immédiat (`HomingRefRaw` recalculé à l'instant, `CablePosM` bascule à `0.0 m` / `CfgTopSensorPosM`).
+- ⚠️ **Repo** : le mécanisme « Homing logiciel immédiat sans condition » existe déjà à `CODE/CODEURS/FB_Encoder_Homing.st:126-135` (front `Home`, `UnitaryMode`). Vérifier qu'il est **câblé/exposé IHM dans `v0.5.9`** (la version repo est la nouvelle archi, pas la `v0.4.27` chargée machine).
+
+---
+
+### MES-018 — 📡 Translation M3 : à l'installation / retour, décodage des capteurs → position connue
+- 📅 **Date** : 2026-08-05 | 📍 **Lieu** : Terrain | 🏷️ **Version** : `v0.4.27_ConfigPersistence_TranslationSupervisionSuite`
+- 🎯 **Périmètre** : Translation M3 — décodage 5 capteurs (Trémie|PV|P2|P1|Maintenance), position au démarrage/installation
+- 🚦 **Statut** : 🟢 **Modification faite — OK**
+- 🔍 **Constat** : À l'**installation / retour** (démarrage, remise en place), la position n'était pas connue directement.
+- 🛠️ **Modification** : Avec le **décodage des capteurs**, le code **dit « on est à telle position »** dès le démarrage (position initialisée depuis le capteur actif, sans homing).
+- ⚠️ **Repo** : comportement déjà implémenté à `CODE/TRANSLATION/FB_Translation_PositionEstimator.st:90-99` (init au premier capteur actif) + recalage absolu aux fronts (§2). ⚠️ L'init se base sur les **capteurs bruts**, pas sur le mot **validé** par `FB_Translation_PositionDecoder` (combinaisons incohérentes) — vérifier le garde-fou incohérence au démarrage dans `v0.5.9`.
+
+---
+
 ## 3. 📄 Modèle à Dupliquer
 
 ```md
