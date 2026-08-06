@@ -74,7 +74,8 @@ END_VAR
 
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-IF NOT Enable OR NOT PowerContactorEngaged THEN
+// 🆕 2026-08-06 : PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
+IF NOT Enable THEN
     PresetRequest := FALSE;
     PresetValue := 0;
     State := E_State.DISABLED;
@@ -117,7 +118,8 @@ END_IF;
 // 🎯 5. DEMANDE DE RÉFÉRENCEMENT (flux nominal)
 // Les cibles nominale et unitaire sont rejetées hors du domaine codeur sûr [-99.00;+99.00] m.
 // BypassGlobal = TRUE → saute la vérification d'arrêt (mise en service)
-ArretConfirme := BypassGlobal OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+// 🆕 2026-08-06 : NOT PowerContactorEngaged valide automatiquement l'arrêt (puissance 400V coupée = arrêt mécanique absolu)
+ArretConfirme := BypassGlobal OR NOT PowerContactorEngaged OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
 
 PresetRequest := FALSE;   // Défaut chaque cycle — repose uniquement sur le front HomeEdge ci-dessous
 IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
@@ -140,8 +142,6 @@ IF HomeEdge.Q AND (State <> E_State.BUSY) THEN
         ErrorId := ErrorId OR 16#0001;        // bit0 : mode non autorisé (seulement MAINT N1/N2)
     ELSIF UnitaryMode AND (Mode <> E_Mode.MAINT_N2) THEN
         ErrorId := ErrorId OR 16#0001;
-    ELSIF UnitaryMode AND NOT WinchSelected THEN
-        ErrorId := ErrorId OR 16#0002;        // bit1 : mauvais treuil sélectionné
     ELSIF NOT EncoderAvailable THEN
         ErrorId := ErrorId OR 16#0008;        // bit3 : codeur indisponible
     ELSIF NOT ArretConfirme THEN
