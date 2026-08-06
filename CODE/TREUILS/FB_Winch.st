@@ -307,13 +307,24 @@ ELSE
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_CASE;
 
+// 🆕 2026-08-06 (retour terrain) : coupure INSTANTANÉE de tous les contacteurs de vitesse dès
+// que l'opérateur relâche le joystick (Direction=0) — ne pas attendre la fin de la rampe de
+// décélération. Avant ce correctif, StepNumber suivait la rampe (décélération progressive),
+// gardant les contacteurs de vitesse engagés plusieurs secondes après l'ordre d'arrêt.
+IF Direction = 0 THEN
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+END_IF;
+
 // 🛑 Interlock de sécurité frein : magnétisation normale autorisée, mais coupure stricte des relais si FB_Brake est en ERREUR
 BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck;
 
 // Le sens et la pré-magnétisation suivent la demande brute ; le palier métier
 // temporisé reste seul transmis à l'interlock final pour autoriser la puissance.
-RelayFwd := (CommandedDirection = 1) AND (RequestedStep > 0) AND BrakeSafetyOk;
-RelayRev := (CommandedDirection = -1) AND (RequestedStep > 0) AND BrakeSafetyOk;
+// 🆕 2026-08-06 (retour terrain) : ET Direction=1/-1 (demande OPÉRATEUR brute, pas
+// CommandedDirection qui reste au dernier sens jusqu'à la retombée de la rampe) — coupure
+// instantanée du contacteur de sens dès le relâchement du joystick, même sécurité que ci-dessus.
+RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep > 0) AND BrakeSafetyOk;
+RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep > 0) AND BrakeSafetyOk;
 
 IF ForbidDescent THEN
     RelayRev := FALSE;
