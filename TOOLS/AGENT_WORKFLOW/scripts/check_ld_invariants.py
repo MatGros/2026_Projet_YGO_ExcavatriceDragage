@@ -33,7 +33,16 @@ POU_NAME = "PRG_06_Outputs_LD"
 # synchronisée à la main avec DIRECT_HW_COILS dans gen_prg06_oracle.py. Reste en WARN
 # (jamais silencieux) — retirer de cette liste dès validation réelle à l'import CODESYS,
 # ou revenir au remap manuel qualifié si le crash annoncé se confirme (REX 2026-08-06).
-KNOWN_DIRECT_HW_COIL_TARGETS = {"M3_BrakeRelease_RQ"}
+KNOWN_DIRECT_HW_COIL_TARGETS = {
+    "M1_RelayFwd_Up_DQ", "M1_RelayRev_Down_DQ",
+    "M1_SpeedContactor_1_DQ", "M1_SpeedContactor_2_DQ", "M1_SpeedContactor_3_DQ", "M1_SpeedContactor_4_DQ",
+    "M1_BrakeRelease_RQ",
+    "M2_RelayFwd_Up_Close_DQ", "M2_RelayRev_Down_Open_DQ",
+    "M2_SpeedContactor_1_DQ", "M2_SpeedContactor_2_DQ", "M2_SpeedContactor_3_DQ", "M2_SpeedContactor_4_DQ",
+    "M2_BrakeRelease_RQ",
+    "M3_BrakeRelease_RQ",
+    "PowerKeepAlive_A_RQ", "PowerKeepAlive_B_RQ", "EmergencyArming_RQ"
+}
 
 
 def _tag(el: ET.Element) -> str:

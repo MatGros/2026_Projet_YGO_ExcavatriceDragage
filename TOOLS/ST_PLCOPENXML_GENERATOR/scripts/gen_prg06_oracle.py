@@ -108,7 +108,24 @@ ACTUATOR_NETWORKS = [
 # ⚠️ SCOPE MINIMAL DÉLIBÉRÉ (frein M3 uniquement) — ne pas généraliser aux autres
 # canaux (M1/M2, chaîne AU) avant validation de CE réseau précis à l'import CODESYS.
 DIRECT_HW_COILS = [
-    ("TranslationBrakeCmd", "M3_BrakeRelease_RQ", "🧪 Frein Translation M3 — coil directe sur nom HW brut (essai 2026-08-06, décision utilisateur)"),
+    ("M1RelayFwd", "M1_RelayFwd_Up_DQ", "Relais Montée M1"),
+    ("M1RelayRev", "M1_RelayRev_Down_DQ", "Relais Descente M1"),
+    ("M1SpeedContactor1", "M1_SpeedContactor_1_DQ", "Contacteur Vitesse M1-1"),
+    ("M1SpeedContactor2", "M1_SpeedContactor_2_DQ", "Contacteur Vitesse M1-2"),
+    ("M1SpeedContactor3", "M1_SpeedContactor_3_DQ", "Contacteur Vitesse M1-3"),
+    ("M1SpeedContactor4", "M1_SpeedContactor_4_DQ", "Contacteur Vitesse M1-4"),
+    ("M1BrakeCmd", "M1_BrakeRelease_RQ", "Frein M1"),
+    ("M2RelayFwd", "M2_RelayFwd_Up_Close_DQ", "Relais Fermeture/Montée M2"),
+    ("M2RelayRev", "M2_RelayRev_Down_Open_DQ", "Relais Ouverture/Descente M2"),
+    ("M2SpeedContactor1", "M2_SpeedContactor_1_DQ", "Contacteur Vitesse M2-1"),
+    ("M2SpeedContactor2", "M2_SpeedContactor_2_DQ", "Contacteur Vitesse M2-2"),
+    ("M2SpeedContactor3", "M2_SpeedContactor_3_DQ", "Contacteur Vitesse M2-3"),
+    ("M2SpeedContactor4", "M2_SpeedContactor_4_DQ", "Contacteur Vitesse M2-4"),
+    ("M2BrakeCmd", "M2_BrakeRelease_RQ", "Frein M2"),
+    ("TranslationBrakeCmd", "M3_BrakeRelease_RQ", "Frein Translation M3"),
+    ("PowerKeepAliveACmd", "PowerKeepAlive_A_RQ", "Maintien Puissance Voie A"),
+    ("PowerKeepAliveBCmd", "PowerKeepAlive_B_RQ", "Maintien Puissance Voie B"),
+    ("EmergencyArmingCmd", "EmergencyArming_RQ", "Impulsion Réarmement AU"),
 ]
 
 # Inputs de FB_Safety (ordre de déclaration) — inchangé (AC5 : ne pas modifier)
