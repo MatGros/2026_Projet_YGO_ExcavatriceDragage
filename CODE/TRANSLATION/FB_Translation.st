@@ -89,7 +89,6 @@ VAR
     RampTargetPct        : REAL;
     CaptorDebounceTon     : TON;
     ArrivalEdge            : R_TRIG;
-    ArrivalNeutralTimer    : TON;          // 🆕 2026-08-06 : anti-rebond retour au neutre (verrou anti-rebond)
     DirectionAtArrival     : INT;
     ArrivalLock             : BOOL;        // Arrêt exact sur capteur cible
     MovementRequested      : BOOL;         // Pilote FB_Brake
@@ -174,29 +173,29 @@ IF (Direction = -1) AND SlowdownSensorP1 THEN
     RampTargetPct := LIMIT(0.0, RampTargetPct, (ApproachSpeedP1Hz / SEL(DriveFreqScaleMaxHz > 0.0, 60.0, DriveFreqScaleMaxHz)) * 100.0);
 END_IF;
 
-// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1 & Maintenance)
-// 🆕 2026-08-06 (retour terrain) : élargi à P1 (arrêt travail), pas seulement les 2 extrémités.
-// Dès qu'on touche un capteur d'arrêt (TargetReached), le sens d'arrivée (DirectionAtArrival)
-// est MÉMORISÉ et BLOQUÉ. Même si le capteur rebondit/clignote quelques ms et qu'on le perd
-// temporairement alors que le joystick reste enclenché, l'automate refuse de ré-avancer dans le
-// MÊME sens tant que l'opérateur n'a pas relâché le manche au neutre de façon SOUTENUE
-// (ArrivalNeutralTimer, pas un simple blip) ou demandé le sens inverse (dégagement, instantané)
-// — évite l'à-coup avant/re-stop sur rebond capteur ET sur relâchement joystick transitoire.
-ArrivalEdge(CLK := TargetReached);
+// 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1, Maintenance, Fdc extrêmes)
+// 🆕 2026-08-06 (retour terrain + revue) : élargi à P1 (arrêt travail), pas seulement les 2
+// extrémités. Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de
+// course dur (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même
+// brève arme le même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ.
+// 🔧 REX 2026-08-06 (revue) : LimitSwitchFwd/Rev ne passaient PAS par ce verrou — un Fdc qui
+// s'ouvre quelques ms pendant le freinage laissait le §5bis relâcher SA coupure directe sans que
+// rien ne prenne le relais, la rampe (encore haute en interne) revenait en sortie -> ré-accélération.
+// Désormais toute activation, même un instant, arme DirectionAtArrival comme un TargetReached.
+ArrivalEdge(CLK := TargetReached
+                 OR (LimitSwitchFwd AND (CommandedDirection = 1))
+                 OR (LimitSwitchRev AND (CommandedDirection = -1)));
 IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
 
-// 🆕 2026-08-06 (retour terrain, à-coup persistant malgré le verrou) : un retour au neutre
-// n'a AUCUN anti-rebond, contrairement au capteur (CaptorDebounceTon ci-dessus) — un
-// `Direction=0` d'un seul scan (bruit joystick, micro-relâchement involontaire à l'arrivée,
-// ou tout autre blip) efface `DirectionAtArrival` immédiatement et lève le verrou. L'opérateur
-// réappuie ensuite dans le MÊME sens (pensant n'avoir jamais lâché) → redémarrage vers la butée.
-// Un changement de sens FRANC (dégagement volontaire, sans ambiguïté) reste instantané, jamais
-// retardé — seul le retour au neutre est débounced, même principe que NeutralHoldTimer côté
-// homme-mort (FB_Joystick.st).
-ArrivalNeutralTimer(IN := (Direction = 0) AND (DirectionAtArrival <> 0), PT := CaptorDebounce);
-IF (Direction = DirectionAtArrival * (-1)) OR ArrivalNeutralTimer.Q THEN
+// 🔧 REX 2026-08-06 (revue) : un retour au neutre, même SOUTENU (>100ms), ne doit JAMAIS lever
+// le verrou — seul un vrai changement de sens (dégagement volontaire, sans ambiguïté) le fait.
+// Sinon : neutre 100ms+ puis réappui dans le MÊME sens (le capteur/Fdc étant resté au niveau
+// haut en continu, TargetReached ne montre plus de front) contournait le verrou et M3 repartait
+// vers la butée. Conforme à la demande d'origine : "on doit repartir dans l'AUTRE sens", jamais
+// juste relâcher-réappuyer pareil. Instantané, jamais retardé (le dégagement doit rester rapide).
+IF Direction = DirectionAtArrival * (-1) THEN
     DirectionAtArrival := 0;
 END_IF;
 

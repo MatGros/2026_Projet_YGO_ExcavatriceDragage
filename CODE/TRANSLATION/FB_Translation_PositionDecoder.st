@@ -26,11 +26,23 @@ VAR_OUTPUT
     SensorsWord       : BYTE;   // Diagnostic (bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance)
 
     // 🆕 Exposition des positions individuelles pour consommation par les programmes aval (migration PRG_00_Inputs)
+    // ⚠️ CUMULATIF ("au-dessus de ce seuil") — pour le ralentissement d'approche (zone large,
+    // doit tenir toute la durée de l'approche, pas juste un instant). Ne PAS utiliser pour
+    // détecter une arrivée/cible (voir TranslationAtXxx ci-dessous, mot exact, avec front).
     TranslationPosTremie      : BOOL;   // TRUE = capteur Trémie actif
     TranslationPosPV          : BOOL;   // TRUE = capteur PV actif
     TranslationPosP2          : BOOL;   // TRUE = capteur P2 actif
     TranslationPosP1          : BOOL;   // TRUE = capteur P1 actif
     TranslationPosMaintenance : BOOL;   // TRUE = capteur Maintenance actif
+
+    // 🆕 2026-08-06 : mot EXACT (pas cumulatif) — dédié détection d'arrivée/cible (front franc
+    // à l'arrivée, peu importe le sens de venue) et coupure dure. Ne PAS utiliser pour le
+    // ralentissement (zone trop étroite, ne tiendrait pas la durée de l'approche).
+    TranslationAtTremie      : BOOL;   // TRUE uniquement si SensorsWord = 11111
+    TranslationAtPV          : BOOL;   // TRUE uniquement si SensorsWord = 01111
+    TranslationAtP2          : BOOL;   // TRUE uniquement si SensorsWord = 00111
+    TranslationAtP1          : BOOL;   // TRUE uniquement si SensorsWord = 00001
+    TranslationAtMaintenance : BOOL;   // TRUE uniquement si SensorsWord = 00000
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -56,8 +68,17 @@ LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
 LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
 
 // 🆕 Reprise des capteurs de position pour les consommateurs legacy (passthrough, identique à l'entrée filtrée)
+// ⚠️ CUMULATIF — voir avertissement en déclaration, réservé au ralentissement d'approche.
 TranslationPosTremie      := SensorTremie;
 TranslationPosPV          := SensorPV;
 TranslationPosP2          := SensorP2;
 TranslationPosP1          := SensorP1;
 TranslationPosMaintenance := SensorMaintenance;
+
+// 🆕 2026-08-06 (retour terrain, décodage réel des positions machine) : mot EXACT, réservé
+// détection d'arrivée/cible et coupure dure — voir avertissement en déclaration.
+TranslationAtTremie      := (SensorsWord = 2#11111);
+TranslationAtPV          := (SensorsWord = 2#01111);
+TranslationAtP2          := (SensorsWord = 2#00111);
+TranslationAtP1          := (SensorsWord = 2#00001);
+TranslationAtMaintenance := (SensorsWord = 2#00000);

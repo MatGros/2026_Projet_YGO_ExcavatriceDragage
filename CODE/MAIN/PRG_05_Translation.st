@@ -143,11 +143,13 @@ M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 // ci-dessous tombait toujours en ELSE=FALSE et le verrou anti-rebond §4ter de FB_Translation
 // (DirectionAtArrival) ne s'armait jamais en usage réel. Repli explicite hors sélection
 // SEMI_AUTO : n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance) arme le verrou.
+// 🆕 2026-08-06 : mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
+// franc à l'arrivée quel que soit le sens de venue (voir FB_Translation_PositionDecoder.st).
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie;
-    2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP2;
-    3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP1;
-    4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosMaintenance;
+    1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie;
+    2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP2;
+    3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP1;
+    4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtMaintenance;
 ELSE
     // 🆕 2026-08-06 (retour terrain) : zone Maintenance interdite (MaintenanceM3TargetEnable=
     // FALSE) -> P2 devient l'arrêt terminal (garde-fou avant la zone interdite), remplace P1/
@@ -155,12 +157,12 @@ ELSE
     // est autorisée. Le ralentissement d'approche P2 existe déjà (SlowdownSensorP1, Direction=-1,
     // FB_Translation §4bis) : même vitesse réutilisée (ApproachSpeedP1Hz), pas de 4e vitesse créée.
     IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
-        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
-                                    OR PRG_02_Acquisition.TranslationPosP1
-                                    OR PRG_02_Acquisition.TranslationPosMaintenance;
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie
+                                    OR PRG_02_Acquisition.TranslationAtP1
+                                    OR PRG_02_Acquisition.TranslationAtMaintenance;
     ELSE
-        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
-                                    OR PRG_02_Acquisition.TranslationPosP2;
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie
+                                    OR PRG_02_Acquisition.TranslationAtP2;
     END_IF;
 END_CASE;
 
