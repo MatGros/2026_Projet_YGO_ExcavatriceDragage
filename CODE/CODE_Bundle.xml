@@ -23200,7 +23200,7 @@ IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     
     // 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect)
     // Permet d'approcher les fins de course / limites en vitesse lente de façon progressive
-    IF Homed AND NOT HomingSuspect AND NOT BypassGlobal THEN
+    IF Homed AND NOT HomingSuspect THEN
         // En montée (engagement ou mouvement actif), ralentit à l'approche de la limite haute
         IF ((CommandedDirection = 1) OR (Direction = 1)) AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM)) THEN
             RampTargetPct := MIN(RampTargetPct, CfgSlowSpeedPct);
