@@ -27161,7 +27161,12 @@ instTranslationM3(
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
     SlowdownSensorMaintenance  := PRG_02_Acquisition.TranslationPosMaintenance AND NOT PRG_02_Acquisition.TranslationPosP2,
-    SlowdownSensorP1           := PRG_02_Acquisition.TranslationPosP2,
+    // 🆕 2026-08-06 (retour terrain, URGENT) : AND NOT TranslationPosP1 manquant — TranslationPosP2
+    // est cumulatif depuis la Trémie (code thermomètre, voir FB_Translation_PositionDecoder.st) et
+    // reste vrai jusqu'à P2, pas juste dans la zone P2→P1. Sans cette exclusion (même doctrine que
+    // SlowdownSensorMaintenance ci-dessus), le ralentissement "approche P1" (10Hz) se déclenchait
+    // dès le départ de la Trémie au lieu de juste avant P1.
+    SlowdownSensorP1           := PRG_02_Acquisition.TranslationPosP2 AND NOT PRG_02_Acquisition.TranslationPosP1,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
