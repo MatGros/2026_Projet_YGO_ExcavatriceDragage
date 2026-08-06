@@ -168,17 +168,20 @@ CASE SelTarget OF
     3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP1;
     4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtMaintenance;
 ELSE
-    // 🆕 2026-08-06 (retour terrain) : zone Maintenance interdite (MaintenanceM3TargetEnable=
-    // FALSE) -> P2 devient l'arrêt terminal (garde-fou avant la zone interdite), remplace P1/
-    // Maintenance dans le jeu d'arrêts — comportement fin de course, comme P1 quand Maintenance
-    // est autorisée. Le ralentissement d'approche P2 existe déjà (SlowdownSensorP1, Direction=-1,
-    // FB_Translation §4bis) : même vitesse réutilisée (ApproachSpeedP1Hz), pas de 4e vitesse créée.
-    IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
-        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie
-                                    OR PRG_02_Acquisition.TranslationAtMaintenance;
+    IF M3_Direction_Active = 1 THEN
+        // En Marche Avant (+1 vers Trémie) : seule Trémie est le point d'arrêt automatique
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie;
+    ELSIF M3_Direction_Active = -1 THEN
+        // En Marche Arrière (-1 vers Maintenance) :
+        // - Si Maintenance autorisée -> arrêt sur Maintenance
+        // - Si Maintenance interdite -> arrêt sur P1
+        IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
+            M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtMaintenance;
+        ELSE
+            M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP1;
+        END_IF;
     ELSE
-        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie
-                                    OR PRG_02_Acquisition.TranslationAtP2;
+        M3_PositionSensorTarget := FALSE;
     END_IF;
 END_CASE;
 
