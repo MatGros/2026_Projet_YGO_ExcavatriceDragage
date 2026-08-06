@@ -86,8 +86,8 @@ VAR_GLOBAL PERSISTENT RETAIN
     // autoriser la translation — actuellement 6,0 m (≈ CfgTopSensorPos_M 8,0 m - 2,0 m de marge),
     // réglage indépendant de la calibration homing : à revoir si CfgTopSensorPos_M change.
     _TranslationMinHeightM1M2_M     : REAL := 6.0;   // Hauteur mini M1 ET M2 pour autoriser translation (m)
-    _TranslationRampAccelRate_Pct   : REAL := 20.0;  // Accélération translation (%/s)
-    _TranslationRampDecelNormal_Pct : REAL := 40.0;  // Décélération normale (%/s)
+    _TranslationRampAccelRate_Pct   : REAL := 40.0;  // Accélération translation (%/s) — défaut usine 40%
+    _TranslationRampDecelNormal_Pct : REAL := 50.0;  // Décélération normale (%/s) — défaut usine 50%
     _TranslationRampDecelFast_Pct   : REAL := 100.0; // Décélération rapide SafeStop (%/s)
     _TranslationAutoSpeedCap_Pct    : REAL := 40.0;  // Plafond vitesse SEMI_AUTO (%)
     _TranslationSetFreq_Hz          : REAL := 20.0;  // 🚦 Consigne fréquence manuelle opérateur (Hz) — 20.0 = défaut usine (mise en service), recopie continue depuis 2026-08-06 (PRG_07_Supervision)
