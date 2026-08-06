@@ -106,6 +106,19 @@ END_IF;
 // 4. Pour chaque palier 2.._MaxStepClamped : au moins 1 contacteur TRUE (cohérence câblage)
 //    Le palier 1 peut légitimement avoir les 4 contacteurs FALSE : résistances rotoriques
 //    toutes insérées = vitesse minimale. On ne valide pas les paliers jamais atteignables.
+// 🛡️ Fallback si la table RAM n'est pas encore initialisée dans CODESYS (ex: mémoire RETAIN vierge)
+IF (Table.StepThreshold_Pct[5] <= 0.0) THEN
+    Table.StepThreshold_Pct[1] := 20.0;
+    Table.StepThreshold_Pct[2] := 40.0;
+    Table.StepThreshold_Pct[3] := 60.0;
+    Table.StepThreshold_Pct[4] := 80.0;
+    Table.StepThreshold_Pct[5] := 100.0;
+    Table.P2R1 := TRUE;
+    Table.P3R1 := TRUE; Table.P3R2 := TRUE;
+    Table.P4R1 := TRUE; Table.P4R2 := TRUE; Table.P4R3 := TRUE;
+    Table.P5R1 := TRUE; Table.P5R2 := TRUE; Table.P5R3 := TRUE; Table.P5R4 := TRUE;
+END_IF;
+
 _ConfigValid := TRUE;
 _ConfigErrorIdInt := 16#0000;
 
