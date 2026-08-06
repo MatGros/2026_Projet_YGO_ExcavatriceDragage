@@ -28,6 +28,13 @@ from pathlib import Path
 NS = {"pou": "http://www.plcopen.org/xml/tc6_0200"}
 POU_NAME = "PRG_06_Outputs_LD"
 
+# 🧪 Exception documentée (décision utilisateur 2026-08-06) : coil voulue délibérément
+# sur un nom HW brut, malgré le risque de crash que cet invariant même détecte. Liste
+# synchronisée à la main avec DIRECT_HW_COILS dans gen_prg06_oracle.py. Reste en WARN
+# (jamais silencieux) — retirer de cette liste dès validation réelle à l'import CODESYS,
+# ou revenir au remap manuel qualifié si le crash annoncé se confirme (REX 2026-08-06).
+KNOWN_DIRECT_HW_COIL_TARGETS = {"M3_BrakeRelease_RQ"}
+
 
 def _tag(el: ET.Element) -> str:
     return el.tag.rsplit("}", 1)[-1]
@@ -111,10 +118,18 @@ def check_bundle(bundle: Path, report: bool = False) -> tuple[list[str], list[st
         if not name:
             errors.append(f"coil localId={coil.get('localId')} sans variable")
         elif "." not in name and name not in declared:
-            errors.append(
-                f"coil variable '{name}' NON déclarée dans l'interface du POU "
-                f"[REX: ArgumentNullException GetOperandDeclarationInfo]"
-            )
+            if name in KNOWN_DIRECT_HW_COIL_TARGETS:
+                warnings.append(
+                    f"coil variable '{name}' NON déclarée dans l'interface du POU — "
+                    f"exception documentée (décision utilisateur 2026-08-06), NON "
+                    f"VALIDÉE par un import CODESYS réel [REX: ArgumentNullException "
+                    f"GetOperandDeclarationInfo si le crash déjà vécu se reproduit]"
+                )
+            else:
+                errors.append(
+                    f"coil variable '{name}' NON déclarée dans l'interface du POU "
+                    f"[REX: ArgumentNullException GetOperandDeclarationInfo]"
+                )
 
     # --- 4. Pas de motif inVariable -> outVariable ---
     out_vars = ld.findall("pou:outVariable", NS)

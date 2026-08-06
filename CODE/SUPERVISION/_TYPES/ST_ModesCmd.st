@@ -18,6 +18,10 @@ STRUCT
     // 🆕 REX (session WINCH-BTN-01) — bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
     // SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
     // sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
-    TglJoystickMaster  : BOOL := TRUE; (* 🕹️ TRUE (défaut) = joystick pilote Winch (comportement historique, préservé au boot) ; FALSE = boutons IHM BtnUp/BtnDown *)
+    // 🔀 2026-08-06 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
+    // (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé, doublon). ⚠️ Le défaut TRUE
+    // (joystick) s'applique désormais à M3 aussi au boot — M3 démarrait avant en boutons IHM
+    // (FALSE) : changement de comportement au démarrage, assumé (décision 2026-08-06).
+    TglJoystickMaster  : BOOL := TRUE; (* 🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 (comportement historique Winch, préservé au boot) ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev) *)
 END_STRUCT
 END_TYPE

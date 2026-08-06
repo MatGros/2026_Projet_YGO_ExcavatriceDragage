@@ -201,7 +201,6 @@ M3_DriveFreqRefWord := instTranslationOutputInterlockM3.DriveFreqRefWord;
 //   M2_RelayRev_Down_Open_DQ <- PRG_06_Outputs_LD.M2RelayRev
 //   M2_SpeedContactor_1..4_DQ<- PRG_06_Outputs_LD.M2SpeedContactor1..4
 //   M2_BrakeRelease_RQ       <- PRG_06_Outputs_LD.M2BrakeCmd
-//   M3_BrakeRelease_RQ       <- PRG_06_Outputs_LD.TranslationBrakeCmd
 //   M3_CommandWord           <- PRG_06_Outputs_LD.M3_DriveControlWord   (0x3101, %QW6)
 //   M3_SetpointFrequencyHz   <- PRG_06_Outputs_LD.M3_DriveFreqRefWord   (0x3100, %QW7)
 //   PowerKeepAlive_A_RQ      <- PRG_06_Outputs_LD.PowerKeepAliveACmd
@@ -229,6 +228,19 @@ GVL_Global.M2SpeedContactor3 := M2SpeedContactor3;
 GVL_Global.M2SpeedContactor4 := M2SpeedContactor4;
 GVL_Global.M2BrakeCmd        := M2BrakeCmd;
 GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
+
+// === 🧪 Coil directe sur nom HW brut — essai 2026-08-06 (décision utilisateur) ===
+// ⚠️ Scope minimal délibéré : frein M3 UNIQUEMENT, pas généralisé à M1/M2/AU tant
+// que CE réseau précis n'est pas validé à l'import CODESYS. Risque documenté :
+// voir gen_prg06_oracle.py DIRECT_HW_COILS. Si l'import plante, retirer ce réseau
+// (section 2ter dans gen_prg06_oracle.py) et revenir au remap manuel qualifié
+// (PRG_06_Outputs_LD.TranslationBrakeCmd -> M3_BrakeRelease_RQ côté Mapping E/S).
+// 🔍 Constat export CODESYS 2026-08-06 : M3_BrakeRelease_RQ (%QX27.2, VH_0008ER,
+// la VRAIE bobine frein) est resté sur son nom brut par défaut jusqu'ici — le
+// remap manuel qualifié demandé par le lot précédent n'a jamais été appliqué à
+// ce canal précis. Cette coil directe est donc la première tentative réelle de
+// piloter cette sortie depuis PRG_06.
+M3_BrakeRelease_RQ := TranslationBrakeCmd;
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
 

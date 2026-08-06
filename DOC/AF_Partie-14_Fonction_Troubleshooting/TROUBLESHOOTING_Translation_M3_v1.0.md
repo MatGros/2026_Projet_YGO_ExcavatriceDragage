@@ -218,7 +218,9 @@ avant validation finale.
 
 1. `Auth.Mode` = `MAINT_N1` ou `MAINT_N2` (§3)
 2. `M3_SensorsWord` valide, pas d'incohérence (§4)
-3. `TglJoystickMaster` : `FALSE` = boutons `BtnFwd`/`BtnRev` IHM, `TRUE` = joystick
+3. `GVL_IHM.Modes.Cmd.TglJoystickMaster` (switch machine unique, ex-`TranslationM3.Cmd.TglJoystickMaster`
+   supprimé 2026-08-06) : `FALSE` = boutons `BtnFwd`/`BtnRev` IHM, `TRUE` = joystick — même switch
+   que pour M1/M2, défaut boot `TRUE`
 4. **`PRG_02_Acquisition.JoystickDeadmanArmed` = `TRUE`** (geste homme-mort joystick, bouton appuyé
    au neutre puis mouvement) — exigé depuis le lot LOT3, **même en pilotage boutons IHM** ; sans lui
    `M3_StartStop_Active` reste `FALSE` quoi que fasse l'opérateur (§3)

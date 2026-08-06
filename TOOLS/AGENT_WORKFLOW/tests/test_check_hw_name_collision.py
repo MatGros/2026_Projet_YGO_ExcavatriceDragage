@@ -19,7 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_csv_reel_contient_les_noms_connus_du_bug_frein_m3() -> None:
-    csv_path = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260729.csv"
+    csv_path = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv"
     names = check_hw_name_collision.load_hw_names(csv_path)
     assert "M3_BrakeRelease_RQ" in names
     assert "M1_RelayFwd_Up_DQ" in names
@@ -46,7 +46,7 @@ def test_declaration_dans_prg_non_acquisition_est_une_erreur(tmp_path, monkeypat
     main_dir = root / "CODE" / "MAIN"
     main_dir.mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config").mkdir(parents=True)
-    (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260729.csv").write_text(
+    (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv").write_text(
         "//header\nM3_BrakeRelease_RQ;Bit;;desc;%QX0.0;Device\n", encoding="utf-8"
     )
     (main_dir / "PRG_06_Outputs_LD.st").write_text(
@@ -64,7 +64,7 @@ def test_frontiere_acquisition_est_exemptee(tmp_path, monkeypatch) -> None:
     main_dir = root / "CODE" / "MAIN"
     main_dir.mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config").mkdir(parents=True)
-    (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260729.csv").write_text(
+    (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv").write_text(
         "//header\nM1_ThermalOk_DI;Bit;;desc;%IX0.1;Device\n", encoding="utf-8"
     )
     (main_dir / "PRG_02_Acquisition.st").write_text(
@@ -86,7 +86,7 @@ def test_pending_field_verification_est_warn_pas_error(tmp_path, monkeypatch) ->
     main_dir = root / "CODE" / "MAIN"
     main_dir.mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config").mkdir(parents=True)
-    (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260729.csv").write_text(
+    (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv").write_text(
         "//header\nTestPendingVar_RQ;Bit;;desc;%QX0.0;Device\n", encoding="utf-8"
     )
     (main_dir / "PRG_06_Outputs_LD.st").write_text(

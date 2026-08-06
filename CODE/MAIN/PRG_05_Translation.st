@@ -75,11 +75,11 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     M3_PositioningActive := GVL_IHM.TranslationM3.Cmd.SelPositioning;
     SelTarget := 0;
 
-    IF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
+    IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
         M3_Direction_Active := 1;
-    ELSIF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
+    ELSIF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
         M3_Direction_Active := -1;
-    ELSIF GVL_IHM.TranslationM3.Cmd.TglJoystickMaster THEN
+    ELSIF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         M3_Direction_Active := PRG_02_Acquisition.JoystickDirectionX;
     ELSE
         M3_Direction_Active := 0;
@@ -87,18 +87,20 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
 
     // 🔫 T106 (audit M3 2026-08-05) : homme-mort exigé même pour boutons IHM en MAINT_N1/N2
     // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
+    // 🔀 2026-08-06 : TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd),
+    // plus de doublon par axe (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé).
     M3_StartStop_Active := (M3_Direction_Active <> 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
-                                OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
-                                OR GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
+                                OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
+                                OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
                            AND PRG_02_Acquisition.JoystickDeadmanArmed
                            AND M3_HeightInterlockOk; // 🆕 2026-08-06 : hauteur mini M1/M2 (risque collision)
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz > 0.0,
                   100.0,
                   (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz > 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
-    // 🕹️ Si TglJoystickMaster = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
-    M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.Cmd.TglJoystickMaster,
+    // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
+    M3_SpeedRef_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
                               FreqPct,
                               (PRG_02_Acquisition.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
@@ -134,9 +136,19 @@ CASE SelTarget OF
     3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP1;
     4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosMaintenance;
 ELSE
-    M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
-                                OR PRG_02_Acquisition.TranslationPosP1
-                                OR PRG_02_Acquisition.TranslationPosMaintenance;
+    // 🆕 2026-08-06 (retour terrain) : zone Maintenance interdite (MaintenanceM3TargetEnable=
+    // FALSE) -> P2 devient l'arrêt terminal (garde-fou avant la zone interdite), remplace P1/
+    // Maintenance dans le jeu d'arrêts — comportement fin de course, comme P1 quand Maintenance
+    // est autorisée. Le ralentissement d'approche P2 existe déjà (SlowdownSensorP1, Direction=-1,
+    // FB_Translation §4bis) : même vitesse réutilisée (ApproachSpeedP1Hz), pas de 4e vitesse créée.
+    IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
+                                    OR PRG_02_Acquisition.TranslationPosP1
+                                    OR PRG_02_Acquisition.TranslationPosMaintenance;
+    ELSE
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
+                                    OR PRG_02_Acquisition.TranslationPosP2;
+    END_IF;
 END_CASE;
 
 

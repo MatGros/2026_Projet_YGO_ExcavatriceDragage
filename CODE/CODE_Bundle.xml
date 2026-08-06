@@ -2177,6 +2177,14 @@
                 <html:xhtml>0 = Décodage 5 Capteurs OK | 1 = Incohérence Position 🔴</html:xhtml>
               </documentation>
             </variable>
+            <variable name="Idx308_HeightInterlockBlocking">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : 0 = M1 ET M2 ≥ hauteur mini (ou bypass) | 1 = Translation bloquée (risque collision) 🔴</html:xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -4875,7 +4883,11 @@ sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 un
                 <html:xhtml>🆕 REX (session WINCH-BTN-01) — bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
 SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
 sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
-🕹️ TRUE (défaut) = joystick pilote Winch (comportement historique, préservé au boot) ; FALSE = boutons IHM BtnUp/BtnDown</html:xhtml>
+🔀 2026-08-06 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
+(ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé, doublon). ⚠️ Le défaut TRUE
+(joystick) s'applique désormais à M3 aussi au boot — M3 démarrait avant en boutons IHM
+(FALSE) : changement de comportement au démarrage, assumé (décision 2026-08-06).
+🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 (comportement historique Winch, préservé au boot) ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -6470,20 +6482,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <html:xhtml>🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs_LD</html:xhtml>
               </documentation>
             </variable>
-            <variable name="TglJoystickMaster">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>🕹️ TRUE = joystick, FALSE = boutons BtnFwd/BtnRev</html:xhtml>
-              </documentation>
-            </variable>
             <variable name="InvertDirection">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</html:xhtml>
+                <html:xhtml>🔀 2026-08-06 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
+GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
+🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</html:xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -21929,6 +21935,7 @@ GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchFwdActive := 
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx305_LimitSwitchRevActive := Translation.State.LimitSwitchRev;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch := Translation.Bypass.LimitSwitch;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent := Translation.State.SensorWordIncoherent;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx308_HeightInterlockBlocking := Translation.State.HeightInterlockBlocking;
 
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqRef_Hz;
@@ -22067,6 +22074,37 @@ GVL_Troubleshooting.MotionM2.AllConditionsMet := GVL_Troubleshooting.MotionM2.St
 GVL_Troubleshooting.MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
 GVL_Troubleshooting.MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
 GVL_Troubleshooting.MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
+
+// === ⚙️ 10bis. Diagnostic Chronologique Mouvement Translation M3 (MotionM3) ===
+// 🆕 2026-08-06 : jamais câblé jusqu'ici (slot vide depuis la création de GVL_Troubleshooting.
+// MotionM3) — ajouté suite à un blocage terrain (interlock hauteur M1/M2) invisible en
+// diagnostic. Step6_DirectionAllowed porte ici l'interlock hauteur (pas ForbidAscent/Descent,
+// qui n'existe pas pour M3 — le même step logique, bloque les deux sens à la fois).
+GVL_Troubleshooting.MotionM3.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
+GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.ActiveSpeedRef_Pct &gt; 0.0);
+GVL_Troubleshooting.MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
+GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.ActiveSpeedRef_Pct;
+GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
+GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // 🆕 interlock hauteur M1/M2 (risque collision)
+GVL_Troubleshooting.MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
+
+GVL_Troubleshooting.MotionM3.AllConditionsMet := GVL_Troubleshooting.MotionM3.Step1_PowerEngaged
+                                              AND GVL_Troubleshooting.MotionM3.Step2_ModeAuthorized
+                                              AND GVL_Troubleshooting.MotionM3.Step3_NotBusyOtherTask
+                                              AND GVL_Troubleshooting.MotionM3.Step4_MotionRequested
+                                              AND GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault
+                                              AND GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed
+                                              AND GVL_Troubleshooting.MotionM3.Step7_BrakeReleased
+                                              AND GVL_Troubleshooting.MotionM3.Step8_OutputInterlockOk;
+
+// 🔌 M3 piloté par variateur AC600 (pas de relais/contacteur de palier comme M1/M2) : ces
+// champs restent des indicateurs de sens actif, pas des retours relais physiques réels.
+GVL_Troubleshooting.MotionM3.RelayFwdActive        := (Translation.State.ActiveDirection = 1) AND Translation.State.Busy;
+GVL_Troubleshooting.MotionM3.RelayRevActive        := (Translation.State.ActiveDirection = -1) AND Translation.State.Busy;
+GVL_Troubleshooting.MotionM3.SpeedContactor1Active := FALSE; // Non applicable — M3 n'a pas de contacteur de vitesse par palier
 
 // === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
 GVL_Troubleshooting.Inputs := HwIn;
@@ -26455,11 +26493,11 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     M3_PositioningActive := GVL_IHM.TranslationM3.Cmd.SelPositioning;
     SelTarget := 0;
 
-    IF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
+    IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
         M3_Direction_Active := 1;
-    ELSIF NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
+    ELSIF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
         M3_Direction_Active := -1;
-    ELSIF GVL_IHM.TranslationM3.Cmd.TglJoystickMaster THEN
+    ELSIF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         M3_Direction_Active := PRG_02_Acquisition.JoystickDirectionX;
     ELSE
         M3_Direction_Active := 0;
@@ -26467,18 +26505,20 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
 
     // 🔫 T106 (audit M3 2026-08-05) : homme-mort exigé même pour boutons IHM en MAINT_N1/N2
     // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
+    // 🔀 2026-08-06 : TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd),
+    // plus de doublon par axe (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé).
     M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
-                                OR NOT GVL_IHM.TranslationM3.Cmd.TglJoystickMaster
-                                OR GVL_IHM.TranslationM3.Cmd.TglJoystickMaster)
+                                OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
+                                OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
                            AND PRG_02_Acquisition.JoystickDeadmanArmed
                            AND M3_HeightInterlockOk; // 🆕 2026-08-06 : hauteur mini M1/M2 (risque collision)
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
                   100.0,
                   (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz &gt; 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
-    // 🕹️ Si TglJoystickMaster = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
-    M3_SpeedRef_Active := SEL(GVL_IHM.TranslationM3.Cmd.TglJoystickMaster,
+    // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
+    M3_SpeedRef_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
                               FreqPct,
                               (PRG_02_Acquisition.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
@@ -26514,9 +26554,19 @@ CASE SelTarget OF
     3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosP1;
     4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosMaintenance;
 ELSE
-    M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
-                                OR PRG_02_Acquisition.TranslationPosP1
-                                OR PRG_02_Acquisition.TranslationPosMaintenance;
+    // 🆕 2026-08-06 (retour terrain) : zone Maintenance interdite (MaintenanceM3TargetEnable=
+    // FALSE) -&gt; P2 devient l'arrêt terminal (garde-fou avant la zone interdite), remplace P1/
+    // Maintenance dans le jeu d'arrêts — comportement fin de course, comme P1 quand Maintenance
+    // est autorisée. Le ralentissement d'approche P2 existe déjà (SlowdownSensorP1, Direction=-1,
+    // FB_Translation §4bis) : même vitesse réutilisée (ApproachSpeedP1Hz), pas de 4e vitesse créée.
+    IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
+                                    OR PRG_02_Acquisition.TranslationPosP1
+                                    OR PRG_02_Acquisition.TranslationPosMaintenance;
+    ELSE
+        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationPosTremie
+                                    OR PRG_02_Acquisition.TranslationPosP2;
+    END_IF;
 END_CASE;
 
 
@@ -28328,7 +28378,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
             <comment localId="121" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M5, A-04)</html:xhtml>
+                <html:xhtml>🧪 Frein Translation M3 — coil directe sur nom HW brut (essai 2026-08-06, décision utilisateur)</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="122">
@@ -28348,41 +28398,23 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff</variable>
+              <variable>TranslationBrakeCmd</variable>
             </contact>
-            <contact localId="124" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff</variable>
-            </contact>
-            <contact localId="125" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</variable>
-            </contact>
-            <coil localId="126" negated="false" storage="none">
+            <coil localId="124" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="123" />
-                <connection refLocalId="124" />
-                <connection refLocalId="125" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PowerCutOffReq</variable>
+              <variable>M3_BrakeRelease_RQ</variable>
             </coil>
-            <comment localId="127" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="125" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
+                <html:xhtml>🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M5, A-04)</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="128">
+            <vendorElement localId="126">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28393,7 +28425,58 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="130" negated="false" storage="none" edge="none">
+            <contact localId="127" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff</variable>
+            </contact>
+            <contact localId="128" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff</variable>
+            </contact>
+            <contact localId="129" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</variable>
+            </contact>
+            <coil localId="130" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="127" />
+                <connection refLocalId="128" />
+                <connection refLocalId="129" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PowerCutOffReq</variable>
+            </coil>
+            <comment localId="131" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="132">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="134" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28401,7 +28484,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>TRUE</variable>
             </contact>
-            <contact localId="131" negated="false" storage="none" edge="none">
+            <contact localId="135" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28409,7 +28492,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
             </contact>
-            <contact localId="132" negated="false" storage="none" edge="none">
+            <contact localId="136" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28417,7 +28500,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyArming</variable>
             </contact>
-            <contact localId="133" negated="false" storage="none" edge="none">
+            <contact localId="137" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28425,7 +28508,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</variable>
             </contact>
-            <contact localId="134" negated="false" storage="none" edge="none">
+            <contact localId="138" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28433,7 +28516,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</variable>
             </contact>
-            <contact localId="135" negated="false" storage="none" edge="none">
+            <contact localId="139" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28441,7 +28524,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PowerCutOffReq</variable>
             </contact>
-            <contact localId="136" negated="false" storage="none" edge="none">
+            <contact localId="140" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28449,42 +28532,42 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
             </contact>
-            <block localId="129" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+            <block localId="133" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="130" />
+                    <connection refLocalId="134" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="131" />
+                    <connection refLocalId="135" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ArmRequest">
                   <connectionPointIn>
-                    <connection refLocalId="132" />
+                    <connection refLocalId="136" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
-                    <connection refLocalId="133" />
+                    <connection refLocalId="137" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="134" />
+                    <connection refLocalId="138" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerCutOffRequest">
                   <connectionPointIn>
-                    <connection refLocalId="135" />
+                    <connection refLocalId="139" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BtnEmergencyCutOff">
                   <connectionPointIn>
-                    <connection refLocalId="136" />
+                    <connection refLocalId="140" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -28565,13 +28648,13 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </block>
-            <comment localId="137" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="141" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>🔔 EmergencyArmingCmd — cible mapping E/S (miroir EmergencyArmingPulseActive)</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="138">
+            <vendorElement localId="142">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -28582,7 +28665,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="139" negated="false" storage="none" edge="none">
+            <contact localId="143" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -28590,10 +28673,10 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>EmergencyArmingPulseActive</variable>
             </contact>
-            <coil localId="140" negated="false" storage="none">
+            <coil localId="144" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="139" />
+                <connection refLocalId="143" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>EmergencyArmingCmd</variable>

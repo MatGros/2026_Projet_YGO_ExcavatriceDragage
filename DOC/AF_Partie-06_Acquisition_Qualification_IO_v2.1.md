@@ -337,7 +337,7 @@ un module DI absent en simulation banc reste un fait materiel reel, jamais un ch
 
 ## 🔌 4. TOR d'entrée — liste exhaustive de `HwIn`
 
-> 📌 **Source de vérité matérielle** : `TOOLS/AGENT_WORKFLOW/config/Device_IO_20260729.csv`
+> 📌 **Source de vérité matérielle** : `TOOLS/AGENT_WORKFLOW/config/Device_IO_20260806.csv`
 > (export CODESYS → CSV, référence T100). **22 TOR d'entrée réelles** sont recensées ici.
 > La structure `ST_HardwareImage` porte les champs ; aucun nouveau champ ne doit être créé dans
 > `ST_InputsQualified` ou dans un POU `PRG_01` en retrait.
