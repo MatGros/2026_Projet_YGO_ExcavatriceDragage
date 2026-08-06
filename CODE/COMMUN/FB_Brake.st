@@ -140,5 +140,9 @@ IF Error THEN
     BrakeCmd := FALSE;
 END_IF;
 
-// 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback)
-BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
+// 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback, ou image de BrakeCmd si BypassContactorCheck=TRUE)
+IF BypassContactorCheck THEN
+    BrakeCommandOpenConfirmed := BrakeCmd;
+ELSE
+    BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
+END_IF;
