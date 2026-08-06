@@ -25,6 +25,7 @@ VAR_INPUT
     SelHomingApproachEnable : BOOL;    // Case IHM autorisant dépassement arrêt haut
     EncoderFaultPresent : BOOL;        // Défaut codeur (agrégat M1/M2, 1 cycle retard)
     JoystickWinchSelectRequest : INT;  // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (brut IHM)
+    SelMaintenanceZoneAccess : BOOL;   // 🆕 2026-08-06 : bit IHM dédié, autorisation CONSCIENTE zone Maintenance M3 (GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess) — MAINT_N2 seul ne suffit plus
 END_VAR
 VAR_OUTPUT
     Ready               : BOOL;
@@ -150,8 +151,10 @@ ELSE
 END_IF;
 
 // 5quinquies. CIBLE TRANSLATION MAINTENANCE
-// Autorisée uniquement en MAINT_N2. PRG_TRANSLATION_CFC consomme ce bit.
-Auth.MaintenanceM3TargetEnable := (Auth.Mode = E_Mode.MAINT_N2);
+// 🆕 2026-08-06 (retour terrain) : MAINT_N2 seul ne suffit plus — bit IHM dédié
+// (SelMaintenanceZoneAccess) exigé EN PLUS, action consciente distincte du simple
+// changement de mode. PRG_TRANSLATION_CFC consomme ce bit.
+Auth.MaintenanceM3TargetEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelMaintenanceZoneAccess;
 
 // GATE — désactivation inhibitions/sync si mode change (sortie N2)
 IF Auth.Mode <> E_Mode.MAINT_N2 THEN
