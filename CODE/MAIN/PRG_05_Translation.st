@@ -34,6 +34,7 @@ VAR
     M3_SafeStop_Aggregate   : BOOL; // 🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)
 
     M3_HeightInterlockOk    : BOOL; // 🆕 2026-08-06 : TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)
+    M3_LimitSwitchRevEffective : BOOL; // 🆕 2026-08-06 : coupure dure §5bis — bascule sur P1 si Maintenance interdite
 END_VAR
 
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
@@ -51,6 +52,18 @@ M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
                             AND (PRG_02_Acquisition.CablePosM1 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
                             AND (PRG_02_Acquisition.CablePosM2 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
+
+// === 🚧 §0bis COUPURE DURE (LimitSwitchRev) — bascule sur P1 si Maintenance interdite ===
+// 🆕 2026-08-06 (retour terrain) : LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
+// (§5bis FB_Translation : coupure immédiate, sans rampe, dès que CommandedDirection insiste
+// dans l'extrémité). P1/P2 n'ont aucune protection dure équivalente — seul le verrou souple
+// (arrival-lock) les couvre. Quand Maintenance est interdite, la coupure dure doit protéger
+// P1 comme si c'était l'extrémité réelle : mot 00001 (P1=0 ET Maintenance=1), UN CRAN AVANT
+// la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
+// avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
+M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
+                                   NOT PRG_02_Acquisition.TranslationPosP1 AND PRG_02_Acquisition.TranslationPosMaintenance,
+                                   PRG_02_Acquisition.M3_LimitSwitchRev);
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
@@ -177,7 +190,7 @@ instSafetyTranslationM3(
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
     Direction               := M3_Direction_Active,
     LimitSwitchFwd          := PRG_02_Acquisition.M3_LimitSwitchFwd,
-    LimitSwitchRev          := PRG_02_Acquisition.M3_LimitSwitchRev,
+    LimitSwitchRev          := M3_LimitSwitchRevEffective,
     SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
@@ -212,7 +225,7 @@ instTranslationM3(
     SlowdownSensorMaintenance  := PRG_02_Acquisition.TranslationPosP1,
     SlowdownSensorP1           := PRG_02_Acquisition.TranslationPosP2,
     LimitSwitchFwd          := PRG_02_Acquisition.M3_LimitSwitchFwd,
-    LimitSwitchRev          := PRG_02_Acquisition.M3_LimitSwitchRev,
+    LimitSwitchRev          := M3_LimitSwitchRevEffective,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
@@ -282,7 +295,7 @@ TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
 TranslationStateHMI.LimitSwitchFwd := PRG_02_Acquisition.M3_LimitSwitchFwd;
-TranslationStateHMI.LimitSwitchRev := PRG_02_Acquisition.M3_LimitSwitchRev;
+TranslationStateHMI.LimitSwitchRev := M3_LimitSwitchRevEffective;
 TranslationStateHMI.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationStateHMI.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
