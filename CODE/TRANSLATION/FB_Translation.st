@@ -89,6 +89,7 @@ VAR
     RampTargetPct        : REAL;
     CaptorDebounceTon     : TON;
     ArrivalEdge            : R_TRIG;
+    ArrivalNeutralTimer    : TON;          // 🆕 2026-08-06 : anti-rebond retour au neutre (verrou anti-rebond)
     DirectionAtArrival     : INT;
     ArrivalLock             : BOOL;        // Arrêt exact sur capteur cible
     MovementRequested      : BOOL;         // Pilote FB_Brake
@@ -178,15 +179,24 @@ END_IF;
 // Dès qu'on touche un capteur d'arrêt (TargetReached), le sens d'arrivée (DirectionAtArrival)
 // est MÉMORISÉ et BLOQUÉ. Même si le capteur rebondit/clignote quelques ms et qu'on le perd
 // temporairement alors que le joystick reste enclenché, l'automate refuse de ré-avancer dans le
-// MÊME sens tant que l'opérateur n'a pas relâché le manche au neutre (Direction = 0) ou demandé
-// le sens inverse (dégagement) — évite l'à-coup avant/re-stop sur rebond capteur.
+// MÊME sens tant que l'opérateur n'a pas relâché le manche au neutre de façon SOUTENUE
+// (ArrivalNeutralTimer, pas un simple blip) ou demandé le sens inverse (dégagement, instantané)
+// — évite l'à-coup avant/re-stop sur rebond capteur ET sur relâchement joystick transitoire.
 ArrivalEdge(CLK := TargetReached);
 IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
 
-// Libération du verrou uniquement au neutre ou en changement de sens
-IF (Direction = 0) OR (Direction <> DirectionAtArrival) THEN
+// 🆕 2026-08-06 (retour terrain, à-coup persistant malgré le verrou) : un retour au neutre
+// n'a AUCUN anti-rebond, contrairement au capteur (CaptorDebounceTon ci-dessus) — un
+// `Direction=0` d'un seul scan (bruit joystick, micro-relâchement involontaire à l'arrivée,
+// ou tout autre blip) efface `DirectionAtArrival` immédiatement et lève le verrou. L'opérateur
+// réappuie ensuite dans le MÊME sens (pensant n'avoir jamais lâché) → redémarrage vers la butée.
+// Un changement de sens FRANC (dégagement volontaire, sans ambiguïté) reste instantané, jamais
+// retardé — seul le retour au neutre est débounced, même principe que NeutralHoldTimer côté
+// homme-mort (FB_Joystick.st).
+ArrivalNeutralTimer(IN := (Direction = 0) AND (DirectionAtArrival <> 0), PT := CaptorDebounce);
+IF (Direction = DirectionAtArrival * (-1)) OR ArrivalNeutralTimer.Q THEN
     DirectionAtArrival := 0;
 END_IF;
 
