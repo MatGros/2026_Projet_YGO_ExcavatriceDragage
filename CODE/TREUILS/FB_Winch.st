@@ -180,7 +180,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
     BrakeContactorCheck := Brake.ContactorCheck;
     CommandedDirection := 0;
-    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
+    DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelayAscent);
     SpeedRamp(Target := 0.0, AccelRate := CfgRampAccelRate, DecelRate := CfgRampDecelFastRate, CycleTimeS := CycleTimeCalc.CycleTimeS);
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
