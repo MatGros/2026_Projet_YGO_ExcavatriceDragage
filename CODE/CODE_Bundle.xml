@@ -14638,7 +14638,7 @@ END_IF;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#100ms" />
+                <simpleValue value="TIME#50ms" />
               </initialValue>
             </variable>
             <variable name="DeadmanRearmTimeout">
