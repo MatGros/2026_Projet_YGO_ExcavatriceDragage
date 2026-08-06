@@ -155,7 +155,7 @@ Source et cas existants : `AUDITS/PreLivraison/TABLE_Renommage_IO_v1.0.md`.
 | `_DQ` | **D**igital **Q** — sortie digitale, point I/O physique final (après `FB_Output`) | `M1_RelayFwd_DQ`, `M3_RelayFwd_DQ` |
 | `_RQ` | Sortie **relais** — requête maintenue logicielle, juste avant `_DQ`/le contacteur, OU variable terminale mappée directement au device quand aucun `_DQ` intermédiaire n'existe | `M1_BrakeRelease_RQ`, `M3_BrakeRelease_RQ` |
 
-🚨 **Un `_DI`/`_DQ`/`_RQ` est un nom de point matériel réel** (`Device_IO_20260729.csv`) — ne
+🚨 **Un `_DI`/`_DQ`/`_RQ` est un nom de point matériel réel** (`Device_IO_20260806.csv`) — ne
 **jamais** redéclarer ce nom exact comme variable locale d'un `PROGRAM` (collision de portée
 IEC 61131-3, REX 2026-08-05 : `DOC/CODE_QUALITY_STANDARDS.md §3bis`). Seul `PRG_02_Acquisition`
 porte ces noms bruts, en `VAR_INPUT`.

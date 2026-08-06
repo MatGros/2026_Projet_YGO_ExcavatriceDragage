@@ -214,6 +214,23 @@ réalité PARTAGÉES (même valeur forcée des deux côtés) — un seul chemin 
 
 ---
 
+## ✅ Lot 3e — Translation M3 : TglJoystickMaster fusionné dans le switch machine unique (non commité)
+
+⚠️ **Chemin très probablement câblé sur le pupitre IHM réel** — c'est une **suppression**, pas un
+renommage : le champ n'existe plus dans `ST_TranslationCmd`. Si un bouton/indicateur du pupitre M3
+pointe encore sur l'ancien chemin, il ne fera plus rien après import — le repointer vers le switch
+machine (déjà migré Lot 2d) avant le prochain essai translation.
+
+⚠️ **Changement de comportement au boot** : le switch machine démarre à `TRUE` (joystick).
+Translation M3 démarrait avant en boutons IHM (`FALSE`) — après ce lot, M3 démarre en joystick
+comme M1/M2.
+
+| Ancien chemin (supprimé) | Nouveau chemin |
+|---|---|
+| `GVL_IHM.TranslationM3.Cmd.TglJoystickMaster` | `GVL_IHM.Modes.Cmd.TglJoystickMaster` (switch machine unique, pilote aussi M1/M2) |
+
+---
+
 ## 🔜 Lots à venir (pas encore de document de tâche)
 
 _(Lot 2 sera complet une fois Cycle vérifié — reste ensuite la persistance généralisée, Lot 3.)_

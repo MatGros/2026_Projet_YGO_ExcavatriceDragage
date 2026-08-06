@@ -96,6 +96,21 @@ ACTUATOR_NETWORKS = [
     ("TranslationBrakeCmd", "M3_BrakeRelease_RQ",     "TranslationBrakeCmd", "Frein Translation M3"),
 ]
 
+# 🧪 Coils DIRECTES sur noms HW bruts (Device_IO CSV) — décision explicite utilisateur
+# 2026-08-06, malgré le risque documenté dans _build_actuator_network ci-dessous.
+# Nuance importante : le crash REX 2026-08-04 (ArgumentNullException) visait un nom
+# totalement ABSENT du bundle (aucune déclaration, ni locale ni GVL). Ici la SOURCE
+# (contact) est une variable locale déjà déclarée dans ce POU ; seule la CIBLE de la
+# coil (M3_BrakeRelease_RQ) reste externe au bundle (Device I/O mapping CODESYS).
+# Non vérifié par cet outil : reproduit potentiellement le même crash si l'import
+# CODESYS résout aussi le TYPE de la cible d'une coil contre le bundle importé (ce
+# que ce POU seul ne peut pas prouver — seul un import réel CODESYS le confirme).
+# ⚠️ SCOPE MINIMAL DÉLIBÉRÉ (frein M3 uniquement) — ne pas généraliser aux autres
+# canaux (M1/M2, chaîne AU) avant validation de CE réseau précis à l'import CODESYS.
+DIRECT_HW_COILS = [
+    ("TranslationBrakeCmd", "M3_BrakeRelease_RQ", "🧪 Frein Translation M3 — coil directe sur nom HW brut (essai 2026-08-06, décision utilisateur)"),
+]
+
 # Inputs de FB_Safety (ordre de déclaration) — inchangé (AC5 : ne pas modifier)
 FB_SAFETY_INPUTS = ["Enable", "Reset", "ArmRequest", "EmergencyChainClosed", "PowerContactorEngaged", "PowerCutOffRequest", "BtnEmergencyCutOff"]
 FB_SAFETY_OUTPUTS = ["Ready", "Busy", "Done", "Error", "ErrorId", "MaintainA_RQ", "MaintainB_RQ", "ArmPulse_RQ", "State", "Diag", "ArmingSeqStep", "RedundancyTestFailed", "EmergencyArmingFailed", "EmergencyArmingLockoutActive"]
@@ -410,6 +425,22 @@ def _build_actuator_network(ld, counter, source_var, dq_var, gvl_field, comment_
     # locale ci-dessus, ex. TranslationBrakeCmd), jamais le nom nu dq_var.
 
 
+def _build_direct_hw_coil_network(ld, counter, source_var, hw_var, comment_text):
+    """🧪 Réseau expérimental : contact sur variable locale (déjà déclarée dans ce
+    POU) -> coil directement sur le nom HW brut (Device I/O mapping, non déclaré
+    dans le bundle). Voir DIRECT_HW_COILS ci-dessus pour le risque documenté et le
+    scope volontairement minimal.
+    """
+    _make_comment(ld, _new_id(counter), comment_text)
+    _make_vendor_element(ld, _new_id(counter))
+
+    contact_id = _new_id(counter)
+    _make_contact(ld, contact_id, source_var)
+
+    coil_id = _new_id(counter)
+    _make_coil(ld, coil_id, contact_id, hw_var)
+
+
 def _make_fb_safety_block(ld, lid, instance_name, input_source_ids):
     block = ET.SubElement(ld, "block")
     block.set("localId", str(lid))
@@ -537,6 +568,12 @@ def build_prg06_ld():
     # ═══════════════════════════════════════════════════════════
     for source_var, dq_var, gvl_field, comment_text in ACTUATOR_NETWORKS:
         _build_actuator_network(ld, counter, source_var, dq_var, gvl_field, comment_text)
+
+    # ═══════════════════════════════════════════════════════════
+    # Section 2ter : 🧪 Coils directes sur noms HW bruts (essai scope minimal)
+    # ═══════════════════════════════════════════════════════════
+    for source_var, hw_var, comment_text in DIRECT_HW_COILS:
+        _build_direct_hw_coil_network(ld, counter, source_var, hw_var, comment_text)
 
     # ═══════════════════════════════════════════════════════════
     # Section 2bis : Agrégation PowerCutOffReq (M5, A-04 — OU strict par procédé)

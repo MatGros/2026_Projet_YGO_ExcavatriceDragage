@@ -91,7 +91,7 @@ Une restitution sans ce bloc est incomplète, quel que soit l'agent qui l'écrit
 
 **Règle** : un `PROGRAM` ne déclare **jamais** de variable (`VAR`/`VAR_INPUT`/`VAR_OUTPUT`)
 portant le **nom exact** d'un point matériel du mapping E/S (`TOOLS/AGENT_WORKFLOW/config/
-Device_IO_20260729.csv`, colonne `Mapped variable`) — sauf `PRG_02_Acquisition`, seul POU dont
+Device_IO_20260806.csv`, colonne `Mapped variable`) — sauf `PRG_02_Acquisition`, seul POU dont
 le rôle architectural est de porter ces noms bruts en `VAR_INPUT` (AF_Partie-06 §1/§4).
 
 Un `FUNCTION_BLOCK` n'est pas concerné : ses paramètres sont toujours référencés via une

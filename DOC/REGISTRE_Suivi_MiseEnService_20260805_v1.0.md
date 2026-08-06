@@ -74,6 +74,17 @@
 
 ---
 
+### MES-016 — ⚠️ PRG_06 : variables output déclarées **même nom que les sorties HW** → chevauchement/écrasement
+- 📅 **Date** : 2026-08-05 | 📍 **Lieu** : Terrain | 🏷️ **Version** : `v0.4.27_ConfigPersistence_TranslationSupervisionSuite`
+- 🎯 **Périmètre** : `PRG_06_Outputs_LD` — sorties HW M1/M2/M3 (`*_DQ`/`*_RQ`), mapping E/S device
+- 🚦 **Statut** : 🟠 **Gros problème — traitement à confirmer**
+- 🔍 **Constat** : Des `VAR_OUTPUT` de `PRG_06` étaient déclarées **avec le même nom que les sorties hardware** (`M1/M2/M3_BrakeRelease_RQ`, `*_DQ`…). → **chevauchement / écrasement** → les sorties **n'étaient pas pilotées correctement**.
+- 💡 **Mécanisme (vérifié)** : le mapping E/S (`Device.export` l.42842-42844, `CreateVariable=True`) auto-crée des **variables globales device** nommées `M3_BrakeRelease_RQ`, etc. Le POU déclare le **même symbole** en `VAR_OUTPUT` → la portée locale gagne : l'affectation du programme écrit la **copie POU**, la sortie physique (reliée à la globale) ne reçoit **rien**.
+- 🛠️ **Traitement** : *(à confirmer — désambiguïsation noms VS variables locales de mapping, cf. note `PRG_06_Outputs_LD.st` l.190-201 : le raccordement physique doit pointer les **variables locales** (ex. `M1BrakeCmd`), pas les `*_DQ/*_RQ`)*
+- ⚠️ **Repo `v0.5.9` à contrôler** : `CODE/MAIN/PRG_06_Outputs_LD.st:64,72,74` garde les `VAR_OUTPUT` homonymes ET `Device.export` garde le mapping sur ces noms → risque identique si le mapping n'est pas déplacé sur les variables locales. **Réauditer au chargement `v0.5.9_IOTest`.**
+
+---
+
 ## 3. 📄 Modèle à Dupliquer
 
 ```md

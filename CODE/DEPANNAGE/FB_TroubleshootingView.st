@@ -221,6 +221,7 @@ GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchFwdActive := 
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx305_LimitSwitchRevActive := Translation.State.LimitSwitchRev;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch := Translation.Bypass.LimitSwitch;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent := Translation.State.SensorWordIncoherent;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx308_HeightInterlockBlocking := Translation.State.HeightInterlockBlocking;
 
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqRef_Hz;
@@ -359,6 +360,37 @@ GVL_Troubleshooting.MotionM2.AllConditionsMet := GVL_Troubleshooting.MotionM2.St
 GVL_Troubleshooting.MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
 GVL_Troubleshooting.MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
 GVL_Troubleshooting.MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
+
+// === ⚙️ 10bis. Diagnostic Chronologique Mouvement Translation M3 (MotionM3) ===
+// 🆕 2026-08-06 : jamais câblé jusqu'ici (slot vide depuis la création de GVL_Troubleshooting.
+// MotionM3) — ajouté suite à un blocage terrain (interlock hauteur M1/M2) invisible en
+// diagnostic. Step6_DirectionAllowed porte ici l'interlock hauteur (pas ForbidAscent/Descent,
+// qui n'existe pas pour M3 — le même step logique, bloque les deux sens à la fois).
+GVL_Troubleshooting.MotionM3.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
+GVL_Troubleshooting.MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
+GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.ActiveSpeedRef_Pct > 0.0);
+GVL_Troubleshooting.MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
+GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.ActiveSpeedRef_Pct;
+GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
+GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // 🆕 interlock hauteur M1/M2 (risque collision)
+GVL_Troubleshooting.MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
+GVL_Troubleshooting.MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
+
+GVL_Troubleshooting.MotionM3.AllConditionsMet := GVL_Troubleshooting.MotionM3.Step1_PowerEngaged
+                                              AND GVL_Troubleshooting.MotionM3.Step2_ModeAuthorized
+                                              AND GVL_Troubleshooting.MotionM3.Step3_NotBusyOtherTask
+                                              AND GVL_Troubleshooting.MotionM3.Step4_MotionRequested
+                                              AND GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault
+                                              AND GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed
+                                              AND GVL_Troubleshooting.MotionM3.Step7_BrakeReleased
+                                              AND GVL_Troubleshooting.MotionM3.Step8_OutputInterlockOk;
+
+// 🔌 M3 piloté par variateur AC600 (pas de relais/contacteur de palier comme M1/M2) : ces
+// champs restent des indicateurs de sens actif, pas des retours relais physiques réels.
+GVL_Troubleshooting.MotionM3.RelayFwdActive        := (Translation.State.ActiveDirection = 1) AND Translation.State.Busy;
+GVL_Troubleshooting.MotionM3.RelayRevActive        := (Translation.State.ActiveDirection = -1) AND Translation.State.Busy;
+GVL_Troubleshooting.MotionM3.SpeedContactor1Active := FALSE; // Non applicable — M3 n'a pas de contacteur de vitesse par palier
 
 // === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
 GVL_Troubleshooting.Inputs := HwIn;

@@ -21,7 +21,7 @@ VAR_OUTPUT sur les noms Device bruts, renommage *Cmd) + CODE/MAIN/PRG_06_Outputs
 Seul PRG_02_Acquisition (frontière acquisition, AF_Partie-06) a le droit de porter ces
 noms bruts, en VAR_INPUT — c'est son rôle architectural documenté.
 
-Source de vérité matérielle : TOOLS/AGENT_WORKFLOW/config/Device_IO_20260729.csv
+Source de vérité matérielle : TOOLS/AGENT_WORKFLOW/config/Device_IO_20260806.csv
 (colonne 1, "Mapped variable" — export CODESYS réel, référence AF_Partie-06 §4).
 """
 
@@ -104,7 +104,7 @@ def main() -> int:
     args = parser.parse_args()
     root = Path(args.root)
 
-    csv_path = root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260729.csv"
+    csv_path = root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv"
     if not csv_path.is_file():
         print(f"[ERROR] Device IO CSV introuvable : {csv_path}", file=sys.stderr)
         return 1
