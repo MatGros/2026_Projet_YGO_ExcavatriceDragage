@@ -48,12 +48,10 @@ VAR_OUTPUT
     EmergencyDiag                : ST_Safety_Emergency_Diag;
     PowerCutOffActive            : BOOL; (* TRUE = demande de coupure finale active *)
 
-    SafetyStructureNotValidated  : BOOL := TRUE; (* 🔒 Garde-fou lot : tant que TRUE, AUCUNE sortie
-                                                      moteur/frein M1/M2/M3 n'est autorisée. Retrait
-                                                      réservé à un lot safety validé séparément. *)
-    M1InterlockEnable            : BOOL; (* Gate finale M1 : structure validée AND WinchM1...Enable *)
-    M2InterlockEnable            : BOOL; (* Gate finale M2 : structure validée AND WinchM2...Enable *)
-    M3InterlockEnable            : BOOL; (* Gate finale M3 : structure validée AND TranslationRequest.Enable *)
+    SafetyStructureNotValidated  : BOOL := FALSE; (* 🔓 Garde-fou désactivé : les autorisations M1/M2/M3 sont liées dynamiquement à leurs sécurités *)
+    M1InterlockEnable            : BOOL; (* Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1Safety.Error *)
+    M2InterlockEnable            : BOOL; (* Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2Safety.Error *)
+    M3InterlockEnable            : BOOL; (* Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationSafety.Error *)
 
     (* 🐛 FIX 2026-08-05 : les noms Device bruts (*_DQ/*_RQ, ex. M1_RelayFwd_Up_DQ,
        M3_BrakeRelease_RQ) NE SONT PLUS déclarés ici — les déclarer créait une collision
@@ -102,7 +100,8 @@ END_VAR
 
 // ── Interlock final M1 (Treuil Retenue) ──────────────────────────────────
 M1InterlockEnable := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable
-                      AND NOT SafetyStructureNotValidated;
+                      AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.PowerCutOff
+                      AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error;
 
 instWinchOutputInterlockM1(
     Enable                     := M1InterlockEnable,
@@ -131,7 +130,8 @@ M1BrakeCmd        := instWinchOutputInterlockM1.BrakeCmd;
 
 // ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
 M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
-                      AND NOT SafetyStructureNotValidated;
+                      AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.PowerCutOff
+                      AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error;
 
 instWinchOutputInterlockM2(
     Enable                     := M2InterlockEnable,
