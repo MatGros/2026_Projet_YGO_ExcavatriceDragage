@@ -220,15 +220,14 @@ ELSE
     ELSIF M3_Direction_Active = -1 THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -> arrêt sur Maintenance
-        // - Si Maintenance interdite -> PAS d'arrêt logiciel automatique sur P1 (retiré ce soir,
-        //   retour terrain 2026-08-06) : M3_AtP1Stable s'arme trop tôt (dès la perte de P2, avant
-        //   la vraie marque P1 — calibration mot binaire à vérifier sur site avant réactivation).
-        //   Bloquait le mouvement réel avant d'atteindre P1. Arrêt manuel opérateur (jog MAINT_N1)
-        //   + coupure dure indépendante du sens (§0bis, mot 00001, non affectée) en secours.
+        // - Si Maintenance interdite -> arrêt sur P1
+        // 🆕 2026-08-06 : réactivé — le retrait d'urgence précédent était dû à AtP1 armé sur le
+        // front du capteur P2 (zone d'approche) au lieu du capteur P1 lui-même (franchissement
+        // réel du point). Corrigé dans FB_Translation_PositionDecoder.st (front du capteur propre).
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
             M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
-            M3_PositionSensorTarget := FALSE;
+            M3_PositionSensorTarget := M3_AtP1Stable;
         END_IF;
     ELSE
         M3_PositionSensorTarget := FALSE;
@@ -301,7 +300,11 @@ instTranslationM3(
     // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
     // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
     SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.TranslationPosP1) AND PRG_02_Acquisition.TranslationPosMaintenance,
-    SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1,
+    // 🆕 2026-08-06 (design opérateur) : ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
+    // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -> 100% vitesse jusqu'à
+    // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
+    SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1
+                                   AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,

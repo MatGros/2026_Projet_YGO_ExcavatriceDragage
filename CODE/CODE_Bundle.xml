@@ -21456,28 +21456,21 @@ TRUE = capteur Trémie actif</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>🆕 2026-08-06 (REX décalage came + REX modèle capteur) : mot EXACT (5 bits combinés)
-ABANDONNÉ pour la détection d'arrivée/cible — un capteur individuel décalé de quelques mm
-suffisait à sauter le mot cible. Détection par FRONT — mais PAS "front du capteur du même
-nom" (erreur de conception initiale, corrigée) : les 5 capteurs sont un CODE THERMOMÈTRE
-cumulatif côté Trémie (bit à 1 tant qu'on n'a pas dépassé SON PROPRE seuil en venant de
-Trémie) :
-Mot :         11111  01111  00111  00011  00001  00000
-Trémie  :       1      0      0      0      0      0
-PV      :       1      1      0      0      0      0
-P2      :       1      1      1      0      0      0
-P1      :       1      1      1      1      0      0
-Maintenance:    1      1      1      1      1      0
-→ l'arrivée à un point Xi EN VENANT DE TRÉMIE (Direction=-1) est marquée par le front
-DESCENDANT du capteur PRÉCÉDENT (plus proche de Trémie), PAS par le capteur Xi lui-même
-(qui ne bouge pas à cette transition) ; l'arrivée EN VENANT DE MAINTENANCE (Direction=+1)
-est marquée par le front MONTANT du capteur Xi lui-même. Trémie et Maintenance sont les 2
-bouts de la chaîne : un seul sens d'arrivée possible chacun (pas de "précédent"/"suivant").
-⚠️ Signal TRANSITOIRE (1 cycle) — distingue "être ENTRE 2 capteurs" (zone, niveau,
-TranslationPosXxx cumulatif ci-dessus) de "être À la position d'UN capteur" (point, front,
-ci-dessous). L'appelant (PRG_05_Translation §0quater) le mémorise en verrou bistable
-(doctrine M3_LimitSwitchFwd/RevStable §0ter) pour tenir le niveau nécessaire au débounce/
-verrou anti-rebond de FB_Translation.
+                <html:xhtml>🆕 2026-08-06 (REX terrain, confirmé sur machine réelle) : mot EXACT (5 bits combinés)
+ABANDONNÉ pour la détection d'arrivée/cible — fragile au décalage came. Détection par FRONT
+DU CAPTEUR PROPRE à chaque position (montant OU descendant) : le franchissement d'un point Xi
+est marqué par SON PROPRE capteur qui bascule (front descendant en venant de Trémie = on
+vient de dépasser Xi ; front montant en venant de Maintenance = on vient d'atteindre Xi) —
+PAS par le capteur voisin (une tentative précédente basée sur le mot thermomètre utilisait le
+capteur PRÉCÉDENT et armait le point ~un cran trop tôt, dès l'entrée de la zone d'approche au
+lieu du franchissement réel du point — confirmé en direct sur machine : arrêt bloqué à P2 au
+lieu de P1). Trémie et Maintenance (bouts de chaîne) n'ont qu'un seul sens d'arrivée valide
+chacun (pas de zone au-delà). ⚠️ Signal TRANSITOIRE (1 cycle) — distingue "être ENTRE 2
+capteurs" (zone, niveau, TranslationPosXxx cumulatif ci-dessus, pilote le ralentissement
+d'approche) de "être À la position d'UN capteur" (point, front, ci-dessous, pilote l'arrêt).
+L'appelant (PRG_05_Translation §0quater) le mémorise en verrou bistable (doctrine
+M3_LimitSwitchFwd/RevStable §0ter) pour tenir le niveau nécessaire au débounce/verrou
+anti-rebond de FB_Translation.
 TRUE 1 cycle : front montant SensorTremie (arrivée venant de Maintenance uniquement)</html:xhtml>
               </documentation>
             </variable>
@@ -21486,7 +21479,7 @@ TRUE 1 cycle : front montant SensorTremie (arrivée venant de Maintenance unique
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE 1 cycle : front descendant SensorTremie (venant Trémie) OU front montant SensorPV (venant Maintenance)</html:xhtml>
+                <html:xhtml>TRUE 1 cycle : front (montant ou descendant) SensorPV</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtP2">
@@ -21494,7 +21487,7 @@ TRUE 1 cycle : front montant SensorTremie (arrivée venant de Maintenance unique
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE 1 cycle : front descendant SensorPV (venant Trémie) OU front montant SensorP2 (venant Maintenance)</html:xhtml>
+                <html:xhtml>TRUE 1 cycle : front (montant ou descendant) SensorP2</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtP1">
@@ -21502,7 +21495,7 @@ TRUE 1 cycle : front montant SensorTremie (arrivée venant de Maintenance unique
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE 1 cycle : front descendant SensorP2 (venant Trémie) OU front montant SensorP1 (venant Maintenance)</html:xhtml>
+                <html:xhtml>TRUE 1 cycle : front (montant ou descendant) SensorP1</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtMaintenance">
@@ -21624,12 +21617,13 @@ EdgeUpP2(CLK := SensorP2);                   EdgeDnP2(CLK := SensorP2);
 EdgeUpP1(CLK := SensorP1);                   EdgeDnP1(CLK := SensorP1);
 EdgeUpMaintenance(CLK := SensorMaintenance); EdgeDnMaintenance(CLK := SensorMaintenance);
 
-// 🆕 Chaîne thermomètre — voir modèle en déclaration. Arrivée venant de Trémie = front descendant
-// du capteur PRÉCÉDENT ; arrivée venant de Maintenance = front montant du capteur PROPRE.
+// 🆕 Front du capteur PROPRE à chaque position — voir modèle en déclaration (confirmé terrain).
+// Extrémités : un seul sens valide chacune. Points intermédiaires : les deux fronts de LEUR PROPRE
+// capteur (montant = atteint en venant de Maintenance, descendant = dépassé en venant de Trémie).
 TranslationAtTremie      := EdgeUpTremie.Q;
-TranslationAtPV          := EdgeDnTremie.Q OR EdgeUpPV.Q;
-TranslationAtP2          := EdgeDnPV.Q OR EdgeUpP2.Q;
-TranslationAtP1          := EdgeDnP2.Q OR EdgeUpP1.Q;
+TranslationAtPV          := EdgeUpPV.Q OR EdgeDnPV.Q;
+TranslationAtP2          := EdgeUpP2.Q OR EdgeDnP2.Q;
+TranslationAtP1          := EdgeUpP1.Q OR EdgeDnP1.Q;
 TranslationAtMaintenance := EdgeDnMaintenance.Q;
 </html:xhtml>
           </ST>
@@ -27096,15 +27090,14 @@ ELSE
     ELSIF M3_Direction_Active = -1 THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -&gt; arrêt sur Maintenance
-        // - Si Maintenance interdite -&gt; PAS d'arrêt logiciel automatique sur P1 (retiré ce soir,
-        //   retour terrain 2026-08-06) : M3_AtP1Stable s'arme trop tôt (dès la perte de P2, avant
-        //   la vraie marque P1 — calibration mot binaire à vérifier sur site avant réactivation).
-        //   Bloquait le mouvement réel avant d'atteindre P1. Arrêt manuel opérateur (jog MAINT_N1)
-        //   + coupure dure indépendante du sens (§0bis, mot 00001, non affectée) en secours.
+        // - Si Maintenance interdite -&gt; arrêt sur P1
+        // 🆕 2026-08-06 : réactivé — le retrait d'urgence précédent était dû à AtP1 armé sur le
+        // front du capteur P2 (zone d'approche) au lieu du capteur P1 lui-même (franchissement
+        // réel du point). Corrigé dans FB_Translation_PositionDecoder.st (front du capteur propre).
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
             M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
-            M3_PositionSensorTarget := FALSE;
+            M3_PositionSensorTarget := M3_AtP1Stable;
         END_IF;
     ELSE
         M3_PositionSensorTarget := FALSE;
@@ -27177,7 +27170,11 @@ instTranslationM3(
     // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
     // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
     SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.TranslationPosP1) AND PRG_02_Acquisition.TranslationPosMaintenance,
-    SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1,
+    // 🆕 2026-08-06 (design opérateur) : ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
+    // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -&gt; 100% vitesse jusqu'à
+    // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
+    SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1
+                                   AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
