@@ -14657,10 +14657,10 @@ END_IF;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#500MS" />
+                <simpleValue value="TIME#100MS" />
               </initialValue>
               <documentation>
-                <html:xhtml>Temps continu au neutre avant désarmement</html:xhtml>
+                <html:xhtml>Temps continu au neutre avant désarmement (100 ms)</html:xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanReconfEnable">
