@@ -76,7 +76,6 @@ VAR
     DeadmanEdge     : R_TRIG;
     DeadmanTimer    : TON;
     NeutralHoldTimer: TON;
-    LeftNeutralSinceArm : BOOL;
     LastMode        : E_Mode;
     BenneBusyFallEdge : F_TRIG;
 END_VAR
@@ -92,7 +91,6 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     SpeedYPct := 0.0; DirectionY := 0;
     Button := FALSE;
     DeadmanArmed := FALSE;   // 🆕 Désarmé sur toute neutralisation — nouvel appui au neutre exigé
-    LeftNeutralSinceArm := FALSE;   // 🔧 2026-07-03terdecies — repart propre au prochain armement
     DeadmanTimer(IN := FALSE, PT := DeadmanRearmTimeout);   // 🆕 2026-07-03decies — pas d'accumulation à froid
     NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);   // 🆕 2026-07-03duodecies — idem
     NeutralXAct := NeutralXMem;
@@ -135,7 +133,6 @@ ScaleY(RawIn := RawY, Neutral := NeutralYMem, Deadband := Deadband);
 // de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
 IF Mode <> LastMode THEN
     DeadmanArmed := FALSE;
-    LeftNeutralSinceArm := FALSE;
 END_IF;
 LastMode := Mode;
 
@@ -145,27 +142,20 @@ LastMode := Mode;
 BenneBusyFallEdge(CLK := BenneBusy);
 IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmed := FALSE;
-    LeftNeutralSinceArm := FALSE;
 END_IF;
 
 // 4ter. BOUTON HOMME-MORT
 DeadmanEdge(CLK := RawButton);
 
-// LeftNeutralSinceArm distingue "vient d'armer, n'a pas encore bougé" (ne désarme pas,
-// l'opérateur a le temps qu'il veut pour démarrer) de "a bougé, puis est revenu au neutre"
-// (NeutralHoldTime s'applique).
-IF NOT DeadmanArmed THEN
-    LeftNeutralSinceArm := FALSE;   // Repos/désarmé : prêt pour le prochain armement
-ELSIF NOT ((ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0)) THEN
-    LeftNeutralSinceArm := TRUE;    // Armé et a quitté le neutre au moins une fois : geste réellement démarré
-END_IF;
-
-// Neutre tenu NeutralHoldTime avant désarmement (pas juste traversé). Filtre les inversions
-// rapides (Fwd→Rev). Ne s'applique qu'après un geste réellement démarré.
-NeutralHoldTimer(IN := DeadmanArmed AND LeftNeutralSinceArm AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0),
+// 🔧 2026-08-06 (retour terrain) : décision 2026-08-03 ("l'opérateur a le temps qu'il veut
+// pour démarrer après armement") ANNULÉE explicitement — un armement resté au neutre sans
+// mouvement démarré ne désarmait JAMAIS (LeftNeutralSinceArm restait FALSE indéfiniment),
+// laissant DeadmanArmed collé à TRUE d'une session à l'autre. Neutre tenu NeutralHoldTime
+// désarme désormais TOUJOURS, qu'un mouvement ait été démarré ou non depuis l'armement.
+NeutralHoldTimer(IN := DeadmanArmed AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0),
                  PT := NeutralHoldTime);
 IF NeutralHoldTimer.Q THEN
-    DeadmanArmed := FALSE;      // Neutre tenu assez longtemps après geste = fin réelle
+    DeadmanArmed := FALSE;      // Neutre tenu assez longtemps = désarmement
 END_IF;
 IF DeadmanEdge.Q AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0) THEN
     DeadmanArmed := TRUE;       // Appui bouton au neutre = armement
