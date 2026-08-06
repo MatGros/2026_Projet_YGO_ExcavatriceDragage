@@ -39,7 +39,13 @@ STRUCT
     PositionP2              : BOOL;
     PositionP1              : BOOL;
     PositionMaintenance     : BOOL;
-    EstimatedPosM3_M        : REAL;    (* 📏 Position continue estimée en mètres (0.0 m Maint -> +X m Trémie) *)
+    (* 🆕 2026-08-06 : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement) *)
+    AtTremie                : BOOL;
+    AtPV                    : BOOL;
+    AtP2                    : BOOL;
+    AtP1                    : BOOL;
+    AtMaintenance           : BOOL;
+    EstimatedPosM3_M        : REAL;    (* 📏 Position continue estimée en mètres (0.0 m Maint -> +X m Trémie) — persistante, survit reboot *)
     SensorsWord             : BYTE;    (* bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance *)
     SensorWordIncoherent    : BOOL;
     LimitSwitchFwd          : BOOL;

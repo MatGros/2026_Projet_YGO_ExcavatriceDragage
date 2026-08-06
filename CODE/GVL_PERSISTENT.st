@@ -99,6 +99,10 @@ VAR_GLOBAL PERSISTENT RETAIN
     _TranslationPosPV_M             : REAL := 21.0;  // Position PV (Pré-ralentissement)
     _TranslationPosTremie_M         : REAL := 25.0;  // Position Trémie (Extrême gauche)
     _TranslationGainMetersPerHzSec  : REAL := 0.008333; // Ratio m/s par Hz (ex: 50 Hz = 0.416 m/s)
+    // 🆕 2026-08-06 : reprise odométrie après reboot — recopie continue (PRG_05_Translation),
+    // pas de bridge dédié (même doctrine que _TranslationSetFreq_Hz ci-dessus).
+    _TranslationPosEstimated_M          : REAL := 0.0;   // Dernière position estimée connue (m)
+    _TranslationPosEstimatedInitialized : BOOL := FALSE;  // TRUE dès la première calibration sur capteur
 
     // 🕹️ JOYSTICK
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)

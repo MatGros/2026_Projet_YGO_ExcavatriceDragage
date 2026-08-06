@@ -30,22 +30,29 @@ VAR_INPUT
 
     (* Gain de vitesse : mètres parcourus par Hz par seconde (ex: 50 Hz = 0.416 m/s => Gain = 0.008333 m/Hz.s) *)
     GainMetersPerHzSec   : REAL := 0.008333;
+
+    (* 🆕 2026-08-06 : reprise après reboot — l'appelant recopie en continu PositionEstimatedM/
+       Initialized vers GVL_PERSISTENT (pas de bridge dédié, simple recopie comme _TranslationSetFreq_Hz)
+       et réinjecte ici au redémarrage, pour ne pas perdre l'estimation odométrique à chaque coupure. *)
+    PersistedPositionM   : REAL := 0.0;
+    PersistedInitialized : BOOL := FALSE;
 END_VAR
 
 VAR_OUTPUT
     PositionEstimatedM   : REAL;   (* Position continue estimée en mètres *)
+    Initialized          : BOOL;   (* 🆕 exposé pour recopie persistante côté appelant *)
     Recalibrated         : BOOL;   (* Pulse 1 cycle lors d'un recalage sur capteur *)
     RecalibratedSensorId : INT;    (* 0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun *)
 END_VAR
 
 VAR
     TrigTremie           : R_TRIG;
-    TrigPV               : R_TRIG;
-    TrigP2               : R_TRIG;
-    TrigP1               : R_TRIG;
-    TrigMaintenance      : R_TRIG;
-    CycleTimeCalc        : FB_CycleTime;
-    Initialized          : BOOL;
+    TrigPV                : R_TRIG;
+    TrigP2                : R_TRIG;
+    TrigP1                : R_TRIG;
+    TrigMaintenance       : R_TRIG;
+    CycleTimeCalc         : FB_CycleTime;
+    ColdStart             : BOOL := TRUE;  // 🆕 seed unique depuis Persisted* au premier scan utile
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -54,6 +61,12 @@ IF NOT Enable THEN
     Recalibrated := FALSE;
     RecalibratedSensorId := -1;
     RETURN;
+END_IF;
+
+IF ColdStart THEN
+    PositionEstimatedM := PersistedPositionM;
+    Initialized := PersistedInitialized;
+    ColdStart := FALSE;
 END_IF;
 
 CycleTimeCalc(DefaultValueS := 0.010);
