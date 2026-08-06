@@ -21428,7 +21428,7 @@ TRUE uniquement si SensorsWord = 11111</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE uniquement si SensorsWord = 00011</html:xhtml>
+                <html:xhtml>TRUE si SensorsWord = 00011 ou 00001 (zone P1 avec tolérance décalage came)</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtMaintenance">
@@ -21494,7 +21494,7 @@ TranslationPosMaintenance := SensorMaintenance;
 TranslationAtTremie      := (SensorsWord = 2#11111);
 TranslationAtPV          := (SensorsWord = 2#01111);
 TranslationAtP2          := (SensorsWord = 2#00111);
-TranslationAtP1          := (SensorsWord = 2#00011);
+TranslationAtP1          := (SensorsWord = 2#00011) OR (SensorsWord = 2#00001);
 TranslationAtMaintenance := (SensorsWord = 2#00000);
 </html:xhtml>
           </ST>
