@@ -94,11 +94,10 @@ PV n'assure le ralentissement qu'avant Trémie.
 
 ---
 
-## 5. Arrêt exact sur capteur
+## 5. Arrêt exact sur capteur et Verrou Anti-rebond (`DirectionAtArrival`)
 
-`ArrivalLock` : verrouille `RampTargetPct=0` tant que `TargetReached AND Direction=DirectionAtArrival`.
-Empêche le dépassement du capteur cible : la rampe reste à 0 tant que le capteur est actif
-dans le même sens d'arrivée.
+`ArrivalLock` : dès qu'un capteur d'arrêt (TargetReached) ou un fin de course extrême est touché, le sens d'arrivée (`DirectionAtArrival`) est mémorisé.
+Le verrou à zéro (`RampTargetPct = 0`) interdit tout réengagement dans le MÊME sens tant qu'un **changement de sens explicite en sens inverse** (`Direction = DirectionAtArrival * (-1)`) n'a pas été demandé par l'opérateur (un retour au neutre seul ne lève plus le verrou).
 
 ---
 
@@ -136,18 +135,20 @@ Fréquence : `RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFr
 
 ## 9. Réglages RETAIN
 
-**Réellement câblés depuis GVL_PERSISTENT** (⚠️ liste exhaustive) :
+**Réellement câblés depuis GVL_PERSISTENT** (via `FB_CfgPersistBridge_TranslationCfg.st` / `ST_TranslationCfg`) :
 ```
 _TranslationMaxFreq_Hz=60.0
 _TranslationRampAccelRate_Pct=20.0
 _TranslationRampDecelNormal_Pct=40.0
 _TranslationRampDecelFast_Pct=100.0
 _TranslationAutoSpeedCap_Pct=40.0
-_TranslationSetFreq_Hz=0.0
+_TranslationSetFreq_Hz=20.0 (défaut IHM)
+CfgApproachSpeedTremie_Hz=15.0
+CfgApproachSpeedMaintenance_Hz=15.0
+CfgApproachSpeedP1_Hz=15.0
 ```
 
-**Restent au défaut du FB** (aucune variable PERSISTENT dédiée) :
-- `ApproachSpeedPct` = 20.0%
+**Restent au défaut du FB** :
 - `CaptorDebounce` = T#100ms
 - `DirectionInterlockDelay` = T#200ms
 

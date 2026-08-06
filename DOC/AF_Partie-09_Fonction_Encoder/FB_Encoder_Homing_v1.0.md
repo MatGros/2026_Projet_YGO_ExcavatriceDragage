@@ -60,11 +60,9 @@ transmet au télégramme EtherCAT, puis renvoie `PresetAck` ou `PresetNak`. Apr�
 | Port entrée | Type | Rôle |
 |---|---|---|
 | `Enable/Reset` | BOOL | Standard |
-| `PowerContactorEngaged` | BOOL | Standard |
+| `PowerContactorEngaged` | BOOL | Informations arrêt (n'interdit plus le homing codeur 24V) |
 | `Mode` | E_Mode | `MAINT_N1` requis pour le flux nominal |
-| `Home` | BOOL (front) | Demande de référencement — **port FB unique**. Côté IHM, `BtnHome`
-  (`ST_WinchCmd`, flux nominal) et `BtnHomingAtZero` (force la cible à `0.0`) sont **combinés en
-  amont dans `PRG_02_Encoders`** ; ce ne sont pas 2 ports séparés de ce FB |
+| `Home` | BOOL (front) | Demande de référencement — **port FB unique**. Calcul de `HomingRefRaw` **instantané et inconditionnel** en logiciel sur front montant, sans attendre l'acquittement SDO drive |
 | `UnitaryMode` | BOOL | `TRUE` = flux unitaire à cible libre (`MAINT_N2` uniquement) |
 | `WinchSelected` | BOOL | `TRUE` = cette instance est le treuil sélectionné (flux unitaire) |
 | `CfgHomingTargetM` | REAL | Cible libre unitaire, `[-99.0 ; +99.0]` m |
@@ -79,7 +77,7 @@ transmet au télégramme EtherCAT, puis renvoie `PresetAck` ou `PresetNak`. Apr�
 | `PointsPerRev` | UDINT := 8192 | Résolution codeur |
 | `MultiTurnRevsMax` | UDINT := 4096 | Tours max multiturn |
 | `CableM_PerRev` | REAL := 2.0 | Câble déroulé par tour |
-| `BypassGlobal` | BOOL := FALSE | 🌐 Ignore arrêt confirmé **et** capteur haut (mise en service) — voir §3bis |
+| `BypassGlobal` | BOOL := FALSE | 🌐 Ignore arrêt confirmé (puissance 400V coupée = arrêt mécanique garanti) |
 
 **InOut** : `Calib : ST_Encoder_Calib` (RETAIN — `HomingRefRaw`, `Homed`, `HomingSuspect`,
 `LastKnownRawPos`, `RestartCoherenceTolerancePts`).
