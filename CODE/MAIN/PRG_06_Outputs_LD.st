@@ -241,6 +241,8 @@ GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
 // ce canal précis. Cette coil directe est donc la première tentative réelle de
 // piloter cette sortie depuis PRG_06.
 M3_BrakeRelease_RQ := TranslationBrakeCmd;
+M3_CommandWord := M3_DriveControlWord;
+M3_SetpointFrequencyHz := M3_DriveFreqRefWord;
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
 
