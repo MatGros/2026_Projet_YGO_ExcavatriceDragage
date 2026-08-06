@@ -24153,42 +24153,15 @@ ELSIF RestartRequired THEN
     State := E_WinchFinalInterlockState.WAIT_RESTART_DELAY;
     Busy := TRUE;
 ELSE
-    // Hausses adjacentes seulement ; le délai est le dernier recours derrière le métier.
-    IF RequestedStepClamped &gt; AuthorizedStep THEN
-        // Toute modification de cible, y compris un abaissement restant supérieur
-        // au palier autorisé, invalide le temps déjà accumulé.
-        IF StepDelayTarget &lt;&gt; RequestedStepClamped THEN
-            StepDelay(IN := FALSE, PT := T#1s250ms);
-            StepDelayElapsed := StepDelay.ET;
-            StepDelayTarget := RequestedStepClamped;
-        ELSE
-            StepDelay(IN := TRUE, PT := T#1s250ms);
-            StepDelayElapsed := StepDelay.ET;
-            IF StepDelay.Q THEN
-                AuthorizedStep := AuthorizedStep + 1;
-                StepDelayTarget := 0;
-                // Conserve T#1s250ms durant ce scan : test/diagnostic de transition exact.
-                StepDelayElapsed := StepDelay.ET;
-                StepDelay(IN := FALSE, PT := T#1s250ms);
-            END_IF;
-        END_IF;
-        State := E_WinchFinalInterlockState.WAIT_STEP_DELAY;
-        Busy := TRUE;
-    ELSE
-        // Palier identique ou abaissé : aucun temps résiduel ne peut être réutilisé.
-        StepDelay(IN := FALSE, PT := T#1s250ms);
-        StepDelayElapsed := StepDelay.ET;
-        StepDelayTarget := 0;
-        AuthorizedStep := RequestedStepClamped;
-        State := E_WinchFinalInterlockState.READY;
-    END_IF;
+    // ⚡ Progression de palier directe : la temporisation (1,5s) est gérée par le métier (FB_Winch).
+    // La barrière finale transmet directement la consigne sans micro-coupure des contacteurs.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := RequestedStepClamped;
+    State := E_WinchFinalInterlockState.READY;
 
-    // Le palier autorisé est un contrôle de temporalité, PAS un nouveau mapping.
-    // FB_Winch/FB_SpeedStep reste l'unique propriétaire de SpeedStepTable, notamment
-    // pour les tables dynamiques M2 Benne. Une hausse inattendue est masquée jusqu'à
-    // ce que AuthorizedStep rejoigne exactement la demande ; aucune combinaison C1..C4
-    // n'est reconstruite ou synthétisée dans cette frontière finale.
-    IF (AuthorizedStep &gt; 0) AND (AuthorizedStep = RequestedStepClamped) THEN
+    IF (AuthorizedStep &gt; 0) OR (RequestedStepClamped &gt; 0) THEN
         RelayFwd := RequestedRelayFwd;
         RelayRev := RequestedRelayRev;
         Contactor1 := RequestedContactor1;
