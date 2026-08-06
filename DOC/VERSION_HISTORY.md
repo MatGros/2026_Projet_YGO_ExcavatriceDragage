@@ -4,6 +4,15 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `M3_TRANSLATION_TERRAIN_SESSION` — 2026-08-06 — mise en service terrain temps réel (commits `076377e`..`a9b016f`)
+- **Position estimée M3 persistante** : reprise après reboot (`GVL_PERSISTENT._TranslationPosEstimated_M`)
+- **Cfg Translation** : 3 vitesses d'approche réglables IHM + persistantes (`ST_TranslationCfg`, pont dédié, doctrine `ST_WinchCfg`)
+- **Détection d'arrivée `AtXxx`** : 3 conceptions testées en direct, la 3e retenue (front du capteur PROPRE à chaque position, verrou libéré sur mouvement réel confirmé ≥1.5s) — détail `FB_Translation_PositionDecoder_v1.0.md` §3bis
+- **`InvertDirection`** : déplacé de l'arbitrage amont vers le mot de commande variateur uniquement (`FB_Translation` §7bis) — désaccordait toute la logique sécurité/ralentissement avec le câblage moteur réel
+- **Ralentissement** : généralisé à 3 zones indépendantes, gate mode Maintenance sur la zone P2→P1
+- **`MaintenanceM3TargetEnable`** : élargi à (MAINT_N1 OU MAINT_N2) ET bit IHM dédié conscient (`TglMaintenanceZoneAccess`)
+- 16/16 gates verts à chaque commit, bundle régénéré et testé en direct sur machine réelle entre chaque lot
+
 ### `DOC_RATIONALISATION_ACQUISITION_FB_INPUT` — 2026-08-04 — documentation préalable
 - AF02 v3.1, AF03 v2.1, AF06 v2.1, AF13 v2.1, AF14 v1.1 et fiches associées : `PRG_02_Acquisition` devient la frontière unique `HwReal/HwSim/HwIn`.
 - `PRG_01_Inputs_LD`, `FB_Input` et `ST_InputsQualified` passent en retrait contrôlé ; aucun code supprimé dans cette phase.
