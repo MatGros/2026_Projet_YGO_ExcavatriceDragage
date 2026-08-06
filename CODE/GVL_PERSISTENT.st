@@ -91,7 +91,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _TranslationRampDecelNormal_Pct : REAL := 40.0;  // Décélération normale (%/s)
     _TranslationRampDecelFast_Pct   : REAL := 100.0; // Décélération rapide SafeStop (%/s)
     _TranslationAutoSpeedCap_Pct    : REAL := 40.0;  // Plafond vitesse SEMI_AUTO (%)
-    _TranslationSetFreq_Hz          : REAL := 0.0;   // 🚦 Consigne fréquence manuelle opérateur (Hz) — protégée depuis Lot 4
+    _TranslationSetFreq_Hz          : REAL := 20.0;  // 🚦 Consigne fréquence manuelle opérateur (Hz) — 20.0 = défaut usine (mise en service), recopie continue depuis 2026-08-06 (PRG_07_Supervision)
 
     // 📏 Positions calibrées repère Translation M3 (mètres)
     _TranslationPosMaintenance_M    : REAL := 0.0;   // Position origine (Maintenance)
