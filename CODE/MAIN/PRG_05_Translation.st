@@ -223,7 +223,7 @@ instTranslationM3(
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
-    SlowdownSensorMaintenance  := PRG_02_Acquisition.TranslationPosP1,
+    SlowdownSensorMaintenance  := PRG_02_Acquisition.TranslationPosMaintenance AND NOT PRG_02_Acquisition.TranslationPosP2,
     SlowdownSensorP1           := PRG_02_Acquisition.TranslationPosP2,
     LimitSwitchFwd          := PRG_02_Acquisition.M3_LimitSwitchFwd,
     LimitSwitchRev          := M3_LimitSwitchRevEffective,
