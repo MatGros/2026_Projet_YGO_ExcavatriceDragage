@@ -15,7 +15,7 @@
 3. DUT et bus
 4. Intégration programme
 5. Alertes et écarts (transverses)
-6. TBD — Commande vitesse par palier (Lot 4)
+6. Commande vitesse par palier — décidé et implémenté (2026-08-06)
 7. Documents liés
 
 ## 🧪 Points de validation
@@ -147,34 +147,35 @@ persistant) : voir la fiche FB concernée (§7 de chaque fiche) et §6 ci-dessou
 
 ---
 
-## 6. TBD — Commande vitesse par palier (Lot 4, étude requise avant code)
+## 6. Commande vitesse par palier — DÉCIDÉ et implémenté (retour terrain 2026-08-06)
 
-> ⛔ **Décision explicitement différée** (`PLAN_TASK.md` Lot 4) : *"Étude montée/descente AVANT
-> code ; ne pas choisir arbitrairement le sort de `DelayMotorDecel`"*. Cette section documente
-> la **cible fonctionnelle proposée** et les **questions ouvertes** — ce n'est ni une spec figée
-> ni une autorisation de coder. Essais en charge réels requis avant tout choix (T91).
+> ✅ **Décision prise et codée le 2026-08-06**, en connaissance de cause et **sans les essais en
+> charge réels** initialement posés comme préalable (`PLAN_TASK.md` Lot 4, T91) : retour terrain
+> répété d'un délai joystick→contacteur de plusieurs secondes, tracé à la rampe %/s
+> (`CfgRampAccelRate=10%/s`) qui retardait `RequestedStep>0`. Décision utilisateur explicite de
+> remplacer immédiatement la rampe par une temporisation fixe par palier, asymétrique
+> montée/descente, plutôt que d'attendre une campagne d'essais en charge. À surveiller au
+> prochain cycle d'essais réels (T91 reste un point de vigilance, pas classé clos).
 
-### 6.1 Constat actuel (vérifié code)
+### 6.1 Mécanisme implémenté (`FB_Winch.st`, commit 2026-08-06)
 
-| Mécanisme | État réel | Détail |
+| Mécanisme | Avant | Après (implémenté) |
 |---|---|---|
-| Accélération/décélération | `FB_Ramp` générique, %/s | `FB_Winch` §7 |
-| Hausse palier | Deux délais empilés (1s500ms + 1s250ms) | `FB_Winch` §7, `FB_WinchOutputInterlock_LD` §4 |
-| Coupure finale (freinage) | `DelayMotorDecel` code mort | `FB_Winch` §6 |
-| Garde-fou vitesse mesurée | Existe, désactivé, non persistant | `FB_Winch` §5 |
-| Bandes de vitesse par palier | Théoriques, jamais mesurées | Voir §6.3 |
+| Accélération/décélération | `FB_Ramp` générique, %/s (`CfgRampAccelRate`/`CfgRampDecelNormalRate`/`CfgRampDecelFastRate`, retirés) | `RampTargetPct` alimente directement `FB_SpeedStep` (pas de lissage) ; progressivité assurée par la tempo par palier ci-dessous |
+| Hausse palier | Délai fixe unique `T#1s500ms`, symétrique montée/descente | `EffectiveStepDelay := EffectiveDirectionInterlockDelay + T#100ms` → **500ms en descente / 1000ms en montée** (déduit de l'interlock de sens, pas un réglage séparé) |
+| Interlock changement de sens | `DirectionInterlockDelay` unique 200ms | Asymétrique : `DirectionInterlockDelayDescent := T#400ms` / `DirectionInterlockDelayAscent := T#900ms`, toujours < la tempo palier correspondante (interlock jamais le facteur limitant, garanti par construction) |
+| Arrêt (relâchement joystick) | Suivait la rampe de décélération (contacteurs engagés plusieurs secondes après l'ordre d'arrêt) | Coupure **instantanée** de `RelayFwd`/`RelayRev` et des 4 contacteurs de vitesse dès `Direction=0`, même scan |
+| Coupure finale (freinage) | `DelayMotorDecel` code mort | Toujours code mort (`FB_Brake.st` ferme `BrakeCmd` same-scan sur `MovementRequested=FALSE`) — non traité par ce lot |
+| Garde-fou vitesse mesurée | Existe, désactivé, non persistant | Inchangé par ce lot |
+| Bandes de vitesse par palier | Théoriques, jamais mesurées | Voir §6.3, non traité par ce lot |
 
-### 6.2 Cible proposée (discussion utilisateur, non tranchée)
+### 6.2 Doctrine anti-retombée associée (`FB_WinchOutputInterlock_LD.st`, commit 2026-08-06)
 
-**Montée en palier (accélération)** — doit rester **progressive** :
-- Remplacer la rampe %/s par une **temporisation par palier** (temps de maintien avant hausse), potentiellement **différente par palier** (démarrage en charge = le plus critique)
-- Conditionner la hausse à un **régime minimal mesuré** (garde-fou vitesse, déjà présent mais désactivé)
+Le contacteur de sens/vitesse doit s'engager **avant** l'ouverture du frein (et non l'inverse) :
+`ContactorEngaged := NOT FwdRevSpeedFeedbackOff` (feedback physique) gate `BrakeCmd`.
 
-**Arrêt (relâchement joystick)** — doit être **rapide**, pas une rampe symétrique à l'accélération :
-- Proposition : coupure en cascade des 4 contacteurs de vitesse, ex. **~100 ms par contacteur** (total configurable, ex. 500 ms), pas une décélération lissée façon variateur
-- Distincte de la séquence frein (`FB_Brake`), qui reste pilotée séparément
-
-**Ce découpage confirme et précise T91 (asymétrie montée/descente) et T93 (tempo par palier au lieu de rampe %/s).**
+**T91 (asymétrie montée/descente) et T93 (tempo par palier au lieu de rampe %/s) sont ainsi
+implémentés** ; seule l'apprentissage/validation en charge réelle (T91 volet essais) reste ouvert.
 
 ### 6.3 TBD — Apprentissage vitesse par palier (nouveau, T96)
 
