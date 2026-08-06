@@ -21429,10 +21429,17 @@ TRUE = capteur Trémie actif</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>🆕 2026-08-06 : mot EXACT (pas cumulatif) — dédié détection d'arrivée/cible (front franc
-à l'arrivée, peu importe le sens de venue) et coupure dure. Ne PAS utiliser pour le
-ralentissement (zone trop étroite, ne tiendrait pas la durée de l'approche).
-TRUE uniquement si SensorsWord = 11111</html:xhtml>
+                <html:xhtml>🆕 2026-08-06 (REX décalage came) : mot EXACT (5 bits combinés) ABANDONNÉ pour la détection
+d'arrivée/cible — un capteur individuel décalé de quelques mm suffisait à sauter le mot
+cible (ex: 00011 jamais atteint, saut direct à 00001, déjà DANS la zone interdite suivante,
+laissant la translation continuer au-delà du point d'arrêt réel avant toute coupure).
+Détection par FRONT (montant OU descendant) du capteur PROPRE à chaque position : ne dépend
+plus des 4 autres capteurs, robuste au décalage mécanique. ⚠️ Signal TRANSITOIRE (1 cycle) —
+distingue "être ENTRE 2 capteurs" (zone, niveau, TranslationPosXxx cumulatif ci-dessus) de
+"être À la position d'UN capteur" (point, front, ci-dessous). L'appelant (PRG_05_Translation
+§0quater) le mémorise en verrou bistable (doctrine M3_LimitSwitchFwd/RevStable §0ter) pour
+tenir le niveau nécessaire au débounce/verrou anti-rebond de FB_Translation.
+TRUE 1 cycle sur front (montant ou descendant) de SensorTremie</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtPV">
@@ -21440,7 +21447,7 @@ TRUE uniquement si SensorsWord = 11111</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE uniquement si SensorsWord = 01111</html:xhtml>
+                <html:xhtml>TRUE 1 cycle sur front (montant ou descendant) de SensorPV</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtP2">
@@ -21448,7 +21455,7 @@ TRUE uniquement si SensorsWord = 11111</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE uniquement si SensorsWord = 00111</html:xhtml>
+                <html:xhtml>TRUE 1 cycle sur front (montant ou descendant) de SensorP2</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtP1">
@@ -21456,7 +21463,7 @@ TRUE uniquement si SensorsWord = 11111</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE si SensorsWord = 00011 ou 00001 (zone P1 avec tolérance décalage came)</html:xhtml>
+                <html:xhtml>TRUE 1 cycle sur front (montant ou descendant) de SensorP1</html:xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtMaintenance">
@@ -21464,19 +21471,72 @@ TRUE uniquement si SensorsWord = 11111</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>TRUE uniquement si SensorsWord = 00000</html:xhtml>
+                <html:xhtml>TRUE 1 cycle sur front (montant ou descendant) de SensorMaintenance</html:xhtml>
               </documentation>
             </variable>
           </outputVars>
+          <localVars>
+            <variable name="EdgeUpTremie">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeDnTremie">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeUpPV">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeDnPV">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeUpP2">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeDnP2">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeUpP1">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeDnP1">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeUpMaintenance">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="EdgeDnMaintenance">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+            </variable>
+          </localVars>
           <documentation>
             <html:xhtml>═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
    ───────────────────────────────────────────────────────────────
     📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.1.md §3
-   🧩 Brique réduite (Partie3 §1bis) : pure logique combinatoire, pas de
+   🧩 Brique technique (AF_Partie-03 §2) : contrat minimal, pas de
       StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
-      Maintenance) en mot de progression, dérive les 2 limites extrêmes et
-      détecte toute combinaison incohérente (défense en profondeur M3).
+      Maintenance) en mot de progression, dérive les 2 limites extrêmes,
+      détecte toute combinaison incohérente (défense en profondeur M3) et
+      les fronts individuels par capteur (arrivée/cible, robuste décalage came).
    🎯 Mot valide : progression monotone de 11111 (extrême Trémie) à 00000
       (extrême Maintenance) : 11111→01111→00111→00011→00001→00000.
       Tout autre mot = incohérence câblage/mécanique (capteur collé/HS).
@@ -21517,13 +21577,19 @@ TranslationPosP2          := SensorP2;
 TranslationPosP1          := SensorP1;
 TranslationPosMaintenance := SensorMaintenance;
 
-// 🆕 2026-08-06 (retour terrain, décodage réel des positions machine) : mot EXACT, réservé
-// détection d'arrivée/cible et coupure dure — voir avertissement en déclaration.
-TranslationAtTremie      := (SensorsWord = 2#11111);
-TranslationAtPV          := (SensorsWord = 2#01111);
-TranslationAtP2          := (SensorsWord = 2#00111);
-TranslationAtP1          := (SensorsWord = 2#00011) OR (SensorsWord = 2#00001);
-TranslationAtMaintenance := (SensorsWord = 2#00000);
+// 🆕 2026-08-06 (REX décalage came) : front individuel par capteur — voir avertissement en
+// déclaration. Transitoire (1 cycle), mémorisé par l'appelant.
+EdgeUpTremie(CLK := SensorTremie);           EdgeDnTremie(CLK := SensorTremie);
+EdgeUpPV(CLK := SensorPV);                   EdgeDnPV(CLK := SensorPV);
+EdgeUpP2(CLK := SensorP2);                   EdgeDnP2(CLK := SensorP2);
+EdgeUpP1(CLK := SensorP1);                   EdgeDnP1(CLK := SensorP1);
+EdgeUpMaintenance(CLK := SensorMaintenance); EdgeDnMaintenance(CLK := SensorMaintenance);
+
+TranslationAtTremie      := EdgeUpTremie.Q OR EdgeDnTremie.Q;
+TranslationAtPV          := EdgeUpPV.Q OR EdgeDnPV.Q;
+TranslationAtP2          := EdgeUpP2.Q OR EdgeDnP2.Q;
+TranslationAtP1          := EdgeUpP1.Q OR EdgeDnP1.Q;
+TranslationAtMaintenance := EdgeUpMaintenance.Q OR EdgeDnMaintenance.Q;
 </html:xhtml>
           </ST>
         </body>
@@ -26761,6 +26827,35 @@ BucketStateHMI.OpenActive := instBucket.OpenReq;
                 <html:xhtml>🆕 2026-08-06 : verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="M3_AtTremieStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-06 : verrous bistables des positions cibles (§0quater) — PositionDecoder n'émet
+plus qu'un front transitoire par capteur (REX décalage came), mémorisé ici jusqu'à dégagement.</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtPVStable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_AtP2Stable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_AtP1Stable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_AtMaintenanceStable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <html:xhtml>═══════════════════════════════════════════════════════════════
@@ -26819,6 +26914,43 @@ IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
 ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.M3_LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
+END_IF;
+
+// 🔒 §0quater MÉMORISATION BISTABLE DES POSITIONS CIBLES (front → verrou, doctrine §0ter)
+// PositionDecoder n'émet plus qu'un front transitoire (1 cycle) par capteur (REX décalage came,
+// voir FB_Translation_PositionDecoder.st) — mémorisé ici jusqu'à un mouvement effectif dans le
+// sens de dégagement, pour tenir le niveau nécessaire au débounce (100ms) + verrou anti-rebond
+// (§4ter DirectionAtArrival) de FB_Translation. Trémie/PV : atteints en Marche Avant (+1),
+// dégagement en Marche Arrière (-1). P2/P1/Maintenance : atteints en Marche Arrière (-1),
+// dégagement en Marche Avant (+1).
+IF PRG_02_Acquisition.TranslationAtTremie THEN
+    M3_AtTremieStable := TRUE;
+ELSIF M3_Direction_Active = -1 THEN
+    M3_AtTremieStable := FALSE;
+END_IF;
+
+IF PRG_02_Acquisition.TranslationAtPV THEN
+    M3_AtPVStable := TRUE;
+ELSIF M3_Direction_Active = -1 THEN
+    M3_AtPVStable := FALSE;
+END_IF;
+
+IF PRG_02_Acquisition.TranslationAtP2 THEN
+    M3_AtP2Stable := TRUE;
+ELSIF M3_Direction_Active = 1 THEN
+    M3_AtP2Stable := FALSE;
+END_IF;
+
+IF PRG_02_Acquisition.TranslationAtP1 THEN
+    M3_AtP1Stable := TRUE;
+ELSIF M3_Direction_Active = 1 THEN
+    M3_AtP1Stable := FALSE;
+END_IF;
+
+IF PRG_02_Acquisition.TranslationAtMaintenance THEN
+    M3_AtMaintenanceStable := TRUE;
+ELSIF M3_Direction_Active = 1 THEN
+    M3_AtMaintenanceStable := FALSE;
 END_IF;
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
@@ -26902,22 +27034,22 @@ M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 // 🆕 2026-08-06 : mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
 // franc à l'arrivée quel que soit le sens de venue (voir FB_Translation_PositionDecoder.st).
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie;
-    2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP2;
-    3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP1;
-    4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtMaintenance;
+    1: M3_PositionSensorTarget := M3_AtTremieStable;
+    2: M3_PositionSensorTarget := M3_AtP2Stable;
+    3: M3_PositionSensorTarget := M3_AtP1Stable;
+    4: M3_PositionSensorTarget := M3_AtMaintenanceStable;
 ELSE
     IF M3_Direction_Active = 1 THEN
         // En Marche Avant (+1 vers Trémie) : seule Trémie est le point d'arrêt automatique
-        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie;
+        M3_PositionSensorTarget := M3_AtTremieStable;
     ELSIF M3_Direction_Active = -1 THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -&gt; arrêt sur Maintenance
         // - Si Maintenance interdite -&gt; arrêt sur P1
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
-            M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtMaintenance;
+            M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
-            M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP1;
+            M3_PositionSensorTarget := M3_AtP1Stable;
         END_IF;
     ELSE
         M3_PositionSensorTarget := FALSE;
@@ -27056,11 +27188,13 @@ TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
 TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
-TranslationStateHMI.AtTremie := PRG_02_Acquisition.TranslationAtTremie;
-TranslationStateHMI.AtPV := PRG_02_Acquisition.TranslationAtPV;
-TranslationStateHMI.AtP2 := PRG_02_Acquisition.TranslationAtP2;
-TranslationStateHMI.AtP1 := PRG_02_Acquisition.TranslationAtP1;
-TranslationStateHMI.AtMaintenance := PRG_02_Acquisition.TranslationAtMaintenance;
+// 🆕 Stable (verrou §0quater), pas le front brut PRG_02_Acquisition.TranslationAtXxx (1 cycle,
+// invisible sur IHM) — cohérent avec ce qui pilote réellement M3_PositionSensorTarget ci-dessus.
+TranslationStateHMI.AtTremie := M3_AtTremieStable;
+TranslationStateHMI.AtPV := M3_AtPVStable;
+TranslationStateHMI.AtP2 := M3_AtP2Stable;
+TranslationStateHMI.AtP1 := M3_AtP1Stable;
+TranslationStateHMI.AtMaintenance := M3_AtMaintenanceStable;
 TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;

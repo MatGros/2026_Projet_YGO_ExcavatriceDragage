@@ -37,6 +37,14 @@ VAR
     M3_LimitSwitchRevEffective : BOOL; // 🆕 2026-08-06 : coupure dure §5bis — bascule sur P1 si Maintenance interdite
     M3_LimitSwitchFwdStable : BOOL; // 🆕 2026-08-06 : verrou bistable Fdc Trémie (mémorisé stable contre les rebonds)
     M3_LimitSwitchRevStable : BOOL; // 🆕 2026-08-06 : verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)
+
+    // 🆕 2026-08-06 : verrous bistables des positions cibles (§0quater) — PositionDecoder n'émet
+    // plus qu'un front transitoire par capteur (REX décalage came), mémorisé ici jusqu'à dégagement.
+    M3_AtTremieStable      : BOOL;
+    M3_AtPVStable          : BOOL;
+    M3_AtP2Stable          : BOOL;
+    M3_AtP1Stable          : BOOL;
+    M3_AtMaintenanceStable : BOOL;
 END_VAR
 
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
@@ -80,6 +88,43 @@ IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
 ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.M3_LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
+END_IF;
+
+// 🔒 §0quater MÉMORISATION BISTABLE DES POSITIONS CIBLES (front → verrou, doctrine §0ter)
+// PositionDecoder n'émet plus qu'un front transitoire (1 cycle) par capteur (REX décalage came,
+// voir FB_Translation_PositionDecoder.st) — mémorisé ici jusqu'à un mouvement effectif dans le
+// sens de dégagement, pour tenir le niveau nécessaire au débounce (100ms) + verrou anti-rebond
+// (§4ter DirectionAtArrival) de FB_Translation. Trémie/PV : atteints en Marche Avant (+1),
+// dégagement en Marche Arrière (-1). P2/P1/Maintenance : atteints en Marche Arrière (-1),
+// dégagement en Marche Avant (+1).
+IF PRG_02_Acquisition.TranslationAtTremie THEN
+    M3_AtTremieStable := TRUE;
+ELSIF M3_Direction_Active = -1 THEN
+    M3_AtTremieStable := FALSE;
+END_IF;
+
+IF PRG_02_Acquisition.TranslationAtPV THEN
+    M3_AtPVStable := TRUE;
+ELSIF M3_Direction_Active = -1 THEN
+    M3_AtPVStable := FALSE;
+END_IF;
+
+IF PRG_02_Acquisition.TranslationAtP2 THEN
+    M3_AtP2Stable := TRUE;
+ELSIF M3_Direction_Active = 1 THEN
+    M3_AtP2Stable := FALSE;
+END_IF;
+
+IF PRG_02_Acquisition.TranslationAtP1 THEN
+    M3_AtP1Stable := TRUE;
+ELSIF M3_Direction_Active = 1 THEN
+    M3_AtP1Stable := FALSE;
+END_IF;
+
+IF PRG_02_Acquisition.TranslationAtMaintenance THEN
+    M3_AtMaintenanceStable := TRUE;
+ELSIF M3_Direction_Active = 1 THEN
+    M3_AtMaintenanceStable := FALSE;
 END_IF;
 
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
@@ -163,22 +208,22 @@ M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 // 🆕 2026-08-06 : mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
 // franc à l'arrivée quel que soit le sens de venue (voir FB_Translation_PositionDecoder.st).
 CASE SelTarget OF
-    1: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie;
-    2: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP2;
-    3: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP1;
-    4: M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtMaintenance;
+    1: M3_PositionSensorTarget := M3_AtTremieStable;
+    2: M3_PositionSensorTarget := M3_AtP2Stable;
+    3: M3_PositionSensorTarget := M3_AtP1Stable;
+    4: M3_PositionSensorTarget := M3_AtMaintenanceStable;
 ELSE
     IF M3_Direction_Active = 1 THEN
         // En Marche Avant (+1 vers Trémie) : seule Trémie est le point d'arrêt automatique
-        M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtTremie;
+        M3_PositionSensorTarget := M3_AtTremieStable;
     ELSIF M3_Direction_Active = -1 THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -> arrêt sur Maintenance
         // - Si Maintenance interdite -> arrêt sur P1
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
-            M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtMaintenance;
+            M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
-            M3_PositionSensorTarget := PRG_02_Acquisition.TranslationAtP1;
+            M3_PositionSensorTarget := M3_AtP1Stable;
         END_IF;
     ELSE
         M3_PositionSensorTarget := FALSE;
@@ -317,11 +362,13 @@ TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
 TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
-TranslationStateHMI.AtTremie := PRG_02_Acquisition.TranslationAtTremie;
-TranslationStateHMI.AtPV := PRG_02_Acquisition.TranslationAtPV;
-TranslationStateHMI.AtP2 := PRG_02_Acquisition.TranslationAtP2;
-TranslationStateHMI.AtP1 := PRG_02_Acquisition.TranslationAtP1;
-TranslationStateHMI.AtMaintenance := PRG_02_Acquisition.TranslationAtMaintenance;
+// 🆕 Stable (verrou §0quater), pas le front brut PRG_02_Acquisition.TranslationAtXxx (1 cycle,
+// invisible sur IHM) — cohérent avec ce qui pilote réellement M3_PositionSensorTarget ci-dessus.
+TranslationStateHMI.AtTremie := M3_AtTremieStable;
+TranslationStateHMI.AtPV := M3_AtPVStable;
+TranslationStateHMI.AtP2 := M3_AtP2Stable;
+TranslationStateHMI.AtP1 := M3_AtP1Stable;
+TranslationStateHMI.AtMaintenance := M3_AtMaintenanceStable;
 TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
 TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
