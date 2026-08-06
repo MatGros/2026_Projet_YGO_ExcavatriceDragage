@@ -185,7 +185,9 @@ END_IF;
 
 // === 📊 §3 PROJECTIONS IHM ET MAPPING ===
 
-GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled;
+GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
+    AND ((PRG_02_Acquisition.CablePosM1 <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
+      OR (PRG_02_Acquisition.CablePosM2 <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI;
