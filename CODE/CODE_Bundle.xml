@@ -897,6 +897,14 @@
                 <html:xhtml>🆕 2026-08-07 : Phase vitesse contrôlée montée en cours (post-fermeture auto)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledMotionBlockedByBucket">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🔴 2026-08-07 : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</html:xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -1563,6 +1571,38 @@
                 <html:xhtml>🆕 2026-08-07 : 1 = Séquencement auto (ouverture/fermeture armée par mouvement couplé) en cours</html:xhtml>
               </documentation>
             </variable>
+            <variable name="Idx105_StateIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : 1 = État ouvert/fermé INCONNU (ni IsOpen ni IsClosed fiable) -- cause fréquente de blocage</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx106_FBState">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : État machine FB_Bucket (READY/BUSY/DONE/DISABLED)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx107_LastPosM2Open_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Dernière position M2 mémorisée "ouvert"</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx108_LastPosM2Close_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Dernière position M2 mémorisée "fermé"</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="Idx201_HmiCmd_BtnOpen">
               <type>
                 <BOOL />
@@ -1603,6 +1643,30 @@
                 <html:xhtml>🆕 2026-08-07 : 1 = Fermeture auto armée (montée couplée demandée, benne pas fermée)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="Idx206_CloseReqActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : 1 = Fermeture mémorisée/en cours (instBucket.CloseReq -- reste à 1 si recul partiel non terminé)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_OpenReqActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : 1 = Ouverture mémorisée/en cours (instBucket.OpenReq -- idem)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx208_MotionBlockedByBucket">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🔴 2026-08-07 : 1 = Mouvement couplé BLOQUÉ (auto-séquencement armé mais benne pas Busy -- vérifier Idx306_ErrorIdRaw)</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="Idx301_EmergencyChainClosed">
               <type>
                 <BOOL />
@@ -1641,6 +1705,14 @@
               </type>
               <documentation>
                 <html:xhtml>🆕 2026-08-07 : 1 = Fond détecté, descente bloquée (ForbidDescentM1/M2_Raw)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_ErrorIdRaw">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : bitfield brut FB_Bucket (bit0 timeout, bit1 incohérence, bit2 limites, bit3 codeur non référencé, bit4 glissement M1)</html:xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_BucketBusy">
@@ -23134,16 +23206,24 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen := WinchM2.Bucke
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed := WinchM2.Bucket.State.MechState.IsClosed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx103_OffsetPos_M := WinchM2.Bucket.State.ActiveOffset_M;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx104_AutoSeqActive := WinchM2.Bucket.State.AutoBucketSeqActive;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx105_StateIncoherent := WinchM2.Bucket.State.MechState.StateIncoherent;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx106_FBState := WinchM2.Bucket.State.FBState;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx107_LastPosM2Open_M := WinchM2.Bucket.State.MechState.LastPosM2Open;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx108_LastPosM2Close_M := WinchM2.Bucket.State.MechState.LastPosM2Close;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := FALSE; // TBD non câblé - voir fiche §6 (pas de sortie Cycle Open publiée)
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx204_CoupledDiveOpenArmed := WinchM2.Bucket.State.CoupledDiveOpenArmed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx205_CoupledAscentCloseArmed := WinchM2.Bucket.State.CoupledAscentCloseArmed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx206_CloseReqActive := WinchM2.Bucket.State.CloseActive;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx207_OpenReqActive := WinchM2.Bucket.State.OpenActive;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx208_MotionBlockedByBucket := WinchM2.Bucket.State.CoupledMotionBlockedByBucket;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive := WinchM2.Bucket.State.Error;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx303_KoboldAutoStopEnabled := Commun.Cfg.TglEnableKoboldAutoStopDescent;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx304_KoboldImmersionConfirmed := Commun.KoboldImmersionConfirmed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched := Commun.KoboldBottomTouchLatched;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx306_ErrorIdRaw := WinchM2.Bucket.State.ErrorId;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx403_ControlAscentActive := WinchM2.Bucket.State.ControlAscentActive;
@@ -26913,6 +26993,14 @@ détection à inventer.
 CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledMotionBlockedByBucket">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🔴 2026-08-07 : garde-fou direct -- voir REX ci-dessous §3</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="CoupledAscentBucketCloseArmed">
               <type>
                 <BOOL />
@@ -27353,6 +27441,20 @@ instBucket(
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
 
+// 🔴🔧 REX 2026-08-07 (retour terrain, TROU DE SÉCURITÉ RÉEL CONFIRMÉ SUR MACHINE) : la Fiche 01
+// bloquait M1 UNIQUEMENT via "NOT instBucket.Busy" (voir M1_StartStop_Active/M2_StartStop_Active
+// plus bas) -- en pariant que instBucket passerait bien en BUSY dès que CmdOpen_IHM/CmdClose_IHM
+// est armé. Si instBucket a un DÉFAUT ACTIF (Error/SevereError, ex. timeout d'une tentative
+// précédente), FB_Bucket refuse d'armer CloseReq/OpenReq (`AND NOT SevereError`) -- Busy reste
+// FALSE en PERMANENCE, et plus RIEN ne bloque M1 ni M2 : confirmé en test réel, la benne restée
+// ouverte n'empêchait plus la montée des 2 treuils après un 2e appui. Corrigé : blocage DIRECT,
+// INDÉPENDANT de FB_Bucket -- si l'auto-séquencement a été armé (Coupled*Armed) mais que
+// instBucket n'est PAS effectivement occupé à l'exécuter (Busy=FALSE, quelle qu'en soit la
+// raison : défaut, précondition non remplie, timing), le mouvement couplé reste bloqué. Défense
+// en profondeur : la règle tient même si FB_Bucket est en défaut, jamais uniquement "pariée" sur
+// son bon fonctionnement.
+CoupledMotionBlockedByBucket := (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed) AND NOT instBucket.Busy;
+
 SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000;
 SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &gt; 0.0);
 SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &lt; 0.0);
@@ -27401,6 +27503,7 @@ ELSE
     END_IF;
 
     M1_StartStop_Active := (M1_Direction_Active &lt;&gt; 0) AND NOT instBucket.Busy
+                            AND NOT CoupledMotionBlockedByBucket
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
                             AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
@@ -27448,6 +27551,7 @@ ELSE
         END_IF;
 
         M2_StartStop_Active := (M2_Direction_Active &lt;&gt; 0)
+                                AND NOT CoupledMotionBlockedByBucket
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)))
                                 AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
@@ -28008,6 +28112,7 @@ BucketStateHMI.AutoBucketSeqActive := (instBucket.Busy AND (CoupledDiveBucketOpe
 BucketStateHMI.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
 BucketStateHMI.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
 BucketStateHMI.ControlAscentActive := ControlAscentActive;
+BucketStateHMI.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 </html:xhtml>
