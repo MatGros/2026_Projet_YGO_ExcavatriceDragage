@@ -109,6 +109,12 @@ VAR
     instEncoderAbsM2         : FB_Encoder_Abs;
     instEncoderScaleM2       : FB_Encoder_Scale;
     instHomingM2             : FB_Encoder_Homing;
+    // 🆕 2026-08-07 (19) : BtnConfirmOpenPos/ClosePos (benne) référencent aussi le codeur M2,
+    // comme BtnHome -- voir bandeau instHomingM2 plus bas.
+    M2BucketRefOpenEdge      : R_TRIG;
+    M2BucketRefCloseEdge     : R_TRIG;
+    M2BucketRefRequested     : BOOL;
+    M2BucketRefTargetM       : REAL;
     instEncoderSafetyM2      : FB_Encoder_Safety;       // 🆕 2026-08-05
     instEncoderSpeedMeasureM2: FB_Encoder_SpeedMeasure;  // 🆕 2026-08-05
     instPosDecoderM3         : FB_Translation_PositionDecoder;
@@ -448,12 +454,32 @@ instEncoderAbsM2(
     PresetValue         := instHomingM2.PresetValue
 );
 
+// 🆕 2026-08-07 (19) — retour terrain, demande client : BtnConfirmOpenPos/ClosePos (benne)
+// doivent AUSSI référencer le codeur M2, comme BtnHome -- pas seulement mémoriser IsOpen/IsClosed
+// (FB_Bucket.st, inchangé, continue de le faire en parallèle). Cible dynamique : ouverture =
+// position réelle actuelle de M1 (offset 0) ; fermeture = M1 + OffsetCloseM (config benne, 15m
+// actuellement). Mêmes gardes que le Confirm logique (Mode MAINT_N1/N2, M1/M2 à l'arrêt) --
+// lecture 1 scan en retard sur PRG_03/PRG_04 (pattern déjà accepté ailleurs, action manuelle
+// ponctuelle, pas un mouvement).
+M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
+M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
+M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
+    AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+    AND NOT PRG_04_Treuils_Benne.instWinchM1.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Busy;
+IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
+    M2BucketRefTargetM := CablePosM1;
+ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
+    M2BucketRefTargetM := CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM;
+END_IF;
+
 instHomingM2(
     Enable               := TRUE,
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
-    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
+    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero OR M2BucketRefRequested,
+    UseDynamicTarget     := M2BucketRefRequested,
+    DynamicHomingTargetM := M2BucketRefTargetM,
     UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 0),
     WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
