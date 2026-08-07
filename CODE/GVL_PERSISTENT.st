@@ -39,22 +39,22 @@ VAR_GLOBAL PERSISTENT RETAIN
     //     doit rester SOUS le capteur physique, qui reste le garde-fou ultime).
     //   • CfgRampAccelRate 50.0 → 10.0 (MES-007 / T78 : adoucir le démarrage des treuils).
     _WinchM1CfgPersist : ST_WinchCfg := (
-        CfgTopSensorPos_M := 8.0,
+        CfgTopSensorPos_M := 8.5, // 🔧 REX 2026-08-07 (24bis) : correction, capteur physique réel à 8.5m
         CfgHomingTarget_M := 0.0,
         CfgRampAccelRate := 10.0,
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
         CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 7.5
+        CfgCableLimitAscent_M := 7.0 // 🔧 REX 2026-08-07 (24) : 7.5 -> 7.0 (demande client)
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M1)
     _WinchM2CfgPersist : ST_WinchCfg := (
-        CfgTopSensorPos_M := 8.0,
+        CfgTopSensorPos_M := 8.5, // 🔧 REX 2026-08-07 (24bis) : correction, capteur physique réel à 8.5m
         CfgHomingTarget_M := 0.0,
         CfgRampAccelRate := 10.0,
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
         CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 7.5
+        CfgCableLimitAscent_M := 7.0 // 🔧 REX 2026-08-07 (24) : 7.5 -> 7.0 (demande client)
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
@@ -70,7 +70,10 @@ VAR_GLOBAL PERSISTENT RETAIN
         Config := (
             OffsetOpenM      := 0.0,
             OffsetCloseM     := 15.0,
-            CoherenceLimitM  := 0.05
+            // 🔧 REX 2026-08-07 (23/23bis) : 0.05 -> 0.5 -> 1.0 -- avec l'anticipation inertie
+            // (correctif 20/21bis), un écart résiduel après arrêt est normal, l'ancien seuil ne
+            // matchait quasiment plus jamais.
+            CoherenceLimitM  := 1.0
         ),
         CfgTimeoutDuration := T#30s
     ); // 🌉 Pont FB_CfgPersistBridge_BucketCfg

@@ -14,7 +14,7 @@ STRUCT
     CfgRampDecelNormalRate  : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
     CfgRampDecelFastRate    : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
     CfgCableLimitDescent_M  : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
-    CfgCableLimitAscent_M   : REAL := 8.0;      (* 📐 Limite haute d'exploitation NORMALE (m) *)
+    CfgCableLimitAscent_M   : REAL := 7.0;      (* 📐 Limite haute d'exploitation NORMALE (m) -- REX 2026-08-07 (24), aligné sur GVL_PERSISTENT *)
 
     (* 🐛 FIX 2026-07-23 : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
        métier dont le défaut peut valoir n'importe quoi) — PRG_SUPERVISION_CFC.st §2/§3 *)
