@@ -38,6 +38,7 @@ VAR_INPUT
     FilterTime      : TIME := TIME#0ms;
     DeadmanRearmTimeout : TIME := T#10S; // Délai max entre 2 appuis en mouvement (si reconfirmation activée)
     NeutralHoldTime     : TIME := T#100MS; // Temps continu au neutre avant désarmement (100 ms)
+    DeadmanArmHoldTime  : TIME := T#100MS; // 🆕 2026-08-07 : Temps d'appui continu avant armement (indépendant position axes)
     DeadmanReconfEnable : BOOL := FALSE; // 🆕 2026-08-03 : FALSE = bouton = consentement au démarrage (mouvement libre, défaut cible) ; TRUE = reconfirmation périodique en mouvement (comportement historique)
 END_VAR
 VAR_OUTPUT
@@ -76,6 +77,8 @@ VAR
     DeadmanEdge     : R_TRIG;
     DeadmanTimer    : TON;
     NeutralHoldTimer: TON;
+    DeadmanArmTimer : TON;
+    DeadmanArmPending : BOOL;
     LastMode        : E_Mode;
     BenneBusyFallEdge : F_TRIG;
 END_VAR
@@ -91,8 +94,10 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     SpeedYPct := 0.0; DirectionY := 0;
     Button := FALSE;
     DeadmanArmed := FALSE;   // 🆕 Désarmé sur toute neutralisation — nouvel appui au neutre exigé
+    DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — annule toute tentative d'armement en cours
     DeadmanTimer(IN := FALSE, PT := DeadmanRearmTimeout);   // 🆕 2026-07-03decies — pas d'accumulation à froid
     NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);   // 🆕 2026-07-03duodecies — idem
+    DeadmanArmTimer(IN := FALSE, PT := DeadmanArmHoldTime);   // 🆕 2026-08-07 — idem
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
     LastMode := Mode;   // 🆕 REX 2026-07-08 — pas de faux changement détecté à la réactivation
@@ -133,6 +138,7 @@ ScaleY(RawIn := RawY, Neutral := NeutralYMem, Deadband := Deadband);
 // de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
 IF Mode <> LastMode THEN
     DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après changement de mode
 END_IF;
 LastMode := Mode;
 
@@ -142,10 +148,33 @@ LastMode := Mode;
 BenneBusyFallEdge(CLK := BenneBusy);
 IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après fin de cycle benne
 END_IF;
 
-// 4ter. BOUTON HOMME-MORT
+// 4ter. BOUTON HOMME-MORT — armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la
+// position des axes pendant l'appui.
+// 🔧 2026-08-07 (retour terrain) : l'ancien armement ("front bouton" ET "axes strictement à
+// 0.0 sur le MÊME scan") échouait dès que l'opérateur poussait le joystick quelques ms après
+// avoir appuyé — trop contraignant en pratique (le geste naturel "j'appuie PUIS je pousse" ratait
+// systématiquement la fenêtre d'un seul scan). Nouvelle séquence : appui (front) → maintien
+// DeadmanArmHoldTime (100 ms) → armé, quelle que soit la position des axes durant ce maintien.
+// Relâchement AVANT la fin du maintien = tentative annulée (DeadmanArmPending retombe), un
+// nouvel appui (front) est requis — pas d'armement différé "surprise" sur un appui prolongé après
+// un désarmement (mode/benne/neutre). Sûr même si le joystick est déjà hors zone morte à la fin
+// du maintien : les rampes d'accel/décel restent gérées par les FB aval (FB_Winch/FB_Translation,
+// cf. §"Rôle" en tête de fichier), donc pas de démarrage brutal possible côté ce FB.
 DeadmanEdge(CLK := RawButton);
+IF DeadmanEdge.Q THEN
+    DeadmanArmPending := TRUE;
+END_IF;
+IF NOT RawButton THEN
+    DeadmanArmPending := FALSE;
+END_IF;
+DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed, PT := DeadmanArmHoldTime);
+IF DeadmanArmTimer.Q THEN
+    DeadmanArmed := TRUE;
+    DeadmanArmPending := FALSE;
+END_IF;
 
 // 🔧 2026-08-06 (retour terrain) : décision 2026-08-03 ("l'opérateur a le temps qu'il veut
 // pour démarrer après armement") ANNULÉE explicitement — un armement resté au neutre sans
@@ -156,9 +185,6 @@ NeutralHoldTimer(IN := DeadmanArmed AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct
                  PT := NeutralHoldTime);
 IF NeutralHoldTimer.Q THEN
     DeadmanArmed := FALSE;      // Neutre tenu assez longtemps = désarmement
-END_IF;
-IF DeadmanEdge.Q AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0) THEN
-    DeadmanArmed := TRUE;       // Appui bouton au neutre = armement
 END_IF;
 
 // 4quater. RECONFIRMATION PÉRIODIQUE (optionnelle) — activée uniquement si DeadmanReconfEnable := TRUE.
