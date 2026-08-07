@@ -1,0 +1,56 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# FICHE 03 — Troubleshooting du séquencement automatique benne
+# ═══════════════════════════════════════════════════════════════════════════
+# DÉPEND DE : FICHE_01 (committée en premier)
+# Lire AGENTS.md + subagent_preamble.md AVANT toute ligne de code.
+
+contract:
+  task_id: LOT_BENNE_03_TROUBLESHOOTING
+  criticality: C1
+  strategy: patch
+
+  objective: >
+    Un technicien en dépannage voit dans l'écran troubleshooting pourquoi
+    une descente/montée couplée ne démarre pas immédiatement (benne en
+    cours d'ouverture/fermeture auto) sans avoir à ouvrir le code.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        GVL_Troubleshooting.BenneOuvertureFermeture (ST_ChainBucket) reçoit
+        au moins : indicateur "séquencement auto en cours" + sens couplé
+        demandé + état benne mesuré (Ouvert/Fermé/Transit/Incohérent).
+      verified_by: "Revue de ST_ChainBucket.st (nouveaux champs Idx suivant la numérotation existante) + FB_TroubleshootingView.st (population)."
+    - id: AC2
+      statement: >
+        FB_TroubleshootingView reste une pure recopie (aucune logique
+        métier ajoutée) — doctrine du fichier, en-tête à relire avant
+        d'écrire.
+      verified_by: "Revue : chaque nouvelle ligne est une affectation directe depuis un champ déjà publié dans GVL_IHM, jamais un calcul."
+
+  scope:
+    allowed:
+      - CODE/SUPERVISION/_TYPES/ST_ChainBucket.st
+      - CODE/DEPANNAGE/FB_TroubleshootingView.st
+    forbidden:
+      - CODE/MAIN/PRG_04_Treuils_Benne.st
+      - CODE/TREUILS/BENNE/FB_Bucket.st
+
+  conservation:
+    must_survive:
+      - "Tous les champs Idx existants de ST_ChainBucket et leur population actuelle"
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Si un champ nécessaire n'existe pas encore côté GVL_IHM (dépend de la
+    Fiche 02), le signaler et attendre plutôt que d'inventer une lecture
+    directe d'instance FB (interdit par la doctrine du fichier).

@@ -1,0 +1,59 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# FICHE 02 — Visibilité IHM du séquencement automatique benne
+# ═══════════════════════════════════════════════════════════════════════════
+# DÉPEND DE : FICHE_01 (committée en premier — a besoin des signaux qu'elle crée)
+# Lire AGENTS.md + subagent_preamble.md AVANT toute ligne de code.
+
+contract:
+  task_id: LOT_BENNE_02_IHM
+  criticality: C1
+  strategy: patch
+
+  objective: >
+    L'opérateur voit sur IHM, en temps réel, si la machine est en train
+    d'ouvrir/fermer automatiquement la benne avant d'enchaîner sur un
+    mouvement couplé — pour comprendre pourquoi M1 ne bouge pas encore
+    pendant les premières secondes d'une demande de descente/montée.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Nouveau champ booléen visible IHM indiquant "séquencement auto benne
+        en cours" (TRUE dès que CmdOpen_IHM/CmdClose_IHM est auto-déclenché
+        par la Fiche 01, FALSE sinon) — nom exact à reprendre depuis le
+        diff committé de la Fiche 01.
+      verified_by: "Lecture GVL_IHM.Commun ou M2TreuilBenne.Bucket.State — champ présent et alimenté depuis PRG_04/PRG_07."
+    - id: AC2
+      statement: >
+        État benne (ouvert/fermé/transit/incohérent) déjà existant
+        (_BucketState.IsOpen/.IsClosed/.StateIncoherent) reste affiché sans
+        régression — ce lot ajoute, ne remplace rien.
+      verified_by: "Diff ne touche aucune ligne existante de publication IsOpen/IsClosed/StateIncoherent."
+
+  scope:
+    allowed:
+      - CODE/SUPERVISION/_TYPES/ST_BucketHMIState.st
+      - CODE/MAIN/PRG_04_Treuils_Benne.st   # uniquement ajout de lignes de publication, pas l'arbitrage
+      - CODE/MAIN/PRG_07_Supervision.st
+    forbidden:
+      - CODE/TREUILS/BENNE/FB_Bucket.st
+      - Toute ligne de PRG_04 touchée par la Fiche 01 (arbitrage M1/M2) — ce lot ne fait QUE lire/publier, jamais modifier l'arbitrage
+
+  conservation:
+    must_survive:
+      - "Tous les champs ST_BucketHMIState existants (M2ForceSlowSpeed, etc.)"
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Si les noms exacts des signaux créés par la Fiche 01 ne sont pas
+    disponibles (Fiche 01 pas encore committée), NE PAS deviner — demander
+    à l'orchestrateur le nom exact avant d'écrire.

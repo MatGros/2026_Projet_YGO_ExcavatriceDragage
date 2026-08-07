@@ -1,0 +1,48 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# FICHE 04 — Documentation du séquencement automatique benne
+# ═══════════════════════════════════════════════════════════════════════════
+# DÉPEND DE : FICHE_01, 02, 03 committées (documente le comportement réel livré)
+# Lire AGENTS.md + subagent_preamble.md AVANT toute ligne.
+
+contract:
+  task_id: LOT_BENNE_04_DOC
+  criticality: C0
+  strategy: patch
+
+  objective: >
+    La règle absolue "descente only si benne ouverte / montée only si benne
+    fermée" et son mécanisme de séquencement automatique sont documentés
+    dans la spec métier treuils/benne, avec la distinction claire vs.
+    DiveSearch/ExtractionSequence (séquences assistées séparées).
+
+  acceptance:
+    - id: AC1
+      statement: "Nouvelle section décrivant la règle, le déclenchement auto, la portée (couplé uniquement) et l'exclusion du pilotage unitaire."
+      verified_by: "Lecture DOC/AF_Partie-10_Fonction_Winch_v2.0.md, nouvelle section présente et cohérente avec le code committé."
+    - id: AC2
+      statement: "DOC/VERSION_HISTORY.md reçoit une entrée pour ce lot (commits réels, pas hypothétiques)."
+      verified_by: "Entrée présente, référence les hash de commit réels des Fiches 01-03."
+
+  scope:
+    allowed:
+      - DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+      - DOC/VERSION_HISTORY.md
+    forbidden:
+      - Tout fichier CODE/
+
+  conservation:
+    must_survive: []
+    dropped_on_purpose: []
+
+  evidence_required:
+    - bundle   # check_doc_links.py --fix à lancer, pas de gate code requis
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "antigravity/gemini-3.5-flash-medium"   # doc pure, non-safety
+
+  alert_duty: >
+    Documenter le comportement RÉELLEMENT committé, jamais le comportement
+    prévu/souhaité si le code final diverge de cette fiche — vérifier le
+    diff réel avant d'écrire.

@@ -1,0 +1,109 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# FICHE 05 — Arrêt automatique descente sur détection fond (Kobold)
+# ═══════════════════════════════════════════════════════════════════════════
+# DÉPEND DE : FICHE_01 (committée en premier — a besoin du signal "descente
+# couplée benne ouverte en cours")
+# Lire AGENTS.md + subagent_preamble.md AVANT toute ligne de code.
+
+contract:
+  task_id: LOT_BENNE_05_KOBOLD_AUTOSTOP
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif métier ──────────────────────────────────────────────────
+  objective: >
+    Pendant une descente couplée normale (benne ouverte, mécanisme Fiche 01),
+    si l'opérateur a activé le toggle IHM dédié, le capteur Kobold (déjà
+    câblé et utilisé dans FB_DiveSearch) détecte le contact avec le fond et
+    coupe la descente des 2 treuils INSTANTANÉMENT — même logique
+    d'immersion/détection que FB_DiveSearch, mais disponible en pilotage
+    normal (hors mode assistance MAINT_N1/N2 Kobold existant), activable/
+    désactivable librement par l'opérateur.
+
+  # ── 2. Critères testables ───────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Nouveau toggle IHM (RETAIN, GVL_PERSISTENT) contrôlant l'activation
+        de cette fonction. Défaut FALSE (l'opérateur doit l'activer
+        volontairement — fonction neuve, jamais testée en production).
+      verified_by: "Champ présent GVL_IHM.Commun.Cmd (ou équivalent), pont persistance vers GVL_PERSISTENT, défaut FALSE vérifiable dans le code source."
+    - id: AC2
+      statement: >
+        Toggle OFF (défaut) : comportement STRICTEMENT identique à
+        aujourd'hui, aucune surveillance Kobold en dehors de FB_DiveSearch
+        (assistance MAINT_N1/N2 existante, non touchée par ce lot).
+      verified_by: "Revue : la surveillance ajoutée par ce lot est entièrement conditionnée par le nouveau toggle, jamais active par défaut."
+    - id: AC3
+      statement: >
+        Toggle ON, descente couplée benne ouverte en cours (signal de la
+        Fiche 01) : un changement d'état Kobold AVANT d'avoir atteint la
+        fenêtre d'immersion (RÉUTILISER GVL_IHM.DredgingAssist.Cfg.
+        ImmersionUpper_M/ImmersionLower_M — ne pas créer de nouveau seuil)
+        est ignoré, aucune action.
+      verified_by: "Revue de code + trace : front Kobold hors fenêtre immersion ne déclenche rien (même logique que FB_DiveSearch.SEARCHING_IMMERSION, dupliquée en plus simple, sans passer par ce FB)."
+    - id: AC4
+      statement: >
+        Front montant Kobold DANS la fenêtre d'immersion → immersion
+        confirmée. Front descendant Kobold APRÈS immersion confirmée → fond
+        détecté → ForbidDescentM1_Raw ET ForbidDescentM2_Raw forcés TRUE
+        le même scan (coupure réelle via décélération rapide déjà
+        existante, pas un simple blocage de StartStop).
+      verified_by: "Trace terrain : décélération rapide déclenchée au front descendant Kobold post-immersion, mesurer le délai (doit être le scan suivant, pas une tempo)."
+    - id: AC5
+      statement: >
+        Après coupure (AC4), la descente reste bloquée tant que le joystick
+        n'est pas repassé par le neutre (ASSOMPTION — à confirmer avec le
+        client avant implémentation définitive, voir devoir d'alerte
+        ci-dessous). Remonter (montée couplée) n'est PAS bloqué par ce
+        verrou — seule la descente l'est.
+      verified_by: "Revue de code : ForbidAscent non affecté par ce mécanisme. Confirmer le point neutre-requis avec l'orchestrateur avant de figer le comportement."
+    - id: AC6
+      statement: >
+        FB_DiveSearch et son usage MAINT_N1/N2 existant restent
+        strictement inchangés — ce lot n'y touche pas, duplique la logique
+        immersion/fond en local plutôt que de le réutiliser (cohérent avec
+        la décision "fonctionnement normal séparé des modes assistés,
+        réconciliation en phase 2").
+      verified_by: "Aucun fichier CODE/CYCLE/FB_DiveSearch.st dans le diff."
+
+  # ── 3. Périmètre ────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_04_Treuils_Benne.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/SUPERVISION/GVL_IHM.st           # ou struct Cmd concernée
+      - CODE/SUPERVISION/_TYPES/ST_CommunHMI.st   # si toggle logé ici
+    forbidden:
+      - CODE/CYCLE/FB_DiveSearch.st
+      - CODE/CYCLE/FB_ExtractionSequence.st
+      - CODE/TREUILS/BENNE/FB_Bucket.st
+      - CODE/TREUILS/FB_Winch.st
+      - CODE/TREUILS/FB_Safety_Winch.st
+
+  # ── 4. Contrat de conservation ──────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "FB_DiveSearch et son comportement MAINT_N1/N2 actuel, inchangés"
+      - "Mécanisme ForbidDescentM1/M2_Raw existant (vidage trémie) non perturbé — additif uniquement (OR)"
+    dropped_on_purpose: []
+
+  # ── 5. Preuves attendues ────────────────────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - task_tests
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    AC5 (levée du verrou au neutre) est une ASSOMPTION de l'orchestrateur,
+    pas une confirmation client explicite — la reformuler comme question à
+    l'orchestrateur avant de figer le comportement si un doute subsiste
+    pendant l'implémentation. Toute divergence entre le seuil d'immersion
+    réellement configuré et "~0.5m" annoncé par le client doit être
+    signalée (vérifier la valeur réelle de ImmersionUpper_M/Lower_M dans
+    GVL_PERSISTENT avant d'écrire, ne pas supposer 0.5m).

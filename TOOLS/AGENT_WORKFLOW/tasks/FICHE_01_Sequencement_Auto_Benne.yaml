@@ -1,0 +1,172 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# FICHE 01 — Séquencement automatique ouverture/fermeture benne
+# ═══════════════════════════════════════════════════════════════════════════
+# Contexte complet : lire AGENTS.md + subagent_preamble.md AVANT toute ligne de code.
+# Criticité C3 : touche l'arbitrage de mouvement M1/M2 en pilotage normal.
+# Priorité : ce lot doit être committé et testé AVANT les fiches 02/03/04.
+
+contract:
+  task_id: LOT_BENNE_01_SEQUENCEMENT_AUTO
+  criticality: C3
+  strategy: patch
+
+  # ── 1. Objectif métier ──────────────────────────────────────────────────
+  objective: >
+    En pilotage couplé (both, M1+M2 ensemble) normal — hors pilotage unitaire
+    M1/M2 seul —, la machine applique désormais une règle absolue :
+    descente autorisée UNIQUEMENT benne ouverte, montée autorisée UNIQUEMENT
+    benne fermée. Si l'opérateur demande une descente/montée couplée alors
+    que la benne n'est pas dans le bon état, la machine ouvre/ferme
+    automatiquement la benne (M2 seul, M1 bloqué par le garde-fou déjà
+    existant `AND NOT instBucket.Busy`), puis enchaîne SANS ARRÊT sur le
+    mouvement couplé demandé, tant que le joystick/bouton reste tenu.
+    Relâcher à tout moment arrête tout immédiatement (comportement standard
+    déjà en place, ne pas y toucher).
+
+  # ── 2. Critères testables ───────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Descente couplée demandée (joystick ou BtnWinchBothDown), benne
+        NON ouverte (_BucketState.IsOpen=FALSE), pilotage couplé
+        (JoystickWinchSelectArbitrated=0) → instBucket.CmdOpen_IHM passe à
+        TRUE le scan suivant, instBucket entre en BUSY, M2 se met en
+        mouvement (ouverture), M1_StartStop_Active reste FALSE tant que
+        instBucket.Busy=TRUE (déjà garanti par le code existant, à ne pas
+        casser).
+      verified_by: >
+        Trace CODESYS (ou revue de code) : instBucket.CmdOpen_IHM,
+        instBucket.Busy, WinchM1StateHMI.StepNumber (doit rester à 0 pendant
+        l'ouverture benne).
+    - id: AC2
+      statement: >
+        Dès que _BucketState.IsOpen passe à TRUE (cible atteinte), et que le
+        joystick/bouton reste tenu en descente, M1 démarre ET M2 continue de
+        descendre SANS repasser par StartStop=FALSE entre les deux phases
+        (pas de coupure, même d'1 scan).
+      verified_by: >
+        Trace CODESYS haute résolution (échantillonnage scan) sur
+        M2_StartStop_Active pendant la transition — doit rester TRUE en
+        continu de la fin de l'ouverture jusqu'au début de la descente
+        couplée. Documenter le mécanisme utilisé (pas un simple test empirique
+        "ça a marché une fois" — la garantie doit être structurelle, cf. §3).
+    - id: AC3
+      statement: >
+        Symétrique exact pour la montée : montée couplée demandée, benne NON
+        fermée → instBucket.CmdClose_IHM auto-déclenché → fermeture M2 seul
+        (M1 bloqué) → dès _BucketState.IsClosed=TRUE, montée couplée M1+M2
+        sans coupure.
+      verified_by: "Même méthode qu'AC1/AC2, sens montée."
+    - id: AC3bis
+      statement: >
+        Après la fermeture auto-benne (AC3), la montée couplée démarre en
+        VITESSE CONTRÔLÉE (palier minimal forcé, même principe que
+        FB_ExtractionSequence.CONTROL_ASCENT/ForceMinSpeedStep) sur une
+        distance réglable — RÉUTILISER le paramètre existant
+        GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M (déjà
+        persistant, ne pas créer de nouveau réglage. Défaut actuel 2.0m).
+        Une fois cette distance parcourue (M1 ET M2), la montée repasse en
+        paliers normaux (comportement standard, plus de plafond).
+      verified_by: >
+        Revue de code : plafond de palier appliqué (mécanisme déjà existant
+        CfgSlowdownMaxStep/ActiveMaxStep ou équivalent) tant que
+        ABS(position - position au début de la montée) < ExtractionControlDistance_M
+        sur M1 ET M2, levé ensuite. Trace terrain : palier ne dépasse pas 1
+        pendant les X premiers mètres, paliers normaux après.
+    - id: AC4
+      statement: >
+        Pilotage UNITAIRE M1 seul (JoystickWinchSelectArbitrated=1) ou M2
+        seul (=2) : AUCUN déclenchement automatique de CmdOpen_IHM/
+        CmdClose_IHM. L'opérateur garde le contrôle direct et manuel de M2
+        pour recalage (ConfirmOpenPosition/ConfirmClosePosition restent la
+        seule voie de recalage en unitaire, comportement actuel préservé).
+      verified_by: >
+        Revue de code : la condition de déclenchement automatique doit
+        explicitement exclure JoystickWinchSelectArbitrated=1 et =2 (et,
+        symétriquement côté boutons IHM, les BtnUp/BtnDown individuels
+        M1TreuilRetenue.Cmd/M2TreuilBenne.Cmd ne doivent PAS déclencher
+        l'auto-séquencement — seuls BtnWinchBothUp/Down et le joystick en
+        mode couplé le font).
+    - id: AC5
+      statement: >
+        Relâcher le joystick/bouton à N'IMPORTE QUEL moment de la séquence
+        (pendant l'ouverture/fermeture auto OU pendant le mouvement couplé)
+        arrête tout immédiatement — comportement déjà garanti par
+        MotionRequestActive dans FB_Bucket et par StartStop dans FB_Winch,
+        À NE PAS DÉGRADER.
+      verified_by: "Revue de non-régression : aucune modification de la logique d'arrêt existante."
+    - id: AC6
+      statement: >
+        Les séquences existantes DiveSearch/ExtractionSequence (MAINT_N1/N2,
+        Kobold, bottom-touch) continuent de fonctionner à l'identique — ce
+        lot ne les touche pas.
+      verified_by: "Aucun fichier CODE/CYCLE/*.st dans le diff de ce lot."
+
+  # ── 3. Périmètre ────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_04_Treuils_Benne.st
+    forbidden:
+      - CODE/TREUILS/BENNE/FB_Bucket.st          # ne pas toucher la machine à états benne elle-même
+      - CODE/CYCLE/FB_DiveSearch.st               # hors scope, séquences assistées séparées
+      - CODE/CYCLE/FB_ExtractionSequence.st       # idem
+      - CODE/TREUILS/FB_Winch.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  # ── 4. Contrat de conservation ──────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Garde-fou M1_StartStop_Active := ... AND NOT instBucket.Busy AND ... (ligne existante, ne pas retirer)"
+      - "Arrêt immédiat sur relâchement joystick/bouton (MotionRequestActive, StartStop)"
+      - "ConfirmOpenPosition/ConfirmClosePosition inchangés (recalage manuel MAINT_N1/N2)"
+      - "Pilotage unitaire M1/M2 (JoystickWinchSelectArbitrated=1/2) totalement inchangé"
+      - "DiveSearch/ExtractionSequence inchangés"
+    dropped_on_purpose: []
+
+  # ── 5. Preuves attendues ────────────────────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - task_tests   # AC1-AC6 : preuve nommée pour CHAQUE critère, pas un résumé global
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Si le mécanisme "repli sans coupure" (AC2) ne peut pas être garanti de
+    façon structurelle (pas juste "ça marche en pratique"), remonter
+    IMMÉDIATEMENT à l'orchestrateur AVANT d'écrire — ne pas livrer une
+    solution qui dépend d'un timing de scan non garanti. C'est le point que
+    le client a explicitement demandé de sécuriser.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NOTE D'IMPLÉMENTATION (piste, à valider/adapter par l'agent — pas une obligation figée)
+# ═══════════════════════════════════════════════════════════════════════════
+# 1. Nouveau signal "intention couplée" AVANT tout effet du benne sur M2 :
+#      CoupledMotionDirection : INT (-1/0/+1), calculé à partir de :
+#        - Boutons IHM : BtnWinchBothUp/Down
+#        - Joystick maître : JoystickWinchSelectArbitrated=0 ET AxisCmdY.Direction
+#      (mêmes 2 sources déjà utilisées séparément pour M1_Direction_Active,
+#       mais AVANT toute influence d'instBucket.Busy)
+#
+# 2. Déclenchement auto :
+#      instBucket.CmdOpen_IHM  := (CoupledMotionDirection = -1) AND NOT _BucketState.IsOpen;
+#      instBucket.CmdClose_IHM := (CoupledMotionDirection = 1)  AND NOT _BucketState.IsClosed;
+#
+# 3. Continuité M2 SANS dépendre du timing exact de la bascule Busy :
+#    au lieu de "IF instBucket.Busy THEN <bucket> ELSE <normal> END_IF" strict,
+#    utiliser un repli qui vérifie l'ÉTAT RÉEL de la demande benne, pas juste
+#    le flag Busy :
+#      IF instBucket.Busy AND instBucket.M2_StartStop THEN
+#          <source = instBucket.M2_StartStop/M2_Direction>
+#      ELSIF CoupledMotionDirection <> 0 THEN
+#          <source = arbitrage normal (même logique que M1)>
+#      ELSE
+#          <arrêt>
+#      END_IF;
+#    Le scan où le benne relâche sa demande (M2_StartStop benne retombé)
+#    tombe alors DIRECTEMENT dans la branche normale si le mouvement est
+#    toujours demandé — plus de fenêtre où les deux sources disent "stop"
+#    en même temps.
