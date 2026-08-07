@@ -18444,6 +18444,20 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</ht
       - **Bit13** : escalade — si l'arrêt (bit12) n'est PAS confirmé (contacteurs ET frein) dans
         `PostRampTimeout` → `SafeStop` ET `PowerCutOff` (dernier recours, même logique que Méca
         B/D : la rampe seule n'a visiblement pas suffi à arrêter réellement le treuil).
+   🔴🔧 REX 2026-08-07 — BypassGlobal DÉSACTIVAIT LES FINS DE COURSE PHYSIQUES (demande client,
+      audit confirmé à 100% par lecture directe du fichier) : `ForbidAscent`/`ForbidDescent`
+      étaient calculés puis ANDés avec `NOT BypassGlobal` en toute fin de logique — même le check
+      brut indépendant du capteur haut (déjà conçu pour "rester actif" selon son propre commentaire
+      REX 2026-07-08) se retrouvait masqué. Concrètement : `Bypass.Global` sur M1/M2 empêchait
+      l'arrêt réel sur fin de course haute/basse au joystick, aucun crash mécanique visible tant
+      que l'opérateur ne relâchait pas. Corrigé : `BypassGlobal` retiré des deux formules finales
+      (`ForbidAscent`/`ForbidDescent`) — seuls `BypassTopLimitSwitch`/`BypassCableLimitSwitch`
+      (individuels, conscients) peuvent désormais lever CES deux protections précises. Le reste du
+      domaine (Méca A-E, thermique, phase, comm, sync, codeur) reste masqué par `BypassGlobal`
+      exactement comme avant — changement strictement limité aux 2 fins de course physiques.
+      Limite connue non traitée (hors demande) : l'`ErrorId` bit5/bit6 et l'alarme IHM associée
+      restent à 0 sous `BypassGlobal` (calcul dans le bloc `IF NOT BypassGlobal`) — seule la
+      sortie `Forbid*` (le blocage réel du mouvement) est corrigée, pas l'affichage du défaut.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===</html:xhtml>
           </documentation>
@@ -18744,14 +18758,27 @@ ELSE
 END_IF;
 
 // ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé (bypasser si BypassGlobal ou BypassCableLimitSwitch)
-ForbidDescent := ((ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch);
+// 🆕 REX 2026-08-07 (demande client, audit confirmé) : terme INDÉPENDANT ajouté — check brut sur
+// la limite basse physique (même condition que le calcul du bit6 ci-dessus §3septies, mais évalué
+// HORS du bloc masqué par BypassGlobal), gardé UNIQUEMENT par BypassCableLimitSwitch. Même doctrine
+// que le check brut ForbidAscent ci-dessous (déjà présent) : BypassGlobal M1/M2 continue de masquer
+// Méca A-E/thermique/phase/comm/sync comme aujourd'hui, mais ne doit plus jamais désactiver l'arrêt
+// physique sur fin de course haute/basse — sécurité positive, seul un bypass individuel conscient
+// (BypassCableLimitSwitch) peut lever CETTE protection précise.
+ForbidDescent := (((ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
+              OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch);
 
-// ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (bypasser si BypassGlobal ou BypassTopLimitSwitch)
+// ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (bypasser si BypassTopLimitSwitch)
 // 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement
+// 🔧 REX 2026-08-07 (demande client, audit confirmé) : BypassGlobal RETIRÉ du ET final — la ligne
+// "Sécurité positive maintenue" ci-dessus était contredite par l'ancien `AND NOT (BypassGlobal OR
+// BypassTopLimitSwitch)` qui masquait quand même le check brut sous BypassGlobal M1/M2. Désormais
+// seul BypassTopLimitSwitch (individuel, conscient) peut lever cette protection précise — le reste
+// du domaine (Méca A-E/thermique/phase/comm/sync) reste masqué par BypassGlobal comme avant.
 ForbidAscent := ((ErrorId AND 16#0020) &lt;&gt; 16#0000
              OR (NOT TopPositionSensor AND NOT InReferencingMode)
              OR ((ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable))
-             AND NOT (BypassGlobal OR BypassTopLimitSwitch);
+             AND NOT BypassTopLimitSwitch;
 
 // 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
