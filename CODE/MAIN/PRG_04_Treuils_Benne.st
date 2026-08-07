@@ -54,6 +54,7 @@ VAR
     // déjà utilisées par instBucket/instDiveSearch/instExtractionSequence, aucune nouvelle
     // détection à inventer.
     CoupledDiveBucketOpenArmed     : BOOL;  // CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)
+    CoupledMotionBlockedByBucket   : BOOL;  // 🔴 2026-08-07 : garde-fou direct -- voir REX ci-dessous §3
     CoupledAscentBucketCloseArmed  : BOOL;  // CmdClose_IHM déclenché par ce mécanisme (diagnostic IHM)
     BucketBusyRiseEdge             : R_TRIG; // Détecte le début d'une action benne (Busy monté)
     BucketBusyFallEdge             : F_TRIG; // Détecte la fin d'une action benne (Busy retombé)
@@ -296,6 +297,20 @@ instBucket(
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
 
+// 🔴🔧 REX 2026-08-07 (retour terrain, TROU DE SÉCURITÉ RÉEL CONFIRMÉ SUR MACHINE) : la Fiche 01
+// bloquait M1 UNIQUEMENT via "NOT instBucket.Busy" (voir M1_StartStop_Active/M2_StartStop_Active
+// plus bas) -- en pariant que instBucket passerait bien en BUSY dès que CmdOpen_IHM/CmdClose_IHM
+// est armé. Si instBucket a un DÉFAUT ACTIF (Error/SevereError, ex. timeout d'une tentative
+// précédente), FB_Bucket refuse d'armer CloseReq/OpenReq (`AND NOT SevereError`) -- Busy reste
+// FALSE en PERMANENCE, et plus RIEN ne bloque M1 ni M2 : confirmé en test réel, la benne restée
+// ouverte n'empêchait plus la montée des 2 treuils après un 2e appui. Corrigé : blocage DIRECT,
+// INDÉPENDANT de FB_Bucket -- si l'auto-séquencement a été armé (Coupled*Armed) mais que
+// instBucket n'est PAS effectivement occupé à l'exécuter (Busy=FALSE, quelle qu'en soit la
+// raison : défaut, précondition non remplie, timing), le mouvement couplé reste bloqué. Défense
+// en profondeur : la règle tient même si FB_Bucket est en défaut, jamais uniquement "pariée" sur
+// son bon fonctionnement.
+CoupledMotionBlockedByBucket := (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed) AND NOT instBucket.Busy;
+
 SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) <> 16#0000;
 SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM > 0.0);
 SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM < 0.0);
@@ -344,6 +359,7 @@ ELSE
     END_IF;
 
     M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
+                            AND NOT CoupledMotionBlockedByBucket
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
                             AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
@@ -391,6 +407,7 @@ ELSE
         END_IF;
 
         M2_StartStop_Active := (M2_Direction_Active <> 0)
+                                AND NOT CoupledMotionBlockedByBucket
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)))
                                 AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
@@ -951,6 +968,7 @@ BucketStateHMI.AutoBucketSeqActive := (instBucket.Busy AND (CoupledDiveBucketOpe
 BucketStateHMI.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
 BucketStateHMI.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
 BucketStateHMI.ControlAscentActive := ControlAscentActive;
+BucketStateHMI.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 

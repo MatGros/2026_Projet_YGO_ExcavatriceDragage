@@ -22,5 +22,6 @@ STRUCT
     CoupledDiveOpenArmed    : BOOL;         (* 🆕 2026-08-07 : Ouverture auto armée (descente couplée demandée, benne pas ouverte) *)
     CoupledAscentCloseArmed : BOOL;         (* 🆕 2026-08-07 : Fermeture auto armée (montée couplée demandée, benne pas fermée) *)
     ControlAscentActive     : BOOL;         (* 🆕 2026-08-07 : Phase vitesse contrôlée montée en cours (post-fermeture auto) *)
+    CoupledMotionBlockedByBucket : BOOL;    (* 🔴 2026-08-07 : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition) *)
 END_STRUCT
 END_TYPE
