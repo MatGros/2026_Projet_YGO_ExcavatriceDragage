@@ -108,7 +108,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)
     _JoystickNeutralY : INT := 5000; // Point neutre axe Y (0..10000)
     _JoystickDeadband_Pct : REAL := 10.0; // Zone morte joystick (%) — REX 2026-07-02 : 5.0→10.0
-    _JoystickFilterTime : TIME := T#50ms; // Constante de temps filtre PT1 — 🔧 2026-08-06 (retour terrain) : réduit de 100ms, délai ressenti joystick→contacteur de sens persistant même après le lot tempo palier (redesign FB_Winch)
+    _JoystickFilterTime : TIME := T#0ms; // Constante de temps filtre PT1 — 🔧 2026-08-07 (demande client) : filtrage supprimé (0ms = pass-through exact, voir FB_Filter_PT1.st "Si TimeConst=0, sortie=entrée"). Historique : 100ms initial → 50ms (2026-08-06, délai ressenti persistant) → 0ms (2026-08-07, suppression complète demandée)
     _JoystickAccelRate_Pct : REAL := 50.0; // Accélération rampe (%/s)
     _JoystickDecelRate_Pct : REAL := 150.0; // Décélération rampe (%/s)
     _JoystickInvertX : BOOL := FALSE; // Inversion axe X
