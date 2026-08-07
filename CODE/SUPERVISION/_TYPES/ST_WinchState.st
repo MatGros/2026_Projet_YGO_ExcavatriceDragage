@@ -52,5 +52,10 @@ STRUCT
     ContactorsCheck         : ST_ContactorCheck; (* 🔌 Coherence contacteurs sens+vitesse *)
     BrakeContactorCheck     : ST_ContactorCheck; (* 🔌 Coherence retour frein *)
     InhibitActive           : BOOL;             (* 🆕 miroir lecture seule — inhibition arbitrée *)
+
+    (* 🐢 2026-08-07 : ralentissement sur bordure — diagnostic zone/limite active *)
+    BottomLimitActiveM      : REAL;             (* 📏 Limite basse active (m) — câble physique OU légale, la plus restrictive *)
+    InTopSlowdownZone       : BOOL;             (* 🐢 Palier plafonné à 1 : approche limite haute *)
+    InBottomSlowdownZone    : BOOL;             (* 🐢 Palier plafonné à 1 : approche limite basse (câble ou légale) *)
 END_STRUCT
 END_TYPE

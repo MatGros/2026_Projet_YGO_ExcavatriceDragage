@@ -132,8 +132,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         SelHomingApproachEnable := FALSE,
         WinchMaxStepDescente := 3,
         WinchMaxStepAscent := 5,
-        WinchSlowdownDistance_M := 1.0,
-        WinchSlowSpeed_Pct := 15.0
+        WinchSlowdownDistance_M := 1.0
     ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg (+ champs Winch communs M1/M2 rapatriés 2026-07-24)
 
     // 🚦 SYSTÈME / IHM

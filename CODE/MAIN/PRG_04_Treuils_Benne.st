@@ -410,8 +410,20 @@ END_IF;
 
 // === 🛑 §5 COUPLAGE CROISÉ & SÉCURITÉS ===
 
-BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
-BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
+// 🆕 2026-08-07 (demande client) : la limite légale (profondeur min. autorisée) doit elle aussi
+// bénéficier du ralentissement progressif avant arrêt (comme la limite câble physique), pas juste
+// un arrêt sec (ForbidDescent, ajouté au lot précédent). Comme les 2 limites bornent la même
+// direction (descente), on alimente FB_Winch.BottomLimitM avec la PLUS RESTRICTIVE des deux
+// (MAX de 2 valeurs négatives = celle la moins profonde = atteinte en premier) : le ralentissement
+// (FB_Winch §"RALENTISSEMENT AUTOMATIQUE SUR BORDURES") s'enclenche alors sur la bonne limite,
+// légale ou câble, sans dupliquer le mécanisme.
+IF _CommunCfgPersist.LimitLegalEnabled THEN
+    BottomLimitM1_Active := MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
+    BottomLimitM2_Active := MAX(_WinchM2CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
+ELSE
+    BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
+    BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
+END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/contacteurs/fin de course des DEUX treuils (VH_0800END,
@@ -584,7 +596,6 @@ instWinchM1(
     TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
-    CfgSlowSpeedPct         := _CommunCfgPersist.WinchSlowSpeed_Pct,
     BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
@@ -614,7 +625,6 @@ instWinchM2(
     TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
-    CfgSlowSpeedPct         := _CommunCfgPersist.WinchSlowSpeed_Pct,
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
@@ -701,6 +711,9 @@ WinchM1StateHMI.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM1.St
 WinchM1StateHMI.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM1.HomingSuspect;
 WinchM1StateHMI.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM1.HomingRefRaw;
 WinchM1StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
+WinchM1StateHMI.BottomLimitActiveM := BottomLimitM1_Active;
+WinchM1StateHMI.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
+WinchM1StateHMI.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
 
 WinchM2StateHMI.Position_M := PRG_02_Acquisition.CablePosM2;
 WinchM2StateHMI.SpeedRef_Pct := M2_SpeedRef_Active;
@@ -747,6 +760,9 @@ WinchM2StateHMI.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM2.St
 WinchM2StateHMI.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM2.HomingSuspect;
 WinchM2StateHMI.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM2.HomingRefRaw;
 WinchM2StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
+WinchM2StateHMI.BottomLimitActiveM := BottomLimitM2_Active;
+WinchM2StateHMI.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
+WinchM2StateHMI.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
 
 WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
 WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;

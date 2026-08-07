@@ -134,6 +134,8 @@ VAR_OUTPUT
     BusinessStepDelayElapsed : TIME;       // Écoulé de la tempo métier (EffectiveStepDelay, asymétrique montée/descente)
     SpeedGuardLimited   : BOOL;
     ContactorsCheck     : ST_ContactorCheck;  // 🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)
+    InTopSlowdownZone    : BOOL;   // 🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite haute)
+    InBottomSlowdownZone : BOOL;   // 🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite basse)
 END_VAR
 VAR
     SpeedStep           : FB_SpeedStep;
@@ -166,6 +168,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BusinessStepDelayElapsed := T#0ms;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelayAscent);
+    InTopSlowdownZone := FALSE;
+    InBottomSlowdownZone := FALSE;
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     Error := FALSE;
@@ -202,21 +206,21 @@ EffectiveSafeStop := SafeStop
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     RampTargetPct := ABS(SpeedRefPct);
-    
-    // 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect)
-    // Permet d'approcher les fins de course / limites en vitesse lente de façon progressive
-    IF Homed AND NOT HomingSuspect THEN
-        // En montée (engagement ou mouvement actif), ralentit à l'approche de la limite haute
-        IF ((CommandedDirection = 1) OR (Direction = 1)) AND (CablePosM >= (TopLimitM - CfgSlowdownDistanceM)) THEN
-            RampTargetPct := MIN(RampTargetPct, CfgSlowSpeedPct);
-        END_IF;
-        
-        // En descente (engagement ou mouvement actif), ralentit à l'approche de la limite basse
-        IF ((CommandedDirection = -1) OR (Direction = -1)) AND (CablePosM <= (BottomLimitM + CfgSlowdownDistanceM)) THEN
-            RampTargetPct := MIN(RampTargetPct, CfgSlowSpeedPct);
-        END_IF;
-    END_IF;
 END_IF;
+
+// 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect) — permet d'approcher
+// les fins de course / limites en vitesse lente de façon progressive.
+// 🔧 2026-08-07 (demande client) : ancien plafond RampTargetPct en % (CfgSlowSpeedPct) remplacé
+// par un plafond palier direct (ActiveMaxStep := 1, ci-dessous, même mécanisme que
+// CfgMaxStepDescente/MaxStepAscent) — un treuil ne connaît que 5 paliers de contacteurs, pas une
+// vitesse continue ; palier 1 = tous contacteurs de vitesse relâchés = vitesse minimale, sans
+// dépendre d'un % qui doit rester sous le 1er seuil de la table pour produire le même effet.
+InTopSlowdownZone := Homed AND NOT HomingSuspect
+                      AND ((CommandedDirection = 1) OR (Direction = 1))
+                      AND (CablePosM >= (TopLimitM - CfgSlowdownDistanceM));
+InBottomSlowdownZone := Homed AND NOT HomingSuspect
+                         AND ((CommandedDirection = -1) OR (Direction = -1))
+                         AND (CablePosM <= (BottomLimitM + CfgSlowdownDistanceM));
 
 // 🆕 2026-08-06 : délai asymétrique selon le sens ENTRANT (Direction) — descente sans effort
 // (câble mou/gravité favorable) réengage plus vite que montée (charge en traction). La tempo
@@ -262,6 +266,13 @@ ELSIF CommandedDirection = 1 THEN
     ActiveMaxStep := MaxStepAscent;
 ELSE
     ActiveMaxStep := 5;
+END_IF;
+
+// 🆕 2026-08-07 : ralentissement sur bordure (voir plus haut) — remplace l'ancien plafond en %
+// par un plafond palier direct, appliqué APRÈS le calcul normal ci-dessus (ne peut qu'abaisser,
+// jamais relever le plafond déjà décidé).
+IF InTopSlowdownZone OR InBottomSlowdownZone THEN
+    ActiveMaxStep := 1;
 END_IF;
 
 SpeedStep(Enable := (RampTargetPct > 0.1), SpeedRefPct := RampTargetPct,
