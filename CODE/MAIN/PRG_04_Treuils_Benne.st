@@ -516,8 +516,11 @@ SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR instB
 SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR PRG_02_Acquisition.InputModuleFault;
 
 // 🆕 2026-08-07 : FICHE 05 — Surveillance Kobold descente normale (hors FB_DiveSearch)
-KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Winch.M1M2_KoboldImmersed_DI);
-KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Winch.M1M2_KoboldImmersed_DI);
+// 🔧 2026-08-07 (compil CODESYS, retour terrain) : "HwIn.Winch.M1M2_KoboldImmersed_DI" n'existe
+// pas (ST_HwWinch n'a pas ce membre) -- corrigé vers le meme signal deja utilise par
+// instDiveSearch ci-dessus (§1, ligne KoboldImmersed), HwIn.Machine.M1_M2_KoboldContactFond_DI.
+KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
+KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
 
 // Levée du verrou au neutre du joystick/boutons ou si toggle désactivé
 IF PRG_02_Acquisition.instJoystick.AtNeutral OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
