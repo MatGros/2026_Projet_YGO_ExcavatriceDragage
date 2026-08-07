@@ -13,8 +13,8 @@ STRUCT
     WinchMaxStepAscent          : INT := 5;     (* 🚀 Limitation palier vitesse en montée (1..5), commun M1/M2 *)
     WinchSlowdownDistance_M     : REAL := 1.0;  (* 📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2 *)
     // 🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
-    // pas une vitesse continue. La zone de ralentissement plafonne désormais directement au
-    // palier 1 (FB_Winch.InTopSlowdownZone/InBottomSlowdownZone -> ActiveMaxStep := 1).
+    // pas une vitesse continue.
+    WinchSlowdownMaxStep        : INT := 1;     (* 🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)
     Initialized                 : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
 END_TYPE

@@ -984,15 +984,39 @@
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>⚠️ Bypass capteur mou de câble (banc de test) — capteur unique M1/M2</html:xhtml>
+                <html:xhtml>⚠️ Bypass capteur mou de câble — capteur unique M1/M2, OR avec bypass individuel</html:xhtml>
               </documentation>
             </variable>
-            <variable name="TopPositionSensor">
+            <variable name="TopLimitSwitch">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>📐 Bypass capteur position haute (banc de test) — capteur unique M1/M2</html:xhtml>
+                <html:xhtml>🚧 Bypass fin de course physique haute (capteur, bit5), OR avec bypass individuel</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopLimitSoftware">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Bypass limite basse physique (longueur câble), OR avec bypass individuel</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Bypass limite légale de profondeur, OR avec bypass individuel</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1004,13 +1028,20 @@
         </addData>
         <documentation>
           <html:xhtml>═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassCommun — Bypass maintenance de capteurs COMMUNS (partagés)
+   🔧 ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
    ───────────────────────────────────────────────────────────────
-   🎨 Regroupe les bypass de capteurs physiquement UNIQUES, partagés
-      entre plusieurs axes (ex: mou de câble et position haute = 1 seul
-      capteur physique commun M1/M2) — jamais dupliqués par axe.
+   🎨 2026-08-07 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
+      un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
+      GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
+      (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
+      pilotage groupé — SANS retirer les bypass individuels pour le pilotage à l'unité.
+      ⚠️ Ne remplace PAS les bypass individuels : les deux se combinent en OR, jamais l'un
+      n'entraîne la désactivation de l'autre.
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
+   🔧 2026-08-07 : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
+      était de toute façon inutilisé comme bypass réel jusqu'ici (PRG_07_Supervision y écrivait un
+      indicateur simulation par erreur, voir ST_CommunHMI.SimTopSensorBypassActive).
    ═══════════════════════════════════════════════════════════════</html:xhtml>
         </documentation>
       </dataType>
@@ -2871,6 +2902,19 @@
                 <html:xhtml>📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2</html:xhtml>
               </documentation>
             </variable>
+            <variable name="WinchSlowdownMaxStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
+pas une vitesse continue.
+🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -2879,10 +2923,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <html:xhtml>🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
-pas une vitesse continue. La zone de ralentissement plafonne désormais directement au
-palier 1 (FB_Winch.InTopSlowdownZone/InBottomSlowdownZone -&gt; ActiveMaxStep := 1).
-🚦 flag restauration boot</html:xhtml>
+                <html:xhtml>🚦 flag restauration boot</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2958,7 +2999,26 @@ palier 1 (FB_Winch.InTopSlowdownZone/InBottomSlowdownZone -&gt; ActiveMaxStep :=
               </type>
               <documentation>
                 <html:xhtml>🔧 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-SlackCable, TopPositionSensor — capteur physique unique M1/M2, jamais duplique par axe</html:xhtml>
+🆕 2026-08-07 : granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimTopSensorBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🩺 2026-08-07 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
+       (etaient ecrits par erreur dans Bypass.SlackCable/TopPositionSensor avant ce lot, ce qui
+       empechait ces champs de servir de vrai bypass RETAIN operateur).
+🩺 Capteur haut ignore car simulation active</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimSlackCableBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🩺 Mou de cable ignore car simulation active</html:xhtml>
               </documentation>
             </variable>
             <variable name="TglHeartbeatIhm">
@@ -15796,8 +15856,8 @@ Auth.InhibitM2 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM2;
 Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
 
 // 5quater. SÉLECTEUR JOYSTICK TREUIL
-// M1 seul ou M2 seul réservé au MAINT_N2. Forcé à Couplé (=3) sinon.
-IF Auth.Mode = E_Mode.MAINT_N2 THEN
+// M1 seul ou M2 seul autorisé en MAINT_N1 et MAINT_N2. Forcé à Couplé (=0) sinon.
+IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
 ELSE
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
@@ -22788,10 +22848,10 @@ GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := H
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := WinchM1.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_ForbidAscentEffective := WinchM1.Safety.ForbidAscent;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx309_ForbidDescentEffective := WinchM1.Safety.ForbidDescent;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx310_MecaFaultMask := WinchM1.Safety.ErrorId;
 
@@ -22837,10 +22897,10 @@ GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed := H
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2.Safety.SafeStop;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := WinchM2.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_ForbidAscentEffective := WinchM2.Safety.ForbidAscent;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := HwIn.Winch.M2_TensionedCable_DI;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx309_ForbidDescentEffective := WinchM2.Safety.ForbidDescent;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx310_MecaFaultMask := WinchM2.Safety.ErrorId;
 
@@ -23340,6 +23400,17 @@ Réengagement en descente (CommandedDirection=-1)</html:xhtml>
                 <html:xhtml>🆕 Distance d'approche avant limite pour ralentir (m)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="CfgSlowdownMaxStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5, défaut 1 = vitesse mini)</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="MeasuredSpeedBand">
               <type>
                 <INT />
@@ -23792,10 +23863,11 @@ ELSE
 END_IF;
 
 // 🆕 2026-08-07 : ralentissement sur bordure (voir plus haut) — remplace l'ancien plafond en %
-// par un plafond palier direct, appliqué APRÈS le calcul normal ci-dessus (ne peut qu'abaisser,
-// jamais relever le plafond déjà décidé).
+// par un plafond palier direct (CfgSlowdownMaxStep, défaut 1 = vitesse mini, réglable IHM),
+// appliqué APRÈS le calcul normal ci-dessus via MIN (ne peut qu'abaisser, jamais relever le
+// plafond déjà décidé par ailleurs — ex. CfgMaxStepDescente déjà plus restrictif).
 IF InTopSlowdownZone OR InBottomSlowdownZone THEN
-    ActiveMaxStep := 1;
+    ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
 END_IF;
 
 SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedRefPct := RampTargetPct,
@@ -27147,10 +27219,13 @@ instSafetyWinchM1(
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
-    BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch,
-    BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware,
-    BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch,
-    BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal,
+    // 🆕 2026-08-07 (demande client) : OR avec le bypass commun (Commun.Bypass) -- leve la
+    // protection sur les 2 treuils simultanement pour le pilotage "both", sans retirer le
+    // bypass individuel pour le pilotage a l'unite.
+    BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
+    BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
+    BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
+    BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal,
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
@@ -27200,10 +27275,11 @@ instSafetyWinchM2(
     BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
     BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
-    BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch,
-    BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware,
-    BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch,
-    BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal,
+    // 🆕 2026-08-07 : OR avec le bypass commun (Commun.Bypass) -- voir M1 ci-dessus
+    BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
+    BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
+    BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
+    BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal,
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
@@ -27268,6 +27344,7 @@ instWinchM1(
     TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
+    CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
     BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
@@ -27297,6 +27374,7 @@ instWinchM2(
     TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
+    CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
@@ -30957,8 +31035,8 @@ GVL_IHM.Commun.Preflight.PreflightErrorId := instPreflight.PreflightErrorId;
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
-GVL_IHM.Commun.Bypass.SlackCable                 := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-GVL_IHM.Commun.Bypass.TopPositionSensor          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 
 GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.WinchM1StateHMI;
 GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.WinchM2StateHMI;

@@ -110,10 +110,10 @@ GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := H
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := WinchM1.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_ForbidAscentEffective := WinchM1.Safety.ForbidAscent;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx309_ForbidDescentEffective := WinchM1.Safety.ForbidDescent;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx310_MecaFaultMask := WinchM1.Safety.ErrorId;
 
@@ -159,10 +159,10 @@ GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed := H
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2.Safety.SafeStop;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := WinchM2.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_ForbidAscentEffective := WinchM2.Safety.ForbidAscent;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := HwIn.Winch.M2_TensionedCable_DI;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.Bypass.SlackCable;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx309_ForbidDescentEffective := WinchM2.Safety.ForbidDescent;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx310_MecaFaultMask := WinchM2.Safety.ErrorId;
 
