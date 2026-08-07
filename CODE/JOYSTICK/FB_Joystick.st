@@ -39,6 +39,7 @@ VAR_INPUT
     DeadmanRearmTimeout : TIME := T#10S; // Délai max entre 2 appuis en mouvement (si reconfirmation activée)
     NeutralHoldTime     : TIME := T#100MS; // Temps continu au neutre avant désarmement (100 ms)
     DeadmanArmHoldTime  : TIME := T#100MS; // 🆕 2026-08-07 : Temps d'appui continu avant armement (indépendant position axes)
+    DeadmanArmGraceTime : TIME := T#3S;    // 🆕 2026-08-07 : Délai après armement avant que le désarmement "neutre tenu" (NeutralHoldTime) puisse s'appliquer — laisse le temps de sortir de la zone morte après un appui au centre
     DeadmanReconfEnable : BOOL := FALSE; // 🆕 2026-08-03 : FALSE = bouton = consentement au démarrage (mouvement libre, défaut cible) ; TRUE = reconfirmation périodique en mouvement (comportement historique)
 END_VAR
 VAR_OUTPUT
@@ -80,6 +81,7 @@ VAR
     NeutralHoldTimer: TON;
     DeadmanArmTimer : TON;
     DeadmanArmPending : BOOL;
+    DeadmanArmGraceTimer : TON;
     LastMode        : E_Mode;
     BenneBusyFallEdge : F_TRIG;
 END_VAR
@@ -100,6 +102,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     DeadmanTimer(IN := FALSE, PT := DeadmanRearmTimeout);   // 🆕 2026-07-03decies — pas d'accumulation à froid
     NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);   // 🆕 2026-07-03duodecies — idem
     DeadmanArmTimer(IN := FALSE, PT := DeadmanArmHoldTime);   // 🆕 2026-08-07 — idem
+    DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);   // 🆕 2026-08-07 — idem
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
     LastMode := Mode;   // 🆕 REX 2026-07-08 — pas de faux changement détecté à la réactivation
@@ -184,10 +187,19 @@ END_IF;
 // mouvement démarré ne désarmait JAMAIS (LeftNeutralSinceArm restait FALSE indéfiniment),
 // laissant DeadmanArmed collé à TRUE d'une session à l'autre. Neutre tenu NeutralHoldTime
 // désarme désormais TOUJOURS, qu'un mouvement ait été démarré ou non depuis l'armement.
-NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral,
+// 🔧 2026-08-07 (retour terrain) : SANS garde-fou, ce désarmement se déclenchait ~100-200ms après
+// CHAQUE armement (l'appui se fait typiquement AU neutre depuis le nouvel armement par maintien —
+// voir §4ter — donc AtNeutral est déjà vrai dès l'instant où DeadmanArmed passe à TRUE, et
+// NeutralHoldTime=100ms est trop court pour laisser le temps de sortir de la zone morte). Ajout
+// DeadmanArmGraceTimer (3s) : le désarmement neutre ne peut s'appliquer qu'APRÈS ce délai suivant
+// l'armement — le risque du 2026-08-06 (armement collé indéfiniment) reste couvert, juste avec
+// une marge de départ au lieu de 100ms. Aucun risque moteur pendant la grâce : au neutre,
+// CmdXVal/CmdYVal restent à 0 (deadband), armé ou non.
+DeadmanArmGraceTimer(IN := DeadmanArmed, PT := DeadmanArmGraceTime);
+NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q,
                  PT := NeutralHoldTime);
 IF NeutralHoldTimer.Q THEN
-    DeadmanArmed := FALSE;      // Neutre tenu assez longtemps = désarmement
+    DeadmanArmed := FALSE;      // Neutre tenu assez longtemps (après la grâce) = désarmement
 END_IF;
 
 // 4quater. RECONFIRMATION PÉRIODIQUE (optionnelle) — activée uniquement si DeadmanReconfEnable := TRUE.
