@@ -140,6 +140,7 @@ sorties axes à 0, `DeadmanArmed=FALSE`, timers deadman reset, `RETURN`.
 | `DeadmanRearmTimeout` | `T#10S` | Délai de reconfirmation (n'agit que si `DeadmanReconfEnable=TRUE`) |
 | `NeutralHoldTime` | `T#100MS` (🔧 2026-08-07, réduit de 500ms) | Neutre tenu avant désarmement |
 | `DeadmanArmHoldTime` | `T#100MS` (🆕 2026-08-07) | Appui bouton maintenu avant armement |
+| `DeadmanArmGraceTime` | `T#3S` (🆕 2026-08-07) | Délai après armement avant que le désarmement neutre (`NeutralHoldTime`) puisse s'appliquer |
 
 ### Armement
 🔧 2026-08-07 (retour terrain) : ancien armement "front bouton **et** axes strictement à 0.0 sur le
@@ -153,7 +154,7 @@ zone morte à l'armement : les rampes accel/décel restent gérées par les FB a
 | Cause | Condition |
 |---|---|
 | Gate | Enable / AU / CAN / device |
-| Neutre tenu | `NeutralHoldTime` (500 ms) au neutre, **que le geste ait démarré un mouvement ou non** (🔧 2026-08-06 — avant : uniquement après avoir quitté le neutre au moins une fois) |
+| Neutre tenu | `NeutralHoldTime` (100 ms) au neutre, **que le geste ait démarré un mouvement ou non** (🔧 2026-08-06 — avant : uniquement après avoir quitté le neutre au moins une fois), **applicable seulement après `DeadmanArmGraceTime` (3s) écoulées depuis l'armement** (🆕 2026-08-07 : sans cette grâce, l'armement — qui se fait typiquement AU neutre — se désarmait ~100-200ms après lui-même) |
 | Timeout présence | Uniquement si `DeadmanReconfEnable=TRUE` : armé + hors neutre + bouton **relâché** ≥ 10 s |
 | Changement mode | `Mode <> LastMode` |
 | Fin benne | Front descendant `BenneBusy` **si** `NOT PreserveArmingAfterBucket` |
