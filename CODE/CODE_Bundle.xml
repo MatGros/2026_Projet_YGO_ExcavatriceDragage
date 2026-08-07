@@ -26928,7 +26928,14 @@ uniquement, même périmètre que instDiveSearch/instExtractionSequence).</html:
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    MaintenanceMotionDirection := PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;
+    // 🔴🔧 REX 2026-08-07 (audit, bug preexistant trouve avant Fiche benne) : ancienne version
+    // affectait HwIn.Operator.JoyYRaw_ANA2 (valeur analogique BRUTE 0..10000, meme signal que
+    // RawY sur instJoystick) directement a MaintenanceMotionDirection, alors que
+    // FB_Bucket/FB_DiveSearch/FB_ExtractionSequence testent MotionDirection = 1/-1 EXACTEMENT.
+    // Consequence : en mode TglJoystickMaster, la benne/les sequenceurs assistes ne pouvaient
+    // JAMAIS demarrer via le joystick (seul le mode Boutons IHM, qui affecte bien 1/-1,
+    // fonctionnait). Corrige : direction deja mise a l'echelle (-1/0/+1) par instJoystick.
+    MaintenanceMotionDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
     MaintenanceMotionRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
     MaintenanceMotionSpeed_Pct := 100.0;
