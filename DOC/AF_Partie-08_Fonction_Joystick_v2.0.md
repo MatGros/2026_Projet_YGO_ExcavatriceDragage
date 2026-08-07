@@ -51,12 +51,12 @@ Profil AF03 : brique métier non-mouvement. Gate : `Enable`, `PowerContactorEnga
 
 ```text
 Raw ─► FB_AxisScale ─► FB_Filter_PT1 ─► Homme-Mort (0 si non armé) ─► ST_Joystick_AxisCmd
-         deadband %        τ filtre
+         deadband raw       τ filtre
 ```
 
 | Brique | Rôle |
 |---|---|
-| `FB_AxisScale` | Neutre + deadband → % signé, borné ±100 |
+| `FB_AxisScale` | Neutre + deadband (compte brut ADC, 🔧 2026-08-07 : remplace le %) → % signé, borné ±100 |
 | `FB_Filter_PT1` | Lissage haute fréquence ; `CycleTimeS` via `FB_CycleTime` interne |
 | Homme-mort | Force la consigne à 0.0 si non armé (`DeadmanArmed = FALSE`) |
 
@@ -94,7 +94,7 @@ Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depui
 | `BusCanOpenOP` / `JoystickOP` | `FB_Diag_CanOpen` |
 | `RawX/Y`, `RawButton` | `Acquisition.HwIn.Operator` |
 | `BtnCalibrate` | `GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate` |
-| `Invert*`, `Deadband`, `FilterTime`, `AccelRate`, `DecelRate` | PERSISTENT |
+| `Invert*`, `DeadbandRaw`, `FilterTime`, `AccelRate`, `DecelRate` | PERSISTENT |
 | `NeutralXMem/YMem` | `VAR_IN_OUT` persistants |
 | `DeadmanRearmTimeout` | `T#10s` — reconfirmation (n'agit que si `DeadmanReconfEnable=TRUE`) |
 | `NeutralHoldTime` | `T#100ms` (🔧 2026-08-07, réduit de 500ms) — neutre tenu avant désarmement |

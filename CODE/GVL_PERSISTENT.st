@@ -107,7 +107,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🕹️ JOYSTICK
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)
     _JoystickNeutralY : INT := 5000; // Point neutre axe Y (0..10000)
-    _JoystickDeadband_Pct : REAL := 6.0; // Zone morte joystick (%) — REX 2026-07-02 : 5.0→10.0 ; 🔧 2026-08-07 (mesure terrain) : bruit neutre observé ±200 sur 0..10000 (~±4 %) → 10.0→6.0 (marge ±300, ~1.5x le bruit mesuré)
+    _JoystickDeadbandRaw : INT := 300; // Zone morte joystick, compte brut ADC (0..10000) — REX 2026-07-02 : 5.0%→10.0% (250→500 raw) ; 🔧 2026-08-07 (demande client, mesure terrain) : bruit neutre observé ±200 → remplace le % par un réglage direct en compte brut, 300 (marge ~1.5x le bruit mesuré)
     _JoystickFilterTime : TIME := T#0ms; // Constante de temps filtre PT1 — 🔧 2026-08-07 (demande client) : filtrage supprimé (0ms = pass-through exact, voir FB_Filter_PT1.st "Si TimeConst=0, sortie=entrée"). Historique : 100ms initial → 50ms (2026-08-06, délai ressenti persistant) → 0ms (2026-08-07, suppression complète demandée)
     _JoystickAccelRate_Pct : REAL := 50.0; // Accélération rampe (%/s)
     _JoystickDecelRate_Pct : REAL := 150.0; // Décélération rampe (%/s)

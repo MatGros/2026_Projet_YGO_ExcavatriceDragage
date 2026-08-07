@@ -34,7 +34,7 @@ VAR_INPUT
     BtnCalibrate    : BOOL;       // Demande de recalage neutre
     InvertX         : BOOL := FALSE;
     InvertY         : BOOL := FALSE;
-    Deadband        : REAL := 10.0;  // Zone morte en %
+    DeadbandRaw     : INT := 300;    // 🔧 2026-08-07 (demande client) : zone morte en compte brut ADC (0..10000), remplace l'ancien % — mesure terrain bruit neutre ±200, marge à ±300
     FilterTime      : TIME := TIME#0ms;
     DeadmanRearmTimeout : TIME := T#10S; // Délai max entre 2 appuis en mouvement (si reconfirmation activée)
     NeutralHoldTime     : TIME := T#100MS; // Temps continu au neutre avant désarmement (100 ms)
@@ -130,8 +130,8 @@ Error := (ErrorId <> 16#0000);
 LastCalibrate := BtnCalibrate;
 
 // 🧮 4bis. MISE À L'ÉCHELLE (avant homme-mort — le neutre s'évalue sur les 2 axes déjà deadbandés)
-ScaleX(RawIn := RawX, Neutral := NeutralXMem, Deadband := Deadband);
-ScaleY(RawIn := RawY, Neutral := NeutralYMem, Deadband := Deadband);
+ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
+ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 
 // 4ter-bis. CHANGEMENT DE MODE : désarme le homme-mort dès que Mode change
 // (MAINT_N1/N2/SEMI_AUTO/AUTO). Évite qu'une commande en cours traverse le changement
