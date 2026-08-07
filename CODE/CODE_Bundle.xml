@@ -15125,10 +15125,10 @@ END_IF;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1S" />
+                <simpleValue value="TIME#100MS" />
               </initialValue>
               <documentation>
-                <html:xhtml>Temps continu au neutre avant désarmement (1.0 s)</html:xhtml>
+                <html:xhtml>Temps continu au neutre avant désarmement (100 ms)</html:xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmHoldTime">
@@ -15568,14 +15568,14 @@ END_IF;
 // Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
 CmdXVal := SEL(DeadmanArmed, 0.0, FilterX.ValueOut);
 
-// Mapping Sortie Standardisée Axe X (déduit strictement de la zone morte DeadbandRaw 300 pts -&gt; CmdXVal = 0.0)
+// Mapping Sortie Standardisée Axe X
 AxisCmdX.Enable := TRUE;
 AxisCmdX.SpeedRef := CmdXVal;
-AxisCmdX.StartStop := (CmdXVal &lt;&gt; 0.0);
+AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
 
-IF CmdXVal &gt; 0.0 THEN
+IF CmdXVal &gt; 0.1 THEN
     AxisCmdX.Direction := 1;
-ELSIF CmdXVal &lt; 0.0 THEN
+ELSIF CmdXVal &lt; -0.1 THEN
     AxisCmdX.Direction := -1;
 ELSE
     AxisCmdX.Direction := 0;
@@ -15596,14 +15596,14 @@ END_IF;
 // Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
 CmdYVal := SEL(DeadmanArmed, 0.0, FilterY.ValueOut);
 
-// Mapping Sortie Standardisée Axe Y (déduit strictement de la zone morte DeadbandRaw 300 pts -&gt; CmdYVal = 0.0)
+// Mapping Sortie Standardisée Axe Y
 AxisCmdY.Enable := TRUE;
 AxisCmdY.SpeedRef := CmdYVal;
-AxisCmdY.StartStop := (CmdYVal &lt;&gt; 0.0);
+AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
 
-IF CmdYVal &gt; 0.0 THEN
+IF CmdYVal &gt; 0.1 THEN
     AxisCmdY.Direction := 1;
-ELSIF CmdYVal &lt; 0.0 THEN
+ELSIF CmdYVal &lt; -0.1 THEN
     AxisCmdY.Direction := -1;
 ELSE
     AxisCmdY.Direction := 0;
@@ -26301,7 +26301,7 @@ instJoystick(
     DeadbandRaw               := _JoystickDeadbandRaw,
     FilterTime                := _JoystickFilterTime,
     DeadmanRearmTimeout       := T#10S,
-    NeutralHoldTime           := T#1S, // 🔧 2026-08-07 (demande client) : 1s au neutre continu avant désarmement homme-mort
+    NeutralHoldTime           := T#100MS, // 🔧 2026-08-07 (demande client) : réduit de 500ms — désarme plus vite au retour neutre
     DeadmanArmHoldTime        := T#100MS, // 🆕 2026-08-07 (demande client) : appui maintenu 100ms arme, indépendamment de la position des axes
     DeadmanArmGraceTime       := T#3S,    // 🆕 2026-08-07 (retour terrain) : grâce avant que le désarmement neutre puisse s'appliquer après un armement
     DeadmanReconfEnable       := FALSE,

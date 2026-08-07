@@ -143,8 +143,8 @@ Auth.InhibitM2 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM2;
 Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
 
 // 5quater. SÉLECTEUR JOYSTICK TREUIL
-// M1 seul ou M2 seul réservé au MAINT_N2. Forcé à Couplé (=3) sinon.
-IF Auth.Mode = E_Mode.MAINT_N2 THEN
+// M1 seul ou M2 seul autorisé en MAINT_N1 et MAINT_N2. Forcé à Couplé (=0) sinon.
+IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
 ELSE
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
