@@ -19,5 +19,8 @@ STRUCT
     MecaADrift_M      : REAL;    (* 📐 Dérive mesurée Méca A (m) *)
     MecaCDrift_M      : REAL;    (* 📐 Dérive mesurée Méca C (m) *)
     MecaBElapsedTime  : TIME;    (* ⏳ Temps écoulé confirmation contacteurs/frein *)
+    PowerCutOff       : BOOL;    (* 🧨 Coupure puissance amont activée *)
+    BrakeTimeoutFault : BOOL;    (* ⏱️ Défaut watchdog confirmation ouverture/fermeture frein *)
+    CableOutOfBoundsFault : BOOL; (* 📐 Dépassement des bornes physiques haute/basse du câble *)
 END_STRUCT
 END_TYPE

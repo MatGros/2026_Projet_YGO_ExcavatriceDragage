@@ -27,6 +27,7 @@ VAR
     instDiagCanOpen : FB_Diag_CanOpen;
     instDiagEthercat : FB_Diag_Ethercat;
     instDiagIhmHeartbeat : FB_Diag_IhmHeartbeat;
+    instPreflight        : FB_Acquisition_Preflight;
     instTroubleshootingView : FB_TroubleshootingView;
 END_VAR
 
@@ -198,6 +199,37 @@ GVL_IHM.Commun.HeartbeatIhmOk            := instDiagIhmHeartbeat.HeartbeatIhmOk;
 GVL_IHM.Commun.HeartbeatIhmTimeout       := instDiagIhmHeartbeat.HeartbeatIhmTimeout;
 GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdge;
 GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc;
+
+// 🩺 Exécution du Preflight Machine à l'arrêt
+instPreflight(
+    Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
+    MachineIsStill            := (PRG_04_Treuils_Benne.WinchM1StateHMI.StepNumber = 0)
+                                 AND (PRG_04_Treuils_Benne.WinchM2StateHMI.StepNumber = 0)
+                                 AND (PRG_05_Translation.TranslationStateHMI.FBState = E_State.READY),
+    M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
+    M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
+    M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct sur ce lot
+    M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+    M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+    M1ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
+    M2ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
+    BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    PhaseRotationOk           := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
+    SlackCableTensioned       := PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
+    M3SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,
+    EmergencyChainClosed      := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
+    PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    EncoderM1Operational      := instDiagEthercat.DeviceEncoderM1.Operational,
+    EncoderM2Operational      := instDiagEthercat.DeviceEncoderM2.Operational,
+    HomedM1                   := PRG_04_Treuils_Benne.WinchM1StateHMI.Encoder.Homed,
+    HomedM2                   := PRG_04_Treuils_Benne.WinchM2StateHMI.Encoder.Homed,
+    M1PositionInBounds        := NOT PRG_02_Acquisition.M1_EncoderIncoherent,
+    M2PositionInBounds        := NOT PRG_02_Acquisition.M2_EncoderIncoherent
+);
+GVL_IHM.Commun.Preflight.PreflightOk      := instPreflight.PreflightOk;
+GVL_IHM.Commun.Preflight.PreflightDone    := instPreflight.PreflightDone;
+GVL_IHM.Commun.Preflight.PreflightBusy    := instPreflight.PreflightBusy;
+GVL_IHM.Commun.Preflight.PreflightErrorId := instPreflight.PreflightErrorId;
 
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
