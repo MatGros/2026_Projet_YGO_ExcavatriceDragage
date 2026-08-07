@@ -27884,8 +27884,12 @@ END_IF;
 ForbidDescentDiveBucketClosed := instDiveSearch.Enable AND MaintenanceMotionRequestActive
     AND (MaintenanceMotionDirection = -1) AND NOT _BucketState.IsOpen;
 
-ForbidDescentM1_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed;
-ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed;
+// 🔴🔧 REX 2026-08-07 (17) — retour terrain : BypassKoboldBottomTouched confirmait le fond
+// (pour Extraction) mais ne bloquait pas la descente elle-même -- seul KoboldBottomTouchLatched
+// (mécanisme Fiche 05 séparé) le faisait. Ajouté : le bypass arrête aussi la descente
+// instantanément, même doctrine que le mécanisme Fiche 05.
+ForbidDescentM1_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched;
+ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched;
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
