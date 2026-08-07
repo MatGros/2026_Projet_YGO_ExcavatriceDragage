@@ -1338,7 +1338,15 @@
               </type>
               <documentation>
                 <html:xhtml>🚧 2. Limites physiques et Positionnement
-🚧 Bypass fin de course physique haute</html:xhtml>
+🚧 Bypass fin de course physique haute (capteur, bit5)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopLimitSoftware">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée CablePosM &gt;= TopLimitM, symétrique CableLimitSwitch)</html:xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitSwitch">
@@ -18163,7 +18171,18 @@ Inhibition de l'AUTRE treuil (mise en service N2)</html:xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <html:xhtml>🚧 Bypass individuel fin de course haute (bit5)</html:xhtml>
+                <html:xhtml>🚧 Bypass individuel fin de course haute PHYSIQUE (capteur, bit5)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassTopLimitSoftware">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Bypass individuel fin de course haute LOGICIEL (position calculée, hors bit)</html:xhtml>
               </documentation>
             </variable>
             <variable name="BypassCableLimitSwitch">
@@ -18965,10 +18984,19 @@ ForbidDescent := (((ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorE
 // BypassTopLimitSwitch)` qui masquait quand même le check brut sous BypassGlobal M1/M2. Désormais
 // seul BypassTopLimitSwitch (individuel, conscient) peut lever cette protection précise — le reste
 // du domaine (Méca A-E/thermique/phase/comm/sync) reste masqué par BypassGlobal comme avant.
-ForbidAscent := ((ErrorId AND 16#0020) &lt;&gt; 16#0000
+// 🆕 2026-08-07 (2) (demande client) : jusqu'ici AUCUN blocage immédiat en montée ne reposait sur
+// la position calculée (CablePosM &gt;= TopLimitM) — seul Méca D (bit11) la surveillait, en escalade
+// DIFFÉRÉE (SafeStop+PowerCutOff après PostRampTimeout), pas un ForbidAscent immédiat. Si le
+// capteur physique reste bloqué "libre" (défaut NC jamais détecté), rien n'arrêtait la montée avant
+// Méca D. Ajout d'un second terme, symétrique au check logiciel déjà présent côté ForbidDescent
+// (CfgCableLimitDescentM ci-dessus) : blocage immédiat dès CablePosM &gt;= TopLimitM (si référencé et
+// non suspect), gardé UNIQUEMENT par BypassTopLimitSoftware (jamais par BypassGlobal, même doctrine
+// que le reste des protections de position 2026-08-07).
+ForbidAscent := (((ErrorId AND 16#0020) &lt;&gt; 16#0000
              OR (NOT TopPositionSensor AND NOT InReferencingMode)
              OR ((ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable))
-             AND NOT BypassTopLimitSwitch;
+             AND NOT BypassTopLimitSwitch)
+             OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM)) AND NOT BypassTopLimitSoftware);
 
 // 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
@@ -27120,6 +27148,7 @@ instSafetyWinchM1(
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
     BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch,
+    BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware,
     BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch,
     BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal,
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
@@ -27172,6 +27201,7 @@ instSafetyWinchM2(
     BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
     BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
     BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch,
+    BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware,
     BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch,
     BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal,
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
