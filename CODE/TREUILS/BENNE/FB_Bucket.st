@@ -241,6 +241,17 @@ IF (State <> E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND Homed
             BucketState.LastPosM2Close := CablePosM2;
             BucketState.StateIncoherent := FALSE;
         END_IF;
+    // 🔴🔧 REX 2026-08-07 (21) — retour terrain, BUG CONFIRMÉ : IsOpen/IsClosed restait figé sur
+    // sa dernière valeur mémorisée quand la position s'éloignait des DEUX fenêtres (aucune des 2
+    // IF/ELSIF ci-dessus ne match) -- ex. jog unitaire M2 loin de la position ouverte/fermée sans
+    // repasser par instBucket. L'IHM affichait "ouvert" alors que la position réelle n'avait plus
+    // rien à voir. Corrigé : hors des 2 fenêtres connues, l'état devient explicitement inconnu.
+    ELSE
+        IF BucketState.IsOpen OR BucketState.IsClosed THEN
+            BucketState.IsOpen := FALSE;
+            BucketState.IsClosed := FALSE;
+            BucketState.StateIncoherent := TRUE;
+        END_IF;
     END_IF;
 END_IF;
 
@@ -400,8 +411,11 @@ CASE State OF
 
         // Condition d'arrêt automatique de la fermeture
         IF CloseReq THEN
-            // Cible atteinte : M2 a assez enroulé (CablePosM2 croissant) — REX 2026-07-07
-            IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM) THEN
+            // 🔴🔧 REX 2026-08-07 (20) — retour terrain : inertie mécanique (M2 continue sur sa
+            // lancée après StartStop:=FALSE) faisait dépasser la cible réelle. Coupe la commande
+            // CloseAnticipationM avant OffsetCloseM -- le coast-down amène l'arrêt réel près du
+            // vrai offset au lieu de le dépasser.
+            IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
 
@@ -429,8 +443,9 @@ CASE State OF
 
         // Condition d'arrêt automatique de l'ouverture
         IF OpenReq THEN
-            // Cible atteinte : M2 a assez déroulé (CablePosM2 décroissant) — REX 2026-07-07
-            IF CablePosM2 <= (CablePosM1 + Config.OffsetOpenM) THEN
+            // 🔴🔧 REX 2026-08-07 (20) — retour terrain : même logique que la fermeture ci-dessus,
+            // inertie différente en ouverture (OpenAnticipationM distinct).
+            IF CablePosM2 <= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
 

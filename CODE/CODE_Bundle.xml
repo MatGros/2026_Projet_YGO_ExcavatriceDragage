@@ -705,6 +705,32 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <html:xhtml>Seuil de détection d'incohérence au boot</html:xhtml>
               </documentation>
             </variable>
+            <variable name="CloseAnticipationM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (20) — retour terrain, demande client : inertie mécanique du benne (M2 continue
+sur sa lancée après coupure StartStop) -- couper la commande EN AVANCE de la cible pour que
+l'arrêt réel (après coast-down) tombe proche du vrai offset, au lieu de dépasser. Anticipation
+distincte par sens (fermeture/ouverture ont des inerties différentes selon retour terrain).
+Coupe la commande de fermeture 1m avant OffsetCloseM</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="OpenAnticipationM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.3" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Coupe la commande d'ouverture 1.3m avant OffsetOpenM</html:xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -10062,6 +10088,17 @@ IF (State &lt;&gt; E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND
             BucketState.LastPosM2Close := CablePosM2;
             BucketState.StateIncoherent := FALSE;
         END_IF;
+    // 🔴🔧 REX 2026-08-07 (21) — retour terrain, BUG CONFIRMÉ : IsOpen/IsClosed restait figé sur
+    // sa dernière valeur mémorisée quand la position s'éloignait des DEUX fenêtres (aucune des 2
+    // IF/ELSIF ci-dessus ne match) -- ex. jog unitaire M2 loin de la position ouverte/fermée sans
+    // repasser par instBucket. L'IHM affichait "ouvert" alors que la position réelle n'avait plus
+    // rien à voir. Corrigé : hors des 2 fenêtres connues, l'état devient explicitement inconnu.
+    ELSE
+        IF BucketState.IsOpen OR BucketState.IsClosed THEN
+            BucketState.IsOpen := FALSE;
+            BucketState.IsClosed := FALSE;
+            BucketState.StateIncoherent := TRUE;
+        END_IF;
     END_IF;
 END_IF;
 
@@ -10221,8 +10258,11 @@ CASE State OF
 
         // Condition d'arrêt automatique de la fermeture
         IF CloseReq THEN
-            // Cible atteinte : M2 a assez enroulé (CablePosM2 croissant) — REX 2026-07-07
-            IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM) THEN
+            // 🔴🔧 REX 2026-08-07 (20) — retour terrain : inertie mécanique (M2 continue sur sa
+            // lancée après StartStop:=FALSE) faisait dépasser la cible réelle. Coupe la commande
+            // CloseAnticipationM avant OffsetCloseM -- le coast-down amène l'arrêt réel près du
+            // vrai offset au lieu de le dépasser.
+            IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
 
@@ -10250,8 +10290,9 @@ CASE State OF
 
         // Condition d'arrêt automatique de l'ouverture
         IF OpenReq THEN
-            // Cible atteinte : M2 a assez déroulé (CablePosM2 décroissant) — REX 2026-07-07
-            IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetOpenM) THEN
+            // 🔴🔧 REX 2026-08-07 (20) — retour terrain : même logique que la fermeture ci-dessus,
+            // inertie différente en ouverture (OpenAnticipationM distinct).
+            IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
 
@@ -27989,8 +28030,12 @@ ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimi
     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
 
 ForbidDescentM1_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched;
+// 🔴🔧 REX 2026-08-07 (21bis) — retour terrain, DÉPASSEMENT CONFIRMÉ : ce chemin (pilotage
+// unitaire M2, hors instBucket) n'avait AUCUNE anticipation d'inertie, contrairement au CASE
+// BUSY de FB_Bucket (correctif 20) -- même OpenAnticipationM/CloseAnticipationM réutilisé ici
+// pour couvrir aussi le jog unitaire.
 ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched
-    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 &lt;= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM)));
+    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 &lt;= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
@@ -28136,7 +28181,8 @@ ForbidAscentExtractionBottomNotConfirmed := instExtractionSequence.Enable
 
 ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
 ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed
-    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 &gt;= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM)));
+    // 🔴🔧 REX 2026-08-07 (21bis) — même correctif d'anticipation que ForbidDescentM2_Raw ci-dessus.
+    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 &gt;= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);

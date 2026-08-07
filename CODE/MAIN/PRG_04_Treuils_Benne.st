@@ -642,8 +642,12 @@ ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimi
     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
 
 ForbidDescentM1_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched;
+// 🔴🔧 REX 2026-08-07 (21bis) — retour terrain, DÉPASSEMENT CONFIRMÉ : ce chemin (pilotage
+// unitaire M2, hors instBucket) n'avait AUCUNE anticipation d'inertie, contrairement au CASE
+// BUSY de FB_Bucket (correctif 20) -- même OpenAnticipationM/CloseAnticipationM réutilisé ici
+// pour couvrir aussi le jog unitaire.
 ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched
-    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 <= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM)));
+    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 <= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
@@ -789,7 +793,8 @@ ForbidAscentExtractionBottomNotConfirmed := instExtractionSequence.Enable
 
 ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
 ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed
-    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 >= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM)));
+    // 🔴🔧 REX 2026-08-07 (21bis) — même correctif d'anticipation que ForbidDescentM2_Raw ci-dessus.
+    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 >= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
