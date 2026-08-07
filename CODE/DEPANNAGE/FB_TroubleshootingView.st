@@ -244,6 +244,9 @@ GVL_Troubleshooting.AssistanceDragage.Idx503_DumpAtTremieAtTremie       := Dredg
 GVL_Troubleshooting.AssistanceDragage.Idx504_DumpAtTremieBucketOpenArmed := DredgingAssist.State.DumpAtTremieBucketOpenArmed;
 GVL_Troubleshooting.AssistanceDragage.Idx505_DumpAtTremieDescentLocked := DredgingAssist.State.DumpAtTremieDescentLocked;
 
+GVL_Troubleshooting.AssistanceDragage.Idx601_BypassDiveActive          := DredgingAssist.State.BypassDiveActive;
+GVL_Troubleshooting.AssistanceDragage.Idx602_BypassKoboldBottomTouched := DredgingAssist.State.BypassKoboldBottomTouched;
+
 // === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI := Translation.State.PositionPV;

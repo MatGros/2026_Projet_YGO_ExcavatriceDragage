@@ -6,6 +6,13 @@ STRUCT
     TglEnableDiveSearch         : BOOL := TRUE;  (* Assistance plongée active *)
     TglEnableExtractionSequence : BOOL := TRUE;  (* Assistance extraction active *)
     TglBucketAtBottomConfirmed  : BOOL := FALSE; (* Attestation manuelle temporaire du fond *)
+    // 🆕 2026-08-07 (9) : bypass simplifié de la séquence FB_DiveSearch complète (préconditions
+    // strictes -- benne ouverte, DiveStartMin_M, fenêtre immersion). Si TRUE, un front MONTANT
+    // Kobold pendant une descente confirme directement le fond, sans passer par l'état-machine
+    // FB_DiveSearch (qui continue de tourner en parallèle, inchangée -- utile pour
+    // KoboldMeasureEnable). Défaut FALSE : comportement identique à avant (séquence complète
+    // seule source de confirmation).
+    TglBypassDiveSearchSequence : BOOL := FALSE;
     TglEnableDumpAtTremie       : BOOL := TRUE;  (* 🆕 2026-08-07 : mode vidage à la trémie —
                                                      verrouille descente treuils (P1/Maintenance
                                                      uniquement) + translation M3 (proche du haut

@@ -125,6 +125,7 @@ DIRECT_HW_COILS = [
     ("M2SpeedContactor4", "M2_SpeedContactor_4_DQ", "Contacteur Vitesse M2-4"),
     ("M2BrakeCmd", "M2_BrakeRelease_RQ", "Frein M2"),
     ("TranslationBrakeCmd", "M3_BrakeRelease_RQ", "Frein Translation M3"),
+    ("KoboldContactorCmd", "M1_M2_KoboldMeasureEnable_DQ", "Contacteur Mesure Kobold"), # 🆕 2026-08-07 (12bis), urgence terrain
     ("PowerKeepAliveACmd", "PowerKeepAlive_A_RQ", "Maintien Puissance Voie A"),
     ("PowerKeepAliveBCmd", "PowerKeepAlive_B_RQ", "Maintien Puissance Voie B"),
     ("EmergencyArmingCmd", "EmergencyArming_RQ", "Impulsion Réarmement AU"),
@@ -625,6 +626,31 @@ def build_prg06_ld():
     ET.SubElement(m2_brake_coil, "connectionPointOut")
     m2_brake_var = ET.SubElement(m2_brake_coil, "variable")
     m2_brake_var.text = "M2BrakeCmd"
+
+    # 🔴🔧 REX 2026-08-07 (12) — retour terrain, GAP CONFIRMÉ : KoboldContactorCmd était
+    # déclaré (localVars ci-dessus) mais JAMAIS assigné -- ni ici, ni dans PRG_06_Outputs_LD.st
+    # -- donc jamais câblé, quel que soit le mapping E/S CODESYS côté device. La chaîne
+    # instDiveSearch.KoboldMeasureEnable -> PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated
+    # s'arrêtait net à la sortie de PRG_04 : le contacteur Kobold n'était physiquement JAMAIS
+    # commandé, aucune erreur pour le signaler (même classe de bug que le fix M3 frein du
+    # 2026-08-05, voir bandeau _build_actuator_network). Mapping E/S CODESYS à faire par
+    # l'utilisateur : M1_M2_KoboldMeasureEnable_DQ <- PRG_06_Outputs_LD.KoboldContactorCmd.
+    _make_comment(ld, _new_id(counter), "🔌 KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated")
+    _make_vendor_element(ld, _new_id(counter))
+    kobold_contact_id = _new_id(counter)
+    _make_contact(ld, kobold_contact_id, "PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated")
+    kobold_coil_id = _new_id(counter)
+    kobold_coil = ET.SubElement(ld, "coil")
+    kobold_coil.set("localId", str(kobold_coil_id))
+    kobold_coil.set("negated", "false")
+    kobold_coil.set("storage", "none")
+    _pos(kobold_coil)
+    kobold_cpi = ET.SubElement(kobold_coil, "connectionPointIn")
+    kobold_conn = ET.SubElement(kobold_cpi, "connection")
+    kobold_conn.set("refLocalId", str(kobold_contact_id))
+    ET.SubElement(kobold_coil, "connectionPointOut")
+    kobold_var = ET.SubElement(kobold_coil, "variable")
+    kobold_var.text = "KoboldContactorCmd"
 
     _build_interlock_gate_network(
         ld, counter,

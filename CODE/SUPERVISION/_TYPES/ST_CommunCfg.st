@@ -6,7 +6,12 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_CommunCfg :
 STRUCT
-    LimitLegalDepthMinAllowed_M : REAL; (* 📐 Cote min de dragage autorisée (m, négatif) *)
+    // 🔴🔧 REX 2026-08-07 (5) — retour terrain, blocage instantané à 0m : sans défaut explicite,
+    // ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM <= 0.0" se déclenche
+    // dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
+    // (jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
+    // erreur -- il faut régler la vraie cote pour que la protection devienne active.
+    LimitLegalDepthMinAllowed_M : REAL := -999.0; (* 📐 Cote min de dragage autorisée (m, négatif) *)
     LimitLegalEnabled           : BOOL; (* 🟢 Activation de la limite légale *)
     SelHomingApproachEnable     : BOOL; (* 🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2) *)
     WinchMaxStepDescente        : INT := 3;     (* 🛑 Limitation palier vitesse en descente (1..5), commun M1/M2 *)
@@ -16,6 +21,10 @@ STRUCT
     // pas une vitesse continue.
     WinchSlowdownMaxStep        : INT := 1;     (* 🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)
     TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* 🆕 2026-08-07 : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
+    // 🔴🔧 REX 2026-08-07 (4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
+    // Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
+    // gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).
+    TglEnableCoupledBucketSequencing : BOOL := FALSE;
     Initialized                 : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
 END_TYPE

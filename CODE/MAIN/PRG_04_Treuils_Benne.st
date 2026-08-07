@@ -101,6 +101,16 @@ VAR
     KoboldAutoStopFallEdge  : F_TRIG;
     KoboldImmersionConfirmed: BOOL;
     KoboldBottomTouchLatched: BOOL;
+    ForbidDescentDiveBucketClosed : BOOL; // 🆕 2026-08-07 (10) : mode Dive actif + benne pas ouverte -- interdit descente
+    ForbidAscentExtractionBottomNotConfirmed : BOOL; // 🆕 2026-08-07 (11) : mode Extraction actif + fond pas confirmé -- interdit montée
+
+    // 🆕 2026-08-07 (9) : bypass simplifié séquence FB_DiveSearch (demande client) -- front montant
+    // Kobold pendant une descente couplée confirme directement le fond, sans passer par les
+    // préconditions strictes de FB_DiveSearch (benne ouverte, DiveStartMin_M, fenêtre immersion).
+    // FB_DiveSearch continue de tourner en parallèle, inchangée (KoboldMeasureEnable toujours câblé
+    // dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.
+    BypassKoboldRiseEdge       : R_TRIG;
+    BypassKoboldBottomTouched  : BOOL;
 
     SyncMinorDeviation      : BOOL;
     SyncMinorDeviationBlocksUp   : BOOL;
@@ -146,14 +156,31 @@ GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
 
+// 🔴🔧 REX 2026-08-07 (15) — retour terrain, BUG CONFIRMÉ : "OR _BucketState.IsOpen" annulait le
+// forçage à CHAQUE scan, alors que confirmer "fond touché" se fait précisément PENDANT que la
+// benne est encore ouverte (avant que l'extraction ne la ferme) -- condition backwards, rendait
+// tout forçage manuel de TglBucketAtBottomConfirmed impossible en pratique. Retiré.
 IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
-   OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1))
-   OR _BucketState.IsOpen THEN
+   OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)) THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
+    BypassKoboldBottomTouched := FALSE;
 END_IF;
 ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
+
+// 🆕 2026-08-07 (9) : bypass séquence DiveSearch -- front montant Kobold pendant une descente
+// couplée = fond touché, directement (voir bandeau §1). Mêmes conditions de garde que la
+// confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension, pas de défaut, benne fermée --
+// réutilise le bloc de clear commun juste au-dessus).
+BypassKoboldRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
+IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
+   AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
+   AND BypassKoboldRiseEdge.Q THEN
+    BypassKoboldBottomTouched := TRUE;
+END_IF;
+GVL_IHM.DredgingAssist.State.BypassDiveActive          := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
+GVL_IHM.DredgingAssist.State.BypassKoboldBottomTouched := BypassKoboldBottomTouched;
 
 instDiveSearch(
     Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
@@ -171,7 +198,10 @@ instDiveSearch(
                        AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.M2_EncoderIncoherent,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
-    ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M
+    ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
+    // 🆕 2026-08-07 (14) : même toggle que le bypass bottom-confirmation -- réglages seuils pas
+    // encore calibrés, saute WAIT_PRECONDITIONS entièrement le temps des essais.
+    BypassPreconditions := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
 );
 
 // 🆕 2026-08-07 : publication IHM (était orpheline -- déclarée mais jamais écrite, voir
@@ -182,9 +212,14 @@ GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Done;
 GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Error;
 GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.ErrorId;
 GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
-GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := instDiveSearch.BottomTouchConfirmed;
+// 🔴🔧 REX 2026-08-07 (7) — retour terrain : affichage IHM ne reflétait que la détection Kobold
+// (instDiveSearch), pas la confirmation manuelle (TglBucketAtBottomConfirmed) ni le bypass --
+// alors que BottomPositionConfirmed (consommée par instExtractionSequence ci-dessous) fait bien
+// le OR des trois. L'opérateur voyait "non confirmé" à l'IHM alors que le séquenceur considérait
+// le fond confirmé -- affichage seul en cause, la logique de commande était correcte.
+BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
+GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
 
-BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed;
 instExtractionSequence(
     Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
@@ -238,10 +273,18 @@ END_IF;
 // demandé" dans les 2 modes (joystick Select=0 exclut le pilotage unitaire M1/M2 seul,
 // BtnWinchBothUp/Down exclut les boutons IHM individuels M1/M2). Jamais actif en SEMI_AUTO
 // (mêmes conditions que le reste de ce §).
-CoupledDiveBucketOpenArmed := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.SEMI_AUTO)
+// 🔴🔧 REX 2026-08-07 (4) — coupe-circuit d'urgence (retour terrain, machine bloquée en butée
+// M2_LimitShift). GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing (défaut FALSE) : si FALSE,
+// ces 2 flags restent FALSE en permanence -- CmdOpen_IHM/CmdClose_IHM ne sont plus jamais armés
+// par le mouvement couplé joystick, instBucket.Busy ne peut plus être déclenché QUE par action
+// manuelle benne/DumpAtTremie/ExtractionSequence (comportement strictement identique à avant
+// Fiche 01).
+CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
+    AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.SEMI_AUTO)
     AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
     AND NOT _BucketState.IsOpen;
-CoupledAscentBucketCloseArmed := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.SEMI_AUTO)
+CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
+    AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.SEMI_AUTO)
     AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)
     AND NOT _BucketState.IsClosed;
 
@@ -255,10 +298,17 @@ ELSE
     CmdBucketCloseArbitrated := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 END_IF;
 
+// 🔴🔧 REX 2026-08-07 (13) — retour terrain, urgence : instDiveSearch.KoboldMeasureEnable
+// n'est TRUE que dans SEARCHING_IMMERSION/SEARCHING_BOTTOM, atteignables uniquement après
+// WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M -- réglages pas encore
+// calibrés). Avec le bypass (TglBypassDiveSearchSequence), le contacteur doit être piloté
+// INDÉPENDAMMENT de ces préconditions dès qu'on descend réellement.
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     KoboldContactorCmdArbitrated := FALSE;
 ELSE
-    KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable;
+    KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
+        OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
+            AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1));
 END_IF;
 
 
@@ -569,10 +619,22 @@ IF KoboldAutoStopFallEdge.Q AND KoboldImmersionConfirmed THEN
     KoboldImmersionConfirmed := FALSE;
 END_IF;
 
-ForbidDescentM1_Raw := KoboldBottomTouchLatched;
-ForbidDescentM2_Raw := KoboldBottomTouchLatched;
+// 🔴🔧 REX 2026-08-07 (10) — retour terrain, GAP RÉEL CONFIRMÉ : instDiveSearch.DescendPermit
+// était calculé (FB_DiveSearch.st) mais JAMAIS consommé nulle part dans PRG_04/PRG_06 -- en
+// mode Dive actif, rien n'empêchait réellement de descendre benne fermée, malgré la précondition
+// FB_DiveSearch (BucketIsOpen requis pour READY_TO_DESCEND). Ajouté : interdiction directe et
+// explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif) -- indépendante du
+// timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
+ForbidDescentDiveBucketClosed := instDiveSearch.Enable AND MaintenanceMotionRequestActive
+    AND (MaintenanceMotionDirection = -1) AND NOT _BucketState.IsOpen;
 
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketCfgPersist.Config.OffsetCloseM);
+ForbidDescentM1_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed;
+ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed;
+
+M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
+                      0.0,
+                      (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
+                      - _WinchM2CfgPersist.CfgCableLimitAscent_M);
 
 // 🆕 2026-08-05 (audit sécurité M3) : FB_Safety_Winch M1/M2 — 0 mécanisme actif avant ce lot.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
@@ -701,8 +763,18 @@ IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
     ForbidDescentM1_Raw := TRUE;
     ForbidDescentM2_Raw := TRUE;
 END_IF;
-ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent;
-ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent;
+// 🔴🔧 REX 2026-08-07 (11) — MÊME CLASSE DE BUG QUE (10) : instExtractionSequence.AscentPermit
+// calculé (FB_ExtractionSequence.st) mais jamais consommé -- rien n'empêchait réellement de monter
+// sans fond confirmé quand le mode Extraction est actif (Enable=TRUE) mais encore en
+// WAIT_BOTTOM_CONFIRMATION. Restreint volontairement à CET état précis (pas READY_TO_CLOSE, où le
+// fond est déjà confirmé par construction, ni CLOSING_BUCKET, où M1 est déjà bloqué par
+// instBucket.Busy et M2 doit continuer sans coupure).
+ForbidAscentExtractionBottomNotConfirmed := instExtractionSequence.Enable
+    AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)
+    AND (instExtractionSequence.ExtractionState = E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION);
+
+ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
+ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -756,8 +828,15 @@ instWinchM2(
     Direction               := M2_Direction_Active,
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
-    CfgMaxStepDescente      := EffectiveMaxStepDescente,
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive, EffectiveMaxStepAscent, 1),
+    // 🔴🔧 REX 2026-08-07 (16) — retour terrain, GAP CONFIRMÉ : instBucket.M2_ForceSlowSpeed
+    // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) n'était consommé que
+    // pour substituer M2_SpeedStepTableActive -- ne plafonnait PAS réellement le palier autorisé
+    // pendant CLOSING_BUCKET/ouverture benne. MaxStepAscent forçait déjà palier 1 pour
+    // CONTROL_ASCENT (ForceMinSpeedStep) mais pas pendant le mouvement benne lui-même ;
+    // CfgMaxStepDescente n'avait AUCUN plafond, jamais. Corrigé : les deux suivent maintenant
+    // instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
+    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed, EffectiveMaxStepDescente, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Error,
