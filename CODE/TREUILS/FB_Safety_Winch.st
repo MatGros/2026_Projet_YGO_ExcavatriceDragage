@@ -123,9 +123,13 @@
       (individuels, conscients) peuvent désormais lever CES deux protections précises. Le reste du
       domaine (Méca A-E, thermique, phase, comm, sync, codeur) reste masqué par `BypassGlobal`
       exactement comme avant — changement strictement limité aux 2 fins de course physiques.
-      Limite connue non traitée (hors demande) : l'`ErrorId` bit5/bit6 et l'alarme IHM associée
-      restent à 0 sous `BypassGlobal` (calcul dans le bloc `IF NOT BypassGlobal`) — seule la
-      sortie `Forbid*` (le blocage réel du mouvement) est corrigée, pas l'affichage du défaut.
+      🔧 COMPLÉTÉ (même jour, demande client "intègre-le totalement côté IHM/troubleshooting") :
+      les calculs bit5/bit6 (§3sexties/§3septies) sont EUX AUSSI sortis du bloc `IF NOT
+      BypassGlobal` — `ErrorId`/`Error` (donc l'alarme IHM `WinchM1/M2SafetyHMI.Error`) reflètent
+      désormais le vrai état des fins de course même sous `BypassGlobal`, cohérent avec le
+      blocage réel déjà corrigé. Seuls `BypassProcess`/`BypassTopLimitSwitch`/
+      `BypassCableLimitSwitch` (conscients, individuels/groupés) peuvent encore éteindre CETTE
+      alarme précise — plus jamais `BypassGlobal` seul.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===
@@ -314,6 +318,34 @@ IF BypassGlobal THEN
     TonMecaE(IN := FALSE);
 END_IF;
 
+// 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
+// ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
+// position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
+// (TopPositionSensor=FALSE), qu'on n'est pas en phase de référencement (homing), ET qu'on
+// commande un mouvement vers le haut (Direction > 0), alors on lève le défaut.
+// 🔧 REX 2026-08-07 (demande client, suite fix ForbidAscent/ForbidDescent) : SORTI du bloc
+// "IF NOT BypassGlobal" ci-dessous — même doctrine que le blocage réel (§4) : BypassGlobal M1/M2
+// ne doit masquer NI le mouvement NI l'alarme IHM de ces 2 fins de course physiques. Seuls
+// BypassProcess (groupé, conscient) ou BypassTopLimitSwitch (individuel) peuvent encore éteindre
+// CETTE alarme — exactement comme tous les autres bypass individuels du fichier (une alarme ne
+// s'éteint QUE si on a explicitement demandé à ignorer CETTE protection précise, jamais via le
+// bypass global qui vise le reste du domaine : Méca A-E, thermique, phase, comm, sync, codeur).
+IF NOT (BypassProcess OR BypassTopLimitSwitch) AND NOT TopPositionSensor AND NOT InReferencingMode AND (Direction > 0) THEN
+    ErrorId := ErrorId OR 16#0020;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFDF;
+END_IF;
+
+// 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
+// Sécurité active hors référencement. Si la position de câble descend sous la limite basse
+// physique (CablePosM <= CfgCableLimitDescentM), alors on interdit uniquement la descente.
+// 🔧 REX 2026-08-07 : SORTI du bloc "IF NOT BypassGlobal" — même doctrine que bit5 ci-dessus.
+IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
+    ErrorId := ErrorId OR 16#0040;
+ELSIF ResetEdge.Q THEN
+    ErrorId := ErrorId AND 16#FFBF;
+END_IF;
+
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
 IF NOT BypassGlobal THEN
 
@@ -370,26 +402,6 @@ IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN
     ErrorId := ErrorId OR 16#0010;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFEF;
-END_IF;
-
-// 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
-// ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
-// position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
-// (TopPositionSensor=FALSE), qu'on n'est pas en phase de référencement (homing), ET qu'on
-// commande un mouvement vers le haut (Direction > 0), alors on lève le défaut.
-IF NOT (BypassProcess OR BypassTopLimitSwitch) AND NOT TopPositionSensor AND NOT InReferencingMode AND (Direction > 0) THEN
-    ErrorId := ErrorId OR 16#0020;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFDF;
-END_IF;
-
-// 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
-// Sécurité active hors référencement. Si la position de câble descend sous la limite basse physique (CablePosM <= CfgCableLimitDescentM),
-// alors on interdit uniquement la descente.
-IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
-    ErrorId := ErrorId OR 16#0040;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFBF;
 END_IF;
 
 // 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL (REX 2026-07-07) — bit7
