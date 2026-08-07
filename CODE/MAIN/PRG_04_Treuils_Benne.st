@@ -102,6 +102,8 @@ VAR
     KoboldImmersionConfirmed: BOOL;
     KoboldBottomTouchLatched: BOOL;
     ForbidDescentDiveBucketClosed : BOOL; // 🆕 2026-08-07 (10) : mode Dive actif + benne pas ouverte -- interdit descente
+    // 🆕 2026-08-07 (18) : pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1
+    ManualBucketLimitsActive : BOOL;
     ForbidAscentExtractionBottomNotConfirmed : BOOL; // 🆕 2026-08-07 (11) : mode Extraction actif + fond pas confirmé -- interdit montée
 
     // 🆕 2026-08-07 (9) : bypass simplifié séquence FB_DiveSearch (demande client) -- front montant
@@ -632,8 +634,16 @@ ForbidDescentDiveBucketClosed := instDiveSearch.Enable AND MaintenanceMotionRequ
 // (pour Extraction) mais ne bloquait pas la descente elle-même -- seul KoboldBottomTouchLatched
 // (mécanisme Fiche 05 séparé) le faisait. Ajouté : le bypass arrête aussi la descente
 // instantanément, même doctrine que le mécanisme Fiche 05.
+// 🆕 2026-08-07 (18) — retour terrain, demande client : mode "pilotage unitaire M2 sécurisé"
+// (SelJoystickWinch=2 + toggle IHM). Ne passe PAS par instBucket (pas de CloseReq/OpenReq
+// mémorisé, jogging libre) -- bornes directes ouvert/fermé (mêmes offsets que FB_Bucket,
+// relatifs à la position réelle de M1) + palier 1 (voir instWinchM2 §6 plus bas).
+ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
+    AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
+
 ForbidDescentM1_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched;
-ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched;
+ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched
+    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 <= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
@@ -778,7 +788,8 @@ ForbidAscentExtractionBottomNotConfirmed := instExtractionSequence.Enable
     AND (instExtractionSequence.ExtractionState = E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION);
 
 ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
-ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
+ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed
+    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 >= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM)));
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -839,8 +850,8 @@ instWinchM2(
     // CONTROL_ASCENT (ForceMinSpeedStep) mais pas pendant le mouvement benne lui-même ;
     // CfgMaxStepDescente n'avait AUCUN plafond, jamais. Corrigé : les deux suivent maintenant
     // instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
-    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed, EffectiveMaxStepAscent, 1),
+    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive, EffectiveMaxStepDescente, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Error,
