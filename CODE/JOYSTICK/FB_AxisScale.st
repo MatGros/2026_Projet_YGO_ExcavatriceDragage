@@ -3,8 +3,11 @@
    ───────────────────────────────────────────────────────────────
    📄 Extrait depuis le projet CODESYS (Device.export, JOYSTICK/)
    🎯 Normalise une valeur brute (0..10000) par rapport au neutre calibré
-      et applique une zone morte en %.
+      et applique une zone morte en unités brutes (compte ADC, pas en %).
    Sortie : OutPct ∈ [-100.0 .. +100.0] (0.0 si dans la deadband)
+   🔧 2026-08-07 (demande client) : Deadband (REAL, %) → DeadbandRaw (INT, compte brut 0..10000).
+      Raison : plus simple à régler directement depuis le bruit mesuré au neutre (ex: ±200 sur le
+      terrain → DeadbandRaw=300 avec marge), sans recalculer un % à chaque calibration.
    ═══════════════════════════════════════════════════════════════
    📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
 *)
@@ -15,8 +18,8 @@ VAR_INPUT
     RawIn   : INT;
     /// Point milieu calibré
     Neutral : INT;
-    /// Zone morte en %
-    Deadband : REAL;
+    /// Zone morte en unités brutes (compte ADC, ex: 300 sur plage 0..10000)
+    DeadbandRaw : INT;
 END_VAR
 VAR_OUTPUT
     /// Valeur finale (-100.0..100.0)
@@ -42,7 +45,7 @@ ELSE
     END_IF;
 END_IF;
 
-IF ABS(OutPct) <= Deadband THEN
+IF ABS(RawIn - Neutral) <= DeadbandRaw THEN
     OutPct := 0.0;
 END_IF;
 

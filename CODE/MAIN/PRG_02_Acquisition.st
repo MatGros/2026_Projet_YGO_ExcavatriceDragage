@@ -336,7 +336,7 @@ instJoystick(
     BtnCalibrate              := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
     InvertX                   := _JoystickInvertX,
     InvertY                   := _JoystickInvertY,
-    Deadband                  := _JoystickDeadband_Pct,
+    DeadbandRaw               := _JoystickDeadbandRaw,
     FilterTime                := _JoystickFilterTime,
     DeadmanRearmTimeout       := T#10S,
     NeutralHoldTime           := T#100MS, // 🔧 2026-08-07 (demande client) : réduit de 500ms — désarme plus vite au retour neutre
