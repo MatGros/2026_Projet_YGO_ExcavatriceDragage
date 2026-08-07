@@ -477,10 +477,13 @@ instSafetyWinchM1(
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
-    BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch,
-    BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware,
-    BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch,
-    BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal,
+    // 🆕 2026-08-07 (demande client) : OR avec le bypass commun (Commun.Bypass) -- leve la
+    // protection sur les 2 treuils simultanement pour le pilotage "both", sans retirer le
+    // bypass individuel pour le pilotage a l'unite.
+    BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
+    BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
+    BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
+    BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal,
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
@@ -530,10 +533,11 @@ instSafetyWinchM2(
     BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
     BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
-    BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch,
-    BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware,
-    BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch,
-    BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal,
+    // 🆕 2026-08-07 : OR avec le bypass commun (Commun.Bypass) -- voir M1 ci-dessus
+    BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
+    BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
+    BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
+    BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal,
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
@@ -598,6 +602,7 @@ instWinchM1(
     TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
+    CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
     BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
@@ -627,6 +632,7 @@ instWinchM2(
     TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
+    CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 

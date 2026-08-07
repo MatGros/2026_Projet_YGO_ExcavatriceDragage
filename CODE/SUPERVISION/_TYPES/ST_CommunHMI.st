@@ -21,7 +21,13 @@ STRUCT
                                           (PRG_AUXILIARY_CFC, diagnostic seul — aucune commande PLC) *)
 
     (* 🔧 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)) *)
-    Bypass : ST_BypassCommun;    (* SlackCable, TopPositionSensor — capteur physique unique M1/M2, jamais duplique par axe *)
+    Bypass : ST_BypassCommun;    (* 🆕 2026-08-07 : granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04 *)
+
+    (* 🩺 2026-08-07 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
+       (etaient ecrits par erreur dans Bypass.SlackCable/TopPositionSensor avant ce lot, ce qui
+       empechait ces champs de servir de vrai bypass RETAIN operateur). *)
+    SimTopSensorBypassActive  : BOOL; (* 🩺 Capteur haut ignore car simulation active *)
+    SimSlackCableBypassActive : BOOL; (* 🩺 Mou de cable ignore car simulation active *)
 
     (* 💓 Heartbeat IHM↔PLC — IHM inverse TglHeartbeatIhm toutes les 500 ms. *)
     TglHeartbeatIhm        : BOOL; (* IHM→PLC : toggle périodique, jamais valeur constante *)

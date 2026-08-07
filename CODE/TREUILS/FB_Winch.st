@@ -111,6 +111,7 @@ VAR_INPUT
     TopLimitM               : REAL := 8.5;      // 🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
     BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
     CfgSlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
+    CfgSlowdownMaxStep         : INT := 1;         // 🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5, défaut 1 = vitesse mini)
     MeasuredSpeedBand       : INT := 0;         // 🛡️ Bande vitesse réelle validée
     SpeedGuardEnable        : BOOL := FALSE;   // 🛡️ Activation garde-fou changement de palier
     SpeedGuardReady         : BOOL := FALSE;   // 🟢 Conditions de stabilité validées
@@ -269,10 +270,11 @@ ELSE
 END_IF;
 
 // 🆕 2026-08-07 : ralentissement sur bordure (voir plus haut) — remplace l'ancien plafond en %
-// par un plafond palier direct, appliqué APRÈS le calcul normal ci-dessus (ne peut qu'abaisser,
-// jamais relever le plafond déjà décidé).
+// par un plafond palier direct (CfgSlowdownMaxStep, défaut 1 = vitesse mini, réglable IHM),
+// appliqué APRÈS le calcul normal ci-dessus via MIN (ne peut qu'abaisser, jamais relever le
+// plafond déjà décidé par ailleurs — ex. CfgMaxStepDescente déjà plus restrictif).
 IF InTopSlowdownZone OR InBottomSlowdownZone THEN
-    ActiveMaxStep := 1;
+    ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
 END_IF;
 
 SpeedStep(Enable := (RampTargetPct > 0.1), SpeedRefPct := RampTargetPct,
