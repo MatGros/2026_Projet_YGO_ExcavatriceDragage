@@ -130,6 +130,13 @@
       blocage réel déjà corrigé. Seuls `BypassProcess`/`BypassTopLimitSwitch`/
       `BypassCableLimitSwitch` (conscients, individuels/groupés) peuvent encore éteindre CETTE
       alarme précise — plus jamais `BypassGlobal` seul.
+   🔴🔧 REX 2026-08-07 (2) — LIMITE LÉGALE JAMAIS APPLIQUÉE EN MANUEL (demande client) :
+      `GVL_IHM.Commun.LimitLegalReached` n'était consommé QUE par `FB_Cycle` (séquenceur
+      semi-automatique) — la descente manuelle au joystick M1/M2 pouvait dépasser la profondeur
+      légale sans AUCUN blocage réel. Ajouté : `LimitLegalReached`/`BypassLimitLegal` en entrée,
+      nouveau terme OR direct sur `ForbidDescent` (pas de nouveau bit `ErrorId` : les 16 bits du
+      WORD sont déjà tous utilisés). Bypassable par `BypassProcess` (groupé) ou `BypassLimitLegal`
+      (individuel, `ST_BypassWinch.LimitLegal`, MAINT_N2) — jamais par `BypassGlobal` seul.
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===
@@ -154,6 +161,7 @@ VAR_INPUT
     InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
     CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)
     CfgCableLimitDescentM  : REAL;        // Limite basse physique descente en mètres (valeur négative)
+    LimitLegalReached   : BOOL;        // 🆕 2026-08-07 : GVL_IHM.Commun.LimitLegalReached — limite légale de profondeur atteinte
     Direction           : INT;         // 🆕 REX 2026-07-08 : Consigne active de direction (-1/0/+1)
     MovementCommanded   : BOOL;        // TRUE si au moins un contacteur de sens est réellement commandé
     Homed               : BOOL;        // Indique si le treuil est référencé
@@ -192,9 +200,10 @@ VAR_INPUT
     // 🌐 Bypass Global : si TRUE, force ErrorId=0 et saute toutes les vérifications
     BypassGlobal              : BOOL := FALSE;
     BypassSafety          : BOOL := FALSE;   // 🛡️ Bypass groupé PowerCutOff (bits 2,7,8,9,10,11,13)
-    BypassProcess         : BOOL := FALSE;   // ⚙️ Bypass groupé SafeStop/Forbid seul (bits 0,1,3,4,5,6,12,14,15)
+    BypassProcess         : BOOL := FALSE;   // ⚙️ Bypass groupé SafeStop/Forbid seul (bits 0,1,3,4,5,6,12,14,15) + limite légale (hors bit, ErrorId plein)
     BypassTopLimitSwitch  : BOOL := FALSE;   // 🚧 Bypass individuel fin de course haute (bit5)
     BypassCableLimitSwitch: BOOL := FALSE;   // 🚧 Bypass individuel limite basse câble (bit6)
+    BypassLimitLegal      : BOOL := FALSE;   // 🆕 2026-08-07 : Bypass individuel limite légale de profondeur
     BypassOperatorComm    : BOOL := FALSE;   // 📡 Bypass perte communication opérateur
     BypassPhaseRotation   : BOOL := FALSE;   // ⚡ Bypass défaut rotation phases
     BypassBrakeThermal    : BOOL := FALSE;   // 🌡️ Bypass surchauffe frein
@@ -563,8 +572,15 @@ END_IF;
 // Méca A-E/thermique/phase/comm/sync comme aujourd'hui, mais ne doit plus jamais désactiver l'arrêt
 // physique sur fin de course haute/basse — sécurité positive, seul un bypass individuel conscient
 // (BypassCableLimitSwitch) peut lever CETTE protection précise.
+// 🆕 2026-08-07 (demande client) : LimitLegalReached n'était câblé QUE dans FB_Cycle (séquenceur
+// semi-auto), jamais ici — la descente manuelle au joystick pouvait dépasser la profondeur légale
+// sans aucun blocage réel. Pas de nouveau bit ErrorId (WORD déjà plein, bits 0-15 tous utilisés) :
+// même doctrine que le terme câble ci-dessus, un OR direct sur ForbidDescent. Bypassable par
+// BypassProcess (groupé) ou BypassLimitLegal (individuel, MAINT_N2) — jamais par BypassGlobal seul
+// (cohérent avec la doctrine 2026-08-07 : BypassGlobal ne masque plus les protections de position).
 ForbidDescent := (((ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
-              OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch);
+              OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
+              OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal));
 
 // ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (bypasser si BypassTopLimitSwitch)
 // 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement
