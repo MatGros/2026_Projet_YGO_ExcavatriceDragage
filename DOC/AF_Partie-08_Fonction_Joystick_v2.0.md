@@ -26,7 +26,7 @@
 | TC-P08-001 | Perte contacteur / CAN ➔ désarmer et annuler axes | `SpeedRef=0`, `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §3 |
 | TC-P08-002 | Armement homme-mort sur front au neutre uniquement | Armement ➔ `SpeedRef` actif | `⚡ SITE+AUTO` | §4 |
 | TC-P08-003 | Bouton relâché en mouvement : **sans** reconfirmation (`DeadmanReconfEnable=FALSE`, défaut) armement conservé ; **avec** reconfirmation (TRUE) relâchement > 10 s ➔ désarmement | `DeadmanArmed` conservé / `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §4 |
-| TC-P08-004 | Neutre rapide (<500ms) conserve armement, prolongé désarme | Armement conservé / perdu | `💻 AUTO` | §4 |
+| TC-P08-004 | Neutre rapide (<100ms) conserve armement, prolongé désarme | Armement conservé / perdu | `💻 AUTO` | §4 |
 | TC-P08-005 | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | §4, §6 |
 | TC-P08-006 | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | §5 |
 | TC-P08-007 | Consigne `SpeedRef` signée [-100;+100] sur `ST_Joystick_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | §1, §2 |
@@ -75,7 +75,7 @@ Raw ─► FB_AxisScale ─► FB_Filter_PT1 ─► Homme-Mort (0 si non armé) 
 | `Direction` | −1 / 0 / +1 (seuil ±0,1 sur rampe) |
 
 Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depuis `GVL_PERSISTENT` ;
-`DeadmanRearmTimeout=T#10s`, `NeutralHoldTime=T#500ms`, `DeadmanReconfEnable=FALSE` (figé, défaut cible).
+`DeadmanRearmTimeout=T#10s`, `NeutralHoldTime=T#100ms` (🔧 2026-08-07, réduit de 500ms), `DeadmanReconfEnable=FALSE` (figé, défaut cible).
 
 ---
 
@@ -97,7 +97,7 @@ Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depui
 | `Invert*`, `Deadband`, `FilterTime`, `AccelRate`, `DecelRate` | PERSISTENT |
 | `NeutralXMem/YMem` | `VAR_IN_OUT` persistants |
 | `DeadmanRearmTimeout` | `T#10s` — reconfirmation (n'agit que si `DeadmanReconfEnable=TRUE`) |
-| `NeutralHoldTime` | `T#500ms` — neutre tenu avant désarmement |
+| `NeutralHoldTime` | `T#100ms` (🔧 2026-08-07, réduit de 500ms) — neutre tenu avant désarmement |
 | `DeadmanReconfEnable` | `FALSE` figé (Acquisition) — consentement au démarrage / reconfirmation |
 
 ### Sorties
@@ -138,7 +138,7 @@ sorties axes à 0, `DeadmanArmed=FALSE`, timers deadman reset, `RETURN`.
 |---|---|---|
 | `DeadmanReconfEnable` | `FALSE` | `FALSE` = consentement au démarrage (mouvement libre) ; `TRUE` = reconfirmation périodique en mouvement |
 | `DeadmanRearmTimeout` | `T#10S` | Délai de reconfirmation (n'agit que si `DeadmanReconfEnable=TRUE`) |
-| `NeutralHoldTime` | `T#500MS` | Neutre tenu avant désarmement |
+| `NeutralHoldTime` | `T#100MS` (🔧 2026-08-07, réduit de 500ms) | Neutre tenu avant désarmement |
 
 ### Armement
 Front bouton **et** `ScaleX.OutPct=0` **et** `ScaleY.OutPct=0` (après deadband, **avant** filtre/rampe).
@@ -262,13 +262,15 @@ une instance, gate fail-safe.
 > `FB_Translation`. Section de suivi ; décision et code dans un lot dédié, contrat de tâche requis
 > (C3/C4 — accélération/décélération treuil = sécurité machine).
 
-### 8bis.1 Filtre PT1 par défaut — réduit (retour terrain 2026-08-06)
+### 8bis.1 Filtre PT1 par défaut — supprimé (retour terrain 2026-08-07)
 
-`_JoystickFilterTime` : `T#100ms` → **`T#50ms`** (`GVL_PERSISTENT` + défaut `FB_Joystick.st`),
-décidé sur retour terrain après le lot tempo palier (AF10 §6) : délai joystick→contacteur de
-sens toujours perceptible même une fois `RestartDelay`/tempo palier hors cause (pause > 1s).
-Contrepartie assumée : moins de lissage du bruit capteur Hall — à surveiller (chatter contacteur
-sur signal bruité). Pas de calcul théorique substitué à l'essai terrain qui a validé la valeur.
+`_JoystickFilterTime` : `T#100ms` → `T#50ms` (2026-08-06) → **`T#0ms`** (2026-08-07, `GVL_PERSISTENT`
++ défaut `FB_Joystick.st`), décidé sur retour terrain répété : délai joystick→contacteur de sens
+toujours perceptible même à 50ms. `T#0ms` = pass-through exact, documenté et supporté nativement
+par `FB_Filter_PT1.st` ("Si TimeConst=0, sortie=entrée") — pas un contournement, un mode prévu.
+Contrepartie assumée : plus aucun lissage du bruit capteur Hall — à surveiller de près (chatter
+contacteur sur signal bruité, plus de marge comme avec 50ms). Pas de calcul théorique substitué
+à l'essai terrain qui a validé chaque palier de réduction.
 
 ### 8bis.2 Double rampe en cascade — ⚠️ constat périmé (code déjà sans `FB_Ramp` côté joystick)
 

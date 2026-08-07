@@ -35,7 +35,7 @@ VAR_INPUT
     InvertX         : BOOL := FALSE;
     InvertY         : BOOL := FALSE;
     Deadband        : REAL := 10.0;  // Zone morte en %
-    FilterTime      : TIME := TIME#50ms;
+    FilterTime      : TIME := TIME#0ms;
     DeadmanRearmTimeout : TIME := T#10S; // Délai max entre 2 appuis en mouvement (si reconfirmation activée)
     NeutralHoldTime     : TIME := T#100MS; // Temps continu au neutre avant désarmement (100 ms)
     DeadmanReconfEnable : BOOL := FALSE; // 🆕 2026-08-03 : FALSE = bouton = consentement au démarrage (mouvement libre, défaut cible) ; TRUE = reconfirmation périodique en mouvement (comportement historique)

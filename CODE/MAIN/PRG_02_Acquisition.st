@@ -339,7 +339,7 @@ instJoystick(
     Deadband                  := _JoystickDeadband_Pct,
     FilterTime                := _JoystickFilterTime,
     DeadmanRearmTimeout       := T#10S,
-    NeutralHoldTime           := T#500MS,
+    NeutralHoldTime           := T#100MS, // 🔧 2026-08-07 (demande client) : réduit de 500ms — désarme plus vite au retour neutre
     DeadmanReconfEnable       := FALSE,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
