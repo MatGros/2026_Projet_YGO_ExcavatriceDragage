@@ -3627,6 +3627,39 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <html:xhtml>Remontée palier 1 avant accélération</html:xhtml>
               </documentation>
             </variable>
+            <variable name="TglEnableDiveSearch">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Mode assistance plongée mémorisé</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableExtractionSequence">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Mode assistance extraction mémorisé</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>Mode assistance vidage trémie mémorisé</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -8388,6 +8421,31 @@ TRUE = relais sens + C1..C4 tous retombés</html:xhtml>
               </type>
               <documentation>
                 <html:xhtml>🐢 Palier plafonné à 1 : approche limite basse (câble ou légale)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <html:xhtml>🩺 2026-08-07 : diagnostic retour terrain — délai ressenti à la remontée
+🩺 Sens interne mémorisé FB_Winch (-1/0/+1)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionChangeDelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <html:xhtml>🩺 Écoulé de l'interlock changement/reprise de sens</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionChangePending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🩺 TRUE tant que CommandedDirection n'a pas rejoint Direction</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -15067,10 +15125,10 @@ END_IF;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#100MS" />
+                <simpleValue value="TIME#1S" />
               </initialValue>
               <documentation>
-                <html:xhtml>Temps continu au neutre avant désarmement (100 ms)</html:xhtml>
+                <html:xhtml>Temps continu au neutre avant désarmement (1.0 s)</html:xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmHoldTime">
@@ -15510,14 +15568,14 @@ END_IF;
 // Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
 CmdXVal := SEL(DeadmanArmed, 0.0, FilterX.ValueOut);
 
-// Mapping Sortie Standardisée Axe X
+// Mapping Sortie Standardisée Axe X (déduit strictement de la zone morte DeadbandRaw 300 pts -&gt; CmdXVal = 0.0)
 AxisCmdX.Enable := TRUE;
 AxisCmdX.SpeedRef := CmdXVal;
-AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
+AxisCmdX.StartStop := (CmdXVal &lt;&gt; 0.0);
 
-IF CmdXVal &gt; 0.1 THEN
+IF CmdXVal &gt; 0.0 THEN
     AxisCmdX.Direction := 1;
-ELSIF CmdXVal &lt; -0.1 THEN
+ELSIF CmdXVal &lt; 0.0 THEN
     AxisCmdX.Direction := -1;
 ELSE
     AxisCmdX.Direction := 0;
@@ -15538,14 +15596,14 @@ END_IF;
 // Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
 CmdYVal := SEL(DeadmanArmed, 0.0, FilterY.ValueOut);
 
-// Mapping Sortie Standardisée Axe Y
+// Mapping Sortie Standardisée Axe Y (déduit strictement de la zone morte DeadbandRaw 300 pts -&gt; CmdYVal = 0.0)
 AxisCmdY.Enable := TRUE;
 AxisCmdY.SpeedRef := CmdYVal;
-AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
+AxisCmdY.StartStop := (CmdYVal &lt;&gt; 0.0);
 
-IF CmdYVal &gt; 0.1 THEN
+IF CmdYVal &gt; 0.0 THEN
     AxisCmdY.Direction := 1;
-ELSIF CmdYVal &lt; -0.1 THEN
+ELSIF CmdYVal &lt; 0.0 THEN
     AxisCmdY.Direction := -1;
 ELSE
     AxisCmdY.Direction := 0;
@@ -23567,6 +23625,30 @@ Réengagement en descente (CommandedDirection=-1)</html:xhtml>
                 <html:xhtml>🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite basse)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="CommandedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : diagnostic — sens interne mémorisé (déclaration déplacée depuis VAR, aucun changement de logique)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionChangeDelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : diagnostic — écoulé de DirectionChangeDelay (miroir, retour terrain délai montée)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionChangePending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : diagnostic — déclaration déplacée depuis VAR (GATE 2sexies : doit accompagner CommandedDirection), aucun changement de logique</html:xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="SpeedStep">
@@ -23614,11 +23696,6 @@ FB_SpeedStep, la progressivité vient de la temporisation par palier (StepDelay 
                 <html:xhtml>🆕 2026-08-06 : déduit d'EffectiveDirectionInterlockDelay + T#100ms</html:xhtml>
               </documentation>
             </variable>
-            <variable name="CommandedDirection">
-              <type>
-                <INT />
-              </type>
-            </variable>
             <variable name="TonContactorsDropped">
               <type>
                 <derived name="TON" />
@@ -23646,11 +23723,6 @@ FB_SpeedStep, la progressivité vient de la temporisation par palier (StepDelay 
             <variable name="RampTargetPct">
               <type>
                 <REAL />
-              </type>
-            </variable>
-            <variable name="DirectionChangePending">
-              <type>
-                <BOOL />
               </type>
             </variable>
             <variable name="EffectiveSafeStop">
@@ -23762,6 +23834,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BusinessStepDelayElapsed := T#0ms;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelayAscent);
+    DirectionChangeDelayElapsed := T#0ms;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
     State := E_State.DISABLED;
@@ -23827,7 +23900,11 @@ END_IF;
 EffectiveStepDelay := EffectiveDirectionInterlockDelay + T#100ms;
 
 IF Direction &lt;&gt; CommandedDirection THEN
-    IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
+    // 🆕 2026-08-07 (retour terrain) : démarrage depuis le neutre/arrêt (CommandedDirection = 0)
+    // prise en compte IMMÉDIATE (0ms), pas de tempo interlock.
+    // L'interlock DirectionChangeDelay (400ms descente / 900ms montée) ne s'applique QU'EN CAS
+    // d'inversion active de sens en mouvement (ex: de -1 vers +1 direct).
+    IF CommandedDirection = 0 THEN
         CommandedDirection := Direction;
         DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
     ELSIF StepNumber = 0 THEN
@@ -23842,6 +23919,7 @@ IF Direction &lt;&gt; CommandedDirection THEN
 ELSE
     DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
 END_IF;
+DirectionChangeDelayElapsed := DirectionChangeDelay.ET; // 🆕 2026-08-07 : diagnostic, miroir pur
 
 // 🆕 Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
 // Palier 1 en approche homing, MaxStepAscent en montée normale — 🔧 REX 2026-07-15 (9))
@@ -23876,16 +23954,22 @@ SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedRefPct := RampTargetPct,
           MeasuredSpeedBand := MeasuredSpeedBand,
           SpeedGuardEnable := SpeedGuardEnable,
           SpeedGuardReady := SpeedGuardReady);
-// 🪜 Tempo métier nominale : toute hausse exige EffectiveStepDelay (interlock + 100ms,
-// asymétrique montée/descente) et progresse par pas adjacents. Toute baisse reste immédiate
-// pour ne jamais retarder un arrêt/safety.
+// 🪜 Tempo métier nominale : le décollage initial de StepNumber=0 vers 1 est IMMÉDIAT (0ms).
+// Toute hausse ultérieure (1-&gt;2-&gt;3) exige EffectiveStepDelay (interlock + 100ms) et progresse par pas adjacents.
+// Toute baisse reste immédiate pour ne jamais retarder un arrêt/safety.
 RequestedStep := SpeedStep.StepNumber;
 IF RequestedStep &gt; StepNumber THEN
-    BusinessStepDelay(IN := TRUE, PT := EffectiveStepDelay);
-    BusinessStepDelayElapsed := BusinessStepDelay.ET;
-    IF BusinessStepDelay.Q THEN
-        StepNumber := StepNumber + 1;
+    IF StepNumber = 0 THEN
+        StepNumber := 1;
         BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
+        BusinessStepDelayElapsed := T#0ms;
+    ELSE
+        BusinessStepDelay(IN := TRUE, PT := EffectiveStepDelay);
+        BusinessStepDelayElapsed := BusinessStepDelay.ET;
+        IF BusinessStepDelay.Q THEN
+            StepNumber := StepNumber + 1;
+            BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
+        END_IF;
     END_IF;
 ELSE
     BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
@@ -24643,6 +24727,15 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
       par §3/§5 avec un retard d'UN scan (~10ms) sur une nouvelle occurrence de défaut —
       négligeable face au budget 500ms du watchdog, et strictement nécessaire pour éviter
       les faux déclenchements.
+   🔴🔧 REX 2026-08-07 — RestartDelay COMPTAIT SANS ATTENDRE LE FREIN PHYSIQUE (audit croisé,
+      demande client) : un lot précédent avait fait démarrer le décompte 1500ms sur `NOT
+      MotorRequest` seul (relâchement joystick, instantané), perdant la dépendance à
+      `BrakeFeedback` (retombée physique bobine/mâchoires, ~200-300ms mécaniques après la
+      commande). Un redémarrage pouvait donc être autorisé alors que le frein n'était pas
+      encore réellement fermé au moment où le décompte a commencé. Corrigé (§4) :
+      `NOT BrakeFeedback` réintégré en ET avec `NOT MotorRequest` — le décompte ne
+      démarre/continue que si les deux conditions (moteur non demandé ET frein physiquement
+      fermé) sont vraies. Comportement "purge pendant la pause" conservé.
    ═══════════════════════════════════════════════════════════════</html:xhtml>
           </documentation>
         </interface>
@@ -24705,22 +24798,25 @@ IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     END_IF;
 END_IF;
 
-// ── 4. Mémorisation de l'arrêt : le prochain départ attend le frein RÉELLEMENT
-// fermé + T#1500ms ────────────────────────────────────────────────────────
-// 🆕 2026-08-07 (demande client) : RestartRequired s'arme toujours instantanément
-// sur l'arrêt commandé (NOT MotorRequest) — bloque §5 dès ce scan, quel que soit
-// le canal de commande. Mais la TEMPORISATION elle-même ne démarre plus sur le
-// retour contacteur de sens (FwdRevSpeedFeedbackOff, image indirecte du joystick
-// au centre) : elle démarre sur BrakeFeedback confirmant le frein RÉELLEMENT
-// fermé (retour physique bobine/contacteur frein). Plus fiable que le centre
-// joystick — fonctionne identiquement dans tous les modes (IHM, joystick, futur
-// séquenceur auto), puisque c'est un état mécanique, pas une convention de canal
-// de commande. Délai total réel = fermeture mécanique du frein + T#1500ms
-// (volontairement plus prudent que l'ancien 1000ms compté dès la commande).
+// ── 4. Mémorisation de l'arrêt : temporisation d'anti-redémarrage chaud ──────────
+// 🆕 2026-08-07 (retour terrain) : la temporisation RestartDelay (1500ms) s'arme à
+// l'arrêt du mouvement (NOT MotorRequest) et s'écoule pendant la pause à l'arrêt (au lieu
+// de repartir de zéro à chaque nouvel appui) — permet un redémarrage instantané si la pause
+// dépasse 1.5s.
+// 🔧 REX 2026-08-07 (2) (audit croisé, demande client "sécuriser avec l'info frein") : la
+// version ci-dessus comptait dès `NOT MotorRequest` (relâchement joystick, INSTANTANÉ) sans
+// attendre la retombée PHYSIQUE du frein (`NOT BrakeFeedback` = bobine retombée, mâchoires
+// serrées — ~200-300ms mécaniques après la commande). Un nouveau départ pouvait donc être
+// autorisé après 1500ms décomptés dès le relâchement, alors que le frein n'était même pas
+// encore complètement fermé au début du décompte — la protection perdait son sens (protéger
+// le moteur/frein d'un réengagement trop rapide après un arrêt RÉELLEMENT confirmé). Corrigé :
+// `NOT BrakeFeedback` réintégré en ET — le décompte ne démarre/continue que si le moteur n'est
+// plus demandé ET que le frein est physiquement confirmé fermé. Garde le comportement "purge
+// pendant la pause" (RestartRequired ne s'arme qu'à NOT MotorRequest, indépendant de la tempo).
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;
@@ -26205,7 +26301,7 @@ instJoystick(
     DeadbandRaw               := _JoystickDeadbandRaw,
     FilterTime                := _JoystickFilterTime,
     DeadmanRearmTimeout       := T#10S,
-    NeutralHoldTime           := T#100MS, // 🔧 2026-08-07 (demande client) : réduit de 500ms — désarme plus vite au retour neutre
+    NeutralHoldTime           := T#1S, // 🔧 2026-08-07 (demande client) : 1s au neutre continu avant désarmement homme-mort
     DeadmanArmHoldTime        := T#100MS, // 🆕 2026-08-07 (demande client) : appui maintenu 100ms arme, indépendamment de la position des axes
     DeadmanArmGraceTime       := T#3S,    // 🆕 2026-08-07 (retour terrain) : grâce avant que le désarmement neutre puisse s'appliquer après un armement
     DeadmanReconfEnable       := FALSE,
@@ -27464,6 +27560,9 @@ WinchM1StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
 WinchM1StateHMI.BottomLimitActiveM := BottomLimitM1_Active;
 WinchM1StateHMI.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
 WinchM1StateHMI.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
+WinchM1StateHMI.CommandedDirection := instWinchM1.CommandedDirection;
+WinchM1StateHMI.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElapsed;
+WinchM1StateHMI.DirectionChangePending := instWinchM1.DirectionChangePending;
 
 WinchM2StateHMI.Position_M := PRG_02_Acquisition.CablePosM2;
 WinchM2StateHMI.SpeedRef_Pct := M2_SpeedRef_Active;
@@ -27513,6 +27612,9 @@ WinchM2StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
 WinchM2StateHMI.BottomLimitActiveM := BottomLimitM2_Active;
 WinchM2StateHMI.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
 WinchM2StateHMI.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
+WinchM2StateHMI.CommandedDirection := instWinchM2.CommandedDirection;
+WinchM2StateHMI.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElapsed;
+WinchM2StateHMI.DirectionChangePending := instWinchM2.DirectionChangePending;
 
 WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
 WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;
@@ -30918,7 +31020,14 @@ END_IF;
 
 instCfgPersistBridgeDredgingAssist(Hmi := GVL_IHM.DredgingAssist.Cfg, Persist := _DredgingAssistCfgPersist);
 IF instCfgPersistBridgeDredgingAssist.JustRestored THEN
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+    GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch         := GVL_IHM.DredgingAssist.Cfg.TglEnableDiveSearch;
+    GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence := GVL_IHM.DredgingAssist.Cfg.TglEnableExtractionSequence;
+    GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie       := GVL_IHM.DredgingAssist.Cfg.TglEnableDumpAtTremie;
+    GVL_IHM.Commun.ConfigRestoredFromPersistent            := TRUE;
+ELSE
+    GVL_IHM.DredgingAssist.Cfg.TglEnableDiveSearch         := GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch;
+    GVL_IHM.DredgingAssist.Cfg.TglEnableExtractionSequence := GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence;
+    GVL_IHM.DredgingAssist.Cfg.TglEnableDumpAtTremie       := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
 END_IF;
 
 IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN

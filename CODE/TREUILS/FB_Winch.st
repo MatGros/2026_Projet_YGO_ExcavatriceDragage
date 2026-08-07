@@ -137,6 +137,9 @@ VAR_OUTPUT
     ContactorsCheck     : ST_ContactorCheck;  // 🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)
     InTopSlowdownZone    : BOOL;   // 🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite haute)
     InBottomSlowdownZone : BOOL;   // 🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite basse)
+    CommandedDirection  : INT;     // 🆕 2026-08-07 : diagnostic — sens interne mémorisé (déclaration déplacée depuis VAR, aucun changement de logique)
+    DirectionChangeDelayElapsed : TIME; // 🆕 2026-08-07 : diagnostic — écoulé de DirectionChangeDelay (miroir, retour terrain délai montée)
+    DirectionChangePending : BOOL; // 🆕 2026-08-07 : diagnostic — déclaration déplacée depuis VAR (GATE 2sexies : doit accompagner CommandedDirection), aucun changement de logique
 END_VAR
 VAR
     SpeedStep           : FB_SpeedStep;
@@ -148,12 +151,10 @@ VAR
     DirectionChangeDelay: TON;
     EffectiveDirectionInterlockDelay : TIME; // 🆕 2026-08-06 : DirectionInterlockDelayDescent/Ascent selon le sens ENTRANT (Direction)
     EffectiveStepDelay  : TIME; // 🆕 2026-08-06 : déduit d'EffectiveDirectionInterlockDelay + T#100ms
-    CommandedDirection  : INT;
     TonContactorsDropped: TON;   // 🔧 REX 2026-07-07 : remplace TonFwdFeedback/TonRevFeedback
     BusinessStepDelay    : TON;   // 🪜 Tempo métier nominale entre hausses de palier
     AllContactorsCommandedOff : BOOL; // 🔧 REX 2026-07-07
     RampTargetPct       : REAL;
-    DirectionChangePending : BOOL;
     EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
     ActiveMaxStep       : INT;    // 🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse
     FirstScanDone       : BOOL;
@@ -169,6 +170,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BusinessStepDelayElapsed := T#0ms;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelayAscent);
+    DirectionChangeDelayElapsed := T#0ms;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
     State := E_State.DISABLED;
@@ -234,7 +236,11 @@ END_IF;
 EffectiveStepDelay := EffectiveDirectionInterlockDelay + T#100ms;
 
 IF Direction <> CommandedDirection THEN
-    IF CommandedDirection = 0 AND Direction <> 0 THEN
+    // 🆕 2026-08-07 (retour terrain) : démarrage depuis le neutre/arrêt (CommandedDirection = 0)
+    // prise en compte IMMÉDIATE (0ms), pas de tempo interlock.
+    // L'interlock DirectionChangeDelay (400ms descente / 900ms montée) ne s'applique QU'EN CAS
+    // d'inversion active de sens en mouvement (ex: de -1 vers +1 direct).
+    IF CommandedDirection = 0 THEN
         CommandedDirection := Direction;
         DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
     ELSIF StepNumber = 0 THEN
@@ -249,6 +255,7 @@ IF Direction <> CommandedDirection THEN
 ELSE
     DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
 END_IF;
+DirectionChangeDelayElapsed := DirectionChangeDelay.ET; // 🆕 2026-08-07 : diagnostic, miroir pur
 
 // 🆕 Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
 // Palier 1 en approche homing, MaxStepAscent en montée normale — 🔧 REX 2026-07-15 (9))
@@ -283,16 +290,22 @@ SpeedStep(Enable := (RampTargetPct > 0.1), SpeedRefPct := RampTargetPct,
           MeasuredSpeedBand := MeasuredSpeedBand,
           SpeedGuardEnable := SpeedGuardEnable,
           SpeedGuardReady := SpeedGuardReady);
-// 🪜 Tempo métier nominale : toute hausse exige EffectiveStepDelay (interlock + 100ms,
-// asymétrique montée/descente) et progresse par pas adjacents. Toute baisse reste immédiate
-// pour ne jamais retarder un arrêt/safety.
+// 🪜 Tempo métier nominale : le décollage initial de StepNumber=0 vers 1 est IMMÉDIAT (0ms).
+// Toute hausse ultérieure (1->2->3) exige EffectiveStepDelay (interlock + 100ms) et progresse par pas adjacents.
+// Toute baisse reste immédiate pour ne jamais retarder un arrêt/safety.
 RequestedStep := SpeedStep.StepNumber;
 IF RequestedStep > StepNumber THEN
-    BusinessStepDelay(IN := TRUE, PT := EffectiveStepDelay);
-    BusinessStepDelayElapsed := BusinessStepDelay.ET;
-    IF BusinessStepDelay.Q THEN
-        StepNumber := StepNumber + 1;
+    IF StepNumber = 0 THEN
+        StepNumber := 1;
         BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
+        BusinessStepDelayElapsed := T#0ms;
+    ELSE
+        BusinessStepDelay(IN := TRUE, PT := EffectiveStepDelay);
+        BusinessStepDelayElapsed := BusinessStepDelay.ET;
+        IF BusinessStepDelay.Q THEN
+            StepNumber := StepNumber + 1;
+            BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
+        END_IF;
     END_IF;
 ELSE
     BusinessStepDelay(IN := FALSE, PT := EffectiveStepDelay);
