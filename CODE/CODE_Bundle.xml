@@ -7956,10 +7956,10 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="8" />
+                <simpleValue value="7" />
               </initialValue>
               <documentation>
-                <html:xhtml>📐 Limite haute d'exploitation NORMALE (m)</html:xhtml>
+                <html:xhtml>📐 Limite haute d'exploitation NORMALE (m) -- REX 2026-08-07 (24), aligné sur GVL_PERSISTENT</html:xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -28175,12 +28175,16 @@ END_IF;
 // WAIT_BOTTOM_CONFIRMATION. Restreint volontairement à CET état précis (pas READY_TO_CLOSE, où le
 // fond est déjà confirmé par construction, ni CLOSING_BUCKET, où M1 est déjà bloqué par
 // instBucket.Busy et M2 doit continuer sans coupure).
+// 🔴🔧 REX 2026-08-07 (22) — retour terrain, demande client explicite : retiré. L'interdiction de
+// montée sans fond confirmé (correctif 11) gênait les essais même sans mode assistance actif.
+// ForbidAscentExtractionBottomNotConfirmed reste calculé (diagnostic IHM), mais n'est plus
+// appliqué à ForbidAscentM1_Raw/M2_Raw.
 ForbidAscentExtractionBottomNotConfirmed := instExtractionSequence.Enable
     AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)
     AND (instExtractionSequence.ExtractionState = E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION);
 
-ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
-ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed
+ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent;
+ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent
     // 🔴🔧 REX 2026-08-07 (21bis) — même correctif d'anticipation que ForbidDescentM2_Raw ci-dessus.
     OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 &gt;= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
