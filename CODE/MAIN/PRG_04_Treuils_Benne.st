@@ -469,6 +469,7 @@ instSafetyWinchM1(
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
+    BypassMotorThermal     := GVL_IHM.M1TreuilRetenue.Bypass.MotorThermal,
     BypassMecaA            := GVL_IHM.M1TreuilRetenue.Bypass.MecaA,
     BypassMecaB            := GVL_IHM.M1TreuilRetenue.Bypass.MecaB,
     BypassMecaC            := GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
@@ -518,6 +519,7 @@ instSafetyWinchM2(
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
+    BypassMotorThermal     := GVL_IHM.M2TreuilBenne.Bypass.MotorThermal,
     BypassMecaA            := GVL_IHM.M2TreuilBenne.Bypass.MecaA,
     BypassMecaB            := GVL_IHM.M2TreuilBenne.Bypass.MecaB,
     BypassMecaC            := GVL_IHM.M2TreuilBenne.Bypass.MecaC,
@@ -746,14 +748,21 @@ WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
 WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;
 WinchM1SafetyHMI.ForbidDescent := ForbidDescentM1_Active;
 WinchM1SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
-WinchM1SafetyHMI.Error := instWinchM1.Error;
+WinchM1SafetyHMI.PowerCutOff := instSafetyWinchM1.PowerCutOff;
+WinchM1SafetyHMI.BrakeTimeoutFault := (PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId AND 16#0001) <> 0;
+WinchM1SafetyHMI.CableOutOfBoundsFault := (PRG_02_Acquisition.instEncoderSafetyM1.ErrorId AND 16#0001) <> 0;
+WinchM1SafetyHMI.Error := instWinchM1.Error OR instSafetyWinchM1.Error;
 WinchM1SafetyHMI.ErrorId := instWinchM1.ErrorId;
+
 WinchM2SafetyHMI.SafeStop := SafeStopM2_Active;
 WinchM2SafetyHMI.ForbidAscent := ForbidAscentM2_Active;
 WinchM2SafetyHMI.ForbidDescent := ForbidDescentM2_Active;
 WinchM2SafetyHMI.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
 WinchM2SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
-WinchM2SafetyHMI.Error := instWinchM2.Error;
+WinchM2SafetyHMI.PowerCutOff := instSafetyWinchM2.PowerCutOff;
+WinchM2SafetyHMI.BrakeTimeoutFault := (PRG_06_Outputs_LD.instWinchOutputInterlockM2.ErrorId AND 16#0001) <> 0;
+WinchM2SafetyHMI.CableOutOfBoundsFault := (PRG_02_Acquisition.instEncoderSafetyM2.ErrorId AND 16#0001) <> 0;
+WinchM2SafetyHMI.Error := instWinchM2.Error OR instSafetyWinchM2.Error;
 WinchM2SafetyHMI.ErrorId := instWinchM2.ErrorId;
 
 SyncStateHMI.DeltaPos_M := instWinchSync.SignedDeltaPosM;

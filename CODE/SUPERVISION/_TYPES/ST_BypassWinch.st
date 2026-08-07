@@ -17,6 +17,7 @@ STRUCT
     ContactorFeedback : BOOL; (* 🔌 Bypass feedbacks contacteurs de puissance et frein *)
     PhaseRotation     : BOOL; (* ⚡ Bypass défaut rotation de phases (commun machine) *)
     BrakeThermal      : BOOL; (* 🌡️ Bypass surchauffe thermique frein (commun machine) *)
+    MotorThermal      : BOOL; (* 🆕 2026-08-07 : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI) *)
 
     (* 🚧 2. Limites physiques et Positionnement *)
     TopLimitSwitch    : BOOL; (* 🚧 Bypass fin de course physique haute *)

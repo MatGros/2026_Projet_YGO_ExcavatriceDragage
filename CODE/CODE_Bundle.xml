@@ -1324,6 +1324,14 @@
                 <html:xhtml>🌡️ Bypass surchauffe thermique frein (commun machine)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="MotorThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI)</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="TopLimitSwitch">
               <type>
                 <BOOL />
@@ -6005,6 +6013,30 @@ TRUE = Défaut sécurité actif ➔ Acquitter via : GVL_IHM.Modes.Cmd.BtnFaultRe
               </type>
               <documentation>
                 <html:xhtml>⏳ Temps écoulé confirmation contacteurs/frein</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🧨 Coupure puissance amont activée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeoutFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>⏱️ Défaut watchdog confirmation ouverture/fermeture frein</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableOutOfBoundsFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>📐 Dépassement des bornes physiques haute/basse du câble</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -18025,6 +18057,17 @@ Inhibition de l'AUTRE treuil (mise en service N2)</html:xhtml>
                 <html:xhtml>🌡️ Bypass surchauffe frein</html:xhtml>
               </documentation>
             </variable>
+            <variable name="BypassMotorThermal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : 🌡️ Bypass surchauffe moteur (bit2) —</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassMecaA">
               <type>
                 <BOOL />
@@ -18033,7 +18076,9 @@ Inhibition de l'AUTRE treuil (mise en service N2)</html:xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <html:xhtml>🔄 Bypass Méca A</html:xhtml>
+                <html:xhtml>manquait alors que BypassBrakeThermal existe déjà pour
+le même niveau de sévérité (SafeStop+PowerCutOff)
+🔄 Bypass Méca A</html:xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaB">
@@ -18502,7 +18547,9 @@ ELSE
 END_IF;
 
 // 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total
-IF NOT BypassSafety AND ThermalFeedback THEN
+// 🆕 2026-08-07 : ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
+// bypass dédié plutôt que de dépendre uniquement du bypass groupé BypassSafety.
+IF NOT (BypassSafety OR BypassMotorThermal) AND ThermalFeedback THEN
     ErrorId := ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFB;
@@ -22457,7 +22504,7 @@ GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed := HwIn.Ma
 GVL_Troubleshooting.ContexteMachineGlobal.Idx302_PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
 // Agrégat simple OR de faits déjà publiés (fiche §5.1) — pas un nouveau calcul métier
 GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny := WinchM1.Safety.SafeStop OR WinchM2.Safety.SafeStop OR Translation.Safety.SafeStop;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := FALSE; // TBD non câblé - voir fiche §6 : ST_SafetyWinch n'expose pas PowerCutOff (seul Translation.Safety.PowerCutOff existe), agrégat M1/M2/M3 impossible sans modifier ST_SafetyWinch (hors scope.allowed ce lot)
+GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := WinchM1.Safety.PowerCutOff OR WinchM2.Safety.PowerCutOff OR Translation.Safety.PowerCutOff;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk    := Commun.HeartbeatIhmOk;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy     := FALSE; // TBD non câblé - voir fiche §6 (champ exact à confirmer côté GVL_IHM.Cycle)
 
@@ -22494,7 +22541,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := 
 
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := FALSE; // TBD non câblé - voir fiche §6 (ST_SafetyWinch n'expose pas PowerCutOff, hors scope.allowed)
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := WinchM1.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_ForbidAscentEffective := WinchM1.Safety.ForbidAscent;
@@ -22540,7 +22587,7 @@ GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection := 
 
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2.Safety.SafeStop;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := FALSE; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := WinchM2.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_ForbidAscentEffective := WinchM2.Safety.ForbidAscent;
@@ -26825,6 +26872,7 @@ instSafetyWinchM1(
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
+    BypassMotorThermal     := GVL_IHM.M1TreuilRetenue.Bypass.MotorThermal,
     BypassMecaA            := GVL_IHM.M1TreuilRetenue.Bypass.MecaA,
     BypassMecaB            := GVL_IHM.M1TreuilRetenue.Bypass.MecaB,
     BypassMecaC            := GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
@@ -26874,6 +26922,7 @@ instSafetyWinchM2(
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
+    BypassMotorThermal     := GVL_IHM.M2TreuilBenne.Bypass.MotorThermal,
     BypassMecaA            := GVL_IHM.M2TreuilBenne.Bypass.MecaA,
     BypassMecaB            := GVL_IHM.M2TreuilBenne.Bypass.MecaB,
     BypassMecaC            := GVL_IHM.M2TreuilBenne.Bypass.MecaC,
@@ -27102,14 +27151,21 @@ WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
 WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;
 WinchM1SafetyHMI.ForbidDescent := ForbidDescentM1_Active;
 WinchM1SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
-WinchM1SafetyHMI.Error := instWinchM1.Error;
+WinchM1SafetyHMI.PowerCutOff := instSafetyWinchM1.PowerCutOff;
+WinchM1SafetyHMI.BrakeTimeoutFault := (PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM1SafetyHMI.CableOutOfBoundsFault := (PRG_02_Acquisition.instEncoderSafetyM1.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM1SafetyHMI.Error := instWinchM1.Error OR instSafetyWinchM1.Error;
 WinchM1SafetyHMI.ErrorId := instWinchM1.ErrorId;
+
 WinchM2SafetyHMI.SafeStop := SafeStopM2_Active;
 WinchM2SafetyHMI.ForbidAscent := ForbidAscentM2_Active;
 WinchM2SafetyHMI.ForbidDescent := ForbidDescentM2_Active;
 WinchM2SafetyHMI.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
 WinchM2SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
-WinchM2SafetyHMI.Error := instWinchM2.Error;
+WinchM2SafetyHMI.PowerCutOff := instSafetyWinchM2.PowerCutOff;
+WinchM2SafetyHMI.BrakeTimeoutFault := (PRG_06_Outputs_LD.instWinchOutputInterlockM2.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM2SafetyHMI.CableOutOfBoundsFault := (PRG_02_Acquisition.instEncoderSafetyM2.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM2SafetyHMI.Error := instWinchM2.Error OR instSafetyWinchM2.Error;
 WinchM2SafetyHMI.ErrorId := instWinchM2.ErrorId;
 
 SyncStateHMI.DeltaPos_M := instWinchSync.SignedDeltaPosM;
