@@ -722,6 +722,9 @@ WinchM1StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
 WinchM1StateHMI.BottomLimitActiveM := BottomLimitM1_Active;
 WinchM1StateHMI.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
 WinchM1StateHMI.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
+WinchM1StateHMI.CommandedDirection := instWinchM1.CommandedDirection;
+WinchM1StateHMI.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElapsed;
+WinchM1StateHMI.DirectionChangePending := instWinchM1.DirectionChangePending;
 
 WinchM2StateHMI.Position_M := PRG_02_Acquisition.CablePosM2;
 WinchM2StateHMI.SpeedRef_Pct := M2_SpeedRef_Active;
@@ -771,6 +774,9 @@ WinchM2StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
 WinchM2StateHMI.BottomLimitActiveM := BottomLimitM2_Active;
 WinchM2StateHMI.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
 WinchM2StateHMI.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
+WinchM2StateHMI.CommandedDirection := instWinchM2.CommandedDirection;
+WinchM2StateHMI.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElapsed;
+WinchM2StateHMI.DirectionChangePending := instWinchM2.DirectionChangePending;
 
 WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
 WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;

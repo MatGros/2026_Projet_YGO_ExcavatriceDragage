@@ -28,6 +28,15 @@
       par §3/§5 avec un retard d'UN scan (~10ms) sur une nouvelle occurrence de défaut —
       négligeable face au budget 500ms du watchdog, et strictement nécessaire pour éviter
       les faux déclenchements.
+   🔴🔧 REX 2026-08-07 — RestartDelay COMPTAIT SANS ATTENDRE LE FREIN PHYSIQUE (audit croisé,
+      demande client) : un lot précédent avait fait démarrer le décompte 1500ms sur `NOT
+      MotorRequest` seul (relâchement joystick, instantané), perdant la dépendance à
+      `BrakeFeedback` (retombée physique bobine/mâchoires, ~200-300ms mécaniques après la
+      commande). Un redémarrage pouvait donc être autorisé alors que le frein n'était pas
+      encore réellement fermé au moment où le décompte a commencé. Corrigé (§4) :
+      `NOT BrakeFeedback` réintégré en ET avec `NOT MotorRequest` — le décompte ne
+      démarre/continue que si les deux conditions (moteur non demandé ET frein physiquement
+      fermé) sont vraies. Comportement "purge pendant la pause" conservé.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchOutputInterlock_LD
@@ -152,22 +161,25 @@ IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     END_IF;
 END_IF;
 
-// ── 4. Mémorisation de l'arrêt : le prochain départ attend le frein RÉELLEMENT
-// fermé + T#1500ms ────────────────────────────────────────────────────────
-// 🆕 2026-08-07 (demande client) : RestartRequired s'arme toujours instantanément
-// sur l'arrêt commandé (NOT MotorRequest) — bloque §5 dès ce scan, quel que soit
-// le canal de commande. Mais la TEMPORISATION elle-même ne démarre plus sur le
-// retour contacteur de sens (FwdRevSpeedFeedbackOff, image indirecte du joystick
-// au centre) : elle démarre sur BrakeFeedback confirmant le frein RÉELLEMENT
-// fermé (retour physique bobine/contacteur frein). Plus fiable que le centre
-// joystick — fonctionne identiquement dans tous les modes (IHM, joystick, futur
-// séquenceur auto), puisque c'est un état mécanique, pas une convention de canal
-// de commande. Délai total réel = fermeture mécanique du frein + T#1500ms
-// (volontairement plus prudent que l'ancien 1000ms compté dès la commande).
+// ── 4. Mémorisation de l'arrêt : temporisation d'anti-redémarrage chaud ──────────
+// 🆕 2026-08-07 (retour terrain) : la temporisation RestartDelay (1500ms) s'arme à
+// l'arrêt du mouvement (NOT MotorRequest) et s'écoule pendant la pause à l'arrêt (au lieu
+// de repartir de zéro à chaque nouvel appui) — permet un redémarrage instantané si la pause
+// dépasse 1.5s.
+// 🔧 REX 2026-08-07 (2) (audit croisé, demande client "sécuriser avec l'info frein") : la
+// version ci-dessus comptait dès `NOT MotorRequest` (relâchement joystick, INSTANTANÉ) sans
+// attendre la retombée PHYSIQUE du frein (`NOT BrakeFeedback` = bobine retombée, mâchoires
+// serrées — ~200-300ms mécaniques après la commande). Un nouveau départ pouvait donc être
+// autorisé après 1500ms décomptés dès le relâchement, alors que le frein n'était même pas
+// encore complètement fermé au début du décompte — la protection perdait son sens (protéger
+// le moteur/frein d'un réengagement trop rapide après un arrêt RÉELLEMENT confirmé). Corrigé :
+// `NOT BrakeFeedback` réintégré en ET — le décompte ne démarre/continue que si le moteur n'est
+// plus demandé ET que le frein est physiquement confirmé fermé. Garde le comportement "purge
+// pendant la pause" (RestartRequired ne s'arme qu'à NOT MotorRequest, indépendant de la tempo).
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;

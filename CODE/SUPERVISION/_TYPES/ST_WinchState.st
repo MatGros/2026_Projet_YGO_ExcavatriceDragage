@@ -57,5 +57,10 @@ STRUCT
     BottomLimitActiveM      : REAL;             (* 📏 Limite basse active (m) — câble physique OU légale, la plus restrictive *)
     InTopSlowdownZone       : BOOL;             (* 🐢 Palier plafonné à 1 : approche limite haute *)
     InBottomSlowdownZone    : BOOL;             (* 🐢 Palier plafonné à 1 : approche limite basse (câble ou légale) *)
+
+    (* 🩺 2026-08-07 : diagnostic retour terrain — délai ressenti à la remontée *)
+    CommandedDirection        : INT;            (* 🩺 Sens interne mémorisé FB_Winch (-1/0/+1) *)
+    DirectionChangeDelayElapsed : TIME;         (* 🩺 Écoulé de l'interlock changement/reprise de sens *)
+    DirectionChangePending      : BOOL;         (* 🩺 TRUE tant que CommandedDirection n'a pas rejoint Direction *)
 END_STRUCT
 END_TYPE
