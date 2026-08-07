@@ -279,7 +279,8 @@ instTroubleshootingView(
     Sync                 := GVL_IHM.M1M2Sync,
     Translation          := GVL_IHM.TranslationM3,
     Commun               := GVL_IHM.Commun,
-    Network              := GVL_IHM.Network
+    Network              := GVL_IHM.Network,
+    DredgingAssist       := GVL_IHM.DredgingAssist
 );
 
 END_PROGRAM

@@ -47,6 +47,7 @@ VAR_INPUT
     Translation              : ST_TranslationHMI;(* GVL_IHM.TranslationM3 *)
     Commun                   : ST_CommunHMI;     (* GVL_IHM.Commun *)
     Network                  : ST_NetworkDiagHMI;(* GVL_IHM.Network *)
+    DredgingAssist           : ST_DredgingAssistHMI; (* 🆕 2026-08-07 : GVL_IHM.DredgingAssist *)
 END_VAR
 VAR_OUTPUT
     Ready                    : BOOL; (* Diagnostic interne minimal — fiche §3 *)
@@ -192,6 +193,35 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive := WinchM2.
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
+
+// === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist (2026-08-07) ===
+GVL_Troubleshooting.AssistanceDragage.Idx101_EnableDiveSearch         := DredgingAssist.Cmd.TglEnableDiveSearch;
+GVL_Troubleshooting.AssistanceDragage.Idx102_EnableExtractionSequence := DredgingAssist.Cmd.TglEnableExtractionSequence;
+GVL_Troubleshooting.AssistanceDragage.Idx103_EnableDumpAtTremie       := DredgingAssist.Cmd.TglEnableDumpAtTremie;
+
+GVL_Troubleshooting.AssistanceDragage.Idx201_DiveReady               := DredgingAssist.State.DiveReady;
+GVL_Troubleshooting.AssistanceDragage.Idx202_DiveBusy                := DredgingAssist.State.DiveBusy;
+GVL_Troubleshooting.AssistanceDragage.Idx203_DiveDone                := DredgingAssist.State.DiveDone;
+GVL_Troubleshooting.AssistanceDragage.Idx204_DiveState                := DredgingAssist.State.DiveState;
+GVL_Troubleshooting.AssistanceDragage.Idx205_DiveError                := DredgingAssist.State.DiveError;
+GVL_Troubleshooting.AssistanceDragage.Idx206_DiveErrorId              := DredgingAssist.State.DiveErrorId;
+GVL_Troubleshooting.AssistanceDragage.Idx207_BottomTouchConfirmed    := DredgingAssist.State.BottomTouchConfirmed;
+
+GVL_Troubleshooting.AssistanceDragage.Idx301_ExtractionReady          := DredgingAssist.State.ExtractionReady;
+GVL_Troubleshooting.AssistanceDragage.Idx302_ExtractionBusy           := DredgingAssist.State.ExtractionBusy;
+GVL_Troubleshooting.AssistanceDragage.Idx303_ExtractionDone           := DredgingAssist.State.ExtractionDone;
+GVL_Troubleshooting.AssistanceDragage.Idx304_ExtractionState          := DredgingAssist.State.ExtractionState;
+GVL_Troubleshooting.AssistanceDragage.Idx305_ExtractionError          := DredgingAssist.State.ExtractionError;
+GVL_Troubleshooting.AssistanceDragage.Idx306_ExtractionErrorId        := DredgingAssist.State.ExtractionErrorId;
+
+GVL_Troubleshooting.AssistanceDragage.Idx401_OperatorActionId        := DredgingAssist.State.OperatorActionId;
+GVL_Troubleshooting.AssistanceDragage.Idx402_OperatorAction          := DredgingAssist.State.OperatorAction;
+
+GVL_Troubleshooting.AssistanceDragage.Idx501_DumpAtTremieArmed          := DredgingAssist.State.DumpAtTremieArmed;
+GVL_Troubleshooting.AssistanceDragage.Idx502_DumpAtTremieAssistActive   := DredgingAssist.State.DumpAtTremieAssistActive;
+GVL_Troubleshooting.AssistanceDragage.Idx503_DumpAtTremieAtTremie       := DredgingAssist.State.DumpAtTremieAtTremie;
+GVL_Troubleshooting.AssistanceDragage.Idx504_DumpAtTremieBucketOpenArmed := DredgingAssist.State.DumpAtTremieBucketOpenArmed;
+GVL_Troubleshooting.AssistanceDragage.Idx505_DumpAtTremieDescentLocked := DredgingAssist.State.DumpAtTremieDescentLocked;
 
 // === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;

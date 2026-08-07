@@ -43,6 +43,7 @@ VAR
     // uniquement, même périmètre que instDiveSearch/instExtractionSequence).
     DumpAtTremieActive             : BOOL;
     DumpAtTremieAssistActive       : BOOL; // Sous-condition Mode MAINT_N1/N2 (assist réellement active)
+    DumpAtTremieBucketOpenArmed    : BOOL; // CmdOpen_IHM déclenché par ce mode (diagnostic)
 
     M1_StartStop_Active     : BOOL;
     M1_Direction_Active     : INT;
@@ -110,6 +111,9 @@ END_IF;
 DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
 DumpAtTremieAssistActive := DumpAtTremieActive
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2);
+GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
+GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
+GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
 
 IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
@@ -139,6 +143,16 @@ instDiveSearch(
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M
 );
 
+// 🆕 2026-08-07 : publication IHM (était orpheline -- déclarée mais jamais écrite, voir
+// GVL_IHM.DredgingAssist.State) — consommée ensuite par FB_TroubleshootingView (debug).
+GVL_IHM.DredgingAssist.State.DiveReady            := instDiveSearch.Ready;
+GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Busy;
+GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Done;
+GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Error;
+GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.ErrorId;
+GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
+GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := instDiveSearch.BottomTouchConfirmed;
+
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed;
 instExtractionSequence(
     Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
@@ -165,6 +179,28 @@ IF instExtractionSequence.BottomConfirmationConsumed THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
 END_IF;
 
+// 🆕 2026-08-07 : publication IHM (voir DiveSearch ci-dessus, même correctif).
+GVL_IHM.DredgingAssist.State.ExtractionReady   := instExtractionSequence.Ready;
+GVL_IHM.DredgingAssist.State.ExtractionBusy    := instExtractionSequence.Busy;
+GVL_IHM.DredgingAssist.State.ExtractionDone    := instExtractionSequence.Done;
+GVL_IHM.DredgingAssist.State.ExtractionError   := instExtractionSequence.Error;
+GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.ErrorId;
+GVL_IHM.DredgingAssist.State.ExtractionState   := instExtractionSequence.ExtractionState;
+
+// 🆕 2026-08-07 : une seule consigne opérateur conduite à la fois (doc §OperatorActionId) —
+// aucun PRG_09 n'existe (jamais câblé), arbitrage fait ici : DiveSearch prioritaire si Busy,
+// sinon ExtractionSequence si Busy, sinon la dernière connue reste affichée à titre informatif.
+IF instDiveSearch.Busy THEN
+    GVL_IHM.DredgingAssist.State.OperatorActionId := instDiveSearch.OperatorActionId;
+    GVL_IHM.DredgingAssist.State.OperatorAction   := instDiveSearch.OperatorAction;
+ELSIF instExtractionSequence.Busy THEN
+    GVL_IHM.DredgingAssist.State.OperatorActionId := instExtractionSequence.OperatorActionId;
+    GVL_IHM.DredgingAssist.State.OperatorAction   := instExtractionSequence.OperatorAction;
+ELSE
+    GVL_IHM.DredgingAssist.State.OperatorActionId := 0;
+    GVL_IHM.DredgingAssist.State.OperatorAction   := '';
+END_IF;
+
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     CmdBucketCloseArbitrated := FALSE;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
@@ -182,18 +218,20 @@ END_IF;
 
 // === 🏗️ §2 COMMANDE DU BENNE (FB_Bucket) ===
 
+// 🆕 2026-08-07 : en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
+// la trémie arme l'ouverture benne au lieu de faire descendre M2 — le mouvement réel reste
+// gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
+// l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
+// l'arbitrage M2 normal (mécanisme déjà existant, voir §3bis plus bas).
+DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.M3_AtTremieStable;
+GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed := DumpAtTremieBucketOpenArmed;
+
 instBucket(
     Enable              := NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_03_Modes_Cycle.Auth.Mode,
-    // 🆕 2026-08-07 : en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
-    // la trémie arme l'ouverture benne au lieu de faire descendre M2 — le mouvement réel reste
-    // gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
-    // l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
-    // l'arbitrage M2 normal (mécanisme déjà existant, voir §3bis plus bas).
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen
-                           OR (DumpAtTremieAssistActive AND PRG_05_Translation.M3_AtTremieStable),
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR DumpAtTremieBucketOpenArmed,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection     := MaintenanceMotionDirection,
@@ -495,7 +533,9 @@ ForbidDescentM2_Raw := ForbidDescentM2_Raw OR instSafetyWinchM2.ForbidDescent;
 // 🆕 2026-08-07 (mode "vidage à la trémie", demande client) : descente M1 ET M2 interdite tant
 // que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
 // descente-treuil / translation pour se rapprocher d'un enchaînement automatique sûr.
-IF DumpAtTremieAssistActive AND NOT (PRG_05_Translation.M3_AtP1Stable OR PRG_05_Translation.M3_AtMaintenanceStable) THEN
+GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked :=
+    DumpAtTremieAssistActive AND NOT (PRG_05_Translation.M3_AtP1Stable OR PRG_05_Translation.M3_AtMaintenanceStable);
+IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
     ForbidDescentM1_Raw := TRUE;
     ForbidDescentM2_Raw := TRUE;
 END_IF;
