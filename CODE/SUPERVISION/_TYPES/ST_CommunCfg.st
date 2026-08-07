@@ -15,6 +15,7 @@ STRUCT
     // 🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
     // pas une vitesse continue.
     WinchSlowdownMaxStep        : INT := 1;     (* 🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)
+    TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* 🆕 2026-08-07 : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
     Initialized                 : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
 END_TYPE

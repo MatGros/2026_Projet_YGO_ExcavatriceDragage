@@ -48,5 +48,9 @@ STRUCT
 
     Preflight : ST_PreflightHMI; (* 🩺 Verdict observateur à l'arrêt — jamais bloquant *)
     WinchSymmetry : ST_WinchSymmetryHMI; (* ⚖️ MES-008 : mesures passives M1/M2 *)
+
+    (* 🩺 2026-08-07 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal) *)
+    KoboldImmersionConfirmed : BOOL; (* Front Kobold confirmé dans la fenêtre d'immersion *)
+    KoboldBottomTouchLatched : BOOL; (* Fond détecté, descente bloquée (ForbidDescentM1/M2_Raw) *)
 END_STRUCT
 END_TYPE
