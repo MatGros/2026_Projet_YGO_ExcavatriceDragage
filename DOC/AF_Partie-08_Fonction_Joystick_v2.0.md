@@ -139,9 +139,15 @@ sorties axes à 0, `DeadmanArmed=FALSE`, timers deadman reset, `RETURN`.
 | `DeadmanReconfEnable` | `FALSE` | `FALSE` = consentement au démarrage (mouvement libre) ; `TRUE` = reconfirmation périodique en mouvement |
 | `DeadmanRearmTimeout` | `T#10S` | Délai de reconfirmation (n'agit que si `DeadmanReconfEnable=TRUE`) |
 | `NeutralHoldTime` | `T#100MS` (🔧 2026-08-07, réduit de 500ms) | Neutre tenu avant désarmement |
+| `DeadmanArmHoldTime` | `T#100MS` (🆕 2026-08-07) | Appui bouton maintenu avant armement |
 
 ### Armement
-Front bouton **et** `ScaleX.OutPct=0` **et** `ScaleY.OutPct=0` (après deadband, **avant** filtre/rampe).
+🔧 2026-08-07 (retour terrain) : ancien armement "front bouton **et** axes strictement à 0.0 sur le
+MÊME scan" retiré — trop contraignant (poussait le joystick quelques ms après l'appui = jamais armé).
+Nouveau : front bouton démarre un maintien `DeadmanArmHoldTime` (100 ms) ; à l'issue du maintien,
+armé — **indépendamment** de la position des axes pendant ce délai. Relâché avant la fin du
+maintien = tentative annulée, nouvel appui (front) exigé. Sûr même si le joystick est déjà hors
+zone morte à l'armement : les rampes accel/décel restent gérées par les FB aval (FB_Winch/FB_Translation).
 
 ### Désarmement
 | Cause | Condition |
