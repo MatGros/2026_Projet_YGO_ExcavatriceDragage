@@ -111,7 +111,6 @@ VAR_INPUT
     TopLimitM               : REAL := 8.5;      // 🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
     BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
     CfgSlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
-    CfgSlowSpeedPct            : REAL := 15.0;     // 🆕 Consigne de vitesse lente dans la zone de ralentissement (%)
     MeasuredSpeedBand       : INT := 0;         // 🛡️ Bande vitesse réelle validée
     SpeedGuardEnable        : BOOL := FALSE;   // 🛡️ Activation garde-fou changement de palier
     SpeedGuardReady         : BOOL := FALSE;   // 🟢 Conditions de stabilité validées

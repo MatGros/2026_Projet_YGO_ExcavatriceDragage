@@ -71,7 +71,7 @@ GVL_Troubleshooting.ContexteMachineGlobal.Idx301_EmergencyChainClosed := HwIn.Ma
 GVL_Troubleshooting.ContexteMachineGlobal.Idx302_PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
 // Agrégat simple OR de faits déjà publiés (fiche §5.1) — pas un nouveau calcul métier
 GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny := WinchM1.Safety.SafeStop OR WinchM2.Safety.SafeStop OR Translation.Safety.SafeStop;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := FALSE; // TBD non câblé - voir fiche §6 : ST_SafetyWinch n'expose pas PowerCutOff (seul Translation.Safety.PowerCutOff existe), agrégat M1/M2/M3 impossible sans modifier ST_SafetyWinch (hors scope.allowed ce lot)
+GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := WinchM1.Safety.PowerCutOff OR WinchM2.Safety.PowerCutOff OR Translation.Safety.PowerCutOff;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk    := Commun.HeartbeatIhmOk;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy     := FALSE; // TBD non câblé - voir fiche §6 (champ exact à confirmer côté GVL_IHM.Cycle)
 
@@ -108,7 +108,7 @@ GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx209_ArbitratedDirection := 
 
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1.Safety.SafeStop;
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := FALSE; // TBD non câblé - voir fiche §6 (ST_SafetyWinch n'expose pas PowerCutOff, hors scope.allowed)
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := WinchM1.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_ForbidAscentEffective := WinchM1.Safety.ForbidAscent;
@@ -154,7 +154,7 @@ GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx209_ArbitratedDirection := 
 
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2.Safety.SafeStop;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := FALSE; // TBD non câblé - voir fiche §6
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := WinchM2.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.Bypass.TopPositionSensor;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_ForbidAscentEffective := WinchM2.Safety.ForbidAscent;
