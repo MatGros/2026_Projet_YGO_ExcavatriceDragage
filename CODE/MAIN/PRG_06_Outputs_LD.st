@@ -160,6 +160,14 @@ M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 // 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT, voir M1 ci-dessus.
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
+// 🔴🔧 REX 2026-08-07 (12) — retour terrain, GAP CONFIRMÉ : KoboldContactorCmd était déclaré
+// (VAR ci-dessus) mais jamais écrit -- la chaîne instDiveSearch.KoboldMeasureEnable ->
+// PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated s'arrêtait net ici, sans erreur de
+// compilation ni de gate pour le signaler (même classe de bug que le fix M3 frein du
+// 2026-08-05). Mapping E/S CODESYS à (re)faire côté utilisateur (voir §2 plus bas) :
+// M1_M2_KoboldMeasureEnable_DQ <- PRG_06_Outputs_LD.KoboldContactorCmd.
+KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;
+
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 // 🛡️ 2026-08-06 (demande maintenance) : déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
 // M3InterlockEnable s'appuie désormais directement sur la sécurité dynamique de M3 (PowerCutOff / SafeStop / Error)
@@ -208,6 +216,7 @@ M3_DriveFreqRefWord := instTranslationOutputInterlockM3.DriveFreqRefWord;
 //   M2_RelayRev_Down_Open_DQ <- PRG_06_Outputs_LD.M2RelayRev
 //   M2_SpeedContactor_1..4_DQ<- PRG_06_Outputs_LD.M2SpeedContactor1..4
 //   M2_BrakeRelease_RQ       <- PRG_06_Outputs_LD.M2BrakeCmd
+//   M1_M2_KoboldMeasureEnable_DQ <- PRG_06_Outputs_LD.KoboldContactorCmd   (🆕 2026-08-07 (12))
 //   M3_CommandWord           <- PRG_06_Outputs_LD.M3_DriveControlWord   (0x3101, %QW6)
 //   M3_SetpointFrequencyHz   <- PRG_06_Outputs_LD.M3_DriveFreqRefWord   (0x3100, %QW7)
 //   PowerKeepAlive_A_RQ      <- PRG_06_Outputs_LD.PowerKeepAliveACmd
@@ -250,6 +259,11 @@ GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
 M3_BrakeRelease_RQ := TranslationBrakeCmd;
 M3_CommandWord := M3_DriveControlWord;
 M3_SetpointFrequencyHz := M3_DriveFreqRefWord;
+// 🔴🔧 REX 2026-08-07 (12bis) — retour terrain, URGENT : ajouté au même titre que
+// M3_BrakeRelease_RQ ci-dessus (coil directe, DIRECT_HW_COILS dans gen_prg06_oracle.py) --
+// confirmé par l'utilisateur que ce pattern fonctionne réellement sur d'autres sorties HW déjà
+// en place, contrairement au remap qualifié seul (jamais appliqué manuellement pour ce canal).
+M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd;
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
 

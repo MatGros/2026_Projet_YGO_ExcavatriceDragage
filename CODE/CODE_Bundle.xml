@@ -2049,6 +2049,22 @@
                 <html:xhtml>1 = Descente M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre</html:xhtml>
               </documentation>
             </variable>
+            <variable name="Idx601_BypassDiveActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (9) : 1 = Bypass séquence DiveSearch armé (IHM)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx602_BypassKoboldBottomTouched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (9) : 1 = Fond confirmé par le bypass (front montant Kobold en descente)</html:xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -3009,8 +3025,16 @@
               <type>
                 <REAL />
               </type>
+              <initialValue>
+                <simpleValue value="-999" />
+              </initialValue>
               <documentation>
-                <html:xhtml>📐 Cote min de dragage autorisée (m, négatif)</html:xhtml>
+                <html:xhtml>🔴🔧 REX 2026-08-07 (5) — retour terrain, blocage instantané à 0m : sans défaut explicite,
+ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM &lt;= 0.0" se déclenche
+dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
+(jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
+erreur -- il faut régler la vraie cote pour que la protection devienne active.
+📐 Cote min de dragage autorisée (m, négatif)</html:xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalEnabled">
@@ -3084,6 +3108,19 @@ pas une vitesse continue.
               </initialValue>
               <documentation>
                 <html:xhtml>🆕 2026-08-07 : Arrêt auto descente sur détection fond Kobold (pilotage normal)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableCoupledBucketSequencing">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🔴🔧 REX 2026-08-07 (4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
+Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
+gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</html:xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -3909,6 +3946,22 @@ Front Kobold confirmé dans la fenêtre d'immersion</html:xhtml>
                 <html:xhtml>Attestation manuelle temporaire du fond</html:xhtml>
               </documentation>
             </variable>
+            <variable name="TglBypassDiveSearchSequence">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (9) : bypass simplifié de la séquence FB_DiveSearch complète (préconditions
+strictes -- benne ouverte, DiveStartMin_M, fenêtre immersion). Si TRUE, un front MONTANT
+Kobold pendant une descente confirme directement le fond, sans passer par l'état-machine
+FB_DiveSearch (qui continue de tourner en parallèle, inchangée -- utile pour
+KoboldMeasureEnable). Défaut FALSE : comportement identique à avant (séquence complète
+seule source de confirmation).</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="TglEnableDumpAtTremie">
               <type>
                 <BOOL />
@@ -4087,6 +4140,23 @@ TglEnableDumpAtTremie (bit IHM brut)</html:xhtml>
               </type>
               <documentation>
                 <html:xhtml>ForbidDescent M1/M2 forcé par ce mode (hors P1/Maintenance)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassDiveActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (9) : diagnostic bypass séquence DiveSearch
+TglBypassDiveSearchSequence armé (descente couplée en cours)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassKoboldBottomTouched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Fond confirmé par le bypass (front montant Kobold en descente)</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -12730,6 +12800,21 @@ END_IF;
                 <REAL />
               </type>
             </variable>
+            <variable name="BypassPreconditions">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (14) — retour terrain, demande explicite : réglages DiveStartMin_M/
+ImmersionUpper_M/ImmersionLower_M pas encore calibrés sur site, bloquaient WAIT_PRECONDITIONS
+(bit2 config) sans aucun moyen de progresser dans la séquence pendant les essais. Si TRUE,
+saute entièrement ErrorCausePresent (bit2) ET le test WAIT_PRECONDITIONS -- transition directe
+vers READY_TO_DESCEND. Défaut FALSE : comportement standard inchangé.</html:xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -12862,8 +12947,8 @@ ResetEdge(CLK := Reset);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 
-ErrorCausePresent := (DiveStartMin_M &lt; ImmersionUpper_M)
-                  OR (ImmersionUpper_M &lt;= ImmersionLower_M);
+ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
+                  OR (ImmersionUpper_M &lt;= ImmersionLower_M));
 IF ErrorCausePresent THEN
     ErrorId := ErrorId OR 16#0004;
 END_IF;
@@ -12890,8 +12975,9 @@ ELSE
     CASE DiveState OF
         E_DiveSearchState.WAIT_PRECONDITIONS:
             State := E_State.INIT;
-            IF NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
-               OR (M1Position_M &lt; DiveStartMin_M) OR (M2Position_M &lt; DiveStartMin_M) THEN
+            IF NOT BypassPreconditions
+               AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
+                    OR (M1Position_M &lt; DiveStartMin_M) OR (M2Position_M &lt; DiveStartMin_M)) THEN
                 OperatorActionId := 16#0100;
                 OperatorAction := 'Vérifier les conditions initiales de plongée.';
             ELSE
@@ -23258,6 +23344,9 @@ GVL_Troubleshooting.AssistanceDragage.Idx503_DumpAtTremieAtTremie       := Dredg
 GVL_Troubleshooting.AssistanceDragage.Idx504_DumpAtTremieBucketOpenArmed := DredgingAssist.State.DumpAtTremieBucketOpenArmed;
 GVL_Troubleshooting.AssistanceDragage.Idx505_DumpAtTremieDescentLocked := DredgingAssist.State.DumpAtTremieDescentLocked;
 
+GVL_Troubleshooting.AssistanceDragage.Idx601_BypassDiveActive          := DredgingAssist.State.BypassDiveActive;
+GVL_Troubleshooting.AssistanceDragage.Idx602_BypassKoboldBottomTouched := DredgingAssist.State.BypassKoboldBottomTouched;
+
 // === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI := Translation.State.PositionPV;
@@ -27210,6 +27299,39 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</html:xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="ForbidDescentDiveBucketClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (10) : mode Dive actif + benne pas ouverte -- interdit descente</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForbidAscentExtractionBottomNotConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (11) : mode Extraction actif + fond pas confirmé -- interdit montée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassKoboldRiseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 (9) : bypass simplifié séquence FB_DiveSearch (demande client) -- front montant
+Kobold pendant une descente couplée confirme directement le fond, sans passer par les
+préconditions strictes de FB_DiveSearch (benne ouverte, DiveStartMin_M, fenêtre immersion).
+FB_DiveSearch continue de tourner en parallèle, inchangée (KoboldMeasureEnable toujours câblé
+dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassKoboldBottomTouched">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="SyncMinorDeviation">
               <type>
                 <BOOL />
@@ -27290,14 +27412,31 @@ GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
 
+// 🔴🔧 REX 2026-08-07 (15) — retour terrain, BUG CONFIRMÉ : "OR _BucketState.IsOpen" annulait le
+// forçage à CHAQUE scan, alors que confirmer "fond touché" se fait précisément PENDANT que la
+// benne est encore ouverte (avant que l'extraction ne la ferme) -- condition backwards, rendait
+// tout forçage manuel de TglBucketAtBottomConfirmed impossible en pratique. Retiré.
 IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
-   OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1))
-   OR _BucketState.IsOpen THEN
+   OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)) THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
+    BypassKoboldBottomTouched := FALSE;
 END_IF;
 ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
+
+// 🆕 2026-08-07 (9) : bypass séquence DiveSearch -- front montant Kobold pendant une descente
+// couplée = fond touché, directement (voir bandeau §1). Mêmes conditions de garde que la
+// confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension, pas de défaut, benne fermée --
+// réutilise le bloc de clear commun juste au-dessus).
+BypassKoboldRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
+IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
+   AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
+   AND BypassKoboldRiseEdge.Q THEN
+    BypassKoboldBottomTouched := TRUE;
+END_IF;
+GVL_IHM.DredgingAssist.State.BypassDiveActive          := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
+GVL_IHM.DredgingAssist.State.BypassKoboldBottomTouched := BypassKoboldBottomTouched;
 
 instDiveSearch(
     Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
@@ -27315,7 +27454,10 @@ instDiveSearch(
                        AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.M2_EncoderIncoherent,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
-    ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M
+    ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
+    // 🆕 2026-08-07 (14) : même toggle que le bypass bottom-confirmation -- réglages seuils pas
+    // encore calibrés, saute WAIT_PRECONDITIONS entièrement le temps des essais.
+    BypassPreconditions := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
 );
 
 // 🆕 2026-08-07 : publication IHM (était orpheline -- déclarée mais jamais écrite, voir
@@ -27326,9 +27468,14 @@ GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Done;
 GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Error;
 GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.ErrorId;
 GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
-GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := instDiveSearch.BottomTouchConfirmed;
+// 🔴🔧 REX 2026-08-07 (7) — retour terrain : affichage IHM ne reflétait que la détection Kobold
+// (instDiveSearch), pas la confirmation manuelle (TglBucketAtBottomConfirmed) ni le bypass --
+// alors que BottomPositionConfirmed (consommée par instExtractionSequence ci-dessous) fait bien
+// le OR des trois. L'opérateur voyait "non confirmé" à l'IHM alors que le séquenceur considérait
+// le fond confirmé -- affichage seul en cause, la logique de commande était correcte.
+BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
+GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
 
-BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed;
 instExtractionSequence(
     Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
@@ -27382,10 +27529,18 @@ END_IF;
 // demandé" dans les 2 modes (joystick Select=0 exclut le pilotage unitaire M1/M2 seul,
 // BtnWinchBothUp/Down exclut les boutons IHM individuels M1/M2). Jamais actif en SEMI_AUTO
 // (mêmes conditions que le reste de ce §).
-CoupledDiveBucketOpenArmed := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+// 🔴🔧 REX 2026-08-07 (4) — coupe-circuit d'urgence (retour terrain, machine bloquée en butée
+// M2_LimitShift). GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing (défaut FALSE) : si FALSE,
+// ces 2 flags restent FALSE en permanence -- CmdOpen_IHM/CmdClose_IHM ne sont plus jamais armés
+// par le mouvement couplé joystick, instBucket.Busy ne peut plus être déclenché QUE par action
+// manuelle benne/DumpAtTremie/ExtractionSequence (comportement strictement identique à avant
+// Fiche 01).
+CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
+    AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
     AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
     AND NOT _BucketState.IsOpen;
-CoupledAscentBucketCloseArmed := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
+    AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
     AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)
     AND NOT _BucketState.IsClosed;
 
@@ -27399,10 +27554,17 @@ ELSE
     CmdBucketCloseArbitrated := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 END_IF;
 
+// 🔴🔧 REX 2026-08-07 (13) — retour terrain, urgence : instDiveSearch.KoboldMeasureEnable
+// n'est TRUE que dans SEARCHING_IMMERSION/SEARCHING_BOTTOM, atteignables uniquement après
+// WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M -- réglages pas encore
+// calibrés). Avec le bypass (TglBypassDiveSearchSequence), le contacteur doit être piloté
+// INDÉPENDAMMENT de ces préconditions dès qu'on descend réellement.
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     KoboldContactorCmdArbitrated := FALSE;
 ELSE
-    KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable;
+    KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
+        OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
+            AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1));
 END_IF;
 
 
@@ -27713,10 +27875,22 @@ IF KoboldAutoStopFallEdge.Q AND KoboldImmersionConfirmed THEN
     KoboldImmersionConfirmed := FALSE;
 END_IF;
 
-ForbidDescentM1_Raw := KoboldBottomTouchLatched;
-ForbidDescentM2_Raw := KoboldBottomTouchLatched;
+// 🔴🔧 REX 2026-08-07 (10) — retour terrain, GAP RÉEL CONFIRMÉ : instDiveSearch.DescendPermit
+// était calculé (FB_DiveSearch.st) mais JAMAIS consommé nulle part dans PRG_04/PRG_06 -- en
+// mode Dive actif, rien n'empêchait réellement de descendre benne fermée, malgré la précondition
+// FB_DiveSearch (BucketIsOpen requis pour READY_TO_DESCEND). Ajouté : interdiction directe et
+// explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif) -- indépendante du
+// timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
+ForbidDescentDiveBucketClosed := instDiveSearch.Enable AND MaintenanceMotionRequestActive
+    AND (MaintenanceMotionDirection = -1) AND NOT _BucketState.IsOpen;
 
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq, 0.0, _BucketCfgPersist.Config.OffsetCloseM);
+ForbidDescentM1_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed;
+ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed;
+
+M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
+                      0.0,
+                      (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
+                      - _WinchM2CfgPersist.CfgCableLimitAscent_M);
 
 // 🆕 2026-08-05 (audit sécurité M3) : FB_Safety_Winch M1/M2 — 0 mécanisme actif avant ce lot.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
@@ -27845,8 +28019,18 @@ IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
     ForbidDescentM1_Raw := TRUE;
     ForbidDescentM2_Raw := TRUE;
 END_IF;
-ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent;
-ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent;
+// 🔴🔧 REX 2026-08-07 (11) — MÊME CLASSE DE BUG QUE (10) : instExtractionSequence.AscentPermit
+// calculé (FB_ExtractionSequence.st) mais jamais consommé -- rien n'empêchait réellement de monter
+// sans fond confirmé quand le mode Extraction est actif (Enable=TRUE) mais encore en
+// WAIT_BOTTOM_CONFIRMATION. Restreint volontairement à CET état précis (pas READY_TO_CLOSE, où le
+// fond est déjà confirmé par construction, ni CLOSING_BUCKET, où M1 est déjà bloqué par
+// instBucket.Busy et M2 doit continuer sans coupure).
+ForbidAscentExtractionBottomNotConfirmed := instExtractionSequence.Enable
+    AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)
+    AND (instExtractionSequence.ExtractionState = E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION);
+
+ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
+ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent OR ForbidAscentExtractionBottomNotConfirmed;
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -27900,8 +28084,15 @@ instWinchM2(
     Direction               := M2_Direction_Active,
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
-    CfgMaxStepDescente      := EffectiveMaxStepDescente,
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive, EffectiveMaxStepAscent, 1),
+    // 🔴🔧 REX 2026-08-07 (16) — retour terrain, GAP CONFIRMÉ : instBucket.M2_ForceSlowSpeed
+    // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) n'était consommé que
+    // pour substituer M2_SpeedStepTableActive -- ne plafonnait PAS réellement le palier autorisé
+    // pendant CLOSING_BUCKET/ouverture benne. MaxStepAscent forçait déjà palier 1 pour
+    // CONTROL_ASCENT (ForceMinSpeedStep) mais pas pendant le mouvement benne lui-même ;
+    // CfgMaxStepDescente n'avait AUCUN plafond, jamais. Corrigé : les deux suivent maintenant
+    // instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
+    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed, EffectiveMaxStepDescente, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Error,
@@ -29660,7 +29851,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
             <comment localId="55" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🛡️ Interlock M3 — Autorisation (structure validée AND demande Enable)</html:xhtml>
+                <html:xhtml>🔌 KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="56">
@@ -29680,47 +29871,23 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.Enable</variable>
+              <variable>PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated</variable>
             </contact>
-            <contact localId="58" negated="true" storage="none" edge="none">
+            <coil localId="58" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="57" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationSafetyHMI.PowerCutOff</variable>
-            </contact>
-            <contact localId="59" negated="true" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="58" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationSafetyHMI.SafeStop</variable>
-            </contact>
-            <contact localId="60" negated="true" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="59" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationSafetyHMI.Error</variable>
-            </contact>
-            <coil localId="61" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="60" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M3InterlockEnable</variable>
+              <variable>KoboldContactorCmd</variable>
             </coil>
-            <comment localId="62" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="59" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🛡️ Barrière finale M3 (Translation AC600) — FB_TranslationOutputInterlock_LD</html:xhtml>
+                <html:xhtml>🛡️ Interlock M3 — Autorisation (structure validée AND demande Enable)</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="63">
+            <vendorElement localId="60">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -29731,7 +29898,64 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="65" negated="false" storage="none" edge="none">
+            <contact localId="61" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.Enable</variable>
+            </contact>
+            <contact localId="62" negated="true" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="61" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_05_Translation.TranslationSafetyHMI.PowerCutOff</variable>
+            </contact>
+            <contact localId="63" negated="true" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="62" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_05_Translation.TranslationSafetyHMI.SafeStop</variable>
+            </contact>
+            <contact localId="64" negated="true" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="63" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_05_Translation.TranslationSafetyHMI.Error</variable>
+            </contact>
+            <coil localId="65" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="64" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M3InterlockEnable</variable>
+            </coil>
+            <comment localId="66" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>🛡️ Barrière finale M3 (Translation AC600) — FB_TranslationOutputInterlock_LD</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="67">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="69" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29739,7 +29963,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>M3InterlockEnable</variable>
             </contact>
-            <contact localId="66" negated="false" storage="none" edge="none">
+            <contact localId="70" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29747,7 +29971,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
             </contact>
-            <contact localId="67" negated="false" storage="none" edge="none">
+            <contact localId="71" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29755,7 +29979,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
-            <contact localId="68" negated="false" storage="none" edge="none">
+            <contact localId="72" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29763,7 +29987,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop</variable>
             </contact>
-            <contact localId="69" negated="false" storage="none" edge="none">
+            <contact localId="73" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29771,7 +29995,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_05_Translation.TranslationFinalInterlockRequest.BrakeReleaseRequest</variable>
             </contact>
-            <contact localId="70" negated="false" storage="none" edge="none">
+            <contact localId="74" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -29779,57 +30003,57 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_05_Translation.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed</variable>
             </contact>
-            <inVariable localId="71">
+            <inVariable localId="75">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveControlWord</expression>
             </inVariable>
-            <inVariable localId="72">
+            <inVariable localId="76">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveFreqHz</expression>
             </inVariable>
-            <block localId="64" typeName="FB_TranslationOutputInterlock_LD" instanceName="instTranslationOutputInterlockM3">
+            <block localId="68" typeName="FB_TranslationOutputInterlock_LD" instanceName="instTranslationOutputInterlockM3">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="65" />
+                    <connection refLocalId="69" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="66" />
+                    <connection refLocalId="70" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="67" />
+                    <connection refLocalId="71" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="SafeStop">
                   <connectionPointIn>
-                    <connection refLocalId="68" />
+                    <connection refLocalId="72" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BrakeReleaseRequest">
                   <connectionPointIn>
-                    <connection refLocalId="69" />
+                    <connection refLocalId="73" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BrakeCommandOpenConfirmed">
                   <connectionPointIn>
-                    <connection refLocalId="70" />
+                    <connection refLocalId="74" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedDriveControlWord">
                   <connectionPointIn>
-                    <connection refLocalId="71" />
+                    <connection refLocalId="75" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedDriveFreqHz">
                   <connectionPointIn>
-                    <connection refLocalId="72" />
+                    <connection refLocalId="76" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -29910,43 +30134,10 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </block>
-            <comment localId="73" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
-              <position x="0" y="0" />
-              <content>
-                <html:xhtml>Relais M1 Marche Avant (Montée)</html:xhtml>
-              </content>
-            </comment>
-            <vendorElement localId="74">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="75" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1RelayFwd</variable>
-            </contact>
-            <coil localId="76" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="75" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M1RelayFwd</variable>
-            </coil>
             <comment localId="77" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Relais M1 Marche Arrière (Descente)</html:xhtml>
+                <html:xhtml>Relais M1 Marche Avant (Montée)</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="78">
@@ -29966,7 +30157,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1RelayRev</variable>
+              <variable>M1RelayFwd</variable>
             </contact>
             <coil localId="80" negated="false" storage="none">
               <position x="0" y="0" />
@@ -29974,12 +30165,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="79" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M1RelayRev</variable>
+              <variable>GVL_Global.M1RelayFwd</variable>
             </coil>
             <comment localId="81" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-1</html:xhtml>
+                <html:xhtml>Relais M1 Marche Arrière (Descente)</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="82">
@@ -29999,7 +30190,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor1</variable>
+              <variable>M1RelayRev</variable>
             </contact>
             <coil localId="84" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30007,12 +30198,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="83" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor1</variable>
+              <variable>GVL_Global.M1RelayRev</variable>
             </coil>
             <comment localId="85" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-2</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-1</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="86">
@@ -30032,7 +30223,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor2</variable>
+              <variable>M1SpeedContactor1</variable>
             </contact>
             <coil localId="88" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30040,12 +30231,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="87" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor2</variable>
+              <variable>GVL_Global.M1SpeedContactor1</variable>
             </coil>
             <comment localId="89" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-3</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-2</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="90">
@@ -30065,7 +30256,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor3</variable>
+              <variable>M1SpeedContactor2</variable>
             </contact>
             <coil localId="92" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30073,12 +30264,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="91" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor3</variable>
+              <variable>GVL_Global.M1SpeedContactor2</variable>
             </coil>
             <comment localId="93" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-4</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-3</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="94">
@@ -30098,7 +30289,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor4</variable>
+              <variable>M1SpeedContactor3</variable>
             </contact>
             <coil localId="96" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30106,12 +30297,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="95" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor4</variable>
+              <variable>GVL_Global.M1SpeedContactor3</variable>
             </coil>
             <comment localId="97" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Frein M1</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-4</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="98">
@@ -30131,7 +30322,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1BrakeCmd</variable>
+              <variable>M1SpeedContactor4</variable>
             </contact>
             <coil localId="100" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30139,12 +30330,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="99" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M1BrakeCmd</variable>
+              <variable>GVL_Global.M1SpeedContactor4</variable>
             </coil>
             <comment localId="101" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Relais M2 Marche Avant (Fermeture)</html:xhtml>
+                <html:xhtml>Frein M1</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="102">
@@ -30164,7 +30355,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2RelayFwd</variable>
+              <variable>M1BrakeCmd</variable>
             </contact>
             <coil localId="104" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30172,12 +30363,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="103" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2RelayFwd</variable>
+              <variable>GVL_Global.M1BrakeCmd</variable>
             </coil>
             <comment localId="105" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Relais M2 Marche Arrière (Ouverture)</html:xhtml>
+                <html:xhtml>Relais M2 Marche Avant (Fermeture)</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="106">
@@ -30197,7 +30388,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2RelayRev</variable>
+              <variable>M2RelayFwd</variable>
             </contact>
             <coil localId="108" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30205,12 +30396,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="107" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2RelayRev</variable>
+              <variable>GVL_Global.M2RelayFwd</variable>
             </coil>
             <comment localId="109" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-1</html:xhtml>
+                <html:xhtml>Relais M2 Marche Arrière (Ouverture)</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="110">
@@ -30230,7 +30421,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor1</variable>
+              <variable>M2RelayRev</variable>
             </contact>
             <coil localId="112" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30238,12 +30429,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="111" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor1</variable>
+              <variable>GVL_Global.M2RelayRev</variable>
             </coil>
             <comment localId="113" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-2</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-1</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="114">
@@ -30263,7 +30454,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor2</variable>
+              <variable>M2SpeedContactor1</variable>
             </contact>
             <coil localId="116" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30271,12 +30462,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="115" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor2</variable>
+              <variable>GVL_Global.M2SpeedContactor1</variable>
             </coil>
             <comment localId="117" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-3</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-2</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="118">
@@ -30296,7 +30487,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor3</variable>
+              <variable>M2SpeedContactor2</variable>
             </contact>
             <coil localId="120" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30304,12 +30495,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="119" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor3</variable>
+              <variable>GVL_Global.M2SpeedContactor2</variable>
             </coil>
             <comment localId="121" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-4</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-3</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="122">
@@ -30329,7 +30520,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor4</variable>
+              <variable>M2SpeedContactor3</variable>
             </contact>
             <coil localId="124" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30337,12 +30528,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="123" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor4</variable>
+              <variable>GVL_Global.M2SpeedContactor3</variable>
             </coil>
             <comment localId="125" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Frein M2</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-4</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="126">
@@ -30362,7 +30553,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2BrakeCmd</variable>
+              <variable>M2SpeedContactor4</variable>
             </contact>
             <coil localId="128" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30370,12 +30561,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="127" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2BrakeCmd</variable>
+              <variable>GVL_Global.M2SpeedContactor4</variable>
             </coil>
             <comment localId="129" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Frein Translation M3</html:xhtml>
+                <html:xhtml>Frein M2</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="130">
@@ -30395,7 +30586,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>TranslationBrakeCmd</variable>
+              <variable>M2BrakeCmd</variable>
             </contact>
             <coil localId="132" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30403,12 +30594,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="131" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.TranslationBrakeCmd</variable>
+              <variable>GVL_Global.M2BrakeCmd</variable>
             </coil>
             <comment localId="133" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Relais Montée M1</html:xhtml>
+                <html:xhtml>Frein Translation M3</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="134">
@@ -30428,7 +30619,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1RelayFwd</variable>
+              <variable>TranslationBrakeCmd</variable>
             </contact>
             <coil localId="136" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30436,12 +30627,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="135" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1_RelayFwd_Up_DQ</variable>
+              <variable>GVL_Global.TranslationBrakeCmd</variable>
             </coil>
             <comment localId="137" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Relais Descente M1</html:xhtml>
+                <html:xhtml>Relais Montée M1</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="138">
@@ -30461,7 +30652,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1RelayRev</variable>
+              <variable>M1RelayFwd</variable>
             </contact>
             <coil localId="140" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30469,12 +30660,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="139" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1_RelayRev_Down_DQ</variable>
+              <variable>M1_RelayFwd_Up_DQ</variable>
             </coil>
             <comment localId="141" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-1</html:xhtml>
+                <html:xhtml>Relais Descente M1</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="142">
@@ -30494,7 +30685,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor1</variable>
+              <variable>M1RelayRev</variable>
             </contact>
             <coil localId="144" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30502,12 +30693,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="143" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1_SpeedContactor_1_DQ</variable>
+              <variable>M1_RelayRev_Down_DQ</variable>
             </coil>
             <comment localId="145" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-2</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-1</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="146">
@@ -30527,7 +30718,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor2</variable>
+              <variable>M1SpeedContactor1</variable>
             </contact>
             <coil localId="148" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30535,12 +30726,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="147" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1_SpeedContactor_2_DQ</variable>
+              <variable>M1_SpeedContactor_1_DQ</variable>
             </coil>
             <comment localId="149" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-3</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-2</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="150">
@@ -30560,7 +30751,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor3</variable>
+              <variable>M1SpeedContactor2</variable>
             </contact>
             <coil localId="152" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30568,12 +30759,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="151" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1_SpeedContactor_3_DQ</variable>
+              <variable>M1_SpeedContactor_2_DQ</variable>
             </coil>
             <comment localId="153" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M1-4</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-3</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="154">
@@ -30593,7 +30784,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1SpeedContactor4</variable>
+              <variable>M1SpeedContactor3</variable>
             </contact>
             <coil localId="156" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30601,12 +30792,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="155" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1_SpeedContactor_4_DQ</variable>
+              <variable>M1_SpeedContactor_3_DQ</variable>
             </coil>
             <comment localId="157" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Frein M1</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M1-4</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="158">
@@ -30626,7 +30817,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1BrakeCmd</variable>
+              <variable>M1SpeedContactor4</variable>
             </contact>
             <coil localId="160" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30634,12 +30825,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="159" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M1_BrakeRelease_RQ</variable>
+              <variable>M1_SpeedContactor_4_DQ</variable>
             </coil>
             <comment localId="161" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Relais Fermeture/Montée M2</html:xhtml>
+                <html:xhtml>Frein M1</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="162">
@@ -30659,7 +30850,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2RelayFwd</variable>
+              <variable>M1BrakeCmd</variable>
             </contact>
             <coil localId="164" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30667,12 +30858,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="163" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2_RelayFwd_Up_Close_DQ</variable>
+              <variable>M1_BrakeRelease_RQ</variable>
             </coil>
             <comment localId="165" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Relais Ouverture/Descente M2</html:xhtml>
+                <html:xhtml>Relais Fermeture/Montée M2</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="166">
@@ -30692,7 +30883,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2RelayRev</variable>
+              <variable>M2RelayFwd</variable>
             </contact>
             <coil localId="168" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30700,12 +30891,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="167" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2_RelayRev_Down_Open_DQ</variable>
+              <variable>M2_RelayFwd_Up_Close_DQ</variable>
             </coil>
             <comment localId="169" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-1</html:xhtml>
+                <html:xhtml>Relais Ouverture/Descente M2</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="170">
@@ -30725,7 +30916,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor1</variable>
+              <variable>M2RelayRev</variable>
             </contact>
             <coil localId="172" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30733,12 +30924,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="171" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2_SpeedContactor_1_DQ</variable>
+              <variable>M2_RelayRev_Down_Open_DQ</variable>
             </coil>
             <comment localId="173" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-2</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-1</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="174">
@@ -30758,7 +30949,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor2</variable>
+              <variable>M2SpeedContactor1</variable>
             </contact>
             <coil localId="176" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30766,12 +30957,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="175" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2_SpeedContactor_2_DQ</variable>
+              <variable>M2_SpeedContactor_1_DQ</variable>
             </coil>
             <comment localId="177" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-3</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-2</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="178">
@@ -30791,7 +30982,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor3</variable>
+              <variable>M2SpeedContactor2</variable>
             </contact>
             <coil localId="180" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30799,12 +30990,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="179" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2_SpeedContactor_3_DQ</variable>
+              <variable>M2_SpeedContactor_2_DQ</variable>
             </coil>
             <comment localId="181" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Contacteur Vitesse M2-4</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-3</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="182">
@@ -30824,7 +31015,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor4</variable>
+              <variable>M2SpeedContactor3</variable>
             </contact>
             <coil localId="184" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30832,12 +31023,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="183" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2_SpeedContactor_4_DQ</variable>
+              <variable>M2_SpeedContactor_3_DQ</variable>
             </coil>
             <comment localId="185" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Frein M2</html:xhtml>
+                <html:xhtml>Contacteur Vitesse M2-4</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="186">
@@ -30857,7 +31048,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2BrakeCmd</variable>
+              <variable>M2SpeedContactor4</variable>
             </contact>
             <coil localId="188" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30865,12 +31056,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="187" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2_BrakeRelease_RQ</variable>
+              <variable>M2_SpeedContactor_4_DQ</variable>
             </coil>
             <comment localId="189" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Frein Translation M3</html:xhtml>
+                <html:xhtml>Frein M2</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="190">
@@ -30890,7 +31081,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>TranslationBrakeCmd</variable>
+              <variable>M2BrakeCmd</variable>
             </contact>
             <coil localId="192" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30898,12 +31089,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="191" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M3_BrakeRelease_RQ</variable>
+              <variable>M2_BrakeRelease_RQ</variable>
             </coil>
             <comment localId="193" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Maintien Puissance Voie A</html:xhtml>
+                <html:xhtml>Frein Translation M3</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="194">
@@ -30923,7 +31114,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PowerKeepAliveACmd</variable>
+              <variable>TranslationBrakeCmd</variable>
             </contact>
             <coil localId="196" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30931,12 +31122,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="195" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PowerKeepAlive_A_RQ</variable>
+              <variable>M3_BrakeRelease_RQ</variable>
             </coil>
             <comment localId="197" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Maintien Puissance Voie B</html:xhtml>
+                <html:xhtml>Contacteur Mesure Kobold</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="198">
@@ -30956,7 +31147,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PowerKeepAliveBCmd</variable>
+              <variable>KoboldContactorCmd</variable>
             </contact>
             <coil localId="200" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30964,12 +31155,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="199" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PowerKeepAlive_B_RQ</variable>
+              <variable>M1_M2_KoboldMeasureEnable_DQ</variable>
             </coil>
             <comment localId="201" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>Impulsion Réarmement AU</html:xhtml>
+                <html:xhtml>Maintien Puissance Voie A</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="202">
@@ -30989,7 +31180,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>EmergencyArmingCmd</variable>
+              <variable>PowerKeepAliveACmd</variable>
             </contact>
             <coil localId="204" negated="false" storage="none">
               <position x="0" y="0" />
@@ -30997,12 +31188,12 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="203" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>EmergencyArming_RQ</variable>
+              <variable>PowerKeepAlive_A_RQ</variable>
             </coil>
             <comment localId="205" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M5, A-04)</html:xhtml>
+                <html:xhtml>Maintien Puissance Voie B</html:xhtml>
               </content>
             </comment>
             <vendorElement localId="206">
@@ -31022,41 +31213,23 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff</variable>
+              <variable>PowerKeepAliveBCmd</variable>
             </contact>
-            <contact localId="208" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff</variable>
-            </contact>
-            <contact localId="209" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</variable>
-            </contact>
-            <coil localId="210" negated="false" storage="none">
+            <coil localId="208" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="207" />
-                <connection refLocalId="208" />
-                <connection refLocalId="209" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PowerCutOffReq</variable>
+              <variable>PowerKeepAlive_B_RQ</variable>
             </coil>
-            <comment localId="211" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="209" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
-                <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
+                <html:xhtml>Impulsion Réarmement AU</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="212">
+            <vendorElement localId="210">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -31067,21 +31240,46 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="214" negated="false" storage="none" edge="none">
+            <contact localId="211" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>TRUE</variable>
+              <variable>EmergencyArmingCmd</variable>
             </contact>
+            <coil localId="212" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="211" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>EmergencyArming_RQ</variable>
+            </coil>
+            <comment localId="213" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>🧨 PowerCutOffReq — agrégation OU strict M1/M2/M3 (M5, A-04)</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="214">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
             <contact localId="215" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff</variable>
             </contact>
             <contact localId="216" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -31089,7 +31287,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_IHM.Modes.Cmd.BtnEmergencyArming</variable>
+              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff</variable>
             </contact>
             <contact localId="217" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -31097,9 +31295,68 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
+              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</variable>
+            </contact>
+            <coil localId="218" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="215" />
+                <connection refLocalId="216" />
+                <connection refLocalId="217" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PowerCutOffReq</variable>
+            </coil>
+            <comment localId="219" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+              <position x="0" y="0" />
+              <content>
+                <html:xhtml>🛡️ Sécurité &amp; Coupure Puissance Amont</html:xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="220">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="222" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>TRUE</variable>
+            </contact>
+            <contact localId="223" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
+            </contact>
+            <contact localId="224" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_IHM.Modes.Cmd.BtnEmergencyArming</variable>
+            </contact>
+            <contact localId="225" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</variable>
             </contact>
-            <contact localId="218" negated="false" storage="none" edge="none">
+            <contact localId="226" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -31107,7 +31364,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</variable>
             </contact>
-            <contact localId="219" negated="false" storage="none" edge="none">
+            <contact localId="227" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -31115,7 +31372,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>PowerCutOffReq</variable>
             </contact>
-            <contact localId="220" negated="false" storage="none" edge="none">
+            <contact localId="228" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -31123,42 +31380,42 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
             </contact>
-            <block localId="213" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+            <block localId="221" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="214" />
+                    <connection refLocalId="222" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="215" />
+                    <connection refLocalId="223" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ArmRequest">
                   <connectionPointIn>
-                    <connection refLocalId="216" />
+                    <connection refLocalId="224" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
-                    <connection refLocalId="217" />
+                    <connection refLocalId="225" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="218" />
+                    <connection refLocalId="226" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerCutOffRequest">
                   <connectionPointIn>
-                    <connection refLocalId="219" />
+                    <connection refLocalId="227" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BtnEmergencyCutOff">
                   <connectionPointIn>
-                    <connection refLocalId="220" />
+                    <connection refLocalId="228" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -31239,13 +31496,13 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </block>
-            <comment localId="221" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
+            <comment localId="229" height="0" width="0" xmlns:html="http://www.w3.org/1999/xhtml">
               <position x="0" y="0" />
               <content>
                 <html:xhtml>🔔 EmergencyArmingCmd — cible mapping E/S (miroir EmergencyArmingPulseActive)</html:xhtml>
               </content>
             </comment>
-            <vendorElement localId="222">
+            <vendorElement localId="230">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -31256,7 +31513,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="223" negated="false" storage="none" edge="none">
+            <contact localId="231" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -31264,10 +31521,10 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
               <connectionPointOut />
               <variable>EmergencyArmingPulseActive</variable>
             </contact>
-            <coil localId="224" negated="false" storage="none">
+            <coil localId="232" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="223" />
+                <connection refLocalId="231" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>EmergencyArmingCmd</variable>

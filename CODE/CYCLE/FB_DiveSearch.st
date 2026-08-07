@@ -22,6 +22,12 @@ VAR_INPUT
     DiveStartMin_M         : REAL;
     ImmersionUpper_M       : REAL;
     ImmersionLower_M       : REAL;
+    // 🆕 2026-08-07 (14) — retour terrain, demande explicite : réglages DiveStartMin_M/
+    // ImmersionUpper_M/ImmersionLower_M pas encore calibrés sur site, bloquaient WAIT_PRECONDITIONS
+    // (bit2 config) sans aucun moyen de progresser dans la séquence pendant les essais. Si TRUE,
+    // saute entièrement ErrorCausePresent (bit2) ET le test WAIT_PRECONDITIONS -- transition directe
+    // vers READY_TO_DESCEND. Défaut FALSE : comportement standard inchangé.
+    BypassPreconditions    : BOOL := FALSE;
 END_VAR
 VAR_OUTPUT
     Ready                  : BOOL;
@@ -62,8 +68,8 @@ ResetEdge(CLK := Reset);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 
-ErrorCausePresent := (DiveStartMin_M < ImmersionUpper_M)
-                  OR (ImmersionUpper_M <= ImmersionLower_M);
+ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M < ImmersionUpper_M)
+                  OR (ImmersionUpper_M <= ImmersionLower_M));
 IF ErrorCausePresent THEN
     ErrorId := ErrorId OR 16#0004;
 END_IF;
@@ -90,8 +96,9 @@ ELSE
     CASE DiveState OF
         E_DiveSearchState.WAIT_PRECONDITIONS:
             State := E_State.INIT;
-            IF NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
-               OR (M1Position_M < DiveStartMin_M) OR (M2Position_M < DiveStartMin_M) THEN
+            IF NOT BypassPreconditions
+               AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
+                    OR (M1Position_M < DiveStartMin_M) OR (M2Position_M < DiveStartMin_M)) THEN
                 OperatorActionId := 16#0100;
                 OperatorAction := 'Vérifier les conditions initiales de plongée.';
             ELSE

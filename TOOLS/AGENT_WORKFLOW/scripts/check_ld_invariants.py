@@ -41,7 +41,8 @@ KNOWN_DIRECT_HW_COIL_TARGETS = {
     "M2_SpeedContactor_1_DQ", "M2_SpeedContactor_2_DQ", "M2_SpeedContactor_3_DQ", "M2_SpeedContactor_4_DQ",
     "M2_BrakeRelease_RQ",
     "M3_BrakeRelease_RQ",
-    "PowerKeepAlive_A_RQ", "PowerKeepAlive_B_RQ", "EmergencyArming_RQ"
+    "PowerKeepAlive_A_RQ", "PowerKeepAlive_B_RQ", "EmergencyArming_RQ",
+    "M1_M2_KoboldMeasureEnable_DQ",  # 🆕 2026-08-07 (12bis) : retour terrain urgent, voir DIRECT_HW_COILS
 }
 
 
