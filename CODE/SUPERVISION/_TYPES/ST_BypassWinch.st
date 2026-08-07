@@ -22,6 +22,7 @@ STRUCT
     (* 🚧 2. Limites physiques et Positionnement *)
     TopLimitSwitch    : BOOL; (* 🚧 Bypass fin de course physique haute *)
     CableLimitSwitch  : BOOL; (* 🚧 Bypass limite basse physique (longueur de câble max) *)
+    LimitLegal        : BOOL; (* 🆕 2026-08-07 : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached) *)
 
     (* ⚙️ 3. Sécurité Mécanique (Méca A-E) *)
     MecaA             : BOOL; (* 🔄 Bypass Méca A : mouvement non commandé à l'arrêt *)

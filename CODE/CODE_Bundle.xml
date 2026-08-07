@@ -1349,6 +1349,14 @@
                 <html:xhtml>🚧 Bypass limite basse physique (longueur de câble max)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="LimitLegal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached)</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="MecaA">
               <type>
                 <BOOL />
@@ -17816,6 +17824,14 @@ State := E_State.READY;
                 <html:xhtml>Limite basse physique descente en mètres (valeur négative)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="LimitLegalReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : GVL_IHM.Commun.LimitLegalReached — limite légale de profondeur atteinte</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="Direction">
               <type>
                 <INT />
@@ -18064,7 +18080,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</html:xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <html:xhtml>⚙️ Bypass groupé SafeStop/Forbid seul (bits 0,1,3,4,5,6,12,14,15)</html:xhtml>
+                <html:xhtml>⚙️ Bypass groupé SafeStop/Forbid seul (bits 0,1,3,4,5,6,12,14,15) + limite légale (hors bit, ErrorId plein)</html:xhtml>
               </documentation>
             </variable>
             <variable name="BypassTopLimitSwitch">
@@ -18087,6 +18103,17 @@ Inhibition de l'AUTRE treuil (mise en service N2)</html:xhtml>
               </initialValue>
               <documentation>
                 <html:xhtml>🚧 Bypass individuel limite basse câble (bit6)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassLimitLegal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Bypass individuel limite légale de profondeur</html:xhtml>
               </documentation>
             </variable>
             <variable name="BypassOperatorComm">
@@ -18527,6 +18554,13 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</ht
       blocage réel déjà corrigé. Seuls `BypassProcess`/`BypassTopLimitSwitch`/
       `BypassCableLimitSwitch` (conscients, individuels/groupés) peuvent encore éteindre CETTE
       alarme précise — plus jamais `BypassGlobal` seul.
+   🔴🔧 REX 2026-08-07 (2) — LIMITE LÉGALE JAMAIS APPLIQUÉE EN MANUEL (demande client) :
+      `GVL_IHM.Commun.LimitLegalReached` n'était consommé QUE par `FB_Cycle` (séquenceur
+      semi-automatique) — la descente manuelle au joystick M1/M2 pouvait dépasser la profondeur
+      légale sans AUCUN blocage réel. Ajouté : `LimitLegalReached`/`BypassLimitLegal` en entrée,
+      nouveau terme OR direct sur `ForbidDescent` (pas de nouveau bit `ErrorId` : les 16 bits du
+      WORD sont déjà tous utilisés). Bypassable par `BypassProcess` (groupé) ou `BypassLimitLegal`
+      (individuel, `ST_BypassWinch.LimitLegal`, MAINT_N2) — jamais par `BypassGlobal` seul.
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===</html:xhtml>
           </documentation>
@@ -18842,8 +18876,15 @@ END_IF;
 // Méca A-E/thermique/phase/comm/sync comme aujourd'hui, mais ne doit plus jamais désactiver l'arrêt
 // physique sur fin de course haute/basse — sécurité positive, seul un bypass individuel conscient
 // (BypassCableLimitSwitch) peut lever CETTE protection précise.
+// 🆕 2026-08-07 (demande client) : LimitLegalReached n'était câblé QUE dans FB_Cycle (séquenceur
+// semi-auto), jamais ici — la descente manuelle au joystick pouvait dépasser la profondeur légale
+// sans aucun blocage réel. Pas de nouveau bit ErrorId (WORD déjà plein, bits 0-15 tous utilisés) :
+// même doctrine que le terme câble ci-dessus, un OR direct sur ForbidDescent. Bypassable par
+// BypassProcess (groupé) ou BypassLimitLegal (individuel, MAINT_N2) — jamais par BypassGlobal seul
+// (cohérent avec la doctrine 2026-08-07 : BypassGlobal ne masque plus les protections de position).
 ForbidDescent := (((ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
-              OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch);
+              OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
+              OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal));
 
 // ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (bypasser si BypassTopLimitSwitch)
 // 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement
@@ -26954,6 +26995,7 @@ instSafetyWinchM1(
     InReferencingMode      := PRG_02_Acquisition.instHomingM1.Busy,
     CablePosM              := PRG_02_Acquisition.CablePosM1,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
+    LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M1_Direction_Active,
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
     Homed                  := PRG_02_Acquisition.instHomingM1.Homed,
@@ -26974,6 +27016,7 @@ instSafetyWinchM1(
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
     BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch,
     BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch,
+    BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal,
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
@@ -27004,6 +27047,7 @@ instSafetyWinchM2(
     InReferencingMode      := PRG_02_Acquisition.instHomingM2.Busy,
     CablePosM              := PRG_02_Acquisition.CablePosM2,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
+    LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M2_Direction_Active,
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
     Homed                  := PRG_02_Acquisition.instHomingM2.Homed,
@@ -27024,6 +27068,7 @@ instSafetyWinchM2(
     BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
     BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch,
     BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch,
+    BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal,
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
@@ -30544,6 +30589,11 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
                 <derived name="FB_Diag_IhmHeartbeat" />
               </type>
             </variable>
+            <variable name="instPreflight">
+              <type>
+                <derived name="FB_Acquisition_Preflight" />
+              </type>
+            </variable>
             <variable name="instTroubleshootingView">
               <type>
                 <derived name="FB_TroubleshootingView" />
@@ -30733,6 +30783,37 @@ GVL_IHM.Commun.HeartbeatIhmOk            := instDiagIhmHeartbeat.HeartbeatIhmOk;
 GVL_IHM.Commun.HeartbeatIhmTimeout       := instDiagIhmHeartbeat.HeartbeatIhmTimeout;
 GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdge;
 GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc;
+
+// 🩺 Exécution du Preflight Machine à l'arrêt
+instPreflight(
+    Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
+    MachineIsStill            := (PRG_04_Treuils_Benne.WinchM1StateHMI.StepNumber = 0)
+                                 AND (PRG_04_Treuils_Benne.WinchM2StateHMI.StepNumber = 0)
+                                 AND (PRG_05_Translation.TranslationStateHMI.FBState = E_State.READY),
+    M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
+    M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
+    M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct sur ce lot
+    M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+    M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+    M1ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
+    M2ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
+    BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    PhaseRotationOk           := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
+    SlackCableTensioned       := PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
+    M3SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,
+    EmergencyChainClosed      := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
+    PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    EncoderM1Operational      := instDiagEthercat.DeviceEncoderM1.Operational,
+    EncoderM2Operational      := instDiagEthercat.DeviceEncoderM2.Operational,
+    HomedM1                   := PRG_04_Treuils_Benne.WinchM1StateHMI.Encoder.Homed,
+    HomedM2                   := PRG_04_Treuils_Benne.WinchM2StateHMI.Encoder.Homed,
+    M1PositionInBounds        := NOT PRG_02_Acquisition.M1_EncoderIncoherent,
+    M2PositionInBounds        := NOT PRG_02_Acquisition.M2_EncoderIncoherent
+);
+GVL_IHM.Commun.Preflight.PreflightOk      := instPreflight.PreflightOk;
+GVL_IHM.Commun.Preflight.PreflightDone    := instPreflight.PreflightDone;
+GVL_IHM.Commun.Preflight.PreflightBusy    := instPreflight.PreflightBusy;
+GVL_IHM.Commun.Preflight.PreflightErrorId := instPreflight.PreflightErrorId;
 
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
