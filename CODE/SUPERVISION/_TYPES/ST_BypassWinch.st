@@ -20,7 +20,8 @@ STRUCT
     MotorThermal      : BOOL; (* 🆕 2026-08-07 : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI) *)
 
     (* 🚧 2. Limites physiques et Positionnement *)
-    TopLimitSwitch    : BOOL; (* 🚧 Bypass fin de course physique haute *)
+    TopLimitSwitch    : BOOL; (* 🚧 Bypass fin de course physique haute (capteur, bit5) *)
+    TopLimitSoftware  : BOOL; (* 🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée CablePosM >= TopLimitM, symétrique CableLimitSwitch) *)
     CableLimitSwitch  : BOOL; (* 🚧 Bypass limite basse physique (longueur de câble max) *)
     LimitLegal        : BOOL; (* 🆕 2026-08-07 : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached) *)
 

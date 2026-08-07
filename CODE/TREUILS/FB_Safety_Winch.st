@@ -201,7 +201,8 @@ VAR_INPUT
     BypassGlobal              : BOOL := FALSE;
     BypassSafety          : BOOL := FALSE;   // 🛡️ Bypass groupé PowerCutOff (bits 2,7,8,9,10,11,13)
     BypassProcess         : BOOL := FALSE;   // ⚙️ Bypass groupé SafeStop/Forbid seul (bits 0,1,3,4,5,6,12,14,15) + limite légale (hors bit, ErrorId plein)
-    BypassTopLimitSwitch  : BOOL := FALSE;   // 🚧 Bypass individuel fin de course haute (bit5)
+    BypassTopLimitSwitch  : BOOL := FALSE;   // 🚧 Bypass individuel fin de course haute PHYSIQUE (capteur, bit5)
+    BypassTopLimitSoftware: BOOL := FALSE;   // 🆕 2026-08-07 : Bypass individuel fin de course haute LOGICIEL (position calculée, hors bit)
     BypassCableLimitSwitch: BOOL := FALSE;   // 🚧 Bypass individuel limite basse câble (bit6)
     BypassLimitLegal      : BOOL := FALSE;   // 🆕 2026-08-07 : Bypass individuel limite légale de profondeur
     BypassOperatorComm    : BOOL := FALSE;   // 📡 Bypass perte communication opérateur
@@ -589,10 +590,19 @@ ForbidDescent := (((ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged
 // BypassTopLimitSwitch)` qui masquait quand même le check brut sous BypassGlobal M1/M2. Désormais
 // seul BypassTopLimitSwitch (individuel, conscient) peut lever cette protection précise — le reste
 // du domaine (Méca A-E/thermique/phase/comm/sync) reste masqué par BypassGlobal comme avant.
-ForbidAscent := ((ErrorId AND 16#0020) <> 16#0000
+// 🆕 2026-08-07 (2) (demande client) : jusqu'ici AUCUN blocage immédiat en montée ne reposait sur
+// la position calculée (CablePosM >= TopLimitM) — seul Méca D (bit11) la surveillait, en escalade
+// DIFFÉRÉE (SafeStop+PowerCutOff après PostRampTimeout), pas un ForbidAscent immédiat. Si le
+// capteur physique reste bloqué "libre" (défaut NC jamais détecté), rien n'arrêtait la montée avant
+// Méca D. Ajout d'un second terme, symétrique au check logiciel déjà présent côté ForbidDescent
+// (CfgCableLimitDescentM ci-dessus) : blocage immédiat dès CablePosM >= TopLimitM (si référencé et
+// non suspect), gardé UNIQUEMENT par BypassTopLimitSoftware (jamais par BypassGlobal, même doctrine
+// que le reste des protections de position 2026-08-07).
+ForbidAscent := (((ErrorId AND 16#0020) <> 16#0000
              OR (NOT TopPositionSensor AND NOT InReferencingMode)
              OR ((ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable))
-             AND NOT BypassTopLimitSwitch;
+             AND NOT BypassTopLimitSwitch)
+             OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM)) AND NOT BypassTopLimitSoftware);
 
 // 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
