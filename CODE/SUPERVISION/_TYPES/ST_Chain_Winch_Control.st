@@ -11,5 +11,8 @@ STRUCT
     Idx409_BrakeTimeoutElapsed   : TIME; // ⏱️ Watchdog 500ms écoulé
     Idx410_RestartDelayElapsed   : TIME; // ⏱️ Verrou 900ms écoulé
     Idx411_StepDelayElapsed      : TIME; // ⏱️ Délai palier 1s250 écoulé
+    Idx412_InTopSlowdownZone     : BOOL; // 🆕 2026-08-07 : Palier plafonné à 1, approche limite haute
+    Idx413_InBottomSlowdownZone  : BOOL; // 🆕 2026-08-07 : Palier plafonné à 1, approche limite basse (câble ou légale)
+    Idx414_BottomLimitActiveM    : REAL; // 🆕 2026-08-07 : Limite basse active (m) — câble physique OU légale, la plus restrictive
 END_STRUCT
 END_TYPE

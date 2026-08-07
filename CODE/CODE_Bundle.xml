@@ -2495,6 +2495,30 @@
                 <html:xhtml>⏱️ Délai palier 1s250 écoulé</html:xhtml>
               </documentation>
             </variable>
+            <variable name="Idx412_InTopSlowdownZone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Palier plafonné à 1, approche limite haute</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx413_InBottomSlowdownZone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Palier plafonné à 1, approche limite basse (câble ou légale)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx414_BottomLimitActiveM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : Limite basse active (m) — câble physique OU légale, la plus restrictive</html:xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2839,17 +2863,6 @@
                 <html:xhtml>📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2</html:xhtml>
               </documentation>
             </variable>
-            <variable name="WinchSlowSpeed_Pct">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="15" />
-              </initialValue>
-              <documentation>
-                <html:xhtml>📉 Vitesse de consigne lente dans la zone de ralentissement (%), commun M1/M2</html:xhtml>
-              </documentation>
-            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -2858,7 +2871,10 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <html:xhtml>🚦 flag restauration boot</html:xhtml>
+                <html:xhtml>🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
+pas une vitesse continue. La zone de ralentissement plafonne désormais directement au
+palier 1 (FB_Winch.InTopSlowdownZone/InBottomSlowdownZone -&gt; ActiveMaxStep := 1).
+🚦 flag restauration boot</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5679,6 +5695,11 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</html:xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="PreflightBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="PreflightErrorId">
               <type>
                 <WORD />
@@ -8274,6 +8295,31 @@ TRUE = relais sens + C1..C4 tous retombés</html:xhtml>
               </type>
               <documentation>
                 <html:xhtml>🆕 miroir lecture seule — inhibition arbitrée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomLimitActiveM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <html:xhtml>🐢 2026-08-07 : ralentissement sur bordure — diagnostic zone/limite active
+📏 Limite basse active (m) — câble physique OU légale, la plus restrictive</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="InTopSlowdownZone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🐢 Palier plafonné à 1 : approche limite haute</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="InBottomSlowdownZone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🐢 Palier plafonné à 1 : approche limite basse (câble ou légale)</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -22706,6 +22752,9 @@ GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx408_BrakeCommandOpenConfirme
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx409_BrakeTimeoutElapsed := WinchM1.State.FinalBrakeTimeoutElapsed;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx410_RestartDelayElapsed := WinchM1.State.FinalRestartDelayElapsed;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed := WinchM1.State.FinalStepDelayElapsed;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx412_InTopSlowdownZone := WinchM1.State.InTopSlowdownZone;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx413_InBottomSlowdownZone := WinchM1.State.InBottomSlowdownZone;
+GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx414_BottomLimitActiveM := WinchM1.State.BottomLimitActiveM;
 
 GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx501_CmdRelayFwd_Up_DQ := WinchM1.State.RelayFwd;
 GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx502_CmdRelayRev_Down_DQ := WinchM1.State.RelayRev;
@@ -22752,6 +22801,9 @@ GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx408_BrakeCommandOpenConfirme
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx409_BrakeTimeoutElapsed := WinchM2.State.FinalBrakeTimeoutElapsed;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx410_RestartDelayElapsed := WinchM2.State.FinalRestartDelayElapsed;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed := WinchM2.State.FinalStepDelayElapsed;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx412_InTopSlowdownZone := WinchM2.State.InTopSlowdownZone;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx413_InBottomSlowdownZone := WinchM2.State.InBottomSlowdownZone;
+GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx414_BottomLimitActiveM := WinchM2.State.BottomLimitActiveM;
 
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx501_CmdRelayFwd_Up_DQ := WinchM2.State.RelayFwd;
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx502_CmdRelayRev_Down_DQ := WinchM2.State.RelayRev;
@@ -23234,17 +23286,6 @@ Réengagement en descente (CommandedDirection=-1)</html:xhtml>
                 <html:xhtml>🆕 Distance d'approche avant limite pour ralentir (m)</html:xhtml>
               </documentation>
             </variable>
-            <variable name="CfgSlowSpeedPct">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="15" />
-              </initialValue>
-              <documentation>
-                <html:xhtml>🆕 Consigne de vitesse lente dans la zone de ralentissement (%)</html:xhtml>
-              </documentation>
-            </variable>
             <variable name="MeasuredSpeedBand">
               <type>
                 <INT />
@@ -23383,6 +23424,22 @@ Réengagement en descente (CommandedDirection=-1)</html:xhtml>
               </type>
               <documentation>
                 <html:xhtml>🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="InTopSlowdownZone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite haute)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="InBottomSlowdownZone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite basse)</html:xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -23580,6 +23637,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BusinessStepDelayElapsed := T#0ms;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelayAscent);
+    InTopSlowdownZone := FALSE;
+    InBottomSlowdownZone := FALSE;
     State := E_State.DISABLED;
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     Error := FALSE;
@@ -23616,21 +23675,21 @@ EffectiveSafeStop := SafeStop
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     RampTargetPct := ABS(SpeedRefPct);
-    
-    // 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect)
-    // Permet d'approcher les fins de course / limites en vitesse lente de façon progressive
-    IF Homed AND NOT HomingSuspect THEN
-        // En montée (engagement ou mouvement actif), ralentit à l'approche de la limite haute
-        IF ((CommandedDirection = 1) OR (Direction = 1)) AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM)) THEN
-            RampTargetPct := MIN(RampTargetPct, CfgSlowSpeedPct);
-        END_IF;
-        
-        // En descente (engagement ou mouvement actif), ralentit à l'approche de la limite basse
-        IF ((CommandedDirection = -1) OR (Direction = -1)) AND (CablePosM &lt;= (BottomLimitM + CfgSlowdownDistanceM)) THEN
-            RampTargetPct := MIN(RampTargetPct, CfgSlowSpeedPct);
-        END_IF;
-    END_IF;
 END_IF;
+
+// 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect) — permet d'approcher
+// les fins de course / limites en vitesse lente de façon progressive.
+// 🔧 2026-08-07 (demande client) : ancien plafond RampTargetPct en % (CfgSlowSpeedPct) remplacé
+// par un plafond palier direct (ActiveMaxStep := 1, ci-dessous, même mécanisme que
+// CfgMaxStepDescente/MaxStepAscent) — un treuil ne connaît que 5 paliers de contacteurs, pas une
+// vitesse continue ; palier 1 = tous contacteurs de vitesse relâchés = vitesse minimale, sans
+// dépendre d'un % qui doit rester sous le 1er seuil de la table pour produire le même effet.
+InTopSlowdownZone := Homed AND NOT HomingSuspect
+                      AND ((CommandedDirection = 1) OR (Direction = 1))
+                      AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM));
+InBottomSlowdownZone := Homed AND NOT HomingSuspect
+                         AND ((CommandedDirection = -1) OR (Direction = -1))
+                         AND (CablePosM &lt;= (BottomLimitM + CfgSlowdownDistanceM));
 
 // 🆕 2026-08-06 : délai asymétrique selon le sens ENTRANT (Direction) — descente sans effort
 // (câble mou/gravité favorable) réengage plus vite que montée (charge en traction). La tempo
@@ -23676,6 +23735,13 @@ ELSIF CommandedDirection = 1 THEN
     ActiveMaxStep := MaxStepAscent;
 ELSE
     ActiveMaxStep := 5;
+END_IF;
+
+// 🆕 2026-08-07 : ralentissement sur bordure (voir plus haut) — remplace l'ancien plafond en %
+// par un plafond palier direct, appliqué APRÈS le calcul normal ci-dessus (ne peut qu'abaisser,
+// jamais relever le plafond déjà décidé).
+IF InTopSlowdownZone OR InBottomSlowdownZone THEN
+    ActiveMaxStep := 1;
 END_IF;
 
 SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedRefPct := RampTargetPct,
@@ -26959,8 +27025,20 @@ END_IF;
 
 // === 🛑 §5 COUPLAGE CROISÉ &amp; SÉCURITÉS ===
 
-BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
-BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
+// 🆕 2026-08-07 (demande client) : la limite légale (profondeur min. autorisée) doit elle aussi
+// bénéficier du ralentissement progressif avant arrêt (comme la limite câble physique), pas juste
+// un arrêt sec (ForbidDescent, ajouté au lot précédent). Comme les 2 limites bornent la même
+// direction (descente), on alimente FB_Winch.BottomLimitM avec la PLUS RESTRICTIVE des deux
+// (MAX de 2 valeurs négatives = celle la moins profonde = atteinte en premier) : le ralentissement
+// (FB_Winch §"RALENTISSEMENT AUTOMATIQUE SUR BORDURES") s'enclenche alors sur la bonne limite,
+// légale ou câble, sans dupliquer le mécanisme.
+IF _CommunCfgPersist.LimitLegalEnabled THEN
+    BottomLimitM1_Active := MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
+    BottomLimitM2_Active := MAX(_WinchM2CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
+ELSE
+    BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
+    BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
+END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/contacteurs/fin de course des DEUX treuils (VH_0800END,
@@ -27133,7 +27211,6 @@ instWinchM1(
     TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
-    CfgSlowSpeedPct         := _CommunCfgPersist.WinchSlowSpeed_Pct,
     BypassGlobal            := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
 
@@ -27163,7 +27240,6 @@ instWinchM2(
     TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
-    CfgSlowSpeedPct         := _CommunCfgPersist.WinchSlowSpeed_Pct,
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
@@ -27250,6 +27326,9 @@ WinchM1StateHMI.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM1.St
 WinchM1StateHMI.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM1.HomingSuspect;
 WinchM1StateHMI.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM1.HomingRefRaw;
 WinchM1StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
+WinchM1StateHMI.BottomLimitActiveM := BottomLimitM1_Active;
+WinchM1StateHMI.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
+WinchM1StateHMI.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
 
 WinchM2StateHMI.Position_M := PRG_02_Acquisition.CablePosM2;
 WinchM2StateHMI.SpeedRef_Pct := M2_SpeedRef_Active;
@@ -27296,6 +27375,9 @@ WinchM2StateHMI.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM2.St
 WinchM2StateHMI.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM2.HomingSuspect;
 WinchM2StateHMI.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM2.HomingRefRaw;
 WinchM2StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
+WinchM2StateHMI.BottomLimitActiveM := BottomLimitM2_Active;
+WinchM2StateHMI.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
+WinchM2StateHMI.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
 
 WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
 WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;
