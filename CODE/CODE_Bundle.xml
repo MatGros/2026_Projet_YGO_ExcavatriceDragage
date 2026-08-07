@@ -3393,6 +3393,17 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <html:xhtml>Attestation manuelle temporaire du fond</html:xhtml>
               </documentation>
             </variable>
+            <variable name="TglEnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : mode vidage à la trémie —</html:xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -25952,6 +25963,24 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
             </variable>
+            <variable name="DumpAtTremieActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : mode "vidage à la trémie" — verrouille descente treuils (P1/Maintenance
+uniquement) et pilote l'ouverture benne quand on demande DOWN à la trémie (MAINT_N1/N2
+uniquement, même périmètre que instDiveSearch/instExtractionSequence).</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Sous-condition Mode MAINT_N1/N2 (assist réellement active)</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="M1_StartStop_Active">
               <type>
                 <BOOL />
@@ -26152,6 +26181,12 @@ ELSE
     MaintenanceMotionSpeed_Pct := 100.0;
 END_IF;
 
+// 🆕 2026-08-07 : mode "vidage à la trémie" (verrouillage, demande client). Périmètre identique
+// à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.
+DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
+DumpAtTremieAssistActive := DumpAtTremieActive
+    AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2);
+
 IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
@@ -26228,7 +26263,13 @@ instBucket(
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_03_Modes_Cycle.Auth.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen,
+    // 🆕 2026-08-07 : en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
+    // la trémie arme l'ouverture benne au lieu de faire descendre M2 — le mouvement réel reste
+    // gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
+    // l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
+    // l'arbitrage M2 normal (mécanisme déjà existant, voir §3bis plus bas).
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen
+                           OR (DumpAtTremieAssistActive AND PRG_05_Translation.M3_AtTremieStable),
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection     := MaintenanceMotionDirection,
@@ -26526,6 +26567,14 @@ SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
 SafeStopM2_Raw := SafeStopM2_Raw OR instSafetyWinchM2.SafeStop;
 ForbidDescentM1_Raw := ForbidDescentM1_Raw OR instSafetyWinchM1.ForbidDescent;
 ForbidDescentM2_Raw := ForbidDescentM2_Raw OR instSafetyWinchM2.ForbidDescent;
+
+// 🆕 2026-08-07 (mode "vidage à la trémie", demande client) : descente M1 ET M2 interdite tant
+// que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
+// descente-treuil / translation pour se rapprocher d'un enchaînement automatique sûr.
+IF DumpAtTremieAssistActive AND NOT (PRG_05_Translation.M3_AtP1Stable OR PRG_05_Translation.M3_AtMaintenanceStable) THEN
+    ForbidDescentM1_Raw := TRUE;
+    ForbidDescentM2_Raw := TRUE;
+END_IF;
 ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent;
 ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent;
 
