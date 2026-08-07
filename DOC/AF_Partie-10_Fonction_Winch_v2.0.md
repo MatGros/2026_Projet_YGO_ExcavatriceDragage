@@ -95,6 +95,28 @@ anti-retombée du 2026-08-06 matin, est retiré) — le couplage est désormais 
 avant engagement mécanique réel du contacteur) est jugé acceptable par le client au profit de
 la garantie structurelle "jamais de mouvement commandé sans frein desserré".
 
+### 1ter. Tempo de reprise basée sur l'état frein, pas le centre joystick (🔧 2026-08-07)
+
+**Décision client** : `RestartDelay` (interlock final, tempo avant réautorisation d'un mouvement
+après arrêt) ne doit plus démarrer sur `FwdRevSpeedFeedbackOff` (retour contacteur, image
+indirecte du centre joystick) mais sur `NOT BrakeFeedback` — c'est-à-dire une fois le frein
+**réellement confirmé fermé** par son propre retour physique. Plus fiable que le centre
+joystick (qui ne dit rien de la réalité mécanique et n'existe que dans certains modes) : l'état
+frein fonctionne identiquement en Mode Boutons IHM, Mode Joystick, ou un futur séquenceur auto.
+
+- `RestartDelay` : `T#1000ms` → **`T#1500ms`**, décompté à partir de la confirmation frein
+  fermé (pas de la commande d'arrêt) — délai réel total = fermeture mécanique du frein +
+  1500ms, volontairement plus prudent que l'ancien calcul.
+- `RestartRequired` reste armé **instantanément** sur l'arrêt commandé (`NOT MotorRequest`,
+  bloque §5 dès ce scan) — seul le **décompte** de la tempo change de déclencheur.
+
+**Un seul verrou de fait entre deux reprises, reprise ou inversion confondues** : `RestartDelay`
+(1500ms + fermeture réelle frein) est structurellement toujours ≥ `DirectionInterlockDelay`
+(400/900ms max, §1). Après une pause réelle suffisante (~2s), les deux verrous sont déjà levés
+en tâche de fond avant même la nouvelle demande opérateur — la reprise est alors instantanée,
+que la nouvelle demande soit dans le même sens ou inversée. Pas un cumul des deux tempos, un
+seul verrou dominant (`RestartDelay`, toujours le plus long des deux).
+
 ---
 
 ## 2. Rôle machine

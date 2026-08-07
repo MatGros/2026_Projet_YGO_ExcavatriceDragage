@@ -152,11 +152,22 @@ IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     END_IF;
 END_IF;
 
-// ── 4. Mémorisation de l'arrêt : le prochain départ attend la retombée + 1000 ms ──
+// ── 4. Mémorisation de l'arrêt : le prochain départ attend le frein RÉELLEMENT
+// fermé + T#1500ms ────────────────────────────────────────────────────────
+// 🆕 2026-08-07 (demande client) : RestartRequired s'arme toujours instantanément
+// sur l'arrêt commandé (NOT MotorRequest) — bloque §5 dès ce scan, quel que soit
+// le canal de commande. Mais la TEMPORISATION elle-même ne démarre plus sur le
+// retour contacteur de sens (FwdRevSpeedFeedbackOff, image indirecte du joystick
+// au centre) : elle démarre sur BrakeFeedback confirmant le frein RÉELLEMENT
+// fermé (retour physique bobine/contacteur frein). Plus fiable que le centre
+// joystick — fonctionne identiquement dans tous les modes (IHM, joystick, futur
+// séquenceur auto), puisque c'est un état mécanique, pas une convention de canal
+// de commande. Délai total réel = fermeture mécanique du frein + T#1500ms
+// (volontairement plus prudent que l'ancien 1000ms compté dès la commande).
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND FwdRevSpeedFeedbackOff AND NOT RestartInhibit, PT := T#1000ms);
+RestartDelay(IN := RestartRequired AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;
