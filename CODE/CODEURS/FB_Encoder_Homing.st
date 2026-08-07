@@ -23,6 +23,13 @@ VAR_INPUT
     UnitaryMode          : BOOL;        // TRUE = flux unitaire à cible libre (MAINT_N2 uniquement)
     WinchSelected        : BOOL;        // TRUE = cette instance est le treuil sélectionné
     CfgHomingTargetM        : REAL;        // Cible libre unitaire, limitée à [-99.0 ; +99.0] m
+    // 🆕 2026-08-07 (19) — retour terrain, demande client : BtnConfirmOpenPos/ClosePos (benne)
+    // doivent aussi référencer le codeur M2 (comme BtnHome), pas seulement mémoriser un état
+    // logique -- cible DYNAMIQUE (position réelle de M1, calculée côté appelant), pas une valeur
+    // de config fixe comme CfgHomingTargetM. Si TRUE au front Home, DynamicHomingTargetM prime
+    // sur UnitaryMode/CfgTopSensorPosM.
+    UseDynamicTarget        : BOOL := FALSE;
+    DynamicHomingTargetM    : REAL := 0.0;
     BtnConfirmCoherence     : BOOL;        // Front — lève le doute §3.7 (bit9), sans réhoming complet
     TopPositionSensor    : BOOL;        // 🔧 2026-07-02 : capteur position haute UNIQUE, COMMUN aux 2 treuils
                                          // (les 2 câbles hissent ensemble le même ensemble mécanique) — câblé
@@ -117,7 +124,9 @@ END_IF;
 
 PresetRequest := FALSE;
 IF HomeEdge.Q THEN
-    IF UnitaryMode THEN
+    IF UseDynamicTarget THEN
+        TargetPositionM := DynamicHomingTargetM;
+    ELSIF UnitaryMode THEN
         TargetPositionM := CfgHomingTargetM;
     ELSE
         TargetPositionM := CfgTopSensorPosM;
