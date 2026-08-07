@@ -51,8 +51,10 @@ WINCH_INTERLOCK_INPUT_FIELDS = [
 ]
 
 WINCH_REQUEST_BOOL_FIELDS = [
-    "PowerContactorEngaged", "SafeStop", "BrakeReleaseRequest",
-    "BrakeCommandOpenConfirmed", "FwdRevSpeedFeedbackOff",
+    # 🆕 2026-08-06 (retrait FB_Brake, demande client) : BrakeReleaseRequest/
+    # BrakeCommandOpenConfirmed remplaces par BrakeFeedback (retour physique brut) --
+    # FB_WinchOutputInterlock_LD calcule desormais BrakeCmd := RelayFwd OR RelayRev.
+    "PowerContactorEngaged", "SafeStop", "BrakeFeedback", "FwdRevSpeedFeedbackOff",
     "RequestedRelayFwd", "RequestedRelayRev",
     "RequestedContactor1", "RequestedContactor2", "RequestedContactor3", "RequestedContactor4",
 ]
@@ -532,11 +534,13 @@ def build_prg06_ld():
             "PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error",
         ],
     )
+    # 2026-08-06 (retrait FB_Brake, demande client) : BrakeCmd n'est plus capture ici --
+    # M1BrakeCmd est recalcule independamment plus bas (OR M1RelayFwd/M1RelayRev, section 1bis),
+    # visible directement dans ce reseau Ladder sans ouvrir FB_WinchOutputInterlock_LD.
     m1_targets = {
         "RelayFwd": "M1RelayFwd", "RelayRev": "M1RelayRev",
         "Contactor1": "M1SpeedContactor1", "Contactor2": "M1SpeedContactor2",
         "Contactor3": "M1SpeedContactor3", "Contactor4": "M1SpeedContactor4",
-        "BrakeCmd": "M1BrakeCmd",
     }
     m1_block_id = _build_winch_interlock_network(
         ld, counter,
@@ -557,11 +561,11 @@ def build_prg06_ld():
             "PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error",
         ],
     )
+    # 2026-08-06 (retrait FB_Brake) : BrakeCmd non capture ici -- voir M1 ci-dessus.
     m2_targets = {
         "RelayFwd": "M2RelayFwd", "RelayRev": "M2RelayRev",
         "Contactor1": "M2SpeedContactor1", "Contactor2": "M2SpeedContactor2",
         "Contactor3": "M2SpeedContactor3", "Contactor4": "M2SpeedContactor4",
-        "BrakeCmd": "M2BrakeCmd",
     }
     m2_block_id = _build_winch_interlock_network(
         ld, counter,
@@ -571,6 +575,56 @@ def build_prg06_ld():
         "PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest",
         m2_targets,
     )
+
+    # ═══════════════════════════════════════════════════════════
+    # Section 1bis : Frein M1/M2 -- couplage direct OR RelayFwd/RelayRev
+    # (2026-08-06, retrait FB_Brake, demande client)
+    # ═══════════════════════════════════════════════════════════
+    # BrakeCmd n'est plus capture depuis la sortie du bloc FB_WinchOutputInterlock_LD --
+    # recalcule INDEPENDAMMENT ici sur M1RelayFwd/M1RelayRev (deja assignes ci-dessus),
+    # meme pattern OR-vers-coil que PowerCutOffReq (section 1ter). Visible directement
+    # dans ce reseau Ladder, sans ouvrir FB_WinchOutputInterlock_LD -- aucun risque
+    # d'ecart frein/mouvement, la coil recoit litteralement les memes signaux que les
+    # relais de sens.
+    _make_comment(ld, _new_id(counter), "🛑 M1BrakeCmd := M1RelayFwd OR M1RelayRev (couplage direct frein)")
+    _make_vendor_element(ld, _new_id(counter))
+    m1_brake_fwd_id = _new_id(counter)
+    _make_contact(ld, m1_brake_fwd_id, "M1RelayFwd")
+    m1_brake_rev_id = _new_id(counter)
+    _make_contact(ld, m1_brake_rev_id, "M1RelayRev")
+    m1_brake_coil_id = _new_id(counter)
+    m1_brake_coil = ET.SubElement(ld, "coil")
+    m1_brake_coil.set("localId", str(m1_brake_coil_id))
+    m1_brake_coil.set("negated", "false")
+    m1_brake_coil.set("storage", "none")
+    _pos(m1_brake_coil)
+    m1_brake_cpi = ET.SubElement(m1_brake_coil, "connectionPointIn")
+    for src_id in (m1_brake_fwd_id, m1_brake_rev_id):
+        conn = ET.SubElement(m1_brake_cpi, "connection")
+        conn.set("refLocalId", str(src_id))
+    ET.SubElement(m1_brake_coil, "connectionPointOut")
+    m1_brake_var = ET.SubElement(m1_brake_coil, "variable")
+    m1_brake_var.text = "M1BrakeCmd"
+
+    _make_comment(ld, _new_id(counter), "🛑 M2BrakeCmd := M2RelayFwd OR M2RelayRev (couplage direct frein)")
+    _make_vendor_element(ld, _new_id(counter))
+    m2_brake_fwd_id = _new_id(counter)
+    _make_contact(ld, m2_brake_fwd_id, "M2RelayFwd")
+    m2_brake_rev_id = _new_id(counter)
+    _make_contact(ld, m2_brake_rev_id, "M2RelayRev")
+    m2_brake_coil_id = _new_id(counter)
+    m2_brake_coil = ET.SubElement(ld, "coil")
+    m2_brake_coil.set("localId", str(m2_brake_coil_id))
+    m2_brake_coil.set("negated", "false")
+    m2_brake_coil.set("storage", "none")
+    _pos(m2_brake_coil)
+    m2_brake_cpi = ET.SubElement(m2_brake_coil, "connectionPointIn")
+    for src_id in (m2_brake_fwd_id, m2_brake_rev_id):
+        conn = ET.SubElement(m2_brake_cpi, "connection")
+        conn.set("refLocalId", str(src_id))
+    ET.SubElement(m2_brake_coil, "connectionPointOut")
+    m2_brake_var = ET.SubElement(m2_brake_coil, "variable")
+    m2_brake_var.text = "M2BrakeCmd"
 
     _build_interlock_gate_network(
         ld, counter,
