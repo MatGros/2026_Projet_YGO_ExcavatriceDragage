@@ -18,5 +18,9 @@ STRUCT
     CloseActive            : BOOL;             (* 🆕 Demande de fermeture active (image FB_Bucket) *)
     OpenActive             : BOOL;             (* 🆕 Demande d'ouverture active (image FB_Bucket) *)
     M2PositionCorrected : REAL;             (* 📊 WinchM2.PositionM - ActiveOffset_M, affichage bargraphe *)
+    AutoBucketSeqActive : BOOL;             (* ⚙️ Séquencement automatique benne en cours (ouverture/fermeture auto) *)
+    CoupledDiveOpenArmed    : BOOL;         (* 🆕 2026-08-07 : Ouverture auto armée (descente couplée demandée, benne pas ouverte) *)
+    CoupledAscentCloseArmed : BOOL;         (* 🆕 2026-08-07 : Fermeture auto armée (montée couplée demandée, benne pas fermée) *)
+    ControlAscentActive     : BOOL;         (* 🆕 2026-08-07 : Phase vitesse contrôlée montée en cours (post-fermeture auto) *)
 END_STRUCT
 END_TYPE

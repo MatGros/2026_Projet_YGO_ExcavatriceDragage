@@ -191,13 +191,20 @@ GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := Wi
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen := WinchM2.Bucket.State.MechState.IsOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed := WinchM2.Bucket.State.MechState.IsClosed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx103_OffsetPos_M := WinchM2.Bucket.State.ActiveOffset_M;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx104_AutoSeqActive := WinchM2.Bucket.State.AutoBucketSeqActive;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := FALSE; // TBD non câblé - voir fiche §6 (pas de sortie Cycle Open publiée)
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx204_CoupledDiveOpenArmed := WinchM2.Bucket.State.CoupledDiveOpenArmed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx205_CoupledAscentCloseArmed := WinchM2.Bucket.State.CoupledAscentCloseArmed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive := WinchM2.Bucket.State.Error;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx303_KoboldAutoStopEnabled := Commun.Cfg.TglEnableKoboldAutoStopDescent;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx304_KoboldImmersionConfirmed := Commun.KoboldImmersionConfirmed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched := Commun.KoboldBottomTouchLatched;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx403_ControlAscentActive := WinchM2.Bucket.State.ControlAscentActive;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
 
 // === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist (2026-08-07) ===
