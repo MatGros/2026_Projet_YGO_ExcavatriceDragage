@@ -180,6 +180,9 @@ VAR_INPUT
     BypassOperatorComm    : BOOL := FALSE;   // 📡 Bypass perte communication opérateur
     BypassPhaseRotation   : BOOL := FALSE;   // ⚡ Bypass défaut rotation phases
     BypassBrakeThermal    : BOOL := FALSE;   // 🌡️ Bypass surchauffe frein
+    BypassMotorThermal    : BOOL := FALSE;   // 🆕 2026-08-07 : 🌡️ Bypass surchauffe moteur (bit2) —
+                                              // manquait alors que BypassBrakeThermal existe déjà pour
+                                              // le même niveau de sévérité (SafeStop+PowerCutOff)
     BypassMecaA           : BOOL := FALSE;   // 🔄 Bypass Méca A
     BypassMecaB           : BOOL := FALSE;   // 🛑 Bypass Méca B
     BypassMecaC           : BOOL := FALSE;   // 🏋️ Bypass Méca C
@@ -330,7 +333,9 @@ ELSE
 END_IF;
 
 // 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total
-IF NOT BypassSafety AND ThermalFeedback THEN
+// 🆕 2026-08-07 : ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
+// bypass dédié plutôt que de dépendre uniquement du bypass groupé BypassSafety.
+IF NOT (BypassSafety OR BypassMotorThermal) AND ThermalFeedback THEN
     ErrorId := ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFB;
