@@ -1647,6 +1647,201 @@
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_ChainDredgingAssist">
+        <baseType>
+          <struct>
+            <variable name="Idx101_EnableDiveSearch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Assistance Plongée Armée (IHM) | 0 = Désarmée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_EnableExtractionSequence">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Assistance Extraction Armée (IHM) | 0 = Désarmée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_EnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Mode Vidage Trémie Armé (IHM) | 0 = Désarmé</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_DiveReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Assistance Plongée Prête | 0 = Non Prête</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_DiveBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Séquence Plongée En Cours | 0 = Repos</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_DiveDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Fond Confirmé | 0 = En Cours</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx204_DiveState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <html:xhtml>État interne séquenceur plongée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx205_DiveError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>0 = Sain | 1 = Défaut Plongée 🔴</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx206_DiveErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <html:xhtml>bit0: préconditions, bit1: séquence Kobold, bit2: config seuils</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_BottomTouchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Contact Fond Confirmé (Kobold ou manuel) | 0 = Non Confirmé</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_ExtractionReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Assistance Extraction Prête | 0 = Non Prête</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_ExtractionBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Séquence Extraction En Cours | 0 = Repos</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_ExtractionDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Extraction Terminée | 0 = En Cours</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_ExtractionState">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <html:xhtml>État interne séquenceur extraction</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_ExtractionError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>0 = Sain | 1 = Défaut Extraction 🔴</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_ExtractionErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <html:xhtml>bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: config</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx401_OperatorActionId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <html:xhtml>Identifiant consigne opérateur conduite (0 = aucune)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_OperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <html:xhtml>Texte consigne opérateur (secours affichage)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx501_DumpAtTremieArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Bit IHM TglEnableDumpAtTremie actif | 0 = Désarmé</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx502_DumpAtTremieAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Mode réellement actif (armé ET Mode MAINT_N1/N2) | 0 = Inactif</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx503_DumpAtTremieAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = M3 à la position Trémie | 0 = Ailleurs</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx504_DumpAtTremieBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Ouverture benne armée par ce mode | 0 = Non armée</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx505_DumpAtTremieDescentLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>1 = Descente M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre</html:xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>26bb9fd2-df98-54a5-a16a-738f3d1532cd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="ST_ChainTranslation">
         <baseType>
           <struct>
@@ -3398,7 +3593,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
                 <html:xhtml>🆕 2026-08-07 : mode vidage à la trémie —</html:xhtml>
@@ -3530,6 +3725,47 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
               </type>
               <documentation>
                 <html:xhtml>Texte de secours ; IHM peut mapper l'identifiant</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : mode vidage à la trémie (pas de FB dédié, logique combinatoire PRG_04)
+TglEnableDumpAtTremie (bit IHM brut)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Armé ET Mode MAINT_N1/N2 (mode réellement actif)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>M3_AtTremieStable</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>CmdOpen_IHM déclenché par ce mode</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieDescentLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>ForbidDescent M1/M2 forcé par ce mode (hors P1/Maintenance)</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -22158,6 +22394,14 @@ GVL_IHM.M1TreuilRetenue</html:xhtml>
                 <html:xhtml>GVL_IHM.Network</html:xhtml>
               </documentation>
             </variable>
+            <variable name="DredgingAssist">
+              <type>
+                <derived name="ST_DredgingAssistHMI" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-07 : GVL_IHM.DredgingAssist</html:xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -22335,6 +22579,35 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx302_BucketFaultActive := WinchM2.
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
+
+// === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist (2026-08-07) ===
+GVL_Troubleshooting.AssistanceDragage.Idx101_EnableDiveSearch         := DredgingAssist.Cmd.TglEnableDiveSearch;
+GVL_Troubleshooting.AssistanceDragage.Idx102_EnableExtractionSequence := DredgingAssist.Cmd.TglEnableExtractionSequence;
+GVL_Troubleshooting.AssistanceDragage.Idx103_EnableDumpAtTremie       := DredgingAssist.Cmd.TglEnableDumpAtTremie;
+
+GVL_Troubleshooting.AssistanceDragage.Idx201_DiveReady               := DredgingAssist.State.DiveReady;
+GVL_Troubleshooting.AssistanceDragage.Idx202_DiveBusy                := DredgingAssist.State.DiveBusy;
+GVL_Troubleshooting.AssistanceDragage.Idx203_DiveDone                := DredgingAssist.State.DiveDone;
+GVL_Troubleshooting.AssistanceDragage.Idx204_DiveState                := DredgingAssist.State.DiveState;
+GVL_Troubleshooting.AssistanceDragage.Idx205_DiveError                := DredgingAssist.State.DiveError;
+GVL_Troubleshooting.AssistanceDragage.Idx206_DiveErrorId              := DredgingAssist.State.DiveErrorId;
+GVL_Troubleshooting.AssistanceDragage.Idx207_BottomTouchConfirmed    := DredgingAssist.State.BottomTouchConfirmed;
+
+GVL_Troubleshooting.AssistanceDragage.Idx301_ExtractionReady          := DredgingAssist.State.ExtractionReady;
+GVL_Troubleshooting.AssistanceDragage.Idx302_ExtractionBusy           := DredgingAssist.State.ExtractionBusy;
+GVL_Troubleshooting.AssistanceDragage.Idx303_ExtractionDone           := DredgingAssist.State.ExtractionDone;
+GVL_Troubleshooting.AssistanceDragage.Idx304_ExtractionState          := DredgingAssist.State.ExtractionState;
+GVL_Troubleshooting.AssistanceDragage.Idx305_ExtractionError          := DredgingAssist.State.ExtractionError;
+GVL_Troubleshooting.AssistanceDragage.Idx306_ExtractionErrorId        := DredgingAssist.State.ExtractionErrorId;
+
+GVL_Troubleshooting.AssistanceDragage.Idx401_OperatorActionId        := DredgingAssist.State.OperatorActionId;
+GVL_Troubleshooting.AssistanceDragage.Idx402_OperatorAction          := DredgingAssist.State.OperatorAction;
+
+GVL_Troubleshooting.AssistanceDragage.Idx501_DumpAtTremieArmed          := DredgingAssist.State.DumpAtTremieArmed;
+GVL_Troubleshooting.AssistanceDragage.Idx502_DumpAtTremieAssistActive   := DredgingAssist.State.DumpAtTremieAssistActive;
+GVL_Troubleshooting.AssistanceDragage.Idx503_DumpAtTremieAtTremie       := DredgingAssist.State.DumpAtTremieAtTremie;
+GVL_Troubleshooting.AssistanceDragage.Idx504_DumpAtTremieBucketOpenArmed := DredgingAssist.State.DumpAtTremieBucketOpenArmed;
+GVL_Troubleshooting.AssistanceDragage.Idx505_DumpAtTremieDescentLocked := DredgingAssist.State.DumpAtTremieDescentLocked;
 
 // === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;
@@ -25981,6 +26254,14 @@ uniquement, même périmètre que instDiveSearch/instExtractionSequence).</html:
                 <html:xhtml>Sous-condition Mode MAINT_N1/N2 (assist réellement active)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="DumpAtTremieBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>CmdOpen_IHM déclenché par ce mode (diagnostic)</html:xhtml>
+              </documentation>
+            </variable>
             <variable name="M1_StartStop_Active">
               <type>
                 <BOOL />
@@ -26186,6 +26467,9 @@ END_IF;
 DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
 DumpAtTremieAssistActive := DumpAtTremieActive
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2);
+GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
+GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
+GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
 
 IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
@@ -26215,6 +26499,16 @@ instDiveSearch(
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M
 );
 
+// 🆕 2026-08-07 : publication IHM (était orpheline -- déclarée mais jamais écrite, voir
+// GVL_IHM.DredgingAssist.State) — consommée ensuite par FB_TroubleshootingView (debug).
+GVL_IHM.DredgingAssist.State.DiveReady            := instDiveSearch.Ready;
+GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Busy;
+GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Done;
+GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Error;
+GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.ErrorId;
+GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
+GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := instDiveSearch.BottomTouchConfirmed;
+
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed;
 instExtractionSequence(
     Enable := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
@@ -26241,6 +26535,28 @@ IF instExtractionSequence.BottomConfirmationConsumed THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
 END_IF;
 
+// 🆕 2026-08-07 : publication IHM (voir DiveSearch ci-dessus, même correctif).
+GVL_IHM.DredgingAssist.State.ExtractionReady   := instExtractionSequence.Ready;
+GVL_IHM.DredgingAssist.State.ExtractionBusy    := instExtractionSequence.Busy;
+GVL_IHM.DredgingAssist.State.ExtractionDone    := instExtractionSequence.Done;
+GVL_IHM.DredgingAssist.State.ExtractionError   := instExtractionSequence.Error;
+GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.ErrorId;
+GVL_IHM.DredgingAssist.State.ExtractionState   := instExtractionSequence.ExtractionState;
+
+// 🆕 2026-08-07 : une seule consigne opérateur conduite à la fois (doc §OperatorActionId) —
+// aucun PRG_09 n'existe (jamais câblé), arbitrage fait ici : DiveSearch prioritaire si Busy,
+// sinon ExtractionSequence si Busy, sinon la dernière connue reste affichée à titre informatif.
+IF instDiveSearch.Busy THEN
+    GVL_IHM.DredgingAssist.State.OperatorActionId := instDiveSearch.OperatorActionId;
+    GVL_IHM.DredgingAssist.State.OperatorAction   := instDiveSearch.OperatorAction;
+ELSIF instExtractionSequence.Busy THEN
+    GVL_IHM.DredgingAssist.State.OperatorActionId := instExtractionSequence.OperatorActionId;
+    GVL_IHM.DredgingAssist.State.OperatorAction   := instExtractionSequence.OperatorAction;
+ELSE
+    GVL_IHM.DredgingAssist.State.OperatorActionId := 0;
+    GVL_IHM.DredgingAssist.State.OperatorAction   := '';
+END_IF;
+
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     CmdBucketCloseArbitrated := FALSE;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
@@ -26258,18 +26574,20 @@ END_IF;
 
 // === 🏗️ §2 COMMANDE DU BENNE (FB_Bucket) ===
 
+// 🆕 2026-08-07 : en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
+// la trémie arme l'ouverture benne au lieu de faire descendre M2 — le mouvement réel reste
+// gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
+// l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
+// l'arbitrage M2 normal (mécanisme déjà existant, voir §3bis plus bas).
+DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.M3_AtTremieStable;
+GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed := DumpAtTremieBucketOpenArmed;
+
 instBucket(
     Enable              := NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_03_Modes_Cycle.Auth.Mode,
-    // 🆕 2026-08-07 : en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
-    // la trémie arme l'ouverture benne au lieu de faire descendre M2 — le mouvement réel reste
-    // gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
-    // l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
-    // l'arbitrage M2 normal (mécanisme déjà existant, voir §3bis plus bas).
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen
-                           OR (DumpAtTremieAssistActive AND PRG_05_Translation.M3_AtTremieStable),
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR DumpAtTremieBucketOpenArmed,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection     := MaintenanceMotionDirection,
@@ -26571,7 +26889,9 @@ ForbidDescentM2_Raw := ForbidDescentM2_Raw OR instSafetyWinchM2.ForbidDescent;
 // 🆕 2026-08-07 (mode "vidage à la trémie", demande client) : descente M1 ET M2 interdite tant
 // que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
 // descente-treuil / translation pour se rapprocher d'un enchaînement automatique sûr.
-IF DumpAtTremieAssistActive AND NOT (PRG_05_Translation.M3_AtP1Stable OR PRG_05_Translation.M3_AtMaintenanceStable) THEN
+GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked :=
+    DumpAtTremieAssistActive AND NOT (PRG_05_Translation.M3_AtP1Stable OR PRG_05_Translation.M3_AtMaintenanceStable);
+IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
     ForbidDescentM1_Raw := TRUE;
     ForbidDescentM2_Raw := TRUE;
 END_IF;
@@ -30333,7 +30653,8 @@ instTroubleshootingView(
     Sync                 := GVL_IHM.M1M2Sync,
     Translation          := GVL_IHM.TranslationM3,
     Commun               := GVL_IHM.Commun,
-    Network              := GVL_IHM.Network
+    Network              := GVL_IHM.Network,
+    DredgingAssist       := GVL_IHM.DredgingAssist
 );
 </html:xhtml>
           </ST>
@@ -30974,6 +31295,14 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <html:xhtml>↔️ 5. Translation Pont M3 (Variateur AC600)</html:xhtml>
           </documentation>
         </variable>
+        <variable name="AssistanceDragage">
+          <type>
+            <derived name="ST_ChainDredgingAssist" />
+          </type>
+          <documentation>
+            <html:xhtml>🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie (2026-08-07)</html:xhtml>
+          </documentation>
+        </variable>
         <variable name="HomingM1">
           <type>
             <derived name="ST_HomingChecklist" />
@@ -31196,6 +31525,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
             <Object Name="ST_ChainBucket" ObjectId="7699fad2-6e4d-5ba2-8474-a7ccec9b870d" />
             <Object Name="ST_ChainContextGlobal" ObjectId="601b64cb-498b-5fca-a2a0-11b24726fea1" />
+            <Object Name="ST_ChainDredgingAssist" ObjectId="26bb9fd2-df98-54a5-a16a-738f3d1532cd" />
             <Object Name="ST_ChainTranslation" ObjectId="7dbc6f0d-3311-5752-8222-088008af3b8a" />
             <Object Name="ST_ChainWinch" ObjectId="cfbad681-bc46-5033-b562-e37133b1f706" />
             <Object Name="ST_ChainWinchSync" ObjectId="68f6d77a-138b-5a81-867d-04895e9150ef" />
