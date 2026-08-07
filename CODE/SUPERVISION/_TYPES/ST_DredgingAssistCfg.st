@@ -8,6 +8,9 @@ STRUCT
     ImmersionUpper_M            : REAL := 0.5;  (* Borne haute fenêtre front immersion *)
     ImmersionLower_M            : REAL := -0.5; (* Borne basse fenêtre front immersion *)
     ExtractionControlDistance_M : REAL := 2.0;  (* Remontée palier 1 avant accélération *)
+    TglEnableDiveSearch         : BOOL := TRUE;  (* Mode assistance plongée mémorisé *)
+    TglEnableExtractionSequence : BOOL := TRUE;  (* Mode assistance extraction mémorisé *)
+    TglEnableDumpAtTremie       : BOOL := TRUE;  (* Mode assistance vidage trémie mémorisé *)
     Initialized                 : BOOL := FALSE; (* Pont persistance/IHM initialisé *)
 END_STRUCT
 END_TYPE
