@@ -111,7 +111,7 @@ VAR
     // préconditions strictes de FB_DiveSearch (benne ouverte, DiveStartMin_M, fenêtre immersion).
     // FB_DiveSearch continue de tourner en parallèle, inchangée (KoboldMeasureEnable toujours câblé
     // dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.
-    BypassKoboldRiseEdge       : R_TRIG;
+    BypassKoboldFallEdge       : F_TRIG; // 🔧 2026-08-07 (26) : front descendant remplace montant
     BypassKoboldBottomTouched  : BOOL;
 
     SyncMinorDeviation      : BOOL;
@@ -121,6 +121,10 @@ VAR
 
     EffectiveMaxStepAscent    : INT;
     EffectiveMaxStepDescente  : INT;
+
+    // 🆕 2026-08-07 (27) : mémoire scan précédent pour SpeedDelta_Mps (IHM)
+    M1_PrevSpeed_Mps : REAL;
+    M2_PrevSpeed_Mps : REAL;
 END_VAR
 
 // === 🪨 §1 INTENTION MAINTENANCE & ASSISTANTS ===
@@ -171,14 +175,14 @@ IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Aut
 END_IF;
 ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
 
-// 🆕 2026-08-07 (9) : bypass séquence DiveSearch -- front montant Kobold pendant une descente
-// couplée = fond touché, directement (voir bandeau §1). Mêmes conditions de garde que la
-// confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension, pas de défaut, benne fermée --
-// réutilise le bloc de clear commun juste au-dessus).
-BypassKoboldRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
+// 🔧 2026-08-07 (26) — retour terrain, demande client : REMPLACÉ front montant par front
+// DESCENDANT Kobold pendant une descente couplée = fond touché, directement (voir bandeau §1).
+// Mêmes conditions de garde que la confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension,
+// pas de défaut, benne fermée -- réutilise le bloc de clear commun juste au-dessus).
+BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
 IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
    AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
-   AND BypassKoboldRiseEdge.Q THEN
+   AND BypassKoboldFallEdge.Q THEN
     BypassKoboldBottomTouched := TRUE;
 END_IF;
 GVL_IHM.DredgingAssist.State.BypassDiveActive          := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
@@ -915,6 +919,15 @@ WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
+// 🔧 2026-08-07 (27) — retour terrain (audit agent) : MeasuredSpeed_Mps jamais recopié, restait
+// à 0.0 en permanence à l'IHM. SpeedDelta_Mps corrigé par rapport à la proposition initiale de
+// l'agent (M1-M2, faux sens) -- le commentaire du type (ST_WinchState.st) dit explicitement
+// "variation de vitesse ENTRE DEUX SCANS", pas un écart M1/M2 (qui existe déjà ailleurs via
+// SyncStateHMI.DeltaPos_M/instWinchSync). Delta temporel via mémoire scan précédent.
+WinchM1StateHMI.MeasuredSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
+WinchM1StateHMI.SpeedDelta_Mps    := PRG_02_Acquisition.M1_Speed_Mps - M1_PrevSpeed_Mps;
+M1_PrevSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
+
 WinchM1StateHMI.Position_M := PRG_02_Acquisition.CablePosM1;
 WinchM1StateHMI.SpeedRef_Pct := M1_SpeedRef_Active;
 WinchM1StateHMI.StepNumber := instWinchM1.StepNumber;
@@ -966,6 +979,11 @@ WinchM1StateHMI.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
 WinchM1StateHMI.CommandedDirection := instWinchM1.CommandedDirection;
 WinchM1StateHMI.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElapsed;
 WinchM1StateHMI.DirectionChangePending := instWinchM1.DirectionChangePending;
+
+// 🔧 2026-08-07 (27) : voir bandeau M1 ci-dessus, même correctif.
+WinchM2StateHMI.MeasuredSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
+WinchM2StateHMI.SpeedDelta_Mps    := PRG_02_Acquisition.M2_Speed_Mps - M2_PrevSpeed_Mps;
+M2_PrevSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
 
 WinchM2StateHMI.Position_M := PRG_02_Acquisition.CablePosM2;
 WinchM2StateHMI.SpeedRef_Pct := M2_SpeedRef_Active;

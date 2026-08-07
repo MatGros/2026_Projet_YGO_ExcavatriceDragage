@@ -45,7 +45,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
         CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 7.0 // 🔧 REX 2026-08-07 (24) : 7.5 -> 7.0 (demande client)
+        CfgCableLimitAscent_M := 6.75 // 🔧 REX 2026-08-07 (25) : 7.5 -> 7.0 -> 6.75 (demande client)
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M1)
     _WinchM2CfgPersist : ST_WinchCfg := (
         CfgTopSensorPos_M := 8.5, // 🔧 REX 2026-08-07 (24bis) : correction, capteur physique réel à 8.5m
@@ -54,7 +54,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
         CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 7.0 // 🔧 REX 2026-08-07 (24) : 7.5 -> 7.0 (demande client)
+        CfgCableLimitAscent_M := 6.75 // 🔧 REX 2026-08-07 (25) : 7.5 -> 7.0 -> 6.75 (demande client)
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
