@@ -214,6 +214,36 @@ IF ConfirmCloseEdge.Q
     OpenReq := FALSE;
 END_IF;
 
+// 🆕 3bis-quater. DÉTECTION AUTOMATIQUE EN CONTINU (REX 2026-08-07, demande client) : contrairement
+// aux 2 blocs ConfirmXxx ci-dessus (action MANUELLE ponctuelle), ceci recalcule IsOpen/IsClosed en
+// PERMANENCE dès que les positions correspondent à un état connu -- sans bouton, sans mode MAINT
+// requis. Nécessaire car les séquencements automatiques (PRG_04, "descente uniquement benne
+// ouverte") s'appuient sur BucketState.IsOpen/IsClosed : si les positions convergent SANS passer
+// par une séquence FB_Bucket commandée (ex. recalage manuel en pilotage unitaire, ou positions
+// déjà alignées au premier boot), l'état restait bloqué à FALSE indéfiniment sans action opérateur
+// -- bloquant en pratique une fois le séquencement auto en place. Actif uniquement à l'arrêt
+// (NOT M1_Busy/M2_Busy), hors séquence benne en cours (State <> BUSY, où IsOpen/IsClosed sont
+// volontairement forcés à FALSE par BusyEdge ci-dessus -- ne rentre jamais en conflit), codeurs
+// référencés. Réutilise la tolérance déjà existante Config.CoherenceLimitM -- pas de nouveau seuil.
+IF (State <> E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND HomedM2
+   AND (Config.CoherenceLimitM > 0.01) THEN
+    IF ABS((CablePosM2 - CablePosM1) - Config.OffsetOpenM) <= Config.CoherenceLimitM THEN
+        IF NOT BucketState.IsOpen THEN
+            BucketState.IsOpen := TRUE;
+            BucketState.IsClosed := FALSE;
+            BucketState.LastPosM2Open := CablePosM2;
+            BucketState.StateIncoherent := FALSE;
+        END_IF;
+    ELSIF ABS((CablePosM2 - CablePosM1) - Config.OffsetCloseM) <= Config.CoherenceLimitM THEN
+        IF NOT BucketState.IsClosed THEN
+            BucketState.IsClosed := TRUE;
+            BucketState.IsOpen := FALSE;
+            BucketState.LastPosM2Close := CablePosM2;
+            BucketState.StateIncoherent := FALSE;
+        END_IF;
+    END_IF;
+END_IF;
+
 // 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4) — REX 2026-07-07
 // M1 doit rester immobile pendant que M2 bouge seul. Référence prise à l'entrée en Busy.
 BusyEdge(CLK := (State = E_State.BUSY));
