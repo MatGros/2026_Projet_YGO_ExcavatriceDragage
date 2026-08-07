@@ -4,6 +4,21 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `TREUILS_JOYSTICK_SESSION_TERRAIN` — 2026-08-07 — retours terrain treuils/joystick (commits `228c438`..`b97a511`)
+- **Retrait `FB_Brake` (M1/M2)** : frein couplé directement `BrakeCmd := RelayFwd OR RelayRev` (`FB_WinchOutputInterlock_LD`), recalculé indépendamment dans `PRG_06_Outputs_LD` (barrière finale visible) ; M3 non touché
+- **`RestartDelay`** : bascule de "retombée contacteur" à "frein réellement fermé" (`BrakeFeedback`), 1000ms→1500ms, puis re-sécurisé pour exiger `NOT BrakeFeedback` ET `NOT MotorRequest` (audit croisé, retour terrain)
+- **Mode vidage trémie** (`TglEnableDumpAtTremie`) : nouvel assistant MAINT_N1/N2, réutilise `FB_Bucket` sans nouveau séquenceur ; verrouillage descente hors P1/Maintenance
+- **`GVL_Troubleshooting.AssistanceDragage`** : visibilité détaillée des 3 modes assistants (Dive/Extraction/DumpAtTremie)
+- **`BypassMotorThermal`** ajouté (symétrie avec `BypassBrakeThermal`, manquant)
+- **Joystick** : filtre PT1 axes supprimé (0ms), `NeutralHoldTime` 500→100ms puis grâce 3s post-armement (`DeadmanArmGraceTime`) pour éviter un désarmement quasi-immédiat après un armement au neutre ; armement par maintien 100ms indépendant de la position des axes ; zone morte 10%→6%→compte brut ADC (300) ; nouveau signal `AtNeutral`
+- **`BypassGlobal` M1/M2** : ne masque plus les fins de course physiques (haut/bas) ni l'alarme IHM associée — seuls les bypass individuels dédiés le peuvent désormais
+- **Fin de course haut LOGICIEL** : nouveau blocage immédiat (`CablePosM >= TopLimitM`), absent jusqu'ici (seul Méca D, différé, le surveillait) — bypass dédié `TopLimitSoftware`
+- **Limite légale de profondeur** : bloque désormais réellement la descente manuelle (`ForbidDescent`), auparavant consommée uniquement par `FB_Cycle` (aucun effet en manuel) ; ralentissement progressif fusionné avec la limite câble (`BottomLimitM` = la plus restrictive des deux)
+- **Ralentissement bordure** : plafond palier direct réglable (`WinchSlowdownMaxStep`, défaut 1) au lieu d'un plafond en % (`WinchSlowSpeed_Pct`, retiré)
+- **Bypass commun granulaire** (`Commun.Bypass.TopLimitSwitch/TopLimitSoftware/CableLimitSwitch/LimitLegal`) : lève une protection sur M1+M2 simultanément (pilotage "both"), en OR avec les bypass individuels — jamais de désactivation croisée
+- **REX terrain non-code** : délai ~500ms au relâcher joystick tracé jusqu'à `GVL_PERSISTENT._JoystickFilterTime` (RETAIN resté à 100ms malgré défaut source 0ms) — écriture forcée en ligne, pas de bug logiciel
+- 17/17 gates verts à chaque commit, bundle régénéré et testé en direct sur machine réelle entre chaque lot
+
 ### `M3_TRANSLATION_TERRAIN_SESSION` — 2026-08-06 — mise en service terrain temps réel (commits `076377e`..`a9b016f`)
 - **Position estimée M3 persistante** : reprise après reboot (`GVL_PERSISTENT._TranslationPosEstimated_M`)
 - **Cfg Translation** : 3 vitesses d'approche réglables IHM + persistantes (`ST_TranslationCfg`, pont dédié, doctrine `ST_WinchCfg`)
