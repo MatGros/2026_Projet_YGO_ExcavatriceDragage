@@ -59,6 +59,7 @@ VAR_OUTPUT
     SpeedYPct       : REAL;       // Consigne vitesse axe Y en % SIGNÉE (-100..+100), miroir AxisCmdY.SpeedRef
     DirectionY      : INT;        // Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdY.Direction
     DeadmanArmed    : BOOL;       // 🆕 Geste armé (bouton appuyé au neutre) — IHM/diagnostic
+    AtNeutral       : BOOL;       // 🆕 2026-08-07 : TRUE si les 2 axes sont en zone morte (position centrale) — IHM/diagnostic
 END_VAR
 VAR_IN_OUT
     NeutralXMem     : INT; // Point neutre X persistant global
@@ -93,6 +94,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     SpeedXPct := 0.0; DirectionX := 0;
     SpeedYPct := 0.0; DirectionY := 0;
     Button := FALSE;
+    AtNeutral := TRUE;   // 🆕 2026-08-07 — pas de commande possible pendant la neutralisation
     DeadmanArmed := FALSE;   // 🆕 Désarmé sur toute neutralisation — nouvel appui au neutre exigé
     DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — annule toute tentative d'armement en cours
     DeadmanTimer(IN := FALSE, PT := DeadmanRearmTimeout);   // 🆕 2026-07-03decies — pas d'accumulation à froid
@@ -132,6 +134,7 @@ LastCalibrate := BtnCalibrate;
 // 🧮 4bis. MISE À L'ÉCHELLE (avant homme-mort — le neutre s'évalue sur les 2 axes déjà deadbandés)
 ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
+AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // 🆕 2026-08-07 : IHM/diagnostic — position centrale (zone morte)
 
 // 4ter-bis. CHANGEMENT DE MODE : désarme le homme-mort dès que Mode change
 // (MAINT_N1/N2/SEMI_AUTO/AUTO). Évite qu'une commande en cours traverse le changement
@@ -181,7 +184,7 @@ END_IF;
 // mouvement démarré ne désarmait JAMAIS (LeftNeutralSinceArm restait FALSE indéfiniment),
 // laissant DeadmanArmed collé à TRUE d'une session à l'autre. Neutre tenu NeutralHoldTime
 // désarme désormais TOUJOURS, qu'un mouvement ait été démarré ou non depuis l'armement.
-NeutralHoldTimer(IN := DeadmanArmed AND (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0),
+NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral,
                  PT := NeutralHoldTime);
 IF NeutralHoldTimer.Q THEN
     DeadmanArmed := FALSE;      // Neutre tenu assez longtemps = désarmement
@@ -196,7 +199,7 @@ END_IF;
 // continue. Corrigé : `NOT RawButton` (niveau, pas front) — maintenir OU réappuyer dans le délai
 // remettent tous les deux `IN` à FALSE (TON.ET repart de 0), seul un RELÂCHEMENT PROLONGÉ désarme.
 DeadmanTimer(IN := DeadmanReconfEnable AND DeadmanArmed
-                   AND NOT ((ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0)) AND NOT RawButton,
+                   AND NOT AtNeutral AND NOT RawButton,
              PT := DeadmanRearmTimeout);
 IF DeadmanTimer.Q THEN
     DeadmanArmed := FALSE;      // Pas de reconfirmation dans le délai → désarmement (décélération sûre)

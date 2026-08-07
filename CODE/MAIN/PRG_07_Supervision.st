@@ -234,6 +234,7 @@ GVL_IHM.JOY1Joystick.State.AxisCmdY := PRG_02_Acquisition.instJoystick.AxisCmdY;
 GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;
 GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;
 GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.JoystickDeadmanArmed;
+GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.instJoystick.AtNeutral;
 GVL_IHM.JOY1Joystick.State.Online := instDiagCanOpen.DeviceJoystick.Online;
 GVL_IHM.JOY1Joystick.State.Operational := instDiagCanOpen.DeviceJoystick.Operational;
 GVL_IHM.JOY1Joystick.State.Error := instDiagCanOpen.Error;
