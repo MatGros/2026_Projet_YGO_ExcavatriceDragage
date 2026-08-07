@@ -41,7 +41,7 @@ dupliqué ici) :
 
 | Fiche | FB détaillé | Contenu |
 |---|---|---|
-| [`AF_Partie-10_FB_Winch_v1.0.md`](AF_Partie-10_FB_Winch_v1.0.md) | `FB_Winch` | Mouvement, rampe, palier, sens, frein |
+| [`AF_Partie-10_FB_Winch_v1.0.md`](AF_Partie-10_FB_Winch_v1.0.md) | `FB_Winch` | Mouvement, palier, sens (🔧 2026-08-06 : frein retiré, voir §1bis) |
 | [`AF_Partie-10_FB_Safety_Winch_v1.0.md`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | `FB_Safety_Winch` | 7 mécanismes A-G, masques, bypass |
 | [`AF_Partie-10_FB_WinchSync_v1.0.md`](AF_Partie-10_FB_WinchSync_v1.0.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
 | [`AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | `FB_WinchOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
@@ -53,19 +53,47 @@ dupliqué ici) :
 
 ```text
 FB_Winch (mouvement, ×2)
- ├─ FB_SpeedStep    (palier → 4 contacteurs)
- ├─ FB_Brake        (séquence frein manque-courant, partagé Translation)
- └─ FB_Ramp         (accel/décel)
+ └─ FB_SpeedStep    (palier → 4 contacteurs)
+    (rampe %/s retirée 2026-08-06, remplacée par tempo palier — §6 ;
+     frein retiré 2026-08-06, voir §1bis)
 
 FB_Safety_Winch (×2)              ──► SafeStop / ForbidDescent / ForbidAscent / PowerCutOff (compose FB_DriftGuard)
 FB_WinchSync (×1)                 ──► DeltaPosM, SyncWarn (niveau 1, warning)
 FB_Bucket (×1)                    ──► Benne (sous-fonction M2, désynchronisation)
-FB_WinchOutputInterlock_LD (×2)   ──► Q finales (barrière, dans Outputs)
+FB_WinchOutputInterlock_LD (×2)   ──► Q finales (barrière, dans Outputs — calcule aussi BrakeCmd, §1bis)
 FB_WinchLoadEstimator (×2)        ──► Diagnostic charge, informatif
 FB_Winch_Symmetry (×1)             ──► Diagnostic passif symétrie M1/M2
 ```
 
 Benne = sous-fonction M2 : aucune I/O propre, réutilise `FB_Winch` M2. Fiche dédiée dans ce dossier.
+
+### 1bis. Frein — couplage direct (🔧 2026-08-06, demande client)
+
+`FB_Brake` (COMMUN, séquence temporisée frein manque-courant) est **retiré de la composition
+`FB_Winch`** — reste utilisé tel quel par `FB_Translation` (M3), non touché. Décision client :
+le frein ne doit jamais pouvoir diverger de l'état des contacteurs de sens, donc plus de FB
+intermédiaire avec sa propre temporisation/état — couplage structurel direct.
+
+Nouvelle architecture :
+- `FB_Winch` ne produit plus aucune sortie frein (`BrakeCmd`/`BrakeCommandOpenConfirmed`/
+  `BrakeContactorCheck` retirés de son interface).
+- `FB_WinchOutputInterlock_LD` calcule `BrakeCmd := RelayFwd OR RelayRev` **après** avoir
+  finalisé ces deux sorties (§5 de sa logique) — hérite automatiquement de toutes leurs
+  conditions de sécurité (Error, RestartInhibit, RestartRequired, MotorRequest) sans les
+  répéter. Watchdog conservé : `BrakeFeedback` (retour physique brut, ex-DI
+  `Mx_BrakeIsOpen_DI`, câblé directement depuis `PRG_04`) comparé à `BrakeCmd`, timeout
+  500 ms → `ErrorId` bit0 → coupe le mouvement (mécanisme `Error` déjà existant).
+- `PRG_06_Outputs_LD` recalcule **la même expression** indépendamment sur les DQ finaux
+  (`M1BrakeCmd := M1RelayFwd OR M1RelayRev`) pour piloter la bobine physique — visible
+  directement dans le réseau Ladder, sans ouvrir `FB_WinchOutputInterlock_LD` (même doctrine
+  de visibilité que les autres barrières finales, voir en-tête `PRG_06_Outputs_LD.st`).
+
+⚠️ Contrepartie assumée (décision client, pas une omission) : le frein n'attend plus de
+confirmation physique du contacteur de sens avant de s'ouvrir (l'ancien `ContactorEngaged`,
+anti-retombée du 2026-08-06 matin, est retiré) — le couplage est désormais sur la **commande**
+`RelayFwd`/`RelayRev`, pas sur leur confirmation terrain. Le risque théorique (frein ouvert
+avant engagement mécanique réel du contacteur) est jugé acceptable par le client au profit de
+la garantie structurelle "jamais de mouvement commandé sans frein desserré".
 
 ---
 
@@ -85,7 +113,7 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 | `ST_SpeedStepTable` | config IHM/RETAIN | `FB_Winch`/`FB_SpeedStep` |
 | `ST_SafetyWinch` | `Supervision` (agrège) | IHM |
 | `ST_BypassWinch` | IHM RETAIN | `FB_Safety_Winch` |
-| `ST_ContactorCheck` (COMMUN) | `FB_Brake`/`FB_Winch` | `FB_Safety_Winch`, IHM |
+| `ST_ContactorCheck` (COMMUN) | `FB_Winch` (contacteurs sens/vitesse) | `FB_Safety_Winch`, IHM |
 
 ---
 
@@ -165,14 +193,17 @@ persistant) : voir la fiche FB concernée (§7 de chaque fiche) et §6 ci-dessou
 | Hausse palier | Délai fixe unique `T#1s500ms`, symétrique montée/descente | `EffectiveStepDelay := EffectiveDirectionInterlockDelay + T#100ms` → **500ms en descente / 1000ms en montée** (déduit de l'interlock de sens, pas un réglage séparé) |
 | Interlock changement de sens | `DirectionInterlockDelay` unique 200ms | Asymétrique : `DirectionInterlockDelayDescent := T#400ms` / `DirectionInterlockDelayAscent := T#900ms`, toujours < la tempo palier correspondante (interlock jamais le facteur limitant, garanti par construction) |
 | Arrêt (relâchement joystick) | Suivait la rampe de décélération (contacteurs engagés plusieurs secondes après l'ordre d'arrêt) | Coupure **instantanée** de `RelayFwd`/`RelayRev` et des 4 contacteurs de vitesse dès `Direction=0`, même scan |
-| Coupure finale (freinage) | `DelayMotorDecel` code mort | Toujours code mort (`FB_Brake.st` ferme `BrakeCmd` same-scan sur `MovementRequested=FALSE`) — non traité par ce lot |
+| Coupure finale (freinage) | `DelayMotorDecel` code mort dans `FB_Brake.st` | Sans objet côté treuil : `FB_Brake` retiré (§1bis), le frein suit désormais `RelayFwd OR RelayRev` sans aucune temporisation |
 | Garde-fou vitesse mesurée | Existe, désactivé, non persistant | Inchangé par ce lot |
 | Bandes de vitesse par palier | Théoriques, jamais mesurées | Voir §6.3, non traité par ce lot |
 
 ### 6.2 Doctrine anti-retombée associée (`FB_WinchOutputInterlock_LD.st`, commit 2026-08-06)
 
-Le contacteur de sens/vitesse doit s'engager **avant** l'ouverture du frein (et non l'inverse) :
-`ContactorEngaged := NOT FwdRevSpeedFeedbackOff` (feedback physique) gate `BrakeCmd`.
+⚠️ **Révisée le même jour (§1bis)** : la doctrine ci-dessous (contacteur confirmé physiquement
+AVANT ouverture frein, via `ContactorEngaged := NOT FwdRevSpeedFeedbackOff`) a été implémentée
+le matin du 2026-08-06, puis **remplacée l'après-midi même** par un couplage direct sur la
+commande (`BrakeCmd := RelayFwd OR RelayRev`, décision client — voir §1bis pour le raisonnement
+et la contrepartie assumée). Conservé ici pour l'historique de la décision, périmé en pratique.
 
 **T91 (asymétrie montée/descente) et T93 (tempo par palier au lieu de rampe %/s) sont ainsi
 implémentés** ; seule l'apprentissage/validation en charge réelle (T91 volet essais) reste ouvert.

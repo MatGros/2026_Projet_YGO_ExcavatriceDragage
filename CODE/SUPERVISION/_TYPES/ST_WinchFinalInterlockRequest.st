@@ -13,8 +13,10 @@ STRUCT
     Reset                        : BOOL;
     PowerContactorEngaged              : BOOL;
     SafeStop                     : BOOL;
-    BrakeReleaseRequest          : BOOL;
-    BrakeCommandOpenConfirmed    : BOOL; // TRUE = contacteur/bobine desserrage confirmé
+    BrakeFeedback                 : BOOL; // 🆕 2026-08-06 (retrait FB_Brake) : retour PHYSIQUE brut du
+                                          // contacteur/bobine frein (TRUE = ouvert/relâché) — remplace
+                                          // BrakeReleaseRequest/BrakeCommandOpenConfirmed ; la barrière
+                                          // finale calcule elle-même BrakeCmd := RelayFwd OR RelayRev.
     FwdRevSpeedFeedbackOff       : BOOL; // TRUE = relais sens + C1..C4 tous retombés
     RequestedRelayFwd            : BOOL;
     RequestedRelayRev            : BOOL;

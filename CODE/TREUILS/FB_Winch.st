@@ -4,10 +4,15 @@
    📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable > SafeStop > StartStop.
-   🧩 Compose FB_SpeedStep (décodage palier) + FB_Brake (séquence frein).
+   🧩 Compose FB_SpeedStep (décodage palier). 🆕 2026-08-06 (retrait FB_Brake, demande
+      client) : le frein n'est plus géré ici — FB_Winch ne produit plus aucune sortie
+      frein. La commande frein est désormais un couplage DIRECT sur RelayFwd/RelayRev,
+      calculé dans FB_WinchOutputInterlock_LD puis câblé au grand jour dans
+      PRG_06_Outputs_LD (voir bandeaux de ces deux fichiers). FB_Brake reste utilisé
+      tel quel pour Translation (M3), non touché par ce lot.
    📤 Sorties physiques : RelayFwd/RelayRev (contacteurs de sens),
-      Contactor1..4 (contacteurs de vitesse), BrakeCmd (bobine frein) —
-      à câbler manuellement sur les canaux Q réels (I/O Mapping CODESYS).
+      Contactor1..4 (contacteurs de vitesse) — à câbler manuellement sur les
+      canaux Q réels (I/O Mapping CODESYS). Le frein n'est plus une sortie de ce FB.
    🔒 Interlock changement de sens : jamais Fwd et Rev simultanément.
       ⚠️ CORRECTIF (retour terrain 2026-07-01) : neutre↔un sens = immédiat ;
       seule une inversion DIRECTE Fwd↔Rev exige la vitesse confirmée nulle
@@ -83,7 +88,6 @@ VAR_INPUT
     HomingApproachActive    : BOOL;        // 🆕 REX 2026-07-08 : Limite la vitesse au palier 1 en montée (approche capteur haut)
     FwdRevSpeedFeedbackOff  : BOOL;   // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
                                        // retombés" (remplace ContactorFeedbackFwd/Rev)
-    BrakeFeedback           : BOOL;
     BypassContactorCheck    : BOOL;   // 🧪 TRUE = désactive StuckClosed (axe simulé,
                                        // voir GVL_Simulation.SensorMxContactorFeedbackIsReal — TOUJOURS FALSE réel)
     BypassGlobal            : BOOL;   // 🌐 TRUE = force ErrorId=0, ignore toutes les erreurs du FB
@@ -101,15 +105,6 @@ VAR_INPUT
     DirectionInterlockDelayDescent : TIME := T#400ms;  // Réengagement en descente (CommandedDirection=-1)
     DirectionInterlockDelayAscent  : TIME := T#900ms;  // Réengagement en montée (CommandedDirection=1)
     ContactorFeedbackTimeout: TIME := T#500ms;
-    // 🆕 2026-08-06 (retour terrain) : plus d'attente fixe à chaque démarrage — le desserrage
-    // frein attend désormais la confirmation PHYSIQUE réelle du contacteur (ContactorEngaged,
-    // FB_WinchOutputInterlock_LD §2bis), pas un délai artificiel identique à chaque fois. Seule
-    // l'inversion de sens rapide reste protégée par un délai dédié (DirectionInterlockDelay
-    // Descent/Ascent ci-dessus) — ce n'est pas la même protection, ne pas réintroduire ici.
-    BrakeDelayContactClose  : TIME := T#0ms;
-    BrakeDelayMagnetise     : TIME := T#0ms;
-    BrakeDelayMotorDecel    : TIME := T#500ms;
-    BrakeFeedbackTimeout    : TIME := T#300ms; // Strictement sous watchdog final 500 ms
     Homed                   : BOOL;             // 🆕 État de référencement du treuil
     HomingSuspect           : BOOL;             // 🆕 REX 2026-07-08 : Incertitude/doute sur le référencement (§3.7)
     CablePosM               : REAL;             // 🆕 Position actuelle du câble en mètres
@@ -139,14 +134,10 @@ VAR_OUTPUT
     StepNumber          : INT;             // Palier métier temporisé, transmis à l'interlock final
     BusinessStepDelayElapsed : TIME;       // Écoulé de la tempo métier (EffectiveStepDelay, asymétrique montée/descente)
     SpeedGuardLimited   : BOOL;
-    BrakeCmd            : BOOL;
-    BrakeCommandOpenConfirmed : BOOL;  // TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)
     ContactorsCheck     : ST_ContactorCheck;  // 🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)
-    BrakeContactorCheck : ST_ContactorCheck;
 END_VAR
 VAR
     SpeedStep           : FB_SpeedStep;
-    Brake               : FB_Brake;
     CycleTimeCalc       : FB_CycleTime;
     // 🆕 2026-08-06 : SpeedRamp (FB_Ramp) retiré — RampTargetPct alimente directement
     // FB_SpeedStep, la progressivité vient de la temporisation par palier (StepDelay ci-dessous).
@@ -163,7 +154,6 @@ VAR
     DirectionChangePending : BOOL;
     EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
     ActiveMaxStep       : INT;    // 🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse
-    BrakeSafetyOk       : BOOL;   // 🛡️ REX 2026-07-24 : Interlock anti-échauffement frein
     FirstScanDone       : BOOL;
 END_VAR
 
@@ -175,12 +165,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     StepNumber := 0;
     BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
     BusinessStepDelayElapsed := T#0ms;
-    Brake(Enable := FALSE, Reset := FALSE, MovementRequested := FALSE, ContactorFeedback := BrakeFeedback,
-          DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
-          DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout);
-    BrakeCmd := Brake.BrakeCmd;
-    BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
-    BrakeContactorCheck := Brake.ContactorCheck;
     CommandedDirection := 0;
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelayAscent);
     State := E_State.DISABLED;
@@ -336,16 +320,16 @@ IF Direction = 0 THEN
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
 
-// 🛑 Interlock de sécurité frein : magnétisation normale autorisée, mais coupure stricte des relais si FB_Brake est en ERREUR
-BrakeSafetyOk := NOT Brake.Error OR BypassContactorCheck;
-
 // Le sens et la pré-magnétisation suivent la demande brute ; le palier métier
 // temporisé reste seul transmis à l'interlock final pour autoriser la puissance.
 // 🆕 2026-08-06 (retour terrain) : ET Direction=1/-1 (demande OPÉRATEUR brute, pas
 // CommandedDirection qui reste au dernier sens jusqu'à la retombée de la rampe) — coupure
 // instantanée du contacteur de sens dès le relâchement du joystick, même sécurité que ci-dessus.
-RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep > 0) AND BrakeSafetyOk;
-RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep > 0) AND BrakeSafetyOk;
+// 🆕 2026-08-06 (retrait FB_Brake, demande client) : plus de terme BrakeSafetyOk — le frein
+// n'est plus une condition d'engagement des relais de sens, c'est l'inverse (voir
+// FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
+RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep > 0);
+RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep > 0);
 
 IF ForbidDescent THEN
     RelayRev := FALSE;
@@ -354,15 +338,6 @@ END_IF;
 IF ForbidAscent THEN
     RelayFwd := FALSE;
 END_IF;
-
-Brake(Enable := TRUE, Reset := Reset, MovementRequested := (RelayFwd OR RelayRev),
-      ContactorFeedback := BrakeFeedback,
-      DelayContactClose := BrakeDelayContactClose, DelayMagnetise := BrakeDelayMagnetise,
-      DelayMotorDecel := BrakeDelayMotorDecel, FeedbackTimeout := BrakeFeedbackTimeout,
-      BypassContactorCheck := BypassContactorCheck);
-BrakeCmd := Brake.BrakeCmd;
-BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
-BrakeContactorCheck := Brake.ContactorCheck;
 
 // 🔧 REX 2026-07-07 : vérification UNIQUEMENT à l'arrêt commandé (plus de détail par sens —
 // voir bandeau en-tête). AllContactorsCommandedOff = tout ce que FB_Winch commande est à FALSE.
@@ -385,11 +360,8 @@ IF BypassGlobal THEN
 END_IF;
 
 IF NOT BypassGlobal THEN
-    IF Brake.Error THEN
-    ErrorId := ErrorId OR 16#0001;
-ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
-END_IF;
+// 🆕 2026-08-06 (retrait FB_Brake) : bit0 ErrorId libre — le frein n'est plus surveillé
+// ici, sa cohérence commande/retour vit désormais dans FB_WinchOutputInterlock_LD (BrakeFeedback).
 
 // 🧪 Simulation (GVL_Simulation.SensorMxContactorFeedbackIsReal, passé par l'appelant via
 // BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed
@@ -437,5 +409,4 @@ IF Error THEN
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-    BrakeCmd := FALSE;
 END_IF;

@@ -108,8 +108,7 @@ instWinchOutputInterlockM1(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop,
-    BrakeReleaseRequest        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeReleaseRequest,
-    BrakeCommandOpenConfirmed  := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeCommandOpenConfirmed,
+    BrakeFeedback              := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
     RequestedRelayFwd          := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd,
     RequestedRelayRev          := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev,
@@ -126,7 +125,10 @@ M1SpeedContactor1 := instWinchOutputInterlockM1.Contactor1;
 M1SpeedContactor2 := instWinchOutputInterlockM1.Contactor2;
 M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
 M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
-M1BrakeCmd        := instWinchOutputInterlockM1.BrakeCmd;
+// 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT sur les DQ
+// finaux (pas une simple recopie de instWinchOutputInterlockM1.BrakeCmd) -- visible ici
+// sans ouvrir FB_WinchOutputInterlock_LD, meme doctrine que le reste de ce POU.
+M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
 // ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
 M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
@@ -138,8 +140,7 @@ instWinchOutputInterlockM2(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop,
-    BrakeReleaseRequest        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeReleaseRequest,
-    BrakeCommandOpenConfirmed  := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeCommandOpenConfirmed,
+    BrakeFeedback              := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
     RequestedRelayFwd          := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayFwd,
     RequestedRelayRev          := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayRev,
@@ -156,7 +157,8 @@ M2SpeedContactor1 := instWinchOutputInterlockM2.Contactor1;
 M2SpeedContactor2 := instWinchOutputInterlockM2.Contactor2;
 M2SpeedContactor3 := instWinchOutputInterlockM2.Contactor3;
 M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
-M2BrakeCmd        := instWinchOutputInterlockM2.BrakeCmd;
+// 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT, voir M1 ci-dessus.
+M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 // 🛡️ 2026-08-06 (demande maintenance) : déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
