@@ -11,6 +11,7 @@ STRUCT
     NeutralXAct  : INT;        (* 🎯 Neutre X calibré actuel (lecture seule) *)
     NeutralYAct  : INT;        (* 🎯 Neutre Y calibré actuel (lecture seule) *)
     DeadmanArmed : BOOL;       (* 🔫 Geste homme-mort armé (FB_Joystick.DeadmanArmed) *)
+    AtNeutral    : BOOL;       (* 🆕 2026-08-07 : TRUE si les 2 axes sont en zone morte (position centrale) *)
     Online       : BOOL;       (* 📡 Liaison CAN joystick active *)
     Operational  : BOOL;       (* 🟢 Joystick opérationnel *)
     Error        : BOOL;       (* 🔴 Joystick en défaut *)
