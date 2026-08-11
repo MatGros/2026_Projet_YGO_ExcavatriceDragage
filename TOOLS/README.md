@@ -19,7 +19,8 @@ TOOLS/
     ├── test_import_poc/
     └── docs/
 ├── PROJECT_WORKSPACE/       # Environnement de travail du projet (Pi, AGY, Claude, Gates, Herdr, Graph)
-│   ├── README.md             # Documentation et guide
+│   ├── README.md             # Documentation et guide (terminaux VS Code)
+│   ├── MARKDOWN_WORKSPACE.md # Édition & cochage des fichiers Markdown (Ctrl+K V)
 │   └── terminals.json        # Fichier de configuration modèle
 ├── DIAGRAM_GENERATORS/      # Générateurs spécialisés de diagrammes Mermaid
 └── visualize_workflow.py    # Compatibilité et moteur commun Mermaid
@@ -141,6 +142,8 @@ Skills disponibles : `codesys-change`, `codesys-review`, `herdr-review`, `doc-sy
 ### `PROJECT_WORKSPACE/` — Orchestration IDE
 
 🖥️ Config para VS Code : lance Pi, Gates, Graph, Herdr dans 4 terminaux parallèles (1 raccourci)
+- `README.md` → terminaux VS Code (`Ctrl+Shift+P` → **Terminals: Run**)
+- `MARKDOWN_WORKSPACE.md` → édition & cochage des fichiers Markdown (`Ctrl+K V` sans extension checkbox)
 
 ---
 
