@@ -30,18 +30,16 @@ Si tu modifies l'extension :
 
 ### 📝 Personnalisation possible
 
-| Élément | Fichier | Action |
-|---------|---------|--------|
+| Élément | Fichier | Ligne |
+|---------|---------|-------|
 | Son alternatif | `sound-notifier.ts` | Modifier le chemin `.wav` |
 | Comportement | `sound-notifier.ts` | Modifier l'event écouté (ex: `turn_end`) |
 
 **Exemples de chemins alternatifs :**
 - `$env:windir\Media\tada.wav` (succès)
 - `$env:windir\Media\chord.wav` (autre)
-- `$env:windir\Media\ding.wav` (notification)
 
 ---
 
 **Créé** : 2025 (REX Pi Coding + VS Code Terminal)  
-**Testé** : ✅ Windows PowerShell + VS Code Terminal  
-**Status** : Opérationnel
+**Testé** : ✅ Windows PowerShell + VS Code Terminal
