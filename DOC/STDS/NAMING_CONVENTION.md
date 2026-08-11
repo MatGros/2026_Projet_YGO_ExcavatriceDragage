@@ -56,7 +56,7 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 > 🗺️ **Cette table ne decide rien : elle recopie la cible de `AF_Partie-02` §2 et §4**, seule
 > source de l'architecture. Elle sert uniquement a fixer l'orthographe des noms.
 > Le decoupage est fait **par ensemble mecanique**, pas par couche transverse : chaque procede
-> porte sa safety dans sa propre page. Decision : `DOC/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
+> porte sa safety dans sa propre page. Decision : `DOC/WFLOW/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
 
 | Rang | Nom cible | Langage / source |
 |---|---|---|
@@ -93,7 +93,7 @@ Aucun n'est un nom cible : ils sont absorbes par la page du procede correspondan
 exige le remappage complet des consommateurs avant suppression de l'ancien producteur, un
 producteur unique a tout instant, et une preuve de liaison. Ordonnancement des lots M0→M8, avec
 M7 (renumerotation) verrouille tant qu'un cycle inter-programme subsiste :
-`DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`.
+`DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`.
 
 ### Instances FB
 - Préfixe **`inst`** + rôle PascalCase : `instJoystick`, `instSafetyWinchM1`.
@@ -157,7 +157,7 @@ Source et cas existants : `AUDITS/PreLivraison/TABLE_Renommage_IO_v1.0.md`.
 
 🚨 **Un `_DI`/`_DQ`/`_RQ` est un nom de point matériel réel** (`Device_IO_20260806.csv`) — ne
 **jamais** redéclarer ce nom exact comme variable locale d'un `PROGRAM` (collision de portée
-IEC 61131-3, REX 2026-08-05 : `DOC/CODE_QUALITY_STANDARDS.md §3bis`). Seul `PRG_02_Acquisition`
+IEC 61131-3, REX 2026-08-05 : `DOC/STDS/CODE_QUALITY_STANDARDS.md §3bis`). Seul `PRG_02_Acquisition`
 porte ces noms bruts, en `VAR_INPUT`.
 
 ⚠️ **Contre-exemple — polarité inversée dans le nom** : `PowerCutOff_A_RQ`/`PowerCutOff_B_RQ`

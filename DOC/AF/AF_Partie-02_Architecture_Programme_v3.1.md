@@ -99,7 +99,7 @@ strategie de test.
 
 Diagnostics (`Error`/`ErrorId`) portes par la frontiere "Etat public" : distinction Warning
 (auto-efface) / Fault (acquittement explicite, pattern `Cause`/`Ack`) documentee dans
-`DOC/CODE_QUALITY_STANDARDS.md §9`, pas reformulee ici.
+`DOC/STDS/CODE_QUALITY_STANDARDS.md §9`, pas reformulee ici.
 
 Interdictions : GVL globale de commande, fusion de sources dans une interface de FB, lecture/ecriture
 
@@ -147,7 +147,7 @@ creait les cycles Safety <-> Treuils et Safety <-> Translation. Correspondance d
 | `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` | Devient aussi l'agrégateur `PowerCutOff` (Ladder). |
 | `PRG_SUPERVISION_CFC` + `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision` | Observation et diagnostic, lecture seule stricte (ST pur). |
 
-📌 Dossier de decision : `DOC/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
+📌 Dossier de decision : `DOC/WFLOW/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
 **Aucun renommage ni fusion ne demarre sans lot dedie** : chaque etape exige remappage complet des
 consommateurs, producteur unique et preuve de liaison.
 

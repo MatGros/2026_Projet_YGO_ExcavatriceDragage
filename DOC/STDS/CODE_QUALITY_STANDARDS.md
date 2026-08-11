@@ -9,9 +9,9 @@
 
 | Sujet | Document |
 |---|---|
-| Comment on **nomme** | `DOC/NAMING_CONVENTION.md` |
+| Comment on **nomme** | `DOC/STDS/NAMING_CONVENTION.md` |
 | Comment on **déclare, encapsule, relie** | **ce document** |
-| Contrats FB, DUT et CFC | `DOC/AF_Partie-03_Contrats_Composants_v2.1.md` |
+| Contrats FB, DUT et CFC | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` |
 | Ce que fait la machine | `DOC/` — voir `DOC/README.md` pour l'index complet |
 | Comment on exécute une modif | `.claude/skills/codesys-workflow.md` |
 
@@ -24,7 +24,7 @@
 3. Une notion = **un seul nom** dans tout le projet (jamais `BrakeIsOpenConfirmed` à côté de `BrakeCommandOpenConfirmed`).
 
 Détail complet (préfixes, suffixes d'unité, polarité booléenne, construction instance→champ) :
-`DOC/NAMING_CONVENTION.md`.
+`DOC/STDS/NAMING_CONVENTION.md`.
 
 ---
 
@@ -345,7 +345,7 @@ fait plus partie des nouveaux contrats LD.
 [ ] check_linkage.py --report = PASS, bloc collé dans la restitution
 [ ] check_doc_links.py = PASS (aucun lien mort, aucune version périmée)
 [ ] check_hw_name_collision.py = PASS (aucune variable PRG_* homonyme d'un point Device_IO, §3bis)
-[ ] Nommage conforme DOC/NAMING_CONVENTION.md
+[ ] Nommage conforme DOC/STDS/NAMING_CONVENTION.md
 [ ] Aucune variable/instance déclarée non utilisée
 [ ] Aucun nombre magique ; constantes nommées
 [ ] Producteur unique par donnée ; aucune GVL de commande cachée

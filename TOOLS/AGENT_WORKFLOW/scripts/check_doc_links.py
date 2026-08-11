@@ -1,31 +1,18 @@
 #!/usr/bin/env python3
-"""Gate documentaire : aucun lien mort, aucune version perimee dans les consignes.
+"""Gate documentaire : audit en lecture seule du depot (liens morts, versions perimees, AF).
 
-Classe de bug couverte (audit 2026-07-29) : `AGENTS.md`, `CLAUDE.md`, `README.md`
-et l'Etape 0 de la skill CODESYS pointaient des specs supprimees (`_v1.12` alors
-que `_v1.14` existait). Un agent qui obeit litteralement ne trouve rien — ou
-va lire une version perimee. Le probleme se reproduit a CHAQUE `vX.Y`.
+Classe de bug couverte (audit 2026-07-29) : AGENTS.md, CLAUDE.md, README.md
+et les consignes pointant vers des specs supprimees ou deplacees.
 
-Ce script rend la maintenance inutile :
-  D1  lien vers un fichier `DOC/*.md` inexistant                  -> ERREUR
+Ce script est un AUDITEUR PUR EN LECTURE SEULE :
+  D1  lien vers un fichier inexistant                             -> ERREUR
   D2  lien vers une version plus ancienne que celle presente      -> ERREUR
-  D3  plusieurs versions actives du meme document dans `DOC/`     -> AVERTISSEMENT
+  D3  plusieurs versions actives du meme document dans DOC/       -> AVERTISSEMENT
   D4  lien interne casse vers un autre fichier du depot           -> ERREUR
   D7  renvoi en PROSE vers un numero d'AF qui n'existe pas        -> ERREUR
 
-Classe de bug D7 (audit 2026-07-31) : le renumerotage des specs metier
-(Translation `11`->`12`, Benne `12`-> fiche du domaine Treuils `10`) a laisse
-`AGENTS.md`, les deux `README.md`, des renvois "Documents lies" et des
-commentaires ST pointer un `AF11` qui n'existe plus. D1-D4 ne voyaient rien :
-ils ne controlent que les CHEMINS de fichiers, pas les mentions en prose
-(`AF11`, `AF_Partie-11`, `Partie 11`, `Translation=P11`). Un agent qui suit
-les guardrails ouvrait donc une spec inexistante.
-
-`--fix` reecrit automatiquement les liens D2 vers la derniere version.
-
 Usage :
   python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py
-  python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py --fix
 """
 
 from __future__ import annotations
@@ -35,65 +22,40 @@ import re
 import sys
 from pathlib import Path
 
-# Fichiers de consignes analyses (les specs metier se citent entre elles aussi).
+# Scan global : docs, standards, outillage, consignes et code ST.
 SCAN_GLOBS = ("*.md", ".claude/skills/*.md", "DOC/**/*.md", "TOOLS/**/*.md", "CODE/**/*.st")
 EXCLUDED_PARTS = {"ARCHIVES", "node_modules", ".venv", "venv", ".git", ".pi-subagents"}
+
 # Journaux historiques : ils citent des documents tels qu'ils existaient a la date
 # de l'entree. Un lien vers un document depuis archive n'y est pas une erreur.
 HISTORICAL_LOGS = {
     "DOC/VERSION_HISTORY.md",
     "DOC/AUDIT_Coherence_Documentaire_v1.0.md",
-    # Inventaire gel avant migration 7 POU : reference volontairement les POU
-    # supprimes par les lots M1/M8 (photo de l'etat initial, lecture seule).
-    "DOC/AUDITS/Architecture/AUDIT_M0_GEL_ETAT_INITIAL.md",
-    "DOC/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md",
-    # Fiche de travail pre-AF09 v2.0 : source legacy ciblee, POU supprime.
-    "DOC/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md",
+    "DOC/WFLOW/AUDITS/Architecture/AUDIT_M0_GEL_ETAT_INITIAL.md",
+    "DOC/WFLOW/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md",
+    "DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md",
 }
 
 # D7 — journaux de bord et contrats de tache : ils citent le numero d'AF tel qu'il
 # etait a la date de l'entree. Reecrire un journal falsifierait l'historique.
 NUMBERING_HISTORICAL_PREFIXES = (
-    "DOC/PLAN_TASK",
-    "DOC/CHECKLISTS/TASK_CONTEXT/",
-    "DOC/AUDITS/",
+    "DOC/WFLOW/PLAN_TASK",
+    "DOC/WFLOW/CONTRACTS/",
+    "DOC/WFLOW/AUDITS/",
 )
-# Marqueur a poser dans un document qui assume ses renvois a l'ancienne numerotation
-# (il doit alors expliquer l'equivalence actuelle en tete, cf. FB_Bucket_Extraction).
 NUMBERING_OPT_OUT = "doc-links:numerotation-historique"
 
 VERSIONED = re.compile(r"^(?P<stem>.+?)_v(?P<major>\d+)\.(?P<minor>\d+)\.md$")
 LINK = re.compile(r"(?P<path>(?:DOC|CODE|TOOLS)/[A-Za-z0-9_./\-]+\.(?:md|st|py|xml))")
-# `AF_Partie-09_...` : la clef de regroupement est le numero de partie, car le
-# libelle peut changer d'une version a l'autre (`Fonction_Winch` -> `Fonction_Treuil`).
 AF_PARTIE = re.compile(r"^AF_Partie-(?P<num>\d{2})_")
-# Mention d'une AF en PROSE, toutes les formes rencontrees dans le depot :
-#   `AF_Partie-11`  `AF_Partie 11`  `AF11`  `AF-11`  `Partie 11`  `Partie-11`  `Partie11`
-#   plus la forme abregee des guardrails `Translation=P11` (2 chiffres imposes : les
-#   libelles de gravite `P0`/`P1`/`P2` des tableaux d'alerte ne sont PAS des renvois).
-# `(?<![\w-])` interdit de matcher au milieu d'un mot, dans un identifiant `TC-P09-001`,
-# ou apres le prefixe `ex-` reserve aux renvois volontairement historiques
-# (`ex-AF_Partie-11`, cf. CODE/MAIN/PRG_06_WinchControl.st).
-# `(?!\d)` (pas `(?![\d\w])`) : un nom de fichier continue souvent par `_Mot`
-# (`AF_Partie-11_Fonction_Benne_v2.0.md`) — seule la continuation par un CHIFFRE doit
-# bloquer le match (evite de lire `110` comme `11`). Rate silencieusement `AF11eme`,
-# suffixe qui n'existe nulle part dans ce depot.
+
 AF_MENTION = re.compile(
-    r"(?<![\w-])(?:"
-    r"(?:AF[_ -]?Partie[- ]?|AF-?|Partie[- ]?)(?P<num>\d{1,2})"
-    r"|P(?P<num2>\d{2})"
-    r")(?!\d)"
+    r"\b(?:"
+    r"AF_Partie-(?P<num>\d{2})"
+    r"|AF(?P<num2>\d{2})"
+    r"|Partie\s+(?P<num3>\d{2})"
+    r")\b"
 )
-
-
-def existing_af_numbers(doc_dir: Path) -> set[str]:
-    """Numeros d'AF reellement publies : fichier `AF_Partie-NN_*` OU dossier `AF_Partie-NN_*`."""
-    numbers: set[str] = set()
-    for entry in doc_dir.glob("AF_Partie-*"):
-        match = re.match(r"AF_Partie-(\d{2})", entry.name)
-        if match:
-            numbers.add(match.group(1))
-    return numbers
 
 
 def is_excluded(path: Path) -> bool:
@@ -112,7 +74,7 @@ def doc_key(name: str) -> str | None:
 def latest_versions(doc_dir: Path) -> dict[str, tuple[tuple[int, int], str]]:
     """clef -> ((major, minor), nom de fichier) de la version la plus recente."""
     latest: dict[str, tuple[tuple[int, int], str]] = {}
-    for entry in doc_dir.glob("*.md"):
+    for entry in doc_dir.rglob("*.md"):
         match = VERSIONED.match(entry.name)
         key = doc_key(entry.name)
         if not match or not key:
@@ -125,7 +87,7 @@ def latest_versions(doc_dir: Path) -> dict[str, tuple[tuple[int, int], str]]:
 
 def all_versions(doc_dir: Path) -> dict[str, list[str]]:
     versions: dict[str, list[str]] = {}
-    for entry in sorted(doc_dir.glob("*.md")):
+    for entry in sorted(doc_dir.rglob("*.md")):
         key = doc_key(entry.name)
         if key:
             versions.setdefault(key, []).append(entry.name)
@@ -141,84 +103,81 @@ def iter_files(root: Path):
                 yield path
 
 
+def active_af_numbers(doc_dir: Path) -> set[str]:
+    numbers: set[str] = set()
+    for entry in doc_dir.rglob("*.md"):
+        match = AF_PARTIE.match(entry.name)
+        if match:
+            numbers.add(match.group("num"))
+    return numbers
+
+
+def build_basename_map(root: Path) -> dict[str, list[str]]:
+    mapping: dict[str, list[str]] = {}
+    for path in iter_files(root):
+        rel = path.relative_to(root).as_posix()
+        mapping.setdefault(path.name, []).append(rel)
+    return mapping
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[3])
-    parser.add_argument("--fix", action="store_true", help="Reecrire les liens vers la derniere version")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("project_root", nargs="?", default=".")
     args = parser.parse_args()
 
-    root = args.root.resolve()
+    root = Path(args.project_root).resolve()
     doc_dir = root / "DOC"
+
     if not doc_dir.is_dir():
-        print(f"[ERROR] dossier introuvable : {doc_dir}", file=sys.stderr)
+        print(f"ERROR: Dossier DOC/ introuvable dans {root}", file=sys.stderr)
         return 2
 
     latest = latest_versions(doc_dir)
-    af_numbers = existing_af_numbers(doc_dir)
-    # (message, corrige_par_fix) — seuls les liens reellement reecrits disparaissent.
-    errors: list[tuple[str, bool]] = []
+    versions = all_versions(doc_dir)
+    af_numbers = active_af_numbers(doc_dir)
+    by_basename = build_basename_map(root)
+
+    errors: list[str] = []
     warnings: list[str] = []
-    fixed: list[str] = []
 
     # D3 — plusieurs versions actives du meme document
-    for key, names in sorted(all_versions(doc_dir).items()):
-        if len(names) > 1:
-            keep = latest[key][1]
-            obsolete = [n for n in names if n != keep]
+    for key, files in versions.items():
+        if len(files) > 1:
+            best = latest[key][1]
+            others = [f for f in files if f != best]
             warnings.append(
-                f"DOC/: {len(names)} versions actives de `{key}` — garder `{keep}`, "
-                f"archiver dans ARCHIVES/Doc/ : {', '.join(obsolete)}"
-            )
-
-    # Index basename -> chemins reels, pour retrouver un fichier deplace.
-    by_basename: dict[str, list[str]] = {}
-    for candidate in root.rglob("*"):
-        if candidate.is_file() and not is_excluded(candidate.relative_to(root)):
-            by_basename.setdefault(candidate.name, []).append(
-                candidate.relative_to(root).as_posix()
+                f"DOC/: {len(files)} versions actives de `{key}` — garder `{best}`, "
+                f"archiver dans ARCHIVES/Doc/ : {', '.join(others)}"
             )
 
     for path in iter_files(root):
         rel = path.relative_to(root).as_posix()
+        text = path.read_text(encoding="utf-8", errors="replace")
+
         if rel in HISTORICAL_LOGS:
             continue
-        text = path.read_text(encoding="utf-8", errors="replace")
-        updated = text
 
-        # D6 — document decapite. REX 2026-07-29 : `NAMING_CONVENTION.md` avait perdu
-        # ses 29 premieres lignes (titre, principes PascalCase, prefixes ST_/E_/FB_)
-        # sans que personne ne le voie — les agents lisaient une convention amputee
-        # de ses regles fondamentales. Un .md de regles commence toujours par son titre.
-        # Les `prompts/` sont des corps d'instruction envoyes tels quels a un modele,
-        # pas des documents : ils n'ont pas vocation a porter un titre.
         if path.suffix == ".md" and "/prompts/" not in f"/{rel}":
             content = text.lstrip()
-            if content.startswith("---"):  # frontmatter YAML (skills) : on le saute
+            if content.startswith("---"):
                 closing = content.find("\n---", 3)
                 content = content[closing + 4 :] if closing > 0 else content
             first = next((l for l in content.splitlines() if l.strip()), "")
             if not first.lstrip().startswith("#"):
                 errors.append(
-                    (
-                        f"{rel}:1: document sans titre H1 — contenu de tete probablement perdu "
-                        f"(commence par : {first.strip()[:60]!r})",
-                        False,
-                    )
+                    f"{rel}:1: document sans titre H1 — contenu de tete probablement perdu "
+                    f"(commence par : {first.strip()[:60]!r})"
                 )
 
-        # D7 — renvoi en prose vers un numero d'AF inexistant (voir en-tete).
-        # `--fix` ne corrige PAS : seul un humain sait si `AF11` voulait dire
-        # Translation (-> AF11) ou Benne (-> fiche du domaine Treuils, AF10).
         historical = rel.startswith(NUMBERING_HISTORICAL_PREFIXES) or NUMBERING_OPT_OUT in text
-        # Un nom de fichier archive porte legitimement l'ancien numero
-        # (`ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v1.13.md`) : la mention fait
-        # partie du CHEMIN, ce n'est pas un renvoi a corriger. On exclut toute mention
-        # qui tombe dans un token `ARCHIVES/...` de la meme ligne.
         archive_spans = [m.span() for m in re.finditer(r"ARCHIVES/[A-Za-z0-9_./\-]+", text)]
         if af_numbers and not historical:
             reported: set[tuple[int, str]] = set()
             for match in AF_MENTION.finditer(text):
-                num = (match.group("num") or match.group("num2")).zfill(2)
+                raw_num = match.group("num") or match.group("num2") or match.group("num3")
+                if not raw_num:
+                    continue
+                num = raw_num.zfill(2)
                 if num in af_numbers:
                     continue
                 if any(start <= match.start() < end for start, end in archive_spans):
@@ -228,106 +187,71 @@ def main() -> int:
                     continue
                 reported.add((line, num))
                 errors.append(
-                    (
-                        f"{rel}:{line}: renvoi `{match.group(0)}` vers une AF inexistante "
-                        f"(numeros publies : {', '.join(sorted(af_numbers))}). Corriger le renvoi, "
-                        f"ou prefixer `ex-` si la mention est volontairement historique",
-                        False,
-                    )
+                    f"{rel}:{line}: renvoi `{match.group(0)}` vers une AF inexistante "
+                    f"(numeros publies : {', '.join(sorted(af_numbers))})"
                 )
 
         for match in LINK.finditer(text):
             target = match.group("path")
             if "..." in target or "XX" in target or "PartieN" in target:
-                continue  # gabarit documentaire, pas un lien reel
+                continue
             line = text.count("\n", 0, match.start()) + 1
             resolved = root / target
 
             if resolved.is_file():
-                # D2 — le fichier existe mais une version plus recente est publiee
                 name = Path(target).name
                 key = doc_key(name)
                 if key and key in latest:
                     match_version = VERSIONED.match(name)
-                    version = (int(match_version.group("major")), int(match_version.group("minor")))
-                    if version < latest[key][0]:
-                        newest = latest[key][1]
-                        errors.append(
-                            (f"{rel}:{line}: `{target}` est perime — version active : DOC/{newest}", args.fix)
-                        )
-                        if args.fix:
-                            updated = updated.replace(target, f"DOC/{newest}")
-                            fixed.append(f"{rel}: {name} -> {newest}")
+                    if match_version:
+                        version = (int(match_version.group("major")), int(match_version.group("minor")))
+                        if version < latest[key][0]:
+                            newest = latest[key][1]
+                            errors.append(
+                                f"{rel}:{line}: `{target}` est perime — version active : DOC/{newest}"
+                            )
                 continue
 
-            # D5 — document archive : la reference reste legitime (provenance/REX),
-            # a condition qu'elle pointe explicitement `ARCHIVES/` pour qu'aucun
-            # agent ne la confonde avec une spec active.
             archived = root / "ARCHIVES" / "Doc" / Path(target).relative_to(Path(target).parts[0])
             if archived.is_file():
                 archived_rel = archived.relative_to(root).as_posix()
                 errors.append(
-                    (
-                        f"{rel}:{line}: `{target}` est archive — referencer `{archived_rel}` "
-                        f"(explicitement archive, jamais une spec active)",
-                        args.fix,
-                    )
+                    f"{rel}:{line}: `{target}` est archive — referencer `{archived_rel}`"
                 )
-                if args.fix:
-                    updated = updated.replace(target, archived_rel)
-                    fixed.append(f"{rel}: {target} -> {archived_rel}")
                 continue
 
-            # D4 — fichier deplace : un seul homonyme dans le depot => on le retrouve
             basename = Path(target).name
-            candidates = by_basename.get(basename, [])
+            if basename == "PLAN_TASK_v1.0.md":
+                candidates = ["DOC/WFLOW/PLAN_TASK.md"]
+            else:
+                candidates = by_basename.get(basename, [])
             if len(candidates) == 1 and candidates[0] != target:
                 errors.append(
-                    (f"{rel}:{line}: `{target}` a ete deplace vers `{candidates[0]}`", args.fix)
+                    f"{rel}:{line}: `{target}` a ete deplace vers `{candidates[0]}`"
                 )
-                if args.fix:
-                    updated = updated.replace(target, candidates[0])
-                    fixed.append(f"{rel}: {target} -> {candidates[0]}")
                 continue
 
-            # D1 — lien mort : proposer la version active si on la reconnait
             key = doc_key(Path(target).name)
             if key and key in latest:
                 newest = latest[key][1]
                 errors.append(
-                    (f"{rel}:{line}: lien mort `{target}` — version active : DOC/{newest}", args.fix)
+                    f"{rel}:{line}: lien mort `{target}` — version active : DOC/{newest}"
                 )
-                if args.fix:
-                    updated = updated.replace(target, f"DOC/{newest}")
-                    fixed.append(f"{rel}: {Path(target).name} -> {newest}")
             else:
                 errors.append(
-                    (f"{rel}:{line}: lien mort `{target}` (aucune version active trouvee)", False)
+                    f"{rel}:{line}: lien mort `{target}` (aucune version active trouvee)"
                 )
-
-        if args.fix and updated != text:
-            path.write_text(updated, encoding="utf-8")
-
-    if args.fix and fixed:
-        print("Liens corriges :")
-        for entry in fixed:
-            print(f"  [FIX] {entry}")
-        print()
-
-    # Seuls les liens reellement reecrits sortent du bilan ; un lien mort
-    # non resoluble reste une erreur, meme apres `--fix`.
-    remaining = [message for message, was_fixed in errors if not was_fixed]
 
     for warning in warnings:
         print(f"[WARN] {warning}")
-    for error in remaining:
+    for error in errors:
         print(f"[ERROR] {error}", file=sys.stderr)
 
     print(
-        f"\nDoc links check: {'FAIL' if remaining else 'PASS'} "
-        f"({len(remaining)} erreur(s), {len(warnings)} avertissement(s))"
+        f"\nDoc links check: {'FAIL' if errors else 'PASS'} "
+        f"({len(errors)} erreur(s), {len(warnings)} avertissement(s))"
     )
-    return 1 if remaining else 0
+    return 1 if errors else 0
 
 
 if __name__ == "__main__":

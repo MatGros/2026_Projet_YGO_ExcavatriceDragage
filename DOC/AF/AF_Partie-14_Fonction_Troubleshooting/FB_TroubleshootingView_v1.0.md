@@ -6,7 +6,7 @@
 > 📄 Source : `CODE/DEPANNAGE/FB_TroubleshootingView.st`
 > 📄 GVL alimentée : `CODE/DEPANNAGE/GVL_Troubleshooting.st`
 > 🔗 Producteur unique de `GVL_Troubleshooting.*` — appelé uniquement dans `PRG_07_Supervision`.
-> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2.
+> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2.
 
 ---
 

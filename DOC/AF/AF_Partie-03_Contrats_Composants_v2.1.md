@@ -67,7 +67,7 @@ StartStop       -> acceleration ou deceleration normale
 - Deux categories de defaut a distinguer des la conception d'un composant : **Warning** (auto-efface
   avec la cause, aucun acquittement) et **Fault** (necessite un acquittement explicite, meme si la
   cause a disparu ; reapparait si la cause revient apres acquittement). Pattern `Cause`/`Ack` et regle
-  complete : `DOC/CODE_QUALITY_STANDARDS.md §9`.
+  complete : `DOC/STDS/CODE_QUALITY_STANDARDS.md §9`.
 - L'acquittement ne redemarre jamais un mouvement : une nouvelle demande explicite est requise.
 - `ErrorId` est un bitfield cumulatif. Chaque bit a une cause, un proprietaire et un texte IHM documentes.
 - `Error := (ErrorId <> 0)`.
@@ -191,7 +191,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
 
 > 🚩 REX 2026-08 : trois bugs d'import CODESYS sur `PRG_01_Inputs_LD` ont nécessité
 > la formalisation des règles de génération LD. Référentiel complet :
-> `DOC/CODE_QUALITY_STANDARDS.md §11`.
+> `DOC/STDS/CODE_QUALITY_STANDARDS.md §11`.
 
 Un programme suffixe `_LD` est une **source ST** convertie en `<LD>` dans le
 bundle PLCopenXML par `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`.
