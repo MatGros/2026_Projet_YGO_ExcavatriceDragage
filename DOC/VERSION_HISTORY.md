@@ -4,6 +4,12 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.6.00_Bascule_Chantier` — 2026-08-07 — transition de version pour la suite des essais
+- **Clôture journée MES** sur `v0.5.25_DepartSoirEssai` (retours terrain : voir `TREUILS_JOYSTICK_SESSION_TERRAIN` ci-dessous)
+- **Passage en `v0.6.00`** pour la suite du chantier et les **prochains essais** (nouvelle architecture)
+- 📦 **Point de sauvegarde** : snapshot daté du code `v0.5.25_DepartSoirEssai` = référence fonctionnelle pour comparaison agents/IA (hors `CODE/` actif)
+- 📅 **Préréception le 17** — retours à intégrer ensuite
+
 ### `TREUILS_JOYSTICK_SESSION_TERRAIN` — 2026-08-07 — retours terrain treuils/joystick (commits `228c438`..`b97a511`)
 - **Retrait `FB_Brake` (M1/M2)** : frein couplé directement `BrakeCmd := RelayFwd OR RelayRev` (`FB_WinchOutputInterlock_LD`), recalculé indépendamment dans `PRG_06_Outputs_LD` (barrière finale visible) ; M3 non touché
 - **`RestartDelay`** : bascule de "retombée contacteur" à "frein réellement fermé" (`BrakeFeedback`), 1000ms→1500ms, puis re-sécurisé pour exiger `NOT BrakeFeedback` ET `NOT MotorRequest` (audit croisé, retour terrain)
@@ -18,6 +24,17 @@ Une entrée par jalon significatif — pas besoin de logguer chaque sous-version
 - **Bypass commun granulaire** (`Commun.Bypass.TopLimitSwitch/TopLimitSoftware/CableLimitSwitch/LimitLegal`) : lève une protection sur M1+M2 simultanément (pilotage "both"), en OR avec les bypass individuels — jamais de désactivation croisée
 - **REX terrain non-code** : délai ~500ms au relâcher joystick tracé jusqu'à `GVL_PERSISTENT._JoystickFilterTime` (RETAIN resté à 100ms malgré défaut source 0ms) — écriture forcée en ligne, pas de bug logiciel
 - 17/17 gates verts à chaque commit, bundle régénéré et testé en direct sur machine réelle entre chaque lot
+
+### `MES_20260805_LOTS0A4_SECURITE_ET_SORTIES` — 2026-08-05 — session MES : safety & sorties (commits `21170be`..`f6e404b`)
+- **LOT0** : `FB_Diag_IhmHeartbeat` instancié dans `PRG_07_Supervision`
+- **LOT2** : sortie moteur AC600 M3 câblée (`DriveFreqRefWord`, échelle ×100 confirmée terrain)
+- **LOT3** : homme-mort joystick exigé pour tout mouvement M3 (`T106`)
+- **M4** : `FB_Safety_Translation` câblé dans `PRG_05_Translation`
+- `FB_Safety_Winch` M1/M2 instancié · chaîne codeur M1/M2 complétée (Safety bornage + SpeedMeasure) · **`PowerCutOff` M1/M2/M3 câblé** à la coupure amont
+- **Fix `PRG_06`** : collision de portée nom HW (`*_RQ`/`*_DQ` identiques aux variables auto-créées du mapping) → sorties jamais réellement pilotées (**MES-016**)
+- Barrières finales M1/M2/M3 visibles en Ladder + garde-fou LD · checklists chronologiques dépanage (Homing/Safety/Joystick/Motion) + fix homing capteur haut
+- Reset watchdog frein conditionné M1/M2/M3 (pattern Cause/Ack) · fix inversion sens rapide translation
+- 17/17 gates verts à chaque commit
 
 ### `M3_TRANSLATION_TERRAIN_SESSION` — 2026-08-06 — mise en service terrain temps réel (commits `076377e`..`a9b016f`)
 - **Position estimée M3 persistante** : reprise après reboot (`GVL_PERSISTENT._TranslationPosEstimated_M`)

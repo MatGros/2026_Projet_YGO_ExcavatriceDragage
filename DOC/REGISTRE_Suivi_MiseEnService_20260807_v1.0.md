@@ -91,6 +91,7 @@
 - 🔍 **Constat** : préconditions `WAIT_PRECONDITIONS` (benne ouverte, fenêtre immersion) bloquaient toute progression tant que les seuils n'étaient pas réglés — besoin d'un chemin de test simplifié pendant la mise en service.
 - 🛠️ **Solution** : `GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence` (défaut `FALSE`) — front montant Kobold pendant descente couplée confirme directement le fond ET bloque la descente (même doctrine que Fiche 05), sans passer par les préconditions. `FB_DiveSearch` continue de gérer le contacteur Kobold en parallèle (jamais désactivé). Preuve : `CODE/CYCLE/FB_DiveSearch.st` (`BypassPreconditions`), `CODE/MAIN/PRG_04_Treuils_Benne.st` (§1).
 - 📌 **Action** : régler `DiveStartMin_M`/`ImmersionUpper_M`/`ImmersionLower_M` définitivement, puis repasser le toggle à `FALSE`.
+- 🟡 **Suivi terrain (même jour, après essais)** : le bypass fonctionne (fond confirmé), mais `DredgingAssist.State.DiveErrorId = 2` (bit1, "séquence Kobold invalide") se déclenche quand même côté `FB_DiveSearch` — normal : ce FB continue de tourner en parallèle avec SA propre logique stricte (fenêtre immersion `ImmersionUpper_M`/`ImmersionLower_M`, pas encore calibrée, voir ci-dessus), indépendante du bypass. Obligation de faire un Reset manuel (`FaultMachineReset_IHM`) pour clear le défaut à chaque fois. Cause racine identique à l'action ouverte ci-dessus (seuils pas calibrés) — pas un bug distinct, mais gênant en pratique tant que non réglé.
 
 ### MES-027 — 🟢 Mode pilotage unitaire M2 sécurisé (bornes ouvert/fermé + palier 1)
 - 🟦 **Date** : 2026-08-07 | 🟧 **Lieu** : Terrain | 🏷️ **Version** : en cours
@@ -99,6 +100,34 @@
 - 🔍 **Constat** : besoin d'un jog libre M2 borné dans les limites benne (0 → `OffsetCloseM`, config) à vitesse bridée, sans passer par `instBucket` (pas de mémorisation `CloseReq`/`OpenReq`).
 - 🛠️ **Solution** : `GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits` (défaut `TRUE`) — actif uniquement en pilotage unitaire M2, borne `ForbidDescentM2`/`ForbidAscentM2` sur `CablePosM1 + OffsetOpenM/OffsetCloseM`, plafonne palier 1. Preuve : `CODE/SUPERVISION/_TYPES/ST_BucketCmd.st`, `CODE/MAIN/PRG_04_Treuils_Benne.st` (§5-6).
 - 📌 **Action** : valider bornes réelles sur site (0 → 15m config actuelle).
+
+### MES-028 — 🟠 Palier ralentissement fin de course haut trop bas si benne chargée
+- 🟦 **Date** : 2026-08-07 | 🟧 **Lieu** : Terrain | 🏷️ **Version** : en cours
+- 🎯 **Périmètre** : M1/M2 — zone de ralentissement à l'approche de la fin de course haute (`CfgSlowdownDistanceM`)
+- 🚦 **Statut** : 🟠 **Action ouverte** — non corrigé, noté pour action
+- 🔍 **Constat** : `WinchSlowdownMaxStep := 1` (`GVL_PERSISTENT._CommunCfgPersist`, commun M1/M2) plafonne au palier 1 dans la zone de ralentissement — palier 1 cale (couple insuffisant) si la benne est chargée. Il faut autoriser au moins le palier 2 dans cette zone.
+- 🛠️ **Solution envisagée** : `WinchSlowdownMaxStep` 1 → 2 (`GVL_PERSISTENT.st:142`, `ST_CommunCfg.st:22`). Pas encore appliqué — à confirmer avant modif (impact sécurité : palier plus élevé = distance de freinage plus longue près de la butée haute).
+- 📌 **Action** : décider palier cible (2 probable) et appliquer, en vérifiant que la distance de ralentissement (`CfgSlowdownDistanceM`) reste suffisante au palier retenu.
+
+---
+
+### MES-022 — 🏁 Clôture journée & bascule de version → `v0.6.00`
+- 📅 **Date** : 2026-08-07 | 📍 **Lieu** : Terrain | 🏷️ **Version** : `v0.5.25_DepartSoirEssai`
+- 🎯 **Périmètre** : Clôture séance MES, transition version, jalon préréception
+- 🚦 **Statut** : ✅ **Journée terminée**
+- 🔍 **Constat** : Fin de la journée de MES **avec** `v0.5.25_DepartSoirEssai` (version d'essai en soirée).
+- 🛠️ **Décision** : Passage en **`v0.6.00`** pour la suite du chantier et les **prochains essais**.
+- 📅 **Jalon** : **Préréception le 17** (commentaires possibles à intégrer). En attendant, avancement sur le programme.
+- 📌 **Action** : Logger le jalon `v0.6.00` dans `VERSION_HISTORY.md` (proposé — pas modifié sans ta validation).
+
+---
+
+### MES-023 — 📦 Décision : point de sauvegarde code `v0.5.25_DepartSoirEssai`
+- 📅 **Date** : 2026-08-07 | 📍 **Lieu** : Organisation projet
+- 🎯 **Périmètre** : Gestion version — `CODE/` reste le **code actif** (travail de tous les agents/programmeurs) ; création d'un **dossier daté** = snapshot du dernier point qui fonctionne (`v0.5.25_DepartSoirEssai`)
+- 🚦 **Statut** : 🟢 **Décision actée** (création par l'utilisateur)
+- 🛠️ **Utilité** : Point de sauvegarde + **code exemple de référence** → permet aux agents/IA de **comparer le fonctionnement** et préserver les **fonctions qui marchent aujourd'hui**.
+- ⚠️ **Point à valider (emplacement)** : placer le snapshot **HORS de `CODE/`** (ex. `ARCHIVES/Code/…` ou racine repo) — sinon les outils qui scannent `CODE/*.st` (bundle PLCopenXML, `check_linkage.py`, gates) risquent de l'ingérer comme code actif et fausser la liaison/les gates.
 
 ---
 
