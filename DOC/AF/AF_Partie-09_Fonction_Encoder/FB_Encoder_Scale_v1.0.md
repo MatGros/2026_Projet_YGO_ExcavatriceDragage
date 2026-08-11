@@ -16,7 +16,7 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P09-013 | Conversion linéaire exacte `PointsPerRev` ➔ mètres câble selon ratio tambour | `💻 AUTO` |
+| <nobr><code>TC-P09-013</code></nobr> | Conversion linéaire exacte `PointsPerRev` ➔ mètres câble selon ratio tambour | `💻 AUTO` |
 
 ---
 

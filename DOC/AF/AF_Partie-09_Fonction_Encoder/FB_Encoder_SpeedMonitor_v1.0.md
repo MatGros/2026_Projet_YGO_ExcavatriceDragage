@@ -16,7 +16,7 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P09-015 | Détection de variation de vitesse brusque > seuil paramétrable avec tempo de confirmation | `💻 AUTO` |
+| <nobr><code>TC-P09-015</code></nobr> | Détection de variation de vitesse brusque > seuil paramétrable avec tempo de confirmation | `💻 AUTO` |
 
 ---
 

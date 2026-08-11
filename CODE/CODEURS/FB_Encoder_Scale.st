@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §2/§3.1
-                   DOC/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §2/§3.1
+                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
    🎯 Formule : CablePosM = (RawPos - HomingRefRaw) × (CableM_PerRev / PointsPerRev)
    🧮 Arithmétique signée sûre : conversion en DINT avant la soustraction.
    ═══════════════════════════════════════════════════════════════ *)

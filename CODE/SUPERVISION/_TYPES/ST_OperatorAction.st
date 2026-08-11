@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎮 ST_OperatorAction — Consigne unique de conduite opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-07_Interface_IHM_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md
    🎯 Les alarmes restent dans Error/ErrorId : cette struct répond seulement
       à « quelle action attend-on maintenant de l'opérateur ? ».
    ═══════════════════════════════════════════════════════════════ *)

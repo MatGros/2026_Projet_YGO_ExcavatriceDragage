@@ -6,7 +6,7 @@
 > **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni programme propre.
 > Source code : `CODE/TREUILS/BENNE/*.st`, `CODE/CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`.
 > Instance unique `instBucket` dans `Treuils (CFC)` — fiche FB du domaine Treuils.
-> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Bucket_Extraction_Code_v1.0.md`.
+> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Bucket_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire
 
@@ -24,18 +24,18 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P10-023 | Fermeture seulement si `MotionDirection=1` ET `MotionRequestActive` | `💻 AUTO` |
-| TC-P10-024 | Ouverture seulement si `MotionDirection=-1` ET `MotionRequestActive` | `💻 AUTO` |
-| TC-P10-025 | Demande refusée si `M1_Busy OR M2_Busy` à l'entrée | `💻 AUTO` |
-| TC-P10-026 | Glissement M1>1.0m pendant BUSY ➔ bit4 + `M1SlipDetected` + coupe M2 | `💻 AUTO` |
-| TC-P10-027 | `M1SlipDetected` force `SafeStop` sur M1 côté Treuils | `💻 AUTO` |
-| TC-P10-028 | Couche 2 (Méca C) : dérive M1>2.0m ➔ `PowerCutOff` | `💻 AUTO` |
-| TC-P10-029 | Recul (sens inverse) borné à la position de départ, jamais au-delà | `💻 AUTO` |
-| TC-P10-030 | `ConfirmOpen/ClosePosition` : effet seulement MAINT_N1/N2 arrêtés | `💻 AUTO` |
-| TC-P10-031 | Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de `Reset` | `💻 AUTO` |
-| TC-P10-032 | `FB_ExtractionSequence.Busy` préserve l'armement joystick en fin benne | `💻 AUTO` |
-| TC-P10-033 | Butée haute M2 décalée de `OffsetCloseM` si fermé/en fermeture | `💻 AUTO` |
-| TC-P10-034 | Terrain : cinématique réelle en charge, amplitude offset validée | `🟢 SITE` |
+| <nobr><code>TC-P10-023</code></nobr> | Fermeture seulement si `MotionDirection=1` ET `MotionRequestActive` | `💻 AUTO` |
+| <nobr><code>TC-P10-024</code></nobr> | Ouverture seulement si `MotionDirection=-1` ET `MotionRequestActive` | `💻 AUTO` |
+| <nobr><code>TC-P10-025</code></nobr> | Demande refusée si `M1_Busy OR M2_Busy` à l'entrée | `💻 AUTO` |
+| <nobr><code>TC-P10-026</code></nobr> | Glissement M1>1.0m pendant BUSY ➔ bit4 + `M1SlipDetected` + coupe M2 | `💻 AUTO` |
+| <nobr><code>TC-P10-027</code></nobr> | `M1SlipDetected` force `SafeStop` sur M1 côté Treuils | `💻 AUTO` |
+| <nobr><code>TC-P10-028</code></nobr> | Couche 2 (Méca C) : dérive M1>2.0m ➔ `PowerCutOff` | `💻 AUTO` |
+| <nobr><code>TC-P10-029</code></nobr> | Recul (sens inverse) borné à la position de départ, jamais au-delà | `💻 AUTO` |
+| <nobr><code>TC-P10-030</code></nobr> | `ConfirmOpen/ClosePosition` : effet seulement MAINT_N1/N2 arrêtés | `💻 AUTO` |
+| <nobr><code>TC-P10-031</code></nobr> | Codeur(s) non référencé(s) ➔ bit3 permanent, indépendant de `Reset` | `💻 AUTO` |
+| <nobr><code>TC-P10-032</code></nobr> | `FB_ExtractionSequence.Busy` préserve l'armement joystick en fin benne | `💻 AUTO` |
+| <nobr><code>TC-P10-033</code></nobr> | Butée haute M2 décalée de `OffsetCloseM` si fermé/en fermeture | `💻 AUTO` |
+| <nobr><code>TC-P10-034</code></nobr> | Terrain : cinématique réelle en charge, amplitude offset validée | `🟢 SITE` |
 
 ---
 

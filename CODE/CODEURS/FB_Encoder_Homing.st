@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §1/§5/§7bis
-                   DOC/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §1/§5/§7bis
+                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
    🎯 Rôle : Gestion du flux de homing nominal (capteur haut + cible paramétrable)
       ou unitaire (MAINT_N2, treuil sélectionné).
    🧮 Calcul du point de calage :

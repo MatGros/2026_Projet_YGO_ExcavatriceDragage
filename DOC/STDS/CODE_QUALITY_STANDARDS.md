@@ -11,13 +11,57 @@
 |---|---|
 | Comment on **nomme** | `DOC/STDS/NAMING_CONVENTION.md` |
 | Comment on **déclare, encapsule, relie** | **ce document** |
+| Comment on **édite une Analyse Fonctionnelle (AF)** | **ce document §0** |
 | Contrats FB, DUT et CFC | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` |
 | Ce que fait la machine | `DOC/` — voir `DOC/README.md` pour l'index complet |
 | Comment on exécute une modif | `.claude/skills/codesys-workflow.md` |
 
 ---
 
-## 1. Nommage — les 3 règles qui ne se négocient pas
+## 0. Rédaction et Édition des Analyses Fonctionnelles (`DOC/AF/`)
+
+1. **Emplacement & Versionnement** :
+   - Toute spécification vit sous `DOC/AF/`.
+   - Une modification d'exigence métier impose une nouvelle version (`_vX.Y.md`). L'ancienne version est déplacée dans `ARCHIVES/Doc/`.
+2. **Structure d'une AF** :
+   - 📌 Sommaire & Rôle Machine
+   - 🧪 **Points de Validation (`TC-Pxx-nnn`)** (juste après le sommaire, obligatoire)
+   - 🧱 Interfaces & DUTs
+   - ⚙️ Chronogrammes & Logique métier
+3. **Règle des Identifiants de Validation (`TC-Pxx-nnn`)** :
+   - **Format** : `TC-P<Partie>-<Numéro>` (ex: `TC-P01-010`, `TC-P10-010`).
+   - **Numérotation par pas de 10** (`010`, `020`, `030`) pour autoriser les insertions sans dénumérotation.
+   - **Immuabilité stricte** : Un identifiant supprimé/obsolète n'est **jamais réattribué** à un nouveau test.
+   - **Formulation synthétique** : Regrouper les sous-conditions logiques par grand test fonctionnel au lieu de multiplier les micro-variables.
+4. **Formatage Ultra-Compact des Tableaux de Validation TC** :
+   - **ID Mono-Ligne** : L'ID doit être encadré par `<nobr><code>TC-Pxx-nnn</code></nobr>` (pas de retour à la ligne sur les tirets).
+   - **Intitulés Denses** : Colonnes compactes (`<nobr>ID Unique</nobr>`, `Groupe`, `Comportement Attendu`, `<nobr>Type</nobr>`, `<nobr>Réf FB</nobr>`).
+   - **Réf FB Compacte** : Utiliser `<small>` avec découpage multi-lignes `<br>` (ex: `<small><code>FB_A</code><br><code>FB_B</code></small>`) pour réduire la largeur.
+   - **Densité Texte** : Descriptions denses et directes (1 à 2 phrases max) pour supprimer les marges et la hauteur inutiles.
+5. **Représentation du Flux de Données & Séquencement FB (Cartes Compactes & Flèches Vectorielles SVG)** :
+   - **Combinaison Zéro-Marge & Flèches Vectorielles** : Cartes HTML ultra-compactes (`padding: 6px 10px`) associées à de vraies flèches vectorielles SVG colorées (`<svg>`).
+   - **Émoji collé directement à gauche** : Émoji sur la même ligne avec espace fixe devant le nom (`🛡️ &nbsp;<b>FB_Safety_Translation</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Rôle</span>`).
+   - **Flèches Vectorielles & Contrats Explicites** : Éléments vectoriels `<svg>` colorés selon le domaine métier et étiquette explicite du signal transmis.
+   - *(Référentiel d'édition complet : [`DOC/STDS/GUIDES/GUIDE_EDITION_AF.md`](GUIDES/GUIDE_EDITION_AF.md))*.
+6. **Cartouche d'Entête des Fichiers Code ST (`CODE/*.st`) & Cohérence AF Stricte** :
+   - **Structure Multi-Lignes à Émojis Sémantiques** : Tout fichier ST commence par un cartouche structuré avec l'émoji du domaine dans la ligne de titre, et des émojis sémantiques distincts par type d'information :
+     ```pascal
+     (* ═══════════════════════════════════════════════════════════════
+        🛡️ FB_Safety_Translation — Anti-télescopage & Verrouillage M3
+        ───────────────────────────────────────────────────────────────
+        🎯 Rôle : Anti-télescopage Benne/Translation et verrous de sécurité M3
+        🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
+        🧩 Architecture : Composition interne Logic/Output
+        📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md
+     *)
+     ```
+   - **Guide des Émojis Sémantiques de Ligne** :
+     - `🎯 Rôle :` = Rôle principal du composant (recopié à l'identique depuis la spec AF).
+     - `🔒 Polarité / Sécurité :` = Invariant de sécurité ou polarité physique.
+     - `🧩 Architecture / Composition :` = Structure interne ou sous-instances.
+     - `📤 Sorties / Bus :` = Bus de données ou signaux produits.
+     - `📄 Docs :` = Références aux spécifications AF actives dans `DOC/AF/`.
+   - **Source Unique de Vérité (Zéro Dérive)** : Le titre et le rôle décrits dans le cartouche d'entête `.st` doivent être **recopiés à l'identique** depuis l'AF spécifiée (`DOC/AF/`). Le script d'audit valide automatiquement cette cohérence.
 
 1. Le nom dit **le rôle**, jamais le type (`bFlag` ❌, `iCounter` ❌ — le type se lit en déclaration).
 2. Le nom se lit **sans le commentaire d'à côté**. Si le commentaire répète le nom, le nom est mauvais.

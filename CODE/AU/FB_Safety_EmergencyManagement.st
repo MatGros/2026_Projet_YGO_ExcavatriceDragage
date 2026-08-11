@@ -1,15 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
-   🛡️ FB_Safety_EmergencyManagement — Bloc Safety Composite (Parent)
+   🛡️ FB_Safety_EmergencyManagement — Composite & Façade Publique
    ───────────────────────────────────────────────────────────────
-   📄 Rôle : Bloc de sécurité principal de la boucle d'arrêt d'urgence.
-   🧩 Encapsule la Logique (FB_Safety_EmergencyManagementLogic) et le
-      Pilote Physique (FB_Safety_EmergencyManagementOutput) par composition.
-   📤 Produit les bus publics ST_Safety_Emergency_State et ST_Safety_Emergency_Diag
-      en sortie, consommés par Supervision et Troubleshooting.
-   🔒 Sorties physiques MaintainA/B_RQ en polarité maintien (TRUE = voie saine).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-03_Contrats_Composants_v2.1.md
+   🎯 Rôle : Façade publique, instance unique ; câblage interne Logic/Output & exposition des bus d'état
+   🧩 Architecture : Câblage interne Logic/Output & exposition des bus d'état
+   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
+            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
 *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagement

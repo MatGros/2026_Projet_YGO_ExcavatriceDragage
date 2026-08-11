@@ -1,14 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
-   📤 FB_Safety_EmergencyManagementOutput — Pilote physique + bus état/diag
+   🔒 FB_Safety_EmergencyManagementOutput — Projection Physique Fail-Safe
    ───────────────────────────────────────────────────────────────
-   📄 Rôle : Transmet les ordres de sécurité logiques vers les
-      sorties physiques ET produit les bus d'état et diagnostic
-      publics (ST_Safety_Emergency_State / ST_Safety_Emergency_Diag).
-   🧩 Instance privée du composite FB_Safety_EmergencyManagement
-      — jamais appelée hors du composite.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-              DOC/AF_Partie-03_Contrats_Composants_v2.1.md
+   🎯 Rôle : Enable gate + copie consignes logiques vers sorties physiques
+   🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
+   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
+            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
 *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput

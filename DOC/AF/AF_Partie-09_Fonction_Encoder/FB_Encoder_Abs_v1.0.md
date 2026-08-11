@@ -16,8 +16,8 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P09-001 | Preset `PresetTriggerCmd=2` sous tolérance 10 pts et timeout 2s | `⚡ AUTO_PLC` |
-| TC-P09-002 | `RawPos` gelé si `EncoderAvailable=FALSE` (perte bus EtherCAT) | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P09-001</code></nobr> | Preset `PresetTriggerCmd=2` sous tolérance 10 pts et timeout 2s | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P09-002</code></nobr> | `RawPos` gelé si `EncoderAvailable=FALSE` (perte bus EtherCAT) | `⚡ AUTO_PLC` |
 
 ---
 

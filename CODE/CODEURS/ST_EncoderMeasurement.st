@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📏 ST_EncoderMeasurement — Mesures codeur qualifiées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Lot M1 · Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2ter
+   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2ter
    🎨 Facts de la chaîne de mesure pure : Abs → Scale → Safety → SpeedMeasure.
    🔗 Producteur : PRG_02_Acquisition_CFC (chaîne codeur du treuil concerné).
    ✅ Tout BOOL = TRUE état normalisé. Aucun brut EtherCAT (alarmes/warnings,

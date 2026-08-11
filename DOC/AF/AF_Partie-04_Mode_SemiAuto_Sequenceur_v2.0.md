@@ -16,14 +16,14 @@
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P04-001 | Relâchement homme-mort stoppe sans perte d'étape | `StartStop=FALSE`, étape inchangée | `💻 AUTO` | §1 |
-| TC-P04-002 | Cycle produit des demandes, zéro sortie physique | Aucune Q/PDO écrite par `FB_Cycle` | `💻 AUTO` | §1 |
-| TC-P04-003 | SafeStop domaine ➔ fige l'étape (hold sur) | Étape figée, pas de reprise auto | `💻 AUTO` | §3 |
-| TC-P04-004 | Reprise après hold : Cause + Reset + nouvel ordre | 3 conditions nécessaires | `💻 AUTO` | §1 |
-| TC-P04-005 | Intention maintenue sur Diving/Extraction | Descente/montée bloquées sans joystick | `⚡ SITE+AUTO` | §2 |
-| TC-P04-006 | Pas d'asservissement continu de vitesse en synchro | Même commande M1/M2, pas de boucle fermée | `💻 AUTO` | §4 |
-| TC-P04-007 | Seuil synchro 1 ➔ arrêt mouvement principal | M1/M2 stoppés, rattrapage dédié | `⚡ SITE+AUTO` | §4 |
-| TC-P04-008 | Écart persistant ➔ escalade safety | `SafeStop`/`PowerCutOff` selon contrat | `💻 AUTO` | §4 |
+| <nobr><code>TC-P04-001</code></nobr> | Relâchement homme-mort stoppe sans perte d'étape | `StartStop=FALSE`, étape inchangée | `💻 AUTO` | <small>§1</small> |
+| <nobr><code>TC-P04-002</code></nobr> | Cycle produit des demandes, zéro sortie physique | Aucune Q/PDO écrite par `FB_Cycle` | `💻 AUTO` | <small>§1</small> |
+| <nobr><code>TC-P04-003</code></nobr> | SafeStop domaine ➔ fige l'étape (hold sur) | Étape figée, pas de reprise auto | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P04-004</code></nobr> | Reprise après hold : Cause + Reset + nouvel ordre | 3 conditions nécessaires | `💻 AUTO` | <small>§1</small> |
+| <nobr><code>TC-P04-005</code></nobr> | Intention maintenue sur Diving/Extraction | Descente/montée bloquées sans joystick | `⚡ SITE+AUTO` | <small>§2</small> |
+| <nobr><code>TC-P04-006</code></nobr> | Pas d'asservissement continu de vitesse en synchro | Même commande M1/M2, pas de boucle fermée | `💻 AUTO` | <small>§4</small> |
+| <nobr><code>TC-P04-007</code></nobr> | Seuil synchro 1 ➔ arrêt mouvement principal | M1/M2 stoppés, rattrapage dédié | `⚡ SITE+AUTO` | <small>§4</small> |
+| <nobr><code>TC-P04-008</code></nobr> | Écart persistant ➔ escalade safety | `SafeStop`/`PowerCutOff` selon contrat | `💻 AUTO` | <small>§4</small> |
 
 ---
 

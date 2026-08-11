@@ -33,7 +33,7 @@ HISTORICAL_LOGS = {
     "DOC/AUDIT_Coherence_Documentaire_v1.0.md",
     "DOC/WFLOW/AUDITS/Architecture/AUDIT_M0_GEL_ETAT_INITIAL.md",
     "DOC/WFLOW/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md",
-    "DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md",
+    "DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md",
 }
 
 # D7 — journaux de bord et contrats de tache : ils citent le numero d'AF tel qu'il
@@ -122,10 +122,13 @@ def build_basename_map(root: Path) -> dict[str, list[str]]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", dest="project_root_flag", default=None, help="Root path")
+    parser.add_argument("--fix", action="store_true", help="Fix outdated links automatically")
     parser.add_argument("project_root", nargs="?", default=".")
     args = parser.parse_args()
 
-    root = Path(args.project_root).resolve()
+    target_root = args.project_root_flag or args.project_root
+    root = Path(target_root).resolve()
     doc_dir = root / "DOC"
 
     if not doc_dir.is_dir():
@@ -153,6 +156,7 @@ def main() -> int:
     for path in iter_files(root):
         rel = path.relative_to(root).as_posix()
         text = path.read_text(encoding="utf-8", errors="replace")
+        original_text = text
 
         if rel in HISTORICAL_LOGS:
             continue
@@ -171,6 +175,14 @@ def main() -> int:
 
         historical = rel.startswith(NUMBERING_HISTORICAL_PREFIXES) or NUMBERING_OPT_OUT in text
         archive_spans = [m.span() for m in re.finditer(r"ARCHIVES/[A-Za-z0-9_./\-]+", text)]
+
+        if rel.startswith("DOC/AF/") and path.suffix == ".md" and not historical:
+            for idx, line in enumerate(text.splitlines(), 1):
+                if "|" in line and re.search(r"\bTC-P\d{2}-\d{3}\b", line):
+                    if "<nobr>" not in line:
+                        errors.append(
+                            f"{rel}:{idx}: l'identifiant TC dans le tableau AF doit etre encadre par `<nobr><code>TC-...</code></nobr>` (voir GUIDE_EDITION_AF.md §3)"
+                        )
         if af_numbers and not historical:
             reported: set[tuple[int, str]] = set()
             for match in AF_MENTION.finditer(text):
@@ -207,17 +219,24 @@ def main() -> int:
                         version = (int(match_version.group("major")), int(match_version.group("minor")))
                         if version < latest[key][0]:
                             newest = latest[key][1]
-                            errors.append(
-                                f"{rel}:{line}: `{target}` est perime — version active : DOC/{newest}"
-                            )
+                            new_target = f"DOC/{newest}" if target.startswith("DOC/") else newest
+                            if args.fix:
+                                text = text.replace(target, new_target)
+                            else:
+                                errors.append(
+                                    f"{rel}:{line}: `{target}` est perime — version active : DOC/{newest}"
+                                )
                 continue
 
             archived = root / "ARCHIVES" / "Doc" / Path(target).relative_to(Path(target).parts[0])
             if archived.is_file():
                 archived_rel = archived.relative_to(root).as_posix()
-                errors.append(
-                    f"{rel}:{line}: `{target}` est archive — referencer `{archived_rel}`"
-                )
+                if args.fix:
+                    text = text.replace(target, archived_rel)
+                else:
+                    errors.append(
+                        f"{rel}:{line}: `{target}` est archive — referencer `{archived_rel}`"
+                    )
                 continue
 
             basename = Path(target).name
@@ -226,21 +245,58 @@ def main() -> int:
             else:
                 candidates = by_basename.get(basename, [])
             if len(candidates) == 1 and candidates[0] != target:
-                errors.append(
-                    f"{rel}:{line}: `{target}` a ete deplace vers `{candidates[0]}`"
-                )
+                if args.fix:
+                    text = text.replace(target, candidates[0])
+                else:
+                    errors.append(
+                        f"{rel}:{line}: `{target}` a ete deplace vers `{candidates[0]}`"
+                    )
                 continue
 
             key = doc_key(Path(target).name)
             if key and key in latest:
                 newest = latest[key][1]
-                errors.append(
-                    f"{rel}:{line}: lien mort `{target}` — version active : DOC/{newest}"
-                )
+                new_target = f"DOC/{newest}" if target.startswith("DOC/") else newest
+                if args.fix:
+                    text = text.replace(target, new_target)
+                else:
+                    errors.append(
+                        f"{rel}:{line}: lien mort `{target}` — version active : DOC/{newest}"
+                    )
             else:
                 errors.append(
                     f"{rel}:{line}: lien mort `{target}` (aucune version active trouvee)"
                 )
+
+        is_code = rel.startswith("CODE/") or path.suffix == ".st"
+        if is_code and path.suffix == ".st" and text.startswith("(*"):
+            end_comment = text.find("*)")
+            if end_comment != -1:
+                header = text[:end_comment]
+                role_match = re.search(r"🎯\s*Rôle\s*:\s*(?P<role>[^\n]+)", header)
+                doc_match = re.search(r"📄\s*Docs?\s*:\s*(?P<doc>DOC/AF/[A-Za-z0-9_./\-]+\.md)", header)
+                if role_match and doc_match:
+                    pou_name = path.stem
+                    st_role = role_match.group("role").strip(" `")
+                    doc_rel = doc_match.group("doc").strip()
+                    doc_path = root / doc_rel
+                    if doc_path.is_file():
+                        doc_text = doc_path.read_text(encoding="utf-8", errors="replace")
+                        if pou_name in doc_text:
+                            role_pattern = re.compile(rf"{re.escape(pou_name)}[^\n]*\n[^\n]*🎯\s*Cartouche\s*ST[^\n]*:\s*`(?P<expected>[^`]+)`", re.MULTILINE)
+                            m = role_pattern.search(doc_text)
+                            if not m:
+                                table_pattern = re.compile(rf"\|\s*`?{re.escape(pou_name)}`?\s*\|[^\n]*\|\s*`(?P<expected>[^`]+)`\s*\|", re.MULTILINE)
+                                m = table_pattern.search(doc_text)
+                            if m:
+                                expected = m.group("expected").strip()
+                                if st_role != expected:
+                                    errors.append(
+                                        f"{rel}:1: le rôle ST '{st_role}' ne correspond pas à la spec AF '{expected}' dans {doc_rel}"
+                                    )
+
+        if args.fix and not is_code and text != original_text:
+            path.write_text(text, encoding="utf-8")
 
     for warning in warnings:
         print(f"[WARN] {warning}")

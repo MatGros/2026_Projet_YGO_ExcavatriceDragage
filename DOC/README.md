@@ -62,9 +62,9 @@ Ils restent des **POU du code actuel**, cibles de migration, jamais des cibles d
 | Pilotage / reliquats / TBD | [WFLOW/PLAN_TASK.md](WFLOW/PLAN_TASK.md) |
 | Historique CODE ↔ DOC | [VERSION_HISTORY.md](VERSION_HISTORY.md) |
 | Décisions de conception | [ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md](../ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md) (archive) |
-| Mise en service | [MES/REGISTRES/REGISTRE_Suivi_MiseEnService_20260724_v1.0.md](MES/REGISTRES/REGISTRE_Suivi_MiseEnService_20260724_v1.0.md) |
-| Post-mise en service | [MES/REGISTRES/REGISTRE_Suivi_PostMiseEnService_Livraison10Aout_20260728_v1.0.md](MES/REGISTRES/REGISTRE_Suivi_PostMiseEnService_Livraison10Aout_20260728_v1.0.md) |
-| Fiches d'essais | `MES/CHECKLISTS/` · Audits ouverts : `WFLOW/AUDITS/` · Schémas : `DIA/` |
+| Mise en service | [TESTS/REGISTRES/REGISTRE_Suivi_MiseEnService.md](TESTS/REGISTRES/REGISTRE_Suivi_MiseEnService.md) |
+| Post-mise en service | [TESTS/REGISTRES/REGISTRE_Suivi_PostMES.md](TESTS/REGISTRES/REGISTRE_Suivi_PostMES.md) |
+| Fiches d'essais | `TESTS/CHECKLISTS/` · Audits ouverts : `WFLOW/AUDITS/` · Schémas : `DIA/` |
 | Décision d'architecture actée | [WFLOW/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md](WFLOW/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md) |
 | Plan d'exécution de la migration | [WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md](WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md) |
 

@@ -2,7 +2,7 @@
    🎚️ PRG_03_Modes_Cycle — Gestion, Modes Machine et Séquenceur de Cycle
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 3 (après PRG_02_Acquisition).
-   📄 Docs : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
+   📄 Docs : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
    🎯 Rôle unique : Instancier FB_Modes, distribuer le bus ST_Modes_Autorisations.
    ═══════════════════════════════════════════════════════════════ *)
 

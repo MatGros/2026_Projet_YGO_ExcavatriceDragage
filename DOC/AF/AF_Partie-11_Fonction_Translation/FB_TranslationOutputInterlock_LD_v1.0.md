@@ -20,10 +20,10 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P11-006 | Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` |
-| TC-P11-007 | Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle demande | `⚡ AUTO_PLC` |
-| TC-P11-008 | Gate final : Mot/fréquence nuls sans confirmation frein simultanée | `⚡ AUTO_PLC` |
-| TC-P11-009 | Mot 7 (reset AC600) autorisé pendant `RestartInhibit` (sans levée inhibition) | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-006</code></nobr> | Watchdog frein 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-007</code></nobr> | Réautorisation post-timeout : Cause + Reset + Mot 0 + Nouvelle demande | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-008</code></nobr> | Gate final : Mot/fréquence nuls sans confirmation frein simultanée | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-009</code></nobr> | Mot 7 (reset AC600) autorisé pendant `RestartInhibit` (sans levée inhibition) | `⚡ AUTO_PLC` |
 
 ---
 

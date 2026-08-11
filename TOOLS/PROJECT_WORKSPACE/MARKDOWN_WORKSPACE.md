@@ -28,14 +28,27 @@ le double affichage source/aperçu suffit.
 3. Rechercher **Markdown Preview Enhanced** (auteur Yiyi Wang) → Installer.
 4. Rechercher **markdownlint** (auteur David Anson) → Installer.
 
+## 🪄 Optionnel — aperçu automatique en side
+
+Au lieu de taper `Ctrl+K V` à chaque ouverture, configurer l'**affichage automatique**
+de l'aperçu en fenêtre latérale :
+
+1. **File → Preferences → Settings** (ou `Ctrl+,`).
+2. Rechercher : `Markdown-preview-enhanced: Automatically Show Preview Of Markdown Being Edited`.
+3. **Cocher** le réglage
+   (`markdown-preview-enhanced.automaticallyShowPreviewOfMarkdownBeingEdited` → `true`).
+
+→ Dès qu'un fichier `.md` est ouvert/édité, l'aperçu s'affiche **automatiquement à côté**
+(édition à gauche, aperçu à droite). Plus besoin de `Ctrl+K V`.
+
 ## ▶️ Utilisation — cocher des cases
 
 1. Ouvrir le fichier Markdown voulu (ex. une checklist de `DOC/CHECKLISTS/`).
-2. Appuyer sur **`Ctrl+K V`**.
-   → Le fichier s'affiche **sur deux fenêtres en parallèle** : édition (gauche) + aperçu (droite).
-3. Dans l'**aperçu**, cliquer sur les cases à cocher : `- [ ]` → `- [x]`.
+   → Si l'aperçu auto est activé (ci-dessus), il s'affiche tout seul à droite.
+   → Sinon, appuyer sur **`Ctrl+K V`** pour ouvrir les deux fenêtres en parallèle.
+2. Dans l'**aperçu**, cliquer sur les cases à cocher : `- [ ]` → `- [x]`.
    → La case se met à jour **instantanément dans la fenêtre d'édition** (source).
-4. **Sauvegarder** le fichier texte (`Ctrl+S`) — c'est le seul moment où le fichier est écrit.
+3. **Sauvegarder** le fichier texte (`Ctrl+S`) — c'est le seul moment où le fichier est écrit.
 
 Raccourcis utiles :
 

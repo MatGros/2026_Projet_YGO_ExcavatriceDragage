@@ -26,6 +26,41 @@ Cette partie ne duplique pas le tableau.
 | Pas d'auto-rearmement ; acquittement defaut ≠ rearmement contacteur | SITE |
 | Redondance A/B : auto-test integre au rearmement (un canal a la fois) + preuve cablage site | AUTO_PLC + SITE |
 
+## 🔄 0. Architecture & Flux Général Machine
+
+<div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
+    📡 &nbsp;<b>PRG_02_Acquisition & FB_Joystick</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Acquisition capteurs, bus CANopen/EtherCAT & intention opérateur</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Signaux qualifiés & Demandes brutes</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #f43f5e; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🛡️ &nbsp;<b>FB_Safety_EmergencyManagement & FB_Safety_*</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Chaîne de sécurité, AU physique & verrouillages</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Autorisations de marche & Inhibit</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #fbbf24; padding:6px 10px; border-radius:4px; font-size:12px;">
+    ⚙️ &nbsp;<b>PRG_03_Modes_Cycle & PRG_04_Treuils / PRG_05_Translation</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Arbitrage modes & génération consignes M1/M2/M3</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Consignes contacteurs & variateur</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🔒 &nbsp;<b>PRG_06_Outputs_LD</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Barrière finale des sorties matérielles</span>
+  </div>
+</div>
+
 ---
 
 ## 🏗️ 1. Equipements principaux

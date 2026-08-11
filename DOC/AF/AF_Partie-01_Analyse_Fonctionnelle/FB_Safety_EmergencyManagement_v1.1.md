@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-01_Analyse_Fonctionnelle_v2.0.md`](AF_Partie-01_Analyse_Fonctionnelle_v2.0.md) §5.
 > Rôle de **ce** document : constitution, interfaces, séquence, intégration, écarts bus —
 > et **catalogue unique** des `TC-P01-*` (ne pas les recopier dans AF01).
-> Extraction code : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md`.
+> Extraction code : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md`.
 > ⚠️ Existant vérifié + écarts à normaliser. Pas de modif code sans validation §8.
 
 ## 🧭 Sommaire
@@ -34,15 +34,15 @@
 
 | ID | Intention | Comportement attendu | Preuve | Type | Réf |
 |---|---|---|---|---|---|
-| TC-P01-001 | AU physique | Coupe puissance moteurs, API vivant | Contacteur ouvert | `🟢 SITE` | §5.1 |
-| TC-P01-002 | Maintien A/B | Perte canal A ou B ouvre la boucle AU | `MaintainA/B_RQ=FALSE` | `⚡ SITE+AUTO` | §4 |
-| TC-P01-003 | Réarmement | Front `ArmRequest` + boucle OK ➔ pulse 1s | Pulse 1s (step 5) | `⚡ AUTO_PLC` | §5.3 |
-| TC-P01-004 | Ack Cause/Ack | `Reset` efface l'affichage (interlock reste sur Cause) | `Error=FALSE` | `💻 AUTO` | §3.4bis |
-| TC-P01-005 | Séquencement | Acquittement et réarmement 2 actions distinctes | 2 actions requises | `⚡ SITE+AUTO` | §5.4 |
-| TC-P01-006 | Auto-test A/B | Test croisé A/B au réarmement (échec ➔ `RedundancyFail`) | Steps 1–4 (200ms) | `⚡ AUTO_PLC` | §3.3bis |
-| TC-P01-007 | Lockout 5s | Échec confirmation contacteur ➔ verrouillage 5s | `LockoutActive=TRUE` | `💻 AUTO` | §5.3 |
-| TC-P01-008 | Coupure métier | `PowerCutOffRequest=TRUE` coupe A et B sans armer | `MaintainA/B_RQ=FALSE` | `💻 AUTO` | §3 |
-| TC-P01-009 | Re-latch Cause | Cause persistante ➔ ré-alarme au prochain essai | `Ack=FALSE` | `💻 AUTO` | §3.4bis |
+| <nobr><code>TC-P01-001</code></nobr> | AU physique | Coupe puissance moteurs, API vivant | Contacteur ouvert | `🟢 SITE` | §5.1 |
+| <nobr><code>TC-P01-002</code></nobr> | Maintien A/B | Perte canal A ou B ouvre la boucle AU | `MaintainA/B_RQ=FALSE` | `⚡ SITE+AUTO` | §4 |
+| <nobr><code>TC-P01-003</code></nobr> | Réarmement | Front `ArmRequest` + boucle OK ➔ pulse 1s | Pulse 1s (step 5) | `⚡ AUTO_PLC` | §5.3 |
+| <nobr><code>TC-P01-004</code></nobr> | Ack Cause/Ack | `Reset` efface l'affichage (interlock reste sur Cause) | `Error=FALSE` | `💻 AUTO` | §3.4bis |
+| <nobr><code>TC-P01-005</code></nobr> | Séquencement | Acquittement et réarmement 2 actions distinctes | 2 actions requises | `⚡ SITE+AUTO` | §5.4 |
+| <nobr><code>TC-P01-006</code></nobr> | Auto-test A/B | Test croisé A/B au réarmement (échec ➔ `RedundancyFail`) | Steps 1–4 (200ms) | `⚡ AUTO_PLC` | §3.3bis |
+| <nobr><code>TC-P01-007</code></nobr> | Lockout 5s | Échec confirmation contacteur ➔ verrouillage 5s | `LockoutActive=TRUE` | `💻 AUTO` | §5.3 |
+| <nobr><code>TC-P01-008</code></nobr> | Coupure métier | `PowerCutOffRequest=TRUE` coupe A et B sans armer | `MaintainA/B_RQ=FALSE` | `💻 AUTO` | §3 |
+| <nobr><code>TC-P01-009</code></nobr> | Re-latch Cause | Cause persistante ➔ ré-alarme au prochain essai | `Ack=FALSE` | `💻 AUTO` | §3.4bis |
 
 ---
 
@@ -55,24 +55,54 @@ explicite de réarmement** du contacteur général, avec auto-test A/B. Ne gère
 protections mouvement métier (`FB_Safety_Winch` / `FB_Safety_Translation`) : il **consomme**
 leur demande `PowerCutOff` agrégée.
 
-### Composition POO et Schéma CFC
+### Composition POO & Schéma CFC
 
-🖼️ **Schéma d'architecture et liaisons inter-blocs (CFC)** : [`DOC/DIAGRAMS/DIAG_EmergencyManagement_CFC.png`](../DIAGRAMS/DIAG_EmergencyManagement_CFC.png)
+<div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #f43f5e; padding:8px 12px; border-radius:4px; font-size:12px;">
+    🛡️ &nbsp;<b>FB_Safety_EmergencyManagement</b> &nbsp;(Composite Parent — Façade Publique)
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic;">Composition & Délégation d'exécution</span>
+  </div>
+  <div style="display:flex; gap:8px; width:100%;">
+    <div style="flex:1; background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:8px 10px; border-radius:4px; font-size:12px;">
+      🧠 &nbsp;<b>Logic : FB_Safety_EmergencyManagementLogic</b><br/>
+      <span style="color:#cbd5e1; font-size:11px;">Machine d'état, fronts Reset/Arm & calcul ErrorId</span>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:center;">
+      <svg width="24" height="16" viewBox="0 0 24 16" fill="none"><path d="M0 8H18M18 8L12 4M18 8L12 12" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="flex:1; background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:8px 10px; border-radius:4px; font-size:12px;">
+      🔒 &nbsp;<b>Output : FB_Safety_EmergencyManagementOutput</b><br/>
+      <span style="color:#cbd5e1; font-size:11px;">Pilote physique fail-safe MaintainA/B_RQ</span>
+    </div>
+  </div>
+</div>
 
-```text
-FB_Safety_EmergencyManagement          ← façade publique, instance unique
- ├─ Logic : FB_Safety_EmergencyManagementLogic   ← décision + séquence + latches
- └─ Output : FB_Safety_EmergencyManagementOutput ← projection physique fail-safe
-      ▲
-      └── Cmd : ST_Safety_Emergency_InternalCmd        ← DUT interne Logic→Output
-```
+---
 
-| POU | Responsabilité | Interdit |
-|---|---|---|
-| Composite | Câblage interne Logic/Output ; exposition ports | Logique métier parallèle |
-| Logic | Machine d'état, fronts Reset/Arm, ErrorId, Cmd | Écriture Q physiques |
-| Output | `Enable` gate + copie Cmd → `*_RQ` | Décision / timers |
-| `ST_Safety_Emergency_InternalCmd` | Bus interne 3 BOOL | Usage hors composite |
+### 🧱 Fiches Composants & Cartouches ST (`CODE/AU/`)
+
+#### 🛡️ `FB_Safety_EmergencyManagement` *(Composite Façade)*
+- **Fichier Source** : [`FB_Safety_EmergencyManagement.st`](../../../../CODE/AU/FB_Safety_EmergencyManagement.st)
+- **🎯 Cartouche ST (`🎯 Rôle`)** : `Façade publique, instance unique ; câblage interne Logic/Output & exposition des bus d'état`
+- **Responsabilité** : Point d'entrée unique de la boucle d'arrêt d'urgence, encapsule les sous-instances privées `Logic` et `Output`.
+
+#### 🧠 `FB_Safety_EmergencyManagementLogic` *(Décision & Machine d'État)*
+- **Fichier Source** : [`FB_Safety_EmergencyManagementLogic.st`](../../../../CODE/AU/FB_Safety_EmergencyManagementLogic.st)
+- **🎯 Cartouche ST (`🎯 Rôle`)** : `Machine d'état, fronts Reset/Arm, calcul ErrorId & consignes logiques`
+- **Responsabilité** : Gère les étapes d'auto-test, les fronts `Reset`/`ArmRequest`, et produit le bus interne `ST_Safety_Emergency_InternalCmd`.
+
+#### 🔒 `FB_Safety_EmergencyManagementOutput` *(Pilote Physique Fail-Safe)*
+- **Fichier Source** : [`FB_Safety_EmergencyManagementOutput.st`](../../../../CODE/AU/FB_Safety_EmergencyManagementOutput.st)
+- **🎯 Cartouche ST (`🎯 Rôle`)** : `Enable gate + copie consignes logiques vers sorties physiques`
+- **Responsabilité** : Barrière physique finale pour les signaux `MaintainA_RQ` et `MaintainB_RQ` (polarité maintien, `TRUE` = voie saine).
+
+#### 🧩 `ST_Safety_Emergency_InternalCmd` *(DUT Bus Interne)*
+- **Fichier Source** : [`ST_Safety_Emergency_InternalCmd.st`](../../../../CODE/AU/ST_Safety_Emergency_InternalCmd.st)
+- **🎯 Cartouche ST (`🎯 Rôle`)** : `Transporte les ordres logiques entre le bloc de décision et le bloc de sortie`
+- **Responsabilité** : Structure d'échange interne à 3 champs `BOOL` reliant `Logic` et `Output`.
 
 Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop` ni `SafeStop`.
 `Reset` sur front. Pas de redémarrage auto après défaut.
@@ -457,7 +487,7 @@ Les résultats d'exécution restent hors AF (scripts / checklists / registres).
 | AF06 | Noms DI/DQ puissance |
 | AF07 | Champs `ST_Modes*` |
 | AF13 | `FB_Sim_Safety` |
-| Extraction | `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md` |
+| Extraction | `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md` |
 
 Fichiers code de référence :
 

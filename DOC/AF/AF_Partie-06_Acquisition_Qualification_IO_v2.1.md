@@ -25,12 +25,12 @@ des derniers consommateurs et validation du filtrage matériel ou de son déplac
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P06-001 | Aucune lecture d'E/S brute dans les FB métier | Consommateurs lisent des faits qualifiés | `💻 AUTO` | §2 |
-| TC-P06-002 | Polarité normalisée une seule fois à l'acquisition | Zéro ré-inversion dans les FB métier | `💻 AUTO` | §2 |
-| TC-P06-003 | Bascule réel/simulation centralisée | `HwIn` source unique par domaine | `💻 AUTO` | §2 |
-| TC-P06-004 | Diag CANopen/EtherCAT publié en ligne | Statuts dispos pour Modes/Safety/IHM | `💻 AUTO` | §3 |
-| TC-P06-005 | Noms des signaux de puissance validés | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI` | `🟢 SITE` | §4 |
-| TC-P06-006 | Écriture des sorties physiques centralisée | `PRG_OUTPUTS_LD` seul producteur final | `💻 AUTO` | §5 |
+| <nobr><code>TC-P06-001</code></nobr> | Aucune lecture d'E/S brute dans les FB métier | Consommateurs lisent des faits qualifiés | `💻 AUTO` | <small>§2</small> |
+| <nobr><code>TC-P06-002</code></nobr> | Polarité normalisée une seule fois à l'acquisition | Zéro ré-inversion dans les FB métier | `💻 AUTO` | <small>§2</small> |
+| <nobr><code>TC-P06-003</code></nobr> | Bascule réel/simulation centralisée | `HwIn` source unique par domaine | `💻 AUTO` | <small>§2</small> |
+| <nobr><code>TC-P06-004</code></nobr> | Diag CANopen/EtherCAT publié en ligne | Statuts dispos pour Modes/Safety/IHM | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P06-005</code></nobr> | Noms des signaux de puissance validés | `PowerKeepAlive_A/B_RQ`, `EmergencyChainClosed_DI` | `🟢 SITE` | <small>§4</small> |
+| <nobr><code>TC-P06-006</code></nobr> | Écriture des sorties physiques centralisée | `PRG_OUTPUTS_LD` seul producteur final | `💻 AUTO` | <small>§5</small> |
 
 ---
 

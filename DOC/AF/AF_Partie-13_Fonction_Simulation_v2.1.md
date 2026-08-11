@@ -23,11 +23,29 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 
 ## 2. 🏗️ Frontière unique
 
-```text
-[%IX / PDO réels] ──► PRG_02_Acquisition ──► HwReal ──► HwRealQualified ──┐
-                                                                           ├──► sélection par domaine ──► HwIn ──► logique métier
-[FB_SimBench]     ───────────────────────────────────────────────► HwSim ──┘
-```
+<div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
+    📡 &nbsp;<b>E/S Physiques [%IX / PDO]</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Acquisition réelle (HwReal & HwRealQualified)</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Signaux physiques réels</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #fbbf24; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🕹️ &nbsp;<b>FB_SimBench</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Génération image de simulation (HwSim)</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Sélection par domaine dans PRG_02_Acquisition</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
+    ⚙️ &nbsp;<b>Image HwIn</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Consommation unique par la logique métier</span>
+  </div>
+</div>
 
 `PRG_02_Acquisition` est la frontière unique réelle/simulée. Il acquiert aussi les codeurs,
 les diagnostics devices/bus et les retours auxiliaires :

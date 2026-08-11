@@ -4,7 +4,7 @@
 > Rôle de **ce** document : synchro niveau 1 (warning), couplage croisé — et **catalogue unique**
 > des `TC-P10-014`, `015`, `016`.
 > Source code : `CODE/TREUILS/FB_WinchSync.st` · instance unique dans `PRG_TREUILS_CFC.st` (ST actuel). Cible de migration : `PRG_04_Treuils_Benne_CFC.xml` CFC natif, absent de `CODE/MAIN`.
-> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
+> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire
 
@@ -19,9 +19,9 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P10-014 | Sync bit0 (écart>0.10m, 800ms) ➔ SyncWarn IHM seul | `💻 AUTO` |
-| TC-P10-015 | Sync bit1 (incohérence commande, 500ms) ➔ SafeStop fast | `💻 AUTO` |
-| TC-P10-016 | Couplage croisé : `SyncActive` ➔ arrêt d'un treuil coupe l'autre | `💻 AUTO` |
+| <nobr><code>TC-P10-014</code></nobr> | Sync bit0 (écart>0.10m, 800ms) ➔ SyncWarn IHM seul | `💻 AUTO` |
+| <nobr><code>TC-P10-015</code></nobr> | Sync bit1 (incohérence commande, 500ms) ➔ SafeStop fast | `💻 AUTO` |
+| <nobr><code>TC-P10-016</code></nobr> | Couplage croisé : `SyncActive` ➔ arrêt d'un treuil coupe l'autre | `💻 AUTO` |
 
 ---
 

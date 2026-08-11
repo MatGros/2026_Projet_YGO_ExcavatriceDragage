@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
    🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
       plus de l'interface standard. Précédence Enable > SafeStop > StartStop.
    🧩 Compose FB_SpeedStep (décodage palier). 🆕 2026-08-06 (retrait FB_Brake, demande
@@ -38,7 +38,7 @@
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
       `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
       déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
-      en train de remonter — voir DOC/AF_Partie-10_Fonction_Winch_v2.0.md §4ter pour le contexte
+      en train de remonter — voir DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
    🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
       nouveau paramètre `CfgMaxStepDescente` (défaut 2). En descente
@@ -95,7 +95,7 @@ VAR_INPUT
     // 🆕 2026-08-06 (décision validée, retour terrain) : rampe %/s (CfgRampAccelRate/
     // DecelNormalRate/DecelFastRate, FB_Ramp) RETIRÉE — remplacée par une temporisation FIXE
     // par palier, asymétrique montée/descente. Cible documentée
-    // DOC/AF_Partie-10_Fonction_Winch_v2.0.md §6.2 (montée en charge = plus prudente, descente
+    // DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §6.2 (montée en charge = plus prudente, descente
     // sans effort = plus rapide).
     // 🆕 2026-08-06 (simplification demandée) : interlock changement de sens asymétrique —
     // descente sans effort (pas de charge résistante, réengagement rapide), montée = charge en

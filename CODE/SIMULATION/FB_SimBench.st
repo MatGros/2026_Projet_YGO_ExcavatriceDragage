@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
    📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :

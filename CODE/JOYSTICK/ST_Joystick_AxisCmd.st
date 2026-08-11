@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
    🎯 4 champs exactement :
       - Enable    : Autorisation globale du pipeline
       - StartStop : RAMPE (TRUE = accélération, FALSE = décélération normale)

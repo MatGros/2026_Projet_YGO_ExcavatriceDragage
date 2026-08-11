@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🔄 FB_Cycle — Séquenceur du Cycle Automatique (Grafcet de dragage)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis).
    ═══════════════════════════════════════════════════════════════ *)
 

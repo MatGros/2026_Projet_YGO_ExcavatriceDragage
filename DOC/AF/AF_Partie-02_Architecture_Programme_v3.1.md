@@ -18,11 +18,11 @@
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P02-001 | Un seul producteur par donnée | Aucun écouteur/écrivain multiple sur un contrat | `💻 AUTO` | §1 |
-| TC-P02-002 | Page CFC sans logique métier | Zéro `IF`/calcul inline dans le CFC | `💻 AUTO` | §1 |
-| TC-P02-003 | Sorties physiques via `PRG_OUTPUTS_LD` | Aucun autre POU n'écrit les Q/PDO finaux | `💻 AUTO` | §2 |
-| TC-P02-004 | Ordre d'exécution MainTask conforme | Tâche CODESYS + `check_linkage.py` PASS | `💻 AUTO` | §4 |
-| TC-P02-005 | Troubleshooting lecture seule | Aucune écriture commande/config/interlock | `💻 AUTO` | §2 |
+| <nobr><code>TC-P02-001</code></nobr> | Un seul producteur par donnée | Aucun écouteur/écrivain multiple sur un contrat | `💻 AUTO` | <small>§1</small> |
+| <nobr><code>TC-P02-002</code></nobr> | Page CFC sans logique métier | Zéro `IF`/calcul inline dans le CFC | `💻 AUTO` | <small>§1</small> |
+| <nobr><code>TC-P02-003</code></nobr> | Sorties physiques via `PRG_OUTPUTS_LD` | Aucun autre POU n'écrit les Q/PDO finaux | `💻 AUTO` | <small>§2</small> |
+| <nobr><code>TC-P02-004</code></nobr> | Ordre d'exécution MainTask conforme | Tâche CODESYS + `check_linkage.py` PASS | `💻 AUTO` | <small>§4</small> |
+| <nobr><code>TC-P02-005</code></nobr> | Troubleshooting lecture seule | Aucune écriture commande/config/interlock | `💻 AUTO` | <small>§2</small> |
 
 ---
 

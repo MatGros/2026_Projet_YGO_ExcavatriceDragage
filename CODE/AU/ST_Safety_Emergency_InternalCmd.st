@@ -6,7 +6,7 @@
    🔒 Polarité maintien : TRUE = voie maintenue saine, FALSE = coupure demandée
       (conforme règle C1 — polarité explicite).
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
 *)
 
 TYPE ST_Safety_Emergency_InternalCmd :

@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📐 FB_DriftGuard — Détection de dérive de position pendant armement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md §4quinquies (Méca A/C)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §4quinquies (Méca A/C)
    🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
       Méca C de FB_Safety_Winch (armement + capture position référence + calcul
       dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.

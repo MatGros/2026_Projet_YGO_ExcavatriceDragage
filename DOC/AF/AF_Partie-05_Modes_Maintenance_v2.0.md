@@ -16,12 +16,12 @@
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P05-001 | Modes machine restreints (Manuel, N1, N2, SEMI_AUTO) | `SyncEnable`, Diving, Extraction hors `E_Mode` | `💻 AUTO` | §1-2 |
-| TC-P05-002 | Mode nominal : joystick pilote M1+M2 conjointement | M1 et M2 reçoivent la même intention | `💻 AUTO` | §3 |
-| TC-P05-003 | Mode MAINT_N2 M1 seul : M2 bloqué, frein serré | Safety reste active sur M2 | `💻 AUTO` | §3 |
-| TC-P05-004 | Refus mode SEMI_AUTO si codeurs invalides | Bascule refusée + message IHM | `💻 AUTO` | §5 |
-| TC-P05-005 | Limite légale = blocage exploitation, pas safety | Pas de `PowerCutOff` sur simple limite légale | `💻 AUTO` | §4 |
-| TC-P05-006 | Pas de redémarrage automatique après défaut | `Reset` + nouvel ordre explicite requis | `💻 AUTO` | §5 |
+| <nobr><code>TC-P05-001</code></nobr> | Modes machine restreints (Manuel, N1, N2, SEMI_AUTO) | `SyncEnable`, Diving, Extraction hors `E_Mode` | `💻 AUTO` | <small>§1-2</small> |
+| <nobr><code>TC-P05-002</code></nobr> | Mode nominal : joystick pilote M1+M2 conjointement | M1 et M2 reçoivent la même intention | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P05-003</code></nobr> | Mode MAINT_N2 M1 seul : M2 bloqué, frein serré | Safety reste active sur M2 | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P05-004</code></nobr> | Refus mode SEMI_AUTO si codeurs invalides | Bascule refusée + message IHM | `💻 AUTO` | <small>§5</small> |
+| <nobr><code>TC-P05-005</code></nobr> | Limite légale = blocage exploitation, pas safety | Pas de `PowerCutOff` sur simple limite légale | `💻 AUTO` | <small>§4</small> |
+| <nobr><code>TC-P05-006</code></nobr> | Pas de redémarrage automatique après défaut | `Reset` + nouvel ordre explicite requis | `💻 AUTO` | <small>§5</small> |
 
 ---
 

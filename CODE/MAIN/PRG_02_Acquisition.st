@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📡 PRG_02_Acquisition — Programme d'Acquisition et Qualification I/O
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2
    ⚙️ Exécuté en tête de la chaîne métier (après les initialisations système).
    🎯 Rôle unique : Produire les images HwReal/HwRealQualified/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
