@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 4 (après PRG_03_Modes_Cycle).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md ; DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_04_Treuils_Benne

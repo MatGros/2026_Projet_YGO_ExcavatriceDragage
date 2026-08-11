@@ -5,7 +5,7 @@
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
 > Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_TREUILS_CFC.st` et `PRG_SAFETY_CFC.st` (tous deux ST actuels), `PRG_OUTPUTS_LD.st` (Ladder généré). Cible de migration CFC native : **une seule page** `PRG_04_Treuils_Benne.xml` — elle absorbe la partie M1/M2/benne de `PRG_SAFETY_CFC` (safety câblée en parallèle visible sur la même page). Aucune page safety séparée n'est une cible.
 > 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
-> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
+> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
 
 ## 🧭 Sommaire
@@ -25,11 +25,11 @@ dupliqué ici) :
 
 | Fiche | TC couverts |
 |---|---|
-| [`FB_Winch`](AF_Partie-10_FB_Winch_v1.0.md) | TC-P10-011, 017, 018, 019 |
-| [`FB_Safety_Winch`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | TC-P10-001 à 010 |
-| [`FB_WinchSync`](AF_Partie-10_FB_WinchSync_v1.0.md) | TC-P10-014, 015, 016 |
-| [`FB_WinchOutputInterlock_LD`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | TC-P10-012, 013, 020, 021, 022 |
-| [`FB_Bucket`](AF_Partie-10_FB_Bucket_v1.0.md) | TC-P10-023 à 034 |
+| [`FB_Winch`](AF_Partie-10_FB_Winch_v1.0.md) | <nobr><code>TC-P10-011</code></nobr>, 017, 018, 019 |
+| [`FB_Safety_Winch`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | <nobr><code>TC-P10-001</code></nobr> à 010 |
+| [`FB_WinchSync`](AF_Partie-10_FB_WinchSync_v1.0.md) | <nobr><code>TC-P10-014</code></nobr>, 015, 016 |
+| [`FB_WinchOutputInterlock_LD`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | <nobr><code>TC-P10-012</code></nobr>, 013, 020, 021, 022 |
+| [`FB_Bucket`](AF_Partie-10_FB_Bucket_v1.0.md) | <nobr><code>TC-P10-023</code></nobr> à 034 |
 | [`FB_Winch_Symmetry`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md) | Diagnostic MES-008, symétrie |
 | [`FB_SpeedStep`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | Décodage paliers 1..5 & garde-fou |
 | [`FB_WinchLoadEstimator`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | Diagnostic charge 2D |
@@ -51,19 +51,38 @@ dupliqué ici) :
 | [`AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_WinchLoadEstimator_v1.0.md) | `FB_WinchLoadEstimator` | Estimation charge 2D palier x vitesse |
 | [`AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_DriftGuard_v1.0.md) | `FB_DriftGuard` | Capture & surveillance dérive sous frein |
 
-```text
-FB_Winch (mouvement, ×2)
- └─ FB_SpeedStep    (palier → 4 contacteurs)
-    (rampe %/s retirée 2026-08-06, remplacée par tempo palier — §6 ;
-     frein retiré 2026-08-06, voir §1bis)
+<div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
+    📡 &nbsp;<b>FB_Encoder_SpeedMeasure / Abs</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Acquisition positions & vitesses M1/M2</span>
+  </div>
 
-FB_Safety_Winch (×2)              ──► SafeStop / ForbidDescent / ForbidAscent / PowerCutOff (compose FB_DriftGuard)
-FB_WinchSync (×1)                 ──► DeltaPosM, SyncWarn (niveau 1, warning)
-FB_Bucket (×1)                    ──► Benne (sous-fonction M2, désynchronisation)
-FB_WinchOutputInterlock_LD (×2)   ──► Q finales (barrière, dans Outputs — calcule aussi BrakeCmd, §1bis)
-FB_WinchLoadEstimator (×2)        ──► Diagnostic charge, informatif
-FB_Winch_Symmetry (×1)             ──► Diagnostic passif symétrie M1/M2
-```
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Positions M1/M2 & Vitesses</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #f43f5e; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🛡️ &nbsp;<b>FB_Safety_Winch (×2) & FB_WinchSync (×1)</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Contrôle dérive (DriftGuard), synchro M1/M2 & sécurités</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Autorisations mouvement & Limites</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #fbbf24; padding:6px 10px; border-radius:4px; font-size:12px;">
+    ⚙️ &nbsp;<b>FB_Winch (×2) & FB_Bucket (×1)</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Pilotage treuils M1/M2, décodeur paliers FB_SpeedStep</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Ordres contacteurs & Freins</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🔒 &nbsp;<b>FB_WinchOutputInterlock_LD (×2)</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Barrière finale matérielle outputs & BrakeCmd</span>
+  </div>
+</div>
 
 Benne = sous-fonction M2 : aucune I/O propre, réutilise `FB_Winch` M2. Fiche dédiée dans ce dossier.
 

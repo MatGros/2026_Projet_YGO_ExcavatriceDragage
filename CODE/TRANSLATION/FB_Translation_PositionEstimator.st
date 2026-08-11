@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-11_Fonction_Translation_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
       la position estimée continue en mètres (0.0 m à la Maintenance -> +X m à la Trémie),
       avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.

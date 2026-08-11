@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🪣 ST_BucketCmdDemand — Demande de commande benne (depuis cycle/sequenceur)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-10_Fonction_Winch_v2.0.md (Benne incluse)
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md (Benne incluse)
    🎯 Demande de mouvement pour benne (depuis FB_Cycle / FB_ExtractionSequence).
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_BucketCmdDemand :

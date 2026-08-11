@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📥 FB_DigitalInputFilter — Filtre temporel minimal d'une entrée TOR
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md
    🎯 Rôle unique : accepter un changement BOOL seulement après FilterTime.
    🛡️ Ce FB ne normalise pas la polarité et ne réalise aucun diagnostic device.
       La polarité est portée par le nom/mapping d'acquisition ; la santé carte

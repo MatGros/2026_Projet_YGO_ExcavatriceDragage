@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation_PositionDecoder — Décodage mot capteurs M3 (5 positions)
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.1.md §3
+    📄 Doc métier : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §3
    🧩 Brique technique (AF_Partie-03 §2) : contrat minimal, pas de
       StartStop/Enable/Reset/Mode — décode 5 capteurs TOR (Trémie|PV|P2|P1|
       Maintenance) en mot de progression, dérive les 2 limites extrêmes,

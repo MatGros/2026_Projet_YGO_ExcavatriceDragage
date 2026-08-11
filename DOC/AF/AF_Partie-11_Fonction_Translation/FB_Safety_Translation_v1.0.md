@@ -20,10 +20,10 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P11-002 | Mot incohérent ➔ Bit7 ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
-| TC-P11-010 | Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
-| TC-P11-011 | Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
-| TC-P11-014 | `BypassGlobal` efface `ErrorId`, coupe TONs, Reset fonctionnel | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-002</code></nobr> | Mot incohérent ➔ Bit7 ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-010</code></nobr> | Méca A (bit5) : arrêt commandé mais freq>0.5Hz >1s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-011</code></nobr> | Méca B (bit4) : incohérence arrêt >3s ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-014</code></nobr> | `BypassGlobal` efface `ErrorId`, coupe TONs, Reset fonctionnel | `⚡ AUTO_PLC` |
 
 ---
 

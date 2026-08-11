@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🕵️♂️ FB_TroubleshootingView — Mise en forme lecture seule pour dépannage
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.0.md
+   📄 Doc : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.0.md
    🔗 Producteur unique de GVL_Troubleshooting.* — instancié UNE SEULE FOIS,
       dans PRG_07_Supervision, après §3 Projections IHM.
    🔒 Lecture seule stricte : aucune VAR_OUTPUT de commande, aucun calcul métier,

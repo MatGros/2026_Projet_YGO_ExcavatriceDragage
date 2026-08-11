@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📤 PRG_06_Outputs_LD — Écriture des SORTIES physiques (PROGRAMME LADDER)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §5
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §5
    ⚙️ Exécuté par la tâche PLC en position 6 (après PRG_05_Translation).
    📄 Converti automatiquement en Ladder Diagram (<LD>) dans CODESYS.
    🛡️ LOT_STRUCTURE_INTERLOCKS_LD (2026-08) : barrières finales M1/M2/M3

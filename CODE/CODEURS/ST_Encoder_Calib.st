@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    🧲 ST_Encoder_Calib — Calibration & référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md
-                   DOC/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
    🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
    ═══════════════════════════════════════════════════════════════ *)
 

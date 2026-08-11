@@ -1,16 +1,12 @@
 (* ═══════════════════════════════════════════════════════════════
-   🛡️ FB_Safety_EmergencyManagementLogic — Décision & Séquencement
+   🛡️ FB_Safety_EmergencyManagementLogic — Décision & Séquencement AU
    ───────────────────────────────────────────────────────────────
-   📄 Rôle : Gère la machine d'état d'auto-test et de réarmement de
-      la boucle d'arrêt d'urgence. Produit les consignes logiques
-      et les bus d'état/diagnostic.
-   🔒 Polarité maintien : MaintainA/B_Cmd (TRUE = voie saine).
-   🛡️ Pattern Cause/Ack (§9 STD) : Reset non conditionné, interlock sur Cause brute,
-      affichage IHM (ErrorId) avec debounce court + Ack.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
-              DOC/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
-              DOC/AF_Partie-03_Contrats_Composants_v2.1.md
+   🎯 Rôle : Machine d'état, fronts Reset/Arm, calcul ErrorId & consignes logiques
+   🛡️ Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
+   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
+            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
+            DOC/STDS/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
+            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
 *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementLogic

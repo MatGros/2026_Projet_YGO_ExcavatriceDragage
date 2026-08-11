@@ -18,8 +18,8 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P11-001 | 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ `Incoherent` | `💻 AUTO` |
-| TC-P11-002 | Mot incohérent ➔ `Incoherent=TRUE` ➔ bit7 Safety ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P11-001</code></nobr> | 6 mots capteurs valides acceptés (11111➔00000) ; autre ➔ `Incoherent` | `💻 AUTO` |
+| <nobr><code>TC-P11-002</code></nobr> | Mot incohérent ➔ `Incoherent=TRUE` ➔ bit7 Safety ➔ SafeStop+PowerCutOff | `⚡ AUTO_PLC` |
 
 ---
 

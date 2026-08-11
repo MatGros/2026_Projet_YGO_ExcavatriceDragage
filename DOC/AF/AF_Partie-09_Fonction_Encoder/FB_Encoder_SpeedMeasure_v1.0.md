@@ -16,7 +16,7 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P09-014 | Calcul vitesse m/s sur fenêtre fixe 50 ms sans filtre passe-bas PT1 parasite | `💻 AUTO` |
+| <nobr><code>TC-P09-014</code></nobr> | Calcul vitesse m/s sur fenêtre fixe 50 ms sans filtre passe-bas PT1 parasite | `💻 AUTO` |
 
 ---
 

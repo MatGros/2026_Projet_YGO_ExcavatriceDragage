@@ -63,23 +63,29 @@
 
 ### 4.1 État actuel du code (ST, avant migration)
 
-```text
-PRG_01_Diagnostics (acquisition brutes device)
-  ├── FB_Diag_CanOpen ──► DeviceJoystick.Online/Operational ──► FB_Safety_Winch/Translation (SafeStop)
-  │                    ──► DeviceCanOpenMaster ──► IHM Network
-  ├── FB_Diag_Ethercat ──► DeviceVariateur.Online/Operational ──► FB_Safety_Translation (SafeStop)
-  │                    ──► DeviceEncoderM1/M2.Operational ──► FB_Acquisition_Preflight, IHM
-  ├── FB_Diag_IhmHeartbeat ──► HeartbeatIhmOk ──► FB_Safety_Winch/Translation (SafeStop)
-  │                        ──► TglHeartbeatPlc ──► IHM
-  └── (sorties diag publiées vers IHM Network + Troubleshooting)
+<div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
+    📡 &nbsp;<b>FB_Diag_CanOpen & FB_Diag_Ethercat & FB_Diag_IhmHeartbeat</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Acquisition brutes device & santé communication bus/IHM</span>
+  </div>
 
-PRG_TROUBLESHOOTING_CFC (observateurs passifs)
-  ├── FB_Acquisition_Preflight ──► PreflightOk/ErrorId ──► IHM uniquement
-  └── FB_Winch_Symmetry ──► SymmetryOk/Valid ──► IHM uniquement
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Online / Operational & HeartbeatOk</span>
+  </div>
 
-> 📌 Preflight et Symmetry sont instanciés dans PRG_TROUBLESHOOTING_CFC mais documentés respectivement
-> dans AF_Partie-06 (qualification E/S) et AF_Partie-10 (mesure treuils).
-```
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #f43f5e; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🛡️ &nbsp;<b>FB_Safety_Winch / FB_Safety_Translation</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Déclenchement SafeStop si perte communication ou défaut bus</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Signaux de diagnostic qualifiés</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🖥️ &nbsp;<b>PRG_07_Supervision_CFC & IHM Network</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Publication des états de diagnostic, Preflight & Symétrie M1/M2</span>
+  </div>
+</div>
 
 ---
 

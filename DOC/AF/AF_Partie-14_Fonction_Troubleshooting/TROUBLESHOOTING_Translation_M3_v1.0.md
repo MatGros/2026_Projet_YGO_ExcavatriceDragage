@@ -69,7 +69,7 @@ Table complète (transverse M1/M2/M3) : `AF_Partie-14_Fonction_Troubleshooting_v
 | Observable | Attendu pour jog/positionneur | Sinon |
 |---|---|---|
 | `PRG_03_Modes_Cycle.Auth.Mode` | `MAINT_N1` ou `MAINT_N2` pour jog manuel ; `SEMI_AUTO` pour positionneur automatique | Aucune commande M3 n'est arbitrée (`PRG_05_Translation.st` §1 force tout à neutre hors ces modes) |
-| `PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable` | `TRUE` uniquement en `MAINT_N2` | Cible "Maintenance" (SelTarget=4) refusée sinon (TC-P11-012) — comportement voulu, pas un bug |
+| `PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable` | `TRUE` uniquement en `MAINT_N2` | Cible "Maintenance" (SelTarget=4) refusée sinon (<nobr><code>TC-P11-012</code></nobr>) — comportement voulu, pas un bug |
 
 ---
 

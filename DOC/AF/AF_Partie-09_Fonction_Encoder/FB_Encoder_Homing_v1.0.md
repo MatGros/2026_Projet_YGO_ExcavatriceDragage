@@ -16,13 +16,13 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P09-003 | Homing nominal refusé sans capteur haut (hors bypass) ➔ Bit4 | `⚡ AUTO_PLC` |
-| TC-P09-004 | Homing refusé si arrêt non confirmé (contacteurs+frein) ➔ Bit2 | `⚡ AUTO_PLC` |
-| TC-P09-005 | Homing unitaire refusé hors MAINT_N2 ou treuil erroné ➔ Bit0/Bit1 | `💻 AUTO` |
-| TC-P09-006 | Cible hors [-99;+99] m rejetée sans écriture preset | `💻 AUTO` |
-| TC-P09-007 | `HomingRefRaw` conforme ; `CablePosM` = cible post-Done | `⚡ AUTO_PLC` |
-| TC-P09-008 | Écart au reboot ➔ `HomingSuspect`, `Homed` masqué | `⚡ AUTO_PLC` |
-| TC-P09-009 | `BtnConfirmCoherence` lève le doute sans réécrire ref | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P09-003</code></nobr> | Homing nominal refusé sans capteur haut (hors bypass) ➔ Bit4 | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P09-004</code></nobr> | Homing refusé si arrêt non confirmé (contacteurs+frein) ➔ Bit2 | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P09-005</code></nobr> | Homing unitaire refusé hors MAINT_N2 ou treuil erroné ➔ Bit0/Bit1 | `💻 AUTO` |
+| <nobr><code>TC-P09-006</code></nobr> | Cible hors [-99;+99] m rejetée sans écriture preset | `💻 AUTO` |
+| <nobr><code>TC-P09-007</code></nobr> | `HomingRefRaw` conforme ; `CablePosM` = cible post-Done | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P09-008</code></nobr> | Écart au reboot ➔ `HomingSuspect`, `Homed` masqué | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P09-009</code></nobr> | `BtnConfirmCoherence` lève le doute sans réécrire ref | `⚡ AUTO_PLC` |
 
 ---
 

@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF_Partie-02_Architecture_Programme_v3.1.md §3,
-                    DOC/AF_Partie-03_Contrats_Composants_v2.1.md §2
+    📄 Doc métier : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §3,
+                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
    Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
    détecter un collage / une absence de fermeture d'un contacteur de
    puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB

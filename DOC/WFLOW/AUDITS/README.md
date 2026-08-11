@@ -77,4 +77,4 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 📌 `ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md` reste à la racine `DOC/` : c'est l'historique des
 décisions de conception, référencé par les documents socle.
 📌 Les actions à mener issues de ces audits sont suivies dans `DOC/WFLOW/PLAN_TASK.md`.
-📌 Les relevés terrain et essais sont consignés dans `DOC/MES/REGISTRES/REGISTRE_Suivi_MiseEnService_20260724_v1.0.md`.
+📌 Les relevés terrain et essais sont consignés dans `DOC/TESTS/REGISTRES/REGISTRE_Suivi_MiseEnService.md`.

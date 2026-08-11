@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (M1: moteur de retenue, M2: moteur Benne — squelette liaisons — pas de correction)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md §9
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §9
    🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop —
       1 seule instance (surveille les 2 treuils, pas 1 par treuil comme FB_Safety_Winch).
    🎯 PÉRIMÈTRE CE LOT (squelette de liaisons, décisions Partie9 §9 déjà actées) :

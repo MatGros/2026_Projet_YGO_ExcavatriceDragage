@@ -37,6 +37,34 @@ Fiches : `AF_Partie-06` (Preflight) et `AF_Partie-10` (Symmetry).
 
 ---
 
+## 🔄 1bis. Flux d'observation & Supervision
+
+<div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
+    📡 &nbsp;<b>PRG_02_Acquisition (HwIn) & Capteurs</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Lecture seule des états d'entrée réels/simulés</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Observation passive (aucune écriture)</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #fbbf24; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🩺 &nbsp;<b>PRG_07_Supervision_CFC</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Observateurs passifs (FB_Acquisition_Preflight & FB_Winch_Symmetry)</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">États de dépannage & mesures</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🖥️ &nbsp;<b>Vue IHM Dépannage & Watch CODESYS</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Affichage opérateur / technicien terrain</span>
+  </div>
+</div>
+
+---
+
 ## 2. 🩺 Table de visu — dépannage de l'acquisition DI
 
 > La source d'observation cible est `PRG_02_Acquisition`. Les références historiques à

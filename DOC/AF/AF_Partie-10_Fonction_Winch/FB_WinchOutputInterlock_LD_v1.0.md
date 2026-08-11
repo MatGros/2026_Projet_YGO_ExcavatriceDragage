@@ -4,7 +4,7 @@
 > Rôle de **ce** document : barrière finale, watchdog frein, machine d'état, anti-redémarrage —
 > et **catalogue unique** des `TC-P10-012`, `013`, `020`.
 > Source code : `CODE/TREUILS/FB_WinchOutputInterlock_LD.st` · instances dans `Outputs (Ladder)`.
-> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
+> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire
 
@@ -20,11 +20,11 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P10-012 | Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` |
-| TC-P10-013 | Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation | `⚡ AUTO_PLC` |
-| TC-P10-020 | Watchdog frein réel terrain (temps, contacteur/bobine) | `🟢 SITE` |
-| TC-P10-021 | Temps mort même sens : 1s après arrêt ➔ nouvelle demande | `💻 AUTO` |
-| TC-P10-022 | Temps mort inversion : 1s après arrêt + inversion sens | `💻 AUTO` |
+| <nobr><code>TC-P10-012</code></nobr> | Watchdog frein barrière 500ms sans confirmation ➔ FAULT + Inhibit | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P10-013</code></nobr> | Anti-redémarrage : Cause + Reset + Neutre ➔ réautorisation | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P10-020</code></nobr> | Watchdog frein réel terrain (temps, contacteur/bobine) | `🟢 SITE` |
+| <nobr><code>TC-P10-021</code></nobr> | Temps mort même sens : 1s après arrêt ➔ nouvelle demande | `💻 AUTO` |
+| <nobr><code>TC-P10-022</code></nobr> | Temps mort inversion : 1s après arrêt + inversion sens | `💻 AUTO` |
 
 ---
 

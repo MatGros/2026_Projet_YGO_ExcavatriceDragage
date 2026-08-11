@@ -5,8 +5,8 @@
       Consommé par PRG_SUPERVISION_CFC et GVL_Troubleshooting.
    🎯 Champs lecture seule — producteur unique = FB composite.
    ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF_Partie-03_Contrats_Composants_v2.1.md
+    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
 *)
 
 TYPE ST_Safety_Emergency_Diag :

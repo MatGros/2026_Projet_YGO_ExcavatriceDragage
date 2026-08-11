@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.A
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.A
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE ST_BucketConfig :

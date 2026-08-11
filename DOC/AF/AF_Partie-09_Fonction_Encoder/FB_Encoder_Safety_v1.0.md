@@ -16,9 +16,9 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| TC-P09-010 | Bornage [-99;+99] m dépassé ➔ position gelée + `EncoderIncoherent = TRUE` | `💻 AUTO` |
-| TC-P09-011 | `EncoderFaultPresent = TRUE` interdit la bascule en mode `SEMI_AUTO` | `⚡ AUTO_PLC` |
-| TC-P09-012 | Méca D (Capteur haut sans arrêt) ➔ `SafeStop` + `PowerCutOff` après 3s | `🟢 SITE` |
+| <nobr><code>TC-P09-010</code></nobr> | Bornage [-99;+99] m dépassé ➔ position gelée + `EncoderIncoherent = TRUE` | `💻 AUTO` |
+| <nobr><code>TC-P09-011</code></nobr> | `EncoderFaultPresent = TRUE` interdit la bascule en mode `SEMI_AUTO` | `⚡ AUTO_PLC` |
+| <nobr><code>TC-P09-012</code></nobr> | Méca D (Capteur haut sans arrêt) ➔ `SafeStop` + `PowerCutOff` après 3s | `🟢 SITE` |
 
 ---
 

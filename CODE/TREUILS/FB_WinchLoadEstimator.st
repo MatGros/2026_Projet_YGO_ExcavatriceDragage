@@ -7,7 +7,7 @@
    ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
       reste à 0 % et Configured reste FALSE.
    ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
 *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchLoadEstimator

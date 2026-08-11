@@ -9,7 +9,7 @@
       Raison : plus simple à régler directement depuis le bruit mesuré au neutre (ex: ±200 sur le
       terrain → DeadbandRaw=300 avec marge), sans recalculer un % à chaque calibration.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📄 Docs : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
 *)
 
 FUNCTION_BLOCK FB_AxisScale

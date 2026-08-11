@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-13_Fonction_Simulation_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
       instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par

@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🪜 ST_SpeedStepTable — Table des paliers de vitesse (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
    🎛️ Table INDÉPENDANTE par treuil (M1 et M2 ont chacun la leur).
    ⚠️ ÉVOLUTION (retour terrain 2026-07-01, remplace le masque BYTE
       packé de la 1ère version) : chaque contacteur de vitesse de

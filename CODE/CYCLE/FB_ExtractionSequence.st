@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ⛏️ FB_ExtractionSequence — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
    🛡️ Sécurité : aucune remontée assistée sans fond confirmé ; palier 1 au contrôle.
    🧩 Responsabilité : séquence métier, jamais commande directe de contacteur.
    ═══════════════════════════════════════════════════════════════ *)

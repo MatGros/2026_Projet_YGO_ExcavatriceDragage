@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📐 FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF_Partie-09_Fonction_Encoder_v2.1.md §3.8
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3.8
    🛡️ Sécurité : mesure propriétaire de la chaîne codeur ; aucune réaction machine
    🧩 Dépendances : position sûre fournie par FB_Encoder_Safety
    ═══════════════════════════════════════════════════════════════ *)

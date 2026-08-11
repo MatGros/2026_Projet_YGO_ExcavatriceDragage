@@ -3,7 +3,7 @@
 > Rôle : acquisition et conditionnement du geste opérateur (Hall CANopen → consignes d'axe).
 > **Pas** un FB de mouvement : pas de `SafeStop` / pas de pilotage Q.
 > Source code : `CODE/JOYSTICK/FB_Joystick.st` · instance `Acquisition (CFC).instJoystick`.
-> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Joystick_Extraction_Code_v1.0.md`.
+> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Joystick_Extraction_Code_v1.0.md`.
 > v1.3 archivée : `ARCHIVES/Doc/AF_Partie-08_Fonction_Joystick_v1.3.md`.
 
 ## 🧭 Sommaire
@@ -23,14 +23,14 @@
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P08-001 | Perte contacteur / CAN ➔ désarmer et annuler axes | `SpeedRef=0`, `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §3 |
-| TC-P08-002 | Armement homme-mort sur front au neutre uniquement | Armement ➔ `SpeedRef` actif | `⚡ SITE+AUTO` | §4 |
-| TC-P08-003 | Bouton relâché en mouvement : **sans** reconfirmation (`DeadmanReconfEnable=FALSE`, défaut) armement conservé ; **avec** reconfirmation (TRUE) relâchement > 10 s ➔ désarmement | `DeadmanArmed` conservé / `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | §4 |
-| TC-P08-004 | Neutre rapide (<100ms) conserve armement, prolongé désarme | Armement conservé / perdu | `💻 AUTO` | §4 |
-| TC-P08-005 | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | §4, §6 |
-| TC-P08-006 | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | §5 |
-| TC-P08-007 | Consigne `SpeedRef` signée [-100;+100] sur `ST_Joystick_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | §1, §2 |
-| TC-P08-008 | Winch, Translation et Cycle exigent `DeadmanArmed` | Linkage vérifié | `💻 AUTO` | §6 |
+| <nobr><code>TC-P08-001</code></nobr> | Perte contacteur / CAN ➔ désarmer et annuler axes | `SpeedRef=0`, `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | <small>§3</small> |
+| <nobr><code>TC-P08-002</code></nobr> | Armement homme-mort sur front au neutre uniquement | Armement ➔ `SpeedRef` actif | `⚡ SITE+AUTO` | <small>§4</small> |
+| <nobr><code>TC-P08-003</code></nobr> | Bouton relâché en mouvement : **sans** reconfirmation (`DeadmanReconfEnable=FALSE`, défaut) armement conservé ; **avec** reconfirmation (TRUE) relâchement > 10 s ➔ désarmement | `DeadmanArmed` conservé / `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | <small>§4</small> |
+| <nobr><code>TC-P08-004</code></nobr> | Neutre rapide (<100ms) conserve armement, prolongé désarme | Armement conservé / perdu | `💻 AUTO` | <small>§4</small> |
+| <nobr><code>TC-P08-005</code></nobr> | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | <small>§4, §6</small> |
+| <nobr><code>TC-P08-006</code></nobr> | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | <small>§5</small> |
+| <nobr><code>TC-P08-007</code></nobr> | Consigne `SpeedRef` signée [-100;+100] sur `ST_Joystick_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | <small>§1, §2</small> |
+| <nobr><code>TC-P08-008</code></nobr> | Winch, Translation et Cycle exigent `DeadmanArmed` | Linkage vérifié | `💻 AUTO` | <small>§6</small> |
 
 ---
 
@@ -209,8 +209,8 @@ lui-même n'a pas été inspecté). À valider avant mise en service.
 
 | TC | Attendu | Type |
 |---|---|---|
-| TC-P08-009 | Neutre persiste après download/redémarrage PLC | SITE |
-| TC-P08-010 | Bouton calibration accessible et fonctionnel sur écran HMI réel | SITE |
+| <nobr><code>TC-P08-009</code></nobr> | Neutre persiste après download/redémarrage PLC | SITE |
+| <nobr><code>TC-P08-010</code></nobr> | Bouton calibration accessible et fonctionnel sur écran HMI réel | SITE |
 
 ---
 

@@ -16,13 +16,13 @@
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| TC-P07-001 | IHM et PLC partagent les mêmes DUTs | Aucun miroir parallèle de variables | `💻 AUTO` | §1 |
-| TC-P07-002 | Structures `Cmd/State/Cfg` par domaine | Convention respectée dans `GVL_IHM` | `💻 AUTO` | §3 |
-| TC-P07-003 | IHM limitée aux variables de `GVL_IHM` | Zéro accès direct aux internes des FB | `💻 AUTO` | §1 |
-| TC-P07-004 | Producteur unique par champ `State` | Un seul écrivain PLC par variable d'état | `💻 AUTO` | §1 |
-| TC-P07-005 | Page Troubleshooting en lecture seule | Zéro écriture de commande/config/bypass | `💻 AUTO` | §5 |
-| TC-P07-006 | Séparation messages action vs état | 2 familles distinctes, alarmes sur `ErrorId` | `⚡ SITE+AUTO` | §4 |
-| TC-P07-007 | Warning auto-effaçable vs Fault sur Reset | Warning s'efface seul, Fault exige `Ack` | `⚡ SITE+AUTO` | §4 |
+| <nobr><code>TC-P07-001</code></nobr> | IHM et PLC partagent les mêmes DUTs | Aucun miroir parallèle de variables | `💻 AUTO` | <small>§1</small> |
+| <nobr><code>TC-P07-002</code></nobr> | Structures `Cmd/State/Cfg` par domaine | Convention respectée dans `GVL_IHM` | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P07-003</code></nobr> | IHM limitée aux variables de `GVL_IHM` | Zéro accès direct aux internes des FB | `💻 AUTO` | <small>§1</small> |
+| <nobr><code>TC-P07-004</code></nobr> | Producteur unique par champ `State` | Un seul écrivain PLC par variable d'état | `💻 AUTO` | <small>§1</small> |
+| <nobr><code>TC-P07-005</code></nobr> | Page Troubleshooting en lecture seule | Zéro écriture de commande/config/bypass | `💻 AUTO` | <small>§5</small> |
+| <nobr><code>TC-P07-006</code></nobr> | Séparation messages action vs état | 2 familles distinctes, alarmes sur `ErrorId` | `⚡ SITE+AUTO` | <small>§4</small> |
+| <nobr><code>TC-P07-007</code></nobr> | Warning auto-effaçable vs Fault sur Reset | Warning s'efface seul, Fault exige `Ack` | `⚡ SITE+AUTO` | <small>§4</small> |
 
 ---
 

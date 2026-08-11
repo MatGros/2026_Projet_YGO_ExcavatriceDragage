@@ -9,7 +9,7 @@
 > Cible : la chaîne codéurs complète rejoint `PRG_02_Acquisition` (rang 02) — voir §4.2.
 > ⚠️ **Point d'arbitrage ouvert pour le lot M1** : le homing lit le mode de marche — voir §4bis.
 > 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
-> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md`.
+> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md`.
 > v2.0 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md`.
 > v1.11 archivée : `ARCHIVES/Doc/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md`.
 
@@ -39,12 +39,12 @@ Catalogue `TC-P09-*` **réparti dans les 6 fiches FB** (propriétaire unique par
 
 | Fiche | TC couverts |
 |---|---|
-| [`FB_Encoder_Abs`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Abs_v1.0.md) | TC-P09-001, 002 |
-| [`FB_Encoder_Homing`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Homing_v1.0.md) | TC-P09-003 à 009 |
-| [`FB_Encoder_Scale`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Scale_v1.0.md) | TC-P09-013 |
-| [`FB_Encoder_Safety`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Safety_v1.0.md) | TC-P09-010, 011, 012 |
-| [`FB_Encoder_SpeedMeasure`](AF_Partie-09_Fonction_Encoder/FB_Encoder_SpeedMeasure_v1.0.md) | TC-P09-014 |
-| [`FB_Encoder_SpeedMonitor`](AF_Partie-09_Fonction_Encoder/FB_Encoder_SpeedMonitor_v1.0.md) | TC-P09-015 |
+| [`FB_Encoder_Abs`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Abs_v1.0.md) | <nobr><code>TC-P09-001</code></nobr>, 002 |
+| [`FB_Encoder_Homing`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Homing_v1.0.md) | <nobr><code>TC-P09-003</code></nobr> à 009 |
+| [`FB_Encoder_Scale`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Scale_v1.0.md) | <nobr><code>TC-P09-013</code></nobr> |
+| [`FB_Encoder_Safety`](AF_Partie-09_Fonction_Encoder/FB_Encoder_Safety_v1.0.md) | <nobr><code>TC-P09-010</code></nobr>, 011, 012 |
+| [`FB_Encoder_SpeedMeasure`](AF_Partie-09_Fonction_Encoder/FB_Encoder_SpeedMeasure_v1.0.md) | <nobr><code>TC-P09-014</code></nobr> |
+| [`FB_Encoder_SpeedMonitor`](AF_Partie-09_Fonction_Encoder/FB_Encoder_SpeedMonitor_v1.0.md) | <nobr><code>TC-P09-015</code></nobr> |
 
 ⏸️ **M2 (rédaction effective des tests)** différé après implémentation du nouveau code — décision
 utilisateur 2026-07-31. Ce catalogue reste la référence d'attribution, pas encore exécuté.
@@ -66,11 +66,47 @@ utilisateur 2026-07-31. Ce catalogue reste la référence d'attribution, pas enc
 
 ## 2. Rôle et pipeline
 
-```text
-FB_Encoder_Abs ──► FB_Encoder_Homing ──► FB_Encoder_Scale ──► FB_Encoder_Safety ──► FB_Encoder_SpeedMeasure
-   (bus EtherCAT)    (référencement,        (pts → m)           (bornage,             (vitesse câble,
-    RawPos/preset)     RETAIN Calib)                              cohérence boot)        50ms/6 éch.)
-```
+<div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
+    📡 &nbsp;<b>FB_Encoder_Abs</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Acquisition bus EtherCAT (RawPos & Preset)</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">RawPos & Statut EtherCAT</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🎯 &nbsp;<b>FB_Encoder_Homing</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Référencement zérotage & RETAIN Calib</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Position brute relative</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #fbbf24; padding:6px 10px; border-radius:4px; font-size:12px;">
+    📐 &nbsp;<b>FB_Encoder_Scale</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Scaling physique (Points ➔ Mètres câble)</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Position brute (mètres)</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #f43f5e; padding:6px 10px; border-radius:4px; font-size:12px;">
+    🛡️ &nbsp;<b>FB_Encoder_Safety</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Bornage [-99;+99] m & Qualification</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0V12M8 12L4 8M8 12L12 8" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span style="color:#94a3b8; font-size:10px; font-style:italic; margin-top:1px;">Position qualifiée (mètres)</span>
+  </div>
+
+  <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
+    ⚡ &nbsp;<b>FB_Encoder_SpeedMeasure</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Calcul vitesse câble m/s (fenêtre 50ms)</span>
+  </div>
+</div>
 
 Les instances de mesure M1/M2 sont dans `PRG_02_Acquisition` — **producteur unique**
 position/vitesse/disponibilite. `FB_Encoder_SpeedMonitor` reste un observateur diagnostique : il

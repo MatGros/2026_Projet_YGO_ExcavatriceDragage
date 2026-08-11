@@ -6,8 +6,8 @@
    Pattern : identique a GVL_IHM.Modes.Cmd dans le projet reel.
           L'IHM ecrit ces champs, le programme les consomme.
    ==============================================================
-    Docs : DOC/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-           DOC/AF_Partie-07_Interface_IHM_v2.0.md
+    Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+           DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md
 *)
 
 TYPE ST_Safety_Emergency_HmiCmd :
