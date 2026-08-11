@@ -1,0 +1,1831 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.781842" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-11T18:19:14.781842">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_HardwareImage">
+        <baseType>
+          <struct>
+            <variable name="Winch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Treuils M1/M2 + codeurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Translation">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Translation M3 + variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Operator">
+              <type>
+                <derived name="ST_HwOperator" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Opérateur / Joystick / bus CAN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Machine">
+              <type>
+                <derived name="ST_HwMachine" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Sécurités/Communs Machine</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6f8e5f63-0c17-53f0-bfdd-b43b9a736035</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwMachine">
+        <baseType>
+          <struct>
+            <variable name="PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirm. contacteur puissance engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermée (coup-de-poing + contact PLC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotationOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle rotation phases élec. OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_KoboldContactFond_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HydraulicThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique centrale hydraulique OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConveyorInfeedReady_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b09d9aab-fffb-5955-a0ee-fbdfe07f4a50</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts communs à la machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwOperator">
+        <baseType>
+          <struct>
+            <variable name="JoyXRaw_ANA1">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute analogique axe X (Translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyYRaw_ANA2">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute analogique axe Y (Levage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyBtnRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton brut joystick (Homme-Mort)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CanBusState">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État bus CANopen (CANbus.GetBusState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JOY1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device JOY1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ce03b729-667a-50ae-8c74-7bdf588f937a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwOperator — Image matérielle brute des entrées Opérateur / Joystick
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts du joystick CANopen JOY1.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwTranslation">
+        <baseType>
+          <struct>
+            <variable name="M3_PosTremie_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosPV_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position point de vitesse (pré-ralentissement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP2_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP1_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosMaintenance_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M3 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ThermalOK_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_StatusWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Status word variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ActualFrequencyHz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence réelle variateur AC600 (x100)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AC600_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device AC600 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>385ab449-ca64-59fe-be25-3863e9125d20</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts de la translation M3 (AC600).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwWinch">
+        <baseType>
+          <struct>
+            <variable name="M1_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M1 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M1 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M2 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M2 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1M2_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun M1/M2 libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_TensionedCable_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur mou de câble M2 (câble tendu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD2 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>72c8e04d-71ee-5733-9392-791d275a6b49</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_SimBench" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation globale (GVL_Simulation.SimulationModeActive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Commandes issues de l'automate (Scan N-1 / PRG_07 / PRG_10) ──────────</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-27 : les 4 contacteurs de palier participent au retour unique
+« tous contacteurs retombés » — sans eux, le modèle annonce l'arrêt alors qu'un
+palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SpeedContactor_2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_3">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_4">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M1_PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="M1_PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="M1_BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = commande desserrage frein M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-27 : idem M1, voir ci-dessus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_SpeedContactor_2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_3">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_4">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M2_PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="M2_PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="M2_BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = commande desserrage frein M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Avant, -1 = Arrière, 0 = Arrêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="M3_BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = commande desserrage frein M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_TargetNum">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible sélectionnée (0..4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAlive_A">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais A maintenu sagement par le PLC</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAlive_B">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais B maintenu sagement par le PLC</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion de réarmement puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimEncoderSpeedFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Stimuli &amp; Paramètres de banc ─────────────────────────────────────────</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimSyncDeviationInjectM1">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimSyncDeviationInjectM2">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimSyncDeviationOffset_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+            </variable>
+            <variable name="SimM3SensorsWordActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimM3SensorsWord">
+              <type>
+                <BYTE />
+              </type>
+              <initialValue>
+                <simpleValue value="16#01" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickRawX">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5000" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickRawY">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5000" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickRawButton">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimKoboldContactValue">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="BtnEmergencyStop">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation appui coup-de-poing AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwReal">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Image réelle fallback ────────────────────────────────────────────────</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Winch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+            </variable>
+            <variable name="Translation">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+            </variable>
+            <variable name="Operator">
+              <type>
+                <derived name="ST_HwOperator" />
+              </type>
+            </variable>
+            <variable name="Machine">
+              <type>
+                <derived name="ST_HwMachine" />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="RawPosM1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawPosM2">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire _SimEncoderRawPosM2 dans GVL_PERSISTENT</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="instSimEncoderM1">
+              <type>
+                <derived name="FB_Sim_Encoder" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Modèles sous-jacents</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instSimEncoderM2">
+              <type>
+                <derived name="FB_Sim_Encoder" />
+              </type>
+            </variable>
+            <variable name="instSimTranslation">
+              <type>
+                <derived name="FB_Sim_Translation" />
+              </type>
+            </variable>
+            <variable name="instSimJoystick">
+              <type>
+                <derived name="FB_Sim_Joystick" />
+              </type>
+            </variable>
+            <variable name="instSimSafety">
+              <type>
+                <derived name="FB_Sim_Safety" />
+              </type>
+            </variable>
+            <variable name="M1_PresetCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Calculs internes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_PresetCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_OffsetPts">
+              <type>
+                <DINT />
+              </type>
+            </variable>
+            <variable name="M2_OffsetPts">
+              <type>
+                <DINT />
+              </type>
+            </variable>
+            <variable name="M3_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_ActualFreqHz">
+              <type>
+                <UINT />
+              </type>
+            </variable>
+            <variable name="M3_StatusWordSim">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
+   
+   🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
+      - FB_Sim_Encoder (instM1, instM2)
+      - FB_Sim_Translation (instTranslation)
+      - FB_Sim_Joystick (instJoystick)
+      - FB_Sim_Safety (instSafety)
+   
+   🔒 Brique réduite : 0 lecture de variable globale en interne.
+      Toutes les entrées (commandes, stimuli, HwReal) sont passées en paramètres.
+   
+   🔴 RÈGLES SÉCURITÉ ET POLARITÉ :
+      - Modèle frein M1/M2/M3 : M1_BrakeIsOpen_DI := M1_BrakeCmd (1 = OUVERT).
+        Ne JAMAIS faire NOT BrakeCmd ! (P1 Lot L6).
+      - Retours contacteurs M1/M2 : 1 = tous retombés (TRUE quand RelayFwd=0 et RelayRev=0).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+IF NOT Enable THEN
+    Winch       := HwReal.Winch;
+    Translation := HwReal.Translation;
+    Operator    := HwReal.Operator;
+    Machine     := HwReal.Machine;
+    RETURN;
+END_IF;
+
+
+// ── 1. MODÈLE TREUILS (M1 + M2) ─────────────────────────────────────────────
+// Presets codeurs : déclenchés si PresetTriggerCmd = 2
+M1_PresetCmd := (M1_PresetTriggerCmd = 2);
+M2_PresetCmd := (M2_PresetTriggerCmd = 2);
+
+// Conversions d'injection d'écart synchro (0.5m -&gt; points codeur avec 8192 pts/tour, 2m/tour)
+// 1m = 4096 points codeur.
+M1_OffsetPts := REAL_TO_DINT(SimSyncDeviationOffset_M * 4096.0);
+M2_OffsetPts := REAL_TO_DINT(SimSyncDeviationOffset_M * 4096.0);
+
+// Instance modèle codeur M1
+instSimEncoderM1(
+    Enable           := TRUE,
+    RelayFwd         := M1_RelayFwd,
+    RelayRev         := M1_RelayRev,
+    SpeedRefPct      := M1_SpeedRefPct,
+    PresetCmd        := M1_PresetCmd,
+    PresetValue      := M1_PresetValueOut,
+    SpeedScaleFactor := SimEncoderSpeedFactor,
+    TestOffsetCmd    := SimSyncDeviationInjectM1,
+    TestOffsetPts    := M1_OffsetPts,
+    RawPos           := RawPosM1
+);
+
+// Instance modèle codeur M2
+instSimEncoderM2(
+    Enable           := TRUE,
+    RelayFwd         := M2_RelayFwd,
+    RelayRev         := M2_RelayRev,
+    SpeedRefPct      := M2_SpeedRefPct,
+    PresetCmd        := M2_PresetCmd,
+    PresetValue      := M2_PresetValueOut,
+    SpeedScaleFactor := SimEncoderSpeedFactor,
+    TestOffsetCmd    := SimSyncDeviationInjectM2,
+    TestOffsetPts    := M2_OffsetPts,
+    RawPos           := RawPosM2
+);
+
+// Recopie structures Winch simulées :
+// 🛑 POLARITÉ DE FREIN SIMULÉ (P1 Lot L6) : 1 = contacteur commandé = frein OUVERT.
+// Câblage réel : DI = 1 ⟺ frein OUVERT. Le modèle produit donc M1_BrakeIsOpen_DI := M1_BrakeCmd !
+Winch.M1_BrakeIsOpen_DI        := M1_BrakeCmd;
+// 🔧 REX 2026-07-27 : retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
+// Omettre les paliers ferait croire à l'arrêt pendant les transitoires → Méca A armée à tort.
+Winch.M1_ContactorsReleased_DI := NOT (M1_RelayFwd OR M1_RelayRev
+                                    OR M1_SpeedContactor_1 OR M1_SpeedContactor_2
+                                    OR M1_SpeedContactor_3 OR M1_SpeedContactor_4);
+Winch.M1_ThermalOk_DI          := TRUE; // Sauf panne simulée
+
+Winch.M2_BrakeIsOpen_DI        := M2_BrakeCmd;
+Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
+                                    OR M2_SpeedContactor_1 OR M2_SpeedContactor_2
+                                    OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
+Winch.M2_ThermalOk_DI          := TRUE;
+
+Winch.M1M2_TopPositionFree_DI  := TRUE; // Butée libre au repos en simu
+Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
+
+Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
+Winch.COD1_Alarms              := 0;
+Winch.COD1_Warnings            := 0;
+Winch.COD1_DeviceState         := 4; // DEVICE_STATE RUNNING = 4 (bus OK)
+
+Winch.COD2_PosValue            := instSimEncoderM2.RawPosOut;
+Winch.COD2_Alarms              := 0;
+Winch.COD2_Warnings            := 0;
+Winch.COD2_DeviceState         := 4; // DEVICE_STATE RUNNING = 4
+
+
+// ── 2. MODÈLE TRANSLATION M3 (AC600) ─────────────────────────────────────────
+M3_RelayFwd := (M3_Direction = 1);
+M3_RelayRev := (M3_Direction = -1);
+
+instSimTranslation(
+    Enable      := TRUE,
+    TargetNum   := M3_TargetNum,
+    RelayFwd    := M3_RelayFwd,
+    RelayRev    := M3_RelayRev,
+    TravelTimeS := 8.0,
+    PVLeadTimeS := 2.0
+);
+
+// Remplissage capteurs de position M3 :
+IF SimM3SensorsWordActive THEN
+    Translation.M3_PosTremie_DI      := SimM3SensorsWord.0;
+    Translation.M3_PosPV_DI          := SimM3SensorsWord.1;
+    Translation.M3_PosP2_DI          := SimM3SensorsWord.2;
+    Translation.M3_PosP1_DI          := SimM3SensorsWord.3;
+    Translation.M3_PosMaintenance_DI := SimM3SensorsWord.4;
+ELSE
+    Translation.M3_PosTremie_DI      := instSimTranslation.PosTremie;
+    Translation.M3_PosPV_DI          := instSimTranslation.PosPV;
+    Translation.M3_PosP2_DI          := instSimTranslation.PosP2;
+    Translation.M3_PosP1_DI          := instSimTranslation.PosP1;
+    Translation.M3_PosMaintenance_DI := instSimTranslation.PosMaintenance;
+END_IF;
+
+// Polarité frein M3 (1 = OUVERT)
+Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
+
+// 🆕 T96 : thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
+Translation.M3_ThermalOK_DI      := TRUE;
+
+// Simulation StatusWord AC600 : Bit 0 (Power Ready) = 1, Bit 7 (Comm Ready) = 1 -&gt; 16#0081
+IF (M3_Direction &lt;&gt; 0) THEN
+    M3_StatusWordSim := 16#0087; // + Operating/Running
+    M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -&gt; 5000)
+ELSE
+    M3_StatusWordSim := 16#0081;
+    M3_ActualFreqHz  := 0;
+END_IF;
+
+Translation.M3_StatusWord        := M3_StatusWordSim;
+Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
+Translation.AC600_DeviceState    := 4; // DEVICE_STATE RUNNING = 4
+
+
+// ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
+instSimJoystick(
+    Enable     := TRUE,
+    NeutralRaw := 5000,
+    MaxRaw     := 10000
+);
+
+// Permet aux stimuli de banc de surcharger le retour du joystick si spécifié :
+IF SimJoystickRawX &lt;&gt; 5000 THEN
+    Operator.JoyXRaw_ANA1 := SimJoystickRawX;
+ELSE
+    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
+END_IF;
+
+IF SimJoystickRawY &lt;&gt; 5000 THEN
+    Operator.JoyYRaw_ANA2 := SimJoystickRawY;
+ELSE
+    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
+END_IF;
+
+IF SimJoystickRawButton THEN
+    Operator.JoyBtnRaw := TRUE;
+ELSE
+    Operator.JoyBtnRaw := instSimJoystick.RawButton;
+END_IF;
+
+Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
+Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
+
+
+// ── 4. MODÈLE SÉCURITÉ &amp; COMMUNS MACHINE ─────────────────────────────────────
+instSimSafety(
+    Enable           := TRUE,
+    PowerCutOff_A    := PowerKeepAlive_A,
+    PowerCutOff_B    := PowerKeepAlive_B,
+    EmergencyArming  := EmergencyArming_RQ,
+    BtnEmergencyStop := BtnEmergencyStop
+);
+
+Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
+Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
+Machine.PhaseRotationOk_DI         := TRUE;
+Machine.BrakeThermalOk_DI          := TRUE;
+Machine.M1_M2_KoboldContactFond_DI := SimKoboldContactValue;
+Machine.HydraulicThermalOk_DI      := TRUE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Encoder" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="PresetCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PresetValue">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="SpeedScaleFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — confort de test, voir bandeau ci-dessus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — front montant = applique TestOffsetPts (test banc)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetPts">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — décalage signé à appliquer (points bruts)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawPosOut">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-08 : référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="Increment">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
+      Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
+      du métier machine.
+   🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
+      réellement, à partir des relais de sens commandés et de la vitesse rampée
+      courante. Extraction PURE de la logique déjà en place dans
+      `PRG_02_Encoders.st` (bloc "SIMULATION SUR BANC DE TEST") — aucun
+      changement de comportement, juste la dissociation en FB dédié.
+   📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
+   📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
+   📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
+   📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
+   📥 PresetValue : valeur brute à charger lors du preset
+   📥 SpeedScaleFactor : 🔧 REX 2026-07-07 — multiplicateur de vitesse simulation (confort de test
+      banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
+      d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
+   📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
+      EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
+   🔧 REX 2026-07-08 : `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+      (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
+      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB (tenté en `VAR RETAIN` puis
+      `VAR PERSISTENT RETAIN` locaux, aucun des deux ne convient). Un vrai codeur absolu physique
+      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate) —
+      il fallait donc bien du PERSISTENT RETAIN réel, regroupé avec le reste dans GVL_PERSISTENT.
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
+
+IF NOT Enable THEN
+    RawPosOut := RawPos;
+    RETURN;
+END_IF;
+
+// 🆕 REX 2026-07-08 (4) — injection test banc : VRAI saut de position (comme un glissement réel),
+// pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
+TestOffsetEdge(CLK := TestOffsetCmd);
+IF TestOffsetEdge.Q THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
+END_IF;
+
+Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
+
+IF PresetCmd THEN
+    RawPos := PresetValue;
+ELSIF RelayFwd THEN
+    RawPos := RawPos + Increment;
+ELSIF RelayRev THEN
+    IF RawPos &gt;= Increment THEN
+        RawPos := RawPos - Increment;
+    ELSE
+        RawPos := 0;
+    END_IF;
+END_IF;
+
+RawPosOut := RawPos;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>526914c5-468f-5758-8161-f70e0fd85cca</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Joystick" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="NeutralRaw">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5000" />
+              </initialValue>
+            </variable>
+            <variable name="MaxRaw">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="10000" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Forçable en instance CODESYS (repos = NeutralRaw)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Forçable en instance CODESYS (repos = NeutralRaw)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawButton">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Forçable en instance CODESYS (repos = FALSE)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="FirstCycle">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
+   🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
+      (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
+      permanence — un vrai contournement de sécurité). Ici, on simule les
+      ENTRÉES BRUTES du capteur (`RawX`/`RawY`/`RawButton`) : le homme-mort réel
+      de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
+      (forcer `RawButton` en instance CODESYS) pour armer — comportement
+      métier testé pour de vrai, pas contourné.
+   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal) — 🔧 REX
+      2026-07-08 : granularité séparée du bus CANopen (BusJoystickIsReal, voir GVL_Simulation)
+   📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.TstJoystickForceNeutralRaw)
+   📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.TstJoystickForceMaxRaw)
+   📤 RawX/RawY     : forçables en instance CODESYS (par défaut = NeutralRaw, repos)
+   📤 RawButton     : forçable en instance CODESYS (par défaut = FALSE, relâché)
+   💡 Note d'application : en vue instance CODESYS, forcer `RawX`/`RawY` à `MaxRaw` (ou une
+      valeur intermédiaire) pour simuler un débattement, et `RawButton` à `TRUE` pour simuler
+      l'appui homme-mort — exactement comme on forcerait le vrai capteur.
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Joystick) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Joystick) ===
+
+// 🔑 Initialise au neutre au premier cycle uniquement — ensuite RawX/RawY/RawButton
+// restent forçables librement en instance CODESYS (un Force n'est jamais écrasé par TRUE,
+// mais une simple écriture cyclique l'écraserait — donc pas de ré-assignation continue ici).
+IF NOT Enable THEN
+    FirstCycle := TRUE;
+    RETURN;
+END_IF;
+
+IF FirstCycle THEN
+    RawX := NeutralRaw;
+    RawY := NeutralRaw;
+    RawButton := FALSE;
+    FirstCycle := FALSE;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a481952f-eb98-506a-b160-fd074635a746</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Safety" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation de la simulation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_A">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande coupure canal A (TRUE = OK/fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff_B">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande coupure canal B (TRUE = OK/fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion de réarmement (TRUE = pulse)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnEmergencyStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="SimChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU simulée saine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur simulé engagé</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ContactorLatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémorisation de l'auto-maintien du contacteur</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Safety — Simulation de la chaîne d'AU et du contacteur de puissance
+   ───────────────────────────────────────────────────────────────
+   📥 Enable          : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
+   📥 PowerCutOff_A   : demande de coupure PLC canal A (maintenu à TRUE en marche normale)
+   📥 PowerCutOff_B   : demande de coupure PLC canal B (maintenu à TRUE en marche normale)
+   📥 EmergencyArming : impulsion de réarmement (EmergencyArming_RQ)
+   
+   📤 SimChainOk      : simulation de la boucle AU (boutons relâchés et coupures PLC inactives)
+   📤 SimContactorOk  : simulation du contacteur engagé (PowerContactorEngaged)
+   
+   ⚙️ Logique physique :
+      - La chaîne d'AU (SimChainOk) est saine si les deux relais PLC de coupure sont maintenus fermés (TRUE).
+      - Le contacteur s'engage (SimContactorOk) lors d'une impulsion de réarmement (EmergencyArming) 
+        et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
+      - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
+   ═══════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+IF NOT Enable THEN
+    SimChainOk     := FALSE;
+    SimContactorOk := FALSE;
+    ContactorLatch := FALSE;
+    RETURN;
+END_IF;
+
+// 1. La chaîne AU est saine si le PLC maintient les deux relais de coupure de puissance
+// AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE)
+SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop;
+
+// 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure
+IF NOT SimChainOk THEN
+    ContactorLatch := FALSE;
+ELSIF EmergencyArming THEN
+    ContactorLatch := TRUE;
+END_IF;
+
+// Recopie vers la sortie
+SimContactorOk := ContactorLatch;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9ab5b810-a798-5ced-ad58-9e4d01ab66eb</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Sim_Translation" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TargetNum">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TravelTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8" />
+              </initialValue>
+            </variable>
+            <variable name="PVLeadTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PosTremie">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosPV">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosP2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosP1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosMaintenance">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="CycleTimeCalc">
+              <type>
+                <derived name="FB_CycleTime" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📚 Réutilisation — pas de recalcul maison du temps de cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ElapsedS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="LastTargetNum">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="TargetChanged">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Reached">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
+   🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
+      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
+      une simulation par temps de parcours : le translation "arrive" à la cible
+      sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
+      continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
+      (M3 translation) — treuils/benne/codeurs sont la priorité de ce lot.
+   📥 Enable      : simulation active (SimulationModeActive AND NOT SensorTranslationPositionIsReal)
+   📥 TargetNum   : cible sélectionnée (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)
+                    — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
+                    — 🆕 REX 2026-07-18 : PV n'est JAMAIS une cible sélectionnable (point de
+                    ralentissement uniquement, pas d'arrêt), voir AF_Partie-02 v2.12 §3bis
+   📥 RelayFwd/RelayRev : sens déduit du mot de commande EtherCAT M3
+   📥 TravelTimeS : temps de trajet simulé (s) — défaut 8.0 (fourchette 5-10s validée
+                    utilisateur, pas de donnée réelle pour calibrer plus précisément)
+   📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
+   📤 PosTremie/PosPV/PosP2/PosP1/PosMaintenance : TRUE quand la cible (ou le point de
+      ralentissement PV) correspondante est atteinte — à OR'er sur le `InputRaw` du capteur
+      réel correspondant (`PRG_02_Acquisition.HwIn`).
+   ⏱️ Changement de cible (`TargetNum`) → trajet remis à zéro (redémarre du début).
+      Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Translation) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Translation) ===
+
+IF NOT Enable THEN
+    ElapsedS := 0.0;
+    LastTargetNum := TargetNum;
+    PosTremie := FALSE; PosPV := FALSE; PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
+    RETURN;
+END_IF;
+
+CycleTimeCalc(DefaultValueS := 0.010);
+
+// 🔁 Changement de cible = nouveau trajet, on repart de zéro
+TargetChanged := (TargetNum &lt;&gt; LastTargetNum);
+LastTargetNum := TargetNum;
+IF TargetChanged THEN
+    ElapsedS := 0.0;
+END_IF;
+
+// ⏱️ Progression du trajet UNIQUEMENT si un relais de sens est actif (mouvement réel demandé) ;
+// à l'arrêt, la progression reste EN PAUSE (pas remise à zéro).
+IF (RelayFwd OR RelayRev) AND (ElapsedS &lt; TravelTimeS) THEN
+    ElapsedS := ElapsedS + CycleTimeCalc.CycleTimeS;
+    IF ElapsedS &gt; TravelTimeS THEN
+        ElapsedS := TravelTimeS;
+    END_IF;
+END_IF;
+
+Reached := (ElapsedS &gt;= TravelTimeS);
+
+// 🆕 REX 2026-07-18 : les capteurs sont codés par progression monotone.
+// La simulation doit donc produire un mot valide à chaque instant, et non
+// uniquement activer le capteur de la cible. Le mot est :
+//   11111 Trémie | 01111 PV | 00111 P2 | 00011 P1 | 00001 approche Maintenance | 00000 Maintenance.
+// 🔧 REX 2026-07-21 : au repos / boot (TargetNum = 0), la position neutre par défaut
+// est positionnée sur P2 (00111) pour éviter d'être par défaut sur le fin de course extrême Maintenance (00000).
+PosTremie := FALSE;
+PosPV := FALSE;
+
+IF TargetNum = 0 THEN
+    // Position neutre par défaut au boot (P2 = 00111) — évite le fin de course extrême arrière au démarrage
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 1 THEN
+    // Trajet vers Trémie : PV puis Trémie, avec les trois capteurs de droite actifs.
+    PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
+    IF ElapsedS &gt;= (TravelTimeS - PVLeadTimeS) THEN
+        PosPV := TRUE;
+        PosP2 := TRUE;
+        PosP1 := TRUE;
+        PosMaintenance := TRUE;
+    END_IF;
+    IF Reached THEN
+        PosTremie := TRUE;
+    END_IF;
+ELSIF TargetNum = 2 THEN
+    // P2 = 00111
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 3 THEN
+    // P1 = 00011
+    PosP2 := FALSE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 4 THEN
+    // Maintenance = 00000 : PosMaintenance reste FALSE pour respecter le codage.
+    PosP2 := FALSE;
+    PosP1 := FALSE;
+    PosMaintenance := FALSE;
+ELSE
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d7634526-8de9-5f93-b858-7e0bb59cdce2</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_CycleTime" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="DefaultValueS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.004" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de secours par défaut (ex. 4ms)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé réel calculé (secondes)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="TimeCurrent">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps système actuel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeLast">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Empreinte de temps du cycle précédent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaTimeMs">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart brut calculé (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InitDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau d'initialisation du premier cycle</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
+      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// 1. ACQUISITION DU TEMPS SYSTÈME
+TimeCurrent := TIME();
+
+// 2. INITIALISATION UNIQUE AU PREMIER CYCLE
+IF NOT InitDone THEN
+    TimeLast := TimeCurrent;
+    InitDone := TRUE;
+    CycleTimeS := DefaultValueS;
+    RETURN;
+END_IF;
+
+// 3. CALCUL DU DELTA EN MILLISECONDES
+DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+
+// 4. CONVERSION ET CHARGE DE SECOURS
+IF DeltaTimeMs &gt; 0 THEN
+    CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
+ELSE
+    CycleTimeS := DefaultValueS;
+END_IF;
+
+// 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
+TimeLast := TimeCurrent;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ac308017-0ba5-51da-b58a-b5951d04dc0f</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="SIMULATION">
+          <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
+          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
+          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+        </Folder>
+        <Folder Name="SUPERVISION">
+          <Folder Name="_TYPES">
+            <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
+            <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
+            <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
+            <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
+            <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+          </Folder>
+        </Folder>
+        <Folder Name="COMMUN">
+          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

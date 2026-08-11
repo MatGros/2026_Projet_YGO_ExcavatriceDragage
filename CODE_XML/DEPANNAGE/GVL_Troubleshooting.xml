@@ -1,0 +1,2931 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.653366" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-11T14:02:33.653366">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_ChainBucket">
+        <baseType>
+          <struct>
+            <variable name="Idx101_BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Benne Mécaniquement Ouvert | 0 = Non Confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_BucketIsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Benne Mécaniquement Fermé | 0 = Non Confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_OffsetPos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Écart d'Ouverture Câble M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx104_AutoSeqActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Séquencement auto (ouverture/fermeture armée par mouvement couplé) en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx105_StateIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = État ouvert/fermé INCONNU (ni IsOpen ni IsClosed fiable) -- cause fréquente de blocage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx106_FBState">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : État machine FB_Bucket (READY/BUSY/DONE/DISABLED)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx107_LastPosM2Open_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Dernière position M2 mémorisée "ouvert"</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx108_LastPosM2Close_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Dernière position M2 mémorisée "fermé"</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_HmiCmd_BtnOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Demande Ouverture IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_HmiCmd_BtnClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Demande Fermeture IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_CycleCmd_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Demande Ouverture par le Cycle Auto</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx204_CoupledDiveOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Ouverture auto armée (descente couplée demandée, benne pas ouverte)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx205_CoupledAscentCloseArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx206_CloseReqActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Fermeture mémorisée/en cours (instBucket.CloseReq -- reste à 1 si recul partiel non terminé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_OpenReqActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Ouverture mémorisée/en cours (instBucket.OpenReq -- idem)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx208_MotionBlockedByBucket">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 2026-08-07 : 1 = Mouvement couplé BLOQUÉ (auto-séquencement armé mais benne pas Busy -- vérifier Idx306_ErrorIdRaw)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = AU Appuyé 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_BucketFaultActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Défaut Mouvement Benne 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_KoboldAutoStopEnabled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (Fiche 05) : 1 = Toggle IHM arrêt auto descente actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_KoboldImmersionConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Immersion confirmée (front Kobold dans la fenêtre)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_KoboldBottomTouchLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Fond détecté, descente bloquée (ForbidDescentM1/M2_Raw)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_ErrorIdRaw">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : bitfield brut FB_Bucket (bit0 timeout, bit1 incohérence, bit2 limites, bit3 codeur non référencé, bit4 glissement M1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx401_BucketBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Mouvement Mâchoires en cours | 0 = Repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_BucketDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Cible Atteinte | 0 = En cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx403_ControlAscentActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx501_M2_CmdRev_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Action Benne M2 ON</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7699fad2-6e4d-5ba2-8474-a7ccec9b870d</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_ChainContextGlobal">
+        <baseType>
+          <struct>
+            <variable name="Idx101_ModeActive">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode de marche actif (MANUEL, SEMI_AUTO, MAINT_N1, MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_SimulationEnabled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Matériel Réel (Nominal) | 1 = SIMULATION ACTIVE ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_JoystickCommOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Comm CANopen Joystick OK (Sain) | 0 = Perte Comm CAN 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_JoystickSelected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Pilotage par Joystick Hall | 0 = Pilotage par Boutons IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_BypassNetworkGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Comm Réseau OK | 1 = BYPASS RÉSEAU ACTIF ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_BypassSensorsGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteurs Actifs | 1 = AU MOINS 1 CAPTEUR SHUNTÉ ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle AU Matérielle Fermée (OK) | 0 = AU APPUYÉ 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Puissance Armée | 0 = Puissance Coupée 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_SafeStopActiveAny">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = AU MOINS UN SAFESTOP MÉTIER ACTIF 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_PowerCutOffActiveAny">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = COUPURE GENERAL COLLAGE ACTIVEE 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx401_HmiHeartbeatOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Liaison IHM Active | 0 = Perte Liaison IHM 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_CycleAutoBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Séquenceur Auto en Cours | 0 = Repos</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>601b64cb-498b-5fca-a2a0-11b24726fea1</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_ChainDredgingAssist">
+        <baseType>
+          <struct>
+            <variable name="Idx101_EnableDiveSearch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Assistance Plongée Armée (IHM) | 0 = Désarmée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_EnableExtractionSequence">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Assistance Extraction Armée (IHM) | 0 = Désarmée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_EnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Mode Vidage Trémie Armé (IHM) | 0 = Désarmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_DiveReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Assistance Plongée Prête | 0 = Non Prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_DiveBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Séquence Plongée En Cours | 0 = Repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_DiveDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Fond Confirmé | 0 = En Cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx204_DiveState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État interne séquenceur plongée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx205_DiveError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Défaut Plongée 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx206_DiveErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: préconditions, bit1: séquence Kobold, bit2: config seuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_BottomTouchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Contact Fond Confirmé (Kobold ou manuel) | 0 = Non Confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_ExtractionReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Assistance Extraction Prête | 0 = Non Prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_ExtractionBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Séquence Extraction En Cours | 0 = Repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_ExtractionDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Extraction Terminée | 0 = En Cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_ExtractionState">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État interne séquenceur extraction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_ExtractionError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Défaut Extraction 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_ExtractionErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: config</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx401_OperatorActionId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant consigne opérateur conduite (0 = aucune)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_OperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte consigne opérateur (secours affichage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx501_DumpAtTremieArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bit IHM TglEnableDumpAtTremie actif | 0 = Désarmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx502_DumpAtTremieAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Mode réellement actif (armé ET Mode MAINT_N1/N2) | 0 = Inactif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx503_DumpAtTremieAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = M3 à la position Trémie | 0 = Ailleurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx504_DumpAtTremieBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ouverture benne armée par ce mode | 0 = Non armée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx505_DumpAtTremieDescentLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx601_BypassDiveActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (9) : 1 = Bypass séquence DiveSearch armé (IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx602_BypassKoboldBottomTouched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (9) : 1 = Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>26bb9fd2-df98-54a5-a16a-738f3d1532cd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_ChainTranslation">
+        <baseType>
+          <struct>
+            <variable name="Inputs_100">
+              <type>
+                <derived name="ST_Chain_Translation_Inputs" />
+              </type>
+            </variable>
+            <variable name="Demandes_200">
+              <type>
+                <derived name="ST_Chain_Translation_Demandes" />
+              </type>
+            </variable>
+            <variable name="Safety_300">
+              <type>
+                <derived name="ST_Chain_Translation_Safety" />
+              </type>
+            </variable>
+            <variable name="Control_400">
+              <type>
+                <derived name="ST_Chain_Translation_Control" />
+              </type>
+            </variable>
+            <variable name="Outputs_500">
+              <type>
+                <derived name="ST_Chain_Translation_Outputs" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7dbc6f0d-3311-5752-8222-088008af3b8a</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_ChainWinch">
+        <baseType>
+          <struct>
+            <variable name="Inputs_100">
+              <type>
+                <derived name="ST_Chain_Winch_Inputs" />
+              </type>
+            </variable>
+            <variable name="Demandes_200">
+              <type>
+                <derived name="ST_Chain_Winch_Demandes" />
+              </type>
+            </variable>
+            <variable name="Safety_300">
+              <type>
+                <derived name="ST_Chain_Winch_Safety" />
+              </type>
+            </variable>
+            <variable name="Control_400">
+              <type>
+                <derived name="ST_Chain_Winch_Control" />
+              </type>
+            </variable>
+            <variable name="Outputs_500">
+              <type>
+                <derived name="ST_Chain_Winch_Outputs" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cfbad681-bc46-5033-b562-e37133b1f706</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_ChainWinchSync">
+        <baseType>
+          <struct>
+            <variable name="Idx101_M1_CablePos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Position Câble M1 Retenue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_M2_CablePos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Position Câble M2 Benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_SyncDelta_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Écart Relatif M1 - M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_JoyYRaw_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick Axe Y (-100% à +100%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_SyncEnabled_IHM">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Couplage Synchro Actif (Nominal) | 0 = Découplé ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_ArbitratedSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Vitesse Synchro Arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = Arrêt Urgence 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_SyncFaultActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Synchro OK | 1 = Écart Synchro Bloquant 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_M1_ForbidAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M1 Bloquée (Fdc/Safety) 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_M2_ForbidAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M2 Bloquée (Fdc/Safety) 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx401_SyncMotionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Mouvement Synchro Autorisé | 0 = Bloqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_M1_SetpointSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Vitesse Calculée M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx403_M2_SetpointSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Vitesse Calculée M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx501_M1_CmdRelayFwd_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M1 ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx502_M2_CmdRelayFwd_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M2 ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>68f6d77a-138b-5a81-867d-04895e9150ef</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_HardwareImage">
+        <baseType>
+          <struct>
+            <variable name="Winch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Treuils M1/M2 + codeurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Translation">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Translation M3 + variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Operator">
+              <type>
+                <derived name="ST_HwOperator" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Opérateur / Joystick / bus CAN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Machine">
+              <type>
+                <derived name="ST_HwMachine" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Sécurités/Communs Machine</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6f8e5f63-0c17-53f0-bfdd-b43b9a736035</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HomingChecklist">
+        <baseType>
+          <struct>
+            <variable name="Step1_ModeAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Pré-requis de mode
+TRUE = Mode MAINT_N1 ou MAINT_N2 actif ➔ Commutateur Mode IHM : GVL_IHM.Modes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2_WinchSelected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Treuil sélectionné en MAINT_N2 ➔ Bouton IHM : GVL_IHM.Modes.Cmd.TglJoystickMaster / Selection Treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3_EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Santé Matériel &amp; Bus
+TRUE = Codeur EtherCAT OK &amp; E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimMachineActive=1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4_ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. État Physique Machine
+TRUE = Tous les contacteurs retombés (attendre l'arrêt complet)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step5_BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Frein serré (attendre l'arrêt complet)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensorActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Fin de course haut physique (TRUE = au contact)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Benne Ouvert (TRUE = Ouvert) ➔ Pour forcer sans codeur : GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllConditionsMet">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Séquence &amp; Bilan
+TRUE = Prêt pour le homing ! ➔ Déclencher : GVL_IHM.M1TreuilRetenue.Cmd.BtnHome (à 8m) ou BtnHomingAtZero (à 0m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Séquence de calage en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Calage réussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingHomed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Treuil actuellement référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Doute redémarrage ➔ Lever le doute via : GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RejectErrorMask">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">5. Code de rejet exact
+Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>2d6561f4-76da-5ede-affd-bb7892225e3b</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎯 ST_HomingChecklist — Diagnostic chronologique de référencement (Dépannage)
+   ───────────────────────────────────────────────────────────────
+   🎨 Permet de localiser immédiatement l'étape qui bloque le Homing (M1/M2).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_JoystickChecklist">
+        <baseType>
+          <struct>
+            <variable name="Step1_CanBusActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Bus &amp; Matériel
+TRUE = Bus CANopen en état ACTIVE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2_JoystickOperational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Esclave JOY1 en état RUNNING</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3_DeadmanPressed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Prise en main &amp; Sécurité
+TRUE = Bouton Homme-Mort appuyé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4_NeutralAcquired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Repassé par le neutre (autorisation mouvement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllConditionsMet">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Éligibilité globale
+TRUE = Joystick prêt pour piloter un axe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickSelected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Joystick maître sélectionné IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Mesures brutes &amp; Filtrées
+Valeur brute axe X (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute axe Y (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeflectionX_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée X (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeflectionY_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée Y (%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8b2fb21c-dcd0-5811-a8c3-9d96f9130525</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_JoystickChecklist — Diagnostic chronologique communication &amp; prise en main Joystick
+   ───────────────────────────────────────────────────────────────
+   🎨 Permet de vérifier la chaîne Joystick (CANopen, Homme-mort, Neutre, Calibration).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MotionChecklist">
+        <baseType>
+          <struct>
+            <variable name="Step1_PowerEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Puissance &amp; Mode
+TRUE = Contacteur principal sous tension (PowerContactorEngaged_DI) ➔ Armer puissance via Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2_ModeAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Mode MAINT_N1 ou N2 actif (pas DISABLE) ➔ Commutateur Mode IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3_NotBusyOtherTask">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Pas d'autre séquence en cours (Homing, Benne busy, etc.)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4_MotionRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Intention &amp; Demande
+TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster doit être à 0 !</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée, -1 = Descente, 0 = Repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedSpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0..100 % consigne demandée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step5_NoSafetyFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Chaîne de Sécurité &amp; Verrous
+TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step6_DirectionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens non interdit (ForbidAscent/ForbidDescent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step7_BrakeReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Commande frein activée &amp; retour frein OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step8_OutputInterlockOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Étage de sortie LD débloqué (pas d'interlock actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllConditionsMet">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Bilan &amp; Exécution Physiques
+🟢 TRUE = TOUTES LES CONDITIONS SONT REMPLIES, LES RELAIS DOIVENT COLLER !</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwdActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Montée physiquement commandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descente physiquement commandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedContactor1Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur de vitesse Palier 1 commandé</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6d9cfeb3-7f24-5c22-8bb6-161cefc2f0eb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_MotionChecklist — Diagnostic chronologique de commande de mouvement
+   ───────────────────────────────────────────────────────────────
+   🎨 Permet de voir en un coup d'œil pourquoi un ordre de mouvement ne fait pas coller les relais.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SafetyChecklist">
+        <baseType>
+          <struct>
+            <variable name="Step1_InputModulesOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Intégrité matérielle &amp; modules E/S
+TRUE = Les 3 cartes E/S physiques sont RUNNING ➔ En simu : GVL_Simulation.SimMachineActive=1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2_EmergencyBtnNotCut">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Pas d'appui AU ➔ Déverrouiller le BP coup-de-poing physique ou IHM : GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Boucle physique AU fermée (EmergencyChainClosed_DI)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4_ContactorRedundancyOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Conditions de réarmement
+TRUE = Test de redondance contacteurs OK ➔ Attendre la retombée complète des contacteurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step5_ArmingAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Machine armable ➔ Appuyer sur BP Reset IHM : GVL_IHM.Modes.Cmd.BtnFaultReset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingPulseActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Séquence de réarmement
+TRUE = Impulsion d'armement 500ms en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Contacteur principal sous tension (PowerContactorEngaged_DI)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllConditionsMet">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Chaîne de sécurité OK et puissance engagée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Erreurs
+TRUE = Défaut sécurité actif ➔ Acquitter via : GVL_IHM.Modes.Cmd.BtnFaultReset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Défaut test de redondance contacteurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Échec de la séquence d'armement</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>eff8efbf-5fc5-566d-a0f9-2b4ea1c877a0</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ ST_SafetyChecklist — Diagnostic chronologique réarmement chaîne de sécurité / AU
+   ───────────────────────────────────────────────────────────────
+   🎨 Permet d'identifier immédiatement pourquoi la puissance / AU ne réarme pas.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="INIT" value="1" />
+              <value name="READY" value="2" />
+              <value name="BUSY" value="3" />
+              <value name="DONE" value="4" />
+              <value name="STOPPING" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STOPPING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_DiveSearchState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="WAIT_PRECONDITIONS" value="0" />
+              <value name="READY_TO_DESCEND" value="1" />
+              <value name="SEARCHING_IMMERSION" value="2" />
+              <value name="SEARCHING_BOTTOM" value="3" />
+              <value name="BOTTOM_CONFIRMED" value="4" />
+              <value name="ERROR_HOLD" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>WAIT_PRECONDITIONS</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente benne ouverte, positions et Kobold au repos</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY_TO_DESCEND</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à assister une demande de descente</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEARCHING_IMMERSION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0→1 dans fenêtre eau</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEARCHING_BOTTOM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1→0 au fond</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BOTTOM_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé ; extraction peut être demandée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR_HOLD</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence invalide, descente assistée interdite</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>31b3ae05-ab16-51e7-b786-307d668b63e5</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_ExtractionSequenceState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="WAIT_BOTTOM_CONFIRMATION" value="0" />
+              <value name="READY_TO_CLOSE" value="1" />
+              <value name="CLOSING_BUCKET" value="2" />
+              <value name="CONTROL_ASCENT" value="3" />
+              <value name="NOMINAL_ASCENT" value="4" />
+              <value name="ERROR_HOLD" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>WAIT_BOTTOM_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente fond Kobold ou attestation opérateur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY_TO_CLOSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à fermer la benne</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CLOSING_BUCKET</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Bucket ferme M2 seul</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CONTROL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">M1/M2 synchronisés au palier sans contacteur vitesse</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>NOMINAL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montée couplée avec vitesse demandée opérateur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR_HOLD</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut extraction, reprise interdite avant reset</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6ae0d8f0-4bfe-5792-a167-697e4476a91d</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Control">
+        <baseType>
+          <struct>
+            <variable name="Idx401_MotionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Mouvement Translation Autorisé | 0 = Bloqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_SetpointFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[Hz] Consigne Fréquence Calculée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx403_DriveControlWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de Commande Calculé Variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx404_FinalInterlockState">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État frontière _LD</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx405_FinalInterlockReason">
+              <type>
+                <derived name="E_TranslationFinalInterlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Cause mémorisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx406_BrakeCommandOpenConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur/bobine, pas frein mécanique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx407_BrakeTimeoutElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Watchdog 500ms écoulé</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>14af5a36-209b-5924-9d37-55e0fe9b9087</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Demandes">
+        <baseType>
+          <struct>
+            <variable name="Idx201_JoyXRaw_ANA">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[pts] Bruts Joystick Axe X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_JoyXScaled_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick Axe X (-100% à +100%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_HmiCmd_BtnFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Avance IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx204_HmiCmd_BtnRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Recul IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx205_HmiTargetPosition">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Sélectionnée IHM (1=Trémie, 2=P2, 3=P1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx206_CycleTargetPosition">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Sélectionnée par le Cycle Auto</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_ModeActive">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant (MANU_N1, AUTO_N1...)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx208_BypassNetworkActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Comm Variateur OK | 1 = Bypass Réseau Actif ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx209_ArbitratedSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne finale Vitesse Translation</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>54c2779a-7906-561e-8905-7cd39e8fd17a</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Inputs">
+        <baseType>
+          <struct>
+            <variable name="Idx101_PosTremie_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Trémie Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_PosPV_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Zone Ralentissement PV Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_PosP2_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Fosse P2 Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx104_PosP1_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Fosse P1 Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx105_PosMaintenance_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Service Maintenance Atteinte | 0 = Absent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx106_DriveActualFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[Hz] Fréquence Réelle Mesurée Variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx107_DriveStatusWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot d'état Brut Variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx108_BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ (NOT BrakeFeedback — IHM garde le sens serré)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx109_DriveThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : TRUE = thermique moteur/variateur AC600 OK (diagnostic seul)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fb10b748-ace9-58b2-a9b2-22283873ba21</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Outputs">
+        <baseType>
+          <struct>
+            <variable name="Idx501_CmdDriveControlWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot de Commande Transmis EtherCAT AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx502_CmdDriveFreq_Hz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[0.01Hz] Consigne Fréquence Transmise EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx503_CmdBrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bobine Frein Translation Alimentée (Ouvert)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>87cc5d9f-4236-5c35-af2e-39700a24a168</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Translation_Safety">
+        <baseType>
+          <struct>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = Arrêt d'Urgence Appuyé 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Translation 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_LimitSwitchFwdActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Avance 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_LimitSwitchRevActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Recul 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_BypassLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Fins de course actives | 1 = Shuntés IHM ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_PositionDecoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Décodage 5 Capteurs OK | 1 = Incohérence Position 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx308_HeightInterlockBlocking">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : 0 = M1 ET M2 ≥ hauteur mini (ou bypass) | 1 = Translation bloquée (risque collision) 🔴</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>82dcbfd2-2633-5250-924d-68e882d3d0cb</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Control">
+        <baseType>
+          <struct>
+            <variable name="Idx401_MotionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Prêt / Mouvement Autorisé | 0 = Bloqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx402_SpeedStepCalculated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier Vitesse Calculé (0, 1, 2, 3, 4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx403_SpeedRamp_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Vitesse après Rampe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx404_BrakeReleaseAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ordre Ouverture Frein | 0 = Ordre Serrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx405_FinalInterlockState">
+              <type>
+                <derived name="E_WinchFinalInterlockState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État frontière _LD</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx406_FinalInterlockReason">
+              <type>
+                <derived name="E_WinchFinalInterlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Cause mémorisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx407_FinalAuthorizedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪜 Palier réellement autorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx408_BrakeCommandOpenConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur/bobine, pas frein mécanique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx409_BrakeTimeoutElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Watchdog 500ms écoulé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx410_RestartDelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Verrou 900ms écoulé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx411_StepDelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Délai palier 1s250 écoulé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx412_InTopSlowdownZone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Palier plafonné à 1, approche limite haute</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx413_InBottomSlowdownZone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Palier plafonné à 1, approche limite basse (câble ou légale)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx414_BottomLimitActiveM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Limite basse active (m) — câble physique OU légale, la plus restrictive</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>52be1c05-56a9-542a-a64f-52f90a2a17c7</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Demandes">
+        <baseType>
+          <struct>
+            <variable name="Idx201_JoyRawPhysical_ANA">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[pts] Bruts convertisseur (-2048 à +2048)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_JoyScaledPhysical_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick (-100% à +100%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_HmiManualCmd_BtnUp">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Montée IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx204_HmiManualCmd_BtnDown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Descente IHM | 0 = Relâché</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx205_CycleAutoCmd_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne auto envoyée par le Cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx206_ModeActive">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant (MANU_N1, AUTO_N1, MAINT_N2...)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_BypassOperatorComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Comm Normale OK | 1 = Bypass Réseau Actif ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx208_ArbitratedSpeed_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne finale retenue après arbitrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx209_ArbitratedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée | 0 = Neutre | -1 = Descente</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d575144c-1279-5e18-b578-c1920999821d</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Inputs">
+        <baseType>
+          <struct>
+            <variable name="Idx101_EncoderRawPos">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[Valeur brutes pts] Codeur connecté</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_CablePos_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[mètres] Position calculée du câble</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = OK (Tous contacteurs retombés à l'arrêt) | 0 = Contacteur collé 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx104_BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein SERRÉ (NOT BrakeFeedback — IHM garde le sens serré)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx105_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Température OK (Sain) | 0 = Surchauffe Moteur M1 🔴</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>67a1e74c-4741-5be8-a23f-8d9f82a30cc0</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Outputs">
+        <baseType>
+          <struct>
+            <variable name="Idx501_CmdRelayFwd_Up_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Montée ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx502_CmdRelayRev_Down_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Descente ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx503_CmdSpeedContactor1_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Contacteur Vitesse 1 ON | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx504_CmdSpeedContactor4_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Contacteur Vitesse 4 ON (Plein Gaz) | 0 = OFF</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx505_CmdBrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bobine Frein Alimentée (Ouvert) | 0 = Non Alimentée (Serré)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e680dbf9-a4ea-58b1-b875-ac21a8a6a304</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Chain_Winch_Safety">
+        <baseType>
+          <struct>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK (Armé) | 0 = Arrêt d'Urgence Appuyé 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Métier Actif 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance Sécurité 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_TopSensorPhysical_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Capteur Haut Libre (Sain) | 0 = Butée Haute Atteinte 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_TopSensorBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteur Actif | 1 = Capteur Haut Shunté IHM ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_ForbidAscentEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Montée Autorisée | 1 = MONTÉE BLOQUÉE 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_SlackCablePhysical_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Câble Tendu (Sain) | 0 = Mou de Câble Détecté 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx308_SlackCableBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteur Actif | 1 = Mou de Câble Shunté IHM ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx309_ForbidDescentEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Descente Autorisée | 1 = DESCENTE BLOQUÉE 🔴</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx310_MecaFaultMask">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Pas de Défaut | &gt;0 = Bitfield Défauts Méca A-E 🔴</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a86515da-77e1-5634-b6f3-443b78eedf33</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_HwMachine">
+        <baseType>
+          <struct>
+            <variable name="PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirm. contacteur puissance engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermée (coup-de-poing + contact PLC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotationOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle rotation phases élec. OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_KoboldContactFond_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HydraulicThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique centrale hydraulique OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConveyorInfeedReady_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b09d9aab-fffb-5955-a0ee-fbdfe07f4a50</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts communs à la machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwOperator">
+        <baseType>
+          <struct>
+            <variable name="JoyXRaw_ANA1">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute analogique axe X (Translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyYRaw_ANA2">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute analogique axe Y (Levage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyBtnRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton brut joystick (Homme-Mort)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CanBusState">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État bus CANopen (CANbus.GetBusState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JOY1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device JOY1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ce03b729-667a-50ae-8c74-7bdf588f937a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwOperator — Image matérielle brute des entrées Opérateur / Joystick
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts du joystick CANopen JOY1.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwTranslation">
+        <baseType>
+          <struct>
+            <variable name="M3_PosTremie_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosPV_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position point de vitesse (pré-ralentissement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP2_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP1_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosMaintenance_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M3 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ThermalOK_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_StatusWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Status word variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ActualFrequencyHz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence réelle variateur AC600 (x100)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AC600_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device AC600 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>385ab449-ca64-59fe-be25-3863e9125d20</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts de la translation M3 (AC600).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwWinch">
+        <baseType>
+          <struct>
+            <variable name="M1_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M1 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M1 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M2 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M2 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1M2_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun M1/M2 libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_TensionedCable_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur mou de câble M2 (câble tendu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD2 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>72c8e04d-71ee-5733-9392-791d275a6b49</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
+   ───────────────────────────────────────────────────────────────
+   📄 Lot L5 (Frontière unique HwIn)
+   🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_TranslationFinalInterlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="BRAKE_COMMAND_NOT_CONFIRMED" value="1" />
+              <value name="RESTART_INHIBITED" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5edc74ff-df78-5968-b824-933c1970008c</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_WinchFinalInterlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="BRAKE_COMMAND_NOT_CONFIRMED" value="1" />
+              <value name="RESTART_INHIBITED" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6c58fa53-306e-500d-a9d6-db062ea6d497</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_WinchFinalInterlockState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="READY" value="1" />
+              <value name="WAIT_BRAKE_COMMAND_CONFIRMATION" value="2" />
+              <value name="WAIT_STEP_DELAY" value="3" />
+              <value name="WAIT_RESTART_DELAY" value="4" />
+              <value name="FAULT" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f4ffbe06-67c2-52e4-817f-cab830f42ec8</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_Troubleshooting">
+        <variable name="ContexteMachineGlobal">
+          <type>
+            <derived name="ST_ChainContextGlobal" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 0. Contexte Global Machine (Mode, Simu, Commande, Bypass)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="LevageSynchroniseM1M2">
+          <type>
+            <derived name="ST_ChainWinchSync" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 1. Levage Synchronisé M1+M2 (Mode Couplé Nominal)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="LevageUnitaireM1">
+          <type>
+            <derived name="ST_ChainWinch" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 2. Levage Unitaire M1 (Treuil Retenue)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="LevageUnitaireM2">
+          <type>
+            <derived name="ST_ChainWinch" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 3. Levage Unitaire M2 (Treuil Benne)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BenneOuvertureFermeture">
+          <type>
+            <derived name="ST_ChainBucket" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 4. Ouverture / Fermeture Benne</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TranslationPontM3">
+          <type>
+            <derived name="ST_ChainTranslation" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 5. Translation Pont M3 (Variateur AC600)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="AssistanceDragage">
+          <type>
+            <derived name="ST_ChainDredgingAssist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie (2026-08-07)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="HomingM1">
+          <type>
+            <derived name="ST_HomingChecklist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Diagnostic chronologique Homing M1 (Treuil Retenue)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="HomingM2">
+          <type>
+            <derived name="ST_HomingChecklist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Diagnostic chronologique Homing M2 (Treuil Benne)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="Safety">
+          <type>
+            <derived name="ST_SafetyChecklist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Diagnostic chronologique Chaîne de Sécurité &amp; Réarmement AU</xhtml>
+          </documentation>
+        </variable>
+        <variable name="Joystick">
+          <type>
+            <derived name="ST_JoystickChecklist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostic chronologique Bus CANopen &amp; Homme-Mort Joystick</xhtml>
+          </documentation>
+        </variable>
+        <variable name="MotionM1">
+          <type>
+            <derived name="ST_MotionChecklist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M1 (Treuil Retenue)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="MotionM2">
+          <type>
+            <derived name="ST_MotionChecklist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M2 (Treuil Benne)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="MotionM3">
+          <type>
+            <derived name="ST_MotionChecklist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M3 (Translation)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="Inputs">
+          <type>
+            <derived name="ST_HardwareImage" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 Image complète des entrées réelles / qualifiées / simulées</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>bc4eb3d9-a87c-5e82-816b-4cd345ae97ab</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕵️‍♂️ GVL_Troubleshooting — GVL Globale de Recherche de Pannes (Orientée Fonctions &amp; Contexte)
+   ───────────────────────────────────────────────────────────────
+   ⚙️ Emplacement : CODE/DEPANNAGE/GVL_Troubleshooting.st
+   🎨 Structurée par CONTEXTE GLOBAL MACHINE + FONCTIONS MÉTIER (Utilisation Opérateur).
+   💬 Permet de localiser en 3 secondes l'environnement et le blocage d'une action.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="DEPANNAGE">
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
+        </Folder>
+        <Folder Name="SUPERVISION">
+          <Folder Name="_TYPES">
+            <Object Name="ST_ChainBucket" ObjectId="7699fad2-6e4d-5ba2-8474-a7ccec9b870d" />
+            <Object Name="ST_ChainContextGlobal" ObjectId="601b64cb-498b-5fca-a2a0-11b24726fea1" />
+            <Object Name="ST_ChainDredgingAssist" ObjectId="26bb9fd2-df98-54a5-a16a-738f3d1532cd" />
+            <Object Name="ST_ChainTranslation" ObjectId="7dbc6f0d-3311-5752-8222-088008af3b8a" />
+            <Object Name="ST_ChainWinch" ObjectId="cfbad681-bc46-5033-b562-e37133b1f706" />
+            <Object Name="ST_ChainWinchSync" ObjectId="68f6d77a-138b-5a81-867d-04895e9150ef" />
+            <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
+            <Object Name="ST_HomingChecklist" ObjectId="2d6561f4-76da-5ede-affd-bb7892225e3b" />
+            <Object Name="ST_JoystickChecklist" ObjectId="8b2fb21c-dcd0-5811-a8c3-9d96f9130525" />
+            <Object Name="ST_MotionChecklist" ObjectId="6d9cfeb3-7f24-5c22-8bb6-161cefc2f0eb" />
+            <Object Name="ST_SafetyChecklist" ObjectId="eff8efbf-5fc5-566d-a0f9-2b4ea1c877a0" />
+            <Object Name="ST_Chain_Translation_Control" ObjectId="14af5a36-209b-5924-9d37-55e0fe9b9087" />
+            <Object Name="ST_Chain_Translation_Demandes" ObjectId="54c2779a-7906-561e-8905-7cd39e8fd17a" />
+            <Object Name="ST_Chain_Translation_Inputs" ObjectId="fb10b748-ace9-58b2-a9b2-22283873ba21" />
+            <Object Name="ST_Chain_Translation_Outputs" ObjectId="87cc5d9f-4236-5c35-af2e-39700a24a168" />
+            <Object Name="ST_Chain_Translation_Safety" ObjectId="82dcbfd2-2633-5250-924d-68e882d3d0cb" />
+            <Object Name="ST_Chain_Winch_Control" ObjectId="52be1c05-56a9-542a-a64f-52f90a2a17c7" />
+            <Object Name="ST_Chain_Winch_Demandes" ObjectId="d575144c-1279-5e18-b578-c1920999821d" />
+            <Object Name="ST_Chain_Winch_Inputs" ObjectId="67a1e74c-4741-5be8-a23f-8d9f82a30cc0" />
+            <Object Name="ST_Chain_Winch_Outputs" ObjectId="e680dbf9-a4ea-58b1-b875-ac21a8a6a304" />
+            <Object Name="ST_Chain_Winch_Safety" ObjectId="a86515da-77e1-5634-b6f3-443b78eedf33" />
+            <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
+            <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
+            <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
+            <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+          </Folder>
+        </Folder>
+        <Folder Name="COMMUN">
+          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+        </Folder>
+        <Folder Name="MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+        </Folder>
+        <Folder Name="CYCLE">
+          <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
+          <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+        </Folder>
+        <Folder Name="TRANSLATION">
+          <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+        </Folder>
+        <Folder Name="TREUILS">
+          <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
+          <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

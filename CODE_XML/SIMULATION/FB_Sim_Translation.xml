@@ -1,0 +1,363 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.783905" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-11T18:19:14.783905">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Sim_Translation" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TargetNum">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TravelTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8" />
+              </initialValue>
+            </variable>
+            <variable name="PVLeadTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PosTremie">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosPV">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosP2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosP1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PosMaintenance">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="CycleTimeCalc">
+              <type>
+                <derived name="FB_CycleTime" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📚 Réutilisation — pas de recalcul maison du temps de cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ElapsedS">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="LastTargetNum">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="TargetChanged">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Reached">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
+   🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
+      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
+      une simulation par temps de parcours : le translation "arrive" à la cible
+      sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
+      continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
+      (M3 translation) — treuils/benne/codeurs sont la priorité de ce lot.
+   📥 Enable      : simulation active (SimulationModeActive AND NOT SensorTranslationPositionIsReal)
+   📥 TargetNum   : cible sélectionnée (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)
+                    — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
+                    — 🆕 REX 2026-07-18 : PV n'est JAMAIS une cible sélectionnable (point de
+                    ralentissement uniquement, pas d'arrêt), voir AF_Partie-02 v2.12 §3bis
+   📥 RelayFwd/RelayRev : sens déduit du mot de commande EtherCAT M3
+   📥 TravelTimeS : temps de trajet simulé (s) — défaut 8.0 (fourchette 5-10s validée
+                    utilisateur, pas de donnée réelle pour calibrer plus précisément)
+   📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
+   📤 PosTremie/PosPV/PosP2/PosP1/PosMaintenance : TRUE quand la cible (ou le point de
+      ralentissement PV) correspondante est atteinte — à OR'er sur le `InputRaw` du capteur
+      réel correspondant (`PRG_02_Acquisition.HwIn`).
+   ⏱️ Changement de cible (`TargetNum`) → trajet remis à zéro (redémarre du début).
+      Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Translation) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Translation) ===
+
+IF NOT Enable THEN
+    ElapsedS := 0.0;
+    LastTargetNum := TargetNum;
+    PosTremie := FALSE; PosPV := FALSE; PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
+    RETURN;
+END_IF;
+
+CycleTimeCalc(DefaultValueS := 0.010);
+
+// 🔁 Changement de cible = nouveau trajet, on repart de zéro
+TargetChanged := (TargetNum &lt;&gt; LastTargetNum);
+LastTargetNum := TargetNum;
+IF TargetChanged THEN
+    ElapsedS := 0.0;
+END_IF;
+
+// ⏱️ Progression du trajet UNIQUEMENT si un relais de sens est actif (mouvement réel demandé) ;
+// à l'arrêt, la progression reste EN PAUSE (pas remise à zéro).
+IF (RelayFwd OR RelayRev) AND (ElapsedS &lt; TravelTimeS) THEN
+    ElapsedS := ElapsedS + CycleTimeCalc.CycleTimeS;
+    IF ElapsedS &gt; TravelTimeS THEN
+        ElapsedS := TravelTimeS;
+    END_IF;
+END_IF;
+
+Reached := (ElapsedS &gt;= TravelTimeS);
+
+// 🆕 REX 2026-07-18 : les capteurs sont codés par progression monotone.
+// La simulation doit donc produire un mot valide à chaque instant, et non
+// uniquement activer le capteur de la cible. Le mot est :
+//   11111 Trémie | 01111 PV | 00111 P2 | 00011 P1 | 00001 approche Maintenance | 00000 Maintenance.
+// 🔧 REX 2026-07-21 : au repos / boot (TargetNum = 0), la position neutre par défaut
+// est positionnée sur P2 (00111) pour éviter d'être par défaut sur le fin de course extrême Maintenance (00000).
+PosTremie := FALSE;
+PosPV := FALSE;
+
+IF TargetNum = 0 THEN
+    // Position neutre par défaut au boot (P2 = 00111) — évite le fin de course extrême arrière au démarrage
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 1 THEN
+    // Trajet vers Trémie : PV puis Trémie, avec les trois capteurs de droite actifs.
+    PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
+    IF ElapsedS &gt;= (TravelTimeS - PVLeadTimeS) THEN
+        PosPV := TRUE;
+        PosP2 := TRUE;
+        PosP1 := TRUE;
+        PosMaintenance := TRUE;
+    END_IF;
+    IF Reached THEN
+        PosTremie := TRUE;
+    END_IF;
+ELSIF TargetNum = 2 THEN
+    // P2 = 00111
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 3 THEN
+    // P1 = 00011
+    PosP2 := FALSE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF TargetNum = 4 THEN
+    // Maintenance = 00000 : PosMaintenance reste FALSE pour respecter le codage.
+    PosP2 := FALSE;
+    PosP1 := FALSE;
+    PosMaintenance := FALSE;
+ELSE
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d7634526-8de9-5f93-b858-7e0bb59cdce2</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_CycleTime" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="DefaultValueS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.004" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de secours par défaut (ex. 4ms)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé réel calculé (secondes)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="TimeCurrent">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps système actuel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeLast">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Empreinte de temps du cycle précédent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaTimeMs">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart brut calculé (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InitDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau d'initialisation du premier cycle</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
+      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// 1. ACQUISITION DU TEMPS SYSTÈME
+TimeCurrent := TIME();
+
+// 2. INITIALISATION UNIQUE AU PREMIER CYCLE
+IF NOT InitDone THEN
+    TimeLast := TimeCurrent;
+    InitDone := TRUE;
+    CycleTimeS := DefaultValueS;
+    RETURN;
+END_IF;
+
+// 3. CALCUL DU DELTA EN MILLISECONDES
+DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+
+// 4. CONVERSION ET CHARGE DE SECOURS
+IF DeltaTimeMs &gt; 0 THEN
+    CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
+ELSE
+    CycleTimeS := DefaultValueS;
+END_IF;
+
+// 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
+TimeLast := TimeCurrent;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ac308017-0ba5-51da-b58a-b5951d04dc0f</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="SIMULATION">
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+        </Folder>
+        <Folder Name="COMMUN">
+          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
