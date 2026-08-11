@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.782852" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-11T18:19:14.782852">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Sim_Encoder" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SpeedRefPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+            <variable name="PresetCmd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PresetValue">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="SpeedScaleFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — confort de test, voir bandeau ci-dessus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — front montant = applique TestOffsetPts (test banc)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetPts">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — décalage signé à appliquer (points bruts)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RawPosOut">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-08 : référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="Increment">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestOffsetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
+      Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
+      du métier machine.
+   🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
+      réellement, à partir des relais de sens commandés et de la vitesse rampée
+      courante. Extraction PURE de la logique déjà en place dans
+      `PRG_02_Encoders.st` (bloc "SIMULATION SUR BANC DE TEST") — aucun
+      changement de comportement, juste la dissociation en FB dédié.
+   📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
+   📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
+   📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
+   📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
+   📥 PresetValue : valeur brute à charger lors du preset
+   📥 SpeedScaleFactor : 🔧 REX 2026-07-07 — multiplicateur de vitesse simulation (confort de test
+      banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
+      d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
+   📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
+      EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
+   🔧 REX 2026-07-08 : `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+      (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
+      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB (tenté en `VAR RETAIN` puis
+      `VAR PERSISTENT RETAIN` locaux, aucun des deux ne convient). Un vrai codeur absolu physique
+      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate) —
+      il fallait donc bien du PERSISTENT RETAIN réel, regroupé avec le reste dans GVL_PERSISTENT.
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
+
+IF NOT Enable THEN
+    RawPosOut := RawPos;
+    RETURN;
+END_IF;
+
+// 🆕 REX 2026-07-08 (4) — injection test banc : VRAI saut de position (comme un glissement réel),
+// pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
+TestOffsetEdge(CLK := TestOffsetCmd);
+IF TestOffsetEdge.Q THEN
+    RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
+END_IF;
+
+Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
+
+IF PresetCmd THEN
+    RawPos := PresetValue;
+ELSIF RelayFwd THEN
+    RawPos := RawPos + Increment;
+ELSIF RelayRev THEN
+    IF RawPos &gt;= Increment THEN
+        RawPos := RawPos - Increment;
+    ELSE
+        RawPos := 0;
+    END_IF;
+END_IF;
+
+RawPosOut := RawPos;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>526914c5-468f-5758-8161-f70e0fd85cca</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="SIMULATION">
+          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

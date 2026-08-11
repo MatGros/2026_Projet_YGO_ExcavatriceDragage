@@ -1,0 +1,489 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-01T00:07:15.208027" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-01T00:07:15.208027">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_CycleHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_CycleCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_CycleState" />
+              </type>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_CycleCfg" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>313e1a80-c1fe-5852-823a-20d942e4c852</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔄 ST_CycleHMI — Données d'échange IHM du cycle semi-automatique
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration en Cmd / State / Cfg / Test (2026-07-24), homogène avec ST_WinchHMI.
+   🐛 T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3) —
+   avant ce lot, SetDepth_M/SetOffset_M n'avaient AUCUN backing persistant (juste un défaut
+   compilé dans le DUT), contrairement à tous les autres domaines déjà traités.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleCfg">
+        <baseType>
+          <struct>
+            <variable name="SetDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-12.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetOffset_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage cible de fermeture de la benne (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>19cafd99-3b26-50ad-b40a-cdf9fb79d238</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔧 ST_CycleCfg — Configuration du cycle semi-automatique
+   🐛 T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">▶️ Lancement cycle automatique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnPause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏸️ Pause cycle automatique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnAbort">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏹️ Abandon / arrêt cycle automatique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général (REX 2026-07-07)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_CycleCmd — Commandes IHM pour le cycle semi-automatique
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleState">
+        <baseType>
+          <struct>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Séquenceur prêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Cycle en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Cycle terminé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code défaut cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStep">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Étape courante du Grafcet</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStateStr">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Libellé texte de l'étape courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelTarget">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Miroir lecture seule de GVL_IHM.TranslationM3.Cmd.SelTarget</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactFond">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Retour physique réel capteur contact de fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Commande contacteur Kobold (calculée par FB_Cycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Miroir de GVL_IHM.Commun.LimitLegalReached</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Miroir de GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ Miroir de l'erreur synchro M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSyncDelta_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ Miroir de l'écart synchro M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatch_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse mesuré (T43/T45)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse détecté</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse confirmé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Position câble M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Position câble M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔫 Homme-mort joystick armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickMotionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Mouvement joystick actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Homme-mort + axe Y actif (CycleMotionPermit)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3316cae9-98ac-5b12-9b8d-a24f1a7445d8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚦 ST_CycleState — États et diagnostics IHM du cycle semi-automatique
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_CycleStep">
+        <baseType>
+          <enum>
+            <values>
+              <value name="INIT" value="0" />
+              <value name="WORK_POS_SELECT" value="1" />
+              <value name="DESCENDING_OPEN" value="2" />
+              <value name="BOTTOM_TOUCH_WAIT" value="3" />
+              <value name="SYNCHRO_ADJUST" value="4" />
+              <value name="CTRL_ASCENDING" value="5" />
+              <value name="ASCENDING_LOADED" value="6" />
+              <value name="DRAINING_PAUSE" value="7" />
+              <value name="TRANSLATION_MOVE" value="8" />
+              <value name="DESCENDING_OPEN_DUMP" value="9" />
+              <value name="RETURN_WORK_POS" value="10" />
+              <value name="READY" value="11" />
+              <value name="ERROR_HOLD" value="12" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vérifs cohérence états + sécurités, mise en position init</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WORK_POS_SELECT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Choix opérateur pos travail 1/2 + déplacement validé joystick</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DESCENDING_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne déjà ouvert, M1+M2 synchro</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BOTTOM_TOUCH_WAIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente info BOOL capteur "fond touché"</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SYNCHRO_ADJUST</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désynchro M2 petite vitesse (offset X) → fermeture benne</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CTRL_ASCENDING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée lente de contrôle (vérification fermeture)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ASCENDING_LOADED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée pleine vitesse charge</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DRAINING_PAUSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé (durée RETAIN)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>TRANSLATION_MOVE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Déplacement translation M3 vers trémie</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DESCENDING_OPEN_DUMP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente de vidage + ouverture benne</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RETURN_WORK_POS</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour position travail (remontée synchro)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle terminé, prêt à reboucler</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR_HOLD</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrêt sûr figé sur défaut (SafeStop)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6cb965ad-bf44-5119-9acc-50ecd5c9f87b</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="SUPERVISION">
+          <Folder Name="_TYPES">
+            <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
+            <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+            <Object Name="ST_CycleCmd" ObjectId="dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28" />
+            <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
+          </Folder>
+        </Folder>
+        <Folder Name="CYCLE">
+          <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

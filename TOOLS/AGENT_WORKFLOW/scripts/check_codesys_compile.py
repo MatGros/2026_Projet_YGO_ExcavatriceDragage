@@ -70,9 +70,10 @@ def main() -> int:
     err_count, warn_count, findings = analyze_log(args.log, args.strict)
 
     if findings:
-        print("=== CODESYS COMPILATION FINDINGS ===")
-        for f in findings:
-            print(f"  {f}")
+        from codesys_compilation_diag import parse_codesys_line, format_diagnostic_report
+        parsed = [parse_codesys_line(f) for f in findings]
+        parsed = [p for p in parsed if p is not None]
+        print(format_diagnostic_report(parsed))
 
     print(f"\nErrors: {err_count}, Warnings: {warn_count}")
 

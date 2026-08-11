@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-22T16:10:21.504862" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-22T16:10:21.504862">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_WinchCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnUp">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnDown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ Mouvement descente maintenu (mode boutons IHM, MAINT_N1 accessible)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnReset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnHome">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnConfirmCoherence">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Confirmation de cohérence au démarrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnInhibit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnHomingAtZero">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX mise en service : force le homing à 0 m (points codeur centre),</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c71b5360-d47d-51c7-a74c-66d1cdd622f0</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_WinchCmd — Commandes IHM pour un Treuil M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné au pilotage manuel et maintenance du treuil depuis l'IHM.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="SUPERVISION">
+          <Folder Name="_TYPES">
+            <Object Name="ST_WinchCmd" ObjectId="c71b5360-d47d-51c7-a74c-66d1cdd622f0" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

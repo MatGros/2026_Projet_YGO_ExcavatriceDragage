@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.790044" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-11T18:19:14.790044">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_DriftGuard" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Arm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Condition d'armement (calculée par l'appelant, ex. FwdRevSpeedFeedbackOff AND BrakeFeedback)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position courante à surveiller</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ToleranceM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tolérance de dérive (m) au-delà de laquelle Violation se déclenche</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="RefPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position de référence capturée à l'armement (diagnostic/IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriftM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dérive absolue courante (m), 0.0 si non armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Violation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si DriftM &gt; ToleranceM pendant que Arm=TRUE</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="WasArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte le passage FALSE→TRUE de Arm (1er cycle armé)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📐 FB_DriftGuard — Détection de dérive de position pendant armement
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §4quinquies (Méca A/C)
+   🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
+      Méca C de FB_Safety_Winch (armement + capture position référence + calcul
+      dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.
+   📂 REX 2026-07-08 (2) : placé dans CODE/WINCH/ (pas COMMUN) — son seul
+      consommateur réel est FB_Safety_Winch (2 instances, Méca A et C, dans le
+      MÊME FB). COMMUN est réservé aux briques à usage cross-domaine AVÉRÉ
+      (ex. FB_Brake, réutilisé par Winch ET Translation aujourd'hui) — pas à un
+      usage hypothétique futur. À remonter en COMMUN le jour où un autre
+      domaine (ex. FB_Safety_Translation) l'utilise réellement.
+   🎯 Rôle : tant que Arm=TRUE, mémorise la position au moment du premier cycle
+      armé (RefPosM), puis calcule en continu la dérive absolue par rapport à
+      cette référence. Violation si la dérive dépasse ToleranceM.
+   ⚠️ Ne fait AUCUNE vérification de vitesse (Méca A ajoute son propre check
+      vitesse en plus, câblé en OR par l'appelant — hors périmètre de cette
+      brique, qui ne gère QUE la dérive de position).
+   ═══════════════════════════════════════════════════════════════
+=== DECLARATION (à coller dans la partie déclaration du POU FB_DriftGuard) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_DriftGuard) ===
+
+IF Arm THEN
+    IF NOT WasArmed THEN
+        RefPosM := PositionM;   // Capture au 1er cycle armé uniquement
+        WasArmed := TRUE;
+    END_IF;
+    DriftM := ABS(PositionM - RefPosM);
+    Violation := DriftM &gt; ToleranceM;
+ELSE
+    WasArmed := FALSE;
+    DriftM := 0.0;
+    Violation := FALSE;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e215f19f-4c29-5289-9559-f2cf7fa9d55e</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="TREUILS">
+          <Object Name="FB_DriftGuard" ObjectId="e215f19f-4c29-5289-9559-f2cf7fa9d55e" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
