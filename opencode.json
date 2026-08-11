@@ -2,5 +2,14 @@
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
     "opencode-omniroute-auth"
-  ]
+  ],
+  "permission": {
+    "edit": {
+      "CODE_v0.5.25_20260807/**": "deny"
+    },
+    "bash": {
+      "*": "allow",
+      "*CODE_v0.5.25_20260807*": "deny"
+    }
+  }
 }
