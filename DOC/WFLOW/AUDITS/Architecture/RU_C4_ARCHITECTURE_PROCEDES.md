@@ -2,7 +2,7 @@
 
 > **Statut : ACTÉE.** Remplace le découpage transverse historique (safety globale séparée des mouvements).
 > Source de la décision : arbitrage utilisateur, session d'architecture avant migration CFC natif.
-> Cette décision est reportée dans `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
+> Cette décision est reportée dans `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 
 ---
 

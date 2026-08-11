@@ -5,7 +5,7 @@
 > §5 (`TranslationPontM3`) avec le détail spécifique M3 : chaque cause de blocage, dans l'ordre où
 > la rencontrer, avec la variable exacte à observer en Watch CODESYS.
 > 📄 Sources : `CODE/TRANSLATION/*.st`, `CODE/MAIN/PRG_02_Acquisition.st`, `PRG_05_Translation.st`,
-> `PRG_06_Outputs_LD.st`. Spec métier : `DOC/AF_Partie-11_Fonction_Translation_v2.1.md`.
+> `PRG_06_Outputs_LD.st`. Spec métier : `DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md`.
 > ⚠️ **Lecture seule stricte** — ce document n'est pas une procédure d'action machine, c'est une
 > aide à l'observation. Toute action reste sous la responsabilité de l'opérateur/automaticien.
 
@@ -261,9 +261,9 @@ avant validation finale.
 
 | Doc | Rôle |
 |---|---|
-| `DOC/AF_Partie-11_Fonction_Translation_v2.1.md` | Spec métier M3, §5 alertes détaillées |
-| `DOC/AF_Partie-14_Fonction_Troubleshooting_v1.1.md` | Table générique transverse (acquisition DI) |
-| `DOC/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.0.md` | FB de recopie IHM (`GVL_Troubleshooting`) |
+| `DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md` | Spec métier M3, §5 alertes détaillées |
+| `DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.1.md` | Table générique transverse (acquisition DI) |
+| `DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.0.md` | FB de recopie IHM (`GVL_Troubleshooting`) |
 | `CHECKLIST_MiseEnService_Translation` (PLAN_TASK T26) | Checklist de recette terrain — **référencée mais pas encore rédigée** dans `DOC/CHECKLISTS/`, exécution/verdict signé restants |
 | `DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_M4_TRANSLATION_SAFETY.yaml` | Contrat agent — ✅ exécuté (prérequis #2 résolu) |
 | `DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_LOT2_TRANSLATION_M3_AC600_OUTPUT.yaml` | Contrat agent — ✅ exécuté côté ST (prérequis #3 : mapping E/S manuel restant) |

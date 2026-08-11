@@ -16,12 +16,12 @@ Point d'entrée agents (guardrails, workflow, délégation) : **[AGENTS.md](AGEN
 
 | Sujet | Document |
 |---|---|
-| Nommage (PascalCase, préfixes, unités, polarité) | [DOC/NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) |
-| Déclaration, liaison, POO, non-régression | [DOC/CODE_QUALITY_STANDARDS.md](DOC/CODE_QUALITY_STANDARDS.md) |
+| Nommage (PascalCase, préfixes, unités, polarité) | [DOC/STDS/NAMING_CONVENTION.md](DOC/STDS/NAMING_CONVENTION.md) |
+| Déclaration, liaison, POO, non-régression | [DOC/STDS/CODE_QUALITY_STANDARDS.md](DOC/STDS/CODE_QUALITY_STANDARDS.md) |
 | Architecture programme (CFC, Ladder, tâches) | [ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md](ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md) |
 | Contrats FB, DUT et CFC | [ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md](ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md) |
 | Fonctions métier (une par FB, 08+) | Joystick · Encoder/Homing · Treuils (Benne incluse) · Translation · Simulation · Troubleshooting — voir [DOC/README.md](DOC/README.md) |
-| Pilotage projet (tâches, reliquats, TBD) | [DOC/PLAN_TASK_v1.0.md](DOC/PLAN_TASK_v1.0.md) |
+| Pilotage projet (tâches, reliquats, TBD) | [DOC/WFLOW/PLAN_TASK.md](DOC/WFLOW/PLAN_TASK.md) |
 
 🚫 `ARCHIVES/` n'est **jamais** une source active — versions remplacées uniquement.
 
@@ -103,7 +103,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .  # bundle à jo
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py               # tous les gates
 ```
 
-Détail : [DOC/CODE_QUALITY_STANDARDS.md §11](DOC/CODE_QUALITY_STANDARDS.md) (checklist de
+Détail : [DOC/STDS/CODE_QUALITY_STANDARDS.md §11](DOC/STDS/CODE_QUALITY_STANDARDS.md) (checklist de
 restitution bloquante).
 
 ---
@@ -112,20 +112,20 @@ restitution bloquante).
 
 | Concept | Important |
 |---------|-----------|
-| **Nommage** | Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md) d'abord — aucun hongrois, PascalCase strict |
+| **Nommage** | Lire [NAMING_CONVENTION.md](DOC/STDS/NAMING_CONVENTION.md) d'abord — aucun hongrois, PascalCase strict |
 | **Tâches** | EtherCAT 4 ms → CAN 20 ms → Main 10 ms ; surveillance périodicité = fonction système CODESYS (200 ms) |
 | **FB Standard** | Tous les FB métier respectent le contrat [AF_Partie-03](ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md) (profils selon catégorie, §1bis) |
 | **Sécurité** | `Enable` > `SafeStop` (par métier, rampe rapide) > `StartStop` (rampe normale) ; AU matériel = seul arrêt brutal + `PowerCutOff` ; `Reset` = front |
-| **Cycle** | Semi-auto : `E_CycleStep` ([AF_Partie-04](DOC/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md)) |
+| **Cycle** | Semi-auto : `E_CycleStep` ([AF_Partie-04](DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md)) |
 
 ---
 
 ## 🚀 Commencer
 
-1. **Lire [NAMING_CONVENTION.md](DOC/NAMING_CONVENTION.md)** ← commence ici
+1. **Lire [NAMING_CONVENTION.md](DOC/STDS/NAMING_CONVENTION.md)** ← commence ici
 2. Consulter [DOC/README.md](DOC/README.md) pour l'index complet des spécifications actives
 3. Charger la skill [`codesys-workflow`](.claude/skills/codesys-workflow.md) avant toute modif `CODE/`
-4. Consulter [PLAN_TASK (v1.0)](DOC/PLAN_TASK_v1.0.md) pour savoir ce qu'il reste à faire, trancher ou demander au client
+4. Consulter [PLAN_TASK (v1.0)](DOC/WFLOW/PLAN_TASK.md) pour savoir ce qu'il reste à faire, trancher ou demander au client
 
 ---
 

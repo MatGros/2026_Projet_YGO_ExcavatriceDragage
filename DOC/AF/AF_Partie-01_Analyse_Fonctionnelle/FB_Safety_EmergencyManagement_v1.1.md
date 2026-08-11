@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-01_Analyse_Fonctionnelle_v2.0.md`](AF_Partie-01_Analyse_Fonctionnelle_v2.0.md) §5.
 > Rôle de **ce** document : constitution, interfaces, séquence, intégration, écarts bus —
 > et **catalogue unique** des `TC-P01-*` (ne pas les recopier dans AF01).
-> Extraction code : `DOC/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md`.
+> Extraction code : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md`.
 > ⚠️ Existant vérifié + écarts à normaliser. Pas de modif code sans validation §8.
 
 ## 🧭 Sommaire
@@ -205,7 +205,7 @@ sans procédure manuelle séparée** :
 > ⚠️ **REX 2026-08** : la règle initiale ("Reset **et** `PowerContactorEngaged=TRUE`") créait une
 > impasse opérateur — le contacteur ne peut justement pas s'engager tant que le défaut est actif,
 > donc le Reset restait bloqué en boucle. Corrigée par le pattern `Cause`/`Ack`
-> (`DOC/CODE_QUALITY_STANDARDS.md §9`) : le Reset **acquitte toujours**, sans condition.
+> (`DOC/STDS/CODE_QUALITY_STANDARDS.md §9`) : le Reset **acquitte toujours**, sans condition.
 
 | Défaut | Catégorie | Condition d'effacement |
 |---|---|---|
@@ -457,7 +457,7 @@ Les résultats d'exécution restent hors AF (scripts / checklists / registres).
 | AF06 | Noms DI/DQ puissance |
 | AF07 | Champs `ST_Modes*` |
 | AF13 | `FB_Sim_Safety` |
-| Extraction | `DOC/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md` |
+| Extraction | `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md` |
 
 Fichiers code de référence :
 
@@ -472,7 +472,7 @@ Fichiers code de référence :
 - `CODE/SUPERVISION/GVL_IHM_AU.st` (interface IHM)
 - `CODE/MAIN/PRG_02_Acquisition.st` (ST pur)
 - `CODE/MAIN/PRG_06_Outputs_LD.st` (sorties)
-- `ARCHIVES/Code/TESTS/PRG_AU_TestBench.st` (banc de test manuel, archivé 2026-08-01 — voir `DOC/PLAN_TASK_v1.0.md`)
+- `ARCHIVES/Code/TESTS/PRG_AU_TestBench.st` (banc de test manuel, archivé 2026-08-01 — voir `DOC/WFLOW/PLAN_TASK.md`)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)
 - Cible de migration : `PRG_02_Acquisition.st` (ST pur, dans `CODE/MAIN`)
 - `CODE/SIMULATION/FB_Sim_Safety.st`

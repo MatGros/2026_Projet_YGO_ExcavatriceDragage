@@ -50,9 +50,9 @@ spontanée. Continuer en silence sur un doute est la faute ; le signaler ne l'es
 ## À lire avant d'écrire (dans cet ordre, aucune exception)
 
 1. `AGENTS.md` — point d'entrée, guardrails, persona et cas d'arrêt
-2. `DOC/CODE_QUALITY_STANDARDS.md` — déclaration, liaison, POO, non-régression
-3. `DOC/NAMING_CONVENTION.md` — nommage
-4. `DOC/AF_Partie-03_Contrats_Composants_v2.1.md` — contrats FB, DUT et CFC (si création/modif de FB)
+2. `DOC/STDS/CODE_QUALITY_STANDARDS.md` — déclaration, liaison, POO, non-régression
+3. `DOC/STDS/NAMING_CONVENTION.md` — nommage
+4. `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` — contrats FB, DUT et CFC (si création/modif de FB)
 5. La spec métier concernée (`DOC/AF_Partie-08` à `-14`)
 
 `ARCHIVES/` n'est **jamais** une source active.

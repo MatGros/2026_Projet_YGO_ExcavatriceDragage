@@ -4,7 +4,7 @@
 > Rôle de **ce** document : interface, 7 mécanismes A-G, masques, écarts — et **catalogue unique**
 > des `TC-P10-001` à `TC-P10-010` (ne pas les recopier dans le chapô AF10).
 > Source code : `CODE/TREUILS/FB_Safety_Winch.st` · instances `Safety (CFC).instSafetyWinchM1/M2`.
-> Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
+> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire
 

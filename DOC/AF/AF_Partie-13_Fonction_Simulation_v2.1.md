@@ -123,4 +123,4 @@ Les gates Python interdisent désormais :
 4. Avant retour réel : désactiver les quatre domaines, puis `SimulationModeActive`; vérifier les
    bypass RETAIN et l'absence de défaut actif.
 
-📌 Suivi organisationnel : `DOC/PLAN_TASK_v1.0.md`.
+📌 Suivi organisationnel : `DOC/WFLOW/PLAN_TASK.md`.

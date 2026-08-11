@@ -3,7 +3,7 @@
 > Role : definir la frontiere unique d'acquisition de `PRG_02_Acquisition` (ST).
 > Statut : décision documentaire préalable au retrait de `PRG_01_Inputs_LD` et `FB_Input`.
 > Les décisions de mouvement restent hors de ce document.
-> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
+> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 
 **Décision v2.1 :** `PRG_02_Acquisition` devient l'unique producteur de `HwReal`,
 `HwRealQualified`, `HwSim`, `HwIn` et des diagnostics d'acquisition. `PRG_01_Inputs_LD`, `FB_Input` et `ST_InputsQualified`
@@ -126,7 +126,7 @@ PLC ne remplace jamais cette chaine.
   pas ici et pas dans un POU safety global — qui n'existe pas dans la cible.
 - Aucune sortie physique : elles restent produites uniquement par `PRG_06_Outputs_LD`.
 
-📌 Lot de migration : **M1** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
+📌 Lot de migration : **M1** de `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
 Le référencement (`FB_Encoder_Homing`) n'appartient pas à cette frontière de mesure : il rejoint
 `PRG_04_Treuils_Benne_CFC`, où les autorisations de maintenance et la visibilité opérateur sont
 disponibles. Il consomme les faits publiés par l'acquisition (`RawPos`, `EncoderAvailable`, retours

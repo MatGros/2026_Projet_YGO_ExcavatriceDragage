@@ -1,6 +1,6 @@
 # Extraction de specifications - AF Partie 03 Contrat FB (v1.0)
 
-> Source analysee : `DOC/AF_Partie-03_Contrats_Composants_v2.1.md`.
+> Source analysee : `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md`.
 > Statut : fiche de conservation pour la future Partie 03. Elle ne remplace pas l'AF03.
 
 ## A conserver sans regression

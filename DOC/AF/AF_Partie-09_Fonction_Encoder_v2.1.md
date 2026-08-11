@@ -8,8 +8,8 @@
 > ce n'est pas du code legacy à migrer) · instances dans `PRG_02_Encoders.st` (POU ST actuel).
 > Cible : la chaîne codéurs complète rejoint `PRG_02_Acquisition` (rang 02) — voir §4.2.
 > ⚠️ **Point d'arbitrage ouvert pour le lot M1** : le homing lit le mode de marche — voir §4bis.
-> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
-> Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md`.
+> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
+> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md`.
 > v2.0 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Encoder_Homing_v2.0.md`.
 > v1.11 archivée : `ARCHIVES/Doc/AF_Partie-10_Fonction_Encoder_Homing_v1.11.md`.
 
@@ -147,7 +147,7 @@ Seule **l'affectation POU** change.
 > (qui réintroduirait la violation grave Homing→Modes). Le gel de sortie (`CablePosMSafe`) reste le
 > comportement naturel de la chaîne (option 3 validée).
 
-📌 Lot de migration : **M1** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
+📌 Lot de migration : **M1** de `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
 
 ---
 
@@ -210,7 +210,7 @@ Questions ouvertes à instruire, avec preuve de code à l'appui :
    touche-t-il une commande, un interlock ou une autorisation de mouvement ?
 
 ⛔ **Tant que ce point n'est pas tranché par l'utilisateur, le lot M1 ne peut pas déplacer
-`instHomingM1/M2`.** Référence pilotage : `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`
+`instHomingM1/M2`.** Référence pilotage : `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`
 §4, lot M1, point dur n°2.
 
 ---

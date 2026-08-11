@@ -6,8 +6,8 @@
 > + intégration programme — il ne recopie pas les interfaces/`TC-` des fiches.
 > Source code : `CODE/TRANSLATION/*.st` · instances dans `PRG_TRANSLATION_CFC.st`, `PRG_SAFETY_CFC.st`, `PRG_OUTPUTS_LD.st` (ST/Ladder actuels).
 > Cible de migration CFC native : **une seule page** `PRG_05_Translation.xml` — elle absorbe la partie M3 de `PRG_SAFETY_CFC`. Aucune page safety séparée n'est une cible.
-> 🗺️ Architecture cible faisant foi : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
-> Extraction : `DOC/CHECKLISTS/EXTRACTIONS/FB_Translation_Extraction_Code_v1.0.md`.
+> 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
+> Extraction : `DOC/MES/CHECKLISTS/EXTRACTIONS/FB_Translation_Extraction_Code_v1.0.md`.
 > v2.0 archivée : `ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md` (§5 audit 2026-08-05 ajouté ici, reste inchangé).
 
 ## 🧭 Sommaire
@@ -122,7 +122,7 @@ sur la lecture de `Direction` (§5 alerte 4) disparaissent par construction. ⚠
 est un **objectif du lot M4**, pas un fait acquis : elle doit être prouvée par `check_linkage.py`
 avant clotûre du lot.
 
-📌 Lot de migration : **M4** de `DOC/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
+📌 Lot de migration : **M4** de `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
 Contrat agent prêt (réécrit 2026-08-05) : `DOC/CHECKLISTS/TASK_CONTEXT/TASK_CONTEXT_M4_TRANSLATION_SAFETY.yaml`.
 
 **Arbitrage Translation** :

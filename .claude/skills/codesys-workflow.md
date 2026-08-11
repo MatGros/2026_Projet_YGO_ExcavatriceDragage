@@ -9,7 +9,7 @@ Procédure **stricte et itérative**. L'utilisateur applique **manuellement** ch
 CODESYS 3.5 (copie du ST).
 
 📖 Les **règles** ne sont pas ici — elles sont dans `DOC/`. Cette skill dit **comment exécuter**,
-pas quoi respecter. En cas de doute sur une règle : `DOC/CODE_QUALITY_STANDARDS.md`.
+pas quoi respecter. En cas de doute sur une règle : `DOC/STDS/CODE_QUALITY_STANDARDS.md`.
 
 ---
 
@@ -39,10 +39,10 @@ jamais l'agent qui l'a produit.
 Lire **la version active** (suffixe `_vX.Y` le plus élevé à la racine de `DOC/`) :
 
 - `AGENTS.md` — guardrails et cas d'arrêt
-- `DOC/CODE_QUALITY_STANDARDS.md` — déclaration, liaison, POO, non-régression
-- `DOC/NAMING_CONVENTION.md` — nommage
-- `DOC/AF_Partie-03_Contrats_Composants_v2.1.md` — contrats FB, DUT et CFC
-- `DOC/AF_Partie-02_Architecture_Programme_v3.1.md` — architecture, tâches et flux
+- `DOC/STDS/CODE_QUALITY_STANDARDS.md` — déclaration, liaison, POO, non-régression
+- `DOC/STDS/NAMING_CONVENTION.md` — nommage
+- `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` — contrats FB, DUT et CFC
+- `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` — architecture, tâches et flux
 - la spec métier concernée (`AF_Partie-08` à `-14`)
 
 🚫 `ARCHIVES/Doc/` = versions **périmées**, jamais une source active.
@@ -147,7 +147,7 @@ l'identificateur non défini commun — jamais corriger erreur par erreur avant 
 ### 📐 Note `_LD.st` → `<LD>` (REX 2026-08)
 
 Les sources `_LD.st` sont converties en `<LD>` Ladder par le générateur.
-Règles bloquantes (détail : `DOC/CODE_QUALITY_STANDARDS.md §11`, `DOC/AF_Partie-03 §6`) :
+Règles bloquantes (détail : `DOC/STDS/CODE_QUALITY_STANDARDS.md §11`, `DOC/AF_Partie-03 §6`) :
 
 - **Rung complet obligatoire** : `contact → block(FB) → coil → rightPowerRail`.
   Le générateur rejette les rungs incomplets (sans coil).

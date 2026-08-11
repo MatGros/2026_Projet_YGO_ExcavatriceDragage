@@ -1,6 +1,6 @@
 # Extraction de specifications - AF Partie 02 Architecture (v1.0)
 
-> Sources analysees : `DOC/AF_Partie-02_Architecture_Programme_v3.1.md`,
+> Sources analysees : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md`,
 > `ARCHIVES/Doc/AUDITS/SYNTHESE_Architecture_CFC_Bus_DUT_v1.0.md`,
 > `ARCHIVES/Doc/AUDITS/MATRICE_Architecture_CFC_Bus_DUT_v1.0.md` et
 > `ARCHIVES/Doc/AUDITS/PLAN_MIGRATION_Lot1_CFC_Acquisition_v1.0.md`.

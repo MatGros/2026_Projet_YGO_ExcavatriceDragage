@@ -4,7 +4,7 @@
 >
 > 🔄 **Numérotation** : ce document a été rédigé quand Benne=`AF11` et Treuils=`AF09`. État final
 > retenu : la Benne est une **fiche du domaine Treuils** →
-> [`DOC/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md`](../../AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md).
+> [`DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md`](../../AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md).
 > Le numéro 11 est désormais réattribué à Translation. Les mentions d'AF ci-dessous sont conservées
 > telles quelles : elles tracent le raisonnement d'origine, pas l'arborescence actuelle.
 >

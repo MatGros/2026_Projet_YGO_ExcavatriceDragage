@@ -100,7 +100,7 @@ Deux familles a distinguer :
 Cette distinction recoupe celle des defauts domaine : **Warning** (etat machine, s'efface seul
 avec la cause, pas d'action requise) vs **Fault** (action attendue = acquittement conscient,
 meme cause disparue). Pattern `Cause`/`Ack`, temporisation d'affichage anti-clignotement et regle
-complete : `DOC/CODE_QUALITY_STANDARDS.md §9`. Pas reformule ici.
+complete : `DOC/STDS/CODE_QUALITY_STANDARDS.md §9`. Pas reformule ici.
 
 Format, priorites, concatenation et proprietaire exact : **TBD**.
 
