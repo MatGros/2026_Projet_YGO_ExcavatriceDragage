@@ -5,7 +5,29 @@
 - **Sémantique** : le nom décrit le rôle, l'unité ou l'état.
 - **PascalCase** partout. Abréviations anglaises courtes acceptées.
 - **Suffixes d'unité** : seule exception aux abréviations (pour lever ambiguïtés métier).
- 
+
+---
+
+## 🧪 Points de validation
+
+> Distincts des `TC-Pxx-nnn` des AF (comportement machine) : ici, vérification du **nommage**
+> lui-même. Numérotation `NC-nnn` par pas de 10, immuable (même règle que `TC-`, voir
+> `CODE_QUALITY_STANDARDS.md §0`). `🤖 AUTO` = mécaniquement vérifiable en regex (candidat au
+> script de lint nommage évoqué le 2026-08-12) ; `👁️ MANUEL` = jugement sémantique, pas
+> automatisable.
+
+| ID | Intention | Preuve | Type | Réf |
+|---|---|---|---|---|
+| <nobr><code>NC-010</code></nobr> | Instance de FB préfixée `inst<Rôle>` | Déclaration `<Nom> : FB_Xxx` — nom commence par `inst` | 🤖 AUTO | §Préfixes structurels |
+| <nobr><code>NC-020</code></nobr> | Pas de notation hongroise (`bFlag`, `iCounter`, `rValue`) | Aucun nom débutant par `b`/`i`/`r` minuscule suivi d'une majuscule | 🤖 AUTO | §Principes |
+| <nobr><code>NC-030</code></nobr> | Suffixe d'unité précédé d'un underscore (`_M`, `_Pct`, `_Hz`, `_Ms`, `_Mps`) | Toute variable finissant par une unité connue respecte le `_` | 🤖 AUTO | §Suffixes d'unité |
+| <nobr><code>NC-040</code></nobr> | `_DI`/`_DQ`/`_RQ` jamais redéclaré comme variable locale hors `PRG_02_Acquisition` | Déjà couvert par `check_hw_name_collision.py` (GATE 2quinquies) | 🤖 AUTO (existant) | `CODE_QUALITY_STANDARDS.md §3bis` |
+| <nobr><code>NC-050</code></nobr> | `Cmd`/`Req` toujours en préfixe sur une **nouvelle** variable, jamais en suffixe | Aucune nouvelle occurrence `XxxCmd`/`XxxReq` hors baseline legacy | 🤖 AUTO | §`Req` vs `Cmd` |
+| <nobr><code>NC-060</code></nobr> | `ST_*HMI` : préfixes `Btn`/`Sel`/`Set`/`Tgl`/`Cfg`/`Tst` sans underscore après le préfixe, jamais `Cmd`/`Req` dedans | Champs des structs `ST_*HMI` respectent `<Préfixe><PascalCase>` | 🤖 AUTO | §Variables IHM |
+| <nobr><code>NC-070</code></nobr> | Variable `PERSISTENT` préfixée `_` | Déclaration dans `GVL_PERSISTENT.st` commence par `_` | 🤖 AUTO | §Variables globales persistantes |
+| <nobr><code>NC-080</code></nobr> | Repère matériel (M1/M2/M3) juste après le préfixe dans une GVL plate | Motif `<Préfixe><Repère><Fonction>` respecté | 👁️ MANUEL | §Repère juste après le préfixe |
+| <nobr><code>NC-090</code></nobr> | Une notion = un seul nom dans tout le projet (pas de synonyme parallèle) | Revue sémantique, pas mécanisable | 👁️ MANUEL | `CODE_QUALITY_STANDARDS.md §1` |
+
 ---
  
 ## Préfixes structurels (classification, non typage)
