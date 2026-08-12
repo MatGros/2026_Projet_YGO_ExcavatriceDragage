@@ -198,7 +198,7 @@ GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
       OR (PRG_02_Acquisition.CablePosM2 <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
-GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI;
+GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
 GVL_IHM.Commun.PhaseRotationFault        := NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;
 
 // 💓 Publication heartbeat IHM↔PLC (T83, LOT0_DIAG_IHM_HEARTBEAT 2026-08-05)
@@ -220,7 +220,7 @@ instPreflight(
     M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     M1ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
     M2ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
-    BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     PhaseRotationOk           := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     SlackCableTensioned       := PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     M3SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,

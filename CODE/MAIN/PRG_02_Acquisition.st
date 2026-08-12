@@ -177,10 +177,11 @@ HwReal.Operator.JOY1_DeviceState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState
 HwReal.Machine.PowerContactorEngaged_DI   := PowerContactorEngaged_DI;
 HwReal.Machine.EmergencyChainClosed_DI    := EmergencyChainClosed_DI;
 HwReal.Machine.PhaseRotationOk_DI         := PhaseRotationOk_DI;
-HwReal.Machine.BrakeThermalOk_DI          := BrakeThermalOk_DI;
-HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
-HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
-HwReal.Machine.ConveyorInfeedReady_DI     := ConveyorInfeedReady_DI;
+HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI  := M1_M2_M3_BrakeThermalOk_DI;
+HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
+HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
+HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
+HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
 
 // === 🧰 §1bis FILTRAGE TOR RÉEL ===
 // HwReal reste brut pour le diagnostic. HwRealQualified porte la même image
@@ -193,14 +194,17 @@ instFilterEmergencyChain(InputRaw := HwReal.Machine.EmergencyChainClosed_DI, Fil
 HwRealQualified.Machine.EmergencyChainClosed_DI := instFilterEmergencyChain.State;
 instFilterPhaseRotation(InputRaw := HwReal.Machine.PhaseRotationOk_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.PhaseRotationOk_DI := instFilterPhaseRotation.State;
-instFilterBrakeThermal(InputRaw := HwReal.Machine.BrakeThermalOk_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.BrakeThermalOk_DI := instFilterBrakeThermal.State;
-instFilterKobold(InputRaw := HwReal.Machine.M1_M2_KoboldContactFond_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.M1_M2_KoboldContactFond_DI := instFilterKobold.State;
+instFilterBrakeThermal(InputRaw := HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.M1_M2_M3_BrakeThermalOk_DI := instFilterBrakeThermal.State;
+instFilterKobold(InputRaw := HwReal.Machine.M1_M2_KoboldBottomTouch_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.M1_M2_KoboldBottomTouch_DI := instFilterKobold.State;
 instFilterHydraulicThermal(InputRaw := HwReal.Machine.HydraulicThermalOk_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.HydraulicThermalOk_DI := instFilterHydraulicThermal.State;
 instFilterConveyorReady(InputRaw := HwReal.Machine.ConveyorInfeedReady_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.ConveyorInfeedReady_DI := instFilterConveyorReady.State;
+// 🆕 2026-08-12 : HopperFull_OR_GateRaised_DI déclaré, pas encore filtré/consommé (pas de câblage
+// électrique confirmé) — pas de FB_DigitalInputFilter tant qu'aucun consommateur n'existe.
+HwRealQualified.Machine.HopperFull_OR_GateRaised_DI := HwReal.Machine.HopperFull_OR_GateRaised_DI;
 
 instFilterM1Contactors(InputRaw := HwReal.Winch.M1_ContactorsReleased_DI, FilterTime := T#20MS);
 HwRealQualified.Winch.M1_ContactorsReleased_DI := instFilterM1Contactors.State;

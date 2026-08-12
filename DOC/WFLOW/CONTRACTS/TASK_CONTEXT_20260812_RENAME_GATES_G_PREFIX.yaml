@@ -1,0 +1,98 @@
+contract:
+  task_id: RENAME_GATES_G_PREFIX
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Renommer les scripts de gate de TOOLS/AGENT_WORKFLOW/scripts/ pour embarquer leur ID Gate
+    (DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md) dans le nom de fichier, format G<ID>_<nom
+    original>.py (ex: check_code_style.py -> G100_check_code_style.py). Met a jour TOUTES les
+    references (run_all_gates.py, imports dans les tests, hooks, documentation) en coherence.
+    Aucun changement de comportement des gates eux-memes : renommage + mise a jour de references
+    uniquement, zero modification de CODE/.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        Chaque script de la table de correspondance (section scope.allowed, sous-liste
+        rename_map ci-dessous en commentaire) est renomme exactement selon le format specifie ;
+        aucun script hors de cette liste n'est renomme.
+      verified_by: "ls TOOLS/AGENT_WORKFLOW/scripts/G*.py : la liste correspond exactement aux 17 entrees du rename_map"
+    - id: AC2
+      statement: >
+        run_all_gates.py utilise les nouveaux chemins de script et affiche les ID Gate (G100,
+        G110, G200 etc.) comme identifiant principal dans son resume, plus les anciens titres
+        GATE 1bis, GATE 2quater etc.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py : sortie RESUME affiche G100, G110, G200 etc. au lieu de GATE 1, GATE 1bis, GATE 2"
+    - id: AC3
+      statement: >
+        run_all_gates.py se termine sur ALL GATES PASSED, exactement comme avant le renommage
+        (aucune regression introduite par le renommage lui-meme).
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py : code de sortie 0, ALL GATES PASSED"
+    - id: AC4
+      statement: >
+        Tous les fichiers de test qui importaient un module renomme (ex: import
+        check_hw_name_collision) sont mis a jour vers le nouveau nom de module, et
+        python -m pytest TOOLS/AGENT_WORKFLOW/tests/ TOOLS/ST_PLCOPENXML_GENERATOR/tests/ passe
+        integralement.
+      verified_by: "python -m pytest TOOLS/AGENT_WORKFLOW/tests/ TOOLS/ST_PLCOPENXML_GENERATOR/tests/ -q : 0 echec"
+    - id: AC5
+      statement: >
+        Toute mention en dur de l'ancien nom de script (ex: 'check_code_style.py') dans
+        DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md, DOC/STDS/CODE_QUALITY_STANDARDS.md,
+        AGENTS.md, .claude/skills/codesys-workflow.md et TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
+        est mise a jour vers le nouveau nom G<ID>_<nom>.py.
+      verified_by: "grep -rn 'check_code_style.py\\|check_naming_style.py\\|check_linkage.py\\|check_cfc_wiring.py\\|check_model_routing.py\\|check_structure.py\\|check_code_structure.py\\|check_bundle_main_coverage.py\\|check_type_safety.py\\|check_doc_links.py\\|check_hw_name_collision.py\\|check_direction_change_interlock.py\\|check_position_calibration_wiring.py\\|check_config_persistence.py\\|check_bundle_freshness.py\\|check_bundle_st_syntax.py\\|check_ld_invariants.py\\|check_codesys_compile.py' DOC/ AGENTS.md .claude/ : aucune occurrence de l'ancien nom SANS prefixe G<ID>_ (les mentions historiques dans PLAN_TASK.md/AUDITS/ARCHIVES sont exemptees, ce sont des journaux d'evenements passes)"
+
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/check_code_style.py                    # -> G100_check_code_style.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_naming_style.py                  # -> G110_check_naming_style.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py                       # -> G200_check_linkage.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_cfc_wiring.py                    # -> G210_check_cfc_wiring.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_model_routing.py                 # -> G220_check_model_routing.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_structure.py                     # -> G300_check_structure.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py                # -> G310_check_code_structure.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_bundle_main_coverage.py          # -> G320_check_bundle_main_coverage.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_type_safety.py                   # -> G330_check_type_safety.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py                     # -> G340_check_doc_links.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_hw_name_collision.py             # -> G350_check_hw_name_collision.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_direction_change_interlock.py    # -> G360_check_direction_change_interlock.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_position_calibration_wiring.py   # -> G370_check_position_calibration_wiring.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_config_persistence.py            # -> G380_check_config_persistence.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_bundle_freshness.py              # -> G390_check_bundle_freshness.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_bundle_st_syntax.py              # -> G400_check_bundle_st_syntax.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_ld_invariants.py                 # -> G410_check_ld_invariants.py
+      - TOOLS/AGENT_WORKFLOW/scripts/check_codesys_compile.py               # -> G500_check_codesys_compile.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md
+      - AGENTS.md
+      - .claude/skills/codesys-workflow.md
+      - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md
+    forbidden:
+      - CODE/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/AGENT_WORKFLOW/scripts/test_codesys_compile.py   # NE PAS renommer : verifier d'abord si pytest le decouvre via le prefixe test_ (auto-discovery) avant toute decision -- si oui, laisser tel quel et le signaler au lieu de deviner
+      - DOC/WFLOW/PLAN_TASK.md               # journal historique, ne pas reecrire les entrees passees
+      - ARCHIVES/                             # jamais une cible active
+
+  evidence_required:
+    - run_all_gates-output
+    - pytest-output
+    - grep-verification-AC5
+    - changed-files
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Aucune commande git (commit/push/reset/rebase/checkout), sous aucun pretexte. Avant de
+    renommer TOOLS/AGENT_WORKFLOW/scripts/test_codesys_compile.py, verifier explicitement s'il
+    est decouvert par pytest via son prefixe test_ (python -m pytest --collect-only) ; si oui,
+    NE PAS le renommer et le signaler comme cas particulier a trancher separement plutot que de
+    deviner. Si un script est importe par un hook (hook_pre_edit.py, hook_post_edit.py,
+    hook_stop.py) par son nom de fichier, mettre a jour aussi -- verifier explicitement, ne pas
+    supposer qu'aucun hook n'en depend.

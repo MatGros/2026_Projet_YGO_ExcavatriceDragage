@@ -65,7 +65,7 @@ def test_pre_edit_bloque_si_specs_non_lues(tmp_path: Path) -> None:
     """Une seule spec lue sur les trois requises : l'ecriture est refusee."""
     result = call(PRE_EDIT, {
         "tool_name": "Write",
-        "transcript_path": transcript_with_reads(tmp_path, "DOC/NAMING_CONVENTION.md"),
+        "transcript_path": transcript_with_reads(tmp_path, "DOC/STDS/NAMING_CONVENTION.md"),
         "tool_input": {"file_path": str(ROOT / "CODE/TREUILS/FB_Winch.st")},
     })
     assert result.returncode == 2, result.stdout + result.stderr
@@ -74,8 +74,8 @@ def test_pre_edit_bloque_si_specs_non_lues(tmp_path: Path) -> None:
 
 def test_pre_edit_autorise_si_tout_lu(tmp_path: Path) -> None:
     """Toutes les specs du dossier lues : l'ecriture passe."""
-    specs = ["DOC/CODE_QUALITY_STANDARDS.md", "DOC/NAMING_CONVENTION.md"]
-    specs += [p.relative_to(ROOT).as_posix() for p in (ROOT / "DOC").glob("AF_Partie-*.md")]
+    specs = ["DOC/STDS/CODE_QUALITY_STANDARDS.md", "DOC/STDS/NAMING_CONVENTION.md"]
+    specs += [p.relative_to(ROOT).as_posix() for p in (ROOT / "DOC" / "AF").glob("AF_Partie-*.md")]
     result = call(PRE_EDIT, {
         "tool_name": "Write",
         "transcript_path": transcript_with_reads(tmp_path, *specs),
@@ -100,8 +100,8 @@ def test_pre_edit_exige_la_version_active_de_la_spec(tmp_path: Path) -> None:
         "tool_name": "Write",
         "transcript_path": transcript_with_reads(
             tmp_path,
-            "DOC/CODE_QUALITY_STANDARDS.md",
-            "DOC/NAMING_CONVENTION.md",
+            "DOC/STDS/CODE_QUALITY_STANDARDS.md",
+            "DOC/STDS/NAMING_CONVENTION.md",
             "ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.13.md",
         ),
         "tool_input": {"file_path": str(ROOT / "CODE/TREUILS/FB_Winch.st")},
