@@ -1,4 +1,4 @@
-# 📐 Guide d'Édition des Analyses Fonctionnelles (AF)
+# 📐 Guide d'Édition des Analyses Fonctionnelles (AF) (v1.0)
 
 > 📌 **Standard normatif d'ingénierie** pour la rédaction, le versionnement et la structuration des spécifications fonctionnelles sous `DOC/AF/`.
 > Tout agent ou développeur modifiant une AF **doit** se conformer à ce guide.

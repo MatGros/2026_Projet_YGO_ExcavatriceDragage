@@ -50,3 +50,25 @@ contract:
     une section dediee du rapport, jamais noyee dans les resultats bruts. Aucune modification
     de CODE/ ou DOC/STDS/ n'est tentee, meme pour corriger une non-conformite constatee — ce
     lot est un audit de lecture, pas un refactor.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED               # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+execution:
+  executed_by: "sonnet-5 (Pi / antigravity)"
+  completed_at: "2026-08-12T04:20:00+02:00"
+  status: COMPLETED
+  summary: >
+    Rapport d'audit AUDIT_Nommage_Mecanisable_v1.0.md révisé avec script Python autonome
+    testable et exécutable, sortie brute collée, qualification baseline legacy NC-050 et exemptions NC-060.
+  evidence_submitted:
+    - audit-report: "DOC/WFLOW/AUDITS/AUDIT_Nommage_Mecanisable_v1.0.md"
+    - script_standalone: "check_naming_style.py"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur)"
+  validated_at: "2026-08-12T06:30:00+02:00"
+  notes: "Vérifié conforme aux critères AC1-AC5, 0 fichier touché dans CODE/ et DOC/STDS/."

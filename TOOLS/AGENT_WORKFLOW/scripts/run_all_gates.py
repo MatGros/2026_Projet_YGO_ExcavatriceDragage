@@ -65,6 +65,7 @@ def main() -> int:
         ("GATE 2quinquies: Collision noms HW (REX 2026-08-05)", [sys.executable, f"{S}/check_hw_name_collision.py", "."]),
         ("GATE 2sexies: Interlock changement de sens (REX 2026-08-05)", [sys.executable, f"{S}/check_direction_change_interlock.py", "."]),
         ("GATE 2septies: Cablage position calibree (REX 2026-08-06)", [sys.executable, f"{S}/check_position_calibration_wiring.py", "."]),
+        ("GATE 2octies: Nommage IEC (NC-010 a NC-070, informatif)", [sys.executable, f"{S}/check_naming_style.py", "CODE"]),
         ("GATE 3: Persistance config",                 [sys.executable, f"{S}/check_config_persistence.py", "."]),
         ("GATE 4: Fraicheur bundle",                   [sys.executable, f"{S}/check_bundle_freshness.py", "."]),
         ("GATE 4bis: Syntaxe ST du bundle (no terminator)", [sys.executable, f"{S}/check_bundle_st_syntax.py", "."]),

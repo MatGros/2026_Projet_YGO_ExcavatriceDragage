@@ -1,4 +1,4 @@
-# 🧭 Standards Qualité Code — Référentiel Universel (v2.0)
+# 🧭 Standards Qualité Code — Référentiel Universel
 
 > 📌 **Propriétaire unique** des règles de déclaration, de liaison et de POO du projet.
 > Tout autre document (skill CODESYS, `CODE_WRITING_POLICY`, prompts Pi) **renvoie ici**
@@ -7,14 +7,15 @@
 
 **Répartition des rôles — ne pas chercher ailleurs :**
 
-| Sujet | Document |
+| <nobr>Sujet</nobr> | Document |
 |---|---|
-| Comment on **nomme** | `DOC/STDS/NAMING_CONVENTION.md` |
-| Comment on **déclare, encapsule, relie** | **ce document** |
-| Comment on **édite une Analyse Fonctionnelle (AF)** | **ce document §0** |
-| Contrats FB, DUT et CFC | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` |
-| Ce que fait la machine | `DOC/` — voir `DOC/README.md` pour l'index complet |
-| Comment on exécute une modif | `.claude/skills/codesys-workflow.md` |
+| <nobr>Comment on **nomme**</nobr> | `DOC/STDS/NAMING_CONVENTION.md` |
+| <nobr>Comment on **déclare, encapsule, relie**</nobr> | **ce document** |
+| <nobr>Comment on **édite une AF**</nobr> | **ce document §0** |
+| <nobr>Comment on **teste/vérifie**</nobr> | `DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.1.md` |
+| <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` |
+| <nobr>Ce que fait la machine</nobr> | `DOC/` — voir `DOC/README.md` pour l'index complet |
+| <nobr>Comment on exécute une modif</nobr> | `.claude/skills/codesys-workflow.md` |
 
 ---
 
@@ -42,7 +43,7 @@
    - **Combinaison Zéro-Marge & Flèches Vectorielles** : Cartes HTML ultra-compactes (`padding: 6px 10px`) associées à de vraies flèches vectorielles SVG colorées (`<svg>`).
    - **Émoji collé directement à gauche** : Émoji sur la même ligne avec espace fixe devant le nom (`🛡️ &nbsp;<b>FB_Safety_Translation</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Rôle</span>`).
    - **Flèches Vectorielles & Contrats Explicites** : Éléments vectoriels `<svg>` colorés selon le domaine métier et étiquette explicite du signal transmis.
-   - *(Référentiel d'édition complet : [`DOC/STDS/GUIDES/GUIDE_EDITION_AF.md`](GUIDES/GUIDE_EDITION_AF.md))*.
+   - *(Référentiel d'édition complet : [`DOC/STDS/GUIDES/GUIDE_EDITION_AF_v1.0.md`](GUIDES/GUIDE_EDITION_AF_v1.0.md))*.
 6. **Cartouche d'Entête des Fichiers Code ST (`CODE/*.st`) & Cohérence AF Stricte** :
    - **Structure Multi-Lignes à Émojis Sémantiques** : Tout fichier ST commence par un cartouche structuré avec l'émoji du domaine dans la ligne de titre, et des émojis sémantiques distincts par type d'information :
      ```pascal
@@ -315,10 +316,10 @@ une affectation évidente.
 
 Deux catégories de défaut, **jamais mélangées dans la même variable** :
 
-| Catégorie | Comportement | Exemple |
+| <nobr>Catégorie</nobr> | Comportement | Exemple |
 |---|---|---|
-| **Info / Warning** | S'affiche et s'efface **seule** avec la cause. Jamais d'acquittement, aucun `Reset` impliqué. | `BypassOperatorComm actif` |
-| **Fault (à acquitter)** | Nécessite un geste opérateur conscient (`Reset`) pour être effacée, **même si la cause a disparu**. Si la cause **revient après acquittement**, l'alarme réapparaît et redemande un acquittement. | `EmergencyArmingFailed`, `SlackCableDetected` |
+| <nobr>**Info / Warning**</nobr> | S'affiche et s'efface **seule** avec la cause. Jamais d'acquittement, aucun `Reset` impliqué. | <small><code>BypassOperatorComm actif</code></small> |
+| <nobr>**Fault (à acquitter)**</nobr> | Nécessite un geste opérateur conscient (`Reset`) pour être effacée, **même si la cause a disparu**. Si la cause **revient après acquittement**, l'alarme réapparaît et redemande un acquittement. | <small><code>EmergencyArmingFailed</code><br><code>SlackCableDetected</code></small> |
 
 ### Le Reset n'est jamais conditionné
 
@@ -443,7 +444,7 @@ fait plus partie des nouveaux contrats LD.
 
 > 📌 Écritures de machine à état non standardisées avant ce REX — origine du flou diagnostic
 > terrain ("pourquoi ça bloque, sur quelle tempo"). Règles ci-dessous **normatives** ; squelettes
-> de code, exemples et détail : [`DOC/STDS/GUIDES/GUIDE_SEQUENCEUR.md`](GUIDES/GUIDE_SEQUENCEUR.md).
+> de code, exemples et détail : [`DOC/STDS/GUIDES/GUIDE_SEQUENCEUR_v1.2.md`](GUIDES/GUIDE_SEQUENCEUR_v1.2.md).
 
 | # | Règle |
 |---|---|
