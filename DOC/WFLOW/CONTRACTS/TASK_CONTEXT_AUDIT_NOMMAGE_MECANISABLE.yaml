@@ -1,0 +1,52 @@
+contract:
+  task_id: AUDIT_NOMMAGE_MECANISABLE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Recenser dans CODE/*.st toutes les occurrences (conformes et non conformes) des regles
+    de nommage mecaniquement verifiables (NC-010 a NC-090, DOC/STDS/NAMING_CONVENTION.md),
+    pour fournir un cahier des charges quantifie et reproductible au futur script
+    check_naming_style.py — sans modifier de code ni de norme.
+
+  acceptance:
+    - id: AC1
+      statement: "Pour chacune des regles NC-010, NC-020, NC-030, NC-050, NC-060, NC-070 (marquees Auto dans NAMING_CONVENTION.md), le rapport donne le nombre total d'occurrences conformes et non conformes trouvees dans CODE/*.st."
+      verified_by: "tableau recapitulatif du rapport, une ligne par NC-0xx, colonnes Conforme/Non-conforme/Total"
+    - id: AC2
+      statement: "Chaque non-conformite listee cite le chemin relatif du fichier, le numero de ligne exact et l'extrait de code concerne."
+      verified_by: "le nombre d'entrees fichier:ligne dans la section Non-conformites du rapport est identique au total Non-conforme annonce dans le tableau AC1, regle par regle"
+    - id: AC3
+      statement: "Pour chaque regle auditee, le rapport fournit la commande grep/regex exacte utilisee, reexecutable telle quelle sans reinterpretation."
+      verified_by: "l'orchestrateur reexecute chaque commande fournie sur CODE/ et verifie que le nombre de resultats correspond au total annonce dans le tableau AC1"
+    - id: AC4
+      statement: "Le rapport isole dans une section dediee les cas ambigus ou faux positifs potentiels (motif regex matche mais conformite douteuse au jugement humain), distincts de la liste brute de non-conformites."
+      verified_by: "presence d'une section '## Faux positifs potentiels' non vide si applicable, ou explicitement 'Aucun' avec justification courte"
+    - id: AC5
+      statement: "Aucun fichier de CODE/ ni de DOC/STDS/ n'est modifie par cette tache."
+      verified_by: "git diff --stat CODE/ DOC/STDS/ vide apres execution"
+
+  scope:
+    allowed:
+      - DOC/WFLOW/AUDITS/AUDIT_Nommage_Mecanisable_v1.0.md
+    forbidden:
+      - CODE/
+      - DOC/STDS/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  evidence_required:
+    - audit-report
+    - grep-commands-reexecuted
+    - changed-files
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Toute regle NC-0xx dont la detection s'avere non fiable en regex (trop de faux positifs
+    pour etre exploitable telle quelle par un futur script) est signalee explicitement dans
+    une section dediee du rapport, jamais noyee dans les resultats bruts. Aucune modification
+    de CODE/ ou DOC/STDS/ n'est tentee, meme pour corriger une non-conformite constatee — ce
+    lot est un audit de lecture, pas un refactor.

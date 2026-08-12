@@ -93,6 +93,50 @@ Détail complet (préfixes, suffixes d'unité, polarité booléenne, constructio
 
 ---
 
+## 2bis. Lisibilité des conditions booléennes (REX 2026-08-12)
+
+> 🚨 Cas vécu (`PRG_04_Treuils_Benne.st`) : `M1_StartStop_Active` combine 7 termes
+> (`AND`/`OR`/`NOT` imbriqués) sur une seule condition. Impossible en Watch CODESYS de voir
+> lequel bloque sans recalculer la condition à la main.
+
+**Règle** : une condition de plus de **3 termes** (comparaisons/`AND`/`OR`/`NOT` chaînés) est
+**scindée** en variables `BOOL` intermédiaires nommées (≤3 termes chacune), recombinées ensuite.
+Zéro changement fonctionnel — chaque variable intermédiaire devient observable seule en Watch.
+
+**Comparaison brute jamais niée inline.** Une comparaison (`=`, `<>`, `>`, `<`, `>=`, `<=`,
+notamment sur un `enum`) qui doit être combinée ou inversée dans une condition composée est
+**nommée d'abord**, puis réutilisée — jamais écrite `NOT (Mode = E_Mode.MAINT_N1)` au milieu
+d'une condition. Le lecteur lit un fait (`ModeIsMaint1`), il n'a pas à repasser par l'opérateur
+de comparaison pour comprendre ce qui est testé.
+
+```pascal
+// ❌ 7 termes sur une ligne, comparaison niée inline, illisible en debug
+M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
+                        AND NOT CoupledMotionBlockedByBucket
+                        AND NOT ((SyncMinorDeviationBlocksUp AND (M1_Direction_Active = 1))
+                             OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
+                        AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
+
+// ✅ décomposé, chaque comparaison nommée avant d'être combinée/niée
+M1_DirectionRequested  := (M1_Direction_Active <> 0);
+M1_BucketFree           := NOT instBucket.Busy AND NOT CoupledMotionBlockedByBucket;
+M1_SyncBlocksDirection := (SyncMinorDeviationBlocksUp AND (M1_Direction_Active = 1))
+                       OR (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1));
+M1_JoystickAuthorized  := NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed;
+
+M1_MotionAllowed    := M1_DirectionRequested AND M1_BucketFree AND NOT M1_SyncBlocksDirection;
+M1_StartStop_Active := M1_MotionAllowed AND M1_JoystickAuthorized;
+```
+
+📌 **Portée** : s'applique aux **nouvelles écritures et aux refactors futurs**, pas de retouche
+rétroactive du code existant à l'occasion de cette règle. Même logique pour la cohérence de
+nommage `NAMING_CONVENTION.md` : l'écart déjà présent dans le code (noms longs plutôt
+qu'abréviations anglaises courtes) n'est **pas** corrigé maintenant — mais toute variable créée
+ou renommée à l'occasion d'un refactor ou d'une nouvelle fonctionnalité **doit** appliquer la
+convention de façon cohérente avec le reste du projet, pas seulement localement.
+
+---
+
 ## 3. Liaison — la vérification qui manquait (REX 2026-07-29)
 
 > ⛔ **Un bundle généré, des tests Python verts ou un XML bien formé ne prouvent JAMAIS
@@ -221,6 +265,18 @@ Sécurité et défauts
 Logique métier
 États et sorties
 Diagnostic / IHM
+```
+
+```mermaid
+flowchart TD
+    A["En-tête — rôle, doc source, sécurité, dépendances"] --> B["Déclarations d'interface — VAR_INPUT / VAR_OUTPUT / VAR_IN_OUT"]
+    B --> C["Déclarations internes — VAR, VAR CONSTANT"]
+    C --> D["Initialisation / gates — Enable, PowerContactorEngaged"]
+    D --> E["Reset sur front"]
+    E --> F["Sécurité et défauts"]
+    F --> G["Logique métier"]
+    G --> H["États et sorties"]
+    H --> I["Diagnostic / IHM"]
 ```
 
 En-tête minimal obligatoire :
@@ -383,6 +439,25 @@ Les tests couvrent les rungs LD actifs, les contacts inversés, l'absence d'inVa
 sur les pages BOOL et la coil reliée à `.State` pour chaque block actif. `FB_Input` historique ne
 fait plus partie des nouveaux contrats LD.
 
+## 11bis. Séquenceurs et machines à état (REX 2026-08-12)
+
+> 📌 Écritures de machine à état non standardisées avant ce REX — origine du flou diagnostic
+> terrain ("pourquoi ça bloque, sur quelle tempo"). Règles ci-dessous **normatives** ; squelettes
+> de code, exemples et détail : [`DOC/STDS/GUIDES/GUIDE_SEQUENCEUR.md`](GUIDES/GUIDE_SEQUENCEUR.md).
+
+| # | Règle |
+|---|---|
+| R1 | `CASE` obligatoire sur enum unique. SET/RESET par étape interdit. |
+| R2 | Label runtime = `"Xn - texte métier"`, toujours le numéro et le texte ensemble. |
+| R2bis | Gabarit `X0..Xn` autorisé en brouillon ; renommage sémantique ensuite, préfixe `Xn` conservé. |
+| R3 | Graphe linéaire ; sous-graphes linéaires ; sauts autorisés seulement s'ils rejoignent le tronc. |
+| R4 | Dernière étape = synchronisation finale nommée et documentée, jamais un simple bit `Done` isolé. |
+| R5 | `TON` scaffold sur chaque bloc de transition, commenté `Xi→Xj : <ce qu'on teste>`. |
+| R6 | Front partagé ≥2 consommateurs (entrée ou `GVL_IHM.*.Cmd`) → centralisé `PRG_02_Acquisition`, jamais `PRG_07_Supervision`. Front à consommateur unique → reste local. |
+| R7 | `FB_Edge` (nouveau, sans lien avec `FB_Input` retiré §10-11) : une instance par entrée qualifiée dans `PRG_02_Acquisition`, sorties `.R`/`.F`, systématique, sans paramètre. |
+| R8 | Porte d'initialisation en tête de FB (`NOT Enable OR NOT PowerContactorEngaged`) : sorties sûres, retour à la **première** étape (jamais intermédiaire), `RETURN` immédiat. |
+| R9 | `<StateField>AtError` mémorise l'étape **spécifique** (pas `E_State` générique) au moment du défaut, capturée avant la bascule vers `ERROR_HOLD`. |
+
 ## 12. Checklist de restitution (bloquante)
 
 ```text
@@ -397,6 +472,7 @@ fait plus partie des nouveaux contrats LD.
 [ ] Non-régression : appelants/IHM/diagnostics identifiés et mis à jour
 [ ] Défaut à acquitter : Reset jamais conditionné (§9) ; Warning auto-effaçable distingué du Fault
 [ ] Orchestration ST pur (.st) : découpage par sections commentées avec emojis, zéro logique métier inline, contrats DUT raccordés (§10)
+[ ] Séquenceur (§11bis) : CASE+enum unique (R1), label "Xn - texte" (R2), graphe linéaire (R3), synchronisation finale nommée (R4), TON scaffold par transition (R5), fronts centralisés si partagés (R6/R7), initialisation standard (R8), StateAtError spécifique (R9)
 [ ] Devoir d'alerte : toute ambiguïté signalée AVANT d'écrire, pas après
 ```
 
