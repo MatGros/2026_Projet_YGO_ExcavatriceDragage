@@ -119,7 +119,7 @@ ne le convertit pas depuis un `.st`. Le bundle decouvre et fusionne ce fichier
 XML natif tel quel dans la sequence canonique de l'etape 6 ci-dessous.
 
 **Reference de syntaxe reelle :**
-`TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_CFC_3FB.xml`
+`TOOLS/SAMPLES_CODESYS/PRG_CFC_3FB.xml`
 (export CODESYS V3.5 SP19 Patch 1, trois FB). Ce sample est une reference de
 **structure XML**, pas de geometrie : ses connecteurs en `(0,0)` ne doivent pas
 etre recopies (regle de visibilite ci-dessous).
