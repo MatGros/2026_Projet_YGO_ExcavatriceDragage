@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_hw_name_collision.py"
-SPEC = importlib.util.spec_from_file_location("check_hw_name_collision", SCRIPT)
-assert SPEC is not None and SPEC.loader is not None
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "G350_check_hw_name_collision.py"
+SPEC = importlib.util.spec_from_file_location("G350_check_hw_name_collision", SCRIPT)
+
 check_hw_name_collision = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = check_hw_name_collision
 SPEC.loader.exec_module(check_hw_name_collision)
@@ -54,7 +54,7 @@ def test_declaration_dans_prg_non_acquisition_est_une_erreur(tmp_path, monkeypat
         encoding="utf-8",
     )
 
-    monkeypatch.setattr(sys, "argv", ["check_hw_name_collision.py", str(root)])
+    monkeypatch.setattr(sys, "argv", ["G350_check_hw_name_collision.py", str(root)])
     exit_code = check_hw_name_collision.main()
     assert exit_code == 1
 
@@ -72,7 +72,7 @@ def test_frontiere_acquisition_est_exemptee(tmp_path, monkeypatch) -> None:
         encoding="utf-8",
     )
 
-    monkeypatch.setattr(sys, "argv", ["check_hw_name_collision.py", str(root)])
+    monkeypatch.setattr(sys, "argv", ["G350_check_hw_name_collision.py", str(root)])
     exit_code = check_hw_name_collision.main()
     assert exit_code == 0
 
@@ -94,13 +94,13 @@ def test_pending_field_verification_est_warn_pas_error(tmp_path, monkeypatch) ->
         encoding="utf-8",
     )
 
-    monkeypatch.setattr(sys, "argv", ["check_hw_name_collision.py", str(root)])
+    monkeypatch.setattr(sys, "argv", ["G350_check_hw_name_collision.py", str(root)])
     exit_code = check_hw_name_collision.main()
     assert exit_code == 0, "PENDING_FIELD_VERIFICATION doit rester non-bloquant (WARN)"
 
 
 def test_codebase_reelle_ne_regresse_pas(monkeypatch) -> None:
     """Preuve de non-regression : le vrai depot, apres le fix M1/M2/M3, doit rester PASS."""
-    monkeypatch.setattr(sys, "argv", ["check_hw_name_collision.py", str(REPO_ROOT)])
+    monkeypatch.setattr(sys, "argv", ["G350_check_hw_name_collision.py", str(REPO_ROOT)])
     exit_code = check_hw_name_collision.main()
     assert exit_code == 0

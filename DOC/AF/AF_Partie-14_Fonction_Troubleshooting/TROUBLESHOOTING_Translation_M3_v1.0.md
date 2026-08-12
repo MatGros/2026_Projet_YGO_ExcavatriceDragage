@@ -13,8 +13,8 @@
 
 ## ⚠️ Prérequis à lire AVANT tout essai (état du code au 2026-08-05, mis à jour après LOT0/M4/LOT3/LOT2 + audit sécurité)
 
-Les 4 lots identifiés le 2026-08-05 sont **implémentés et vérifiés côté code** (`check_linkage.py`,
-`check_ld_invariants.py` PASS). Un audit sécurité indépendant a ensuite trouvé 2 trous **encore
+Les 4 lots identifiés le 2026-08-05 sont **implémentés et vérifiés côté code** (`G200_check_linkage.py`,
+`G410_check_ld_invariants.py` PASS). Un audit sécurité indépendant a ensuite trouvé 2 trous **encore
 réels** qui bloquent ou dégradent un essai M3 — à ne pas confondre avec un défaut terrain :
 
 | # | Trou | État | Effet sur l'essai | Réf. |

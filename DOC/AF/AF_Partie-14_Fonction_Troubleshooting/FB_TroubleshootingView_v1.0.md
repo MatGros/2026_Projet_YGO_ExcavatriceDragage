@@ -167,7 +167,7 @@ Ce FB ne doit pas être bloqué par ces 4 points : ils sont publiés à `0`/`FAL
 | TC-P14-TSV-01 | `FB_TroubleshootingView` n'a aucune `VAR_OUTPUT` de commande | Lecture interface |
 | TC-P14-TSV-02 | Chaque champ `GVL_Troubleshooting.*` a un producteur documenté en §5 | Revue de cette fiche |
 | TC-P14-TSV-03 | Aucun champ TBD (§6) n'affiche une valeur laissant croire à une mesure réelle | Revue code + commentaire explicite |
-| TC-P14-TSV-04 | `check_linkage.py` : instance unique, appelée dans `PRG_07_Supervision` seul | `check_linkage.py --report` |
+| TC-P14-TSV-04 | `G200_check_linkage.py` : instance unique, appelée dans `PRG_07_Supervision` seul | `G200_check_linkage.py --report` |
 | TC-P14-TSV-05 | Aucune régression sur les gates existants | `run_all_gates.py` |
 
 ## 9. Documents liés

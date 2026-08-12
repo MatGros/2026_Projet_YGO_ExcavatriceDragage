@@ -72,8 +72,8 @@ Chaque `.pi-subagents/artifacts/*_meta.json` enregistre le modèle **réellement
 La preuve est donc déjà dans le dépôt ; il suffit de la lire.
 
 ```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/check_model_routing.py            # gate (bloquant)
-python TOOLS/AGENT_WORKFLOW/scripts/check_model_routing.py --inventory # qui a fait quoi
+python TOOLS/AGENT_WORKFLOW/scripts/G220_check_model_routing.py            # gate (bloquant)
+python TOOLS/AGENT_WORKFLOW/scripts/G220_check_model_routing.py --inventory # qui a fait quoi
 ```
 
 | Contrôle | Détecte |

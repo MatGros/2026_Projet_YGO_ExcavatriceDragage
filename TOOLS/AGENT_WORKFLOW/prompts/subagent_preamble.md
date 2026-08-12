@@ -69,19 +69,19 @@ spontanée. Continuer en silence sur un doute est la faute ; le signaler ne l'es
 ## Vérification mécanique avant de rendre le lot
 
 ```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
 ```
 
 ⛔ Un bundle généré ou des tests Python verts **ne prouvent pas** qu'une fonction est reliée.
-Seul `check_linkage.py` le prouve. Le bloc `Auto-vérification liaison` qu'il produit doit
+Seul `G200_check_linkage.py` le prouve. Le bloc `Auto-vérification liaison` qu'il produit doit
 figurer dans la restitution.
 
 ## Format de restitution attendu
 
 ```text
-Auto-vérification liaison (check_linkage.py) — PASS|FAIL
+Auto-vérification liaison (G200_check_linkage.py) — PASS|FAIL
   OK  <instance> : <FB> — déclarée <fichier>:<ligne> · appelée :<ligne>
   ...
 Gates : structure / style / liaison / persistance / bundle / pytest = PASS|FAIL

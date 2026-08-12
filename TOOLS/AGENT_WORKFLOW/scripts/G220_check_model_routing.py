@@ -21,8 +21,8 @@ Controles :
   M4  modele inconnu du catalogue (routage non maitrise)
 
 Usage :
-  python TOOLS/AGENT_WORKFLOW/scripts/check_model_routing.py
-  python TOOLS/AGENT_WORKFLOW/scripts/check_model_routing.py --inventory
+  python TOOLS/AGENT_WORKFLOW/scripts/G220_check_model_routing.py
+  python TOOLS/AGENT_WORKFLOW/scripts/G220_check_model_routing.py --inventory
 """
 
 from __future__ import annotations

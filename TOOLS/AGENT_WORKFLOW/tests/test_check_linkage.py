@@ -10,7 +10,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_linkage.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "G200_check_linkage.py"
 
 FB_INTERLOCK = """\
 FUNCTION_BLOCK PUBLIC FB_Interlock
@@ -214,7 +214,7 @@ Dummy := TRUE;
     # commentaires et docstrings, qui eux ont le droit d'en parler.
     import ast
 
-    source = (Path(__file__).resolve().parents[1] / "scripts" / "check_linkage.py").read_text(
+    source = (Path(__file__).resolve().parents[1] / "scripts" / "G200_check_linkage.py").read_text(
         encoding="utf-8"
     )
     tree = ast.parse(source)
@@ -235,7 +235,7 @@ Dummy := TRUE;
         and id(node) not in docstrings
     ]
     faulty = [lit for lit in literals if "Device.export" in lit or "PROJ_Full_ImportExport" in lit]
-    assert not faulty, f"check_linkage ne doit jamais lire Device.export : {faulty}"
+    assert not faulty, f"G200_check_linkage ne doit jamais lire Device.export : {faulty}"
 
 
 def test_l13_fb_orphelin_jamais_instancie(tmp_path: Path) -> None:

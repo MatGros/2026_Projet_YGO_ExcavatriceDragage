@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_code_structure.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "G310_check_code_structure.py"
 
 
 def program(name: str) -> str:

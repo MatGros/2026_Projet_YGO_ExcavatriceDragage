@@ -41,10 +41,10 @@ tout moment exiger l'exécution complète, mais ce n'est pas le mode par défaut
 
 | <nobr>Palier</nobr> | Quand | <nobr>Tranche ID</nobr> | Outils | <nobr>Coût</nobr> |
 |---|---|---|---|---|
-| <nobr>**A** — bloc isolé</nobr> | Édition d'un bloc/fonction/FB/ST écrite **de façon isolée**, pas encore reliée à d'autres | <small><code>100</code>-<code>110</code></small> | <small><code>check_code_style.py</code><br><code>check_naming_style.py</code></small> | <nobr>instantané</nobr> |
-| <nobr>**B** — liens/dépendances</nobr> | Dès que l'édition crée des **liens/dépendances** avec d'autres blocs (appel d'instance, référence croisée) | <small><code>200</code>-<code>220</code></small> | <small><code>check_linkage.py --report</code></small> | <nobr>secondes</nobr> |
+| <nobr>**A** — bloc isolé</nobr> | Édition d'un bloc/fonction/FB/ST écrite **de façon isolée**, pas encore reliée à d'autres | <small><code>100</code>-<code>110</code></small> | <small><code>G100_check_code_style.py</code><br><code>G110_check_naming_style.py</code></small> | <nobr>instantané</nobr> |
+| <nobr>**B** — liens/dépendances</nobr> | Dès que l'édition crée des **liens/dépendances** avec d'autres blocs (appel d'instance, référence croisée) | <small><code>200</code>-<code>220</code></small> | <small><code>G200_check_linkage.py --report</code></small> | <nobr>secondes</nobr> |
 | <nobr>**C** — fin de lot</nobr> | Plusieurs fonctions codées, lot complet, avant d'annoncer terminé | <small><code>300</code>-<code>420</code></small> | <small><code>run_all_gates.py</code> + génération XML granulaire (`CODE_XML/`) + bundle agrégé (`CODE_XML/CODE_Bundle.xml`, construit **à partir** du granulaire)</small> | <nobr>secondes</nobr> |
-| <nobr>**D** — sur demande</nobr> | Validation explicite demandée par l'utilisateur, pas systématique | <small><code>500</code>-<code>510</code></small> | <small><code>check_codesys_compile.py</code> (log) / <code>test_codesys_compile.py &lt;Objet&gt;</code> (vrai compilateur, tâche de fond)</small> | <nobr>minutes</nobr> |
+| <nobr>**D** — sur demande</nobr> | Validation explicite demandée par l'utilisateur, pas systématique | <small><code>500</code>-<code>510</code></small> | <small><code>G500_check_codesys_compile.py</code> (log) / <code>test_codesys_compile.py &lt;Objet&gt;</code> (vrai compilateur, tâche de fond)</small> | <nobr>minutes</nobr> |
 
 `430`-`490` restent en réserve pour de futurs gates du palier C sans empiéter sur la tranche D.
 
@@ -63,40 +63,40 @@ tout moment exiger l'exécution complète, mais ce n'est pas le mode par défaut
 
 | <nobr>ID Gate</nobr> | <nobr>Script</nobr> | Vérifie |
 |---|---|---|
-| <nobr><code>100</code></nobr> | <small><code>check_code_style.py</code></small> | Style (`VAR_OUTPUT`, simulation) |
-| <nobr><code>110</code></nobr> | <small><code>check_naming_style.py</code></small> | Nommage IEC 61131-3 (`NC-010`→`NC-070`, informatif, baseline) |
+| <nobr><code>100</code></nobr> | <small><code>G100_check_code_style.py</code></small> | Style (`VAR_OUTPUT`, simulation) |
+| <nobr><code>110</code></nobr> | <small><code>G110_check_naming_style.py</code></small> | Nommage IEC 61131-3 (`NC-010`→`NC-070`, informatif, baseline) |
 
 ### Palier B — `200`-`220`
 
 | <nobr>ID Gate</nobr> | <nobr>Script</nobr> | Vérifie |
 |---|---|---|
-| <nobr><code>200</code></nobr> | <small><code>check_linkage.py</code></small> | Liaison — **seule preuve de câblage réel**, `§3` |
-| <nobr><code>210</code></nobr> | <small><code>check_cfc_wiring.py</code></small> | Câblage CFC natif |
-| <nobr><code>220</code></nobr> | <small><code>check_model_routing.py</code></small> | Routage modèle (Pi Subagents) |
+| <nobr><code>200</code></nobr> | <small><code>G200_check_linkage.py</code></small> | Liaison — **seule preuve de câblage réel**, `§3` |
+| <nobr><code>210</code></nobr> | <small><code>G210_check_cfc_wiring.py</code></small> | Câblage CFC natif |
+| <nobr><code>220</code></nobr> | <small><code>G220_check_model_routing.py</code></small> | Routage modèle (Pi Subagents) |
 
 ### Palier C — `300`-`420`
 
 | <nobr>ID Gate</nobr> | <nobr>Script</nobr> | Vérifie |
 |---|---|---|
-| <nobr><code>300</code></nobr> | <small><code>check_structure.py</code></small> | Structure générale du dépôt |
-| <nobr><code>310</code></nobr> | <small><code>check_code_structure.py</code></small> | Structure `CODE/` (POU, suffixe, ordre) |
-| <nobr><code>320</code></nobr> | <small><code>check_bundle_main_coverage.py</code></small> | Couverture `MAIN` dans le bundle |
-| <nobr><code>330</code></nobr> | <small><code>check_type_safety.py</code></small> | Sécurité des types/membres `STRUCT` |
-| <nobr><code>340</code></nobr> | <small><code>check_doc_links.py</code></small> | Liens documentaires (`DOC/`) |
-| <nobr><code>350</code></nobr> | <small><code>check_hw_name_collision.py</code></small> | Collision noms HW (REX 2026-08-05, `§3bis`) |
-| <nobr><code>360</code></nobr> | <small><code>check_direction_change_interlock.py</code></small> | Interlock changement de sens |
-| <nobr><code>370</code></nobr> | <small><code>check_position_calibration_wiring.py</code></small> | Câblage position calibrée |
-| <nobr><code>380</code></nobr> | <small><code>check_config_persistence.py</code></small> | Persistance config (RETAIN/PERSISTENT) |
-| <nobr><code>390</code></nobr> | <small><code>check_bundle_freshness.py</code></small> | Fraîcheur du bundle vs. sources |
-| <nobr><code>400</code></nobr> | <small><code>check_bundle_st_syntax.py</code></small> | Syntaxe ST du bundle (no terminator) |
-| <nobr><code>410</code></nobr> | <small><code>check_ld_invariants.py</code></small> | Invariants LD `PRG_06_Outputs_LD` |
+| <nobr><code>300</code></nobr> | <small><code>G300_check_structure.py</code></small> | Structure générale du dépôt |
+| <nobr><code>310</code></nobr> | <small><code>G310_check_code_structure.py</code></small> | Structure `CODE/` (POU, suffixe, ordre) |
+| <nobr><code>320</code></nobr> | <small><code>G320_check_bundle_main_coverage.py</code></small> | Couverture `MAIN` dans le bundle |
+| <nobr><code>330</code></nobr> | <small><code>G330_check_type_safety.py</code></small> | Sécurité des types/membres `STRUCT` |
+| <nobr><code>340</code></nobr> | <small><code>G340_check_doc_links.py</code></small> | Liens documentaires (`DOC/`) |
+| <nobr><code>350</code></nobr> | <small><code>G350_check_hw_name_collision.py</code></small> | Collision noms HW (REX 2026-08-05, `§3bis`) |
+| <nobr><code>360</code></nobr> | <small><code>G360_check_direction_change_interlock.py</code></small> | Interlock changement de sens |
+| <nobr><code>370</code></nobr> | <small><code>G370_check_position_calibration_wiring.py</code></small> | Câblage position calibrée |
+| <nobr><code>380</code></nobr> | <small><code>G380_check_config_persistence.py</code></small> | Persistance config (RETAIN/PERSISTENT) |
+| <nobr><code>390</code></nobr> | <small><code>G390_check_bundle_freshness.py</code></small> | Fraîcheur du bundle vs. sources |
+| <nobr><code>400</code></nobr> | <small><code>G400_check_bundle_st_syntax.py</code></small> | Syntaxe ST du bundle (no terminator) |
+| <nobr><code>410</code></nobr> | <small><code>G410_check_ld_invariants.py</code></small> | Invariants LD `PRG_06_Outputs_LD` |
 | <nobr><code>420</code></nobr> | <small><code>pytest</code></small> | Tests gates (`AGENT_WORKFLOW/tests/`) + convertisseur ST→XML (`ST_PLCOPENXML_GENERATOR/tests/`) |
 
 ### Palier D — `500`-`510`
 
 | <nobr>ID Gate</nobr> | <nobr>Script</nobr> | Vérifie |
 |---|---|---|
-| <nobr><code>500</code></nobr> | <small><code>check_codesys_compile.py</code></small> *(optionnel)* | Analyse d'un log de compilation CODESYS déjà produit |
+| <nobr><code>500</code></nobr> | <small><code>G500_check_codesys_compile.py</code></small> *(optionnel)* | Analyse d'un log de compilation CODESYS déjà produit |
 | <nobr><code>510</code></nobr> | <small><code>test_codesys_compile.py</code></small> | Vrai compilateur CODESYS headless (`codesys.exe --noUI`) |
 
 ---
@@ -123,8 +123,8 @@ est **généré à partir** des XML granulaires du même dossier (`CODE_XML/*.xm
 directement depuis les sources `.st` par un chemin séparé.
 
 ⚠️ **Non câblé aujourd'hui** (reliquat, §5) : `generate_codesys_bundle.py` écrit encore
-`CODE/CODE_Bundle.xml`, et `check_linkage.py` (Gate `200`) lit ce même chemin en dur pour ses
-vérifications L5. Relocaliser le bundle sans adapter `check_linkage.py` casserait la preuve de
+`CODE/CODE_Bundle.xml`, et `G200_check_linkage.py` (Gate `200`) lit ce même chemin en dur pour ses
+vérifications L5. Relocaliser le bundle sans adapter `G200_check_linkage.py` casserait la preuve de
 liaison — chantier à faire ensemble, pas en isolation.
 
 ---
@@ -134,9 +134,9 @@ liaison — chantier à faire ensemble, pas en isolation.
 - **Renommage de `run_all_gates.py`** vers les `ID Gate` ci-dessus (le script affiche encore les
   anciens titres `GATE 1bis`/`GATE 2quater`...) : chantier séparé, pas fait.
 - **Relocalisation du bundle** `CODE/CODE_Bundle.xml` → `CODE_XML/CODE_Bundle.xml` : décidée
-  (ci-dessus), mais `generate_codesys_bundle.py` et `check_linkage.py` (Gate `200`) doivent être
+  (ci-dessus), mais `generate_codesys_bundle.py` et `G200_check_linkage.py` (Gate `200`) doivent être
   adaptés ensemble — pas fait.
-- **Palier B en pratique** : `check_linkage.py` existe et fonctionne déjà mid-édition, mais rien
+- **Palier B en pratique** : `G200_check_linkage.py` existe et fonctionne déjà mid-édition, mais rien
   n'automatise son déclenchement dès qu'un lien apparaît — c'est aujourd'hui une discipline
   documentée, pas un hook.
 - **Audit du nombre de tests** (`AGENT_WORKFLOW/tests/` : 13 fichiers · `ST_PLCOPENXML_GENERATOR/tests/` : ~15 fichiers) : pas revu fichier par fichier pour identifier d'éventuels tests redondants ou obsolètes — chantier distinct, à traiter un par un plutôt qu'à la louche.
@@ -145,7 +145,7 @@ liaison — chantier à faire ensemble, pas en isolation.
 
 ## 📚 Documents liés
 
-- [`CODE_QUALITY_STANDARDS.md §3`](../CODE_QUALITY_STANDARDS.md) — pourquoi `check_linkage.py` est non négociable.
+- [`CODE_QUALITY_STANDARDS.md §3`](../CODE_QUALITY_STANDARDS.md) — pourquoi `G200_check_linkage.py` est non négociable.
 - [`GUIDE_SEQUENCEUR_v1.2.md`](GUIDE_SEQUENCEUR_v1.2.md) — norme d'écriture des séquenceurs (sujet différent, même famille de guides).
 - `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md` — criticité C0-C4, voies Fast/Standard/Safety (processus humain↔agent, pas la liste des gates).
 - `DOC/WFLOW/RAPPORT_LINTER_ET_WORKFLOW_CODESYS.md` — rapport d'origine ayant introduit `CODE_XML/`, `test_codesys_compile.py`, `codesys_compilation_diag.py`.

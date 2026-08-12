@@ -141,10 +141,10 @@ contract:
   acceptance:
     - id: AC1
       statement: "Le nom de fichier est identique au nom de POU declare."
-      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py"
     - id: AC2
       statement: "Le suffixe de langage correspond au langage genere dans le bundle."
-      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py"
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py"
   scope:
     allowed:
       - CODE/MAIN/PRG_08_Modes_CFC.xml

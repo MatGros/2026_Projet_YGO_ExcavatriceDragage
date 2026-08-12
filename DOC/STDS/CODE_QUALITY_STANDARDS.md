@@ -156,7 +156,7 @@ Quatre faits doivent être **prouvés par recherche**, jamais déduits :
 🤖 **Ce n'est plus à faire de tête** — c'est mécanique et obligatoire :
 
 ```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 ```
 
 Le résultat (bloc `Auto-vérification liaison`) est **collé dans la restitution du lot**.
@@ -192,7 +192,7 @@ qui recréerait la collision.
 
 🤖 **Vérification automatique** :
 ```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/check_hw_name_collision.py .
+python TOOLS/AGENT_WORKFLOW/scripts/G350_check_hw_name_collision.py .
 ```
 Intégré à `run_all_gates.py` (GATE 2quinquies). Toute nouvelle collision est bloquante (`ERROR`).
 
@@ -462,9 +462,9 @@ fait plus partie des nouveaux contrats LD.
 ## 12. Checklist de restitution (bloquante)
 
 ```text
-[ ] check_linkage.py --report = PASS, bloc collé dans la restitution
-[ ] check_doc_links.py = PASS (aucun lien mort, aucune version périmée)
-[ ] check_hw_name_collision.py = PASS (aucune variable PRG_* homonyme d'un point Device_IO, §3bis)
+[ ] G200_check_linkage.py --report = PASS, bloc collé dans la restitution
+[ ] G340_check_doc_links.py = PASS (aucun lien mort, aucune version périmée)
+[ ] G350_check_hw_name_collision.py = PASS (aucune variable PRG_* homonyme d'un point Device_IO, §3bis)
 [ ] Nommage conforme DOC/STDS/NAMING_CONVENTION.md
 [ ] Aucune variable/instance déclarée non utilisée
 [ ] Aucun nombre magique ; constantes nommées

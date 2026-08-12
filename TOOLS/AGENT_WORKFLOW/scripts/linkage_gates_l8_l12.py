@@ -1,5 +1,5 @@
 """
-Gates L8-L12 pour check_linkage.py
+Gates L8-L12 pour G200_check_linkage.py
 
 L8  : VAR_OUTPUT physique jamais assignée
 L9  : VAR_OUTPUT absent du mapping I/O (io_mapping.yaml)

@@ -46,7 +46,7 @@ L'objectif de cette session de travail était de fournir une solution complète,
   # Analyse explicative d'un texte d'erreur brut
   python TOOLS/AGENT_WORKFLOW/scripts/codesys_compilation_diag.py --text "C0037: 'MyVar' est un identificateur non défini"
   ```
-* **Intégration Gate** : Directement câblé dans `check_codesys_compile.py` (Gate 6).
+* **Intégration Gate** : Directement câblé dans `G500_check_codesys_compile.py` (Gate 6).
 
 ---
 

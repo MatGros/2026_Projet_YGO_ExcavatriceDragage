@@ -5,8 +5,8 @@ This does NOT compile CODESYS (no headless API). It validates the compilation
 log exported from CODESYS after a manual build.
 
 Usage:
-    python check_codesys_compile.py --log build.log
-    python check_codesys_compile.py --log build.log --strict
+    python G500_check_codesys_compile.py --log build.log
+    python G500_check_codesys_compile.py --log build.log --strict
 
 Exit codes:
     0 = PASS (0 errors)

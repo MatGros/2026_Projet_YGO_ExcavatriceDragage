@@ -6,9 +6,9 @@ import importlib.util
 import sys
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_code_style.py"
-SPEC = importlib.util.spec_from_file_location("check_code_style", SCRIPT)
-assert SPEC is not None and SPEC.loader is not None
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "G100_check_code_style.py"
+SPEC = importlib.util.spec_from_file_location("G100_check_code_style", SCRIPT)
+
 check_code_style = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = check_code_style
 SPEC.loader.exec_module(check_code_style)

@@ -126,7 +126,7 @@
 ### Commande exécutée
 
 ```bash
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 ```
 
 ### Résultats observés
@@ -226,7 +226,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
 - Contrats de tâche : `TASK_L8_IMPLEMENTATION_CONTRACT.yaml`, `TASK_L9_L10_L11_L12_CONTRACTS.yaml`
 - Code livré : `TOOLS/AGENT_WORKFLOW/scripts/linkage_gates_l8_l12.py` (15.4 KB)
 - Tests : `tests/test_l8_l12.py` (13.9 KB) — 13/13 PASSED
-- Intégration : `TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py` (modifié)
+- Intégration : `TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py` (modifié)
 - Config : `TOOLS/AGENT_WORKFLOW/config/io_mapping.yaml` (7.3 KB template)
 - Docs : `TOOLS/AGENT_WORKFLOW/docs/L8_*.md` (critique, spec, plan)
 - Rapport final : Ce document

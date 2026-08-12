@@ -49,7 +49,7 @@ Lire **la version active** (suffixe `_vX.Y` le plus élevé à la racine de `DOC
 ✋ Si une règle DOC contredit la demande → signaler **avant** de coder.
 
 💡 Les liens de version sont maintenus automatiquement :
-`python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py --fix`.
+`python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py --fix`.
 
 ---
 
@@ -122,12 +122,12 @@ pour des preuves jamais réellement exécutées en CODESYS (`CODE/TESTS/` archiv
 > tous ces contrôles (REX 2026-07-29).
 
 ```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
 ```
 
-- `check_linkage.py` prouve : instance déclarée là où elle doit vivre, appelée dans le même POU,
+- `G200_check_linkage.py` prouve : instance déclarée là où elle doit vivre, appelée dans le même POU,
   aucune orpheline ailleurs, références croisées valides, `typeName` du bundle = type déclaré,
   programme présent dans la configuration de tâche.
 - Le bloc **`Auto-vérification liaison`** produit par `--report` est **collé dans la restitution**.
@@ -182,7 +182,7 @@ Attendre le **nouvel export** utilisateur (`Device.export` régénéré) → rep
 - [ ] Architecture + existant analysés (appelants inclus)
 - [ ] Plan groupé par concept **validé par l'utilisateur**
 - [ ] Code ST commenté FR + emoji dans `CODE/<DOSSIER>/*.st`
-- [ ] `check_linkage.py --report` = PASS, bloc collé dans la restitution **(bloquant)**
+- [ ] `G200_check_linkage.py --report` = PASS, bloc collé dans la restitution **(bloquant)**
 - [ ] `CODE/CODE_Bundle.xml` régénéré + `run_all_gates.py` = PASS **(bloquant)**
 - [ ] Si C3/C4/safety : tests PLC implémentés + exécutés **(bloquant)**
 - [ ] Doc métier + note d'application dans `DOC/AF_Partie-N_Fonction_*`

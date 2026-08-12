@@ -52,24 +52,26 @@ def main() -> int:
         py313 = Path(sys.executable)
 
     S = "TOOLS/AGENT_WORKFLOW/scripts"
+    # ID Gate (G<ID>) = identifiant principal (GUIDE_GATES_ET_TESTS_v1.2.md) ;
+    # l'ancien titre GATE N/Nbis/... est conserve en suffixe pour la tracabilite.
     plan: list[tuple[str, list[str]]] = [
-        ("GATE 1: Structure",                          [sys.executable, f"{S}/check_structure.py"]),
-        ("GATE 1bis: Structure CODE (POU, suffixe, ordre)", [sys.executable, f"{S}/check_code_structure.py"]),
-        ("GATE 1ter: Couverture MAIN du bundle", [sys.executable, f"{S}/check_bundle_main_coverage.py"]),
-        ("GATE 1quater: Securite des types et membres STRUCT", [sys.executable, f"{S}/check_type_safety.py"]),
-        ("GATE 2: Code style (VAR_OUTPUT, simulation)", [sys.executable, f"{S}/check_code_style.py", "CODE"]),
-        ("GATE 2bis: LIAISON (instances, refs, bundle)", [sys.executable, f"{S}/check_linkage.py"]),
-        ("GATE 2bis-bis: Cablage CFC natif",           [sys.executable, f"{S}/check_cfc_wiring.py"]),
-        ("GATE 2ter: Routage modele",                  [sys.executable, f"{S}/check_model_routing.py"]),
-        ("GATE 2quater: Liens documentaires",          [sys.executable, f"{S}/check_doc_links.py"]),
-        ("GATE 2quinquies: Collision noms HW (REX 2026-08-05)", [sys.executable, f"{S}/check_hw_name_collision.py", "."]),
-        ("GATE 2sexies: Interlock changement de sens (REX 2026-08-05)", [sys.executable, f"{S}/check_direction_change_interlock.py", "."]),
-        ("GATE 2septies: Cablage position calibree (REX 2026-08-06)", [sys.executable, f"{S}/check_position_calibration_wiring.py", "."]),
-        ("GATE 2octies: Nommage IEC (NC-010 a NC-070, informatif)", [sys.executable, f"{S}/check_naming_style.py", "CODE"]),
-        ("GATE 3: Persistance config",                 [sys.executable, f"{S}/check_config_persistence.py", "."]),
-        ("GATE 4: Fraicheur bundle",                   [sys.executable, f"{S}/check_bundle_freshness.py", "."]),
-        ("GATE 4bis: Syntaxe ST du bundle (no terminator)", [sys.executable, f"{S}/check_bundle_st_syntax.py", "."]),
-        ("GATE 4ter: Invariants LD PRG_06 (REX 2026-08-04)", [sys.executable, f"{S}/check_ld_invariants.py", "."]),
+        ("G300 — GATE 1: Structure",                          [sys.executable, f"{S}/G300_check_structure.py"]),
+        ("G310 — GATE 1bis: Structure CODE (POU, suffixe, ordre)", [sys.executable, f"{S}/G310_check_code_structure.py"]),
+        ("G320 — GATE 1ter: Couverture MAIN du bundle", [sys.executable, f"{S}/G320_check_bundle_main_coverage.py"]),
+        ("G330 — GATE 1quater: Securite des types et membres STRUCT", [sys.executable, f"{S}/G330_check_type_safety.py"]),
+        ("G100 — GATE 2: Code style (VAR_OUTPUT, simulation)", [sys.executable, f"{S}/G100_check_code_style.py", "CODE"]),
+        ("G200 — GATE 2bis: LIAISON (instances, refs, bundle)", [sys.executable, f"{S}/G200_check_linkage.py"]),
+        ("G210 — GATE 2bis-bis: Cablage CFC natif",           [sys.executable, f"{S}/G210_check_cfc_wiring.py"]),
+        ("G220 — GATE 2ter: Routage modele",                  [sys.executable, f"{S}/G220_check_model_routing.py"]),
+        ("G340 — GATE 2quater: Liens documentaires",          [sys.executable, f"{S}/G340_check_doc_links.py"]),
+        ("G350 — GATE 2quinquies: Collision noms HW (REX 2026-08-05)", [sys.executable, f"{S}/G350_check_hw_name_collision.py", "."]),
+        ("G360 — GATE 2sexies: Interlock changement de sens (REX 2026-08-05)", [sys.executable, f"{S}/G360_check_direction_change_interlock.py", "."]),
+        ("G370 — GATE 2septies: Cablage position calibree (REX 2026-08-06)", [sys.executable, f"{S}/G370_check_position_calibration_wiring.py", "."]),
+        ("G110 — GATE 2octies: Nommage IEC (NC-010 a NC-070, informatif)", [sys.executable, f"{S}/G110_check_naming_style.py", "CODE"]),
+        ("G380 — GATE 3: Persistance config",                 [sys.executable, f"{S}/G380_check_config_persistence.py", "."]),
+        ("G390 — GATE 4: Fraicheur bundle",                   [sys.executable, f"{S}/G390_check_bundle_freshness.py", "."]),
+        ("G400 — GATE 4bis: Syntaxe ST du bundle (no terminator)", [sys.executable, f"{S}/G400_check_bundle_st_syntax.py", "."]),
+        ("G410 — GATE 4ter: Invariants LD PRG_06 (REX 2026-08-04)", [sys.executable, f"{S}/G410_check_ld_invariants.py", "."]),
         ("GATE 5: PyTest",                             [str(py313), "-m", "pytest",
                                                         "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
                                                         "TOOLS/AGENT_WORKFLOW/tests", "-q"]),
@@ -81,8 +83,8 @@ def main() -> int:
             break
 
     if not args.skip_codesys and args.codesys_log:
-        gate("GATE 6: Compilation CODESYS", [
-            sys.executable, f"{S}/check_codesys_compile.py",
+        gate("G500 — GATE 6: Compilation CODESYS", [
+            sys.executable, f"{S}/G500_check_codesys_compile.py",
             "--log", str(args.codesys_log),
             "--max-warnings", "0" if args.strict else "10",
         ])

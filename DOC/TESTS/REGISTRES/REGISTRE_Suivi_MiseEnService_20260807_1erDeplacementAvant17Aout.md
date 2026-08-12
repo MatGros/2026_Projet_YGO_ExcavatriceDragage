@@ -127,7 +127,7 @@
 - 🎯 **Périmètre** : Gestion version — `CODE/` reste le **code actif** (travail de tous les agents/programmeurs) ; création d'un **dossier daté** = snapshot du dernier point qui fonctionne (`v0.5.25_DepartSoirEssai`)
 - 🚦 **Statut** : 🟢 **Décision actée** (création par l'utilisateur)
 - 🛠️ **Utilité** : Point de sauvegarde + **code exemple de référence** → permet aux agents/IA de **comparer le fonctionnement** et préserver les **fonctions qui marchent aujourd'hui**.
-- ⚠️ **Point à valider (emplacement)** : placer le snapshot **HORS de `CODE/`** (ex. `ARCHIVES/Code/…` ou racine repo) — sinon les outils qui scannent `CODE/*.st` (bundle PLCopenXML, `check_linkage.py`, gates) risquent de l'ingérer comme code actif et fausser la liaison/les gates.
+- ⚠️ **Point à valider (emplacement)** : placer le snapshot **HORS de `CODE/`** (ex. `ARCHIVES/Code/…` ou racine repo) — sinon les outils qui scannent `CODE/*.st` (bundle PLCopenXML, `G200_check_linkage.py`, gates) risquent de l'ingérer comme code actif et fausser la liaison/les gates.
 
 ---
 

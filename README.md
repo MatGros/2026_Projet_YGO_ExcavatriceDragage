@@ -97,8 +97,8 @@ Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
 ### 🤖 Vérifications obligatoires avant de restituer un lot
 
 ```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report    # liaison réelle (BLOQUANT)
-python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py            # liens/numérotation doc
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report    # liaison réelle (BLOQUANT)
+python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py            # liens/numérotation doc
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .  # bundle à jour
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py               # tous les gates
 ```
