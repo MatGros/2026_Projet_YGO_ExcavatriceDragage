@@ -53,7 +53,7 @@ VAR_OUTPUT
     M2InterlockEnable            : BOOL; (* Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2Safety.Error *)
     M3InterlockEnable            : BOOL; (* Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationSafety.Error *)
 
-    (* 🐛 FIX 2026-08-05 : les noms Device bruts (*_DQ/*_RQ, ex. M1_RelayFwd_Up_DQ,
+    (* 🐛 FIX 2026-08-05 : les noms Device bruts ( *_DQ / *_RQ ), ex. M1_RelayFwd_Up_DQ,
        M3_BrakeRelease_RQ) NE SONT PLUS déclarés ici — les déclarer créait une collision
        de portée avec la variable GLOBALE homonyme créée par le mapping E/S CODESYS
        (Device.export), qui masquait silencieusement le pilotage matériel réel (voir §2

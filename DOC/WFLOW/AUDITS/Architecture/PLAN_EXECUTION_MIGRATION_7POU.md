@@ -165,7 +165,7 @@ Contrainte structurelle : nom de fichier = nom de POU, suffixe = langage génér
 ### M8 — Conversion CFC natif *(C3, patch, itératif)*
 
 Une page `.xml` à la fois, sur le modèle
-`TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_CFC_3FB.xml`.
+`TOOLS/SAMPLES_CODESYS/PRG_CFC_3FB.xml`.
 
 Après chaque page : bundle → linkage → import CODESYS manuel → validation utilisateur.
 Jamais deux pages converties dans le même lot : l'import CODESYS est manuel et doit rester

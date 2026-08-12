@@ -879,7 +879,7 @@ def main():
     print("...")
     print(f"Total chars: {len(xml_str)}")
 
-    out_path = "TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_06_Outputs_LD_full.xml"
+    out_path = "TOOLS/SAMPLES_CODESYS/PRG_06_Outputs_LD_full.xml"
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(xml_str)
     print(f"Écrit: {out_path}")

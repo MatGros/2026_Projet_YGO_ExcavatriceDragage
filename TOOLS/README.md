@@ -15,7 +15,7 @@ TOOLS/
 ├── ST_PLCOPENXML_GENERATOR/  # Convertisseur ST → PLCopenXML (autonome)
     ├── generator/        # Code Python du générateur
     ├── tests/            # Unitaires, intégration, golden files (306 tests)
-    ├── samples_reference_codesys/
+    ├── SAMPLES_CODESYS/
     ├── test_import_poc/
     └── docs/
 ├── PROJECT_WORKSPACE/       # Environnement de travail du projet (Pi, AGY, Claude, Gates, Herdr, Graph)

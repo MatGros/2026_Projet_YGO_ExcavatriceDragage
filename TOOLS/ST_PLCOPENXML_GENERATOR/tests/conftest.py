@@ -7,4 +7,4 @@ if str(TOOLING_ROOT) not in sys.path:
 
 REPO_ROOT = TOOLING_ROOT.parent.parent
 CODE_DIR = REPO_ROOT / "CODE"
-SAMPLES_DIR = TOOLING_ROOT / "samples_reference_codesys"
+SAMPLES_DIR = TOOLING_ROOT.parent / "SAMPLES_CODESYS"

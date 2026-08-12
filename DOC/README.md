@@ -12,7 +12,7 @@
 | [STDS/CODE_QUALITY_STANDARDS.md](STDS/CODE_QUALITY_STANDARDS.md) | **Déclaration, liaison, POO, robustesse, non-régression** — propriétaire unique |
 | [STDS/NAMING_CONVENTION.md](STDS/NAMING_CONVENTION.md) | Nommage normatif (préfixes, unités, polarité, construction d'un nom) |
 | [WFLOW/AUDITS/REX_Nommage_v1.0.md](WFLOW/AUDITS/REX_Nommage_v1.0.md) | 📖 *Non normatif* : incidents fondateurs, chantiers différés, décisions rejetées |
-| [Sample CFC natif](../TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_CFC_3FB.xml) | Structure PLCopenXML exportée par CODESYS ; procédure normative dans AF_Partie-03 §5 |
+| [Sample CFC natif](../TOOLS/SAMPLES_CODESYS/PRG_CFC_3FB.xml) | Structure PLCopenXML exportée par CODESYS ; procédure normative dans AF_Partie-03 §5 |
 
 ## 📐 Spécifications fonctionnelles (sous `AF/`)
 
