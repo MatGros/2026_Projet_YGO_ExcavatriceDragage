@@ -280,7 +280,8 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI         := TRUE;
-Machine.BrakeThermalOk_DI          := TRUE;
-Machine.M1_M2_KoboldContactFond_DI := SimKoboldContactValue;
-Machine.HydraulicThermalOk_DI      := TRUE;
+Machine.PhaseRotationOk_DI             := TRUE;
+Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
+Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
+Machine.HydraulicThermalOk_DI          := TRUE;
+Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore câblé, simulé inactif par défaut

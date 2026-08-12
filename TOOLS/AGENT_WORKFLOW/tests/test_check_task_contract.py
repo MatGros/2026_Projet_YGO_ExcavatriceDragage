@@ -298,7 +298,7 @@ def test_campaign_raw_fallback(tmp_path: Path) -> None:
     )
     for name in names:
         result = run(
-            root / "DOC" / "CHECKLISTS" / "TASK_CONTEXT" / name,
+            root / "ARCHIVES" / "Doc" / "CONTRACTS" / name,
             disable_pyyaml=True,
         )
         assert result.returncode == 0, f"{name}: {result.stdout}{result.stderr}"

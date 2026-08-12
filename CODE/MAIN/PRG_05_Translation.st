@@ -251,7 +251,7 @@ instSafetyTranslationM3(
     JoystickOperational     := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     PhaseRotationOk         := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     DriveOnline             := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Online,
     DriveOperational        := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Operational,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,

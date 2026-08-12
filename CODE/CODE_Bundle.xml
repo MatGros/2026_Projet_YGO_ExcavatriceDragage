@@ -4761,20 +4761,20 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</html:xhtml>
                 <html:xhtml>Contrôle rotation phases élec. OK</html:xhtml>
               </documentation>
             </variable>
-            <variable name="BrakeThermalOk_DI">
+            <variable name="M1_M2_M3_BrakeThermalOk_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>Thermique frein M1/M2/M3 commun OK</html:xhtml>
+                <html:xhtml>Thermique frein M1/M2/M3 commun OK — 🆕 2026-08-12 : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</html:xhtml>
               </documentation>
             </variable>
-            <variable name="M1_M2_KoboldContactFond_DI">
+            <variable name="M1_M2_KoboldBottomTouch_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>Retour détecteur fond Kobold</html:xhtml>
+                <html:xhtml>Retour détecteur fond Kobold — 🆕 2026-08-12 : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</html:xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -4791,6 +4791,14 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</html:xhtml>
               </type>
               <documentation>
                 <html:xhtml>Autorisation démarrage crible (dépôt gravats)</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HopperFull_OR_GateRaised_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 2026-08-12 : Trémie pleine OU grille levée — pas encore câblé électriquement,</html:xhtml>
               </documentation>
             </variable>
           </struct>
@@ -20111,10 +20119,11 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI         := TRUE;
-Machine.BrakeThermalOk_DI          := TRUE;
-Machine.M1_M2_KoboldContactFond_DI := SimKoboldContactValue;
-Machine.HydraulicThermalOk_DI      := TRUE;
+Machine.PhaseRotationOk_DI             := TRUE;
+Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
+Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
+Machine.HydraulicThermalOk_DI          := TRUE;
+Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore câblé, simulé inactif par défaut
 </html:xhtml>
           </ST>
         </body>
@@ -26550,10 +26559,11 @@ HwReal.Operator.JOY1_DeviceState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState
 HwReal.Machine.PowerContactorEngaged_DI   := PowerContactorEngaged_DI;
 HwReal.Machine.EmergencyChainClosed_DI    := EmergencyChainClosed_DI;
 HwReal.Machine.PhaseRotationOk_DI         := PhaseRotationOk_DI;
-HwReal.Machine.BrakeThermalOk_DI          := BrakeThermalOk_DI;
-HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
-HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
-HwReal.Machine.ConveyorInfeedReady_DI     := ConveyorInfeedReady_DI;
+HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI  := M1_M2_M3_BrakeThermalOk_DI;
+HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
+HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
+HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
+HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
 
 // === 🧰 §1bis FILTRAGE TOR RÉEL ===
 // HwReal reste brut pour le diagnostic. HwRealQualified porte la même image
@@ -26566,14 +26576,17 @@ instFilterEmergencyChain(InputRaw := HwReal.Machine.EmergencyChainClosed_DI, Fil
 HwRealQualified.Machine.EmergencyChainClosed_DI := instFilterEmergencyChain.State;
 instFilterPhaseRotation(InputRaw := HwReal.Machine.PhaseRotationOk_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.PhaseRotationOk_DI := instFilterPhaseRotation.State;
-instFilterBrakeThermal(InputRaw := HwReal.Machine.BrakeThermalOk_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.BrakeThermalOk_DI := instFilterBrakeThermal.State;
-instFilterKobold(InputRaw := HwReal.Machine.M1_M2_KoboldContactFond_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.M1_M2_KoboldContactFond_DI := instFilterKobold.State;
+instFilterBrakeThermal(InputRaw := HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.M1_M2_M3_BrakeThermalOk_DI := instFilterBrakeThermal.State;
+instFilterKobold(InputRaw := HwReal.Machine.M1_M2_KoboldBottomTouch_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.M1_M2_KoboldBottomTouch_DI := instFilterKobold.State;
 instFilterHydraulicThermal(InputRaw := HwReal.Machine.HydraulicThermalOk_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.HydraulicThermalOk_DI := instFilterHydraulicThermal.State;
 instFilterConveyorReady(InputRaw := HwReal.Machine.ConveyorInfeedReady_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.ConveyorInfeedReady_DI := instFilterConveyorReady.State;
+// 🆕 2026-08-12 : HopperFull_OR_GateRaised_DI déclaré, pas encore filtré/consommé (pas de câblage
+// électrique confirmé) — pas de FB_DigitalInputFilter tant qu'aucun consommateur n'existe.
+HwRealQualified.Machine.HopperFull_OR_GateRaised_DI := HwReal.Machine.HopperFull_OR_GateRaised_DI;
 
 instFilterM1Contactors(InputRaw := HwReal.Winch.M1_ContactorsReleased_DI, FilterTime := T#20MS);
 HwRealQualified.Winch.M1_ContactorsReleased_DI := instFilterM1Contactors.State;
@@ -27566,7 +27579,7 @@ ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomCon
 // DESCENDANT Kobold pendant une descente couplée = fond touché, directement (voir bandeau §1).
 // Mêmes conditions de garde que la confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension,
 // pas de défaut, benne fermée -- réutilise le bloc de clear commun juste au-dessus).
-BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
+BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
    AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
    AND BypassKoboldFallEdge.Q THEN
@@ -27584,7 +27597,7 @@ instDiveSearch(
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection := MaintenanceMotionDirection,
     BucketIsOpen := _BucketState.IsOpen,
-    KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI,
+    KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     M1Position_M := PRG_02_Acquisition.CablePosM1,
     M2Position_M := PRG_02_Acquisition.CablePosM2,
     PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.M1_EncoderIncoherent
@@ -27978,9 +27991,9 @@ SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR
 // 🆕 2026-08-07 : FICHE 05 — Surveillance Kobold descente normale (hors FB_DiveSearch)
 // 🔧 2026-08-07 (compil CODESYS, retour terrain) : "HwIn.Winch.M1M2_KoboldImmersed_DI" n'existe
 // pas (ST_HwWinch n'a pas ce membre) -- corrigé vers le meme signal deja utilise par
-// instDiveSearch ci-dessus (§1, ligne KoboldImmersed), HwIn.Machine.M1_M2_KoboldContactFond_DI.
-KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
-KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
+// instDiveSearch ci-dessus (§1, ligne KoboldImmersed), HwIn.Machine.M1_M2_KoboldBottomTouch_DI.
+KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
+KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 
 // Levée du verrou au neutre du joystick/boutons ou si toggle désactivé
 IF PRG_02_Acquisition.instJoystick.AtNeutral OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
@@ -28060,7 +28073,7 @@ instSafetyWinchM1(
     EncoderAvailable       := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
-    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -28116,7 +28129,7 @@ instSafetyWinchM2(
     EncoderAvailable       := PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
-    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -28866,7 +28879,7 @@ instSafetyTranslationM3(
     JoystickOperational     := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     PhaseRotationOk         := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     DriveOnline             := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Online,
     DriveOperational        := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Operational,
     DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
@@ -31986,7 +31999,7 @@ GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
       OR (PRG_02_Acquisition.CablePosM2 &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
-GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI;
+GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
 GVL_IHM.Commun.PhaseRotationFault        := NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;
 
 // 💓 Publication heartbeat IHM↔PLC (T83, LOT0_DIAG_IHM_HEARTBEAT 2026-08-05)
@@ -32008,7 +32021,7 @@ instPreflight(
     M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     M1ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
     M2ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
-    BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     PhaseRotationOk           := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     SlackCableTensioned       := PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     M3SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,

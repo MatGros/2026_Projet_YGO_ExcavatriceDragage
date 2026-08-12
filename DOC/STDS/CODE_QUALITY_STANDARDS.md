@@ -12,7 +12,7 @@
 | <nobr>Comment on **nomme**</nobr> | `DOC/STDS/NAMING_CONVENTION.md` |
 | <nobr>Comment on **déclare, encapsule, relie**</nobr> | **ce document** |
 | <nobr>Comment on **édite une AF**</nobr> | **ce document §0** |
-| <nobr>Comment on **teste/vérifie**</nobr> | `DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.1.md` |
+| <nobr>Comment on **teste/vérifie**</nobr> | `DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md` |
 | <nobr>Contrats FB, DUT et CFC</nobr> | `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md` |
 | <nobr>Ce que fait la machine</nobr> | `DOC/` — voir `DOC/README.md` pour l'index complet |
 | <nobr>Comment on exécute une modif</nobr> | `.claude/skills/codesys-workflow.md` |
@@ -180,7 +180,7 @@ Une restitution sans ce bloc est incomplète, quel que soit l'agent qui l'écrit
 
 **Règle** : un `PROGRAM` ne déclare **jamais** de variable (`VAR`/`VAR_INPUT`/`VAR_OUTPUT`)
 portant le **nom exact** d'un point matériel du mapping E/S (`TOOLS/AGENT_WORKFLOW/config/
-Device_IO_20260806.csv`, colonne `Mapped variable`) — sauf `PRG_02_Acquisition`, seul POU dont
+Device_IO_*.csv`, le plus récent, colonne `Mapped variable`) — sauf `PRG_02_Acquisition`, seul POU dont
 le rôle architectural est de porter ces noms bruts en `VAR_INPUT` (AF_Partie-06 §1/§4).
 
 Un `FUNCTION_BLOCK` n'est pas concerné : ses paramètres sont toujours référencés via une

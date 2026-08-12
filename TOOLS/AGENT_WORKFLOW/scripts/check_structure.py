@@ -71,7 +71,7 @@ def check_doc(root: Path, errors: list[str], warnings: list[str]) -> None:
         errors.append(f"missing directory: {doc}")
         return
 
-    allowed_doc_dirs = {"AUDITS", "CHECKLISTS", "DIAGRAMS", "NAVBOARDS"}
+    allowed_doc_dirs = {"AF", "DIA", "STDS", "TESTS", "WFLOW"}
     fiche_folder = re.compile(r"^AF_Partie-\d{2}_")
     for entry in doc.iterdir():
         if entry.is_dir():

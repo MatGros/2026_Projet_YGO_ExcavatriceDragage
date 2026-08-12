@@ -179,7 +179,7 @@ ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomCon
 // DESCENDANT Kobold pendant une descente couplée = fond touché, directement (voir bandeau §1).
 // Mêmes conditions de garde que la confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension,
 // pas de défaut, benne fermée -- réutilise le bloc de clear commun juste au-dessus).
-BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
+BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
    AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
    AND BypassKoboldFallEdge.Q THEN
@@ -197,7 +197,7 @@ instDiveSearch(
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection := MaintenanceMotionDirection,
     BucketIsOpen := _BucketState.IsOpen,
-    KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI,
+    KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     M1Position_M := PRG_02_Acquisition.CablePosM1,
     M2Position_M := PRG_02_Acquisition.CablePosM2,
     PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.M1_EncoderIncoherent
@@ -591,9 +591,9 @@ SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR PRG_0
 // 🆕 2026-08-07 : FICHE 05 — Surveillance Kobold descente normale (hors FB_DiveSearch)
 // 🔧 2026-08-07 (compil CODESYS, retour terrain) : "HwIn.Winch.M1M2_KoboldImmersed_DI" n'existe
 // pas (ST_HwWinch n'a pas ce membre) -- corrigé vers le meme signal deja utilise par
-// instDiveSearch ci-dessus (§1, ligne KoboldImmersed), HwIn.Machine.M1_M2_KoboldContactFond_DI.
-KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
-KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldContactFond_DI);
+// instDiveSearch ci-dessus (§1, ligne KoboldImmersed), HwIn.Machine.M1_M2_KoboldBottomTouch_DI.
+KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
+KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 
 // Levée du verrou au neutre du joystick/boutons ou si toggle désactivé
 IF PRG_02_Acquisition.instJoystick.AtNeutral OR NOT GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent THEN
@@ -673,7 +673,7 @@ instSafetyWinchM1(
     EncoderAvailable       := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
-    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -729,7 +729,7 @@ instSafetyWinchM2(
     EncoderAvailable       := PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
-    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.BrakeThermalOk_DI,
+    BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,

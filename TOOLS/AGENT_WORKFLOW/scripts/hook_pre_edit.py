@@ -32,7 +32,7 @@ DOC = ROOT / "DOC"
 
 VERSIONED = re.compile(r"^AF_Partie-(?P<num>\d{2})_.+_v(?P<major>\d+)\.(?P<minor>\d+)\.md$")
 
-ALWAYS_REQUIRED = ["DOC/CODE_QUALITY_STANDARDS.md", "DOC/NAMING_CONVENTION.md"]
+ALWAYS_REQUIRED = ["DOC/STDS/CODE_QUALITY_STANDARDS.md", "DOC/STDS/NAMING_CONVENTION.md"]
 
 # Dossier reel de CODE/ -> numeros de partie AF a avoir lus.
 # Aucune VERSION ici : elle est resolue au moment du controle.
@@ -54,13 +54,13 @@ SPEC_MAP: dict[str, list[int]] = {
 
 def latest_spec(partie: int) -> str | None:
     best: tuple[tuple[int, int], str] | None = None
-    for entry in DOC.glob("*.md"):
+    for entry in (DOC / "AF").glob("*.md"):
         match = VERSIONED.match(entry.name)
         if not match or int(match.group("num")) != partie:
             continue
         version = (int(match.group("major")), int(match.group("minor")))
         if best is None or version > best[0]:
-            best = (version, f"DOC/{entry.name}")
+            best = (version, f"DOC/AF/{entry.name}")
     return best[1] if best else None
 
 
