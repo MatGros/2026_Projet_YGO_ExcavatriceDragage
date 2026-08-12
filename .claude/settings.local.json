@@ -121,7 +121,9 @@
       "Bash(python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report)",
       "Read(//c/Users/ZEDVICTUS/AppData/Local/Temp/claude/C---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage/3b121974-6c26-4832-b143-729d9c757e1c/scratchpad/**)",
       "Bash(grep *)",
-      "Bash(git -C \"C:\\\\_MGS\\\\DEV\\\\2026_Projet_YGO_ExcavatriceDragage\" show eb40478 -- CODE/MAIN/PRG_02_Acquisition.st)"
+      "Bash(git -C \"C:\\\\_MGS\\\\DEV\\\\2026_Projet_YGO_ExcavatriceDragage\" show eb40478 -- CODE/MAIN/PRG_02_Acquisition.st)",
+      "Bash(python3 -c ' *)",
+      "Bash(echo \"exit code: $?\")"
     ],
     "ask": [
       "Bash(git reset *)",

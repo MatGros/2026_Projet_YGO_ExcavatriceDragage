@@ -16,8 +16,8 @@ Controles :
   W4  chaque <block>/<inVariable>/<outVariable> a une position non nulle
 
 Usage :
-  python TOOLS/AGENT_WORKFLOW/scripts/check_cfc_wiring.py
-  python TOOLS/AGENT_WORKFLOW/scripts/check_cfc_wiring.py --report
+  python TOOLS/AGENT_WORKFLOW/scripts/G210_check_cfc_wiring.py
+  python TOOLS/AGENT_WORKFLOW/scripts/G210_check_cfc_wiring.py --report
 """
 
 from __future__ import annotations
@@ -180,7 +180,7 @@ def main() -> int:
     if args.report:
         print()
         print("```text")
-        print(f"Auto-verification cablage CFC (check_cfc_wiring.py) — {'FAIL' if all_errors else 'PASS'}")
+        print(f"Auto-verification cablage CFC (G210_check_cfc_wiring.py) — {'FAIL' if all_errors else 'PASS'}")
         print(f"  {pages_checked} page(s) CFC native(s) verifiee(s)")
         for error in all_errors[:8]:
             print(f"  KO  {error}")

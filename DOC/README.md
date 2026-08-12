@@ -25,13 +25,13 @@
 | 07 | Interface IHM |
 | 08+ | Une fonction métier par domaine : 08 Joystick · 09 Encoder/Homing · 10 Treuils (**Benne incluse**) · 11 Translation · 12 Diagnostic · 13 Simulation · 14 Troubleshooting |
 
-⚠️ **Historique de numérotation** : le numéro 11 a d'abord été celui de la Translation, puis de la Benne, puis a été retiré. Il est désormais réattribué à la Translation (P11). La Benne est une fiche du domaine Treuils : [`AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md`](AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md). Contrôlé automatiquement (règle `D7` de `check_doc_links.py`).
+⚠️ **Historique de numérotation** : le numéro 11 a d'abord été celui de la Translation, puis de la Benne, puis a été retiré. Il est désormais réattribué à la Translation (P11). La Benne est une fiche du domaine Treuils : [`AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md`](AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md). Contrôlé automatiquement (règle `D7` de `G340_check_doc_links.py`).
 
 Les domaines `09`, `10`, `11` et `12` sont **éclatés en une fiche par FB** dans un sous-dossier
 `AF/AF_Partie-NN_.../` ; le fichier `_vX.Y.md` reste le **chapô** (rôle machine, intégration programme).
 
 👉 Toujours ouvrir la version `_vX.Y` **la plus élevée**. Les renvois sont maintenus
-automatiquement par `python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py --fix`.
+automatiquement par `python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py --fix`.
 
 ## 🗺️ Architecture cible — une seule source
 
@@ -85,7 +85,7 @@ Les résultats d'exécution restent hors AF : scripts ST→Python, checklists si
 ## 📏 Règles de versionnement
 
 - **Une seule** version par Partie sous `DOC/` — l'ancienne part dans `../ARCHIVES/Doc/`
-  (contrôlé automatiquement : `check_doc_links.py` avertit si deux versions coexistent).
+  (contrôlé automatiquement : `G340_check_doc_links.py` avertit si deux versions coexistent).
 - La version v2.1 de l'acquisition décrit la cible documentaire ; le code reste en phase transitoire
   jusqu'à validation humaine du remappage et du filtrage.
 - Jamais d'écrasement : nouvelle version = nouveau fichier `_vX.Y`.

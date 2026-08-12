@@ -12,10 +12,10 @@ lors du débogage IndexOutOfRangeException / ArgumentNullException :
 4. Pas de motif inVariable(expression) -> outVariable (IndexOutOfRange)
 
 Usage:
-    python check_ld_invariants.py [project_root] [--report]
+    python G410_check_ld_invariants.py [project_root] [--report]
 
 Exemple:
-    python check_ld_invariants.py . --report
+    python G410_check_ld_invariants.py . --report
 """
 
 from __future__ import annotations

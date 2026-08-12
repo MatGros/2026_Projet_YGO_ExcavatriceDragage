@@ -12,7 +12,7 @@ Ce script est un AUDITEUR PUR EN LECTURE SEULE :
   D7  renvoi en PROSE vers un numero d'AF qui n'existe pas        -> ERREUR
 
 Usage :
-  python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py
+  python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py
 """
 
 from __future__ import annotations
@@ -34,6 +34,10 @@ HISTORICAL_LOGS = {
     "DOC/WFLOW/AUDITS/Architecture/AUDIT_M0_GEL_ETAT_INITIAL.md",
     "DOC/WFLOW/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md",
     "DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md",
+    # PLAN_TASK est un journal d'evenements passes (REX 2026-08-12, lot
+    # RENAME_GATES_G_PREFIX) : il cite les scripts sous leur ancien nom a la date
+    # de l'entree. Reecrire un journal falsifierait l'historique.
+    "DOC/WFLOW/PLAN_TASK.md",
 }
 
 # D7 — journaux de bord et contrats de tache : ils citent le numero d'AF tel qu'il

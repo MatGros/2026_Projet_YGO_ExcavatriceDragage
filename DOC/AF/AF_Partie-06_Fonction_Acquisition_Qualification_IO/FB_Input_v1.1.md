@@ -46,4 +46,4 @@ grep -RInE --exclude-dir=ARCHIVES --exclude=Device.export \
   'FB_Input|ChannelOk|PRG_01_Inputs_LD|ST_InputsQualified' CODE DOC TOOLS
 ```
 
-Le retrait n'est autorisé qu'après analyse de chaque occurrence et preuve `check_linkage.py`.
+Le retrait n'est autorisé qu'après analyse de chaque occurrence et preuve `G200_check_linkage.py`.

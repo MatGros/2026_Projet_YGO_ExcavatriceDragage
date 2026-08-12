@@ -37,7 +37,7 @@ def main() -> int:
     root = Path(args.project_root).resolve()
     code_dir = root / "CODE"
     generator_dir = root / "TOOLS" / "ST_PLCOPENXML_GENERATOR"
-    freshness = root / "TOOLS" / "AGENT_WORKFLOW" / "scripts" / "check_bundle_freshness.py"
+    freshness = root / "TOOLS" / "AGENT_WORKFLOW" / "scripts" / "G390_check_bundle_freshness.py"
     bundle = code_dir / "CODE_Bundle.xml"
     project_name = args.project_name or existing_project_name(bundle)
 

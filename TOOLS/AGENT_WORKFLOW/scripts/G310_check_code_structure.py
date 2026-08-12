@@ -16,8 +16,8 @@ Controles :
       Les fragments sans epilogue sont ignores.
 
 Usage :
-  python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py
-  python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py --root <projet>
+  python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py
+  python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py --root <projet>
 """
 
 from __future__ import annotations

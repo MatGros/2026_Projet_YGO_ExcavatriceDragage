@@ -20,7 +20,7 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 🚫 `ARCHIVES/` n'est **jamais** une source active.
 ⚠️ Toujours la version `_vX.Y` la plus élevée à la racine de `DOC/` — maintenu automatiquement par
-`python TOOLS/AGENT_WORKFLOW/scripts/check_doc_links.py --fix`.
+`python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py --fix`.
 
 ---
 
@@ -79,11 +79,11 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 
 > ⛔ Un bundle généré, des tests Python verts ou un XML bien formé **ne prouvent jamais**
 > qu'une fonction est reliée au reste du programme. Le bug `PRG_10_Outputs_LD` a franchi tous
-> ces contrôles (REX 2026-07-29). Seul `check_linkage.py` prouve le câblage réel.
+> ces contrôles (REX 2026-07-29). Seul `G200_check_linkage.py` prouve le câblage réel.
 
 ```powershell
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . # bundle PLCopenXML
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report    # liaison sur le bundle (BLOQUANT)
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report    # liaison sur le bundle (BLOQUANT)
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py             # tous les gates
 ```
 

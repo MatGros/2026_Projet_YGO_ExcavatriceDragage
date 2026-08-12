@@ -22,9 +22,9 @@ Aucun controle ne lit `Device.export` : cet export est mis a jour au bon vouloir
 humain, il ne peut donc pas servir de reference. Debogage ponctuel uniquement.
 
 Usage :
-  python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py            # tout CODE/
-  python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report   # + bloc de restitution
-  python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --files CODE/MAIN/PRG_10_Outputs_LD.st
+  python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py            # tout CODE/
+  python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report   # + bloc de restitution
+  python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --files CODE/MAIN/PRG_10_Outputs_LD.st
 """
 
 from __future__ import annotations
@@ -245,7 +245,7 @@ def parse_pou(path: Path) -> Pou | None:
 
 def load_native_xml_pou_names(root: Path) -> set[str]:
     """POU definis directement en XML PLCopenXML natif (ex. PRG_GLOBAL_CFC.xml,
-    PRG_AU_Acquisition_CFC.xml). check_linkage.py ne parse que les .st : ces POU
+    PRG_AU_Acquisition_CFC.xml). G200_check_linkage.py ne parse que les .st : ces POU
     sont donc traites comme externes de confiance pour L4 (reference croisee),
     le generator/xml_builder.py validant deja leur cablage interne a la build.
     """
@@ -1050,7 +1050,7 @@ def main() -> int:
     if args.report:
         print()
         print("```text")
-        print(f"Auto-verification liaison (check_linkage.py) — {'FAIL' if all_errors else 'PASS'}")
+        print(f"Auto-verification liaison (G200_check_linkage.py) — {'FAIL' if all_errors else 'PASS'}")
         print(f"  Linkage (L1-L7):    {len(verified)} OK, {len(errors)} KO")
         print(f"  L8 (Output assign): {len(l8_verified)} OK, {len(l8_errors)} KO, {len(l8_warnings)} WARN")
         print(f"  L9 (I/O mapping):   {len(l9_verified)} OK, {len(l9_errors)} KO, {len(l9_warnings)} WARN")

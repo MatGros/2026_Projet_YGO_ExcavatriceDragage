@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_doc_links.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "G340_check_doc_links.py"
 
 
 def run(root: Path, *args: str) -> subprocess.CompletedProcess[str]:

@@ -67,4 +67,4 @@
 3. **GVL de flux** : la proposition de publication de tous les bus dans `GVL_Global` contredit les regles de producteur unique et les frontieres typees directes.
 4. **Couverture fonctionnelle incomplete** : l'arborescence CFC proposee ne porte pas explicitement Modes, Cycle, Supervision, sorties physiques et gestion AU.
 5. **Contrats trop precoces** : les huit bus proposes melangent parfois commande, configuration, safety et diagnostic. Le contrat de chaque frontiere doit etre defini avant tout nom de DUT ou schema CFC.
-6. **CFC et ordre scan** : un schema visuel ne prouve ni l'ordre d'appel ni l'appartenance a la tache. AF02 v3 devra exiger une preuve CODESYS et `check_linkage.py`.
+6. **CFC et ordre scan** : un schema visuel ne prouve ni l'ordre d'appel ni l'appartenance a la tache. AF02 v3 devra exiger une preuve CODESYS et `G200_check_linkage.py`.

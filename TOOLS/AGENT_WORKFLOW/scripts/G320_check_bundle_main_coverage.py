@@ -8,9 +8,9 @@ source filename, source POU, and generated POU use the same final POU identity:
 ``--report`` so they cannot be mistaken for coverage failures.
 
 Usage:
-  python TOOLS/AGENT_WORKFLOW/scripts/check_bundle_main_coverage.py
-  python TOOLS/AGENT_WORKFLOW/scripts/check_bundle_main_coverage.py --report
-  python TOOLS/AGENT_WORKFLOW/scripts/check_bundle_main_coverage.py --root <projet>
+  python TOOLS/AGENT_WORKFLOW/scripts/G320_check_bundle_main_coverage.py
+  python TOOLS/AGENT_WORKFLOW/scripts/G320_check_bundle_main_coverage.py --report
+  python TOOLS/AGENT_WORKFLOW/scripts/G320_check_bundle_main_coverage.py --root <projet>
 """
 
 from __future__ import annotations

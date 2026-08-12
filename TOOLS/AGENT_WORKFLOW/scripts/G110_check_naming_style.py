@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Automation of naming style checks for IEC 61131-3 ST code (check_naming_style.py)
+Automation of naming style checks for IEC 61131-3 ST code (G110_check_naming_style.py)
 Référentiel : DOC/STDS/NAMING_CONVENTION.md (Règles NC-010 à NC-070)
 Audit d'origine : DOC/WFLOW/AUDITS/AUDIT_Nommage_Mecanisable_v1.0.md
 """
@@ -300,7 +300,7 @@ def main() -> int:
 
     # Affichage du tableau récapitulatif
     print("=" * 100)
-    print("AUDIT DE NOMMAGE IEC 61131-3 (check_naming_style.py)")
+    print("AUDIT DE NOMMAGE IEC 61131-3 (G110_check_naming_style.py)")
     print("Référentiel : DOC/STDS/NAMING_CONVENTION.md (Règles NC-010 à NC-070)")
     print("=" * 100)
     print(f"{'Règle':<8} | {'Description':<52} | {'Conformes':<9} | {'Exemptés/Legacy':<15} | {'Baseline':<9} | {'Nouveaux':<8}")

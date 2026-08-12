@@ -96,7 +96,7 @@ de cycle de vie du FB.
 | Moyen | Usage |
 |---|---|
 | 🔗 Typage DUT | Premiere barriere : un bus `ST_Safety_*` ne se branche pas sur une entree `ST_Cmd_*`. |
-| ✍️ Producteur unique | Une donnee, un ecrivain ; prouve par fiche contrat + `check_linkage.py`. |
+| ✍️ Producteur unique | Une donnee, un ecrivain ; prouve par fiche contrat + `G200_check_linkage.py`. |
 | ✅ `Valid` | Seulement si le lecteur a un repli documente quand `FALSE` (souvent mesures / safety). |
 | 🚫 Pas d'ID de connexion | Aucun `ProducerId`, signature ou jeton d'appairage dans les DUT internes. Surcharge et fausse securite en CFC local. |
 | 📡 Bus terrain | Identite = adresse device + diag existant (`FB_Diag_Ethercat`, `FB_Diag_CanOpen`, OP/erreur). Pas de second ID applicatif. |
@@ -108,7 +108,7 @@ de cycle de vie du FB.
 - Les commandes ne se croisent pas : tout arbitrage est realise par un composant proprietaire, expose et nomme.
 - Les sorties safety entrent par le haut ou une zone safety dediee, avec une polarite lisible.
 - Une page reste limitee a un domaine ; une autre page est reliee par DUT, jamais par interne d'instance.
-- Le numero d'ordre graphique ne prouve pas l'ordre scan. La configuration de tache CODESYS et `check_linkage.py` sont les preuves requises.
+- Le numero d'ordre graphique ne prouve pas l'ordre scan. La configuration de tache CODESYS et `G200_check_linkage.py` sont les preuves requises.
 - Une GVL ne sert pas de bus de commande interne. `GVL_IHM`, persistance et simulation restent des frontieres justifiees.
 
 ### Production obligatoire d'une page CFC native
@@ -175,11 +175,11 @@ Procedure par page :
 5. Conserver toute logique (`IF`, calcul, arbitrage, ecriture sortie) dans un FB
    proprietaire : la page ne fait que declarer et relier les contrats publics.
 6. Generer le bundle, prouver sa liaison, puis executer tous les gates. Le
-   runner inclut le controle `check_cfc_wiring.py` des pages CFC natives :
+   runner inclut le controle `G210_check_cfc_wiring.py` des pages CFC natives :
 
 ```powershell
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
 ```
 

@@ -153,7 +153,7 @@ du bug, a été retirée).
 | `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py` | script oracle : localId bloc, coils locales, pas de doublon, commentaires textuels |
 | `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/prg06_oracle_postprocess.py` | injection dans le bundle + ObjectId conservé |
 | `TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py` | applique le postprocess |
-| `TOOLS/AGENT_WORKFLOW/scripts/check_bundle_freshness.py` | vérifie le bundle frais |
+| `TOOLS/AGENT_WORKFLOW/scripts/G390_check_bundle_freshness.py` | vérifie le bundle frais |
 | `CODE/MAIN/PRG_06_Outputs_LD.st` | outputs directs du FB (au lieu de chemins nested) |
 
 ---

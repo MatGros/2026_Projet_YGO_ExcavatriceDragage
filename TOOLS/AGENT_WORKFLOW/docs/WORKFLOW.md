@@ -40,13 +40,13 @@ En cas d'hésitation → **patch par défaut** : il est réversible, le rebuild 
 ### 🧱 Séquence rebuild (obligatoire si stratégie = rebuild)
 
 ```text
-1. Inventaire du périmètre    → check_linkage.py donne les consommateurs
+1. Inventaire du périmètre    → G200_check_linkage.py donne les consommateurs
 2. CONTRAT DE CONSERVATION    → ce qui doit survivre / ce qu'on abandonne sciemment
    ⛔ arrêt : validation humaine du contrat AVANT toute suppression de lien
 3. Nouveau FB, interface propre
 4. Remap des consommateurs
 5. Preuve de non-dégradation  → chaque ligne du contrat vérifiée
-6. Suppression de l'ancien    → check_linkage.py prouve zéro orphelin
+6. Suppression de l'ancien    → G200_check_linkage.py prouve zéro orphelin
 ```
 
 ⚠️ **Écrire ce qui doit survivre AVANT de couper.** Sans ce contrat écrit en amont,
@@ -73,7 +73,7 @@ devoir d'alerte.
 2. suffixe de langage = langage généré dans le bundle.
 
 `check_task_contract.py` contrôle ces critères **dans le contrat** (T8), avant toute
-écriture. `check_code_structure.py` contrôle ensuite leur réalité dans le code et le bundle.
+écriture. `G310_check_code_structure.py` contrôle ensuite leur réalité dans le code et le bundle.
 
 🔁 **Il traverse les trois runtimes** — c'est son intérêt principal : les hooks ne couvrent que
 l'orchestrateur Claude Code, le contrat s'applique aussi aux sous-agents Pi (ses critères
@@ -151,7 +151,7 @@ Pi qualifie et propose, l'humain valide en 1 mot.
   `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de sa tâche.** Un sous-agent
   démarre froid : sans ce préambule il ne connaît ni les règles, ni les cas d'arrêt, ni la
   vérification de liaison — c'est ce qui a laissé passer le bug `PRG_10_Outputs_LD`.
-- 🤖 **Aucun lot n'est restitué sans `check_linkage.py --report`.** Bundle généré et tests Python
+- 🤖 **Aucun lot n'est restitué sans `G200_check_linkage.py --report`.** Bundle généré et tests Python
   verts ne prouvent jamais qu'une fonction est reliée.
 - `TOOLS/` reste séparé de `DOC/` et `CODE/`.
 - `ST_PLCOPENXML_GENERATOR` reste autonome ; le workflow peut l'appeler pour générer le bundle `CODE/CODE_Bundle.xml` à partir des sources ST et des POU XML natifs/CFC présents dans `CODE/`.
@@ -178,13 +178,12 @@ Toute erreur détectée — **à n'importe quelle étape** (édition, gate, comp
 
 | Origine erreur | Garde-fou ajouté |
 |---|---|
-| **Instance déclarée jamais appelée (`PRG_10_Outputs_LD`, 2026-07-29)** | **`check_linkage.py` — gate 2bis + hook PostToolUse** |
-| **Nom de fichier/POU ou suffixe/langage incohérent (audit 2026-08)** | **`check_code_structure.py` — gate 1bis + tests unitaires** |
-| **CFC natif aux fils invisibles (connecteurs empilés/à 0,0)** | **`check_cfc_wiring.py` — gate 2bis-bis** |
-| **Consignes pointant des specs supprimées** | **`check_doc_links.py` (+ `--fix` automatique)** |
-| **Document amputé de sa tête sans être vu (`NAMING_CONVENTION`)** | **`check_doc_links.py` D6 — titre H1 obligatoire** |
-| **Sous-agent démarrant sans les règles projet** | **`prompts/subagent_preamble.md` obligatoire en tête de tâche** |
-| Compilation CODESYS C0037 | Règle `check_code_style` détection écriture VAR_OUTPUT |
+| **Instance déclarée jamais appelée (`PRG_10_Outputs_LD`, 2026-07-29)** | **`G200_check_linkage.py` — gate 2bis + hook PostToolUse** |
+| **Nom de fichier/POU ou suffixe/langage incohérent (audit 2026-08)** | **`G310_check_code_structure.py` — gate 1bis + tests unitaires** |
+| **CFC natif aux fils invisibles (connecteurs empilés/à 0,0)** | **`G210_check_cfc_wiring.py` — gate 2bis-bis** |
+| **Consignes pointant des specs supprimées** | **`G340_check_doc_links.py` (+ `--fix` automatique)** |
+| **Document amputé de sa tête sans être vu (`NAMING_CONVENTION`)** | **`G340_check_doc_links.py` D6 — titre H1 obligatoire** |
+| Compilation CODESYS C0037 | Règle `G100_check_code_style` détection écriture VAR_OUTPUT |
 | Oubli homme-mort boutons | Pattern `StartStop.*DeadmanArmed` obligatoire |
 | FDC sans rampe | Template `motion_fb_header` section FDC_EXTRÊMES |
 | Bit safety non classifié | Template `requirement_intake` champ `safetyClassification` |

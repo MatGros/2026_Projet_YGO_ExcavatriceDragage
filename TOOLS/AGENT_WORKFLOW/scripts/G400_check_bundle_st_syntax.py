@@ -9,7 +9,7 @@ trouve" + C0190. Ce gate inspecte le bundle et rejette tout body ST qui
 contient un token de fin de POU.
 
 Usage:
-    python check_bundle_st_syntax.py [project_root]
+    python G400_check_bundle_st_syntax.py [project_root]
 
 Exit codes:
     0 = PASS (aucun body ST ne contient de terminator)

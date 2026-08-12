@@ -35,7 +35,7 @@ TOOLS/
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
 
 # 🔗 BLOQUANT : Vérifier que TOUT est câblé (REX 2026-07-29)
-python TOOLS/AGENT_WORKFLOW/scripts/check_linkage.py --report
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 ```
 
 👉 **Pas de commit sans gates verts ET validation utilisateur** — les deux sont obligatoires.

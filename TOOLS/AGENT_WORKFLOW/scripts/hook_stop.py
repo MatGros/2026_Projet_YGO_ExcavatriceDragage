@@ -11,7 +11,7 @@ depot. Une session de discussion, d'audit ou de documentation n'est jamais
 bloquee — on ne genera personne pour rien.
 
 Verifications bloquantes quand du ST a bouge :
-  S1  check_linkage.py vert (aucune instance orpheline, aucune ref cassee)
+  S1  G200_check_linkage.py vert (aucune instance orpheline, aucune ref cassee)
   S2  CODE/CODE_Bundle.xml a jour vis-a-vis des sources
 
 Philosophie : echec d'INFRASTRUCTURE (git absent, script illisible) = on laisse
@@ -61,14 +61,14 @@ def main() -> int:
 
     problems: list[str] = []
 
-    code, out = run([sys.executable, str(SCRIPTS / "check_linkage.py"), "--report"])
+    code, out = run([sys.executable, str(SCRIPTS / "G200_check_linkage.py"), "--report"])
     if code:
         problems.append(
             "[S1] Gate de liaison EN ECHEC — une instance est orpheline ou une "
             "reference croisee est cassee :\n" + out
         )
 
-    code, out = run([sys.executable, str(SCRIPTS / "check_bundle_freshness.py"), "."])
+    code, out = run([sys.executable, str(SCRIPTS / "G390_check_bundle_freshness.py"), "."])
     if code:
         problems.append(
             "[S2] CODE/CODE_Bundle.xml est perime par rapport aux sources.\n"

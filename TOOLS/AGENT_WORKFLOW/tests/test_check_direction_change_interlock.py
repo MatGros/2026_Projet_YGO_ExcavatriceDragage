@@ -6,9 +6,9 @@ import importlib.util
 import sys
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "check_direction_change_interlock.py"
-SPEC = importlib.util.spec_from_file_location("check_direction_change_interlock", SCRIPT)
-assert SPEC is not None and SPEC.loader is not None
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "G360_check_direction_change_interlock.py"
+SPEC = importlib.util.spec_from_file_location("G360_check_direction_change_interlock", SCRIPT)
+
 check_direction_change_interlock = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = check_direction_change_interlock
 SPEC.loader.exec_module(check_direction_change_interlock)
@@ -23,7 +23,7 @@ def test_fb_avec_commandeddirection_sans_directionchangepending_est_une_erreur(t
         "FUNCTION_BLOCK FB_Broken\nVAR\n    CommandedDirection : INT;\nEND_VAR\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(sys, "argv", ["check_direction_change_interlock.py", str(tmp_path)])
+    monkeypatch.setattr(sys, "argv", ["G360_check_direction_change_interlock.py", str(tmp_path)])
     assert check_direction_change_interlock.main() == 1
 
 
@@ -36,7 +36,7 @@ def test_fb_avec_les_deux_variables_passe(tmp_path, monkeypatch) -> None:
         "DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirection <> 0);\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(sys, "argv", ["check_direction_change_interlock.py", str(tmp_path)])
+    monkeypatch.setattr(sys, "argv", ["G360_check_direction_change_interlock.py", str(tmp_path)])
     assert check_direction_change_interlock.main() == 0
 
 
@@ -47,11 +47,11 @@ def test_fb_sans_commandeddirection_nest_pas_concerne(tmp_path, monkeypatch) -> 
         "FUNCTION_BLOCK FB_Unrelated\nVAR\n    SomeVar : BOOL;\nEND_VAR\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(sys, "argv", ["check_direction_change_interlock.py", str(tmp_path)])
+    monkeypatch.setattr(sys, "argv", ["G360_check_direction_change_interlock.py", str(tmp_path)])
     assert check_direction_change_interlock.main() == 0
 
 
 def test_codebase_reelle_ne_regresse_pas(monkeypatch) -> None:
     """Preuve de non-regression : FB_Winch et FB_Translation portent bien le pattern."""
-    monkeypatch.setattr(sys, "argv", ["check_direction_change_interlock.py", str(REPO_ROOT)])
+    monkeypatch.setattr(sys, "argv", ["G360_check_direction_change_interlock.py", str(REPO_ROOT)])
     assert check_direction_change_interlock.main() == 0

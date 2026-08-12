@@ -7,8 +7,8 @@ robuste quel que soit le modele, le workflow (Claude, Codex, Pi) ou la fatigue
 de l'orchestrateur.
 
 Declenche uniquement sur les fichiers qui le meritent :
-  * `CODE/**/*.st`  -> check_linkage.py (instances orphelines, refs croisees)
-  * `*.md`          -> check_doc_links.py (liens morts, versions perimees)
+  * `CODE/**/*.st`  -> G200_check_linkage.py (instances orphelines, refs croisees)
+  * `*.md`          -> G340_check_doc_links.py (liens morts, versions perimees)
 
 Silencieux quand tout va bien : seuls les problemes remontent a l'agent.
 Ne bloque jamais une edition (exit 0) — il informe, le gate de restitution
@@ -53,7 +53,7 @@ def main() -> int:
     messages: list[str] = []
 
     if "/CODE/" in f"/{target}" and target.endswith(".st"):
-        code, out = run_check("check_linkage.py")
+        code, out = run_check("G200_check_linkage.py")
         if code:
             messages.append(
                 "Gate de liaison EN ECHEC apres cette edition — instance orpheline, "
@@ -61,7 +61,7 @@ def main() -> int:
             )
 
     if target.endswith(".md"):
-        code, out = run_check("check_doc_links.py")
+        code, out = run_check("G340_check_doc_links.py")
         if code:
             messages.append(
                 "Liens documentaires invalides apres cette edition "
