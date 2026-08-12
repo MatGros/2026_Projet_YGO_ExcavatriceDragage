@@ -1,10 +1,37 @@
-# 🔄 Guide d'Écriture des Séquenceurs & Fronts (v1.1)
+# 🔄 Guide d'Écriture des Séquenceurs & Fronts (v1.2)
 
-> 📌 **Guide pratique** compagnon de [`CODE_QUALITY_STANDARDS.md §11bis`](../CODE_QUALITY_STANDARDS.md#11bis-séquenceurs-et-machines-à-état-rex-2026-08-12) —
-> les règles R1 à R9 y sont normatives, ce document montre **comment** les appliquer avec des
-> squelettes de code prêts à copier.
-> Origine : réflexion terrain 2026-08-12 sur le manque de repères en mise en service (tempos
-> bloquantes non identifiables, fronts dupliqués, pas de convention d'écriture de séquence).
+## 🎯 Raison d'être & Responsabilité Unique
+- **Problème résolu** : trois écritures de machine à état coexistaient sans règle commune
+  (`CASE`+enum avec label texte, `E_State` générique + tempos ad hoc, `E_Diag_State`) — en essai,
+  une tempo bloquante n'a pas de repère uniforme et un enum ne dit pas son rang sans rouvrir la
+  déclaration.
+- **Périmètre strict** : comment écrire un séquenceur ST (`CASE`+enum) et centraliser un front.
+  Ne redéfinit pas le contrat FB standard (`AF_Partie-03`) ni la casuistique métier de chaque
+  domaine.
+- **Type de composant** : guide pratique, compagnon normatif de
+  [`CODE_QUALITY_STANDARDS.md §11bis`](../CODE_QUALITY_STANDARDS.md#11bis-séquenceurs-et-machines-à-état-rex-2026-08-12)
+  (règles R1-R9) — ce document montre **comment** les appliquer, il ne les redéfinit pas.
+
+> Origine : réflexion terrain 2026-08-12 (fronts dupliqués, pas de convention d'écriture de
+> séquence, tempos bloquantes non identifiables en mise en service).
+
+---
+
+## 🧭 Sommaire
+
+| <nobr>§</nobr> | Contenu |
+|---|---|
+| <nobr>1</nobr> | Pourquoi ce guide |
+| <nobr>2</nobr> | Vue d'ensemble (diagramme) |
+| <nobr>3</nobr> | Squelette d'une séquence (R1, R2, R2bis) |
+| <nobr>4</nobr> | Graphe linéaire (R3) |
+| <nobr>5</nobr> | Étape de synchronisation finale (R4) |
+| <nobr>6</nobr> | Initialisation (R8) |
+| <nobr>7</nobr> | Cas de repli — `StateAtError` (R9) |
+| <nobr>8</nobr> | Tempo scaffold par transition (R5) |
+| <nobr>9</nobr> | Fronts — centralisation (R6) et `FB_Edge` (R7) |
+| <nobr>10</nobr> | Checklist rapide |
+| <nobr>11</nobr> | Glossaire |
 
 ---
 
@@ -230,10 +257,10 @@ Le `TON` est déclaré même si la transition n'en a finalement pas besoin — c
 
 ### Où vit un front ?
 
-| Consommateurs | Où | Exemple |
+| <nobr>Consommateurs</nobr> | Où | Exemple |
 |---|---|---|
-| 1 seul FB | Local au FB (`R_TRIG`/`F_TRIG` en `VAR`) | `ResetEdge`, `ConfirmOpenEdge` (`FB_Bucket`) |
-| ≥ 2 FB, entrée matérielle/simu ou commande IHM `Cmd` | Centralisé dans `PRG_02_Acquisition`, jamais `PRG_07_Supervision` (lecture seule stricte) | voir doublon identifié ci-dessous |
+| <nobr>1 seul FB</nobr> | Local au FB (`R_TRIG`/`F_TRIG` en `VAR`) | <small><code>ResetEdge</code><br><code>ConfirmOpenEdge</code> (`FB_Bucket`)</small> |
+| <nobr>≥ 2 FB</nobr>, entrée matérielle/simu ou commande IHM `Cmd` | Centralisé `PRG_02_Acquisition`, jamais `PRG_07_Supervision` (lecture seule stricte) | voir doublon ci-dessous |
 
 ⚠️ Doublon connu, à corriger dans un lot dédié (pas dans ce guide, qui ne modifie pas `CODE/`) :
 `ConfirmOpenPosition`/`ConfirmClosePosition` (bouton IHM référencement benne) est aujourd'hui
@@ -307,16 +334,16 @@ actives sans impact mesuré).
 
 | Terme | Sens |
 |---|---|
-| `CASE`+enum | Machine à état où une seule variable enum porte l'étape active — exclusivité mutuelle garantie par le compilateur (R1) |
-| Label runtime | Texte affiché en IHM/Watch pour l'étape courante, toujours préfixé `Xn -` (R2) |
-| Gabarit `X0..Xn` | Nommage brouillon des littéraux enum avant stabilisation de la séquence (R2bis) |
-| Graphe linéaire | Séquence sans fourche réelle ; les sauts autorisés rejoignent toujours le tronc (R3) |
-| Synchronisation finale | Dernière étape nommée du `CASE`, point d'intégration officiel pour les FB avals (R4) |
-| Porte d'initialisation | Bloc `IF NOT Enable OR ...` en tête de FB, retour à la première étape (R8) |
-| `StateAtError` | Champ qui mémorise l'étape spécifique (pas `E_State` générique) au moment du défaut (R9) |
-| `TON` scaffold | Temporisateur pré-déclaré sur chaque transition, utilisé ou non (R5) |
-| `FB_Edge` | FB générique front montant/descendant (`.R`/`.F`), une instance par entrée qualifiée (R7) |
-| Front centralisé | Détection de front à la source unique quand ≥ 2 FB consomment le même signal (R6) |
+| <nobr><code>CASE</code>+enum</nobr> | Machine à état où une seule variable enum porte l'étape active — exclusivité mutuelle garantie par le compilateur (R1) |
+| <nobr>Label runtime</nobr> | Texte affiché en IHM/Watch pour l'étape courante, toujours préfixé `Xn -` (R2) |
+| <nobr>Gabarit <code>X0..Xn</code></nobr> | Nommage brouillon des littéraux enum avant stabilisation de la séquence (R2bis) |
+| <nobr>Graphe linéaire</nobr> | Séquence sans fourche réelle ; les sauts autorisés rejoignent toujours le tronc (R3) |
+| <nobr>Synchronisation finale</nobr> | Dernière étape nommée du `CASE`, point d'intégration officiel pour les FB avals (R4) |
+| <nobr>Porte d'initialisation</nobr> | Bloc `IF NOT Enable OR ...` en tête de FB, retour à la première étape (R8) |
+| <nobr><code>StateAtError</code></nobr> | Champ qui mémorise l'étape spécifique (pas `E_State` générique) au moment du défaut (R9) |
+| <nobr><code>TON</code> scaffold</nobr> | Temporisateur pré-déclaré sur chaque transition, utilisé ou non (R5) |
+| <nobr><code>FB_Edge</code></nobr> | FB générique front montant/descendant (`.R`/`.F`), une instance par entrée qualifiée (R7) |
+| <nobr>Front centralisé</nobr> | Détection de front à la source unique quand ≥ 2 FB consomment le même signal (R6) |
 
 ---
 

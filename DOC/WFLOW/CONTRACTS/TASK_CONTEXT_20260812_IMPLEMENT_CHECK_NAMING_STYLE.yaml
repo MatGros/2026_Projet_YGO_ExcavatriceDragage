@@ -1,0 +1,82 @@
+contract:
+  task_id: IMPLEMENT_CHECK_NAMING_STYLE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Transformer le script verifie dans DOC/WFLOW/AUDITS/AUDIT_Nommage_Mecanisable_v1.0.md (section
+    "Script Python testable et executable") en outil reellement deploye et non-bloquant :
+    TOOLS/AGENT_WORKFLOW/scripts/check_naming_style.py, avec une baseline des occurrences deja
+    recensees et une integration informative dans run_all_gates.py. Aucune modification de CODE/ :
+    ce lot outille la verification, il ne corrige aucun nommage existant.
+
+  acceptance:
+    - id: AC1
+      statement: "TOOLS/AGENT_WORKFLOW/scripts/check_naming_style.py existe, reprend la logique regex verifiee du rapport d'audit (NC-010/020/030/050/060/070), et son execution sur CODE/ produit des totaux identiques a ceux du tableau revise du rapport (ou l'ecart est explique dans la restitution)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_naming_style.py : sortie comparee ligne a ligne au tableau section 'Synthese quantitative revisee' de DOC/WFLOW/AUDITS/AUDIT_Nommage_Mecanisable_v1.0.md"
+    - id: AC2
+      statement: "Le script ne bloque jamais l'execution : code de sortie 0 systematique, quel que soit le nombre d'occurrences detectees."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_naming_style.py ; echo $? renvoie 0 sur l'etat actuel de CODE/ (qui contient des occurrences connues)"
+    - id: AC3
+      statement: "Une baseline des occurrences deja recensees par l'audit (NC-010/030/050/060) est generee dans TOOLS/AGENT_WORKFLOW/config/naming_baseline.json ; le script ne signale que les occurrences absentes de cette baseline (nouvelles depuis l'audit)."
+      verified_by: "deux executions consecutives sans modification de CODE/ produisent zero nouveau signalement ; une occurrence non-conforme ajoutee dans un fichier de test hors CODE/ (scratch) est bien signalee comme nouvelle"
+    - id: AC4
+      statement: "check_naming_style.py est ajoute a run_all_gates.py comme etape informative : son resultat est affiche dans le resume final, mais un run avec des occurrences connues (deja en baseline) se termine quand meme sur ALL GATES PASSED si les autres gates passent."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py : la sortie inclut la ligne du nouveau gate, code de sortie global inchange par les occurrences deja en baseline"
+    - id: AC5
+      statement: "DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS.md est mis a jour pour refleter l'integration reelle (ID de gate dans le groupe 600 Tests, ligne dediee), coherent avec ce qui est reellement cable dans run_all_gates.py."
+      verified_by: "lecture du tableau des gates : la ligne ajoutee correspond exactement au script et a l'ID reellement utilises dans run_all_gates.py"
+
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/check_naming_style.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - TOOLS/AGENT_WORKFLOW/config/naming_baseline.json
+      - DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS.md
+      - DOC/WFLOW/PLAN_TASK.md
+    forbidden:
+      - CODE/
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md
+      - DOC/STDS/NAMING_CONVENTION.md
+      - DOC/WFLOW/AUDITS/AUDIT_Nommage_Mecanisable_v1.0.md
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  evidence_required:
+    - check_naming_style-output
+    - run_all_gates-output
+    - changed-files
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Aucune commande git (commit/push/reset/rebase/checkout), sous aucun pretexte — un precedent
+    dans cette meme session a efface des modifications non commitees de l'orchestrateur via une
+    commande git lancee par un agent en tache de fond. Si les totaux reproduits par le script
+    different de ceux du rapport d'audit, le signaler explicitement plutot que d'ajuster le script
+    pour forcer la correspondance. Aucune correction de nommage dans CODE/ n'est tentee : ce lot
+    outille la verification, il ne corrige rien.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED               # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+execution:
+  executed_by: "sonnet-5 (Pi / antigravity)"
+  completed_at: "2026-08-12T06:27:00+02:00"
+  status: COMPLETED
+  summary: >
+    Script check_naming_style.py créé, baseline naming_baseline.json générée (221 occurrences),
+    GATE 2octies intégré dans run_all_gates.py et documenté dans GUIDE_GATES_ET_TESTS.md.
+  evidence_submitted:
+    - script: "TOOLS/AGENT_WORKFLOW/scripts/check_naming_style.py"
+    - baseline: "TOOLS/AGENT_WORKFLOW/config/naming_baseline.json"
+    - gate: "GATE 2octies dans run_all_gates.py"
+
+validation:
+  status: APPROVED
+  validated_by: "Claude Code (Orchestrateur)"
+  validated_at: "2026-08-12T06:31:00+02:00"
+  notes: "Exécution validée sur run_all_gates.py (GATE 2octies PASS), 0 fichier CODE/ touché."

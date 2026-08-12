@@ -1,21 +1,12 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# CONTRAT DE TACHE — a remplir par l'ORCHESTRATEUR avant toute ecriture
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Pourquoi ce fichier existe (REX 2026-07-29) :
-# sur 53 taches deleguees, les criteres d'acceptation etaient 3 phrases
-# generiques ("implement the requested change without widening scope").
-# Un agent rendait donc un rapport "conforme" a RIEN. Une verification qui
-# ne porte sur aucun objectif reste creuse, meme rendue obligatoire.
+# Pourquoi ce fichier existe (REX 2026-07-29 & REX 2026-08-12) :
+# 1. Définit le contrat d'exécution (objectif, critères testables, scope, preuves).
+# 2. Sert de suivi lisible en un coup d'œil par l'humain (`status: PENDING | COMPLETED | VALIDATED`).
+# 3. Consigne le rapport synthétique de l'agent (`execution:`) et le visa de l'orchestrateur (`validation:`).
 #
-# Ce contrat est la reference UNIQUE de la verification finale.
-# Il traverse les trois runtimes :
-#   - orchestrateur Claude Code -> le hook Stop refuse de conclure sans les preuves
-#   - sous-agent Pi             -> ces criteres remplacent le boilerplate d'acceptance
-#   - Codex / antigravity       -> relecture du diff contre ces criteres
-#
-# Obligatoire a partir de C2. Facultatif en C0-C1 (sur une typo, c'est du bruit).
-# Emplacement : section `contract:` du TASK_CONTEXT.yaml de la tache.
 # Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -27,14 +18,10 @@ contract:
 
   # ── 1. Objectif metier ────────────────────────────────────────────────────
   # Ce que la MACHINE doit faire de plus ou de different, en une phrase.
-  # Pas "modifier FB_Winch" (c'est un moyen) mais l'effet attendu sur le procede.
   objective: >
     En une phrase : quel comportement machine change, et pourquoi.
 
   # ── 2. Criteres testables ─────────────────────────────────────────────────
-  # Chacun doit etre verifiable par une commande, un test PLC ou une
-  # observation nommee. Si un critere ne peut pas etre verifie, ce n'est pas
-  # un critere : c'est une intention. Le reecrire ou le retirer.
   acceptance:
     - id: AC1
       statement: "Comportement observable attendu, formule au present."
@@ -42,13 +29,6 @@ contract:
     - id: AC2
       statement: "..."
       verified_by: "..."
-
-  # ── Objectifs structurels obligatoires si scope.allowed touche CODE/MAIN/ ─
-  # Le gate T8 refuse le contrat si les DEUX criteres suivants sont absents :
-  # - nom de fichier = nom de POU declare ;
-  # - suffixe de langage = langage genere dans le bundle PLCopenXML.
-  # Chaque critere doit avoir son propre verified_by (normalement
-  # check_code_structure.py). Le gate verifie le contrat, il ne parse pas CODE/.
 
   # ── 3. Perimetre ──────────────────────────────────────────────────────────
   scope:
@@ -60,8 +40,6 @@ contract:
 
   # ── 4. Contrat de conservation ────────────────────────────────────────────
   # OBLIGATOIRE si strategy = rebuild. Ecrit AVANT toute suppression de lien.
-  # C'est la liste, validee par l'humain, de ce que l'ancien bloc garantissait.
-  # Sans elle, "pas de degradation" n'est qu'une impression.
   conservation:
     must_survive:            # comportements/donnees a preserver imperativement
       - "…"
@@ -69,26 +47,40 @@ contract:
       - "…"
 
   # ── 5. Preuves attendues en restitution ───────────────────────────────────
-  # Sorties de script qui DOIVENT figurer dans la reponse finale.
   evidence_required:
     - check_linkage          # bloc "Auto-verification liaison"
     - run_all_gates          # resultat des gates
     - bundle                 # CODE/CODE_Bundle.xml regenere
-    # - task_tests           # seulement si tests_automated_required: true (option, plus une obligation C3/C4 depuis 2026-08-01)
 
   # ── 6. Modeles autorises ──────────────────────────────────────────────────
-  # Voir TOOLS/AGENT_WORKFLOW/docs/MODEL_ROUTING.md.
-  # Verifie a posteriori par check_model_routing.py sur les meta.json Pi.
   models_allowed:
     - "omni/cc/claude-sonnet-5"
     - "omni/cx/gpt-5.6-terra"
-    # flash autorise en scout/resume non-safety uniquement :
-    # - "antigravity/gemini-3.5-flash-medium"
 
   # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
-  # Non negociable, rappele ici pour qu'il soit dans le contrat et pas
-  # seulement dans une checklist que personne n'ouvre.
   alert_duty: >
     Tout probleme constate en cours de route (incoherence de spec, bug
     preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
     pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "..."         # Ex: sonnet-5 (Pi / antigravity)
+  completed_at: "..."        # Timestamp ISO (ex: 2026-08-12T06:27:00+02:00)
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []     # Preuves clés (ex: "run_all_gates: PASS", "linkage: PASS")
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: "..."        # Ex: Claude Code (Orchestrateur)
+  validated_at: "..."        # Timestamp ISO
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

@@ -34,6 +34,7 @@
 
 | Date | Jalon |
 |---|---|
+| 2026-08-12 | 🤖 Audit du nommage IEC 61131-3 mécanisable (NC-010 à NC-070) révisé (`AUDIT_Nommage_Mecanisable_v1.0.md`) et déployé (`check_naming_style.py`, `GATE 2octies`, `naming_baseline.json`) |
 | 2026-08-01 | 🗑️ `CODE/TESTS/` archivé (4 fichiers → `ARCHIVES/Code/TESTS/`) + retrait de l'obligation de test PLC automatique en C3/C4 — détail §2 « Extension 2026-08-01 » |
 | 2026-07-28 | 🚀 `v0.5.3_PreCommissioningPrep` — Initialisation nouvelle session de travail, cadrage registre post-MES (`PMS-XXX`), pense-bête client YGO (isolation simu, visu pas-à-pas, dédouanement PLC/Matériel, MAINT_N1 ➔ Auto) |
 | 2026-07-27 | 🏁 **Chantier pré-livraison — simulation & diagnostic TERMINÉ** (commits `72a3bbc`→`HEAD`). Détail §1bis. Documents de conduite archivés dans `ARCHIVES/Doc/AUDITS/PreLivraison/` : ce plan redevient l'unique source du pilotage |
