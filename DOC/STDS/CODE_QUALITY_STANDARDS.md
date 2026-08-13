@@ -433,6 +433,12 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 
 #### Structure confirmée du bloc `AND`/`OR` — REX 2026-08-13 (import CODESYS réel réussi)
 
+> 📌 **Portée** : cette structure produit une **valeur** (argument de fonction, condition ≥3
+> termes isolée pour le Watch). Pour câbler une condition **directement** vers une bobine/un
+> contact suivant dans le même rung, voir la convergence de contacts documentée dans
+> `GUIDES/GUIDE_IMPLEMENTATION_LADDER_PLCOPEN_XML_v1.0.md §4.1` — pas de bloc `AND`/`OR` là,
+> juste plusieurs `<connection>` dans un même `connectionPointIn`.
+
 Premier pattern de condition composée **confirmé par un import CODESYS réel** dans ce projet
 (branches visibles dans l'éditeur LD, compilation propre) :
 
