@@ -9,7 +9,7 @@ CODE/*.st
    ↓
 ST_PLCOPENXML_GENERATOR
    ↓
-CODE/CODE_Bundle.xml
+CODE_XML/CODE_Bundle.xml
    ↓
 Import PLCopenXML dans CODESYS
 ```

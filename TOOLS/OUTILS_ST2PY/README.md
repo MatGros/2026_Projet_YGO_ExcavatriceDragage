@@ -7,8 +7,8 @@ la logique métier sans matériel. Prototype, pas un outil de production.
 
 | Je veux... | Commande |
 |---|---|
-| Lister les POU d'un bundle | `python scripts/st_to_py.py --list --bundle ../../CODE/CODE_Bundle.xml` |
-| Générer un FB en Python | `python core/fb_gen.py --bundle ../../CODE/CODE_Bundle.xml --pou <POU> --out RESULTS/<DOMAINE>/modules` |
+| Lister les POU d'un bundle | `python scripts/st_to_py.py --list --bundle ../../CODE_XML/CODE_Bundle.xml` |
+| Générer un FB en Python | `python core/fb_gen.py --bundle ../../CODE_XML/CODE_Bundle.xml --pou <POU> --out RESULTS/<DOMAINE>/modules` |
 | Régénérer malgré le cache | idem + `--force` |
 | Générer les FB modifiés (git) | idem + `--changed --ref origin/main` |
 | Lancer toute la suite pytest | `python -m pytest` |

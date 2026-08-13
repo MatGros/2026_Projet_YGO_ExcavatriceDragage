@@ -101,7 +101,7 @@ def check(root: Path) -> list[str]:
         return [f"[S0] repertoire introuvable : {main}"]
 
     sources = st_program_sources(code) + xml_program_sources(code)
-    bundle = code / "CODE_Bundle.xml"
+    bundle = root / "CODE_XML" / "CODE_Bundle.xml"
     if not bundle.is_file():
         return [f"[S0] bundle introuvable : {bundle.relative_to(root).as_posix()}"]
     try:

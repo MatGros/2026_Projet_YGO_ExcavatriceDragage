@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-BUNDLE = ROOT / "CODE" / "CODE_Bundle.xml"
+BUNDLE = ROOT / "CODE_XML" / "CODE_Bundle.xml"
 NS = {"pou": "http://www.plcopen.org/xml/tc6_0200"}
 
 

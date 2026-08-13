@@ -33,7 +33,7 @@ def make_project(
         source = tmp_path / "CODE" / "MAIN" / relative
         source.parent.mkdir(parents=True, exist_ok=True)
         source.write_text(content, encoding="utf-8")
-    output = tmp_path / "CODE" / "CODE_Bundle.xml"
+    output = tmp_path / "CODE_XML" / "CODE_Bundle.xml"
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(bundle(emitted), encoding="utf-8")
     return tmp_path

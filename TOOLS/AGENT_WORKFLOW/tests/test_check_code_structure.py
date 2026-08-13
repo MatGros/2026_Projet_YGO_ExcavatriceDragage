@@ -31,7 +31,7 @@ def make_project(tmp_path: Path, sources: dict[str, str], emitted: dict[str, str
         path = root / "CODE" / "MAIN" / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
-    bundle_path = root / "CODE" / "CODE_Bundle.xml"
+    bundle_path = root / "CODE_XML" / "CODE_Bundle.xml"
     bundle_path.parent.mkdir(parents=True, exist_ok=True)
     bundle_path.write_text(bundle(emitted), encoding="utf-8")
     return root

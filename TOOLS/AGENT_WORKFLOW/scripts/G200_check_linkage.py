@@ -284,7 +284,7 @@ def load_native_xml_block_types(root: Path) -> set[str]:
 
 def load_bundle_blocks(root: Path) -> list[tuple[str, str, str]]:
     """Retourne [(pou, instanceName, typeName)] du bundle PLCopenXML."""
-    bundle = root / "CODE" / "CODE_Bundle.xml"
+    bundle = root / "CODE_XML" / "CODE_Bundle.xml"
     if not bundle.is_file():
         return []
     text = bundle.read_text(encoding="utf-8", errors="replace")

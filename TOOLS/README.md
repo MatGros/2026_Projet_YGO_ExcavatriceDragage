@@ -45,7 +45,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 ```powershell
 # Depuis la racine du projet
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
-# Sortie : CODE/CODE_Bundle.xml → copier/coller dans CODESYS 3.5
+# Sortie : CODE_XML/CODE_Bundle.xml → copier/coller dans CODESYS 3.5
 ```
 
 **Alternative manuelle** (rarement) :

@@ -452,11 +452,22 @@ Sous-ensemble ST **obligatoire** pour tout `_LD.st` contenant une sélection con
 ### Extraction FC pour logique de sélection typée — REX 2026-08-13
 
 Une logique de sélection/condition répétée sur des structs différents (ex. bascule
-Sim/Réel par domaine machine) ne se duplique **jamais** inline dans le PRG appelant :
-extraction en `FC_<Domaine><Action>` dédié par type (ex. `FC_SelectWinchSource`,
-`FC_SelectTranslationSource`) — pas de FC générique paramétrable par type dans ce projet.
-Le réseau LD du PRG appelant devient alors un simple bloc (appel FC) câblé à sa sortie,
-sans logique conditionnelle à traduire au niveau du PRG.
+Sim/Réel par domaine machine) ne se duplique **jamais** inline dans le PRG appelant.
+
+**Priorité 1 — `SEL(G, IN0, IN1)`** (brique IEC 61131-3 standard, générique `ANY`,
+composée avant toute réimplémentation — AF_Partie-03 §1) : `SEL(cond, ValeurSiFalse,
+ValeurSiTrue)` remplace directement le `IF/ELSE` à deux branches, y compris sur des
+structs (à confirmer par compilation CODESYS réelle à chaque premier usage sur un type
+sans précédent dans le projet — REX 2026-08-13, aucun antécédent `SEL` sur `STRUCT`
+avant `PRG_02_Acquisition_LD`).
+
+**Priorité 2 — `FC_<Domaine><Action>` dédié** (ex. `FC_SelectWinchSource`) : seulement
+si `SEL` ne compile pas sur le type concerné, ou si la logique dépasse une sélection à
+deux branches. Pas de FC générique paramétrable par type dans ce projet (pas de
+generics en ST standard).
+
+Dans les deux cas, le réseau LD du PRG appelant devient un simple bloc (`SEL` ou appel
+FC) câblé à sa sortie, sans logique conditionnelle à traduire au niveau du PRG.
 
 ### Tests de régression
 

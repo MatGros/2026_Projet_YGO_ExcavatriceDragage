@@ -12,7 +12,7 @@ bloquee — on ne genera personne pour rien.
 
 Verifications bloquantes quand du ST a bouge :
   S1  G200_check_linkage.py vert (aucune instance orpheline, aucune ref cassee)
-  S2  CODE/CODE_Bundle.xml a jour vis-a-vis des sources
+  S2  CODE_XML/CODE_Bundle.xml a jour vis-a-vis des sources
 
 Philosophie : echec d'INFRASTRUCTURE (git absent, script illisible) = on laisse
 passer, on ne bloque pas le travail sur un probleme d'outillage. Echec de
@@ -71,7 +71,7 @@ def main() -> int:
     code, out = run([sys.executable, str(SCRIPTS / "G390_check_bundle_freshness.py"), "."])
     if code:
         problems.append(
-            "[S2] CODE/CODE_Bundle.xml est perime par rapport aux sources.\n"
+            "[S2] CODE_XML/CODE_Bundle.xml est perime par rapport aux sources.\n"
             "Regenerer : python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .\n"
             + out
         )

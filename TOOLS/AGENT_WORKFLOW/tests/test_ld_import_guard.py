@@ -376,7 +376,7 @@ def test_bundle_prg06_outputs_ld_valid_invariables_and_block_refs() -> None:
     Le programme ne doit pas non plus déclarer de VAR_INPUT (inputVars doit être vide).
     """
     import xml.etree.ElementTree as ET
-    bundle = Path(__file__).resolve().parents[2].parent / "CODE" / "CODE_Bundle.xml"
+    bundle = Path(__file__).resolve().parents[2].parent / "CODE_XML" / "CODE_Bundle.xml"
     assert bundle.exists()
     root = ET.parse(bundle).getroot()
 

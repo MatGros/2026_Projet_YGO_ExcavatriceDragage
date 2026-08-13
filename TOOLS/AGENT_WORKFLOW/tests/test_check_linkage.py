@@ -166,7 +166,7 @@ VAR
 END_VAR
 instInterlockM1(Enable := TRUE);
 """,
-            "CODE/CODE_Bundle.xml": """\
+            "CODE_XML/CODE_Bundle.xml": """\
 <project>
   <pou name="PRG_10_Outputs">
     <block localId="5" typeName="FB_Output" instanceName="instInterlockM1">

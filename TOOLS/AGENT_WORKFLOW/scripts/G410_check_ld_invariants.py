@@ -185,7 +185,7 @@ def main() -> int:
         bundle = Path(args.bundle).resolve()
     else:
         root = Path(args.project_root).resolve()
-        bundle = root / "CODE" / "CODE_Bundle.xml"
+        bundle = root / "CODE_XML" / "CODE_Bundle.xml"
     if not bundle.is_file():
         print(f"ERROR: {bundle} introuvable", file=sys.stderr)
         return 2
