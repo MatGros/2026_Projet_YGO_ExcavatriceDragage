@@ -483,7 +483,6 @@ def _write_bool_block(ld: ET.Element, op_name: str, operands: list[str], curr_id
     block.set("localId", str(block_id))
     block.set("typeName", op_name)
     block.set("instanceName", "")
-    block.set("__unverified__", "true")
     ET.SubElement(block, "position", x="0", y="0")
 
     in_vars_el = ET.SubElement(block, "inputVariables")
@@ -526,8 +525,6 @@ def _write_call_as_block(ld: ET.Element, fn_name: str, args_str: str, target_var
     block.set("localId", str(block_id))
     block.set("typeName", fn_name)
     block.set("instanceName", "")
-    if unverified:
-        block.set("__unverified__", "true")
     ET.SubElement(block, "position", x="0", y="0")
 
     in_vars_el = ET.SubElement(block, "inputVariables")
