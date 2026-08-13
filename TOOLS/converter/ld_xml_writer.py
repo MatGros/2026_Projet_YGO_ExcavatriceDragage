@@ -399,6 +399,125 @@ _KNOWN_POSITIONAL_PARAMS: dict[str, list[str]] = {
 }
 
 
+def _top_level_bool_op(expr: str) -> str | None:
+    """Return 'AND'/'OR' if that operator appears at paren-depth 0 in expr, else None."""
+    depth = 0
+    for op in (" OR ", " AND "):
+        depth = 0
+        i = 0
+        while i < len(expr):
+            ch = expr[i]
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+            elif depth == 0 and expr[i:i + len(op)] == op:
+                return op.strip()
+            i += 1
+    return None
+
+
+def _split_top_level_bool(expr: str, op: str) -> list[str]:
+    marker = f" {op} "
+    parts: list[str] = []
+    buf: list[str] = []
+    depth = 0
+    i = 0
+    while i < len(expr):
+        ch = expr[i]
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if depth == 0 and expr[i:i + len(marker)] == marker:
+            parts.append("".join(buf).strip())
+            buf = []
+            i += len(marker)
+            continue
+        buf.append(ch)
+        i += 1
+    tail = "".join(buf).strip()
+    if tail:
+        parts.append(tail)
+    return parts
+
+
+def _write_source_node(ld: ET.Element, expr: str, curr_id: int) -> tuple[int, int]:
+    """Write whatever feeds a connectionPointIn for `expr`, return (its localId, next_id).
+
+    A composite condition (A AND B) is wired as a real <block typeName="AND"> with one
+    operand per input pin -- never dumped as raw ST text inside an inVariable's
+    <expression> (REX 2026-08-13, "cette ecriture doit etre interdite" -- an LD page
+    represents logic graphically, a text blob defeats the point of compiling to LD).
+    """
+    expr = expr.strip()
+    op = _top_level_bool_op(expr)
+    if op:
+        return _write_bool_block(ld, op, _split_top_level_bool(expr, op), curr_id)
+
+    src_id = curr_id
+    curr_id += 1
+    in_node = ET.SubElement(ld, "inVariable")
+    in_node.set("localId", str(src_id))
+    ET.SubElement(in_node, "position", x="0", y="0")
+    ET.SubElement(in_node, "connectionPointOut")
+    expr_el = ET.SubElement(in_node, "expression")
+    expr_el.text = expr
+    return src_id, curr_id
+
+
+def _write_bool_block(ld: ET.Element, op_name: str, operands: list[str], curr_id: int) -> tuple[int, int]:
+    """AND/OR as a real graphical block, one input pin per operand.
+
+    ⚠️ UNVERIFIED against a real CODESYS import: no genuine export sample of a
+    graphical AND/OR function block exists in this codebase to copy the exact
+    formalParameter convention from (unlike SEL, whose G/IN0/IN1 names are the
+    documented IEC signature). IN1/IN2/... follows the same numbering CODESYS uses
+    for TON's IN/PT-style single-letter pins extended to N inputs, the closest
+    precedent available -- flagged, not claimed as proven.
+    """
+    block_id = curr_id
+    curr_id += 1
+
+    block = ET.SubElement(ld, "block")
+    block.set("localId", str(block_id))
+    block.set("typeName", op_name)
+    block.set("instanceName", "")
+    block.set("__unverified__", "true")
+    ET.SubElement(block, "position", x="0", y="0")
+
+    in_vars_el = ET.SubElement(block, "inputVariables")
+    for idx, operand in enumerate(operands, start=1):
+        negated = False
+        operand_clean = operand.strip()
+        if operand_clean.upper().startswith("NOT "):
+            negated = True
+            operand_clean = operand_clean[4:].strip()
+
+        src_id, curr_id = _write_source_node(ld, operand_clean, curr_id)
+
+        in_var = ET.SubElement(in_vars_el, "variable")
+        in_var.set("formalParameter", f"IN{idx}")
+        if negated:
+            in_var.set("negated", "true")
+        cpi = ET.SubElement(in_var, "connectionPointIn")
+        conn = ET.SubElement(cpi, "connection")
+        conn.set("refLocalId", str(src_id))
+
+    ET.SubElement(block, "inOutVariables")
+    out_vars_el = ET.SubElement(block, "outputVariables")
+    var_out = ET.SubElement(out_vars_el, "variable")
+    var_out.set("formalParameter", "OUT")
+    ET.SubElement(var_out, "connectionPointOut")
+
+    b_adddata = ET.SubElement(block, "addData")
+    d_b = ET.SubElement(b_adddata, "data", name="http://www.3s-software.com/plcopenxml/fbdcalltype", handleUnknown="implementation")
+    call_type = ET.SubElement(d_b, "CallType")
+    call_type.text = "function"
+
+    return block_id, curr_id
+
+
 def _write_call_as_block(ld: ET.Element, fn_name: str, args_str: str, target_var: str, start_id: int, unverified: bool = False) -> int:
     block_id = start_id
     curr_id = start_id + 1
@@ -429,14 +548,7 @@ def _write_call_as_block(ld: ET.Element, fn_name: str, args_str: str, target_var
         in_var.set("formalParameter", p_name)
         cpi = ET.SubElement(in_var, "connectionPointIn")
 
-        src_id = curr_id
-        curr_id += 1
-        in_node = ET.SubElement(ld, "inVariable")
-        in_node.set("localId", str(src_id))
-        ET.SubElement(in_node, "position", x="0", y="0")
-        ET.SubElement(in_node, "connectionPointOut")
-        expr_el = ET.SubElement(in_node, "expression")
-        expr_el.text = p_val
+        src_id, curr_id = _write_source_node(ld, p_val, curr_id)
 
         conn = ET.SubElement(cpi, "connection")
         conn.set("refLocalId", str(src_id))
