@@ -30,6 +30,11 @@ Un agent **choisit** le test adapté à sa tâche du moment, il ne subit pas un 
 dans un script (ex. un nom de fichier qui déclenche seul une conversion). L'utilisateur peut à
 tout moment exiger l'exécution complète, mais ce n'est pas le mode par défaut pendant l'écriture.
 
+Le choix se fait à deux niveaux : **quel palier** (`--palier A|B|C|D`) et, pour un bloc encore
+isolé, **quel fichier** (`--files <fichier.st>`). Exécuter sur un fichier unique est légitime :
+on ne peut pas valider le programme global à partir d'une seule fonction — on valide le fichier,
+et les contrôles globaux sont rejoués sur le bundle complet au palier C.
+
 ---
 
 ## 🪜 2. Les 4 paliers — un palier = une tranche de centaine
@@ -39,14 +44,40 @@ tout moment exiger l'exécution complète, mais ce n'est pas le mode par défaut
 > catégorie (Structure/Style/Doc...) indépendamment du palier — résultat décousu (palier A
 > renvoyait vers `200` et `340`, deux tranches sans rapport). Corrigé.
 
-| <nobr>Palier</nobr> | Quand | <nobr>Tranche ID</nobr> | Outils | <nobr>Coût</nobr> |
-|---|---|---|---|---|
-| <nobr>**A** — bloc isolé</nobr> | Édition d'un bloc/fonction/FB/ST écrite **de façon isolée**, pas encore reliée à d'autres | <small><code>100</code>-<code>110</code></small> | <small><code>G100_check_code_style.py</code><br><code>G110_check_naming_style.py</code></small> | <nobr>instantané</nobr> |
-| <nobr>**B** — liens/dépendances</nobr> | Dès que l'édition crée des **liens/dépendances** avec d'autres blocs (appel d'instance, référence croisée) | <small><code>200</code>-<code>220</code></small> | <small><code>G200_check_linkage.py --report</code></small> | <nobr>secondes</nobr> |
-| <nobr>**C** — fin de lot</nobr> | Plusieurs fonctions codées, lot complet, avant d'annoncer terminé | <small><code>300</code>-<code>420</code></small> | <small><code>run_all_gates.py</code> + génération XML granulaire (`CODE_XML/`) + bundle agrégé (`CODE_XML/CODE_Bundle.xml`, construit **à partir** du granulaire)</small> | <nobr>secondes</nobr> |
-| <nobr>**D** — sur demande</nobr> | Validation explicite demandée par l'utilisateur, pas systématique | <small><code>500</code>-<code>510</code></small> | <small><code>G500_check_codesys_compile.py</code> (log) / <code>test_codesys_compile.py &lt;Objet&gt;</code> (vrai compilateur, tâche de fond)</small> | <nobr>minutes</nobr> |
+| <nobr>Palier</nobr> | Quand | <nobr>Tranche ID</nobr> | Outils | <nobr>Commande</nobr> | <nobr>Coût</nobr> |
+|---|---|---|---|---|---|
+| <nobr>**A** — bloc isolé</nobr> | Édition d'un bloc/fonction/FB/ST écrite **de façon isolée**, pas encore reliée à d'autres | <small><code>100</code>-<code>110</code></small> | <small><code>G100_check_code_style.py</code><br><code>G110_check_naming_style.py</code></small> | <small><code>run_all_gates.py --palier A</code></small> | <nobr>instantané</nobr> |
+| <nobr>**B** — liens/dépendances</nobr> | Dès que l'édition crée des **liens/dépendances** avec d'autres blocs (appel d'instance, référence croisée) | <small><code>200</code>-<code>220</code></small> | <small><code>G200_check_linkage.py --report</code></small> | <small><code>run_all_gates.py --palier B</code></small> | <nobr>secondes</nobr> |
+| <nobr>**C** — fin de lot</nobr> | Plusieurs fonctions codées, lot complet, avant d'annoncer terminé | <small><code>300</code>-<code>420</code></small> | <small><code>run_all_gates.py</code> + génération XML granulaire (`CODE_XML/`) + bundle agrégé (`CODE_XML/CODE_Bundle.xml`, construit **à partir** du granulaire)</small> | <small><code>run_all_gates.py --palier C</code></small> | <nobr>secondes</nobr> |
+| <nobr>**D** — sur demande</nobr> | Validation explicite demandée par l'utilisateur, pas systématique | <small><code>500</code>-<code>510</code></small> | <small><code>G500_check_codesys_compile.py</code> (log) / <code>test_codesys_compile.py &lt;Objet&gt;</code> (vrai compilateur, tâche de fond)</small> | <small><code>run_all_gates.py --palier D --codesys-log &lt;build.log&gt;</code></small> | <nobr>minutes</nobr> |
 
 `430`-`490` restent en réserve pour de futurs gates du palier C sans empiéter sur la tranche D.
+
+**Point d'entrée unique par palier** (`run_all_gates.py --palier A|B|C|D`) — le guide est
+documenté §1 : menu par intention, l'agent choisit le palier adapté à sa tâche. Sans `--palier`,
+le runner exécute tout (comportement historique). `--codesys-log` ajoute G500 à n'importe quel
+palier ; `--palier D` sans log affiche un message informatif (validation sur demande) sans échouer.
+
+### Ciblage d'un fichier unique — `--files <fichier.st>`
+
+Un FB, une fonction ou un POU **isolé** (pas encore relié au reste) se vérifie sans le bundle
+complet. Seuls les gates applicables à un bloc isolé s'exécutent :
+
+| <nobr>Gate</nobr> | Applicable en `--files` ? |
+|---|---|
+| <small><code>100</code></small> — style | ✅ oui (scope = le fichier) |
+| <small><code>110</code></small> — nommage | ✅ oui (scope = le fichier) |
+| <small><code>200</code></small> — liaison | ✅ oui (`--files` du script) |
+| <small><code>210</code>-<code>420</code></small> | ❌ globaux (bundle/dépôt) → signalés `[--]` non applicables, s'exécuteront au palier C |
+
+```
+python run_all_gates.py --files CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st
+python run_all_gates.py --palier A --files CODE/MAIN/PRG_02_Acquisition.st
+python run_all_gates.py --files CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st CODE/TREUILS/FB_WinchOutputInterlock_LD.st   # multi-fichiers
+```
+
+Les gates globaux sont listés comme **non applicables** (sans bloquer) : le mode fichier
+prévient explicitement qu'ils seront rejoués sur le bundle complet au palier C.
 
 ---
 
@@ -89,7 +120,7 @@ tout moment exiger l'exécution complète, mais ce n'est pas le mode par défaut
 | <nobr><code>380</code></nobr> | <small><code>G380_check_config_persistence.py</code></small> | Persistance config (RETAIN/PERSISTENT) |
 | <nobr><code>390</code></nobr> | <small><code>G390_check_bundle_freshness.py</code></small> | Fraîcheur du bundle vs. sources |
 | <nobr><code>400</code></nobr> | <small><code>G400_check_bundle_st_syntax.py</code></small> | Syntaxe ST du bundle (no terminator) |
-| <nobr><code>410</code></nobr> | <small><code>G410_check_ld_invariants.py</code></small> | Invariants LD `PRG_06_Outputs_LD` |
+| <nobr><code>410</code></nobr> | <small><code>G410_check_ld_invariants.py</code></small> | Invariants LD — tous les POU `_LD` du bundle (`PRG_06_Outputs_LD`, `PRG_02_Acquisition_LD`, …) |
 | <nobr><code>420</code></nobr> | <small><code>pytest</code></small> | Tests gates (`AGENT_WORKFLOW/tests/`) + convertisseur ST→XML (`ST_PLCOPENXML_GENERATOR/tests/`) |
 
 ### Palier D — `500`-`510`

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Garde-fou (REX 2026-08-04) : invariants LD du POU PRG_06_Outputs_LD.
+"""Garde-fou (REX 2026-08-04) : invariants LD de TOUS les POU `_LD`.
 
-Vérifie sur CODE_Bundle.xml les contraintes structurelles CODESYS découvertes
-lors du débogage IndexOutOfRangeException / ArgumentNullException :
+Vérifie sur le bundle (ou un XML direct) les contraintes structurelles CODESYS
+découvertes lors du débogage IndexOutOfRangeException / ArgumentNullException.
+Appliqué à chaque POU suffixé `_LD` (initialement figé sur PRG_06_Outputs_LD,
+généralisé 2026-08-13 : un nouveau POU `_LD` comme PRG_02_Acquisition_LD doit
+être couvert par le même garde-fou) :
 
 1. localId du bloc < localId de ses sources (inVariable/contact connectés)
 2. Pas de coil doublon : un output assigné par expression DANS le bloc ne doit
@@ -10,12 +13,14 @@ lors du débogage IndexOutOfRangeException / ArgumentNullException :
 3. Les coils pointent vers des variables déclarées dans l'interface du POU
    (les sorties Device _DQ sont absentes du bundle -> crash à l'ouverture)
 4. Pas de motif inVariable(expression) -> outVariable (IndexOutOfRange)
+5. Pas de contact câblé sur une broche de sortie de bloc (cause #6, REX_PRG06)
 
 Usage:
-    python G410_check_ld_invariants.py [project_root] [--report]
+    python G410_check_ld_invariants.py [project_root] [--bundle PATH] [--report]
 
 Exemple:
     python G410_check_ld_invariants.py . --report
+    python G410_check_ld_invariants.py --bundle scratch/PRG_02_Acquisition_LD.xml --report
 """
 
 from __future__ import annotations
@@ -26,7 +31,6 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 NS = {"pou": "http://www.plcopen.org/xml/tc6_0200"}
-POU_NAME = "PRG_06_Outputs_LD"
 
 # 🧪 Exception documentée (décision utilisateur 2026-08-06) : coil voulue délibérément
 # sur un nom HW brut, malgré le risque de crash que cet invariant même détecte. Liste
@@ -63,25 +67,44 @@ def _local_vars(pou: ET.Element) -> set[str]:
 
 
 def check_bundle(bundle: Path, report: bool = False) -> tuple[list[str], list[str]]:
-    """Retourne (errors, warnings)."""
+    """Retourne (errors, warnings). Applique les invariants à TOUS les POU `_LD`."""
     errors: list[str] = []
     warnings: list[str] = []
 
     tree = ET.parse(bundle)
     root = tree.getroot()
 
-    pou = next(
-        (p for p in root.findall(".//pou:pou", NS) if p.get("name") == POU_NAME), None
-    )
-    if pou is None:
-        return [f"POU {POU_NAME} introuvable dans le bundle"], []
+    ld_pous = [
+        p for p in root.findall(".//pou:pou", NS)
+        if p.get("name", "").endswith("_LD")
+        and p.get("pouType") == "program"
+    ]
+    if not ld_pous:
+        return ["Aucun POU `_LD` dans le bundle"], []
+
+    for pou in ld_pous:
+        pou_errors, pou_warnings = _check_pou(pou)
+        errors.extend(pou_errors)
+        warnings.extend(pou_warnings)
+
+    return errors, warnings
+
+
+def _check_pou(pou: ET.Element) -> tuple[list[str], list[str]]:
+    """Invariants LD pour un POU `_LD`. Retourne (errors, warnings)."""
+    pou_name = pou.get("name")
+    errors: list[str] = []
+    warnings: list[str] = []
 
     ld = pou.find("pou:body/pou:LD", NS)
     if ld is None:
-        return [f"POU {POU_NAME} sans corps LD"], []
+        return [f"{pou_name}: sans corps LD"], []
 
     all_ids = {el.get("localId"): el for el in ld}
     declared = _local_vars(pou)
+
+    def pref(msg: str) -> str:
+        return f"{pou_name}: {msg}"
 
     # --- 1. localId du bloc < localId de ses sources ---
     # Oracle CODESYS : block=3, sources=4-10 (bloc PLUS PETIT que ses sources).
@@ -96,9 +119,11 @@ def check_bundle(bundle: Path, report: bool = False) -> tuple[list[str], list[st
         for ref in connected:
             if ref <= block_id:
                 errors.append(
-                    f"block {block.get('typeName')} (localId={block_id}) a une source "
-                    f"localId={ref} PLUS PETITE ou égale (doit être > lui) "
-                    f"[REX: IndexOutOfRangeException]"
+                    pref(
+                        f"block {block.get('typeName')} (localId={block_id}) a une source "
+                        f"localId={ref} PLUS PETITE ou égale (doit être > lui) "
+                        f"[REX: IndexOutOfRangeException]"
+                    )
                 )
                 break
 
@@ -116,9 +141,11 @@ def check_bundle(bundle: Path, report: bool = False) -> tuple[list[str], list[st
         conn = coil.find("pou:connectionPointIn/pou:connection", NS)
         if conn is not None and conn.get("formalParameter") in assigned_in_block:
             errors.append(
-                f"coil {coil.find('pou:variable', NS).text} connecté à l'output "
-                f"{conn.get('formalParameter')} DÉJÀ assigné par expression dans le bloc "
-                f"[REX: ArgumentNullException à l'ouverture]"
+                pref(
+                    f"coil {coil.find('pou:variable', NS).text} connecté à l'output "
+                    f"{conn.get('formalParameter')} DÉJÀ assigné par expression dans le bloc "
+                    f"[REX: ArgumentNullException à l'ouverture]"
+                )
             )
 
     # --- 3. Variables des coils déclarées dans le POU ---
@@ -126,27 +153,33 @@ def check_bundle(bundle: Path, report: bool = False) -> tuple[list[str], list[st
         var = coil.find("pou:variable", NS)
         name = (var.text or "").strip() if var is not None else ""
         if not name:
-            errors.append(f"coil localId={coil.get('localId')} sans variable")
+            errors.append(pref(f"coil localId={coil.get('localId')} sans variable"))
         elif "." not in name and name not in declared:
             if name in KNOWN_DIRECT_HW_COIL_TARGETS:
                 warnings.append(
-                    f"coil variable '{name}' NON déclarée dans l'interface du POU — "
-                    f"exception documentée (décision utilisateur 2026-08-06), NON "
-                    f"VALIDÉE par un import CODESYS réel [REX: ArgumentNullException "
-                    f"GetOperandDeclarationInfo si le crash déjà vécu se reproduit]"
+                    pref(
+                        f"coil variable '{name}' NON déclarée dans l'interface du POU — "
+                        f"exception documentée (décision utilisateur 2026-08-06), NON "
+                        f"VALIDÉE par un import CODESYS réel [REX: ArgumentNullException "
+                        f"GetOperandDeclarationInfo si le crash déjà vécu se reproduit]"
+                    )
                 )
             else:
                 errors.append(
-                    f"coil variable '{name}' NON déclarée dans l'interface du POU "
-                    f"[REX: ArgumentNullException GetOperandDeclarationInfo]"
+                    pref(
+                        f"coil variable '{name}' NON déclarée dans l'interface du POU "
+                        f"[REX: ArgumentNullException GetOperandDeclarationInfo]"
+                    )
                 )
 
     # --- 4. Pas de motif inVariable -> outVariable ---
     out_vars = ld.findall("pou:outVariable", NS)
     if out_vars:
         errors.append(
-            f"{len(out_vars)} outVariable présent(s) dans le LD "
-            f"[REX: IndexOutOfRangeException]"
+            pref(
+                f"{len(out_vars)} outVariable présent(s) dans le LD "
+                f"[REX: IndexOutOfRangeException]"
+            )
         )
 
     # --- 5. Pas de contact câblé sur une broche de sortie de bloc ---
@@ -163,12 +196,14 @@ def check_bundle(bundle: Path, report: bool = False) -> tuple[list[str], list[st
             if ref_el is not None and _tag(ref_el) == "block":
                 var = contact.find("pou:variable", NS)
                 errors.append(
-                    f"contact localId={contact.get('localId')} variable "
-                    f"'{var.text if var is not None else '?'}' câblé sur la broche de "
-                    f"sortie '{conn.get('formalParameter')}' du bloc localId={conn.get('refLocalId')} "
-                    f"[REX: référence de l'objet non définie à l'import/ouverture, "
-                    f"DOC/REX_PRG06_Import_Error.md cause #6 — assigner par <expression> "
-                    f"dans le bloc, jamais via contact externe]"
+                    pref(
+                        f"contact localId={contact.get('localId')} variable "
+                        f"'{var.text if var is not None else '?'}' câblé sur la broche de "
+                        f"sortie '{conn.get('formalParameter')}' du bloc localId={conn.get('refLocalId')} "
+                        f"[REX: référence de l'objet non définie à l'import/ouverture, "
+                        f"DOC/REX_PRG06_Import_Error.md cause #6 — assigner par <expression> "
+                        f"dans le bloc, jamais via contact externe]"
+                    )
                 )
 
     return errors, warnings
@@ -193,7 +228,7 @@ def main() -> int:
     errors, warnings = check_bundle(bundle, report=args.report)
 
     if args.report:
-        print(f"=== Garde-fou LD ({POU_NAME}) ===")
+        print(f"=== Garde-fou LD (tous les POU `_LD`) ===")
         if errors:
             print(f"  [KO] {len(errors)} erreur(s) :")
             for e in errors:

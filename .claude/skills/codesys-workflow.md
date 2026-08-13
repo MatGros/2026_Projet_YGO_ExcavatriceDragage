@@ -124,7 +124,7 @@ pour des preuves jamais réellement exécutées en CODESYS (`CODE/TESTS/` archiv
 ```powershell
 python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
-python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C   # fin de lot ; A/B/D pour un palier isolé (GUIDE_GATES_ET_TESTS §2)
 ```
 
 - `G200_check_linkage.py` prouve : instance déclarée là où elle doit vivre, appelée dans le même POU,
