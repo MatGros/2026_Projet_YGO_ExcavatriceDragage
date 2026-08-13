@@ -422,7 +422,7 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 | `NOT var` (BOOL connu) | contact `negated="true"` |
 | `var1 AND var2` (2 termes) | série de contacts |
 | `var1 OR var2` (2 termes) | parallèle de contacts |
-| Condition composée ≥3 termes nommés (post §2bis) | bloc `AND`/`OR`/`NOT` — 1 broche par terme, résultat à droite. **Jamais** de chaîne série/parallèle au-delà de 2 termes : illisible à l'import et invérifiable en Watch |
+| Condition composée ≥3 termes nommés (post §2bis), ou toute condition passée en argument d'un appel (ex. `SEL(A AND B, ...)`) | bloc `AND`/`OR` — 1 broche par terme, résultat à droite. **Jamais** de chaîne série/parallèle au-delà de 2 termes, **jamais** de texte ST brut injecté dans un `<expression>` : illisible à l'import, invérifiable en Watch, et un texte brut défait l'intérêt même de compiler en LD |
 | Expression typée non-BOOL | `inVariable` → `outVariable` (hors page BOOL pure) |
 
 - **`NOT var` ne produit jamais d'`inVariable`/`outVariable`** pour un signal
@@ -430,6 +430,22 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 - Une page `_LD` de type BOOL pur (notamment `PRG_06_Outputs_LD`) ne doit contenir
   **aucun** `inVariable` ni `outVariable` — uniquement des `contact`, `coil`,
   `block` et `comment`.
+
+#### Structure confirmée du bloc `AND`/`OR` — REX 2026-08-13 (import CODESYS réel réussi)
+
+Premier pattern de condition composée **confirmé par un import CODESYS réel** dans ce projet
+(branches visibles dans l'éditeur LD, compilation propre) :
+
+| Élément | Règle |
+|---|---|
+| `<block typeName="AND"\|"OR">` | `localId` **plus petit** que celui de toutes ses sources (même règle que pour un bloc FB, REX 2026-08-04) |
+| Broches d'entrée | `formalParameter="IN1"`, `"IN2"`, ... — une par opérande, jamais de chaîne série/parallèle |
+| Opérande `NOT x` | `negated="true"` sur la broche `INn`, jamais de texte `NOT` dans une expression |
+| Broche de sortie | `formalParameter="OUT"`, `connectionPointOut` sans expression — le bloc consommateur référence directement le `localId` du bloc `AND`/`OR` |
+| Imbrication (`A AND B OR C`) | un bloc peut être l'opérande d'un autre bloc — le `localId` du bloc source doit toujours rester supérieur à celui de son consommateur |
+
+Chaque opérande simple (variable, littéral `TRUE`/`FALSE`) reste un `inVariable` ; seul un
+sous-groupe `AND`/`OR` imbriqué devient lui-même un bloc.
 
 ### Structures conditionnelles (`IF/ELSE`) — REX 2026-08-13
 

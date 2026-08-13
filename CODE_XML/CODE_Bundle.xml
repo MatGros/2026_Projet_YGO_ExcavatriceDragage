@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:html="http://www.w3.org/1999/xhtml">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.764528" />
-  <contentHeader name="v0.6.00_RepriseApres20260807.project" modificationDateTime="2026-08-11T18:19:14.764528">
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T18:19:14.764528">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.00_RepriseApres20260807</property>
+          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -26703,8 +26703,9 @@ END_IF;
 // Condition câblée directement en G (pas de variable intermédiaire) pour Translation/Operator/
 // Machine : usage unique, contrairement à WinchInputSourceSimulated réutilisé pour la détection
 // de front ci-dessus (REX 2026-08-13, retour terrain).
-// ⚠️ Premier usage SEL() sur STRUCT dans ce projet (précédents = REAL/INT/BOOL uniquement) :
-// à confirmer par compilation CODESYS réelle avant de considérer ce lot terminé.
+// Premier usage SEL() sur STRUCT dans ce projet (précédents = REAL/INT/BOOL uniquement) :
+// confirmé par import + compilation CODESYS réelle sur scratch/PRG_02_Acquisition_LD.st
+// (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
 HwIn.Winch       := SEL(WinchInputSourceSimulated, HwRealQualified.Winch, instSimBench.Winch);
 HwIn.Translation := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive, HwRealQualified.Translation, instSimBench.Translation);
 HwIn.Operator     := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive, HwReal.Operator, instSimBench.Operator);

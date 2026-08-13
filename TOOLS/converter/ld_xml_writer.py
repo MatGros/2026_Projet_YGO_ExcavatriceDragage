@@ -467,14 +467,11 @@ def _write_source_node(ld: ET.Element, expr: str, curr_id: int) -> tuple[int, in
 
 
 def _write_bool_block(ld: ET.Element, op_name: str, operands: list[str], curr_id: int) -> tuple[int, int]:
-    """AND/OR as a real graphical block, one input pin per operand.
+    """AND/OR as a real graphical block, one input pin per operand (IN1, IN2, ...).
 
-    ⚠️ UNVERIFIED against a real CODESYS import: no genuine export sample of a
-    graphical AND/OR function block exists in this codebase to copy the exact
-    formalParameter convention from (unlike SEL, whose G/IN0/IN1 names are the
-    documented IEC signature). IN1/IN2/... follows the same numbering CODESYS uses
-    for TON's IN/PT-style single-letter pins extended to N inputs, the closest
-    precedent available -- flagged, not claimed as proven.
+    Confirmed by a real CODESYS import (REX 2026-08-13, PRG_02_Acquisition_LD) --
+    branches render correctly in the LD editor and the project compiles. See
+    CODE_QUALITY_STANDARDS.md §11 for the full confirmed structure.
     """
     block_id = curr_id
     curr_id += 1

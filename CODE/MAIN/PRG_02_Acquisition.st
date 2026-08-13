@@ -321,8 +321,9 @@ END_IF;
 // Condition câblée directement en G (pas de variable intermédiaire) pour Translation/Operator/
 // Machine : usage unique, contrairement à WinchInputSourceSimulated réutilisé pour la détection
 // de front ci-dessus (REX 2026-08-13, retour terrain).
-// ⚠️ Premier usage SEL() sur STRUCT dans ce projet (précédents = REAL/INT/BOOL uniquement) :
-// à confirmer par compilation CODESYS réelle avant de considérer ce lot terminé.
+// Premier usage SEL() sur STRUCT dans ce projet (précédents = REAL/INT/BOOL uniquement) :
+// confirmé par import + compilation CODESYS réelle sur scratch/PRG_02_Acquisition_LD.st
+// (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
 HwIn.Winch       := SEL(WinchInputSourceSimulated, HwRealQualified.Winch, instSimBench.Winch);
 HwIn.Translation := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive, HwRealQualified.Translation, instSimBench.Translation);
 HwIn.Operator     := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive, HwReal.Operator, instSimBench.Operator);
