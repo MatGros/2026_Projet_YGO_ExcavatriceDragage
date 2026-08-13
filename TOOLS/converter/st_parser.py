@@ -232,6 +232,14 @@ def parse_st_source(st_text: str, default_name: str = "PRG_Unknown") -> ProgramA
                     fb_ast.param_outputs[out_part].append(target)
                     continue
 
+            # Check function call FIRST -- a call's arguments (e.g. SEL(A AND B, C, D))
+            # can themselves contain " OR "/" AND ", so the whole-expression OR/AND
+            # split below must never run on a call's text (REX 2026-08-13: produced
+            # two garbage contacts, each holding a fragment of the SEL(...) text).
+            if re.match(r"^[A-Za-z_]\w*\s*\(.*\)$", expr, re.DOTALL):
+                ast.statements.append(AssignmentAST(target_var=target, expression=expr, raw_text=stmt))
+                continue
+
             # Check OR network
             if " OR " in expr:
                 conds = [c.strip() for c in expr.split(" OR ")]

@@ -128,11 +128,6 @@ VAR
     WinchInputSourceSimulated         : BOOL;
     PreviousWinchInputSourceSimulated : BOOL;
     WinchInputSourceInitialized       : BOOL;
-
-    (* ── Bascule simulation autres domaines (§2, sans mémoire de front) ── *)
-    TranslationSourceSimulated : BOOL;
-    OperatorSourceSimulated    : BOOL;
-    MachineSourceSimulated     : BOOL;
 END_VAR
 
 // === 📥 §1 ACQUISITION BRUTE (HwReal) ===
@@ -320,19 +315,18 @@ ELSE
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
 END_IF;
 
-TranslationSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
-OperatorSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
-MachineSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive;
-
 // 🔧 SEL(G, IN0, IN1) : brique standard IEC 61131-3, retourne IN1 si G=TRUE, IN0 sinon
 // (AF_Partie-03 §1 : composer l'existant avant réimplémentation) — remplace les 4 IF/ELSE
 // compactés qui cassaient le générateur ST→LD (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
+// Condition câblée directement en G (pas de variable intermédiaire) pour Translation/Operator/
+// Machine : usage unique, contrairement à WinchInputSourceSimulated réutilisé pour la détection
+// de front ci-dessus (REX 2026-08-13, retour terrain).
 // ⚠️ Premier usage SEL() sur STRUCT dans ce projet (précédents = REAL/INT/BOOL uniquement) :
 // à confirmer par compilation CODESYS réelle avant de considérer ce lot terminé.
 HwIn.Winch       := SEL(WinchInputSourceSimulated, HwRealQualified.Winch, instSimBench.Winch);
-HwIn.Translation := SEL(TranslationSourceSimulated, HwRealQualified.Translation, instSimBench.Translation);
-HwIn.Operator     := SEL(OperatorSourceSimulated, HwReal.Operator, instSimBench.Operator);
-HwIn.Machine      := SEL(MachineSourceSimulated, HwRealQualified.Machine, instSimBench.Machine);
+HwIn.Translation := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive, HwRealQualified.Translation, instSimBench.Translation);
+HwIn.Operator     := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive, HwReal.Operator, instSimBench.Operator);
+HwIn.Machine      := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive, HwRealQualified.Machine, instSimBench.Machine);
 
 
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===

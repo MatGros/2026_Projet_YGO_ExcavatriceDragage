@@ -389,6 +389,16 @@ def _write_value_copy(ld: ET.Element, stmt: AssignmentAST, start_id: int) -> int
     return _write_call_as_block(ld, "MOVE", "IN := " + stmt.expression, stmt.target_var, start_id, unverified=True)
 
 
+# Real IEC 61131-3 formal parameter names for standard functions used positionally
+# (no ":=" in the call site) -- CODESYS validates a block's formalParameter names
+# against the function's actual signature, so a generic IN0/IN1/... placeholder is
+# wrong for any function with named parameters (REX 2026-08-13: SEL's first param
+# is "G", not "IN0" -- confirmed positional args must map to the real names).
+_KNOWN_POSITIONAL_PARAMS: dict[str, list[str]] = {
+    "SEL": ["G", "IN0", "IN1"],
+}
+
+
 def _write_call_as_block(ld: ET.Element, fn_name: str, args_str: str, target_var: str, start_id: int, unverified: bool = False) -> int:
     block_id = start_id
     curr_id = start_id + 1
@@ -402,11 +412,18 @@ def _write_call_as_block(ld: ET.Element, fn_name: str, args_str: str, target_var
     ET.SubElement(block, "position", x="0", y="0")
 
     in_vars_el = ET.SubElement(block, "inputVariables")
+    known_names = _KNOWN_POSITIONAL_PARAMS.get(fn_name, [])
+    positional_idx = 0
     for p_item in _split_top_level_expr(args_str):
         if ":=" in p_item:
             p_name, p_val = [x.strip() for x in p_item.split(":=", 1)]
         else:
-            p_name, p_val = f"IN{len(in_vars_el)}", p_item.strip()
+            if positional_idx < len(known_names):
+                p_name = known_names[positional_idx]
+            else:
+                p_name = f"IN{positional_idx}"
+            p_val = p_item.strip()
+            positional_idx += 1
 
         in_var = ET.SubElement(in_vars_el, "variable")
         in_var.set("formalParameter", p_name)
