@@ -52,19 +52,56 @@ def _split_top_level(text: str) -> list[str]:
     return [p for p in parts if p]
 
 
-def _split_statements(body_text: str) -> list[str]:
+_NETWORK_TITLE_RE = re.compile(r"^===\s*(.+?)\s*===$")
+
+
+def _extract_comment_blocks(body_text: str) -> dict[int, str]:
+    """Map 1-indexed statement-start line -> preceding comment text (as-written).
+
+    Two real, distinct comment kinds observed in this codebase (REX 2026-08-13) --
+    both captured here, classification (title vs plain) happens in ld_xml_writer.py:
+      1. `// === §N TITLE ===` box comment -> CODESYS network title
+         (confirmed pattern: <comment> + <vendorElement ElementType=networktitle>,
+         PRG_06_Outputs_LD oracle export).
+      2. A plain `// explanatory text` line -> ordinary <comment>, no vendorElement.
+    Only a comment on its OWN line, directly preceding a statement (blank lines
+    tolerated in between) is captured -- a comment embedded inside a multi-line
+    function call's parameter list is a separate, unsolved problem.
+    """
+    lines = body_text.splitlines()
+    blocks: dict[int, str] = {}
+    block_lines: list[str] = []
+    for idx, line in enumerate(lines, start=1):
+        stripped = line.strip()
+        if stripped.startswith("//"):
+            block_lines.append(stripped[2:].strip())
+            continue
+        if not stripped:
+            continue  # blank line between a comment block and its statement: keep pending
+        if block_lines:
+            blocks[idx] = "\n".join(block_lines)
+            block_lines = []
+    return blocks
+
+
+def _split_statements(body_text: str) -> list[tuple[str | None, str]]:
     """Join multi-line ST statements into single logical units, split on top-level ';'.
 
     A naive line-by-line scan silently drops any statement (FB call, assignment)
     that spans multiple physical lines -- e.g. a multi-parameter FB call written
     one named parameter per line, common style in this codebase (REX 2026-08-13:
     instSimBench(...) was entirely dropped, no <block> emitted at all).
+
+    Returns [(comment_or_None, statement_text)].
     """
+    comment_blocks = _extract_comment_blocks(body_text)
     clean = _strip_comments(body_text)
-    statements: list[str] = []
+    statements: list[tuple[str | None, str]] = []
     buf: list[str] = []
+    buf_start_line: int | None = None
     depth = 0
     if_depth = 0
+    line_no = 1
     # Word-boundary scan for IF/END_IF so a whole conditional becomes ONE statement
     # instead of being fragmented at its internal ';' -- fragmenting produces corrupt
     # variable names (e.g. "IF NOT X THEN Y" as a target) that crash CODESYS import
@@ -81,9 +118,16 @@ def _split_statements(body_text: str) -> list[str]:
                 if_depth += 1
             elif word == "END_IF":
                 if_depth -= 1
+            if buf_start_line is None:
+                buf_start_line = line_no
             buf.append(word)
             i = m.end()
             continue
+        if ch == "\n":
+            line_no += 1
+        elif not ch.isspace():
+            if buf_start_line is None:
+                buf_start_line = line_no
         if ch == "(":
             depth += 1
         elif ch == ")":
@@ -92,14 +136,17 @@ def _split_statements(body_text: str) -> list[str]:
         if ch == ";" and depth <= 0 and if_depth <= 0:
             stmt = "".join(buf).strip()
             if stmt:
-                statements.append(stmt)
+                comment = comment_blocks.get(buf_start_line) if buf_start_line else None
+                statements.append((comment, stmt))
             buf = []
+            buf_start_line = None
             depth = 0
             if_depth = 0
         i += 1
     tail = "".join(buf).strip()
     if tail:
-        statements.append(tail)
+        comment = comment_blocks.get(buf_start_line) if buf_start_line else None
+        statements.append((comment, tail))
     return statements
 
 
@@ -177,7 +224,7 @@ def parse_st_source(st_text: str, default_name: str = "PRG_Unknown") -> ProgramA
     # Parse body statements
     fb_calls: dict[str, FbCallAST] = {}
 
-    for raw_stmt in _split_statements(body_text):
+    for stmt_comment, raw_stmt in _split_statements(body_text):
         stmt = " ".join(raw_stmt.split())
         if not stmt:
             continue
@@ -197,7 +244,7 @@ def parse_st_source(st_text: str, default_name: str = "PRG_Unknown") -> ProgramA
             params_str = fb_call_match.group(2)
             fb_type = fb_instances.get(inst_name, "FB_Block")
 
-            fb_ast = FbCallAST(instance_name=inst_name, fb_type=fb_type, raw_text=stmt)
+            fb_ast = FbCallAST(instance_name=inst_name, fb_type=fb_type, raw_text=stmt, comment=stmt_comment)
 
             if params_str.strip():
                 # Parse parameters inside () -- split on top-level commas only,
@@ -237,23 +284,23 @@ def parse_st_source(st_text: str, default_name: str = "PRG_Unknown") -> ProgramA
             # split below must never run on a call's text (REX 2026-08-13: produced
             # two garbage contacts, each holding a fragment of the SEL(...) text).
             if re.match(r"^[A-Za-z_]\w*\s*\(.*\)$", expr, re.DOTALL):
-                ast.statements.append(AssignmentAST(target_var=target, expression=expr, raw_text=stmt))
+                ast.statements.append(AssignmentAST(target_var=target, expression=expr, raw_text=stmt, comment=stmt_comment))
                 continue
 
             # Check OR network
             if " OR " in expr:
                 conds = [c.strip() for c in expr.split(" OR ")]
-                ast.statements.append(BooleanNetworkAST(target_var=target, operator="OR", operands=conds, raw_text=stmt))
+                ast.statements.append(BooleanNetworkAST(target_var=target, operator="OR", operands=conds, raw_text=stmt, comment=stmt_comment))
                 continue
 
             # Check AND network
             if " AND " in expr:
                 conds = [c.strip() for c in expr.split(" AND ")]
-                ast.statements.append(BooleanNetworkAST(target_var=target, operator="AND", operands=conds, raw_text=stmt))
+                ast.statements.append(BooleanNetworkAST(target_var=target, operator="AND", operands=conds, raw_text=stmt, comment=stmt_comment))
                 continue
 
             # Simple contact/coil or assignment
-            ast.statements.append(AssignmentAST(target_var=target, expression=expr, raw_text=stmt))
+            ast.statements.append(AssignmentAST(target_var=target, expression=expr, raw_text=stmt, comment=stmt_comment))
 
     return ast
 
