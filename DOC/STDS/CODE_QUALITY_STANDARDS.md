@@ -420,8 +420,9 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 |---|---|
 | `var` (BOOL connu) | contact `negated="false"` |
 | `NOT var` (BOOL connu) | contact `negated="true"` |
-| `var1 AND var2` | série de contacts |
-| `var1 OR var2` | parallèle de contacts |
+| `var1 AND var2` (2 termes) | série de contacts |
+| `var1 OR var2` (2 termes) | parallèle de contacts |
+| Condition composée ≥3 termes nommés (post §2bis) | bloc `AND`/`OR`/`NOT` — 1 broche par terme, résultat à droite. **Jamais** de chaîne série/parallèle au-delà de 2 termes : illisible à l'import et invérifiable en Watch |
 | Expression typée non-BOOL | `inVariable` → `outVariable` (hors page BOOL pure) |
 
 - **`NOT var` ne produit jamais d'`inVariable`/`outVariable`** pour un signal
@@ -429,6 +430,33 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 - Une page `_LD` de type BOOL pur (notamment `PRG_06_Outputs_LD`) ne doit contenir
   **aucun** `inVariable` ni `outVariable` — uniquement des `contact`, `coil`,
   `block` et `comment`.
+
+### Structures conditionnelles (`IF/ELSE`) — REX 2026-08-13
+
+> 🚩 `PRG_02_Acquisition_LD` importé le 2026-08-13 a révélé un `IF WinchInputSourceSimulated
+> THEN HwIn.Winch := instSimBench.Winch; ELSE HwIn.Winch := HwRealQualified.Winch; END_IF;`
+> compacté sur une ligne : le générateur a fuité le texte brut `ELSE ... END_IF` dans un contact.
+
+Sous-ensemble ST **obligatoire** pour tout `_LD.st` contenant une sélection conditionnelle :
+
+- `IF` / `ELSIF` / `ELSE` / `END_IF` chacun sur **sa propre ligne** — le style compact
+  (`IF x THEN a := b; ELSE a := c; END_IF;` sur une seule ligne) est **interdit**.
+- **1 instruction par ligne** — jamais deux `:=` sur la même ligne.
+- Commentaire de fin de ligne (`// ...`) **interdit** dans le corps exécutable d'un `_LD.st` —
+  uniquement en ligne dédiée, précédant l'instruction qu'il documente.
+- `CASE` est **hors périmètre `_LD.st`** : les machines à état restent en ST pur dans le corps
+  d'un FB (§11bis), jamais directement en page LD.
+- Toute construction hors de ce sous-ensemble doit être **refusée** par le générateur
+  (erreur bloquante) — jamais approximée ou silencieusement corrompue en sortie.
+
+### Extraction FC pour logique de sélection typée — REX 2026-08-13
+
+Une logique de sélection/condition répétée sur des structs différents (ex. bascule
+Sim/Réel par domaine machine) ne se duplique **jamais** inline dans le PRG appelant :
+extraction en `FC_<Domaine><Action>` dédié par type (ex. `FC_SelectWinchSource`,
+`FC_SelectTranslationSource`) — pas de FC générique paramétrable par type dans ce projet.
+Le réseau LD du PRG appelant devient alors un simple bloc (appel FC) câblé à sa sortie,
+sans logique conditionnelle à traduire au niveau du PRG.
 
 ### Tests de régression
 
