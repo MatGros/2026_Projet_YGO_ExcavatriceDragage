@@ -57,7 +57,7 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 
 1. ✅ Charger la skill [`codesys-workflow`](.claude/skills/codesys-workflow.md)
 2. ✅ Lire les documents 1 à 5 ci-dessus (ajuster la spec métier : Joystick=P08, Encoder/Homing=P09,
-   Treuils **Benne incluse**=P10, Translation=P11, Diagnostic=P12
+   Treuils **Benne incluse**=P10, Translation=P11, Diagnostic=P12, Simulation=P13, Troubleshooting=P14
 3. ✅ Vérifier que la spec est complète → sinon **demander**, ne pas deviner
 4. ✅ Auditer nommage, interface FB, sécurité **avant** d'écrire
 5. ✅ Vérifier mécaniquement la liaison **avant** de restituer (voir ci-dessous)
