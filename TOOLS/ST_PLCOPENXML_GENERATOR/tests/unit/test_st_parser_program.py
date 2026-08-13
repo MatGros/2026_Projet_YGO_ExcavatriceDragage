@@ -28,6 +28,6 @@ def test_real_prg_acquisition_parses_end_to_end():
     assert obj.name == "PRG_02_Acquisition"
     names = [v.name for v in obj.output_vars]
     assert "HwReal" in names
-    assert "HwRealQualified" in names
+    assert "HwRealQualified" not in names
     assert "HwIn" in names
     assert not diag.has_errors()

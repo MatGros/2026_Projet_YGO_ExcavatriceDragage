@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.767541" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T18:19:14.767541">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T22:17:06.143048" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T22:17:06.143048">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1998,7 +1998,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §3bis
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3bis
    🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
       pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
       TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
@@ -4895,11 +4895,6 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
               </documentation>
             </variable>
             <variable name="HwReal">
-              <type>
-                <derived name="ST_HardwareImage" />
-              </type>
-            </variable>
-            <variable name="HwRealQualified">
               <type>
                 <derived name="ST_HardwareImage" />
               </type>

@@ -1,14 +1,12 @@
-# Analyse Fonctionnelle - Partie 6 : Acquisition & Qualification I/O (v2.1)
+# Analyse Fonctionnelle - Partie 6 : Acquisition & Qualification I/O (v2.2)
 
 > Role : definir la frontiere unique d'acquisition de `PRG_02_Acquisition` (ST).
 > Statut : décision documentaire préalable au retrait de `PRG_01_Inputs_LD` et `FB_Input`.
 > Les décisions de mouvement restent hors de ce document.
 > 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 
-**Décision v2.1 :** `PRG_02_Acquisition` devient l'unique producteur de `HwReal`,
-`HwRealQualified`, `HwSim`, `HwIn` et des diagnostics d'acquisition. `PRG_01_Inputs_LD`, `FB_Input` et `ST_InputsQualified`
-ne sont pas supprimés dans cette phase documentaire ; ils seront retirés après remappage prouvé
-des derniers consommateurs et validation du filtrage matériel ou de son déplacement dans `PRG_02`.
+**Décision v2.2 :** `PRG_02_Acquisition` devient l'unique producteur de `HwReal`,
+`HwSim`, `HwIn` et des diagnostics d'acquisition. Le filtrage TOR applicatif non requis a été retiré.
 
 
 ## 🧭 Sommaire
@@ -36,13 +34,12 @@ des derniers consommateurs et validation du filtrage matériel ou de son déplac
 
 ## 🎯 1. Role
 
-`PRG_02_Acquisition` acquiert les entrées réelles, construit les images `HwReal`/`HwRealQualified`/`HwSim`/`HwIn`,
+`PRG_02_Acquisition` acquiert les entrées réelles, construit les images `HwReal`/`HwSim`/`HwIn`,
 normalise les faits d'entrée et publie les diagnostics device. Il ne décide ni `SafeStop`, ni mode,
 ni commande actionneur.
 
 L'acquisition publie des **faits qualifiés** :
 - E/S TOR, PDO et mesures réelles brutes dans `HwReal` ;
-- E/S TOR réelles filtrées dans `HwRealQualified` via `FB_DigitalInputFilter` ;
 - image simulée dans `HwSim` ;
 - image effectivement consommée dans `HwIn` ;
 - disponibilité des devices, dont les trois modules DI (`Local_Digital_IO`, `VH_0800END`,
@@ -53,7 +50,6 @@ Le nom métier des entrées porte la polarité attendue (`EmergencyChainClosed_D
 chaîne fermée, par exemple). Toute inversion nécessaire doit être prouvée par le mapping réel et
 centralisée dans cette frontière ; aucun consommateur ne ré-inverse un signal.
 
-Le filtrage équivalent est porté par `FB_DigitalInputFilter` dans `PRG_02` pour les 22 TOR.
 `GetDeviceState()` reste un diagnostic de carte, pas un filtre de voie.
 
 ---
@@ -61,13 +57,12 @@ Le filtrage équivalent est porté par `FB_DigitalInputFilter` dans `PRG_02` pou
 ## 🏗️ 2. Chaine d'acquisition
 
 ```text
-E/S TOR + PDO + devices réels ──► PRG_02_Acquisition ──► HwReal brut
-                                      │                         │
-                                      │                         ├──► FB_DigitalInputFilter ×22
-                                      │                         │       └──► HwRealQualified
-                                      ├──► FB_SimBench ──► HwSim │
-                                      └──► sélection par domaine ───► HwIn
-                                                                  │
+E/S TOR + PDO + devices réels ──► PRG_02_Acquisition ──► HwReal brut ──┐
+                                      │                                 │
+                                      ├──► FB_SimBench ──► HwSim        ├──► sélection par domaine ──► HwIn
+                                      │                                 │
+                                      └─────────────────────────────────┘
+                                                                        │
 Modes/Cycle → procédés avec leur safety → PRG_06_Outputs_LD → Supervision
 ```
 
@@ -76,7 +71,7 @@ Modes/Cycle → procédés avec leur safety → PRG_06_Outputs_LD → Supervisio
 | 🧱 Frontière unique | Aucun FB métier ne lit une E/S brute device ; il lit `HwIn`. |
 | 🧪 Simulation | La bascule réel/simulé se fait une seule fois, par domaine, dans `PRG_02_Acquisition`. |
 | 🔒 Polarité | Chaque champ `HwIn` expose l'état métier attendu ; aucune ré-inversion aval. |
-| ✍️ Producteur unique | `PRG_02_Acquisition` est l'unique producteur de `HwReal`, `HwRealQualified`, `HwSim`, `HwIn` et diagnostics acquisition. |
+| ✍️ Producteur unique | `PRG_02_Acquisition` est l'unique producteur de `HwReal`, `HwSim`, `HwIn` et diagnostics acquisition. |
 | 🪜 Entrées | `PRG_01_Inputs_LD` est une couche historique en retrait ; aucun nouveau consommateur ne doit y être ajouté. |
 
 Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte seulement leur acquisition et leur publication.
@@ -140,16 +135,15 @@ d'arrêt) et publie sa calibration/requête de preset vers la chaîne EtherCAT.
 > écrivain. Quatre images du même type `ST_HardwareImage` (brute / qualifiée / simulée / sélectionnée).
 > Aucun FB métier ne lit une E/S brute device : tout passe par `HwIn`.
 
-### 🧱 `ST_HardwareImage` — quatre images d'acquisition
+### 🧱 `ST_HardwareImage` — trois images d'acquisition
 
 | | Instance | Contenu | Producteur | Lecteurs |
 |---|---|---|---|---|
-| Brute | `HwReal` | Image device réelle brute | `PRG_02_Acquisition` (lectures E/S/PDO, `GetDeviceState`) | `FB_SimBench`, dépannage |
-| Qualifiée | `HwRealQualified` | Image réelle TOR filtrée, sans inversion | `PRG_02_Acquisition` + `FB_DigitalInputFilter` ×22 | sélection réel uniquement |
+| Brute | `HwReal` | Image device réelle brute | `PRG_02_Acquisition` (lectures E/S/PDO, `GetDeviceState`) | `FB_SimBench`, sélection, dépannage |
 | Simulée | `HwSim` | Image simulée normalisée | `FB_SimBench` | `PRG_02_Acquisition` uniquement |
-| Sélectionnée | `HwIn` | Image résultante par domaine (réel qualifié ou simulé) | `PRG_02_Acquisition` | **Tout le programme métier** (Modes, Treuils/Benne, Translation, Outputs, Supervision) |
+| Sélectionnée | `HwIn` | Image résultante par domaine (réel brut ou simulé) | `PRG_02_Acquisition` | **Tout le programme métier** (Modes, Treuils/Benne, Translation, Outputs, Supervision) |
 
-**Structure** (4 sous-domaines, identiques entre les 4 images) :
+**Structure** (4 sous-domaines, identiques entre les 3 images) :
 
 | Champ | Type | Contenu | Unités | Polarité |
 |---|---|---|---|---|
@@ -161,10 +155,10 @@ d'arrêt) et publie sa calibration/requête de preset vers la chaîne EtherCAT.
 **Sélection par domaine** (une seule bascule, visible dans le CFC Acquisition) :
 
 ```text
-HwIn.<Domaine> := SEL(SimActive.<Domaine>, HwSim.<Domaine>, <réel du domaine>)
+HwIn.<Domaine> := SEL(SimActive.<Domaine>, HwReal.<Domaine>, HwSim.<Domaine>)
 ```
 
-- Domaine réel → source = `HwRealQualified` filtrée par `FB_DigitalInputFilter`.
+- Domaine réel → source = `HwReal`.
 - Domaine simulé → source = `HwSim` **sans filtrage supplémentaire** (valeurs simulées normalisées, AF13 §4).
 - 🧪 Tous les domaines ont la même logique visible : pas de bascule cachée dans un Ladder.
 
@@ -174,8 +168,7 @@ disponibilité (device, communication) restent évalués sur la source réelle p
 **Cadence** : tâche `MainTask` (cycle rapide, AF02 §4), lecture seule, aucun effet de bord.
 
 **Tests de contrat** :
-- Sans simulation : `HwIn.<domaine> == HwRealQualified.<domaine>`.
-- Dépannage : comparer `HwReal` brut et `HwRealQualified` filtré.
+- Sans simulation : `HwIn.<domaine> == HwReal.<domaine>`.
 - Simulation active sur un domaine : `HwIn.<Domaine> == HwSim.<Domaine>` quel que soit le réel.
 - Aucun `_DI` de `HwIn` n'a une polarité physique : tout `TRUE` = état logique normalisé.
 
@@ -439,7 +432,7 @@ Cible : `PRG_07_Supervision_CFC`, qui absorbe le troubleshooting en lecture seul
 - Diagnostic par canal (`FB_Input.ChannelOk`) : non disponible avec le materiel actuel
   (`GetDeviceState()` = etat carte, pas etat voie) — a revisiter si un module diagnostiquant
   chaque canal individuellement est installe.
-- ~~Contrat exact des structures de publication internes vers les pages CFC.~~ ✅ **Résolu** — §2ter : `ST_HardwareImage` (HwReal/HwRealQualified/HwSim/HwIn), diagnostic modules et `ST_EncoderMeasurements` (M1/M2, lecteurs Treuils/Modes/Supervision).
+- ~~Contrat exact des structures de publication internes vers les pages CFC.~~ ✅ **Résolu** — §2ter : `ST_HardwareImage` (HwReal/HwSim/HwIn), diagnostic modules et `ST_EncoderMeasurements` (M1/M2, lecteurs Treuils/Modes/Supervision).
 
 ## 📚 Documents lies
 

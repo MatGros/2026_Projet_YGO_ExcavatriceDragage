@@ -4447,7 +4447,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</html:xhtml>
           <html:xhtml>═══════════════════════════════════════════════════════════════
    📏 ST_EncoderMeasurement — Mesures codeur qualifiées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2ter
+   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §2ter
    🎨 Facts de la chaîne de mesure pure : Abs → Scale → Safety → SpeedMeasure.
    🔗 Producteur : PRG_02_Acquisition_CFC (chaîne codeur du treuil concerné).
    ✅ Tout BOOL = TRUE état normalisé. Aucun brut EtherCAT (alarmes/warnings,
@@ -4485,7 +4485,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</html:xhtml>
           <html:xhtml>═══════════════════════════════════════════════════════════════
    📏 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
    ───────────────────────────────────────────────────────────────
-   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2ter
+   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §2ter
    🎨 Un sous-DUT par treuil (M1, M2) de la chaîne de mesure pure.
    🔗 Producteur unique : PRG_02_Acquisition_CFC (rang 02, chaîne codeur M1/M2).
       Lecteurs : PRG_04_Treuils_Benne_CFC, PRG_03_Modes_Cycle_CFC, Supervision/IHM.
@@ -5168,7 +5168,7 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</html:xhtml>
           <html:xhtml>═══════════════════════════════════════════════════════════════
    🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §3bis
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3bis
    🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
       pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
       TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
@@ -11997,7 +11997,7 @@ TimeLast := TimeCurrent;
    📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §3
+              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3
    🎯 Rôle : Décide Online/Operational et publie ST_Diag_Device.
       Distinction explicite dans State :
       - INIT       : pas encore online (ni réel, ni bypass)
@@ -12371,7 +12371,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</html:xhtml>
    📡 FB_Diag_Ethercat — Diagnostic bus EtherCAT (3 esclaves)
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §3
+              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3
    🎯 Rôle : Décide Online/Operational pour variateur M3 + codeurs M1/M2.
       Publie ST_Diag_Device par device + state global.
    ═══════════════════════════════════════════════════════════════</html:xhtml>
@@ -12703,83 +12703,6 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>7e9589ba-412d-5501-80d5-184905e87d23</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_DigitalInputFilter" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="InputRaw">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>Valeur brute du canal réel</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="FilterTime">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <html:xhtml>Durée minimale de stabilité avant validation</html:xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="State">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <html:xhtml>Valeur filtrée ; première valeur prise immédiatement au démarrage</html:xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="FilterTon">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="FirstScanDone">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-          </localVars>
-          <documentation>
-            <html:xhtml>═══════════════════════════════════════════════════════════════
-   📥 FB_DigitalInputFilter — Filtre temporel minimal d'une entrée TOR
-   ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md
-   🎯 Rôle unique : accepter un changement BOOL seulement après FilterTime.
-   🛡️ Ce FB ne normalise pas la polarité et ne réalise aucun diagnostic device.
-      La polarité est portée par le nom/mapping d'acquisition ; la santé carte
-      est publiée séparément par PRG_02_Acquisition.GetDeviceState().
-   🔗 Producteur : PRG_02_Acquisition, image HwRealQualified.
-   ═══════════════════════════════════════════════════════════════</html:xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <html:xhtml>
-
-IF NOT FirstScanDone THEN
-    State := InputRaw;
-    FirstScanDone := TRUE;
-ELSE
-    FilterTon(IN := (InputRaw &lt;&gt; State), PT := FilterTime);
-    IF FilterTon.Q THEN
-        State := InputRaw;
-    END_IF;
-END_IF;
-</html:xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>127981b6-b363-5819-9fb6-c0bf2b6d50a4</ObjectId>
           </data>
         </addData>
       </pou>
@@ -23111,11 +23034,6 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <derived name="ST_HardwareImage" />
               </type>
             </variable>
-            <variable name="HwRealQualified">
-              <type>
-                <derived name="ST_HardwareImage" />
-              </type>
-            </variable>
             <variable name="InputModuleFault">
               <type>
                 <BOOL />
@@ -25987,14 +25905,6 @@ Status Word 0x3102 (%IW8)</html:xhtml>
                 <html:xhtml>Image brute réelle ; TRUE = état physique lu</html:xhtml>
               </documentation>
             </variable>
-            <variable name="HwRealQualified">
-              <type>
-                <derived name="ST_HardwareImage" />
-              </type>
-              <documentation>
-                <html:xhtml>Image réelle TOR filtrée ; TRUE = état stable</html:xhtml>
-              </documentation>
-            </variable>
             <variable name="HwSim">
               <type>
                 <derived name="ST_HardwareImage" />
@@ -26284,119 +26194,6 @@ Vitesse absolue M1, m/s</html:xhtml>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="instFilterPowerContactor">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-              <documentation>
-                <html:xhtml>── Filtrage temporel des 22 TOR réelles ──</html:xhtml>
-              </documentation>
-            </variable>
-            <variable name="instFilterEmergencyChain">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterPhaseRotation">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterBrakeThermal">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterM1Brake">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterM2Brake">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterM3Brake">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterM1Contactors">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterM1Thermal">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterM2Contactors">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterM2Thermal">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterTensionedCable">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterKobold">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterM3Thermal">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterTopPosition">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterPosTremie">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterPosPV">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterPosP2">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterPosP1">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterPosMaintenance">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterHydraulicThermal">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
-            <variable name="instFilterConveyorReady">
-              <type>
-                <derived name="FB_DigitalInputFilter" />
-              </type>
-            </variable>
             <variable name="instSimBench">
               <type>
                 <derived name="FB_SimBench" />
@@ -26524,13 +26321,31 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</html:xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>── Mémoire bascule simulation Winch ──</html:xhtml>
+                <html:xhtml>── Sélection de source par domaine ──</html:xhtml>
               </documentation>
+            </variable>
+            <variable name="TranslationInputSourceSimulated">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="OperatorInputSourceSimulated">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MachineInputSourceSimulated">
+              <type>
+                <BOOL />
+              </type>
             </variable>
             <variable name="PreviousWinchInputSourceSimulated">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <html:xhtml>── Mémoire de détection de changement Winch ──</html:xhtml>
+              </documentation>
             </variable>
             <variable name="WinchInputSourceInitialized">
               <type>
@@ -26542,9 +26357,9 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</html:xhtml>
             <html:xhtml>═══════════════════════════════════════════════════════════════
    📡 PRG_02_Acquisition — Programme d'Acquisition et Qualification I/O
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §2
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §2
    ⚙️ Exécuté en tête de la chaîne métier (après les initialisations système).
-   🎯 Rôle unique : Produire les images HwReal/HwRealQualified/HwSim/HwIn,
+   🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
       et publier les retours.
    ═══════════════════════════════════════════════════════════════</html:xhtml>
@@ -26606,60 +26421,6 @@ HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
 HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
-// === 🧰 §1bis FILTRAGE TOR RÉEL ===
-// HwReal reste brut pour le diagnostic. HwRealQualified porte la même image
-// après filtrage temporel ; aucune inversion ni information de santé carte ici.
-HwRealQualified := HwReal;
-
-instFilterPowerContactor(InputRaw := HwReal.Machine.PowerContactorEngaged_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.PowerContactorEngaged_DI := instFilterPowerContactor.State;
-instFilterEmergencyChain(InputRaw := HwReal.Machine.EmergencyChainClosed_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.EmergencyChainClosed_DI := instFilterEmergencyChain.State;
-instFilterPhaseRotation(InputRaw := HwReal.Machine.PhaseRotationOk_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.PhaseRotationOk_DI := instFilterPhaseRotation.State;
-instFilterBrakeThermal(InputRaw := HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.M1_M2_M3_BrakeThermalOk_DI := instFilterBrakeThermal.State;
-instFilterKobold(InputRaw := HwReal.Machine.M1_M2_KoboldBottomTouch_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.M1_M2_KoboldBottomTouch_DI := instFilterKobold.State;
-instFilterHydraulicThermal(InputRaw := HwReal.Machine.HydraulicThermalOk_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.HydraulicThermalOk_DI := instFilterHydraulicThermal.State;
-instFilterConveyorReady(InputRaw := HwReal.Machine.ConveyorInfeedReady_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.ConveyorInfeedReady_DI := instFilterConveyorReady.State;
-// 🆕 2026-08-12 : HopperFull_OR_GateRaised_DI déclaré, pas encore filtré/consommé (pas de câblage
-// électrique confirmé) — pas de FB_DigitalInputFilter tant qu'aucun consommateur n'existe.
-HwRealQualified.Machine.HopperFull_OR_GateRaised_DI := HwReal.Machine.HopperFull_OR_GateRaised_DI;
-
-instFilterM1Contactors(InputRaw := HwReal.Winch.M1_ContactorsReleased_DI, FilterTime := T#20MS);
-HwRealQualified.Winch.M1_ContactorsReleased_DI := instFilterM1Contactors.State;
-instFilterM1Thermal(InputRaw := HwReal.Winch.M1_ThermalOk_DI, FilterTime := T#20MS);
-HwRealQualified.Winch.M1_ThermalOk_DI := instFilterM1Thermal.State;
-instFilterM1Brake(InputRaw := HwReal.Winch.M1_BrakeIsOpen_DI, FilterTime := T#20MS);
-HwRealQualified.Winch.M1_BrakeIsOpen_DI := instFilterM1Brake.State;
-instFilterM2Contactors(InputRaw := HwReal.Winch.M2_ContactorsReleased_DI, FilterTime := T#20MS);
-HwRealQualified.Winch.M2_ContactorsReleased_DI := instFilterM2Contactors.State;
-instFilterM2Thermal(InputRaw := HwReal.Winch.M2_ThermalOk_DI, FilterTime := T#20MS);
-HwRealQualified.Winch.M2_ThermalOk_DI := instFilterM2Thermal.State;
-instFilterM2Brake(InputRaw := HwReal.Winch.M2_BrakeIsOpen_DI, FilterTime := T#20MS);
-HwRealQualified.Winch.M2_BrakeIsOpen_DI := instFilterM2Brake.State;
-instFilterTensionedCable(InputRaw := HwReal.Winch.M2_TensionedCable_DI, FilterTime := T#20MS);
-HwRealQualified.Winch.M2_TensionedCable_DI := instFilterTensionedCable.State;
-instFilterTopPosition(InputRaw := HwReal.Winch.M1M2_TopPositionFree_DI, FilterTime := T#20MS);
-HwRealQualified.Winch.M1M2_TopPositionFree_DI := instFilterTopPosition.State;
-
-instFilterM3Brake(InputRaw := HwReal.Translation.M3_BrakeIsOpen_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_BrakeIsOpen_DI := instFilterM3Brake.State;
-instFilterM3Thermal(InputRaw := HwReal.Translation.M3_ThermalOK_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_ThermalOK_DI := instFilterM3Thermal.State;
-instFilterPosTremie(InputRaw := HwReal.Translation.M3_PosTremie_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_PosTremie_DI := instFilterPosTremie.State;
-instFilterPosPV(InputRaw := HwReal.Translation.M3_PosPV_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_PosPV_DI := instFilterPosPV.State;
-instFilterPosP2(InputRaw := HwReal.Translation.M3_PosP2_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_PosP2_DI := instFilterPosP2.State;
-instFilterPosP1(InputRaw := HwReal.Translation.M3_PosP1_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_PosP1_DI := instFilterPosP1.State;
-instFilterPosMaintenance(InputRaw := HwReal.Translation.M3_PosMaintenance_DI, FilterTime := T#20MS);
-HwRealQualified.Translation.M3_PosMaintenance_DI := instFilterPosMaintenance.State;
 
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING =&gt; module opérationnel. Si la simulation globale/machine est active,
@@ -26674,6 +26435,7 @@ ELSE
     Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
 InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
+
 // === 🎭 §2 SIMULATION &amp; AIGUILLAGE (HwIn) ===
 
 instSimBench(
@@ -26724,12 +26486,17 @@ instSimBench(
     RawPosM2                 := _SimEncoderRawPosM2
 );
 
+// Exposition de l'image de simulation produite par le banc
 HwSim.Winch       := instSimBench.Winch;
 HwSim.Translation := instSimBench.Translation;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
 
-WinchInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
+OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
+MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive;
+
 IF NOT WinchInputSourceInitialized THEN
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
     WinchInputSourceInitialized := TRUE;
@@ -26742,16 +26509,11 @@ END_IF;
 // 🔧 SEL(G, IN0, IN1) : brique standard IEC 61131-3, retourne IN1 si G=TRUE, IN0 sinon
 // (AF_Partie-03 §1 : composer l'existant avant réimplémentation) — remplace les 4 IF/ELSE
 // compactés qui cassaient le générateur ST→LD (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
-// Condition câblée directement en G (pas de variable intermédiaire) pour Translation/Operator/
-// Machine : usage unique, contrairement à WinchInputSourceSimulated réutilisé pour la détection
-// de front ci-dessus (REX 2026-08-13, retour terrain).
-// Premier usage SEL() sur STRUCT dans ce projet (précédents = REAL/INT/BOOL uniquement) :
-// confirmé par import + compilation CODESYS réelle sur scratch/PRG_02_Acquisition_LD.st
-// (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
-HwIn.Winch       := SEL(WinchInputSourceSimulated, HwRealQualified.Winch, instSimBench.Winch);
-HwIn.Translation := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive, HwRealQualified.Translation, instSimBench.Translation);
-HwIn.Operator     := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive, HwReal.Operator, instSimBench.Operator);
-HwIn.Machine      := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive, HwRealQualified.Machine, instSimBench.Machine);
+// Utilisation explicite de HwSim.* et des 4 variables de sélection par domaine.
+HwIn.Winch       := SEL(WinchInputSourceSimulated, HwReal.Winch, HwSim.Winch);
+HwIn.Translation := SEL(TranslationInputSourceSimulated, HwReal.Translation, HwSim.Translation);
+HwIn.Operator    := SEL(OperatorInputSourceSimulated, HwReal.Operator, HwSim.Operator);
+HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machine);
 
 
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
@@ -32142,7 +31904,6 @@ instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
     HwReal               := PRG_02_Acquisition.HwReal,
-    HwRealQualified      := PRG_02_Acquisition.HwRealQualified,
     InputModuleFault     := PRG_02_Acquisition.InputModuleFault,
     LocalDigitalIoOk     := PRG_02_Acquisition.LocalDigitalIoOk,
     Vh0800EndOk          := PRG_02_Acquisition.Vh0800EndOk,
@@ -32926,7 +32687,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
           <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
-          <Object Name="FB_DigitalInputFilter" ObjectId="127981b6-b363-5819-9fb6-c0bf2b6d50a4" />
           <Object Name="FB_Output" ObjectId="b60dd37c-0508-57b7-805e-ba43b1805814" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />

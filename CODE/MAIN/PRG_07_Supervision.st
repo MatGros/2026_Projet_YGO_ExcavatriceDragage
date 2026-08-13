@@ -303,7 +303,6 @@ instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
     HwReal               := PRG_02_Acquisition.HwReal,
-    HwRealQualified      := PRG_02_Acquisition.HwRealQualified,
     InputModuleFault     := PRG_02_Acquisition.InputModuleFault,
     LocalDigitalIoOk     := PRG_02_Acquisition.LocalDigitalIoOk,
     Vh0800EndOk          := PRG_02_Acquisition.Vh0800EndOk,

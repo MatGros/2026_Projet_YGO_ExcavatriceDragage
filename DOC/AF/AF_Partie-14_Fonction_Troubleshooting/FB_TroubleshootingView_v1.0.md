@@ -29,7 +29,7 @@ Construit une image de dépannage lisible dans l'ordre **contexte → module →
 recopiant des faits déjà publiés par leurs producteurs réels :
 
 ```text
-PRG_02_Acquisition (HwReal/HwRealQualified/HwIn, InputModuleFault, diag devices)
+PRG_02_Acquisition (HwReal/HwIn, InputModuleFault, diag devices)
 PRG_03_Modes_Cycle (Auth)
 PRG_04_Treuils_Benne (état M1, état M2, safety, benne, synchro)
 PRG_05_Translation (état M3, safety)
@@ -55,7 +55,7 @@ Un seul appel, dans `PRG_07_Supervision`, après que tous les domaines aient pub
 | Port | Type | Rôle |
 |---|---|---|
 | `Enable` | `BOOL` | `TRUE` en permanence (aucune condition de scan) |
-| `HwIn`, `HwReal`, `HwRealQualified` | `ST_HardwareImage` | Image acquisition (`PRG_02_Acquisition`) |
+| `HwIn`, `HwReal` | `ST_HardwareImage` | Image acquisition (`PRG_02_Acquisition`) |
 | `InputModuleFault` | `BOOL` | Agrégat modules DI (`PRG_02_Acquisition`) |
 | `LocalDigitalIoOk`, `Vh0800EndOk`, `Vh0808EtpOk` | `BOOL` | États modules individuels |
 | `Auth` | `ST_Modes_Autorisations` | Mode et autorisations (`PRG_03_Modes_Cycle`) |

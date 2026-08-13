@@ -25,7 +25,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 
 <div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
   <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">
-    📡 &nbsp;<b>E/S Physiques [%IX / PDO]</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Acquisition réelle (HwReal & HwRealQualified)</span>
+    📡 &nbsp;<b>E/S Physiques [%IX / PDO]</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Acquisition réelle (HwReal)</span>
   </div>
 
   <div style="display:flex; flex-direction:column; align-items:center; margin:3px 0;">
@@ -51,12 +51,11 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
 les diagnostics devices/bus et les retours auxiliaires :
 
 1. il acquiert chaque E/S brute dans `HwReal : ST_HardwareImage` ;
-2. il filtre les 22 TOR dans `HwRealQualified` via `FB_DigitalInputFilter` ;
-3. il évalue `GetDeviceState()` et publie `InputModuleFault` ;
-4. `instSimBench` construit les sous-images simulées ;
-5. `HwSim : ST_HardwareImage` les expose pour observation ;
-6. les sélecteurs par domaine choisissent `HwRealQualified` ou `HwSim` dans `HwIn` ;
-7. `HwIn` alimente la logique métier.
+2. il évalue `GetDeviceState()` et publie `InputModuleFault` ;
+3. `instSimBench` construit les sous-images simulées ;
+4. `HwSim : ST_HardwareImage` les expose pour observation ;
+5. les sélecteurs par domaine choisissent `HwReal` ou `HwSim` dans `HwIn` ;
+6. `HwIn` alimente la logique métier.
 
 `PRG_01_Inputs_LD`, `FB_Input` et `ST_InputsQualified` sont en retrait documentaire et ne doivent
 plus recevoir de nouveau consommateur. Leur suppression effective intervient après le remappage
@@ -79,7 +78,7 @@ autorisés. Polarité positive : `TRUE = simulation active`; tous les flags sont
 | `SimMachineActive` | chaîne AU, contacteur, réarmement, phases, Kobold, hydrauliques |
 
 Le sélecteur est atomique par domaine : `HwIn.<Domaine> := HwSim.<Domaine>` ou
-`HwRealQualified.<Domaine>`. Il interdit tout mélange réel/simulé dans un même domaine.
+`HwReal.<Domaine>`. Il interdit tout mélange réel/simulé dans un même domaine.
 
 ## 4. 🧩 Modèle de banc
 
@@ -111,7 +110,6 @@ En vue instance de `PRG_02_Acquisition`, lire côte à côte les trois `ST_Hardw
 | Image | Signification |
 |---|---|
 | `HwReal` | valeur brute reçue du matériel/PDO |
-| `HwRealQualified` | valeur réelle TOR filtrée |
 | `HwSim` | valeur calculée par le banc |
 | `HwIn` | valeur réellement utilisée par le programme |
 

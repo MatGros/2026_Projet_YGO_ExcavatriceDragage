@@ -47,15 +47,15 @@ def test_legacy_qualified_types_are_absent_from_bundle() -> None:
     } & data_types
 
 
-def test_acquisition_filter_is_present_and_used() -> None:
+def test_acquisition_filter_is_retired() -> None:
     root = _bundle_root()
     names = _pou_names(root)
     assert "PRG_02_Acquisition" in names
-    assert "FB_DigitalInputFilter" in names
+    assert "FB_DigitalInputFilter" not in names
     acquisition = next(
         pou for pou in root.findall(".//pou:pou", NS)
         if pou.get("name") == "PRG_02_Acquisition"
     )
     body_text = ET.tostring(acquisition, encoding="unicode")
-    assert body_text.count("FB_DigitalInputFilter") >= 22
-    assert "HwRealQualified" in body_text
+    assert "FB_DigitalInputFilter" not in body_text
+    assert "HwRealQualified" not in body_text
