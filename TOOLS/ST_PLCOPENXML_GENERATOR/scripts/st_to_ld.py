@@ -41,7 +41,6 @@ def _is_ld_program(obj) -> bool:
         obj is not None
         and obj.kind == "program"
         and obj.name.startswith("PRG_")
-        and obj.name.endswith("_LD")
     )
 
 
@@ -61,7 +60,7 @@ def build_ld_pou_xml(st_path: Path, diagnostics: DiagnosticCollector) -> bytes:
 
 
 def build_ld_project_xml(
-    st_paths: list[Path], diagnostics: DiagnosticCollector
+    st_paths: list[Path], diagnostics: DiagnosticCollector, target_name: str | None = None
 ) -> bytes:
     """Assemble a full ``<project>`` bundle from multiple ``PRG_*_LD.st`` files."""
     objects_by_name: dict[str, object] = {}
@@ -75,6 +74,8 @@ def build_ld_project_xml(
                 f"{st_path.name}: not a PRG_*_LD program — st_to_ld.py only converts "
                 f"PROGRAM objects named PRG_*_LD. Got: {obj.kind} '{obj.name}'."
             )
+        if target_name and target_name.endswith("_LD") and not obj.name.endswith("_LD"):
+            obj.name = target_name
         objects_by_name[obj.name] = obj
         root_names.append(obj.name)
     return build_multi_file_project(objects_by_name, root_names, diagnostics)
@@ -107,12 +108,8 @@ def main(argv: list[str] | None = None) -> int:
 
     diagnostics = DiagnosticCollector()
     try:
-        if len(st_paths) == 1:
-            data = build_ld_pou_xml(st_paths[0], diagnostics)
-            label = "LD POU"
-        else:
-            data = build_ld_project_xml(st_paths, diagnostics)
-            label = f"LD project bundle ({len(st_paths)} POUs)"
+        data = build_ld_project_xml(st_paths, diagnostics, target_name=out_path.stem)
+        label = "LD project bundle"
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
