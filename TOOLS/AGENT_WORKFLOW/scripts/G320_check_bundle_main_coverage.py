@@ -166,7 +166,7 @@ def bundle_program_languages(bundle: Path) -> dict[str, list[set[str]]]:
 def check(root: Path) -> CheckResult:
     """Return coverage and identity failures independently."""
     main = root / "CODE" / "MAIN"
-    bundle = root / "CODE" / "CODE_Bundle.xml"
+    bundle = root / "CODE_XML" / "CODE_Bundle.xml"
     if not main.is_dir():
         return CheckResult([f"[BMC0] repertoire introuvable : {main}"], [])
     if not bundle.is_file():

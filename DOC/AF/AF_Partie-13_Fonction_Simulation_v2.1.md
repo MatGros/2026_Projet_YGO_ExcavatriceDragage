@@ -133,7 +133,7 @@ Les gates Python interdisent désormais :
 
 ## 7. 📥 Application CODESYS 3.5
 
-1. Importer le bundle unique `CODE/CODE_Bundle.xml` dans `Application` via
+1. Importer le bundle unique `CODE_XML/CODE_Bundle.xml` dans `Application` via
    **Project → Import PLCopenXML**.
 2. En vue instance, ouvrir `PRG_02_Acquisition` et comparer `HwReal`, `HwSim`, `HwIn`.
 3. Machine arrêtée : activer le bit maître puis un seul domaine; contrôler que `HwIn` bascule

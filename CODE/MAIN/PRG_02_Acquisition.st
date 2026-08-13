@@ -75,7 +75,7 @@ END_VAR
 
 VAR
     (* ── Filtrage temporel des 22 TOR réelles ── *)
-    instFilterPowerContactor      : FB_DigitalInputFilter;
+        instFilterPowerContactor      : FB_DigitalInputFilter;
     instFilterEmergencyChain      : FB_DigitalInputFilter;
     instFilterPhaseRotation       : FB_DigitalInputFilter;
     instFilterBrakeThermal        : FB_DigitalInputFilter;
@@ -100,7 +100,7 @@ VAR
 
     (* ── Blocs complexes ── *)
     instSimBench             : FB_SimBench;
-    instJoystick             : FB_Joystick;
+        instJoystick             : FB_Joystick;
     instEncoderAbsM1         : FB_Encoder_Abs;
     instEncoderScaleM1       : FB_Encoder_Scale;
     instHomingM1             : FB_Encoder_Homing;
@@ -128,6 +128,11 @@ VAR
     WinchInputSourceSimulated         : BOOL;
     PreviousWinchInputSourceSimulated : BOOL;
     WinchInputSourceInitialized       : BOOL;
+
+    (* ── Bascule simulation autres domaines (§2, sans mémoire de front) ── *)
+    TranslationSourceSimulated : BOOL;
+    OperatorSourceSimulated    : BOOL;
+    MachineSourceSimulated     : BOOL;
 END_VAR
 
 // === 📥 §1 ACQUISITION BRUTE (HwReal) ===
@@ -182,7 +187,6 @@ HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
 HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
-
 // === 🧰 §1bis FILTRAGE TOR RÉEL ===
 // HwReal reste brut pour le diagnostic. HwRealQualified porte la même image
 // après filtrage temporel ; aucune inversion ni information de santé carte ici.
@@ -251,8 +255,6 @@ ELSE
     Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
 InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
-
-
 // === 🎭 §2 SIMULATION & AIGUILLAGE (HwIn) ===
 
 instSimBench(
@@ -318,14 +320,19 @@ ELSE
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
 END_IF;
 
-IF WinchInputSourceSimulated
-    THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwRealQualified.Winch;             END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive
-    THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwRealQualified.Translation; END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive
-    THEN HwIn.Operator := instSimBench.Operator;       ELSE HwIn.Operator := HwReal.Operator;       END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
-    THEN HwIn.Machine := instSimBench.Machine;         ELSE HwIn.Machine := HwRealQualified.Machine;         END_IF;
+TranslationSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
+OperatorSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
+MachineSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive;
+
+// 🔧 SEL(G, IN0, IN1) : brique standard IEC 61131-3, retourne IN1 si G=TRUE, IN0 sinon
+// (AF_Partie-03 §1 : composer l'existant avant réimplémentation) — remplace les 4 IF/ELSE
+// compactés qui cassaient le générateur ST→LD (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
+// ⚠️ Premier usage SEL() sur STRUCT dans ce projet (précédents = REAL/INT/BOOL uniquement) :
+// à confirmer par compilation CODESYS réelle avant de considérer ce lot terminé.
+HwIn.Winch       := SEL(WinchInputSourceSimulated, HwRealQualified.Winch, instSimBench.Winch);
+HwIn.Translation := SEL(TranslationSourceSimulated, HwRealQualified.Translation, instSimBench.Translation);
+HwIn.Operator     := SEL(OperatorSourceSimulated, HwReal.Operator, instSimBench.Operator);
+HwIn.Machine      := SEL(MachineSourceSimulated, HwRealQualified.Machine, instSimBench.Machine);
 
 
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
@@ -364,8 +371,6 @@ JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prére
 JoystickDirectionX := instJoystick.DirectionX;
 JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
 JoystickXNeutral := (instJoystick.DirectionX = 0);
-
-
 // === 🧲 §4 CODEURS & HOMING (M1 / M2) ===
 
 instEncoderAbsM1(
@@ -534,8 +539,6 @@ instEncoderSpeedMeasureM2(
 M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
 M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
 M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
-
-
 // === ↔️ §5 DÉCODAGE POSITION TRANSLATION (M3) ===
 
 instPosDecoderM3(
@@ -560,8 +563,6 @@ M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 M3_SensorsWord          := instPosDecoderM3.SensorsWord;
-
-
 // === 📊 §6 FILTRAGE PT1 RETOURS VARIATEUR (M3) ===
 
 instCycleTimeAcq(DefaultValueS := 0.010);

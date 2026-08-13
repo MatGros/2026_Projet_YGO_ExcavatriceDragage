@@ -572,7 +572,7 @@ Regroupe tous les objets demandés ainsi que leurs dépendances transitives dans
 [cli.py] <-- (4. dépendances résolues) --- [dependency_resolver.py]
 [cli.py] -- (5. build_project_xml) --> [xml_builder.py] (inclut objets + dépendances + ProjectStructure multi-dossiers)
 [cli.py] <-- (6. XML Tree) ------------ [xml_builder.py]
-[cli.py] -- (7. write_file) ---------> [xml_serializer.py] --> Écrit sur disque (ex: CODE/CODE_Bundle.xml)
+[cli.py] -- (7. write_file) ---------> [xml_serializer.py] --> Écrit sur disque (ex: CODE_XML/CODE_Bundle.xml)
 ```
 
 ### 🧪 Stratégie de tests avec `pytest`

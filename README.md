@@ -89,7 +89,7 @@ Deux chemins possibles pour intégrer les modifs dans CODESYS 3.5 :
 ```
 1. Modifier le code ST dans CODE/*.st
 2. python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
-   → régénère CODE/CODE_Bundle.xml
+   → régénère CODE_XML/CODE_Bundle.xml
 3. Dans CODESYS 3.5 : Project → Import PLCopenXML... → sélectionner CODE_Bundle.xml
 4. Exporter Device.export après validation
 ```

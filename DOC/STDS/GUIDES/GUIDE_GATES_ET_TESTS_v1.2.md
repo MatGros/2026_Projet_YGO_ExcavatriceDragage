@@ -123,7 +123,7 @@ est **généré à partir** des XML granulaires du même dossier (`CODE_XML/*.xm
 directement depuis les sources `.st` par un chemin séparé.
 
 ⚠️ **Non câblé aujourd'hui** (reliquat, §5) : `generate_codesys_bundle.py` écrit encore
-`CODE/CODE_Bundle.xml`, et `G200_check_linkage.py` (Gate `200`) lit ce même chemin en dur pour ses
+`CODE_XML/CODE_Bundle.xml`, et `G200_check_linkage.py` (Gate `200`) lit ce même chemin en dur pour ses
 vérifications L5. Relocaliser le bundle sans adapter `G200_check_linkage.py` casserait la preuve de
 liaison — chantier à faire ensemble, pas en isolation.
 
@@ -133,7 +133,7 @@ liaison — chantier à faire ensemble, pas en isolation.
 
 - **Renommage de `run_all_gates.py`** vers les `ID Gate` ci-dessus (le script affiche encore les
   anciens titres `GATE 1bis`/`GATE 2quater`...) : chantier séparé, pas fait.
-- **Relocalisation du bundle** `CODE/CODE_Bundle.xml` → `CODE_XML/CODE_Bundle.xml` : décidée
+- **Relocalisation du bundle** `CODE_XML/CODE_Bundle.xml` → `CODE_XML/CODE_Bundle.xml` : décidée
   (ci-dessus), mais `generate_codesys_bundle.py` et `G200_check_linkage.py` (Gate `200`) doivent être
   adaptés ensemble — pas fait.
 - **Palier B en pratique** : `G200_check_linkage.py` existe et fonctionne déjà mid-édition, mais rien

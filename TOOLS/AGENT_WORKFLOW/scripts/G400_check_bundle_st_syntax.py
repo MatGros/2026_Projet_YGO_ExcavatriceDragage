@@ -105,7 +105,7 @@ def analyze_bundle(bundle: Path) -> list[tuple[str, str, int, str]]:
 def main() -> int:
     args = sys.argv[1:]
     root = Path(args[0]).resolve() if args else Path.cwd()
-    bundle = root / "CODE" / "CODE_Bundle.xml"
+    bundle = root / "CODE_XML" / "CODE_Bundle.xml"
     if not bundle.is_file():
         print(f"ERROR: bundle introuvable : {bundle}", file=sys.stderr)
         return 2

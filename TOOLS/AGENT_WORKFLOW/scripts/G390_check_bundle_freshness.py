@@ -19,10 +19,11 @@ def main() -> int:
 
     root = Path(args.project_root).resolve()
     code_dir = root / "CODE"
-    bundle = code_dir / "CODE_Bundle.xml"
+    out_dir = root / "CODE_XML"
+    bundle = out_dir / "CODE_Bundle.xml"
     generator_dir = root / "TOOLS" / "ST_PLCOPENXML_GENERATOR"
     if not code_dir.is_dir() or not bundle.is_file():
-        print("ERROR: CODE/ or CODE/CODE_Bundle.xml missing", file=sys.stderr)
+        print("ERROR: CODE/ or CODE_XML/CODE_Bundle.xml missing", file=sys.stderr)
         return 2
 
     tree = ET.parse(bundle)
@@ -76,10 +77,10 @@ def main() -> int:
             )
 
         if generated.read_bytes() != bundle.read_bytes():
-            print("FAIL: CODE/CODE_Bundle.xml is stale")
+            print("FAIL: CODE_XML/CODE_Bundle.xml is stale")
             return 1
 
-    print("PASS: CODE/CODE_Bundle.xml is fresh")
+    print("PASS: CODE_XML/CODE_Bundle.xml is fresh")
     return 0
 
 

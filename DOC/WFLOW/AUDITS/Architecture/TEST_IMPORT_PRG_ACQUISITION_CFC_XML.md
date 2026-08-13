@@ -10,7 +10,7 @@
 
 1. Faire une archive CODESYS du projet fonctionnel.
 2. Sélectionner `Application` → **Project / Import PLCopenXML**.
-3. Importer `CODE/CODE_Bundle.xml`.
+3. Importer `CODE_XML/CODE_Bundle.xml`.
 4. Vérifier que CODESYS propose de remplacer **un seul** objet :
    `PRG_ACQUISITION_CFC`.
 5. Vérifier que la `MainTask` appelle toujours exactement

@@ -141,7 +141,7 @@ l'identificateur non défini commun — jamais corriger erreur par erreur avant 
 
 1. Sélectionner le nœud `Application` dans l'arbre CODESYS 3.5
 2. **Project → Import PLCopenXML...**
-3. Choisir `CODE/CODE_Bundle.xml`
+3. Choisir `CODE_XML/CODE_Bundle.xml`
 4. Valider les objets proposés
 
 ### 📐 Note `_LD.st` → `<LD>` (REX 2026-08)
@@ -183,7 +183,7 @@ Attendre le **nouvel export** utilisateur (`Device.export` régénéré) → rep
 - [ ] Plan groupé par concept **validé par l'utilisateur**
 - [ ] Code ST commenté FR + emoji dans `CODE/<DOSSIER>/*.st`
 - [ ] `G200_check_linkage.py --report` = PASS, bloc collé dans la restitution **(bloquant)**
-- [ ] `CODE/CODE_Bundle.xml` régénéré + `run_all_gates.py` = PASS **(bloquant)**
+- [ ] `CODE_XML/CODE_Bundle.xml` régénéré + `run_all_gates.py` = PASS **(bloquant)**
 - [ ] Si C3/C4/safety : tests PLC implémentés + exécutés **(bloquant)**
 - [ ] Doc métier + note d'application dans `DOC/AF_Partie-N_Fonction_*`
 - [ ] REX + specs versionnées · garde-fou `guard:` ajouté si bug rencontré
