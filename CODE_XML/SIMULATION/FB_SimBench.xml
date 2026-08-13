@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.781842" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-11T18:19:14.781842">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T19:12:41.534854" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T19:12:41.534854">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -101,20 +101,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle rotation phases élec. OK</xhtml>
               </documentation>
             </variable>
-            <variable name="BrakeThermalOk_DI">
+            <variable name="M1_M2_M3_BrakeThermalOk_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — 🆕 2026-08-12 : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_M2_KoboldContactFond_DI">
+            <variable name="M1_M2_KoboldBottomTouch_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — 🆕 2026-08-12 : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -131,6 +131,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HopperFull_OR_GateRaised_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-12 : Trémie pleine OU grille levée — pas encore câblé électriquement,</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -741,6 +749,35 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
             </variable>
           </inputVars>
           <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-13 : sorties d'état du profil AF_Partie-03 §2, absentes jusque-là.
+       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung (confirmé par
+       l'oracle PRG_06 : `Ready` n'y porte jamais d'expression, les broches suivantes oui).
+       Sans elles, `Winch` tombait sur cette broche réservée et se retrouvait câblée à une
+       branche au lieu de sa variable (retour terrain 2026-08-13).
+TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = cycle de simulation en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = images de simulation publiées ce scan</xhtml>
+              </documentation>
+            </variable>
             <variable name="Winch">
               <type>
                 <derived name="ST_HwWinch" />
@@ -883,12 +920,21 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
 // === IMPLEMENTATION ===
 
 IF NOT Enable THEN
+    // 🔌 Banc désactivé : repli sur l'image réelle, aucune simulation en cours
+    Ready       := FALSE;
+    Busy        := FALSE;
+    Done        := FALSE;
     Winch       := HwReal.Winch;
     Translation := HwReal.Translation;
     Operator    := HwReal.Operator;
     Machine     := HwReal.Machine;
     RETURN;
 END_IF;
+
+// ▶️ Banc actif : le cycle de simulation démarre pour ce scan
+Ready := TRUE;
+Busy  := TRUE;
+Done  := FALSE;
 
 
 // ── 1. MODÈLE TREUILS (M1 + M2) ─────────────────────────────────────────────
@@ -1049,10 +1095,15 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI         := TRUE;
-Machine.BrakeThermalOk_DI          := TRUE;
-Machine.M1_M2_KoboldContactFond_DI := SimKoboldContactValue;
-Machine.HydraulicThermalOk_DI      := TRUE;
+Machine.PhaseRotationOk_DI             := TRUE;
+Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
+Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
+Machine.HydraulicThermalOk_DI          := TRUE;
+Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore câblé, simulé inactif par défaut
+
+// ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
+Busy := FALSE;
+Done := TRUE;
 </xhtml>
           </ST>
         </body>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T21:31:46.144217" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-11T21:31:46.144217">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T18:55:57.959426" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T18:55:57.959426">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -400,20 +400,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle rotation phases élec. OK</xhtml>
               </documentation>
             </variable>
-            <variable name="BrakeThermalOk_DI">
+            <variable name="M1_M2_M3_BrakeThermalOk_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — 🆕 2026-08-12 : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_M2_KoboldContactFond_DI">
+            <variable name="M1_M2_KoboldBottomTouch_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — 🆕 2026-08-12 : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -430,6 +430,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HopperFull_OR_GateRaised_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-12 : Trémie pleine OU grille levée — pas encore câblé électriquement,</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1464,11 +1472,11 @@ HwReal.Operator.JOY1_DeviceState  := JOY1_JOYSTICK_MCB560_CO4201A.GetDeviceState
 HwReal.Machine.PowerContactorEngaged_DI   := PowerContactorEngaged_DI;
 HwReal.Machine.EmergencyChainClosed_DI    := EmergencyChainClosed_DI;
 HwReal.Machine.PhaseRotationOk_DI         := PhaseRotationOk_DI;
-HwReal.Machine.BrakeThermalOk_DI          := BrakeThermalOk_DI;
-HwReal.Machine.M1_M2_KoboldContactFond_DI := M1_M2_KoboldContactFond_DI;
-HwReal.Machine.HydraulicThermalOk_DI      := HydraulicThermalOk_DI;
-HwReal.Machine.ConveyorInfeedReady_DI     := ConveyorInfeedReady_DI;
-
+HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI  := M1_M2_M3_BrakeThermalOk_DI;
+HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
+HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
+HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
+HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
 // === 🧰 §1bis FILTRAGE TOR RÉEL ===
 // HwReal reste brut pour le diagnostic. HwRealQualified porte la même image
 // après filtrage temporel ; aucune inversion ni information de santé carte ici.
@@ -1480,14 +1488,17 @@ instFilterEmergencyChain(InputRaw := HwReal.Machine.EmergencyChainClosed_DI, Fil
 HwRealQualified.Machine.EmergencyChainClosed_DI := instFilterEmergencyChain.State;
 instFilterPhaseRotation(InputRaw := HwReal.Machine.PhaseRotationOk_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.PhaseRotationOk_DI := instFilterPhaseRotation.State;
-instFilterBrakeThermal(InputRaw := HwReal.Machine.BrakeThermalOk_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.BrakeThermalOk_DI := instFilterBrakeThermal.State;
-instFilterKobold(InputRaw := HwReal.Machine.M1_M2_KoboldContactFond_DI, FilterTime := T#20MS);
-HwRealQualified.Machine.M1_M2_KoboldContactFond_DI := instFilterKobold.State;
+instFilterBrakeThermal(InputRaw := HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.M1_M2_M3_BrakeThermalOk_DI := instFilterBrakeThermal.State;
+instFilterKobold(InputRaw := HwReal.Machine.M1_M2_KoboldBottomTouch_DI, FilterTime := T#20MS);
+HwRealQualified.Machine.M1_M2_KoboldBottomTouch_DI := instFilterKobold.State;
 instFilterHydraulicThermal(InputRaw := HwReal.Machine.HydraulicThermalOk_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.HydraulicThermalOk_DI := instFilterHydraulicThermal.State;
 instFilterConveyorReady(InputRaw := HwReal.Machine.ConveyorInfeedReady_DI, FilterTime := T#20MS);
 HwRealQualified.Machine.ConveyorInfeedReady_DI := instFilterConveyorReady.State;
+// 🆕 2026-08-12 : HopperFull_OR_GateRaised_DI déclaré, pas encore filtré/consommé (pas de câblage
+// électrique confirmé) — pas de FB_DigitalInputFilter tant qu'aucun consommateur n'existe.
+HwRealQualified.Machine.HopperFull_OR_GateRaised_DI := HwReal.Machine.HopperFull_OR_GateRaised_DI;
 
 instFilterM1Contactors(InputRaw := HwReal.Winch.M1_ContactorsReleased_DI, FilterTime := T#20MS);
 HwRealQualified.Winch.M1_ContactorsReleased_DI := instFilterM1Contactors.State;
@@ -1534,8 +1545,6 @@ ELSE
     Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
 InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
-
-
 // === 🎭 §2 SIMULATION &amp; AIGUILLAGE (HwIn) ===
 
 instSimBench(
@@ -1601,14 +1610,19 @@ ELSE
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
 END_IF;
 
-IF WinchInputSourceSimulated
-    THEN HwIn.Winch := instSimBench.Winch;             ELSE HwIn.Winch := HwRealQualified.Winch;             END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive
-    THEN HwIn.Translation := instSimBench.Translation; ELSE HwIn.Translation := HwRealQualified.Translation; END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive
-    THEN HwIn.Operator := instSimBench.Operator;       ELSE HwIn.Operator := HwReal.Operator;       END_IF;
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive
-    THEN HwIn.Machine := instSimBench.Machine;         ELSE HwIn.Machine := HwRealQualified.Machine;         END_IF;
+// 🔧 SEL(G, IN0, IN1) : brique standard IEC 61131-3, retourne IN1 si G=TRUE, IN0 sinon
+// (AF_Partie-03 §1 : composer l'existant avant réimplémentation) — remplace les 4 IF/ELSE
+// compactés qui cassaient le générateur ST→LD (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
+// Condition câblée directement en G (pas de variable intermédiaire) pour Translation/Operator/
+// Machine : usage unique, contrairement à WinchInputSourceSimulated réutilisé pour la détection
+// de front ci-dessus (REX 2026-08-13, retour terrain).
+// Premier usage SEL() sur STRUCT dans ce projet (précédents = REAL/INT/BOOL uniquement) :
+// confirmé par import + compilation CODESYS réelle sur scratch/PRG_02_Acquisition_LD.st
+// (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
+HwIn.Winch       := SEL(WinchInputSourceSimulated, HwRealQualified.Winch, instSimBench.Winch);
+HwIn.Translation := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive, HwRealQualified.Translation, instSimBench.Translation);
+HwIn.Operator     := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive, HwReal.Operator, instSimBench.Operator);
+HwIn.Machine      := SEL(GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive, HwRealQualified.Machine, instSimBench.Machine);
 
 
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
@@ -1647,8 +1661,6 @@ JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prére
 JoystickDirectionX := instJoystick.DirectionX;
 JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
 JoystickXNeutral := (instJoystick.DirectionX = 0);
-
-
 // === 🧲 §4 CODEURS &amp; HOMING (M1 / M2) ===
 
 instEncoderAbsM1(
@@ -1817,8 +1829,6 @@ instEncoderSpeedMeasureM2(
 M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
 M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
 M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
-
-
 // === ↔️ §5 DÉCODAGE POSITION TRANSLATION (M3) ===
 
 instPosDecoderM3(
@@ -1843,8 +1853,6 @@ M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 M3_SensorsWord          := instPosDecoderM3.SensorsWord;
-
-
 // === 📊 §6 FILTRAGE PT1 RETOURS VARIATEUR (M3) ===
 
 instCycleTimeAcq(DefaultValueS := 0.010);
@@ -4553,6 +4561,35 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
             </variable>
           </inputVars>
           <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-13 : sorties d'état du profil AF_Partie-03 §2, absentes jusque-là.
+       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung (confirmé par
+       l'oracle PRG_06 : `Ready` n'y porte jamais d'expression, les broches suivantes oui).
+       Sans elles, `Winch` tombait sur cette broche réservée et se retrouvait câblée à une
+       branche au lieu de sa variable (retour terrain 2026-08-13).
+TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = cycle de simulation en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = images de simulation publiées ce scan</xhtml>
+              </documentation>
+            </variable>
             <variable name="Winch">
               <type>
                 <derived name="ST_HwWinch" />
@@ -4695,12 +4732,21 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
 // === IMPLEMENTATION ===
 
 IF NOT Enable THEN
+    // 🔌 Banc désactivé : repli sur l'image réelle, aucune simulation en cours
+    Ready       := FALSE;
+    Busy        := FALSE;
+    Done        := FALSE;
     Winch       := HwReal.Winch;
     Translation := HwReal.Translation;
     Operator    := HwReal.Operator;
     Machine     := HwReal.Machine;
     RETURN;
 END_IF;
+
+// ▶️ Banc actif : le cycle de simulation démarre pour ce scan
+Ready := TRUE;
+Busy  := TRUE;
+Done  := FALSE;
 
 
 // ── 1. MODÈLE TREUILS (M1 + M2) ─────────────────────────────────────────────
@@ -4861,10 +4907,15 @@ instSimSafety(
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
-Machine.PhaseRotationOk_DI         := TRUE;
-Machine.BrakeThermalOk_DI          := TRUE;
-Machine.M1_M2_KoboldContactFond_DI := SimKoboldContactValue;
-Machine.HydraulicThermalOk_DI      := TRUE;
+Machine.PhaseRotationOk_DI             := TRUE;
+Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
+Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
+Machine.HydraulicThermalOk_DI          := TRUE;
+Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore câblé, simulé inactif par défaut
+
+// ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
+Busy := FALSE;
+Done := TRUE;
 </xhtml>
           </ST>
         </body>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-23T23:39:10.916070" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-23T23:39:10.916070">
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-07-23T23:39:10.916070">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
         </ProjectInformation>
       </data>
     </addData>

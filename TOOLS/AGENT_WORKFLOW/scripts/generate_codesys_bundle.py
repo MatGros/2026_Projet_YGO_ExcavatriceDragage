@@ -58,6 +58,20 @@ def main() -> int:
     if result.returncode:
         return result.returncode
 
+    # Miroir un-fichier-par-objet dans CODE_XML/ : `--bundle` et le mode par objet sont
+    # exclusifs dans generator/cli.py, donc sans ce second passage les fichiers de
+    # CODE_XML/<DOSSIER>/*.xml restent perimes en silence pendant que le bundle, lui,
+    # est a jour (REX 2026-08-13 : FB_SimBench.xml datait de la veille apres modif du .st).
+    per_object = [
+        sys.executable, "-m", "generator.cli",
+        "--code-dir", str(code_dir),
+        "--out-dir", str(out_dir),
+        "--project-name", project_name,
+    ]
+    result_objects = subprocess.run(per_object, cwd=generator_dir)
+    if result_objects.returncode:
+        return result_objects.returncode
+
     # Post-traitement oracle : remplacer PRG_06_Outputs_LD par l'oracle CODESYS
     # (REX 2026-08-04 : ld_builder.py produit un LD non importable)
     oracle_script = generator_dir / "scripts" / "prg06_oracle_postprocess.py"

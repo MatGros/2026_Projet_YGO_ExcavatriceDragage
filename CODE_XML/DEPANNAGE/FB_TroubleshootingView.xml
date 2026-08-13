@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.767541" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-11T18:19:14.767541">
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T18:19:14.767541">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">Generated</property>
+          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1390,20 +1390,20 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle rotation phases élec. OK</xhtml>
               </documentation>
             </variable>
-            <variable name="BrakeThermalOk_DI">
+            <variable name="M1_M2_M3_BrakeThermalOk_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — 🆕 2026-08-12 : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_M2_KoboldContactFond_DI">
+            <variable name="M1_M2_KoboldBottomTouch_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — 🆕 2026-08-12 : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -1420,6 +1420,14 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HopperFull_OR_GateRaised_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-12 : Trémie pleine OU grille levée — pas encore câblé électriquement,</xhtml>
               </documentation>
             </variable>
           </struct>
