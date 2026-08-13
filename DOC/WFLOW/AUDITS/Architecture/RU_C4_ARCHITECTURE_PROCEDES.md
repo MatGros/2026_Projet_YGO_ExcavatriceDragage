@@ -36,7 +36,7 @@ du procédé voit sur le même schéma : consigne → surveillance safety → co
 
 | Rang | POU cible | Contenu |
 |---|---|---|
-| 01 | `PRG_02_Acquisition` | Acquisition unique `HwReal`/`HwRealQualified`/`HwSim`/`HwIn`, chaîne codeurs complète M1/M2/M3, joystick, diagnostics devices/bus, retours auxiliaires, **état AU qualifié**. |
+| 01 | `PRG_02_Acquisition` | Acquisition unique `HwReal`/`HwSim`/`HwIn`, chaîne codeurs complète M1/M2/M3, joystick, diagnostics devices/bus, retours auxiliaires, **état AU qualifié**. |
 | — | `PRG_01_Inputs_LD` | Couche historique retirée après remappage ; aucune nouvelle liaison. |
 | 03 | `PRG_03_Modes_Cycle` | Modes, droits, autorisations, séquenceur `FB_Cycle`. |
 | 04 | `PRG_04_Treuils_Benne` | M1 + M2 + synchro + benne + assistants, **safety M1/M2 intégrée**. |

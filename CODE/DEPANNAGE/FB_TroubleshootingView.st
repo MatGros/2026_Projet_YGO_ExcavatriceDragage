@@ -24,7 +24,6 @@ VAR_INPUT
     (* 📡 PRG_02_Acquisition *)
     HwIn                     : ST_HardwareImage;
     HwReal                   : ST_HardwareImage;
-    HwRealQualified          : ST_HardwareImage;
     InputModuleFault         : BOOL;
     LocalDigitalIoOk         : BOOL; (* Mirroir Network.InputModules — pas de champ ST_Chain* dédié ce lot *)
     Vh0800EndOk              : BOOL; (* idem *)

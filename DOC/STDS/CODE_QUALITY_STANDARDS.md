@@ -456,7 +456,7 @@ sous-groupe `AND`/`OR` imbriqué devient lui-même un bloc.
 ### Structures conditionnelles (`IF/ELSE`) — REX 2026-08-13
 
 > 🚩 `PRG_02_Acquisition_LD` importé le 2026-08-13 a révélé un `IF WinchInputSourceSimulated
-> THEN HwIn.Winch := instSimBench.Winch; ELSE HwIn.Winch := HwRealQualified.Winch; END_IF;`
+> THEN HwIn.Winch := instSimBench.Winch; ELSE HwIn.Winch := HwReal.Winch; END_IF;`
 > compacté sur une ligne : le générateur a fuité le texte brut `ELSE ... END_IF` dans un contact.
 
 Sous-ensemble ST **obligatoire** pour tout `_LD.st` contenant une sélection conditionnelle :

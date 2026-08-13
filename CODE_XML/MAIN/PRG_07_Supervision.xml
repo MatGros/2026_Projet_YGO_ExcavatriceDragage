@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-12T21:43:48.387915" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-12T21:43:48.387915">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T22:17:09.763473" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T22:17:09.763473">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2442,7 +2442,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §3bis
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3bis
    🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
       pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
       TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
@@ -5302,7 +5302,6 @@ instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
     HwReal               := PRG_02_Acquisition.HwReal,
-    HwRealQualified      := PRG_02_Acquisition.HwRealQualified,
     InputModuleFault     := PRG_02_Acquisition.InputModuleFault,
     LocalDigitalIoOk     := PRG_02_Acquisition.LocalDigitalIoOk,
     Vh0800EndOk          := PRG_02_Acquisition.Vh0800EndOk,
@@ -6067,7 +6066,7 @@ END_IF;
    📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §3
+              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3
    🎯 Rôle : Décide Online/Operational et publie ST_Diag_Device.
       Distinction explicite dans State :
       - INIT       : pas encore online (ni réel, ni bypass)
@@ -6441,7 +6440,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
    📡 FB_Diag_Ethercat — Diagnostic bus EtherCAT (3 esclaves)
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md §3
+              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3
    🎯 Rôle : Décide Online/Operational pour variateur M3 + codeurs M1/M2.
       Publie ST_Diag_Device par device + state global.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -6796,11 +6795,6 @@ END_IF;
               </documentation>
             </variable>
             <variable name="HwReal">
-              <type>
-                <derived name="ST_HardwareImage" />
-              </type>
-            </variable>
-            <variable name="HwRealQualified">
               <type>
                 <derived name="ST_HardwareImage" />
               </type>

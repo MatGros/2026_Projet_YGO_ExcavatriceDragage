@@ -21,7 +21,6 @@ def generate_object_id(kind: str, name: str) -> str:
 def discover_fb_contracts(code_dir: Path) -> dict[str, list[str]]:
     """Discover all FB output formal parameters from project FB_*.st files."""
     fb_contracts: dict[str, list[str]] = {
-        "FB_DigitalInputFilter": ["FilteredValue", "Out", "Error", "State"],
         "FB_Encoder_Abs": ["RawValue", "PositionM", "Incoherent", "Valid"],
         "FB_Encoder_Homing": ["HomingDone", "ZeroRefPosM", "Valid"],
         "FB_Encoder_Scale": ["RawValue", "PositionM", "Valid"],

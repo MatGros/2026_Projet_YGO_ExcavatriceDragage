@@ -274,7 +274,7 @@ fois dans `FB_Bucket` (`ConfirmOpenEdge`), sur le même bouton. Autres candidats
 ```pascal
 FUNCTION_BLOCK PUBLIC FB_Edge
 VAR_INPUT
-    InputRaw : BOOL; // Valeur déjà qualifiée (HwRealQualified ou GVL_IHM.*.Cmd)
+    InputRaw : BOOL; // Valeur déjà qualifiée (HwIn ou GVL_IHM.*.Cmd)
 END_VAR
 VAR_OUTPUT
     R : BOOL; // Front montant (Rising)
@@ -291,24 +291,18 @@ R := RTrig.Q;
 F := FTrig.Q;
 ```
 
-Instanciation dans `PRG_02_Acquisition`, juste après le filtre existant, une entrée qualifiée =
-une instance :
+Instanciation dans `PRG_02_Acquisition`, une entrée qualifiée = une instance :
 
 ```pascal
 // VAR
-instFilterM1ContactorsReleased : FB_DigitalInputFilter;
 instEdgeM1ContactorsReleased   : FB_Edge;
 
 // Corps
-instFilterM1ContactorsReleased(InputRaw := HwReal.M1_ContactorsReleased_DI, FilterTime := T#20ms);
-HwRealQualified.M1_ContactorsReleased_DI := instFilterM1ContactorsReleased.State;
-instEdgeM1ContactorsReleased(InputRaw := HwRealQualified.M1_ContactorsReleased_DI);
+instEdgeM1ContactorsReleased(InputRaw := HwIn.Winch.M1_ContactorsReleased_DI);
 // Consommateurs : instEdgeM1ContactorsReleased.R / .F
 ```
 
-Pas de paramètre d'activation — toujours actif, sur **toutes** les entrées qualifiées, coût CPU
-négligeable (même ordre de grandeur qu'un `TON`, déjà 22 instances de `FB_DigitalInputFilter`
-actives sans impact mesuré).
+Pas de paramètre d'activation — toujours actif, coût CPU négligeable (même ordre de grandeur qu'un `TON`).
 
 ⚠️ `FB_Edge` ≠ `FB_Input` (composant historique en retrait, `AF_Partie-06`). Rôle différent
 (front, pas diagnostic canal `ChannelOk`), nom délibérément distinct.
@@ -354,4 +348,3 @@ actives sans impact mesuré).
 - `AF_Partie-02_Architecture_Programme_v3.1.md §5` — `PRG_07_Supervision` lecture seule stricte.
 - `AF_Partie-14_Fonction_Troubleshooting_v1.1.md` — invariant troubleshooting lecture seule.
 - Exemples de code déjà conformes (R1-R4, R8) : `CODE/CYCLE/FB_Cycle.st`, `CODE/CYCLE/FB_DiveSearch.st`, `CODE/CYCLE/FB_ExtractionSequence.st`.
-- Précédent d'instanciation par canal (R7) : `CODE/COMMUN/FB_DigitalInputFilter.st`, `CODE/MAIN/PRG_02_Acquisition.st`.
