@@ -55,6 +55,7 @@ VAR
     EncoderM2OnlineEff   : BOOL;
 END_VAR
 
+{region "§1 Gate de desactivation"}
 // 🛑 1. GATE : Désactivation si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
@@ -84,6 +85,9 @@ END_IF;
 
 Ready := TRUE;
 
+{endregion}
+
+{region "§2 Interpretation etats bruts et bypass"}
 // 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
 VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
 EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
@@ -100,6 +104,9 @@ EncoderM2OnlineEff := EncoderM2OnlineReal OR EncoderM2Bypass;
 // 🔑 3. RESET FRONT
 ResetEdge(CLK := Reset);
 
+{endregion}
+
+{region "§3 Diagnostic par equipement"}
 // 🔍 4. DIAGNOSTIC VARIATEUR (AC600_ECAT_Drive / Translation M3)
 DeviceVariateur.Online := VariateurOnlineEff;
 DeviceVariateur.Operational := VariateurOnlineEff;
@@ -130,6 +137,9 @@ ELSE
     DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
+{endregion}
+
+{region "§4 Etats diagnostic par equipement"}
 // 🚦 7. STATE MACHINES DE CHAQUE APPAREIL
 IF DeviceVariateur.ErrorId <> 0 THEN
     DeviceVariateur.State := E_Diag_State.ERROR;
@@ -168,6 +178,9 @@ IF (DeviceVariateur.ErrorId <> 0 OR DeviceEncoderM1.ErrorId <> 0 OR DeviceEncode
     END_IF;
 END_IF;
 
+{endregion}
+
+{region "§5 Synthese EtherCAT et sorties"}
 // 📤 8. RÉSUMÉ ET DÉFAUTS
 DeviceVariateur.Error := (DeviceVariateur.ErrorId <> 0);
 DeviceEncoderM1.Error := (DeviceEncoderM1.ErrorId <> 0);
@@ -206,3 +219,5 @@ DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
 
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}

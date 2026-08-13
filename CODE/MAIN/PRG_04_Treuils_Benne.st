@@ -127,6 +127,7 @@ VAR
     M2_PrevSpeed_Mps : REAL;
 END_VAR
 
+{region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE & ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
@@ -318,6 +319,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§2 Commande benne"}
 // === 🏗️ §2 COMMANDE DU BENNE (FB_Bucket) ===
 
 // 🆕 2026-08-07 : en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
@@ -384,6 +388,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§3 Arbitrage consignes M1/M2"}
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -508,6 +515,9 @@ IF ControlAscentActive THEN
 END_IF;
 
 
+{endregion}
+
+{region "§4 Synchronisation M1/M2"}
 // === 🔄 §4 SYNCHRONISATION M1 / M2 ===
 
 instWinchSync(
@@ -565,6 +575,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§5 Couplage croise et securites"}
 // === 🛑 §5 COUPLAGE CROISÉ & SÉCURITÉS ===
 
 // 🆕 2026-08-07 (demande client) : la limite légale (profondeur min. autorisée) doit elle aussi
@@ -812,6 +825,9 @@ ForbidAscentM1_Active  := ForbidAscentM1_Raw  OR (instWinchSync.SyncActive AND F
 ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM1_Raw);
 
 
+{endregion}
+
+{region "§6 Execution treuils M1/M2"}
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 & M2) ===
 
 instWinchM1(
@@ -882,6 +898,9 @@ instWinchM2(
 );
 
 
+{endregion}
+
+{region "§7 Publication demandes brutes"}
 // === 📤 §7 PUBLICATION DEMANDES BRUTES (WinchM1/M2FinalInterlockRequest) ===
 
 WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
@@ -918,6 +937,9 @@ WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
+{endregion}
+
+{region "§8 Publication etats IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
 // 🔧 2026-08-07 (27) — retour terrain (audit agent) : MeasuredSpeed_Mps jamais recopié, restait
 // à 0.0 en permanence à l'IHM. SpeedDelta_Mps corrigé par rapport à la proposition initiale de
@@ -1093,4 +1115,5 @@ BucketStateHMI.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 
+{endregion}
 END_PROGRAM

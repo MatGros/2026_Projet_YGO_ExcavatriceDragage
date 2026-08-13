@@ -1,0 +1,81 @@
+contract:
+  task_id: LOT_C2_REGIONS_PRAGMA_PROJECT
+  criticality: C2
+  strategy: patch
+  objective: >
+    Ameliorer la lecture des POU et FB ST longs par des Regions Pragma CODESYS
+    repliables, sans modifier le comportement automate, les interfaces ni le
+    langage des POU.
+  acceptance:
+    - id: AC1
+      statement: "Chaque POU ST multi-responsabilite explicitement cible par le garde-fou contient des Regions nommees par responsabilite fonctionnelle ; les POU cohesifs restent exclus."
+      verified_by: "test_region_pragmas.py sur l'inventaire cible CODE/**/*.st"
+    - id: AC2
+      statement: "Chaque region est ouverte et fermee dans le meme POU, sans croisement, et son titre est en francais et decrit un role."
+      verified_by: "test_region_pragmas.py"
+    - id: AC3
+      statement: "Aucun POU _LD.st, GVL, DUT ou ENUM ne contient de Region Pragma."
+      verified_by: "test_region_pragmas.py et G410_check_ld_invariants.py"
+    - id: AC4
+      statement: "Les regions sont strictement visuelles : les declarations, les appels, les affectations, les interfaces et les ordres d'execution restent inchanges."
+      verified_by: "revue diff ciblee, G200_check_linkage.py --report et run_all_gates.py"
+    - id: AC5
+      statement: "Le generateur PLCopenXML preserve les pragmas Region dans les corps ST, et le convertisseur ST vers LD les ignore."
+      verified_by: "tests unitaires generateur et converter, inspection de CODE_XML/CODE_Bundle.xml"
+    - id: AC6
+      statement: "La convention Region Pragma est documentee dans les standards actifs du projet."
+      verified_by: "revue DOC/STDS/CODE_QUALITY_STANDARDS.md et DOC/STDS/NAMING_CONVENTION.md"
+  scope:
+    allowed:
+      - CODE/**/*.st
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/**/*.xml
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md
+      - DOC/STDS/NAMING_CONVENTION.md
+      - .claude/skills/codesys-workflow.md
+      - TOOLS/converter/st_parser.py
+      - TOOLS/converter/test_st_parser.py
+      - TOOLS/ST_PLCOPENXML_GENERATOR/tests/unit/test_st_parser_program.py
+      - TOOLS/AGENT_WORKFLOW/tests/test_region_pragmas.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_20260814_REGIONS_PRAGMA_PROJECT.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/**
+      - scratch/**
+      - CODE/**/*_LD.st
+      - CODE/**/GVL_*.st
+      - CODE/**/ST_*.st
+      - CODE/**/E_*.st
+  conservation:
+    must_survive:
+      - "Chaque POU conserve exactement ses declarations, appels, affectations et ordre d'execution."
+      - "Les POU _LD restent sans Region Pragma et continuent de generer du Ladder."
+      - "Le bundle PLCopenXML reste importable sous CODESYS 3.5."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - human_validation_c2
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute region qui imposerait de couper une structure de controle, toute perte
+    de lisibilite, tout conflit avec un changement parallele ou toute divergence
+    entre ST et bundle bloque le fichier concerne et est remonte immediatement.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Pilote PRG_02 valide manuellement sous CODESYS 3.5 ; generalisation selective, standards, garde-fou et bundle termines."
+  evidence_submitted:
+    - "Validation humaine : import et repli des regions dans PRG_02_Acquisition confirmes le 2026-08-14."
+    - "Bundle regenere : 170/170 objets, 0 erreur."
+    - "G200_check_linkage.py --report : PASS, 984 instances verifiees, 0 erreur."
+    - "run_all_gates.py : PASS, 489 passed, 8 skipped."
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-08-14"
+  notes: "Generalisation selective aux POU/FB ST longs, standards et garde-fou automatique approuves."

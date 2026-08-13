@@ -55,6 +55,7 @@ VAR
     M3_ConfirmedMoving   : BOOL;
 END_VAR
 
+{region "§0 Interlock hauteur M1/M2"}
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
 // PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 < 05) : lecture
 // du même scan, aucun retard. Bypass = maintenance consciente, doctrine ST_BypassTranslation.
@@ -71,6 +72,9 @@ M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
                             AND (PRG_02_Acquisition.CablePosM2 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
+{endregion}
+
+{region "§0bis Coupure dure limite translation"}
 // === 🚧 §0bis COUPURE DURE (LimitSwitchRev) — bascule sur P1 si Maintenance interdite ===
 // 🆕 2026-08-06 (retour terrain) : LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
 // (§5bis FB_Translation : coupure immédiate, sans rampe, dès que CommandedDirection insiste
@@ -124,6 +128,9 @@ ELSIF TonM3ConfirmedMoving.Q THEN
     M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
 END_IF;
 
+{endregion}
+
+{region "§1 Arbitrage cible et direction"}
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -235,6 +242,9 @@ ELSE
 END_CASE;
 
 
+{endregion}
+
+{region "§1bis Securite M3"}
 // === 🛡️ §1bis SÉCURITÉ M3 (FB_Safety_Translation, câblée en parallèle visible) ===
 // ⚠️ Ordre d'appel volontaire : la safety lit ici le BrakeReleaseRequest et le
 // BrakeCmd du SCAN PRÉCÉDENT d'instTranslationM3 (elle est appelée avant), exactement
@@ -279,6 +289,9 @@ instSafetyTranslationM3(
 // OR safety M3 (8 mécanismes) — aucune des deux causes ne doit être perdue.
 M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 
+{endregion}
+
+{region "§2 Pilotage translation M3"}
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
 instTranslationM3(
@@ -346,6 +359,9 @@ GVL_PERSISTENT._TranslationPosEstimated_M := instPosEstimatorM3.PositionEstimate
 GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initialized;
 
 
+{endregion}
+
+{region "§3 Publication demande translation"}
 // === 📤 §3 PUBLICATION DEMANDE BRUTE TRANSLATION ===
 
 TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE);
@@ -358,6 +374,9 @@ TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
 
+{endregion}
+
+{region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
 TranslationStateHMI.FBState := instTranslationM3.State;
 TranslationStateHMI.Ready := instTranslationM3.Ready;
@@ -422,4 +441,5 @@ TranslationSafetyHMI.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafetyHMI.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
 
+{endregion}
 END_PROGRAM

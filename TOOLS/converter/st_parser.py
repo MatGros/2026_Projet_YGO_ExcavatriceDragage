@@ -5,12 +5,28 @@ from pathlib import Path
 from .st_ast import ProgramAST, VariableDecl, FbCallAST, BooleanNetworkAST, AssignmentAST, StatementAST
 
 
+_REGION_PRAGMA_RE = re.compile(
+    r"\{\s*(?:region(?:\s+(?:\"[^\"]*\"|'[^']*'))?|endregion)\s*\}",
+    re.IGNORECASE,
+)
+
 def _strip_comments(text: str) -> str:
-    """Remove // and (* *) comments, preserving line count so line numbers stay meaningful."""
+    """Remove comments and visual CODESYS regions, preserving line count.
+
+    ``{region ...}`` / ``{endregion}`` are editor-only pragmas. They must not
+    become ST statements when this legacy converter reads a POU for LD.
+    """
     out = []
     i = 0
     n = len(text)
     while i < n:
+        if text[i] == "{":
+            region_match = _REGION_PRAGMA_RE.match(text, i)
+            if region_match:
+                pragma = region_match.group(0)
+                out.append("".join("\n" if ch == "\n" else " " for ch in pragma))
+                i = region_match.end()
+                continue
         if text[i:i + 2] == "(*":
             end = text.find("*)", i + 2)
             if end == -1:

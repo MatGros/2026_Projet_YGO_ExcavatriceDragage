@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-12T21:43:48.385240" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-12T21:43:48.385240">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:09:36.988438" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T23:09:36.988438">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2199,6 +2199,7 @@ dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
@@ -2390,6 +2391,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§2 Commande benne"}
 // === 🏗️ §2 COMMANDE DU BENNE (FB_Bucket) ===
 
 // 🆕 2026-08-07 : en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
@@ -2456,6 +2460,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§3 Arbitrage consignes M1/M2"}
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -2580,6 +2587,9 @@ IF ControlAscentActive THEN
 END_IF;
 
 
+{endregion}
+
+{region "§4 Synchronisation M1/M2"}
 // === 🔄 §4 SYNCHRONISATION M1 / M2 ===
 
 instWinchSync(
@@ -2637,6 +2647,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§5 Couplage croise et securites"}
 // === 🛑 §5 COUPLAGE CROISÉ &amp; SÉCURITÉS ===
 
 // 🆕 2026-08-07 (demande client) : la limite légale (profondeur min. autorisée) doit elle aussi
@@ -2884,6 +2897,9 @@ ForbidAscentM1_Active  := ForbidAscentM1_Raw  OR (instWinchSync.SyncActive AND F
 ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM1_Raw);
 
 
+{endregion}
+
+{region "§6 Execution treuils M1/M2"}
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) ===
 
 instWinchM1(
@@ -2954,6 +2970,9 @@ instWinchM2(
 );
 
 
+{endregion}
+
+{region "§7 Publication demandes brutes"}
 // === 📤 §7 PUBLICATION DEMANDES BRUTES (WinchM1/M2FinalInterlockRequest) ===
 
 WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
@@ -2990,6 +3009,9 @@ WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
+{endregion}
+
+{region "§8 Publication etats IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
 // 🔧 2026-08-07 (27) — retour terrain (audit agent) : MeasuredSpeed_Mps jamais recopié, restait
 // à 0.0 en permanence à l'IHM. SpeedDelta_Mps corrigé par rapport à la proposition initiale de
@@ -3164,6 +3186,8 @@ BucketStateHMI.ControlAscentActive := ControlAscentActive;
 BucketStateHMI.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -3658,6 +3682,7 @@ GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "Gate securite"}
 // 🛑 1. GATE DE SÉCURITÉ
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
@@ -3682,6 +3707,9 @@ IF State = E_State.DISABLED THEN
     State := E_State.READY;
 END_IF;
 
+{endregion}
+
+{region "Reset et bypass"}
 // 🔑 2. GESTION DU RESET (FRONT MONTANT)
 ResetEdge(CLK := Reset);
 
@@ -3694,6 +3722,9 @@ IF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
 END_IF;
 
+{endregion}
+
+{region "Coherence et etat mecanique benne"}
 // 📏 3. DÉTECTION D'INCOHÉRENCE AU BOOT (PREMIER CYCLE API)
 IF FirstCycle THEN
     FirstCycle := FALSE;
@@ -3834,6 +3865,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 M1SlipDetected := (ErrorId AND 16#0010) &lt;&gt; 16#0000;
 
+{endregion}
+
+{region "Surveillance limites timeout et arret"}
 // 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
@@ -3866,6 +3900,9 @@ IF SevereError THEN
     State := E_State.READY;
 END_IF;
 
+{endregion}
+
+{region "Machine etat commande"}
 // 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
 CASE State OF
     E_State.READY:
@@ -4067,6 +4104,8 @@ ELSE
     // Par défaut, ou en cours/état d'ouverture, on applique l'offset ouvert
     ActiveOffsetM := Config.OffsetOpenM;
 END_IF;
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -4289,6 +4328,7 @@ vers READY_TO_DESCEND. Défaut FALSE : comportement standard inchangé.</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
@@ -4301,6 +4341,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "§2 Preconditions fronts et rearmement"}
 ResetEdge(CLK := Reset);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
@@ -4324,6 +4367,9 @@ DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
 Ready := FALSE; Busy := FALSE; Done := FALSE;
 OperatorActionId := 0; OperatorAction := '';
 
+{endregion}
+
+{region "§3 Machine etat plongee recherche fond"}
 IF ErrorId &lt;&gt; 16#0000 THEN
     State := E_State.READY;
     DiveState := E_DiveSearchState.ERROR_HOLD;
@@ -4397,6 +4443,8 @@ ELSE
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -4609,6 +4657,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
@@ -4620,6 +4669,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "§2 Preconditions reset et initialisation sorties"}
 ResetEdge(CLK := Reset);
 ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
 IF ErrorCausePresent THEN
@@ -4636,6 +4688,9 @@ BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
 BottomConfirmationConsumed := FALSE;
 OperatorActionId := 0; OperatorAction := '';
 
+{endregion}
+
+{region "§3 Machine etat fermeture remontee"}
 IF ErrorId &lt;&gt; 16#0000 THEN
     State := E_State.READY;
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
@@ -4709,6 +4764,8 @@ ELSE
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -5623,6 +5680,7 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
@@ -5651,6 +5709,9 @@ END_IF;
 Ready := TRUE;
 State := E_State.READY;
 
+{endregion}
+
+{region "Initialisation et bypass global"}
 // Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
 IF LastInReferencingMode AND NOT InReferencingMode THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
@@ -5683,6 +5744,9 @@ IF BypassGlobal THEN
     TonMecaE(IN := FALSE);
 END_IF;
 
+{endregion}
+
+{region "Protections immediates position"}
 // 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
 // ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
 // position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
@@ -5711,6 +5775,9 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFBF;
 END_IF;
 
+{endregion}
+
+{region "Diagnostics et protections treuil"}
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
 IF NOT BypassGlobal THEN
 
@@ -5902,6 +5969,9 @@ END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Arbitrage sorties securite"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -5977,6 +6047,8 @@ PowerCutOff := (ErrorId AND 16#2F84) &lt;&gt; 16#0000;
 // Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -6572,6 +6644,7 @@ FB_SpeedStep, la progressivité vient de la temporisation par palier (StepDelay 
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "Gate et initialisation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -6603,6 +6676,9 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Preparation commande et limites vitesse"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);
 
@@ -6696,6 +6772,9 @@ IF InTopSlowdownZone OR InBottomSlowdownZone THEN
     ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
 END_IF;
 
+{endregion}
+
+{region "Selection et temporisation paliers"}
 SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedRefPct := RampTargetPct,
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
           MaxStepNumber := ActiveMaxStep,
@@ -6726,6 +6805,9 @@ ELSE
 END_IF;
 SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
 
+{endregion}
+
+{region "Commandes contacteurs et sens"}
 // Les sorties métier suivent le palier temporisé. FB_Winch/SpeedStepTable reste
 // propriétaire unique des combinaisons, y compris les mappings M2 Benne dynamiques.
 // FB_WinchOutputInterlock_LD ne fait qu'autoriser ou masquer ces quatre demandes.
@@ -6791,6 +6873,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de confirmation par sens, voir bandeau)
 
+{endregion}
+
+{region "Diagnostic contacteurs et configuration"}
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d'erreur
 IF BypassGlobal THEN
     ErrorId := 16#0000;
@@ -6825,6 +6910,9 @@ END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Etats et repli defaut"}
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
@@ -6847,6 +6935,8 @@ IF Error THEN
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -7188,6 +7278,7 @@ END_IF;
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -7200,6 +7291,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Initialisation et activation synchro"}
 Ready := TRUE;
 State := E_State.READY;
 
@@ -7221,6 +7315,9 @@ CASE Mode OF
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
 
+{endregion}
+
+{region "Calcul ecart position"}
 // 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
 IF HomedM1 AND HomedM2 THEN
     SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
@@ -7230,6 +7327,9 @@ ELSE
     DeltaPosM := 0.0;
 END_IF;
 
+{endregion}
+
+{region "Surveillance synchronisme"}
 // 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
 IF NOT BypassGlobal THEN
 
@@ -7267,6 +7367,9 @@ END_IF; // fin du IF MismatchActive
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -7277,6 +7380,8 @@ END_IF;
 SyncWarn := Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </xhtml>
           </ST>
         </body>

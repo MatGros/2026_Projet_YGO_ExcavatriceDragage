@@ -68,7 +68,7 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 **Règles :**
 - Tout programme est préfixé `PRG_XX_` : la numérotation fixe l'ordre exact d'exécution dans la `MainTask` (décidé dans `AF_Partie-02`).
 - Les programmes d'orchestration procédés sont rédigés en **Texte Structuré ST (`.st`)** pour maximiser la vitesse d'implémentation et la lisibilité textuelle.
-- **Organisation en sections commentées avec emojis dans le ST** : Chaque programme ST d'orchestration doit structurer son flux de manière limpide de haut en bas (ex: `// === 📥 §1 ACQUISITION ===`, `// === 🛡️ §2 SÉCURITÉ ===`, `// === 🔀 §3 ARBITRAGE ===`).
+- **Organisation en sections commentées avec emojis dans le ST** : Chaque programme ST d'orchestration doit structurer son flux de manière limpide de haut en bas (ex: `// === 📥 §1 ACQUISITION ===`, `// === 🛡️ §2 SÉCURITÉ ===`, `// === 🔀 §3 ARBITRAGE ===`). Les sections de responsabilité distinctes d'un POU ST sont repliables avec `{region "§N Rôle fonctionnel"}` / `{endregion}` ; le commentaire reste visible dans le source et la recherche texte.
 - **Aucune logique métier inline** dans les POU `PRG_` ST : l'orchestration ne contient ni `IF` complexe ni calcul métier — uniquement des instanciations de FB et des câblages par bus DUT (`ST_*`).
 - Les programmes `_LD.st` restent convertis automatiquement en `<LD>` pour la barrière finale des sorties
   (`PRG_06_Outputs_LD.st`). `PRG_01_Inputs_LD.st` est une couche historique en retrait.

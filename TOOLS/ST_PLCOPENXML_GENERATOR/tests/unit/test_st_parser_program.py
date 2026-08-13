@@ -30,4 +30,6 @@ def test_real_prg_acquisition_parses_end_to_end():
     assert "HwReal" in names
     assert "HwRealQualified" not in names
     assert "HwIn" in names
+    assert '{region "§1 Acquisition brute — HwReal"}' in obj.body_text
+    assert "{endregion}" in obj.body_text
     assert not diag.has_errors()

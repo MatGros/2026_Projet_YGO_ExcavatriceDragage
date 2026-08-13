@@ -79,6 +79,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -102,6 +103,9 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Initialisation et bypass global"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
@@ -120,6 +124,9 @@ IF BypassGlobal THEN
     TonMecaA(IN := FALSE);
 END_IF;
 
+{endregion}
+
+{region "Diagnostics et protections translation"}
 // ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
 // On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
 IF NOT BypassGlobal THEN
@@ -231,6 +238,9 @@ IF NOT BypassGlobal THEN
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
@@ -261,3 +271,5 @@ Done := FALSE;
 // 🚦 5. STATE MACHINE (phase diagnostic)
 State := E_State.READY;
 
+
+{endregion}

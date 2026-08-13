@@ -298,6 +298,22 @@ une affectation évidente.
 
 ---
 
+### 7bis. Regions Pragma CODESYS — repli visuel
+
+```st
+{region "§1 Rôle fonctionnel"}
+// === 📥 §1 RÔLE FONCTIONNEL ===
+...
+{endregion}
+```
+
+- Une Region est **purement visuelle** : elle ne porte aucune logique et ne modifie ni l'ordre d'exécution, ni l'interface du POU.
+- L'utiliser dans un `PROGRAM` ou `FUNCTION_BLOCK` ST lorsqu'il regroupe plusieurs responsabilités top-level. Ce n'est pas une règle de longueur : un FB cohésif reste sans Region.
+- Ouvrir/fermer uniquement entre deux structures complètes top-level ; ne jamais couper ou traverser `IF`, `CASE`, `FOR`, `WHILE` ou `REPEAT`. Pas de Regions imbriquées par défaut.
+- Les `PROGRAM` utilisent `§N` et un rôle en français ; un `FUNCTION_BLOCK` utilise un rôle en français, avec `§N` seulement si son ordre est stable. Conserver le commentaire de section avec emoji.
+- Interdit dans `*_LD.st`, `GVL_*`, `ST_*`, `E_*` et les déclarations `VAR_*` dans cette phase. Le convertisseur ST→LD ignore les pragmas par sécurité.
+- Le garde-fou `TOOLS/AGENT_WORKFLOW/tests/test_region_pragmas.py` vérifie l'équilibrage, le périmètre autorisé et les POU sélectionnés.
+
 ## 8. Non-régression
 
 - **Avant** modification : identifier ce qui consomme la fonction/variable touchée (appelants,

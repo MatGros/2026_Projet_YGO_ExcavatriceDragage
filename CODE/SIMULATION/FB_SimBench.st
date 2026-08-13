@@ -122,6 +122,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
+{region "§1 Repli image reelle banc desactive"}
 IF NOT Enable THEN
     // 🔌 Banc désactivé : repli sur l'image réelle, aucune simulation en cours
     Ready       := FALSE;
@@ -140,6 +141,9 @@ Busy  := TRUE;
 Done  := FALSE;
 
 
+{endregion}
+
+{region "§2 Simulation treuils M1/M2"}
 // ── 1. MODÈLE TREUILS (M1 + M2) ─────────────────────────────────────────────
 // Presets codeurs : déclenchés si PresetTriggerCmd = 2
 M1_PresetCmd := (M1_PresetTriggerCmd = 2);
@@ -209,6 +213,9 @@ Winch.COD2_Warnings            := 0;
 Winch.COD2_DeviceState         := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§3 Simulation translation M3"}
 // ── 2. MODÈLE TRANSLATION M3 (AC600) ─────────────────────────────────────────
 M3_RelayFwd := (M3_Direction = 1);
 M3_RelayRev := (M3_Direction = -1);
@@ -257,6 +264,9 @@ Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
 Translation.AC600_DeviceState    := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
 instSimJoystick(
     Enable     := TRUE,
@@ -287,6 +297,9 @@ Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
 Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§5 Simulation securite et image machine"}
 // ── 4. MODÈLE SÉCURITÉ & COMMUNS MACHINE ─────────────────────────────────────
 instSimSafety(
     Enable           := TRUE,
@@ -307,3 +320,5 @@ Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore
 // ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
 Busy := FALSE;
 Done := TRUE;
+
+{endregion}

@@ -89,6 +89,7 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -101,6 +102,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Initialisation et activation synchro"}
 Ready := TRUE;
 State := E_State.READY;
 
@@ -122,6 +126,9 @@ CASE Mode OF
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
 
+{endregion}
+
+{region "Calcul ecart position"}
 // 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
 IF HomedM1 AND HomedM2 THEN
     SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
@@ -131,6 +138,9 @@ ELSE
     DeltaPosM := 0.0;
 END_IF;
 
+{endregion}
+
+{region "Surveillance synchronisme"}
 // 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
 IF NOT BypassGlobal THEN
 
@@ -168,6 +178,9 @@ END_IF; // fin du IF MismatchActive
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
@@ -178,3 +191,5 @@ END_IF;
 SyncWarn := Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}

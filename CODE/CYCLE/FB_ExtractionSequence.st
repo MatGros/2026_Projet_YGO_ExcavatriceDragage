@@ -48,6 +48,7 @@ VAR
     ErrorCausePresent          : BOOL;
 END_VAR
 
+{region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
@@ -59,6 +60,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "§2 Preconditions reset et initialisation sorties"}
 ResetEdge(CLK := Reset);
 ErrorCausePresent := (ControlAscentDistance_M <= 0.0);
 IF ErrorCausePresent THEN
@@ -75,6 +79,9 @@ BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
 BottomConfirmationConsumed := FALSE;
 OperatorActionId := 0; OperatorAction := '';
 
+{endregion}
+
+{region "§3 Machine etat fermeture remontee"}
 IF ErrorId <> 16#0000 THEN
     State := E_State.READY;
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
@@ -148,3 +155,5 @@ ELSE
 END_IF;
 
 Error := (ErrorId <> 16#0000);
+
+{endregion}

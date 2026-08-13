@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-12T21:43:48.386303" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-12T21:43:48.386303">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:09:36.977683" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T23:09:36.977683">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -919,6 +919,7 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§0 Interlock hauteur M1/M2"}
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
 // PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 &lt; 05) : lecture
 // du même scan, aucun retard. Bypass = maintenance consciente, doctrine ST_BypassTranslation.
@@ -935,6 +936,9 @@ M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
                             AND (PRG_02_Acquisition.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
+{endregion}
+
+{region "§0bis Coupure dure limite translation"}
 // === 🚧 §0bis COUPURE DURE (LimitSwitchRev) — bascule sur P1 si Maintenance interdite ===
 // 🆕 2026-08-06 (retour terrain) : LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
 // (§5bis FB_Translation : coupure immédiate, sans rampe, dès que CommandedDirection insiste
@@ -988,6 +992,9 @@ ELSIF TonM3ConfirmedMoving.Q THEN
     M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
 END_IF;
 
+{endregion}
+
+{region "§1 Arbitrage cible et direction"}
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -1099,6 +1106,9 @@ ELSE
 END_CASE;
 
 
+{endregion}
+
+{region "§1bis Securite M3"}
 // === 🛡️ §1bis SÉCURITÉ M3 (FB_Safety_Translation, câblée en parallèle visible) ===
 // ⚠️ Ordre d'appel volontaire : la safety lit ici le BrakeReleaseRequest et le
 // BrakeCmd du SCAN PRÉCÉDENT d'instTranslationM3 (elle est appelée avant), exactement
@@ -1143,6 +1153,9 @@ instSafetyTranslationM3(
 // OR safety M3 (8 mécanismes) — aucune des deux causes ne doit être perdue.
 M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 
+{endregion}
+
+{region "§2 Pilotage translation M3"}
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
 instTranslationM3(
@@ -1210,6 +1223,9 @@ GVL_PERSISTENT._TranslationPosEstimated_M := instPosEstimatorM3.PositionEstimate
 GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initialized;
 
 
+{endregion}
+
+{region "§3 Publication demande translation"}
 // === 📤 §3 PUBLICATION DEMANDE BRUTE TRANSLATION ===
 
 TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE);
@@ -1222,6 +1238,9 @@ TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
 
+{endregion}
+
+{region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
 TranslationStateHMI.FBState := instTranslationM3.State;
 TranslationStateHMI.Ready := instTranslationM3.Ready;
@@ -1285,6 +1304,8 @@ TranslationSafetyHMI.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafetyHMI.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafetyHMI.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -1782,6 +1803,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -1805,6 +1827,9 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Initialisation et bypass global"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
@@ -1823,6 +1848,9 @@ IF BypassGlobal THEN
     TonMecaA(IN := FALSE);
 END_IF;
 
+{endregion}
+
+{region "Diagnostics et protections translation"}
 // ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
 // On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
 IF NOT BypassGlobal THEN
@@ -1934,6 +1962,9 @@ IF NOT BypassGlobal THEN
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -1964,6 +1995,8 @@ Done := FALSE;
 // 🚦 5. STATE MACHINE (phase diagnostic)
 State := E_State.READY;
 
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -2525,6 +2558,7 @@ le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise 
 
 // === IMPLEMENTATION ===
 
+{region "Gate et initialisation"}
 // 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
@@ -2554,6 +2588,9 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Acquisition commandes et position cible"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms
 
@@ -2564,6 +2601,9 @@ ResetEdge(CLK := Reset);
 CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 
+{endregion}
+
+{region "Consigne vitesse ralentissement verrou arrivee"}
 // ⚙️ 4. CORE — arbitrage rampe : Enable &gt; SafeStop &gt; StartStop
 // 🆕 2026-08-05 : DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de
 // sens est en attente — sans ça, la cible suit la magnitude joystick en continu et ne
@@ -2642,6 +2682,9 @@ SpeedRamp(Target := RampTargetPct,
           DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
+{endregion}
+
+{region "Interlock changement sens"}
 // 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (vitesse confirmée nulle)
 IF Direction &lt;&gt; CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
@@ -2660,6 +2703,9 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
+{endregion}
+
+{region "Commande variateur et protections fin course"}
 // 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
 // OU que la fréquence réelle mesurée du variateur M3 est &gt;= 1.0 Hz.
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
@@ -2706,6 +2752,9 @@ IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (Co
     SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
 END_IF;
 
+{endregion}
+
+{region "Commande frein"}
 // 🛑 6. FREIN (composé, réutilisé tel quel)
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       ContactorFeedback := BrakeFeedback,
@@ -2721,6 +2770,9 @@ BrakeContactorCheck := Brake.ContactorCheck;
 // la vitesse ne vaut pas zéro, la demande et le desserrage suivent la décélération.
 // FB_TranslationOutputInterlock_LD ne doit jamais transformer SafeStop en coupure sèche.
 
+{endregion}
+
+{region "Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
@@ -2770,6 +2822,8 @@ IF Error THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
+
+{endregion}
 </xhtml>
           </ST>
         </body>

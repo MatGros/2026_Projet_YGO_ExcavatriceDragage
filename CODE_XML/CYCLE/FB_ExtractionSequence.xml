@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.766036" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T18:19:14.766036">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:13:36.948352" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T23:13:36.948352">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -409,6 +409,7 @@
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
@@ -420,6 +421,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "§2 Preconditions reset et initialisation sorties"}
 ResetEdge(CLK := Reset);
 ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
 IF ErrorCausePresent THEN
@@ -436,6 +440,9 @@ BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
 BottomConfirmationConsumed := FALSE;
 OperatorActionId := 0; OperatorAction := '';
 
+{endregion}
+
+{region "§3 Machine etat fermeture remontee"}
 IF ErrorId &lt;&gt; 16#0000 THEN
     State := E_State.READY;
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
@@ -509,6 +516,8 @@ ELSE
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
+
+{endregion}
 </xhtml>
           </ST>
         </body>
