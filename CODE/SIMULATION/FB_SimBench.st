@@ -79,6 +79,15 @@ VAR_INPUT
 END_VAR
 
 VAR_OUTPUT
+    (* 🆕 2026-08-13 : sorties d'état du profil AF_Partie-03 §2, absentes jusque-là.
+       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung (confirmé par
+       l'oracle PRG_06 : `Ready` n'y porte jamais d'expression, les broches suivantes oui).
+       Sans elles, `Winch` tombait sur cette broche réservée et se retrouvait câblée à une
+       branche au lieu de sa variable (retour terrain 2026-08-13). *)
+    Ready                      : BOOL;             (* TRUE = banc prêt (Enable actif, modèles à jour) *)
+    Busy                       : BOOL;             (* TRUE = cycle de simulation en cours *)
+    Done                       : BOOL;             (* TRUE = images de simulation publiées ce scan *)
+
     Winch                      : ST_HwWinch;
     Translation                : ST_HwTranslation;
     Operator                   : ST_HwOperator;
@@ -114,12 +123,21 @@ END_VAR
 // === IMPLEMENTATION ===
 
 IF NOT Enable THEN
+    // 🔌 Banc désactivé : repli sur l'image réelle, aucune simulation en cours
+    Ready       := FALSE;
+    Busy        := FALSE;
+    Done        := FALSE;
     Winch       := HwReal.Winch;
     Translation := HwReal.Translation;
     Operator    := HwReal.Operator;
     Machine     := HwReal.Machine;
     RETURN;
 END_IF;
+
+// ▶️ Banc actif : le cycle de simulation démarre pour ce scan
+Ready := TRUE;
+Busy  := TRUE;
+Done  := FALSE;
 
 
 // ── 1. MODÈLE TREUILS (M1 + M2) ─────────────────────────────────────────────
@@ -285,3 +303,7 @@ Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
 Machine.HydraulicThermalOk_DI          := TRUE;
 Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore câblé, simulé inactif par défaut
+
+// ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
+Busy := FALSE;
+Done := TRUE;

@@ -43,13 +43,18 @@ def discover_fb_contracts(code_dir: Path) -> dict[str, list[str]]:
         out_sec = re.search(r"\bVAR_OUTPUT\b(.*?)\bEND_VAR\b", text, re.DOTALL)
         outputs = []
         if out_sec:
-            for line in out_sec.group(1).splitlines():
+            # Strip (* *) blocks first: a multi-line comment's continuation lines start
+            # with plain text, so a per-line startswith("(*") test misses them and turns
+            # comment prose into a phantom output pin (REX 2026-08-13).
+            section = re.sub(r"\(\*.*?\*\)", "", out_sec.group(1), flags=re.DOTALL)
+            for line in section.splitlines():
                 line_clean = line.strip()
-                if not line_clean or line_clean.startswith("//") or line_clean.startswith("(*"):
+                if not line_clean or line_clean.startswith("//"):
                     continue
                 if ":" in line_clean:
                     v_name = line_clean.split(":", 1)[0].strip()
-                    outputs.append(v_name)
+                    if re.match(r"^[A-Za-z_]\w*$", v_name):
+                        outputs.append(v_name)
         if outputs:
             fb_contracts[fb_name] = outputs
 
@@ -165,6 +170,8 @@ def _build_pou_element(ast: ProgramAST, guid: str, fb_contracts: dict[str, list[
     ET.SubElement(rail_left, "connectionPointOut", formalParameter="none")
 
     for stmt in ast.statements:
+        if getattr(stmt, "comment", None):
+            local_id = _write_comment(ld, stmt.comment, local_id)
         if isinstance(stmt, FbCallAST):
             local_id = _write_fb_call(ld, stmt, local_id, fb_contracts)
         elif isinstance(stmt, BooleanNetworkAST):
@@ -203,6 +210,74 @@ def _append_var_decl(parent: ET.Element, v: Any) -> None:
         doc = ET.SubElement(var_el, "documentation")
         xhtml = ET.SubElement(doc, "xhtml", xmlns="http://www.w3.org/1999/xhtml")
         xhtml.text = v.comment
+
+
+_XHTML_NS = "http://www.w3.org/1999/xhtml"
+_NETWORK_TITLE_RE = re.compile(r"^===\s*(.+?)\s*===$")
+
+
+def _emit_comment_element(ld: ET.Element, text: str, local_id: int) -> None:
+    comment_el = ET.SubElement(ld, "comment")
+    comment_el.set("localId", str(local_id))
+    # The genuine PRG_10_LD_Commentaires export uses height=0/width=0, but its comments
+    # are 1-2 short lines; CODESYS then renders a zero-sized box that clips longer text
+    # (retour terrain 2026-08-13). Size the box from the content instead.
+    line_list = text.splitlines() or [""]
+    longest = max((len(line) for line in line_list), default=0)
+    comment_el.set("height", str(max(20, len(line_list) * 20 + 10)) if text else "0")
+    comment_el.set("width", str(max(200, longest * 8 + 20)) if text else "0")
+    ET.SubElement(comment_el, "position", x="0", y="0")
+    content = ET.SubElement(comment_el, "content")
+    xhtml = ET.SubElement(content, "xhtml")
+    xhtml.set("xmlns", _XHTML_NS)
+    if text:
+        xhtml.text = text
+
+
+def _emit_network_title_marker(ld: ET.Element, local_id: int) -> None:
+    vendor = ET.SubElement(ld, "vendorElement")
+    vendor.set("localId", str(local_id))
+    ET.SubElement(vendor, "position", x="0", y="0")
+    alt = ET.SubElement(vendor, "alternativeText")
+    alt_xhtml = ET.SubElement(alt, "xhtml")
+    alt_xhtml.set("xmlns", _XHTML_NS)
+    v_adddata = ET.SubElement(vendor, "addData")
+    d_v = ET.SubElement(v_adddata, "data", name="http://www.3s-software.com/plcopenxml/fbdelementtype", handleUnknown="implementation")
+    el_type = ET.SubElement(d_v, "ElementType")
+    el_type.set("xmlns", "")
+    el_type.text = "networktitle"
+
+
+def _write_comment(ld: ET.Element, comment_text: str, start_id: int) -> int:
+    """Emit a comment, distinguishing the two real kinds found in this codebase.
+
+    Structure copied from the genuine CODESYS oracle export (PRG_06_Outputs_LD,
+    PRG_10_LD_Commentaires -- REX 2026-08):
+      - `=== §N TITLE ===` box comment -> its OWN dedicated network: <comment> +
+        <vendorElement networktitle>, then an EMPTY <comment> + <vendorElement
+        networktitle> pair that opens the next network carrying the actual logic.
+        That empty pair is exactly what separates the section header from the code
+        in a real export (retour terrain 2026-08-13, "devrait être dans un réseau
+        dédié pour séparer").
+      - plain text -> a bare <comment>, no vendorElement, inside the current network.
+    """
+    lines = comment_text.splitlines()
+    title_match = _NETWORK_TITLE_RE.match(lines[0].strip()) if lines else None
+
+    curr_id = start_id
+    _emit_comment_element(ld, comment_text, curr_id)
+    curr_id += 1
+
+    if title_match:
+        _emit_network_title_marker(ld, curr_id)
+        curr_id += 1
+        # Empty pair -> closes the title-only network, opens the logic network.
+        _emit_comment_element(ld, "", curr_id)
+        curr_id += 1
+        _emit_network_title_marker(ld, curr_id)
+        curr_id += 1
+
+    return curr_id
 
 
 def _write_fb_call(ld: ET.Element, stmt: FbCallAST, start_id: int, fb_contracts: dict[str, list[str]]) -> int:

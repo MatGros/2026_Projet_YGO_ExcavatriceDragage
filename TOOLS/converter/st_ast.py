@@ -16,6 +16,7 @@ class VariableDecl:
 class StatementAST:
     """Base class for parsed ST statements."""
     raw_text: str = ""
+    comment: str | None = None  # preceding // comment block (title or plain), if any
 
 
 @dataclass
