@@ -102,6 +102,7 @@ VAR
     ConfirmCloseEdge    : R_TRIG;           // 🆕 REX 2026-07-08 — détecteur de front ConfirmClosePosition
 END_VAR
 
+{region "Gate securite"}
 // 🛑 1. GATE DE SÉCURITÉ
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
@@ -126,6 +127,9 @@ IF State = E_State.DISABLED THEN
     State := E_State.READY;
 END_IF;
 
+{endregion}
+
+{region "Reset et bypass"}
 // 🔑 2. GESTION DU RESET (FRONT MONTANT)
 ResetEdge(CLK := Reset);
 
@@ -138,6 +142,9 @@ IF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
 END_IF;
 
+{endregion}
+
+{region "Coherence et etat mecanique benne"}
 // 📏 3. DÉTECTION D'INCOHÉRENCE AU BOOT (PREMIER CYCLE API)
 IF FirstCycle THEN
     FirstCycle := FALSE;
@@ -278,6 +285,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 M1SlipDetected := (ErrorId AND 16#0010) <> 16#0000;
 
+{endregion}
+
+{region "Surveillance limites timeout et arret"}
 // 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
@@ -310,6 +320,9 @@ IF SevereError THEN
     State := E_State.READY;
 END_IF;
 
+{endregion}
+
+{region "Machine etat commande"}
 // 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
 CASE State OF
     E_State.READY:
@@ -511,3 +524,5 @@ ELSE
     // Par défaut, ou en cours/état d'ouverture, on applique l'offset ouvert
     ActiveOffsetM := Config.OffsetOpenM;
 END_IF;
+
+{endregion}

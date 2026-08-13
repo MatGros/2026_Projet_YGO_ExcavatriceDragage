@@ -59,6 +59,7 @@ IF NOT Enable THEN
 END_IF;
 Ready := TRUE;
 
+{region "§0 Contexte machine global"}
 // === 🌐 0. ContexteMachineGlobal : ST_ChainContextGlobal (fiche §5.1) ===
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive        := Auth.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled := SimulationModeActive;
@@ -74,6 +75,9 @@ GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := WinchM1
 GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk    := Commun.HeartbeatIhmOk;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy     := FALSE; // TBD non câblé - voir fiche §6 (champ exact à confirmer côté GVL_IHM.Cycle)
 
+{endregion}
+
+{region "§1 Levage synchronise M1/M2"}
 // === 🛗 1. LevageSynchroniseM1M2 : ST_ChainWinchSync (fiche §5.2) ===
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx101_M1_CablePos_M  := WinchM1.State.Position_M;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx102_M2_CablePos_M  := WinchM2.State.Position_M;
@@ -87,6 +91,9 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.St
 // Idx402-403_SetpointSpeed : non câblés — fiche §5.2 "(reste) champs à revoir un par un", laissés à
 // leur valeur d'initialisation, pas de calcul inventé (fiche §7).
 
+{endregion}
+
+{region "§2 Levage unitaire M1/M2"}
 // === 🛗 2. LevageUnitaireM1 / LevageUnitaireM2 : ST_ChainWinch (fiche §5.3) ===
 // --- M1 ---
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos := 0; // TBD non câblé - voir fiche §6 (aucun producteur public actuel)
@@ -186,6 +193,9 @@ GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ :=
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
 
+{endregion}
+
+{region "§3 Benne ouverture et fermeture"}
 // === 🪣 3. BenneOuvertureFermeture : ST_ChainBucket (fiche §5.4, source WinchM2.Bucket) ===
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen := WinchM2.Bucket.State.MechState.IsOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed := WinchM2.Bucket.State.MechState.IsClosed;
@@ -214,6 +224,9 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx403_ControlAscentActive := WinchM2.Bucket.State.ControlAscentActive;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
 
+{endregion}
+
+{region "§4 Assistance dragage"}
 // === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist (2026-08-07) ===
 GVL_Troubleshooting.AssistanceDragage.Idx101_EnableDiveSearch         := DredgingAssist.Cmd.TglEnableDiveSearch;
 GVL_Troubleshooting.AssistanceDragage.Idx102_EnableExtractionSequence := DredgingAssist.Cmd.TglEnableExtractionSequence;
@@ -246,6 +259,9 @@ GVL_Troubleshooting.AssistanceDragage.Idx505_DumpAtTremieDescentLocked := Dredgi
 GVL_Troubleshooting.AssistanceDragage.Idx601_BypassDiveActive          := DredgingAssist.State.BypassDiveActive;
 GVL_Troubleshooting.AssistanceDragage.Idx602_BypassKoboldBottomTouched := DredgingAssist.State.BypassKoboldBottomTouched;
 
+{endregion}
+
+{region "§5 Translation pont M3"}
 // === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI := Translation.State.PositionPV;
@@ -288,6 +304,9 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := 
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqRef_Hz en REAL Hz existe)
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;
 
+{endregion}
+
+{region "§6 Diagnostic homing"}
 // === 🎯 6. Diagnostic Chronologique Homing (HomingM1 & HomingM2) ===
 // --- M1 ---
 GVL_Troubleshooting.HomingM1.Step1_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2);
@@ -331,6 +350,9 @@ GVL_Troubleshooting.HomingM2.HomingHomed     := WinchM2.State.Encoder.Homed;
 GVL_Troubleshooting.HomingM2.HomingSuspect   := WinchM2.State.Encoder.HomingSuspect;
 GVL_Troubleshooting.HomingM2.RejectErrorMask := WinchM2.State.Encoder.HomingErrorId;
 
+{endregion}
+
+{region "§7 Diagnostic chaine securite et AU"}
 // === 🛡️ 7. Diagnostic Chronologique Chaîne de Sécurité & AU (Safety) ===
 GVL_Troubleshooting.Safety.Step1_InputModulesOk        := NOT InputModuleFault;
 GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut    := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
@@ -350,6 +372,9 @@ GVL_Troubleshooting.Safety.SafetyError          := GVL_IHM.Modes.State.AnyFaultA
 GVL_Troubleshooting.Safety.RedundancyTestFailed := GVL_IHM.Modes.State.RedundancyTestFailed;
 GVL_Troubleshooting.Safety.ArmingFailed         := GVL_IHM.Modes.State.EmergencyArmingFailed;
 
+{endregion}
+
+{region "§8 Diagnostic CAN et joystick"}
 // === 🕹️ 8. Diagnostic Chronologique Bus CAN & Joystick (Joystick) ===
 GVL_Troubleshooting.Joystick.Step1_CanBusActive        := NOT Network.CanError;
 GVL_Troubleshooting.Joystick.Step2_JoystickOperational := Network.Joystick.Operational;
@@ -364,6 +389,9 @@ GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMa
 GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
 
+{endregion}
+
+{region "§9 Diagnostic mouvement treuil M1"}
 // === ⚙️ 9. Diagnostic Chronologique Mouvement Treuil M1 (MotionM1) ===
 GVL_Troubleshooting.MotionM1.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.MotionM1.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
@@ -389,6 +417,9 @@ GVL_Troubleshooting.MotionM1.RelayFwdActive        := WinchM1.State.RelayFwd;
 GVL_Troubleshooting.MotionM1.RelayRevActive        := WinchM1.State.RelayRev;
 GVL_Troubleshooting.MotionM1.SpeedContactor1Active := WinchM1.State.Contactor1;
 
+{endregion}
+
+{region "§10 Diagnostic mouvement treuil M2"}
 // === ⚙️ 10. Diagnostic Chronologique Mouvement Treuil M2 (MotionM2) ===
 GVL_Troubleshooting.MotionM2.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.MotionM2.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
@@ -414,6 +445,9 @@ GVL_Troubleshooting.MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
 GVL_Troubleshooting.MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
 GVL_Troubleshooting.MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
 
+{endregion}
+
+{region "§11 Diagnostic mouvement translation M3"}
 // === ⚙️ 10bis. Diagnostic Chronologique Mouvement Translation M3 (MotionM3) ===
 // 🆕 2026-08-06 : jamais câblé jusqu'ici (slot vide depuis la création de GVL_Troubleshooting.
 // MotionM3) — ajouté suite à un blocage terrain (interlock hauteur M1/M2) invisible en
@@ -445,8 +479,13 @@ GVL_Troubleshooting.MotionM3.RelayFwdActive        := (Translation.State.ActiveD
 GVL_Troubleshooting.MotionM3.RelayRevActive        := (Translation.State.ActiveDirection = -1) AND Translation.State.Busy;
 GVL_Troubleshooting.MotionM3.SpeedContactor1Active := FALSE; // Non applicable — M3 n'a pas de contacteur de vitesse par palier
 
+{endregion}
+
+{region "§12 Images entrees reelles et simulees"}
 // === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
 GVL_Troubleshooting.Inputs := HwIn;
 
 
 
+
+{endregion}

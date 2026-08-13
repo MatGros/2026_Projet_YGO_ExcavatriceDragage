@@ -9957,6 +9957,7 @@ END_IF;
           <ST>
             <html:xhtml>
 
+{region "Gate securite"}
 // 🛑 1. GATE DE SÉCURITÉ
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
@@ -9981,6 +9982,9 @@ IF State = E_State.DISABLED THEN
     State := E_State.READY;
 END_IF;
 
+{endregion}
+
+{region "Reset et bypass"}
 // 🔑 2. GESTION DU RESET (FRONT MONTANT)
 ResetEdge(CLK := Reset);
 
@@ -9993,6 +9997,9 @@ IF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
 END_IF;
 
+{endregion}
+
+{region "Coherence et etat mecanique benne"}
 // 📏 3. DÉTECTION D'INCOHÉRENCE AU BOOT (PREMIER CYCLE API)
 IF FirstCycle THEN
     FirstCycle := FALSE;
@@ -10133,6 +10140,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 M1SlipDetected := (ErrorId AND 16#0010) &lt;&gt; 16#0000;
 
+{endregion}
+
+{region "Surveillance limites timeout et arret"}
 // 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
@@ -10165,6 +10175,9 @@ IF SevereError THEN
     State := E_State.READY;
 END_IF;
 
+{endregion}
+
+{region "Machine etat commande"}
 // 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
 CASE State OF
     E_State.READY:
@@ -10366,6 +10379,8 @@ ELSE
     // Par défaut, ou en cours/état d'ouverture, on applique l'offset ouvert
     ActiveOffsetM := Config.OffsetOpenM;
 END_IF;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -11335,6 +11350,7 @@ Distance de remontée lente de contrôle</html:xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "Gate securite"}
 // 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     WinchM1Cmd.StartStop   := FALSE;
@@ -11361,6 +11377,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Preparation surveillance et commandes cycle"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
@@ -11428,6 +11447,9 @@ IF AbortEdge.Q THEN
     State := E_CycleStep.INIT;
 END_IF;
 
+{endregion}
+
+{region "Machine etat cycle automatique"}
 // 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d'état)
 CASE State OF
 
@@ -11680,6 +11702,9 @@ CASE State OF
 
 END_CASE;
 
+{endregion}
+
+{region "Repli homme mort"}
 // 🛑 Relâchement homme-mort : aucune demande d'actionneur ne reste active.
 // L'étape est mémorisée et reprend au prochain appui valide.
 IF Busy AND NOT CycleMotionPermit THEN
@@ -11690,6 +11715,8 @@ IF Busy AND NOT CycleMotionPermit THEN
     BucketCmd.Close := FALSE;
     BucketCmd.KoboldContactorCmd := FALSE;
 END_IF;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -12381,6 +12408,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</html:xhtml>
           <ST>
             <html:xhtml>
 
+{region "§1 Gate de desactivation"}
 // 🛑 1. GATE : Désactivation si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
@@ -12410,6 +12438,9 @@ END_IF;
 
 Ready := TRUE;
 
+{endregion}
+
+{region "§2 Interpretation etats bruts et bypass"}
 // 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
 VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
 EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
@@ -12426,6 +12457,9 @@ EncoderM2OnlineEff := EncoderM2OnlineReal OR EncoderM2Bypass;
 // 🔑 3. RESET FRONT
 ResetEdge(CLK := Reset);
 
+{endregion}
+
+{region "§3 Diagnostic par equipement"}
 // 🔍 4. DIAGNOSTIC VARIATEUR (AC600_ECAT_Drive / Translation M3)
 DeviceVariateur.Online := VariateurOnlineEff;
 DeviceVariateur.Operational := VariateurOnlineEff;
@@ -12456,6 +12490,9 @@ ELSE
     DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
+{endregion}
+
+{region "§4 Etats diagnostic par equipement"}
 // 🚦 7. STATE MACHINES DE CHAQUE APPAREIL
 IF DeviceVariateur.ErrorId &lt;&gt; 0 THEN
     DeviceVariateur.State := E_Diag_State.ERROR;
@@ -12494,6 +12531,9 @@ IF (DeviceVariateur.ErrorId &lt;&gt; 0 OR DeviceEncoderM1.ErrorId &lt;&gt; 0 OR 
     END_IF;
 END_IF;
 
+{endregion}
+
+{region "§5 Synthese EtherCAT et sorties"}
 // 📤 8. RÉSUMÉ ET DÉFAUTS
 DeviceVariateur.Error := (DeviceVariateur.ErrorId &lt;&gt; 0);
 DeviceEncoderM1.Error := (DeviceEncoderM1.ErrorId &lt;&gt; 0);
@@ -12532,6 +12572,8 @@ DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
 
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -12919,6 +12961,7 @@ vers READY_TO_DESCEND. Défaut FALSE : comportement standard inchangé.</html:xh
           <ST>
             <html:xhtml>
 
+{region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
@@ -12931,6 +12974,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "§2 Preconditions fronts et rearmement"}
 ResetEdge(CLK := Reset);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
@@ -12954,6 +13000,9 @@ DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
 Ready := FALSE; Busy := FALSE; Done := FALSE;
 OperatorActionId := 0; OperatorAction := '';
 
+{endregion}
+
+{region "§3 Machine etat plongee recherche fond"}
 IF ErrorId &lt;&gt; 16#0000 THEN
     State := E_State.READY;
     DiveState := E_DiveSearchState.ERROR_HOLD;
@@ -13027,6 +13076,8 @@ ELSE
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -13928,6 +13979,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</html:xhtml>
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
 
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
 // 🆕 2026-08-06 : PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
@@ -13945,6 +13997,9 @@ END_IF;
 
 Ready := TRUE;
 
+{endregion}
+
+{region "§2 Fronts et coherence demarrage"}
 // 🔑 2. FRONTS
 ResetEdge(CLK := Reset);
 HomeEdge(CLK := Home);
@@ -13965,6 +14020,9 @@ ELSE
     IF State = E_State.INIT THEN State := E_State.READY; END_IF;
 END_IF;
 
+{endregion}
+
+{region "§3 Confirmation coherence et demande homing"}
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
 IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
     Calib.HomingSuspect := FALSE;
@@ -14001,6 +14059,9 @@ IF HomeEdge.Q THEN
     PresetRequest := TRUE;
 END_IF;
 
+{endregion}
+
+{region "§4 Suivi SDO reset et sorties etat"}
 // ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
 IF State = E_State.BUSY THEN
     IF PresetAck THEN
@@ -14036,6 +14097,8 @@ Busy := (State = E_State.BUSY);
 Homed := Calib.Homed AND NOT Calib.HomingSuspect; // 🆕 REX 2026-07-08 : Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -15100,6 +15163,7 @@ END_IF;
           <ST>
             <html:xhtml>
 
+{region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
@@ -15111,6 +15175,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "§2 Preconditions reset et initialisation sorties"}
 ResetEdge(CLK := Reset);
 ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
 IF ErrorCausePresent THEN
@@ -15127,6 +15194,9 @@ BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
 BottomConfirmationConsumed := FALSE;
 OperatorActionId := 0; OperatorAction := '';
 
+{endregion}
+
+{region "§3 Machine etat fermeture remontee"}
 IF ErrorId &lt;&gt; 16#0000 THEN
     State := E_State.READY;
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
@@ -15200,6 +15270,8 @@ ELSE
 END_IF;
 
 Error := (ErrorId &lt;&gt; 16#0000);
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -15746,6 +15818,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</html
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
 
+{region "§1 Gate securite"}
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
 IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -15769,6 +15842,9 @@ END_IF;
 
 Ready := TRUE; Busy := TRUE;
 
+{endregion}
+
+{region "§2 Reset acquisition timing et bouton"}
 // 🔑 2. RESET DÉFAUT (front + cause disparue, Partie3 §5)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q AND (RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000) THEN
@@ -15779,6 +15855,9 @@ END_IF;
 CycleTimeCalc();
 Button := RawButton;
 
+{endregion}
+
+{region "§3 Calibration et mise a echelle"}
 // 🎯 4. CALIBRATION DYNAMIQUE (Zone RETAIN)
 IF BtnCalibrate AND NOT LastCalibrate THEN
     IF RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000 THEN
@@ -15797,6 +15876,9 @@ ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // 🆕 2026-08-07 : IHM/diagnostic — position centrale (zone morte)
 
+{endregion}
+
+{region "§4 Desarmements changement mode et fin benne"}
 // 4ter-bis. CHANGEMENT DE MODE : désarme le homme-mort dès que Mode change
 // (MAINT_N1/N2/SEMI_AUTO/AUTO). Évite qu'une commande en cours traverse le changement
 // de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
@@ -15815,6 +15897,9 @@ IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après fin de cycle benne
 END_IF;
 
+{endregion}
+
+{region "§5 Armement homme mort"}
 // 4ter. BOUTON HOMME-MORT — armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la
 // position des axes pendant l'appui.
 // 🔧 2026-08-07 (retour terrain) : l'ancien armement ("front bouton" ET "axes strictement à
@@ -15875,6 +15960,9 @@ IF DeadmanTimer.Q THEN
     DeadmanArmed := FALSE;      // Pas de reconfirmation dans le délai → désarmement (décélération sûre)
 END_IF;
 
+{endregion}
+
+{region "§6 Pipeline axe X"}
 // 🕹️ 5. PIPELINE TRAITEMENT — AXE X
 IF InvertX THEN
     FilterX(ValueIn := -ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
@@ -15903,6 +15991,9 @@ END_IF;
 SpeedXPct := AxisCmdX.SpeedRef;
 DirectionX := AxisCmdX.Direction;
 
+{endregion}
+
+{region "§7 Pipeline axe Y et sorties"}
 // 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
 IF InvertY THEN
     FilterY(ValueIn := -ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
@@ -15935,6 +16026,8 @@ DirectionY := AxisCmdY.Direction;
 NeutralXAct := NeutralXMem;
 NeutralYAct := NeutralYMem;
 Done := NOT Error;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -16134,6 +16227,7 @@ Done := NOT Error;
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate neutralisation"}
 // 1. GATE — neutralisation si désactivé ou AU non armé
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.Mode := E_Mode.DISABLE;
@@ -16153,6 +16247,9 @@ END_IF;
 Ready := TRUE;
 State := E_State.READY;
 
+{endregion}
+
+{region "§2 Reset et arbitrage mode"}
 // 2. RESET FRONT (bit0 = défaut codeur)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
@@ -16174,6 +16271,9 @@ ELSE
     Auth.Mode := SelMode;
 END_IF;
 
+{endregion}
+
+{region "§3 Calcul autorisations machine"}
 // 5. SYNC ENABLE — actionnable en MAINT_N1 ou MAINT_N2
 // FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
 Auth.SyncEnable := NOT ((Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
@@ -16253,6 +16353,9 @@ IF (Auth.Mode &lt;&gt; E_Mode.MAINT_N2) AND (Auth.Mode &lt;&gt; E_Mode.MAINT_N1)
     Auth.JoystickWinchSelectArbitrated := 0;
 END_IF;
 
+{endregion}
+
+{region "§4 Etats et defauts"}
 // 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -16262,6 +16365,8 @@ END_IF;
 
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -17074,11 +17179,15 @@ Latch brut : canal collé détecté à l'auto-test</html:xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "Fronts de commande"}
 // 🔄 Fronts
 EnableRising(CLK := Enable);
 ResetEdge(CLK := Reset);
 ArmReqEdge(CLK := ArmRequest);
 
+{endregion}
+
+{region "Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -17114,6 +17223,9 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Autotest demarrage"}
 // 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01)
 // Vérifications synchrones 1 cycle au premier passage Enable=TRUE
 IF EnableRising.Q THEN
@@ -17134,6 +17246,9 @@ IF NOT StartupCheckDone THEN
     RETURN; // 1 cycle pour laisser le temps aux entrées de se stabiliser
 END_IF;
 
+{endregion}
+
+{region "Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
 // ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
 // pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
@@ -17147,6 +17262,9 @@ IF ResetEdge.Q THEN
     ErrorId := 16#0000;
 END_IF;
 
+{endregion}
+
+{region "Sequence rearmement AU"}
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
@@ -17239,6 +17357,9 @@ IF TonArmingLockout.Q THEN
     EmergencyArmingLockoutActive := FALSE;
 END_IF;
 
+{endregion}
+
+{region "Gestion cause et acquittement"}
 // 🆕 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
 // L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
 // jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
@@ -17252,6 +17373,9 @@ IF ArmingFailedCauseEdge.Q THEN
     EmergencyArmingFailedAck := FALSE;
 END_IF;
 
+{endregion}
+
+{region "Commandes et etats publics"}
 // 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES — basées sur la Cause brute (jamais sur l'Ack)
 Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
 Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
@@ -17269,6 +17393,9 @@ Armable := EmergencyChainClosed
 
 ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
 
+{endregion}
+
+{region "Affichage defauts IHM"}
 // 📤 7. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
 // ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
 // sur la Cause brute, jamais retardée par ce debounce.
@@ -17278,6 +17405,9 @@ RedundancyTestFailed := TonRedundancyDisplay.Q OR NOT RedundancyTestFailedAck;
 TonArmingFailedDisplay(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebounce);
 EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAck;
 
+{endregion}
+
+{region "Synthese ErrorId"}
 // 📤 8. SYNTHÈSE DES ERREURS (bitfield affiché, basé sur RedundancyTestFailed/EmergencyArmingFailed affichés)
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN
@@ -17290,6 +17420,8 @@ END_IF;
 // — ne pas l'effacer ici (reset explicite requis)
 
 Error := (ErrorId &lt;&gt; 16#0000);
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -17990,6 +18122,7 @@ Status diagnostic communication EtherCAT (Online)</html:xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -18013,6 +18146,9 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Initialisation et bypass global"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
@@ -18031,6 +18167,9 @@ IF BypassGlobal THEN
     TonMecaA(IN := FALSE);
 END_IF;
 
+{endregion}
+
+{region "Diagnostics et protections translation"}
 // ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
 // On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
 IF NOT BypassGlobal THEN
@@ -18142,6 +18281,9 @@ IF NOT BypassGlobal THEN
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -18172,6 +18314,8 @@ Done := FALSE;
 // 🚦 5. STATE MACHINE (phase diagnostic)
 State := E_State.READY;
 
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -19086,6 +19230,7 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</ht
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
@@ -19114,6 +19259,9 @@ END_IF;
 Ready := TRUE;
 State := E_State.READY;
 
+{endregion}
+
+{region "Initialisation et bypass global"}
 // Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
 IF LastInReferencingMode AND NOT InReferencingMode THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
@@ -19146,6 +19294,9 @@ IF BypassGlobal THEN
     TonMecaE(IN := FALSE);
 END_IF;
 
+{endregion}
+
+{region "Protections immediates position"}
 // 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
 // ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
 // position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
@@ -19174,6 +19325,9 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFBF;
 END_IF;
 
+{endregion}
+
+{region "Diagnostics et protections treuil"}
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
 IF NOT BypassGlobal THEN
 
@@ -19365,6 +19519,9 @@ END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Arbitrage sorties securite"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -19440,6 +19597,8 @@ PowerCutOff := (ErrorId AND 16#2F84) &lt;&gt; 16#0000;
 // Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -19904,6 +20063,7 @@ TRUE = banc prêt (Enable actif, modèles à jour)</html:xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "§1 Repli image reelle banc desactive"}
 IF NOT Enable THEN
     // 🔌 Banc désactivé : repli sur l'image réelle, aucune simulation en cours
     Ready       := FALSE;
@@ -19922,6 +20082,9 @@ Busy  := TRUE;
 Done  := FALSE;
 
 
+{endregion}
+
+{region "§2 Simulation treuils M1/M2"}
 // ── 1. MODÈLE TREUILS (M1 + M2) ─────────────────────────────────────────────
 // Presets codeurs : déclenchés si PresetTriggerCmd = 2
 M1_PresetCmd := (M1_PresetTriggerCmd = 2);
@@ -19991,6 +20154,9 @@ Winch.COD2_Warnings            := 0;
 Winch.COD2_DeviceState         := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§3 Simulation translation M3"}
 // ── 2. MODÈLE TRANSLATION M3 (AC600) ─────────────────────────────────────────
 M3_RelayFwd := (M3_Direction = 1);
 M3_RelayRev := (M3_Direction = -1);
@@ -20039,6 +20205,9 @@ Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
 Translation.AC600_DeviceState    := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
 instSimJoystick(
     Enable     := TRUE,
@@ -20069,6 +20238,9 @@ Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
 Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§5 Simulation securite et image machine"}
 // ── 4. MODÈLE SÉCURITÉ &amp; COMMUNS MACHINE ─────────────────────────────────────
 instSimSafety(
     Enable           := TRUE,
@@ -20089,6 +20261,8 @@ Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore
 // ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
 Busy := FALSE;
 Done := TRUE;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -21758,6 +21932,7 @@ le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise 
 
 // === IMPLEMENTATION ===
 
+{region "Gate et initialisation"}
 // 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
@@ -21787,6 +21962,9 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Acquisition commandes et position cible"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms
 
@@ -21797,6 +21975,9 @@ ResetEdge(CLK := Reset);
 CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 
+{endregion}
+
+{region "Consigne vitesse ralentissement verrou arrivee"}
 // ⚙️ 4. CORE — arbitrage rampe : Enable &gt; SafeStop &gt; StartStop
 // 🆕 2026-08-05 : DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de
 // sens est en attente — sans ça, la cible suit la magnitude joystick en continu et ne
@@ -21875,6 +22056,9 @@ SpeedRamp(Target := RampTargetPct,
           DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
+{endregion}
+
+{region "Interlock changement sens"}
 // 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (vitesse confirmée nulle)
 IF Direction &lt;&gt; CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
@@ -21893,6 +22077,9 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
+{endregion}
+
+{region "Commande variateur et protections fin course"}
 // 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
 // OU que la fréquence réelle mesurée du variateur M3 est &gt;= 1.0 Hz.
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
@@ -21939,6 +22126,9 @@ IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (Co
     SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
 END_IF;
 
+{endregion}
+
+{region "Commande frein"}
 // 🛑 6. FREIN (composé, réutilisé tel quel)
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       ContactorFeedback := BrakeFeedback,
@@ -21954,6 +22144,9 @@ BrakeContactorCheck := Brake.ContactorCheck;
 // la vitesse ne vaut pas zéro, la demande et le desserrage suivent la décélération.
 // FB_TranslationOutputInterlock_LD ne doit jamais transformer SafeStop en coupure sèche.
 
+{endregion}
+
+{region "Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
@@ -22003,6 +22196,8 @@ IF Error THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -23200,6 +23395,7 @@ IF NOT Enable THEN
 END_IF;
 Ready := TRUE;
 
+{region "§0 Contexte machine global"}
 // === 🌐 0. ContexteMachineGlobal : ST_ChainContextGlobal (fiche §5.1) ===
 GVL_Troubleshooting.ContexteMachineGlobal.Idx101_ModeActive        := Auth.Mode;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx102_SimulationEnabled := SimulationModeActive;
@@ -23215,6 +23411,9 @@ GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := WinchM1
 GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk    := Commun.HeartbeatIhmOk;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy     := FALSE; // TBD non câblé - voir fiche §6 (champ exact à confirmer côté GVL_IHM.Cycle)
 
+{endregion}
+
+{region "§1 Levage synchronise M1/M2"}
 // === 🛗 1. LevageSynchroniseM1M2 : ST_ChainWinchSync (fiche §5.2) ===
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx101_M1_CablePos_M  := WinchM1.State.Position_M;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx102_M2_CablePos_M  := WinchM2.State.Position_M;
@@ -23228,6 +23427,9 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.St
 // Idx402-403_SetpointSpeed : non câblés — fiche §5.2 "(reste) champs à revoir un par un", laissés à
 // leur valeur d'initialisation, pas de calcul inventé (fiche §7).
 
+{endregion}
+
+{region "§2 Levage unitaire M1/M2"}
 // === 🛗 2. LevageUnitaireM1 / LevageUnitaireM2 : ST_ChainWinch (fiche §5.3) ===
 // --- M1 ---
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx101_EncoderRawPos := 0; // TBD non câblé - voir fiche §6 (aucun producteur public actuel)
@@ -23327,6 +23529,9 @@ GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ :=
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
 
+{endregion}
+
+{region "§3 Benne ouverture et fermeture"}
 // === 🪣 3. BenneOuvertureFermeture : ST_ChainBucket (fiche §5.4, source WinchM2.Bucket) ===
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx101_BucketIsOpen := WinchM2.Bucket.State.MechState.IsOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx102_BucketIsClosed := WinchM2.Bucket.State.MechState.IsClosed;
@@ -23355,6 +23560,9 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx403_ControlAscentActive := WinchM2.Bucket.State.ControlAscentActive;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
 
+{endregion}
+
+{region "§4 Assistance dragage"}
 // === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist (2026-08-07) ===
 GVL_Troubleshooting.AssistanceDragage.Idx101_EnableDiveSearch         := DredgingAssist.Cmd.TglEnableDiveSearch;
 GVL_Troubleshooting.AssistanceDragage.Idx102_EnableExtractionSequence := DredgingAssist.Cmd.TglEnableExtractionSequence;
@@ -23387,6 +23595,9 @@ GVL_Troubleshooting.AssistanceDragage.Idx505_DumpAtTremieDescentLocked := Dredgi
 GVL_Troubleshooting.AssistanceDragage.Idx601_BypassDiveActive          := DredgingAssist.State.BypassDiveActive;
 GVL_Troubleshooting.AssistanceDragage.Idx602_BypassKoboldBottomTouched := DredgingAssist.State.BypassKoboldBottomTouched;
 
+{endregion}
+
+{region "§5 Translation pont M3"}
 // === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx101_PosTremie_DI := Translation.State.PositionTremie;
 GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx102_PosPV_DI := Translation.State.PositionPV;
@@ -23429,6 +23640,9 @@ GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx501_CmdDriveControlWord := 
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx502_CmdDriveFreq_Hz := 0; // TBD non câblé - voir fiche §6 (format UINT 0.01Hz non exposé, seul DriveFreqRef_Hz en REAL Hz existe)
 GVL_Troubleshooting.TranslationPontM3.Outputs_500.Idx503_CmdBrakeRelease_RQ := Translation.State.BrakeCmd;
 
+{endregion}
+
+{region "§6 Diagnostic homing"}
 // === 🎯 6. Diagnostic Chronologique Homing (HomingM1 &amp; HomingM2) ===
 // --- M1 ---
 GVL_Troubleshooting.HomingM1.Step1_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2);
@@ -23472,6 +23686,9 @@ GVL_Troubleshooting.HomingM2.HomingHomed     := WinchM2.State.Encoder.Homed;
 GVL_Troubleshooting.HomingM2.HomingSuspect   := WinchM2.State.Encoder.HomingSuspect;
 GVL_Troubleshooting.HomingM2.RejectErrorMask := WinchM2.State.Encoder.HomingErrorId;
 
+{endregion}
+
+{region "§7 Diagnostic chaine securite et AU"}
 // === 🛡️ 7. Diagnostic Chronologique Chaîne de Sécurité &amp; AU (Safety) ===
 GVL_Troubleshooting.Safety.Step1_InputModulesOk        := NOT InputModuleFault;
 GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut    := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
@@ -23491,6 +23708,9 @@ GVL_Troubleshooting.Safety.SafetyError          := GVL_IHM.Modes.State.AnyFaultA
 GVL_Troubleshooting.Safety.RedundancyTestFailed := GVL_IHM.Modes.State.RedundancyTestFailed;
 GVL_Troubleshooting.Safety.ArmingFailed         := GVL_IHM.Modes.State.EmergencyArmingFailed;
 
+{endregion}
+
+{region "§8 Diagnostic CAN et joystick"}
 // === 🕹️ 8. Diagnostic Chronologique Bus CAN &amp; Joystick (Joystick) ===
 GVL_Troubleshooting.Joystick.Step1_CanBusActive        := NOT Network.CanError;
 GVL_Troubleshooting.Joystick.Step2_JoystickOperational := Network.Joystick.Operational;
@@ -23505,6 +23725,9 @@ GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMa
 GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
 
+{endregion}
+
+{region "§9 Diagnostic mouvement treuil M1"}
 // === ⚙️ 9. Diagnostic Chronologique Mouvement Treuil M1 (MotionM1) ===
 GVL_Troubleshooting.MotionM1.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.MotionM1.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
@@ -23530,6 +23753,9 @@ GVL_Troubleshooting.MotionM1.RelayFwdActive        := WinchM1.State.RelayFwd;
 GVL_Troubleshooting.MotionM1.RelayRevActive        := WinchM1.State.RelayRev;
 GVL_Troubleshooting.MotionM1.SpeedContactor1Active := WinchM1.State.Contactor1;
 
+{endregion}
+
+{region "§10 Diagnostic mouvement treuil M2"}
 // === ⚙️ 10. Diagnostic Chronologique Mouvement Treuil M2 (MotionM2) ===
 GVL_Troubleshooting.MotionM2.Step1_PowerEngaged       := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.MotionM2.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
@@ -23555,6 +23781,9 @@ GVL_Troubleshooting.MotionM2.RelayFwdActive        := WinchM2.State.RelayFwd;
 GVL_Troubleshooting.MotionM2.RelayRevActive        := WinchM2.State.RelayRev;
 GVL_Troubleshooting.MotionM2.SpeedContactor1Active := WinchM2.State.Contactor1;
 
+{endregion}
+
+{region "§11 Diagnostic mouvement translation M3"}
 // === ⚙️ 10bis. Diagnostic Chronologique Mouvement Translation M3 (MotionM3) ===
 // 🆕 2026-08-06 : jamais câblé jusqu'ici (slot vide depuis la création de GVL_Troubleshooting.
 // MotionM3) — ajouté suite à un blocage terrain (interlock hauteur M1/M2) invisible en
@@ -23586,11 +23815,16 @@ GVL_Troubleshooting.MotionM3.RelayFwdActive        := (Translation.State.ActiveD
 GVL_Troubleshooting.MotionM3.RelayRevActive        := (Translation.State.ActiveDirection = -1) AND Translation.State.Busy;
 GVL_Troubleshooting.MotionM3.SpeedContactor1Active := FALSE; // Non applicable — M3 n'a pas de contacteur de vitesse par palier
 
+{endregion}
+
+{region "§12 Images entrees reelles et simulees"}
 // === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
 GVL_Troubleshooting.Inputs := HwIn;
 
 
 
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -24186,6 +24420,7 @@ FB_SpeedStep, la progressivité vient de la temporisation par palier (StepDelay 
           <ST>
             <html:xhtml>
 
+{region "Gate et initialisation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -24217,6 +24452,9 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Preparation commande et limites vitesse"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);
 
@@ -24310,6 +24548,9 @@ IF InTopSlowdownZone OR InBottomSlowdownZone THEN
     ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
 END_IF;
 
+{endregion}
+
+{region "Selection et temporisation paliers"}
 SpeedStep(Enable := (RampTargetPct &gt; 0.1), SpeedRefPct := RampTargetPct,
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
           MaxStepNumber := ActiveMaxStep,
@@ -24340,6 +24581,9 @@ ELSE
 END_IF;
 SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
 
+{endregion}
+
+{region "Commandes contacteurs et sens"}
 // Les sorties métier suivent le palier temporisé. FB_Winch/SpeedStepTable reste
 // propriétaire unique des combinaisons, y compris les mappings M2 Benne dynamiques.
 // FB_WinchOutputInterlock_LD ne fait qu'autoriser ou masquer ces quatre demandes.
@@ -24405,6 +24649,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de confirmation par sens, voir bandeau)
 
+{endregion}
+
+{region "Diagnostic contacteurs et configuration"}
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d'erreur
 IF BypassGlobal THEN
     ErrorId := 16#0000;
@@ -24439,6 +24686,9 @@ END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Etats et repli defaut"}
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
@@ -24461,6 +24711,8 @@ IF Error THEN
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -25625,6 +25877,7 @@ END_IF;
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -25637,6 +25890,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Initialisation et activation synchro"}
 Ready := TRUE;
 State := E_State.READY;
 
@@ -25658,6 +25914,9 @@ CASE Mode OF
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
 
+{endregion}
+
+{region "Calcul ecart position"}
 // 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
 IF HomedM1 AND HomedM2 THEN
     SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
@@ -25667,6 +25926,9 @@ ELSE
     DeltaPosM := 0.0;
 END_IF;
 
+{endregion}
+
+{region "Surveillance synchronisme"}
 // 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
 IF NOT BypassGlobal THEN
 
@@ -25704,6 +25966,9 @@ END_IF; // fin du IF MismatchActive
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -25714,6 +25979,8 @@ END_IF;
 SyncWarn := Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -26369,6 +26636,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</html:xhtml>
           <ST>
             <html:xhtml>
 
+{region "§1 Acquisition brute — HwReal"}
 // === 📥 §1 ACQUISITION BRUTE (HwReal) ===
 
 // Winch M1 / M2 et codeurs
@@ -26421,7 +26689,9 @@ HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
 HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
+{endregion}
 
+{region "§1bis Diagnostic modules DI"}
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING =&gt; module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
@@ -26435,7 +26705,9 @@ ELSE
     Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
 InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
+{endregion}
 
+{region "§2 Simulation et aiguillage — HwIn"}
 // === 🎭 §2 SIMULATION &amp; AIGUILLAGE (HwIn) ===
 
 instSimBench(
@@ -26514,8 +26786,10 @@ HwIn.Winch       := SEL(WinchInputSourceSimulated, HwReal.Winch, HwSim.Winch);
 HwIn.Translation := SEL(TranslationInputSourceSimulated, HwReal.Translation, HwSim.Translation);
 HwIn.Operator    := SEL(OperatorInputSourceSimulated, HwReal.Operator, HwSim.Operator);
 HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machine);
+{endregion}
 
 
+{region "§3 Traitement joystick"}
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
 
 instJoystick(
@@ -26552,6 +26826,9 @@ JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prére
 JoystickDirectionX := instJoystick.DirectionX;
 JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
 JoystickXNeutral := (instJoystick.DirectionX = 0);
+{endregion}
+
+{region "§4 Codeurs et homing — M1/M2"}
 // === 🧲 §4 CODEURS &amp; HOMING (M1 / M2) ===
 
 instEncoderAbsM1(
@@ -26720,6 +26997,9 @@ instEncoderSpeedMeasureM2(
 M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
 M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
 M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
+{endregion}
+
+{region "§5 Décodage position translation — M3"}
 // === ↔️ §5 DÉCODAGE POSITION TRANSLATION (M3) ===
 
 instPosDecoderM3(
@@ -26744,6 +27024,9 @@ M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 M3_SensorsWord          := instPosDecoderM3.SensorsWord;
+{endregion}
+
+{region "§6 Filtrage PT1 retours variateur — M3"}
 // === 📊 §6 FILTRAGE PT1 RETOURS VARIATEUR (M3) ===
 
 instCycleTimeAcq(DefaultValueS := 0.010);
@@ -26761,6 +27044,7 @@ instFilterM3ActualFreqHz(
     CycleTimeS := instCycleTimeAcq.CycleTimeS
 );
 M3_ActualFrequencyHz_Filtered := REAL_TO_UINT(instFilterM3ActualFreqHz.ValueOut);
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -27327,6 +27611,7 @@ dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.
           <ST>
             <html:xhtml>
 
+{region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
@@ -27518,6 +27803,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§2 Commande benne"}
 // === 🏗️ §2 COMMANDE DU BENNE (FB_Bucket) ===
 
 // 🆕 2026-08-07 : en mode "vidage à la trémie" (MAINT_N1/N2, bit armé), une demande DOWN à
@@ -27584,6 +27872,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§3 Arbitrage consignes M1/M2"}
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -27708,6 +27999,9 @@ IF ControlAscentActive THEN
 END_IF;
 
 
+{endregion}
+
+{region "§4 Synchronisation M1/M2"}
 // === 🔄 §4 SYNCHRONISATION M1 / M2 ===
 
 instWinchSync(
@@ -27765,6 +28059,9 @@ ELSE
 END_IF;
 
 
+{endregion}
+
+{region "§5 Couplage croise et securites"}
 // === 🛑 §5 COUPLAGE CROISÉ &amp; SÉCURITÉS ===
 
 // 🆕 2026-08-07 (demande client) : la limite légale (profondeur min. autorisée) doit elle aussi
@@ -28012,6 +28309,9 @@ ForbidAscentM1_Active  := ForbidAscentM1_Raw  OR (instWinchSync.SyncActive AND F
 ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM1_Raw);
 
 
+{endregion}
+
+{region "§6 Execution treuils M1/M2"}
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) ===
 
 instWinchM1(
@@ -28082,6 +28382,9 @@ instWinchM2(
 );
 
 
+{endregion}
+
+{region "§7 Publication demandes brutes"}
 // === 📤 §7 PUBLICATION DEMANDES BRUTES (WinchM1/M2FinalInterlockRequest) ===
 
 WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
@@ -28118,6 +28421,9 @@ WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
+{endregion}
+
+{region "§8 Publication etats IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
 // 🔧 2026-08-07 (27) — retour terrain (audit agent) : MeasuredSpeed_Mps jamais recopié, restait
 // à 0.0 en permanence à l'IHM. SpeedDelta_Mps corrigé par rapport à la proposition initiale de
@@ -28292,6 +28598,8 @@ BucketStateHMI.ControlAscentActive := ControlAscentActive;
 BucketStateHMI.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -28483,6 +28791,7 @@ indépendant du mouvement réel (rebond capteur mal filtré).</html:xhtml>
           <ST>
             <html:xhtml>
 
+{region "§0 Interlock hauteur M1/M2"}
 // === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
 // PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 &lt; 05) : lecture
 // du même scan, aucun retard. Bypass = maintenance consciente, doctrine ST_BypassTranslation.
@@ -28499,6 +28808,9 @@ M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
                             AND (PRG_02_Acquisition.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
+{endregion}
+
+{region "§0bis Coupure dure limite translation"}
 // === 🚧 §0bis COUPURE DURE (LimitSwitchRev) — bascule sur P1 si Maintenance interdite ===
 // 🆕 2026-08-06 (retour terrain) : LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
 // (§5bis FB_Translation : coupure immédiate, sans rampe, dès que CommandedDirection insiste
@@ -28552,6 +28864,9 @@ ELSIF TonM3ConfirmedMoving.Q THEN
     M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
 END_IF;
 
+{endregion}
+
+{region "§1 Arbitrage cible et direction"}
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -28663,6 +28978,9 @@ ELSE
 END_CASE;
 
 
+{endregion}
+
+{region "§1bis Securite M3"}
 // === 🛡️ §1bis SÉCURITÉ M3 (FB_Safety_Translation, câblée en parallèle visible) ===
 // ⚠️ Ordre d'appel volontaire : la safety lit ici le BrakeReleaseRequest et le
 // BrakeCmd du SCAN PRÉCÉDENT d'instTranslationM3 (elle est appelée avant), exactement
@@ -28707,6 +29025,9 @@ instSafetyTranslationM3(
 // OR safety M3 (8 mécanismes) — aucune des deux causes ne doit être perdue.
 M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 
+{endregion}
+
+{region "§2 Pilotage translation M3"}
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
 instTranslationM3(
@@ -28774,6 +29095,9 @@ GVL_PERSISTENT._TranslationPosEstimated_M := instPosEstimatorM3.PositionEstimate
 GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initialized;
 
 
+{endregion}
+
+{region "§3 Publication demande translation"}
 // === 📤 §3 PUBLICATION DEMANDE BRUTE TRANSLATION ===
 
 TranslationFinalInterlockRequest.Enable := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE);
@@ -28786,6 +29110,9 @@ TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
 
+{endregion}
+
+{region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
 TranslationStateHMI.FBState := instTranslationM3.State;
 TranslationStateHMI.Ready := instTranslationM3.Ready;
@@ -28849,6 +29176,8 @@ TranslationSafetyHMI.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafetyHMI.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafetyHMI.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>
@@ -31632,6 +31961,7 @@ TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSenso
           <ST>
             <html:xhtml>
 
+{region "§1 Horloge et reset machine"}
 // === 🧩 §1 HORLOGE &amp; RESET MACHINE ===
 
 instBlink1Hz(
@@ -31679,6 +32009,9 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
 
 
+{endregion}
+
+{region "§2 Persistance et restauration configuration"}
 // === 🌉 §2 PERSISTANCE &amp; RESTAURATION CONFIG ===
 
 instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
@@ -31792,6 +32125,9 @@ IF GVL_IHM.M1M2Sync.Bypass.Global &lt;&gt; BypassSyncGlobal THEN
 END_IF;
 
 
+{endregion}
+
+{region "§3 Projections IHM et mapping"}
 // === 📊 §3 PROJECTIONS IHM ET MAPPING ===
 
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
@@ -31898,6 +32234,9 @@ GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
 GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.InputModuleFault;
 
 
+{endregion}
+
+{region "§4 Vue depannage lecture seule"}
 // === 🕵️♂️ §4 VUE DÉPANNAGE (lecture seule stricte) ===
 
 instTroubleshootingView(
@@ -31922,6 +32261,8 @@ instTroubleshootingView(
     Network              := GVL_IHM.Network,
     DredgingAssist       := GVL_IHM.DredgingAssist
 );
+
+{endregion}
 </html:xhtml>
           </ST>
         </body>

@@ -160,6 +160,7 @@ VAR
     FirstScanDone       : BOOL;
 END_VAR
 
+{region "Gate et initialisation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -191,6 +192,9 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Preparation commande et limites vitesse"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);
 
@@ -284,6 +288,9 @@ IF InTopSlowdownZone OR InBottomSlowdownZone THEN
     ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
 END_IF;
 
+{endregion}
+
+{region "Selection et temporisation paliers"}
 SpeedStep(Enable := (RampTargetPct > 0.1), SpeedRefPct := RampTargetPct,
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
           MaxStepNumber := ActiveMaxStep,
@@ -314,6 +321,9 @@ ELSE
 END_IF;
 SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
 
+{endregion}
+
+{region "Commandes contacteurs et sens"}
 // Les sorties métier suivent le palier temporisé. FB_Winch/SpeedStepTable reste
 // propriétaire unique des combinaisons, y compris les mappings M2 Benne dynamiques.
 // FB_WinchOutputInterlock_LD ne fait qu'autoriser ou masquer ces quatre demandes.
@@ -379,6 +389,9 @@ ELSIF ResetEdge.Q THEN
 END_IF;
 ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de confirmation par sens, voir bandeau)
 
+{endregion}
+
+{region "Diagnostic contacteurs et configuration"}
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d'erreur
 IF BypassGlobal THEN
     ErrorId := 16#0000;
@@ -413,6 +426,9 @@ END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Etats et repli defaut"}
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
@@ -435,3 +451,5 @@ IF Error THEN
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
+
+{endregion}

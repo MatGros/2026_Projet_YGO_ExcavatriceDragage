@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T22:28:00.574712" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T22:28:00.574712">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:13:36.916344" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T23:13:36.916344">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -420,6 +420,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate de desactivation"}
 // 🛑 1. GATE : Désactivation si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
@@ -449,6 +450,9 @@ END_IF;
 
 Ready := TRUE;
 
+{endregion}
+
+{region "§2 Interpretation etats bruts et bypass"}
 // 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
 VariateurOnlineReal := (DeviceVariateurStateRaw = DEVICE_STATE.RUNNING);
 EncoderM1OnlineReal := (DeviceEncoderM1StateRaw = DEVICE_STATE.RUNNING);
@@ -465,6 +469,9 @@ EncoderM2OnlineEff := EncoderM2OnlineReal OR EncoderM2Bypass;
 // 🔑 3. RESET FRONT
 ResetEdge(CLK := Reset);
 
+{endregion}
+
+{region "§3 Diagnostic par equipement"}
 // 🔍 4. DIAGNOSTIC VARIATEUR (AC600_ECAT_Drive / Translation M3)
 DeviceVariateur.Online := VariateurOnlineEff;
 DeviceVariateur.Operational := VariateurOnlineEff;
@@ -495,6 +502,9 @@ ELSE
     DeviceEncoderM2.ErrorId := DeviceEncoderM2.ErrorId AND 16#FFCF; (* Effacement auto dès que RUNNING *)
 END_IF;
 
+{endregion}
+
+{region "§4 Etats diagnostic par equipement"}
 // 🚦 7. STATE MACHINES DE CHAQUE APPAREIL
 IF DeviceVariateur.ErrorId &lt;&gt; 0 THEN
     DeviceVariateur.State := E_Diag_State.ERROR;
@@ -533,6 +543,9 @@ IF (DeviceVariateur.ErrorId &lt;&gt; 0 OR DeviceEncoderM1.ErrorId &lt;&gt; 0 OR 
     END_IF;
 END_IF;
 
+{endregion}
+
+{region "§5 Synthese EtherCAT et sorties"}
 // 📤 8. RÉSUMÉ ET DÉFAUTS
 DeviceVariateur.Error := (DeviceVariateur.ErrorId &lt;&gt; 0);
 DeviceEncoderM1.Error := (DeviceEncoderM1.ErrorId &lt;&gt; 0);
@@ -571,6 +584,8 @@ DeviceEncoderM2StateRawOut := DeviceEncoderM2StateRaw;
 
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </xhtml>
           </ST>
         </body>

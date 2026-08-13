@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.766036" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T18:19:14.766036">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:13:36.954970" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T23:13:36.954970">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -809,6 +809,7 @@ Distance de remontée lente de contrôle</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "Gate securite"}
 // 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     WinchM1Cmd.StartStop   := FALSE;
@@ -835,6 +836,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Preparation surveillance et commandes cycle"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
@@ -902,6 +906,9 @@ IF AbortEdge.Q THEN
     State := E_CycleStep.INIT;
 END_IF;
 
+{endregion}
+
+{region "Machine etat cycle automatique"}
 // 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d'état)
 CASE State OF
 
@@ -1154,6 +1161,9 @@ CASE State OF
 
 END_CASE;
 
+{endregion}
+
+{region "Repli homme mort"}
 // 🛑 Relâchement homme-mort : aucune demande d'actionneur ne reste active.
 // L'étape est mémorisée et reprend au prochain appui valide.
 IF Busy AND NOT CycleMotionPermit THEN
@@ -1164,6 +1174,8 @@ IF Busy AND NOT CycleMotionPermit THEN
     BucketCmd.Close := FALSE;
     BucketCmd.KoboldContactorCmd := FALSE;
 END_IF;
+
+{endregion}
 </xhtml>
           </ST>
         </body>

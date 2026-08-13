@@ -79,6 +79,7 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
 
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
 // 🆕 2026-08-06 : PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
@@ -96,6 +97,9 @@ END_IF;
 
 Ready := TRUE;
 
+{endregion}
+
+{region "§2 Fronts et coherence demarrage"}
 // 🔑 2. FRONTS
 ResetEdge(CLK := Reset);
 HomeEdge(CLK := Home);
@@ -116,6 +120,9 @@ ELSE
     IF State = E_State.INIT THEN State := E_State.READY; END_IF;
 END_IF;
 
+{endregion}
+
+{region "§3 Confirmation coherence et demande homing"}
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
 IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
     Calib.HomingSuspect := FALSE;
@@ -152,6 +159,9 @@ IF HomeEdge.Q THEN
     PresetRequest := TRUE;
 END_IF;
 
+{endregion}
+
+{region "§4 Suivi SDO reset et sorties etat"}
 // ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
 IF State = E_State.BUSY THEN
     IF PresetAck THEN
@@ -187,3 +197,5 @@ Busy := (State = E_State.BUSY);
 Homed := Calib.Homed AND NOT Calib.HomingSuspect; // 🆕 REX 2026-07-08 : Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
+
+{endregion}

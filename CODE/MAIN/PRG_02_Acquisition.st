@@ -110,6 +110,7 @@ VAR
     WinchInputSourceInitialized       : BOOL;
 END_VAR
 
+{region "§1 Acquisition brute — HwReal"}
 // === 📥 §1 ACQUISITION BRUTE (HwReal) ===
 
 // Winch M1 / M2 et codeurs
@@ -162,7 +163,9 @@ HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
 HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
+{endregion}
 
+{region "§1bis Diagnostic modules DI"}
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING => module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
@@ -176,7 +179,9 @@ ELSE
     Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
 InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
+{endregion}
 
+{region "§2 Simulation et aiguillage — HwIn"}
 // === 🎭 §2 SIMULATION & AIGUILLAGE (HwIn) ===
 
 instSimBench(
@@ -255,8 +260,10 @@ HwIn.Winch       := SEL(WinchInputSourceSimulated, HwReal.Winch, HwSim.Winch);
 HwIn.Translation := SEL(TranslationInputSourceSimulated, HwReal.Translation, HwSim.Translation);
 HwIn.Operator    := SEL(OperatorInputSourceSimulated, HwReal.Operator, HwSim.Operator);
 HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machine);
+{endregion}
 
 
+{region "§3 Traitement joystick"}
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
 
 instJoystick(
@@ -293,6 +300,9 @@ JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prére
 JoystickDirectionX := instJoystick.DirectionX;
 JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
 JoystickXNeutral := (instJoystick.DirectionX = 0);
+{endregion}
+
+{region "§4 Codeurs et homing — M1/M2"}
 // === 🧲 §4 CODEURS & HOMING (M1 / M2) ===
 
 instEncoderAbsM1(
@@ -461,6 +471,9 @@ instEncoderSpeedMeasureM2(
 M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
 M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
 M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
+{endregion}
+
+{region "§5 Décodage position translation — M3"}
 // === ↔️ §5 DÉCODAGE POSITION TRANSLATION (M3) ===
 
 instPosDecoderM3(
@@ -485,6 +498,9 @@ M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 M3_SensorsWord          := instPosDecoderM3.SensorsWord;
+{endregion}
+
+{region "§6 Filtrage PT1 retours variateur — M3"}
 // === 📊 §6 FILTRAGE PT1 RETOURS VARIATEUR (M3) ===
 
 instCycleTimeAcq(DefaultValueS := 0.010);
@@ -502,5 +518,6 @@ instFilterM3ActualFreqHz(
     CycleTimeS := instCycleTimeAcq.CycleTimeS
 );
 M3_ActualFrequencyHz_Filtered := REAL_TO_UINT(instFilterM3ActualFreqHz.ValueOut);
+{endregion}
 
 END_PROGRAM

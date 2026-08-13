@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.794156" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T18:19:14.794156">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:13:36.988588" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T23:13:36.988588">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -473,6 +473,7 @@
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -485,6 +486,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Initialisation et activation synchro"}
 Ready := TRUE;
 State := E_State.READY;
 
@@ -506,6 +510,9 @@ CASE Mode OF
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
 
+{endregion}
+
+{region "Calcul ecart position"}
 // 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
 IF HomedM1 AND HomedM2 THEN
     SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
@@ -515,6 +522,9 @@ ELSE
     DeltaPosM := 0.0;
 END_IF;
 
+{endregion}
+
+{region "Surveillance synchronisme"}
 // 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
 IF NOT BypassGlobal THEN
 
@@ -552,6 +562,9 @@ END_IF; // fin du IF MismatchActive
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -562,6 +575,8 @@ END_IF;
 SyncWarn := Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </xhtml>
           </ST>
         </body>

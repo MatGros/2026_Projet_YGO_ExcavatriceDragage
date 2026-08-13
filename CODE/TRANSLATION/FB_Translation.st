@@ -113,6 +113,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
+{region "Gate et initialisation"}
 // 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
@@ -142,6 +143,9 @@ IF NOT FirstScanDone THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Acquisition commandes et position cible"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms
 
@@ -152,6 +156,9 @@ ResetEdge(CLK := Reset);
 CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 
+{endregion}
+
+{region "Consigne vitesse ralentissement verrou arrivee"}
 // ⚙️ 4. CORE — arbitrage rampe : Enable > SafeStop > StartStop
 // 🆕 2026-08-05 : DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de
 // sens est en attente — sans ça, la cible suit la magnitude joystick en continu et ne
@@ -230,6 +237,9 @@ SpeedRamp(Target := RampTargetPct,
           DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
           CycleTimeS := CycleTimeCalc.CycleTimeS);
 
+{endregion}
+
+{region "Interlock changement sens"}
 // 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (vitesse confirmée nulle)
 IF Direction <> CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction <> 0 THEN
@@ -248,6 +258,9 @@ ELSE
     DirectionChangeDelay(IN := FALSE, PT := DirectionInterlockDelay);
 END_IF;
 
+{endregion}
+
+{region "Commande variateur et protections fin course"}
 // 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
 // OU que la fréquence réelle mesurée du variateur M3 est >= 1.0 Hz.
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
@@ -294,6 +307,9 @@ IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (Co
     SpeedRamp(Target := 0.0, AccelRate := 0.0, DecelRate := 100000.0, CycleTimeS := 1.0);
 END_IF;
 
+{endregion}
+
+{region "Commande frein"}
 // 🛑 6. FREIN (composé, réutilisé tel quel)
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       ContactorFeedback := BrakeFeedback,
@@ -309,6 +325,9 @@ BrakeContactorCheck := Brake.ContactorCheck;
 // la vitesse ne vaut pas zéro, la demande et le desserrage suivent la décélération.
 // FB_TranslationOutputInterlock_LD ne doit jamais transformer SafeStop en coupure sèche.
 
+{endregion}
+
+{region "Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
@@ -358,3 +377,5 @@ IF Error THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
+
+{endregion}

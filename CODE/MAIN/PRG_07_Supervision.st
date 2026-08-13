@@ -31,6 +31,7 @@ VAR
     instTroubleshootingView : FB_TroubleshootingView;
 END_VAR
 
+{region "§1 Horloge et reset machine"}
 // === 🧩 §1 HORLOGE & RESET MACHINE ===
 
 instBlink1Hz(
@@ -78,6 +79,9 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
 
 
+{endregion}
+
+{region "§2 Persistance et restauration configuration"}
 // === 🌉 §2 PERSISTANCE & RESTAURATION CONFIG ===
 
 instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
@@ -191,6 +195,9 @@ IF GVL_IHM.M1M2Sync.Bypass.Global <> BypassSyncGlobal THEN
 END_IF;
 
 
+{endregion}
+
+{region "§3 Projections IHM et mapping"}
 // === 📊 §3 PROJECTIONS IHM ET MAPPING ===
 
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
@@ -297,6 +304,9 @@ GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
 GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.InputModuleFault;
 
 
+{endregion}
+
+{region "§4 Vue depannage lecture seule"}
 // === 🕵️♂️ §4 VUE DÉPANNAGE (lecture seule stricte) ===
 
 instTroubleshootingView(
@@ -322,4 +332,5 @@ instTroubleshootingView(
     DredgingAssist       := GVL_IHM.DredgingAssist
 );
 
+{endregion}
 END_PROGRAM

@@ -99,6 +99,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
+{region "Gate securite"}
 // 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     WinchM1Cmd.StartStop   := FALSE;
@@ -125,6 +126,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "Preparation surveillance et commandes cycle"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
@@ -192,6 +196,9 @@ IF AbortEdge.Q THEN
     State := E_CycleStep.INIT;
 END_IF;
 
+{endregion}
+
+{region "Machine etat cycle automatique"}
 // 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d'état)
 CASE State OF
 
@@ -444,6 +451,9 @@ CASE State OF
 
 END_CASE;
 
+{endregion}
+
+{region "Repli homme mort"}
 // 🛑 Relâchement homme-mort : aucune demande d'actionneur ne reste active.
 // L'étape est mémorisée et reprend au prochain appui valide.
 IF Busy AND NOT CycleMotionPermit THEN
@@ -454,5 +464,7 @@ IF Busy AND NOT CycleMotionPermit THEN
     BucketCmd.Close := FALSE;
     BucketCmd.KoboldContactorCmd := FALSE;
 END_IF;
+
+{endregion}
 
 END_FUNCTION_BLOCK

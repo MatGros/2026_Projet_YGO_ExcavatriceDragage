@@ -52,6 +52,7 @@ VAR
     ErrorCausePresent      : BOOL;
 END_VAR
 
+{region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
@@ -64,6 +65,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
+{endregion}
+
+{region "§2 Preconditions fronts et rearmement"}
 ResetEdge(CLK := Reset);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
@@ -87,6 +91,9 @@ DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
 Ready := FALSE; Busy := FALSE; Done := FALSE;
 OperatorActionId := 0; OperatorAction := '';
 
+{endregion}
+
+{region "§3 Machine etat plongee recherche fond"}
 IF ErrorId <> 16#0000 THEN
     State := E_State.READY;
     DiveState := E_DiveSearchState.ERROR_HOLD;
@@ -160,3 +167,5 @@ ELSE
 END_IF;
 
 Error := (ErrorId <> 16#0000);
+
+{endregion}

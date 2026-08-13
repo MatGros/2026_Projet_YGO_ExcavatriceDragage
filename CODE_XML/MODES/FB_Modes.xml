@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.781842" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T18:19:14.781842">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:13:36.944245" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T23:13:36.944245">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -409,6 +409,7 @@
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate neutralisation"}
 // 1. GATE — neutralisation si désactivé ou AU non armé
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.Mode := E_Mode.DISABLE;
@@ -428,6 +429,9 @@ END_IF;
 Ready := TRUE;
 State := E_State.READY;
 
+{endregion}
+
+{region "§2 Reset et arbitrage mode"}
 // 2. RESET FRONT (bit0 = défaut codeur)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
@@ -449,6 +453,9 @@ ELSE
     Auth.Mode := SelMode;
 END_IF;
 
+{endregion}
+
+{region "§3 Calcul autorisations machine"}
 // 5. SYNC ENABLE — actionnable en MAINT_N1 ou MAINT_N2
 // FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
 Auth.SyncEnable := NOT ((Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
@@ -528,6 +535,9 @@ IF (Auth.Mode &lt;&gt; E_Mode.MAINT_N2) AND (Auth.Mode &lt;&gt; E_Mode.MAINT_N1)
     Auth.JoystickWinchSelectArbitrated := 0;
 END_IF;
 
+{endregion}
+
+{region "§4 Etats et defauts"}
 // 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -537,6 +547,8 @@ END_IF;
 
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 </xhtml>
           </ST>
         </body>

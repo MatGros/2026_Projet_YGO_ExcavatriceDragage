@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T22:27:47.898034" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T22:27:47.898034">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T22:48:55.785707" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T22:48:55.785707">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1322,6 +1322,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Acquisition brute — HwReal"}
 // === 📥 §1 ACQUISITION BRUTE (HwReal) ===
 
 // Winch M1 / M2 et codeurs
@@ -1374,7 +1375,9 @@ HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
 HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
+{endregion}
 
+{region "§1bis Diagnostic modules DI"}
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING =&gt; module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
@@ -1388,7 +1391,9 @@ ELSE
     Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
 InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
+{endregion}
 
+{region "§2 Simulation et aiguillage — HwIn"}
 // === 🎭 §2 SIMULATION &amp; AIGUILLAGE (HwIn) ===
 
 instSimBench(
@@ -1467,8 +1472,10 @@ HwIn.Winch       := SEL(WinchInputSourceSimulated, HwReal.Winch, HwSim.Winch);
 HwIn.Translation := SEL(TranslationInputSourceSimulated, HwReal.Translation, HwSim.Translation);
 HwIn.Operator    := SEL(OperatorInputSourceSimulated, HwReal.Operator, HwSim.Operator);
 HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machine);
+{endregion}
 
 
+{region "§3 Traitement joystick"}
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
 
 instJoystick(
@@ -1505,6 +1512,9 @@ JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prére
 JoystickDirectionX := instJoystick.DirectionX;
 JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
 JoystickXNeutral := (instJoystick.DirectionX = 0);
+{endregion}
+
+{region "§4 Codeurs et homing — M1/M2"}
 // === 🧲 §4 CODEURS &amp; HOMING (M1 / M2) ===
 
 instEncoderAbsM1(
@@ -1673,6 +1683,9 @@ instEncoderSpeedMeasureM2(
 M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
 M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
 M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
+{endregion}
+
+{region "§5 Décodage position translation — M3"}
 // === ↔️ §5 DÉCODAGE POSITION TRANSLATION (M3) ===
 
 instPosDecoderM3(
@@ -1697,6 +1710,9 @@ M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 M3_SensorsWord          := instPosDecoderM3.SensorsWord;
+{endregion}
+
+{region "§6 Filtrage PT1 retours variateur — M3"}
 // === 📊 §6 FILTRAGE PT1 RETOURS VARIATEUR (M3) ===
 
 instCycleTimeAcq(DefaultValueS := 0.010);
@@ -1714,6 +1730,7 @@ instFilterM3ActualFreqHz(
     CycleTimeS := instCycleTimeAcq.CycleTimeS
 );
 M3_ActualFrequencyHz_Filtered := REAL_TO_UINT(instFilterM3ActualFreqHz.ValueOut);
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -2604,6 +2621,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
 
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
 // 🆕 2026-08-06 : PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
@@ -2621,6 +2639,9 @@ END_IF;
 
 Ready := TRUE;
 
+{endregion}
+
+{region "§2 Fronts et coherence demarrage"}
 // 🔑 2. FRONTS
 ResetEdge(CLK := Reset);
 HomeEdge(CLK := Home);
@@ -2641,6 +2662,9 @@ ELSE
     IF State = E_State.INIT THEN State := E_State.READY; END_IF;
 END_IF;
 
+{endregion}
+
+{region "§3 Confirmation coherence et demande homing"}
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
 IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
     Calib.HomingSuspect := FALSE;
@@ -2677,6 +2701,9 @@ IF HomeEdge.Q THEN
     PresetRequest := TRUE;
 END_IF;
 
+{endregion}
+
+{region "§4 Suivi SDO reset et sorties etat"}
 // ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
 IF State = E_State.BUSY THEN
     IF PresetAck THEN
@@ -2712,6 +2739,8 @@ Busy := (State = E_State.BUSY);
 Homed := Calib.Homed AND NOT Calib.HomingSuspect; // 🆕 REX 2026-07-08 : Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -3845,6 +3874,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
 
+{region "§1 Gate securite"}
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
 IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -3868,6 +3898,9 @@ END_IF;
 
 Ready := TRUE; Busy := TRUE;
 
+{endregion}
+
+{region "§2 Reset acquisition timing et bouton"}
 // 🔑 2. RESET DÉFAUT (front + cause disparue, Partie3 §5)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q AND (RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000) THEN
@@ -3878,6 +3911,9 @@ END_IF;
 CycleTimeCalc();
 Button := RawButton;
 
+{endregion}
+
+{region "§3 Calibration et mise a echelle"}
 // 🎯 4. CALIBRATION DYNAMIQUE (Zone RETAIN)
 IF BtnCalibrate AND NOT LastCalibrate THEN
     IF RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000 THEN
@@ -3896,6 +3932,9 @@ ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // 🆕 2026-08-07 : IHM/diagnostic — position centrale (zone morte)
 
+{endregion}
+
+{region "§4 Desarmements changement mode et fin benne"}
 // 4ter-bis. CHANGEMENT DE MODE : désarme le homme-mort dès que Mode change
 // (MAINT_N1/N2/SEMI_AUTO/AUTO). Évite qu'une commande en cours traverse le changement
 // de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
@@ -3914,6 +3953,9 @@ IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après fin de cycle benne
 END_IF;
 
+{endregion}
+
+{region "§5 Armement homme mort"}
 // 4ter. BOUTON HOMME-MORT — armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la
 // position des axes pendant l'appui.
 // 🔧 2026-08-07 (retour terrain) : l'ancien armement ("front bouton" ET "axes strictement à
@@ -3974,6 +4016,9 @@ IF DeadmanTimer.Q THEN
     DeadmanArmed := FALSE;      // Pas de reconfirmation dans le délai → désarmement (décélération sûre)
 END_IF;
 
+{endregion}
+
+{region "§6 Pipeline axe X"}
 // 🕹️ 5. PIPELINE TRAITEMENT — AXE X
 IF InvertX THEN
     FilterX(ValueIn := -ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
@@ -4002,6 +4047,9 @@ END_IF;
 SpeedXPct := AxisCmdX.SpeedRef;
 DirectionX := AxisCmdX.Direction;
 
+{endregion}
+
+{region "§7 Pipeline axe Y et sorties"}
 // 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
 IF InvertY THEN
     FilterY(ValueIn := -ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
@@ -4034,6 +4082,8 @@ DirectionY := AxisCmdY.Direction;
 NeutralXAct := NeutralXMem;
 NeutralYAct := NeutralYMem;
 Done := NOT Error;
+
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -4498,6 +4548,7 @@ TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "§1 Repli image reelle banc desactive"}
 IF NOT Enable THEN
     // 🔌 Banc désactivé : repli sur l'image réelle, aucune simulation en cours
     Ready       := FALSE;
@@ -4516,6 +4567,9 @@ Busy  := TRUE;
 Done  := FALSE;
 
 
+{endregion}
+
+{region "§2 Simulation treuils M1/M2"}
 // ── 1. MODÈLE TREUILS (M1 + M2) ─────────────────────────────────────────────
 // Presets codeurs : déclenchés si PresetTriggerCmd = 2
 M1_PresetCmd := (M1_PresetTriggerCmd = 2);
@@ -4585,6 +4639,9 @@ Winch.COD2_Warnings            := 0;
 Winch.COD2_DeviceState         := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§3 Simulation translation M3"}
 // ── 2. MODÈLE TRANSLATION M3 (AC600) ─────────────────────────────────────────
 M3_RelayFwd := (M3_Direction = 1);
 M3_RelayRev := (M3_Direction = -1);
@@ -4633,6 +4690,9 @@ Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
 Translation.AC600_DeviceState    := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
 instSimJoystick(
     Enable     := TRUE,
@@ -4663,6 +4723,9 @@ Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
 Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
 
 
+{endregion}
+
+{region "§5 Simulation securite et image machine"}
 // ── 4. MODÈLE SÉCURITÉ &amp; COMMUNS MACHINE ─────────────────────────────────────
 instSimSafety(
     Enable           := TRUE,
@@ -4683,6 +4746,8 @@ Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore
 // ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
 Busy := FALSE;
 Done := TRUE;
+
+{endregion}
 </xhtml>
           </ST>
         </body>

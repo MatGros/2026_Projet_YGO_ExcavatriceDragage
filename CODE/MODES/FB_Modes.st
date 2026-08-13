@@ -46,6 +46,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate neutralisation"}
 // 1. GATE — neutralisation si désactivé ou AU non armé
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.Mode := E_Mode.DISABLE;
@@ -65,6 +66,9 @@ END_IF;
 Ready := TRUE;
 State := E_State.READY;
 
+{endregion}
+
+{region "§2 Reset et arbitrage mode"}
 // 2. RESET FRONT (bit0 = défaut codeur)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
@@ -86,6 +90,9 @@ ELSE
     Auth.Mode := SelMode;
 END_IF;
 
+{endregion}
+
+{region "§3 Calcul autorisations machine"}
 // 5. SYNC ENABLE — actionnable en MAINT_N1 ou MAINT_N2
 // FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
 Auth.SyncEnable := NOT ((Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
@@ -165,6 +172,9 @@ IF (Auth.Mode <> E_Mode.MAINT_N2) AND (Auth.Mode <> E_Mode.MAINT_N1) THEN
     Auth.JoystickWinchSelectArbitrated := 0;
 END_IF;
 
+{endregion}
+
+{region "§4 Etats et defauts"}
 // 6. SORTIES ÉTAT
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
@@ -174,5 +184,7 @@ END_IF;
 
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}
 
 END_FUNCTION_BLOCK

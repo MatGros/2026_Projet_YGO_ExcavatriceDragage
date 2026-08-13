@@ -268,6 +268,7 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
 
+{region "Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
@@ -296,6 +297,9 @@ END_IF;
 Ready := TRUE;
 State := E_State.READY;
 
+{endregion}
+
+{region "Initialisation et bypass global"}
 // Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
 IF LastInReferencingMode AND NOT InReferencingMode THEN
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
@@ -328,6 +332,9 @@ IF BypassGlobal THEN
     TonMecaE(IN := FALSE);
 END_IF;
 
+{endregion}
+
+{region "Protections immediates position"}
 // 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
 // ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
 // position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
@@ -356,6 +363,9 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFBF;
 END_IF;
 
+{endregion}
+
+{region "Diagnostics et protections treuil"}
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
 IF NOT BypassGlobal THEN
 
@@ -547,6 +557,9 @@ END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
+{endregion}
+
+{region "Arbitrage sorties securite"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -622,3 +635,5 @@ PowerCutOff := (ErrorId AND 16#2F84) <> 16#0000;
 // Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
 Busy := FALSE;
 Done := FALSE;
+
+{endregion}

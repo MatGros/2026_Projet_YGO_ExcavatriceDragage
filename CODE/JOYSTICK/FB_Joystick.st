@@ -88,6 +88,7 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
 
+{region "§1 Gate securite"}
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
 IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -111,6 +112,9 @@ END_IF;
 
 Ready := TRUE; Busy := TRUE;
 
+{endregion}
+
+{region "§2 Reset acquisition timing et bouton"}
 // 🔑 2. RESET DÉFAUT (front + cause disparue, Partie3 §5)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q AND (RawX >= 2000 AND RawX <= 8000 AND RawY >= 2000 AND RawY <= 8000) THEN
@@ -121,6 +125,9 @@ END_IF;
 CycleTimeCalc();
 Button := RawButton;
 
+{endregion}
+
+{region "§3 Calibration et mise a echelle"}
 // 🎯 4. CALIBRATION DYNAMIQUE (Zone RETAIN)
 IF BtnCalibrate AND NOT LastCalibrate THEN
     IF RawX >= 2000 AND RawX <= 8000 AND RawY >= 2000 AND RawY <= 8000 THEN
@@ -139,6 +146,9 @@ ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // 🆕 2026-08-07 : IHM/diagnostic — position centrale (zone morte)
 
+{endregion}
+
+{region "§4 Desarmements changement mode et fin benne"}
 // 4ter-bis. CHANGEMENT DE MODE : désarme le homme-mort dès que Mode change
 // (MAINT_N1/N2/SEMI_AUTO/AUTO). Évite qu'une commande en cours traverse le changement
 // de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
@@ -157,6 +167,9 @@ IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après fin de cycle benne
 END_IF;
 
+{endregion}
+
+{region "§5 Armement homme mort"}
 // 4ter. BOUTON HOMME-MORT — armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la
 // position des axes pendant l'appui.
 // 🔧 2026-08-07 (retour terrain) : l'ancien armement ("front bouton" ET "axes strictement à
@@ -217,6 +230,9 @@ IF DeadmanTimer.Q THEN
     DeadmanArmed := FALSE;      // Pas de reconfirmation dans le délai → désarmement (décélération sûre)
 END_IF;
 
+{endregion}
+
+{region "§6 Pipeline axe X"}
 // 🕹️ 5. PIPELINE TRAITEMENT — AXE X
 IF InvertX THEN
     FilterX(ValueIn := -ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
@@ -245,6 +261,9 @@ END_IF;
 SpeedXPct := AxisCmdX.SpeedRef;
 DirectionX := AxisCmdX.Direction;
 
+{endregion}
+
+{region "§7 Pipeline axe Y et sorties"}
 // 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
 IF InvertY THEN
     FilterY(ValueIn := -ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
@@ -277,3 +296,5 @@ DirectionY := AxisCmdY.Direction;
 NeutralXAct := NeutralXMem;
 NeutralYAct := NeutralYMem;
 Done := NOT Error;
+
+{endregion}
