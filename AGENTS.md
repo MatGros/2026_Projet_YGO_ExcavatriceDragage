@@ -84,7 +84,8 @@ Les agents interviennent avec la posture d'un **Expert Senior en Automatisme Ind
 ```powershell
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . # bundle PLCopenXML
 python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report    # liaison sur le bundle (BLOQUANT)
-python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py             # tous les gates
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C   # fin de lot (ou A/B/D, GUIDE_GATES_ET_TESTS §2)
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py              # TOUS les gates
 ```
 
 Le bloc `Auto-vérification liaison` produit par `--report` est **collé dans la restitution**.

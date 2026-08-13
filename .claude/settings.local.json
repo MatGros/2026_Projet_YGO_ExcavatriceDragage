@@ -123,7 +123,10 @@
       "Bash(grep *)",
       "Bash(git -C \"C:\\\\_MGS\\\\DEV\\\\2026_Projet_YGO_ExcavatriceDragage\" show eb40478 -- CODE/MAIN/PRG_02_Acquisition.st)",
       "Bash(python3 -c ' *)",
-      "Bash(echo \"exit code: $?\")"
+      "Bash(echo \"exit code: $?\")",
+      "Bash(awk 'NR==25918,NR==26200' CODE/CODE_Bundle.xml)",
+      "Bash(awk *)",
+      "Bash(python3 *)"
     ],
     "ask": [
       "Bash(git reset *)",

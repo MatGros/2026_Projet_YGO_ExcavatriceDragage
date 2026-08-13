@@ -6,6 +6,19 @@ import xml.etree.ElementTree as ET
 PLCOPEN_NS = "http://www.plcopen.org/xml/tc6_0200"
 XHTML_NS = "http://www.w3.org/1999/xhtml"
 
+# Types scalaires IEC 61131-3 : les copies de sorties typées de FB vers des variables
+# locales/POU sont convertibles en Ladder via le pattern inVariable→outVariable (PDO
+# WORD/UINT/REAL). Tout type hors cette liste est un STRUCT/derived → copie struct non
+# convertible (refus, REX 2026-08-13).
+SCALAR_TYPES = {
+    "BOOL", "BYTE", "WORD", "DWORD", "LWORD",
+    "SINT", "INT", "DINT", "LINT",
+    "USINT", "UINT", "UDINT", "ULINT",
+    "REAL", "LREAL",
+    "TIME", "LTIME", "DATE", "TIME_OF_DAY", "TOD", "DATE_AND_TIME", "DT",
+    "STRING", "WSTRING", "CHAR",
+}
+
 
 def _create_standalone_banner_network(
     ld: ET.Element,
@@ -148,10 +161,25 @@ def build_ld_body(
     statements_with_headers = []
     current_stmt = []
     in_banner_desc = False
+    in_block_comment = False
 
     for line in lines:
         line_s = line.strip()
         if not line_s:
+            continue
+
+        # REX 2026-08-13 : un bloc commenté `(* ... *)` multi-lignes dans le corps
+        # était traité comme du code actif (seule la ligne d'ouverture était sautée),
+        # provoquant "LD block instance without declared type" sur des instances
+        # déclarées uniquement dans la section commentée. On saute tout le bloc.
+        if in_block_comment:
+            if "*)" in line_s:
+                in_block_comment = False
+            continue
+        if line_s.startswith("(*"):
+            if "*)" in line_s:
+                continue
+            in_block_comment = True
             continue
 
         # 1. Détection Bannière Grand Titre : // == ou // ===
@@ -255,6 +283,43 @@ def build_ld_body(
             _target, _inst, _output = m_fb_out.groups()
             fb_output_assignments.setdefault(_inst, {}).setdefault(_output, []).append(_target)
             continue  # Ne pas mettre dans other_statements (sera dans le bloc)
+
+        # ⛔ REX 2026-08-13 (PRG_02_Acquisition_LD scratch) : ici tout ce qui n'a été capturé
+        # par AUCUN pattern tomberait dans le fallback qui produit du XML invalide
+        # (IndexOutOfRangeException à l'import CODESYS). On refuse net plutôt que d'approximer.
+        # Cas non convertibles :
+        #   - contrôle de flux (IF/ELSE/CASE/FOR/WHILE) → coil au nom absurde
+        #   - fonctions standards structurées (SEL/MUX/...) → inVariable non résoluble
+        #   - copie struct→struct (HwSim.Winch := instSimBench.Winch) → outVariable
+        flow_kw = re.match(
+            r"\b(IF|CASE|FOR|WHILE|ELSIF|ELSE|THEN|END_IF|END_CASE|END_FOR|END_WHILE)\b",
+            stmt_clean,
+        )
+        if flow_kw:
+            raise ValueError(
+                f"LD non convertible : `{stmt_clean[:80]}` — construction de contrôle de "
+                f"flux '{flow_kw.group(1)}' interdite dans un POU `_LD` (REX 2026-08-13). "
+                f"Convertir la logique en réseau de contacts/coils, ou la sortir vers un FB ST."
+            )
+        if any(k in stmt_clean for k in ("SEL(", "MUX(", "LIMIT(", "MAX(", "MIN(", "ABS(")):
+            raise ValueError(
+                f"LD non convertible : `{stmt_clean[:80]}` — fonction standard non prise en "
+                f"charge en Ladder (REX 2026-08-13). Sortir le calcul dans un FB ST et câbler "
+                f"sa sortie, ne pas l'écrire dans le POU `_LD`."
+            )
+        m_copy = re.match(r"^([\w.]+)\s*:=\s*([\w.]+)$", stmt_clean)
+        if m_copy and "." in m_copy.group(2):
+            src = m_copy.group(2)
+            inst, member = src.split(".", 1)
+            if "." not in member and inst in instance_output_type_map:
+                src_type = instance_output_type_map.get(inst, {}).get(member)
+                if src_type is not None and src_type not in SCALAR_TYPES:
+                    raise ValueError(
+                        f"LD non convertible : `{stmt_clean[:80]}` — copie struct→struct "
+                        f"(source `{src}` type `{src_type}`, STRUCT) interdite dans un "
+                        f"POU `_LD` (REX 2026-08-13). Publier la structure depuis un FB ST "
+                        f"et câbler ses champs BOOL un à un."
+                    )
 
         other_statements.append((b_title, b_desc, stmt_comm, stmt_clean))
 

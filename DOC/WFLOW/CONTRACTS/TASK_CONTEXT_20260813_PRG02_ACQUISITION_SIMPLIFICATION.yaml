@@ -1,0 +1,80 @@
+contract:
+  task_id: LOT_C3_PRG02_ACQUISITION_SIMPLIFICATION
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Simplifier la frontiere d'acquisition sans modifier les polarites ni les
+    sources consommees par le metier : supprimer le filtrage TOR non requis,
+    conserver HwReal/HwSim/HwIn et rendre explicite la selection par domaine.
+
+  acceptance:
+    - id: AC1
+      statement: "PRG_02_Acquisition ne declare ni n'appelle FB_DigitalInputFilter et ne publie plus HwRealQualified."
+      verified_by: "rg des declarations/appels puis G200_check_linkage.py --report"
+    - id: AC2
+      statement: "Sans simulation d'un domaine, HwIn.<Domaine> est issu de HwReal.<Domaine>."
+      verified_by: "Revue ST et Watch CODESYS des quatre domaines"
+    - id: AC3
+      statement: "Avec SimulationModeActive et SimMachineActive, HwIn.Machine est issu de HwSim.Machine et les trois diagnostics DI sont OK pour le banc sans materiel."
+      verified_by: "Watch CODESYS sans modules DI reels"
+    - id: AC4
+      statement: "Une simulation partielle ne masque pas les diagnostics DI reels lorsque SimMachineActive est FALSE."
+      verified_by: "Watch CODESYS avec simulation Treuil ou Translation seulement"
+    - id: AC5
+      statement: "Les polarites et les appelants metier de HwIn restent inchanges."
+      verified_by: "Revue diff, G200_check_linkage.py --report et run_all_gates.py --palier C"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_02_Acquisition.st
+      - CODE/COMMUN/FB_DigitalInputFilter.st
+      - CODE/DEPANNAGE/FB_TroubleshootingView.st
+      - DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.1.md
+      - DOC/AF/AF_Partie-06_Fonction_Acquisition_Qualification_IO/FB_DigitalInputFilter_v1.0.md
+      - TOOLS/AGENT_WORKFLOW/tests/test_input_layer_retirement.py
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_20260813_PRG02_ACQUISITION_SIMPLIFICATION.yaml
+    forbidden:
+      - scratch/PRG_02_Acquisition_LD.st
+      - scratch/PRG_02_Acquisition_LD.xml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/MAIN/PRG_02_Acquisition.st#section-2-simulation-et-aiguillage
+
+  conservation:
+    must_survive:
+      - "HwReal reste l'image brute reelle, disponible pour diagnostic et simulation."
+      - "HwIn reste l'unique image consommee par le metier, selectionnee une fois par domaine."
+      - "Simulation machine sans modules DI reels reste executable."
+      - "Les polarites TRUE des entrees et toutes les commandes/sorties restent inchangees."
+    dropped_on_purpose:
+      - "Filtrage temporel applicatif des 22 entrees TOR et image HwRealQualified."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - human_validation_c3
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Toute divergence de polarite, de source HwIn, de comportement simulation
+    ou tout conflit avec le travail parallele sur la section 2 est remonte
+    immediatement et bloque la modification concernee.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: "Codex"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat cree ; modification du code en attente de synchronisation du perimetre §2."
+  evidence_submitted: []
+
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-08-13"
+  notes: "Plan C3 valide. Ne pas ecraser le travail parallele dans la section §2."
