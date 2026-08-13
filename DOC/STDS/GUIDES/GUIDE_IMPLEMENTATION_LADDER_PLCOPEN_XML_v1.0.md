@@ -422,6 +422,13 @@ S'utilisent pour scinder un fil complexe en deux sans encombrer le schéma graph
 
 ## 4. Topologies Avancées : Dérivation (OR) et Branched Connections
 
+> 📌 **Portée de §4.1** : câblage direct d'une condition **vers un élément aval** (bobine,
+> contact suivant) dans le même rung. Pour produire une **valeur** réutilisable — argument
+> d'un appel de fonction (`SEL(A AND B, ...)`), ou condition ≥3 termes qu'on veut isoler et
+> nommer pour le Watch — utiliser le bloc `AND`/`OR` câblé documenté dans
+> `CODE_QUALITY_STANDARDS.md §11` (confirmé par import CODESYS réel, REX 2026-08-13),
+> pas la convergence de contacts ci-dessous.
+
 ### 4.1 Implantation de Contacts en Parallèle (Logique OU / OR)
 Pour implanter une structure en parallèle (par exemple `(bStart1 OR bStart2) AND bStop`),
 plusieurs contacts amont doivent faire référence au même composant source et converger vers la
