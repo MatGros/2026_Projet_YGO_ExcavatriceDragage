@@ -49,9 +49,21 @@ VAR_OUTPUT
     PowerCutOffActive            : BOOL; (* TRUE = demande de coupure finale active *)
 
     SafetyStructureNotValidated  : BOOL := FALSE; (* 🔓 Garde-fou désactivé : les autorisations M1/M2/M3 sont liées dynamiquement à leurs sécurités *)
-    M1InterlockEnable            : BOOL; (* Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1Safety.Error *)
-    M2InterlockEnable            : BOOL; (* Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2Safety.Error *)
-    M3InterlockEnable            : BOOL; (* Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationSafety.Error *)
+    // 🔧 FIX 2026-08-14 (audit sécurité) : Enable ne coupe plus que sur PowerCutOff (barrière
+    // finale, AF02 §2, AF06 §5 "SafeStop laisse la décélération métier se terminer"). SafeStop/
+    // Error retirés du calcul — SafeStop est une rampe rapide gérée en amont par FB_Winch/
+    // FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ; Error mirait tout ErrorId y
+    // compris les mécanismes SafeStop-only, donc coupait Enable pour la même mauvaise raison.
+    // Couper ici sur SafeStop/Error écrasait la rampe déjà calculée en amont en un arrêt
+    // brutal — contraire à la doctrine Enable>SafeStop>StartStop.
+    M1InterlockEnable            : BOOL; (* Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1FinalInterlockRequest.PowerCutOff *)
+    M2InterlockEnable            : BOOL; (* Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2FinalInterlockRequest.PowerCutOff *)
+    M3InterlockEnable            : BOOL; (* Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationFinalInterlockRequest.PowerCutOff *)
+    // 🆕 Réseau informatif séparé (demande utilisateur) : visibilité maintenance de ce qui
+    // bloque (SafeStop/Error), SANS influencer Enable — juste de l'information en Watch/Ladder.
+    M1BlockedBySafetyInfo        : BOOL;
+    M2BlockedBySafetyInfo        : BOOL;
+    M3BlockedBySafetyInfo        : BOOL;
 
     (* 🐛 FIX 2026-08-05 : les noms Device bruts ( *_DQ / *_RQ ), ex. M1_RelayFwd_Up_DQ,
        M3_BrakeRelease_RQ) NE SONT PLUS déclarés ici — les déclarer créait une collision
@@ -90,6 +102,16 @@ VAR
     EmergencyArmingCmd  : BOOL; (* Impulsion réarmement — cible du mapping E/S *)
 
     instSafetyEmergencyManagement : FB_Safety_EmergencyManagement;
+
+    // 🆕 Relais locaux pour le réseau informatif M1/M2/M3BlockedBySafetyInfo — copie simple
+    // avant OR (bug générateur ST→LD confirmé sur un OR à 2 branches qualifiées PRG_xx.*.*,
+    // contournement documenté, PAS une préférence de style).
+    M1SafeStopInfo      : BOOL;
+    M1ErrorInfo         : BOOL;
+    M2SafeStopInfo      : BOOL;
+    M2ErrorInfo         : BOOL;
+    M3SafeStopInfo      : BOOL;
+    M3ErrorInfo         : BOOL;
 END_VAR
 
 // === 🛡️ §1 BARRIÈRES FINALES M1 / M2 / M3 — INTERLOCKS VISIBLES ===
@@ -100,8 +122,12 @@ END_VAR
 
 // ── Interlock final M1 (Treuil Retenue) ──────────────────────────────────
 M1InterlockEnable := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop
-                      AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error;
+                      AND NOT PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff;
+
+// Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
+M1SafeStopInfo := PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop;
+M1ErrorInfo := PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error;
+M1BlockedBySafetyInfo := M1SafeStopInfo OR M1ErrorInfo;
 
 instWinchOutputInterlockM1(
     Enable                     := M1InterlockEnable,
@@ -132,8 +158,12 @@ M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
 // ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
 M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop
-                      AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error;
+                      AND NOT PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff;
+
+// Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
+M2SafeStopInfo := PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop;
+M2ErrorInfo := PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error;
+M2BlockedBySafetyInfo := M2SafeStopInfo OR M2ErrorInfo;
 
 instWinchOutputInterlockM2(
     Enable                     := M2InterlockEnable,
@@ -170,12 +200,15 @@ KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 // 🛡️ 2026-08-06 (demande maintenance) : déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
-// M3InterlockEnable s'appuie désormais directement sur la sécurité dynamique de M3 (PowerCutOff / SafeStop / Error)
-// publiée sur PRG_05_Translation.TranslationSafetyHMI, rendant les motifs de coupure lisibles en direct.
+// 🔧 FIX 2026-08-14 : ne coupe plus que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête
+// de fichier (SafeStop/Error écrasaient la rampe rapide gérée en amont par FB_Translation).
 M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
-                      AND NOT PRG_05_Translation.TranslationSafetyHMI.PowerCutOff
-                      AND NOT PRG_05_Translation.TranslationSafetyHMI.SafeStop
-                      AND NOT PRG_05_Translation.TranslationSafetyHMI.Error;
+                      AND NOT PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
+
+// Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
+M3SafeStopInfo := PRG_05_Translation.TranslationSafetyHMI.SafeStop;
+M3ErrorInfo := PRG_05_Translation.TranslationSafetyHMI.Error;
+M3BlockedBySafetyInfo := M3SafeStopInfo OR M3ErrorInfo;
 
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,
