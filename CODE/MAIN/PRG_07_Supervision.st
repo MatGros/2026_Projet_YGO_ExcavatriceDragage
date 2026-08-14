@@ -217,9 +217,9 @@ GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc
 // 🩺 Exécution du Preflight Machine à l'arrêt
 instPreflight(
     Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
-    MachineIsStill            := (PRG_04_Treuils_Benne.WinchM1StateHMI.StepNumber = 0)
-                                 AND (PRG_04_Treuils_Benne.WinchM2StateHMI.StepNumber = 0)
-                                 AND (PRG_05_Translation.TranslationStateHMI.FBState = E_State.READY),
+    MachineIsStill            := (PRG_04_Treuils_Benne.WinchM1State.StepNumber = 0)
+                                 AND (PRG_04_Treuils_Benne.WinchM2State.StepNumber = 0)
+                                 AND (PRG_05_Translation.TranslationState.FBState = E_State.READY),
     M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct sur ce lot
@@ -235,8 +235,8 @@ instPreflight(
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderM1Operational      := instDiagEthercat.DeviceEncoderM1.Operational,
     EncoderM2Operational      := instDiagEthercat.DeviceEncoderM2.Operational,
-    HomedM1                   := PRG_04_Treuils_Benne.WinchM1StateHMI.Encoder.Homed,
-    HomedM2                   := PRG_04_Treuils_Benne.WinchM2StateHMI.Encoder.Homed,
+    HomedM1                   := PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed,
+    HomedM2                   := PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed,
     M1PositionInBounds        := NOT PRG_02_Acquisition.M1_EncoderIncoherent,
     M2PositionInBounds        := NOT PRG_02_Acquisition.M2_EncoderIncoherent
 );
@@ -251,14 +251,14 @@ GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 
-GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.WinchM1StateHMI;
-GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.WinchM2StateHMI;
-GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.WinchM1SafetyHMI;
-GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.WinchM2SafetyHMI;
-GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.SyncStateHMI;
-GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.BucketStateHMI;
-GVL_IHM.TranslationM3.State := PRG_05_Translation.TranslationStateHMI;
-GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafetyHMI;
+GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.WinchM1State;
+GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.WinchM2State;
+GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.WinchM1Safety;
+GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.WinchM2Safety;
+GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.SyncState;
+GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.BucketState;
+GVL_IHM.TranslationM3.State := PRG_05_Translation.TranslationState;
+GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
 GVL_IHM.Modes.State.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;

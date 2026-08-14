@@ -125,24 +125,24 @@ M1InterlockEnable := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
 // 🧨 Bloc 1 : Sécurités entraînant un PowerCutOff (coupure puissance)
 M1PowerCutOffSafetyInfo := OR(
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.PowerCutOff,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaA,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaB,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaC,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaD,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaE,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ThermalFault
+    PRG_04_Treuils_Benne.WinchM1Safety.PowerCutOff,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaA,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaB,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaC,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaD,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaE,
+    PRG_04_Treuils_Benne.WinchM1Safety.ThermalFault
 );
 
 // 🛡️ Bloc 2 : Défauts sécurité entraînant un SafeStop / Rampe rapide
 M1SafeStopSafetyInfo := OR(
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorOperatorComm,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorEncoder,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorPhaseRotation,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorOppositeDir,
-    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorNoMovement
+    PRG_04_Treuils_Benne.WinchM1Safety.SafeStop,
+    PRG_04_Treuils_Benne.WinchM1Safety.Error,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorOperatorComm,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorEncoder,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorPhaseRotation,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorOppositeDir,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorNoMovement
 );
 
 // 🚫 Bloc 3 : Synthèse globale du blocage sécurité (PowerCutOff OU SafeStop)
@@ -185,25 +185,27 @@ M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
 // 🧨 Bloc 1 : Sécurités entraînant un PowerCutOff (coupure puissance)
 M2PowerCutOffSafetyInfo := OR(
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.PowerCutOff,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaA,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaB,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaC,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaD,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaE,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ThermalFault
+    PRG_04_Treuils_Benne.WinchM2Safety.PowerCutOff,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaA,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaB,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaC,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaD,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaE,
+    PRG_04_Treuils_Benne.WinchM2Safety.ThermalFault
 );
 
-// 🛡️ Bloc 2 : Défauts sécurité entraînant un SafeStop / Rampe rapide
+// 🛡️ Bloc 2 : Défauts sécurité entraînant un SafeStop / Rampe rapide / Verrous Benne
 M2SafeStopSafetyInfo := OR(
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorOperatorComm,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorEncoder,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorPhaseRotation,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorOppositeDir,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorNoMovement,
-    PRG_04_Treuils_Benne.WinchM2SafetyHMI.SlackCable
+    PRG_04_Treuils_Benne.WinchM2Safety.SafeStop,
+    PRG_04_Treuils_Benne.WinchM2Safety.Error,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorOperatorComm,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorEncoder,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorPhaseRotation,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorOppositeDir,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorNoMovement,
+    PRG_04_Treuils_Benne.WinchM2Safety.SlackCable,
+    PRG_04_Treuils_Benne.BucketState.Error,
+    PRG_04_Treuils_Benne.BucketState.CoupledMotionBlockedByBucket
 );
 
 // 🚫 Bloc 3 : Synthèse globale du blocage sécurité (PowerCutOff OU SafeStop)
@@ -255,21 +257,21 @@ M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
 // 🧨 Bloc 1 : Sécurités entraînant un PowerCutOff (coupure puissance)
 M3PowerCutOffSafetyInfo := OR(
-    PRG_05_Translation.TranslationSafetyHMI.PowerCutOff,
-    PRG_05_Translation.TranslationSafetyHMI.ErrorMecaA,
-    PRG_05_Translation.TranslationSafetyHMI.ErrorMecaB,
-    PRG_05_Translation.TranslationSafetyHMI.ErrorBrakeThermal
+    PRG_05_Translation.TranslationSafety.PowerCutOff,
+    PRG_05_Translation.TranslationSafety.ErrorMecaA,
+    PRG_05_Translation.TranslationSafety.ErrorMecaB,
+    PRG_05_Translation.TranslationSafety.ErrorBrakeThermal
 );
 
 // 🛡️ Bloc 2 : Défauts sécurité entraînant un SafeStop / Rampe rapide
 M3SafeStopSafetyInfo := OR(
-    PRG_05_Translation.TranslationSafetyHMI.SafeStop,
-    PRG_05_Translation.TranslationSafetyHMI.Error,
-    PRG_05_Translation.TranslationSafetyHMI.ErrorOperatorComm,
-    PRG_05_Translation.TranslationSafetyHMI.ErrorDriveComm,
-    PRG_05_Translation.TranslationSafetyHMI.ErrorPhaseRotation,
-    PRG_05_Translation.TranslationSafetyHMI.ErrorLimitSwitch,
-    PRG_05_Translation.TranslationSafetyHMI.ErrorSensorIncoherent
+    PRG_05_Translation.TranslationSafety.SafeStop,
+    PRG_05_Translation.TranslationSafety.Error,
+    PRG_05_Translation.TranslationSafety.ErrorOperatorComm,
+    PRG_05_Translation.TranslationSafety.ErrorDriveComm,
+    PRG_05_Translation.TranslationSafety.ErrorPhaseRotation,
+    PRG_05_Translation.TranslationSafety.ErrorLimitSwitch,
+    PRG_05_Translation.TranslationSafety.ErrorSensorIncoherent
 );
 
 // 🚫 Bloc 3 : Synthèse globale du blocage sécurité (PowerCutOff OU SafeStop)
