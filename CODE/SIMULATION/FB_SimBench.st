@@ -258,12 +258,20 @@ Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
 // 🆕 T96 : thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
 Translation.M3_ThermalOK_DI      := TRUE;
 
-// Simulation StatusWord AC600 : Bit 0 (Power Ready) = 1, Bit 7 (Comm Ready) = 1 -> 16#0081
+// Simulation StatusWord AC600 : Bit 0 (Power Ready) = 1, Bit 7 (Comm Ready) = 1 -> 16#0087 en mouvement
+// 🐛 FIX 2026-08-14 (REX Troubleshooting AU simu) : Bit0 était forcé à 1 en continu à l'arrêt
+// (16#0081) -- FB_Safety_Translation.st:181 lit ce même bit comme indicateur "mouvement non
+// commandé" (Méca B, TonMecaB 3s) : le modèle déclenchait donc un PowerCutOff simulé permanent
+// après 3s d'arrêt, coupant PowerKeepAlive_A/B et bloquant Step3_EmergencyChainClosed en boucle
+// (Reset efface, TonMecaB re-déclenche 3s après). Jamais vu HW réel connecté (non testé dans
+// cette condition). Bit0 retombe désormais à l'arrêt, cohérent avec un variateur qui confirme
+// l'arrêt sans rester "actif" -- DrivePowerReady (diagnostic IHM seul, non consommé par un
+// interlock) est le seul autre lecteur, aucune régression de mouvement possible.
 IF (M3_Direction <> 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
     M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -> 5000)
 ELSE
-    M3_StatusWordSim := 16#0081;
+    M3_StatusWordSim := 16#0080; // Comm Ready seul -- Bit0 retombé, arrêt confirmé
     M3_ActualFreqHz  := 0;
 END_IF;
 

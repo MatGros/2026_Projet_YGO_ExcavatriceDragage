@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:06:55.953745" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:06:55.953745">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T17:19:21.802983" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T17:19:21.802983">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,6 +26,25 @@
       <dataType name="ST_SafetyChecklist">
         <baseType>
           <struct>
+            <variable name="SimulationModeActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0. Aiguillage source — dit QUELLE entree alimente les steps 1-3 ci-dessous.
+       Absent jusqu'ici : diagnostiquer un blocage AU en full simu obligeait a rouvrir
+       GVL_Simulation dans un Watch separe (REX 2026-08-14, banc sans HW).
+TRUE = bit maitre simu actif (GVL_Simulation.SimulationModeActive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimSafetyActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = domaine Safety simule ➔ Step1-3 lisent FB_Sim_Safety, pas les DI/comm reelles</xhtml>
+              </documentation>
+            </variable>
             <variable name="Step1_InputModulesOk">
               <type>
                 <BOOL />
@@ -51,13 +70,13 @@ TRUE = Les 3 cartes E/S physiques sont RUNNING ➔ En simu : GVL_Simulation.SimS
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Boucle physique AU fermée (EmergencyChainClosed_DI)</xhtml>
               </documentation>
             </variable>
-            <variable name="Step4_ContactorRedundancyOk">
+            <variable name="Step4_ContactorReleased">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Conditions de réarmement
-TRUE = Test de redondance contacteurs OK ➔ Attendre la retombée complète des contacteurs</xhtml>
+TRUE = Contacteur relâché ; précondition AF01 avant réarmement</xhtml>
               </documentation>
             </variable>
             <variable name="Step5_ArmingAllowed">
@@ -65,7 +84,16 @@ TRUE = Test de redondance contacteurs OK ➔ Attendre la retombée complète des
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Machine armable ➔ Appuyer sur BP Reset IHM : GVL_IHM.Modes.Cmd.BtnFaultReset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Armable ; acquitter si nécessaire puis générer un front BtnEmergencyArming</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Séquence de réarmement
+0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingPulseActive">
@@ -73,8 +101,23 @@ TRUE = Test de redondance contacteurs OK ➔ Attendre la retombée complète des
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Séquence de réarmement
-TRUE = Impulsion d'armement 500ms en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Impulsion d'armement en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = séquence de réarmement ou verrouillage en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = verrouillage temporel entre tentatives</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -85,12 +128,36 @@ TRUE = Impulsion d'armement 500ms en cours</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Contacteur principal sous tension (PowerContactorEngaged_DI)</xhtml>
               </documentation>
             </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande de coupure safety active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainAActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = maintien voie A demandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainBActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = maintien voie B demandé</xhtml>
+              </documentation>
+            </variable>
             <variable name="AllConditionsMet">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Chaîne de sécurité OK et puissance engagée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = état final : chaîne OK et puissance engagée</xhtml>
               </documentation>
             </variable>
             <variable name="SafetyError">
@@ -99,7 +166,15 @@ TRUE = Impulsion d'armement 500ms en cours</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Erreurs
-TRUE = Défaut sécurité actif ➔ Acquitter via : GVL_IHM.Modes.Cmd.BtnFaultReset</xhtml>
+TRUE = Défaut sécurité actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 redondance ; bit1 échec confirmation contacteur</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">

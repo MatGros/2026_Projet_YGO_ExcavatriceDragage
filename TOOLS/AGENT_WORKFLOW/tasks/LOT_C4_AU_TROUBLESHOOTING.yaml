@@ -1,0 +1,104 @@
+contract:
+  task_id: LOT_C4_AU_TROUBLESHOOTING
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Fournir dans GVL_Troubleshooting.Safety une lecture seule, chronologique et
+    complète des préconditions AF01 de réarmement AU, afin qu'un technicien
+    identifie sans accéder aux variables internes pourquoi le contacteur ne
+    s'arme pas ou retombe en simulation.
+
+  acceptance:
+    - id: AC1
+      statement: "La checklist publie séparément : chaîne AU saine, contacteur relâché avant armement, séquence/verrouillage inactif, absence d'échec redondance, et état Armable public."
+      verified_by: "Revue de ST_SafetyChecklist.st et FB_TroubleshootingView.st ; sources limitées à ST_Safety_Emergency_State/Diag publics."
+    - id: AC2
+      statement: "Le champ Step4 ne désigne plus un faux test de redondance : TRUE signifie explicitement que le contacteur est relâché, condition AF01 au réarmement."
+      verified_by: "Inspection du champ Step4_ContactorReleased et de son affectation NOT EmergencyState.ContactorOk."
+    - id: AC3
+      statement: "Le message opérateur de l'état Armable indique BtnEmergencyArming, jamais BtnFaultReset."
+      verified_by: "Recherche BtnFaultReset/BtnEmergencyArming dans ST_SafetyChecklist.st et AF14."
+    - id: AC4
+      statement: "La vue publie l'étape 0..6, ArmingBusy, LockoutActive, ArmingErrorId et PowerCutOffActive ; aucun de ces champs ne constitue une commande ou un interlock."
+      verified_by: "Revue interface et G200_check_linkage.py --report."
+    - id: AC5
+      statement: "AllConditionsMet décrit uniquement l'état final puissance engagée ; il n'est pas présenté comme une précondition d'armement."
+      verified_by: "Revue ST_SafetyChecklist.st, FB_TroubleshootingView.st et AF14."
+    - id: AC6
+      statement: "FB_TroubleshootingView reste lecture seule : il ne modifie ni logique AU, ni PRG_06_Outputs_LD, ni une commande IHM, ni une safety métier."
+      verified_by: "git diff ciblé et revue indépendante C4."
+    - id: AC7
+      statement: "Un garde-fou automatique échoue si ST_SafetyChecklist omet les observables publics obligatoires de réarmement AU ou conserve Step4_ContactorRedundancyOk."
+      verified_by: "pytest du garde-fou ajouté."
+    - id: AC8
+      statement: "AF14 décrit l'ordre de lecture et les actions opérateur conformément à AF01 §5.3 : acquittement défaut puis front BtnEmergencyArming, sans réarmement automatique."
+      verified_by: "Revue AF01/AF14 et protocole Watch CODESYS du TEST_DESIGN."
+    - id: AC9
+      statement: "Nom de fichier est egal au nom de POU ; suffixe est egal au langage genere dans le bundle."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_code_structure.py et inspection du bundle."
+
+  scope:
+    allowed:
+      - CODE/DEPANNAGE/FB_TroubleshootingView.st
+      - CODE/DEPANNAGE/GVL_Troubleshooting.st
+      - CODE/SUPERVISION/_TYPES/ST_SafetyChecklist.st
+      - CODE/MAIN/PRG_07_Supervision.st
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.2.md
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
+      - DOC/WFLOW/TEST_DESIGN_LOT_C4_AU_TROUBLESHOOTING.md
+      - DOC/WFLOW/REGISTRE_ACTIONS_LOT_C4_AU_TROUBLESHOOTING.md
+      - TOOLS/AGENT_WORKFLOW/tests/test_au_troubleshooting_guard.py
+      - TOOLS/AGENT_WORKFLOW/tasks/LOT_C4_AU_TROUBLESHOOTING.yaml
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/**/*.xml
+    forbidden:
+      - CODE/AU/**
+      - CODE/MAIN/PRG_06_Outputs_LD.st
+      - PRJ_CODESYS/**
+      - Device.export
+      - ARCHIVES/**
+      - GVL_IHM.*.Cmd
+
+  conservation:
+    must_survive:
+      - "La logique de réarmement AU, ses temporisations, ses latches et ses sorties A/B restent strictement inchangés."
+      - "Le diagnostic reste une projection lecture seule, producteur unique dans PRG_07_Supervision."
+      - "Aucun réarmement automatique, aucun bypass, aucune commande d'AU ne peut être introduit par Troubleshooting."
+      - "Les sources State, Diag et PowerCutOffActive restent les sorties publiques existantes de PRG_06_Outputs_LD."
+    dropped_on_purpose:
+      - "Le libellé Step4_ContactorRedundancyOk, faux car il recopie le retour contacteur, est abandonné."
+      - "Le texte Step5 indiquant BtnFaultReset comme action de réarmement est abandonné."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_review
+    - human_validation_c4
+
+  models_allowed:
+    - "visible-pi-readonly-reviewer"
+
+  alert_duty: >
+    Stop immédiat si une donnée demandée n'est pas une sortie publique, si le
+    diagnostic exige de modifier la logique AU, ou si AF01 et le code public
+    divergent sur les préconditions de réarmement.
+
+status: IN_PROGRESS
+execution:
+  executed_by: "Pi orchestrateur"
+  completed_at: "2026-08-14"
+  status: IMPLEMENTED_PENDING_HUMAN_WATCH
+  summary: "Projection GVL corrigée et documentée ; logique AU inchangée. Validation finale requise par essai Watch CODESYS."
+  evidence_submitted:
+    - "AF01 §5.3 lu : préconditions boucle saine, contacteur non engagé, aucune séquence/verrouillage actif, front BtnEmergencyArming."
+    - "Contrat vérifié : check_task_contract.py PASS."
+    - "Garde-fou pytest : 2 passed ; gates palier C : PASS ; bundle 170/170 ; G200 : 0 KO."
+    - "G100 après renommage ArmingErrorId : PASS ; aucun changement PRJ_CODESYS/Device.export."
+    - "Revue agent visible impossible : exécutable Pi/Claude absent dans herdr ; revue effectuée directement par l'orchestrateur, à compléter par validation humaine."
+validation:
+  status: PENDING_HUMAN_WATCH
+  validated_by: ""
+  validated_at: ""
+  notes: "Essais C4-001 à C4-005 à exécuter sous CODESYS/Watch avant commit."
