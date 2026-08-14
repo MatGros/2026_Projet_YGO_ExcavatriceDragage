@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:06:52.405024" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:06:52.405024">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:54:10.683602" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:54:10.683602">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1182,6 +1182,131 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des diagnostics CANopen et EtherCAT.
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Safety_Emergency_Diag">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Synthèse : (ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ bit0 = RedundancyTestFailed (auto-test A/B), bit1 = EmergencyArmingFailed (timeout confirm contacteur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Canal A ou B resté collé/shunté détecté à l'auto-test — Reset requis (cause disparue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance non confirmé sous 2 s — Reset + contacteur engagé requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Verrouillage temporel de 5 s entre tentatives de réarmement échouées</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>960e6dac-c920-5489-a179-e9465fa4bc67</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+   ───────────────────────────────────────────────────────────────
+   📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
+      Consommé par PRG_SUPERVISION_CFC et GVL_Troubleshooting.
+   🎯 Champs lecture seule — producteur unique = FB composite.
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Safety_Emergency_State">
+        <baseType>
+          <struct>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Boucle AU fermée (EmergencyChainClosed_DI = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur puissance confirmé engagé (PowerContactorEngaged_DI = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Étape séquence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Réarmement possible maintenant : chain OK, step=0, pas de lockout, pas de redondance échouée, pas de contacteur déjà engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence armement OU lockout en cours (nouvelle demande ignorée)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dd3ab3f7-a7b2-54ae-a567-e544f71a8526</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚦 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
+   ───────────────────────────────────────────────────────────────
+   📄 Produit par FB_Safety_EmergencyManagement (sortie State).
+      Consommé par PRG_SUPERVISION_CFC → GVL_IHM.Modes.State pour IHM,
+      et par GVL_Troubleshooting pour diagnostic.
+   🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
+              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_SyncHMI">
@@ -5328,7 +5453,13 @@ instTroubleshootingView(
     Translation          := GVL_IHM.TranslationM3,
     Commun               := GVL_IHM.Commun,
     Network              := GVL_IHM.Network,
-    DredgingAssist       := GVL_IHM.DredgingAssist
+    DredgingAssist       := GVL_IHM.DredgingAssist,
+    EmergencyState       := PRG_06_Outputs_LD.EmergencyState,
+    EmergencyDiag        := PRG_06_Outputs_LD.EmergencyDiag,
+    PowerCutOffActive    := PRG_06_Outputs_LD.PowerCutOffActive,
+    ArmingPulseActive    := PRG_06_Outputs_LD.EmergencyArmingPulseActive,
+    MaintainAActive      := PRG_06_Outputs_LD.PowerKeepAliveACmd,
+    MaintainBActive      := PRG_06_Outputs_LD.PowerKeepAliveBCmd
 );
 
 {endregion}
@@ -6948,6 +7079,39 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : GVL_IHM.DredgingAssist</xhtml>
               </documentation>
             </variable>
+            <variable name="EmergencyState">
+              <type>
+                <derived name="ST_Safety_Emergency_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sorties publiques AU produites par PRG_06_Outputs_LD</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyDiag">
+              <type>
+                <derived name="ST_Safety_Emergency_Diag" />
+              </type>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmingPulseActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MaintainAActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MaintainBActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -6963,7 +7127,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕵️♂️ FB_TroubleshootingView — Mise en forme lecture seule pour dépannage
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.1.md
+   📄 Doc : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
    🔗 Producteur unique de GVL_Troubleshooting.* — instancié UNE SEULE FOIS,
       dans PRG_07_Supervision, après §3 Projections IHM.
    🔒 Lecture seule stricte : aucune VAR_OUTPUT de commande, aucun calcul métier,
@@ -7287,23 +7451,34 @@ GVL_Troubleshooting.HomingM2.RejectErrorMask := WinchM2.State.Encoder.HomingErro
 
 {region "§7 Diagnostic chaine securite et AU"}
 // === 🛡️ 7. Diagnostic Chronologique Chaîne de Sécurité &amp; AU (Safety) ===
-GVL_Troubleshooting.Safety.Step1_InputModulesOk        := NOT InputModuleFault;
-GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut    := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
-GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed  := HwIn.Machine.EmergencyChainClosed_DI;
-GVL_Troubleshooting.Safety.Step4_ContactorRedundancyOk := GVL_IHM.Modes.State.PowerContactorOk;
-GVL_Troubleshooting.Safety.Step5_ArmingAllowed         := GVL_IHM.Modes.State.EmergencyArmable;
+// 🆕 Aiguillage source (REX 2026-08-14, banc full simu) : dit si Step1-3 lisent le modèle
+// simulé (FB_Sim_Safety, indépendant des DI/comm réelles) ou les DI physiques brutes —
+// évite de rouvrir GVL_Simulation dans un Watch séparé pour diagnostiquer un blocage AU.
+GVL_Troubleshooting.Safety.SimulationModeActive       := SimulationModeActive;
+GVL_Troubleshooting.Safety.SimSafetyActive            := SimSafetyActive;
 
-GVL_Troubleshooting.Safety.ArmingPulseActive     := GVL_IHM.Modes.State.EmergencyArmingBusy;
-GVL_Troubleshooting.Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
-GVL_Troubleshooting.Safety.AllConditionsMet      := GVL_Troubleshooting.Safety.Step1_InputModulesOk
-                                                AND GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut
-                                                AND GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed
-                                                AND GVL_Troubleshooting.Safety.Step4_ContactorRedundancyOk
-                                                AND GVL_Troubleshooting.Safety.PowerContactorEngaged;
+GVL_Troubleshooting.Safety.Step1_InputModulesOk       := NOT InputModuleFault;
+GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut   := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
+GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed := EmergencyState.ChainOk;
+GVL_Troubleshooting.Safety.Step4_ContactorReleased     := NOT EmergencyState.ContactorOk;
+GVL_Troubleshooting.Safety.Step5_ArmingAllowed        := EmergencyState.Armable;
 
-GVL_Troubleshooting.Safety.SafetyError          := GVL_IHM.Modes.State.AnyFaultActive;
-GVL_Troubleshooting.Safety.RedundancyTestFailed := GVL_IHM.Modes.State.RedundancyTestFailed;
-GVL_Troubleshooting.Safety.ArmingFailed         := GVL_IHM.Modes.State.EmergencyArmingFailed;
+GVL_Troubleshooting.Safety.ArmingStep            := EmergencyState.Step;
+GVL_Troubleshooting.Safety.ArmingPulseActive    := ArmingPulseActive;
+GVL_Troubleshooting.Safety.ArmingBusy           := EmergencyState.ArmingBusy;
+GVL_Troubleshooting.Safety.LockoutActive        := EmergencyDiag.LockoutActive;
+GVL_Troubleshooting.Safety.PowerContactorEngaged := EmergencyState.ContactorOk;
+GVL_Troubleshooting.Safety.PowerCutOffActive    := PowerCutOffActive;
+GVL_Troubleshooting.Safety.MaintainAActive      := MaintainAActive;
+GVL_Troubleshooting.Safety.MaintainBActive      := MaintainBActive;
+
+(* État final uniquement : ce n'est pas une précondition de réarmement. *)
+GVL_Troubleshooting.Safety.AllConditionsMet := EmergencyState.ChainOk
+                                            AND EmergencyState.ContactorOk;
+GVL_Troubleshooting.Safety.SafetyError          := EmergencyDiag.Error;
+GVL_Troubleshooting.Safety.ArmingErrorId       := EmergencyDiag.ErrorId;
+GVL_Troubleshooting.Safety.RedundancyTestFailed := EmergencyDiag.RedundancyTestFailed;
+GVL_Troubleshooting.Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
 
 {endregion}
 
@@ -7510,6 +7685,10 @@ GVL_Troubleshooting.Inputs := HwIn;
             <Object Name="ST_BypassBucket" ObjectId="77e7b77e-4a14-5220-93aa-7bb27ede6733" />
             <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
           </Folder>
+        </Folder>
+        <Folder Name="AU">
+          <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
+          <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
         </Folder>
         <Folder Name="TREUILS">
           <Folder Name="BENNE">

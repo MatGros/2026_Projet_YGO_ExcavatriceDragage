@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🕵️♂️ FB_TroubleshootingView — Mise en forme lecture seule pour dépannage
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.1.md
+   📄 Doc : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
    🔗 Producteur unique de GVL_Troubleshooting.* — instancié UNE SEULE FOIS,
       dans PRG_07_Supervision, après §3 Projections IHM.
    🔒 Lecture seule stricte : aucune VAR_OUTPUT de commande, aucun calcul métier,
@@ -47,6 +47,14 @@ VAR_INPUT
     Commun                   : ST_CommunHMI;     (* GVL_IHM.Commun *)
     Network                  : ST_NetworkDiagHMI;(* GVL_IHM.Network *)
     DredgingAssist           : ST_DredgingAssistHMI; (* 🆕 2026-08-07 : GVL_IHM.DredgingAssist *)
+
+    (* 🛡️ Sorties publiques AU produites par PRG_06_Outputs_LD *)
+    EmergencyState           : ST_Safety_Emergency_State;
+    EmergencyDiag            : ST_Safety_Emergency_Diag;
+    PowerCutOffActive        : BOOL;
+    ArmingPulseActive        : BOOL;
+    MaintainAActive          : BOOL;
+    MaintainBActive          : BOOL;
 END_VAR
 VAR_OUTPUT
     Ready                    : BOOL; (* Diagnostic interne minimal — fiche §3 *)
@@ -354,23 +362,34 @@ GVL_Troubleshooting.HomingM2.RejectErrorMask := WinchM2.State.Encoder.HomingErro
 
 {region "§7 Diagnostic chaine securite et AU"}
 // === 🛡️ 7. Diagnostic Chronologique Chaîne de Sécurité & AU (Safety) ===
-GVL_Troubleshooting.Safety.Step1_InputModulesOk        := NOT InputModuleFault;
-GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut    := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
-GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed  := HwIn.Machine.EmergencyChainClosed_DI;
-GVL_Troubleshooting.Safety.Step4_ContactorRedundancyOk := GVL_IHM.Modes.State.PowerContactorOk;
-GVL_Troubleshooting.Safety.Step5_ArmingAllowed         := GVL_IHM.Modes.State.EmergencyArmable;
+// 🆕 Aiguillage source (REX 2026-08-14, banc full simu) : dit si Step1-3 lisent le modèle
+// simulé (FB_Sim_Safety, indépendant des DI/comm réelles) ou les DI physiques brutes —
+// évite de rouvrir GVL_Simulation dans un Watch séparé pour diagnostiquer un blocage AU.
+GVL_Troubleshooting.Safety.SimulationModeActive       := SimulationModeActive;
+GVL_Troubleshooting.Safety.SimSafetyActive            := SimSafetyActive;
 
-GVL_Troubleshooting.Safety.ArmingPulseActive     := GVL_IHM.Modes.State.EmergencyArmingBusy;
-GVL_Troubleshooting.Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
-GVL_Troubleshooting.Safety.AllConditionsMet      := GVL_Troubleshooting.Safety.Step1_InputModulesOk
-                                                AND GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut
-                                                AND GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed
-                                                AND GVL_Troubleshooting.Safety.Step4_ContactorRedundancyOk
-                                                AND GVL_Troubleshooting.Safety.PowerContactorEngaged;
+GVL_Troubleshooting.Safety.Step1_InputModulesOk       := NOT InputModuleFault;
+GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut   := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
+GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed := EmergencyState.ChainOk;
+GVL_Troubleshooting.Safety.Step4_ContactorReleased     := NOT EmergencyState.ContactorOk;
+GVL_Troubleshooting.Safety.Step5_ArmingAllowed        := EmergencyState.Armable;
 
-GVL_Troubleshooting.Safety.SafetyError          := GVL_IHM.Modes.State.AnyFaultActive;
-GVL_Troubleshooting.Safety.RedundancyTestFailed := GVL_IHM.Modes.State.RedundancyTestFailed;
-GVL_Troubleshooting.Safety.ArmingFailed         := GVL_IHM.Modes.State.EmergencyArmingFailed;
+GVL_Troubleshooting.Safety.ArmingStep            := EmergencyState.Step;
+GVL_Troubleshooting.Safety.ArmingPulseActive    := ArmingPulseActive;
+GVL_Troubleshooting.Safety.ArmingBusy           := EmergencyState.ArmingBusy;
+GVL_Troubleshooting.Safety.LockoutActive        := EmergencyDiag.LockoutActive;
+GVL_Troubleshooting.Safety.PowerContactorEngaged := EmergencyState.ContactorOk;
+GVL_Troubleshooting.Safety.PowerCutOffActive    := PowerCutOffActive;
+GVL_Troubleshooting.Safety.MaintainAActive      := MaintainAActive;
+GVL_Troubleshooting.Safety.MaintainBActive      := MaintainBActive;
+
+(* État final uniquement : ce n'est pas une précondition de réarmement. *)
+GVL_Troubleshooting.Safety.AllConditionsMet := EmergencyState.ChainOk
+                                            AND EmergencyState.ContactorOk;
+GVL_Troubleshooting.Safety.SafetyError          := EmergencyDiag.Error;
+GVL_Troubleshooting.Safety.ArmingErrorId       := EmergencyDiag.ErrorId;
+GVL_Troubleshooting.Safety.RedundancyTestFailed := EmergencyDiag.RedundancyTestFailed;
+GVL_Troubleshooting.Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
 
 {endregion}
 
