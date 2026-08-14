@@ -439,6 +439,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont activée</xhtml>
               </documentation>
             </variable>
+            <variable name="BlockedBySafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚫 Synthèse globale : actionneur bloqué par la sécurité (PowerCutOff OU SafeStop/Error)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Synthèse sécurités critiques entraînant une coupure puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide</xhtml>
+              </documentation>
+            </variable>
             <variable name="ErrorOperatorComm">
               <type>
                 <BOOL />

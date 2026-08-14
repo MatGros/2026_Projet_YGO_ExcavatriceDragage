@@ -17,5 +17,8 @@ STRUCT
     ErrorSensorIncoherent : BOOL; (* 🧭 Mot capteurs M3 incohérent (bit7) *)
     SafeStop          : BOOL;    (* 🛡️ Décélération de sécurité demandée *)
     PowerCutOff       : BOOL;    (* 🧨 Coupure puissance demandée *)
+    BlockedBySafety   : BOOL;    (* 🚫 Synthèse globale : translation bloquée par la sécurité *)
+    PowerCutOffSafety : BOOL;    (* 🧨 Synthèse sécurités critiques entraînant une coupure puissance *)
+    SafeStopSafety    : BOOL;    (* 🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide *)
 END_STRUCT
 END_TYPE

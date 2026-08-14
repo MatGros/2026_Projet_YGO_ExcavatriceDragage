@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:25.991438" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:25.991438">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T23:18:52.755679" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T23:18:52.755679">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -120,6 +120,30 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockedBySafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚫 Synthèse globale : translation bloquée par la sécurité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Synthèse sécurités critiques entraînant une coupure puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1306,6 +1330,9 @@ TranslationSafetyHMI.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafetyHMI.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafetyHMI.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
+TranslationSafetyHMI.PowerCutOffSafety := PRG_06_Outputs_LD.M3PowerCutOffSafetyInfo;
+TranslationSafetyHMI.SafeStopSafety := PRG_06_Outputs_LD.M3SafeStopSafetyInfo;
+TranslationSafetyHMI.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
 
 {endregion}
 </xhtml>

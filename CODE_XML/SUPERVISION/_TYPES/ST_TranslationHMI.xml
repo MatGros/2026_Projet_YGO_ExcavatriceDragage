@@ -322,6 +322,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
+            <variable name="BlockedBySafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚫 Synthèse globale : translation bloquée par la sécurité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Synthèse sécurités critiques entraînant une coupure puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

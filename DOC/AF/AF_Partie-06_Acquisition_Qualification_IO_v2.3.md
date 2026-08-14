@@ -381,18 +381,29 @@ confirme la boucle AU (Partie 01).
 
 ---
 
-## ⚡ 5. Sorties physiques
+## ⚡ 5. Sorties physiques & Barrières de sécurité
 
-Les sorties finales restent dans `PRG_OUTPUTS_LD` en Ladder (cible `PRG_06_Outputs_LD`).
+Les sorties finales et barrières de commande matérielle sont gérées dans `PRG_06_Outputs_LD` en Ladder.
 
 | Regle | Exigence |
 |---|---|
-| 🧱 Barrieres finales | Uniques productrices des commandes physiques autorisees. |
-| 🛡️ SafeStop | Laisse la deceleration metier se terminer. |
-| 🔴 Coupure finale | `Enable=FALSE`, perte contacteur, timeout ou defaut final. |
+| 🧱 Barrieres finales | Uniques productrices des commandes physiques autorisees (`M1InterlockEnable`, etc.). |
+| 🛡️ SafeStop | Laisse la deceleration metier se terminer (n'écrase pas `Enable`). |
+| 🔴 Coupure finale | `Enable=FALSE` uniquement sur `PowerCutOff` matériel ou défaut d'interlock bloquant. |
 | 🧨 PowerCutOff | Demande safety agregee puis canaux A/B fail-safe. |
 
-Le detail de la chaine AU/rearmement est proprietaire de la Partie 01.
+### 🔍 Diagnostic graphique Ladder & Publication GVL_IHM
+
+Pour chaque actionneur (**M1 Treuil Retenue**, **M2 Treuil Benne**, **M3 Translation**), `PRG_06_Outputs_LD` intègre 3 blocs opérateurs `OR` de diagnostic pur (Watch/Ladder) :
+
+1. **`*PowerCutOffSafetyInfo`** (Bloc 1) : Regroupe les mécanismes critiques provoquant une coupure de puissance amont (Méca A..E, thermiques, perte de contrôle).
+2. **`*SafeStopSafetyInfo`** (Bloc 2) : Regroupe les défauts entraînant une rampe de décélération rapide contrôlée (perte comm opérateur/joystick, codeur, rotation phase, etc.).
+3. **`*BlockedBySafetyInfo`** (Bloc 3) : Synthèse globale du blocage (`PowerCutOff` OU `SafeStop`), reliant graphiquement les sorties des deux premiers blocs vers l'état général.
+
+Ces signaux sont directement projetés dans `GVL_IHM` via `ST_SafetyWinch` (`M1TreuilRetenue.Safety`, `M2TreuilBenne.Safety`) et `ST_SafetyTranslation` (`TranslationM3.Safety`) :
+- `BlockedBySafety`
+- `PowerCutOffSafety`
+- `SafeStopSafety`
 
 ---
 
