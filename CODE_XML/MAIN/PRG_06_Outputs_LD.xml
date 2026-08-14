@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T22:27:50.269347" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T22:27:50.269347">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T14:39:25.105175" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T14:39:25.105175">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -399,7 +399,14 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1Safety.Error</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 FIX 2026-08-14 (audit sécurité) : Enable ne coupe plus que sur PowerCutOff (barrière
+finale, AF02 §2, AF06 §5 "SafeStop laisse la décélération métier se terminer"). SafeStop/
+Error retirés du calcul — SafeStop est une rampe rapide gérée en amont par FB_Winch/
+FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ; Error mirait tout ErrorId y
+compris les mécanismes SafeStop-only, donc coupait Enable pour la même mauvaise raison.
+Couper ici sur SafeStop/Error écrasait la rampe déjà calculée en amont en un arrêt
+brutal — contraire à la doctrine Enable&gt;SafeStop&gt;StartStop.
+Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1FinalInterlockRequest.PowerCutOff</xhtml>
               </documentation>
             </variable>
             <variable name="M2InterlockEnable">
@@ -407,7 +414,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2Safety.Error</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2FinalInterlockRequest.PowerCutOff</xhtml>
               </documentation>
             </variable>
             <variable name="M3InterlockEnable">
@@ -415,8 +422,27 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationSafety.Error</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               </documentation>
+            </variable>
+            <variable name="M1BlockedBySafetyInfo">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Réseau informatif séparé (demande utilisateur) : visibilité maintenance de ce qui
+bloque (SafeStop/Error), SANS influencer Enable — juste de l'information en Watch/Ladder.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BlockedBySafetyInfo">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3BlockedBySafetyInfo">
+              <type>
+                <BOOL />
+              </type>
             </variable>
             <variable name="TranslationBrakeCmd">
               <type>
@@ -573,6 +599,41 @@ Demande frein M3 arbitrée — cible du mapping E/S</xhtml>
                 <derived name="FB_Safety_EmergencyManagement" />
               </type>
             </variable>
+            <variable name="M1SafeStopInfo">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Relais locaux pour le réseau informatif M1/M2/M3BlockedBySafetyInfo — copie simple
+avant OR (bug générateur ST→LD confirmé sur un OR à 2 branches qualifiées PRG_xx.*.*,
+contournement documenté, PAS une préférence de style).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1ErrorInfo">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2SafeStopInfo">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2ErrorInfo">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3SafeStopInfo">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3ErrorInfo">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -658,7 +719,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
             <inVariable localId="5">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop AND NOT PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error</expression>
+              <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable AND NOT PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff</expression>
             </inVariable>
             <outVariable localId="6">
               <position x="0" y="0" />
@@ -670,7 +731,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
             <comment localId="15" height="0" width="0">
               <position x="0" y="0" />
               <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.</xhtml>
               </content>
             </comment>
             <vendorElement localId="16">
@@ -684,69 +745,71 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="27" negated="false" storage="none" edge="none">
+            <inVariable localId="17">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop</expression>
+            </inVariable>
+            <outVariable localId="18">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="0" />
+                <connection refLocalId="17" />
               </connectionPointIn>
+              <expression>M1SafeStopInfo</expression>
+            </outVariable>
+            <comment localId="27" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="28">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="29">
+              <position x="0" y="0" />
               <connectionPointOut />
-              <variable>M1InterlockEnable</variable>
-            </contact>
-            <contact localId="29" negated="false" storage="none" edge="none">
+              <expression>PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error</expression>
+            </inVariable>
+            <outVariable localId="30">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="0" />
+                <connection refLocalId="29" />
               </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
-            </contact>
-            <contact localId="31" negated="false" storage="none" edge="none">
+              <expression>M1ErrorInfo</expression>
+            </outVariable>
+            <comment localId="39" height="0" width="0">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged</variable>
-            </contact>
-            <contact localId="33" negated="false" storage="none" edge="none">
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="40">
               <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop</variable>
-            </contact>
-            <contact localId="35" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeFeedback</variable>
-            </contact>
-            <contact localId="37" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff</variable>
-            </contact>
-            <contact localId="39" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd</variable>
-            </contact>
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
             <contact localId="41" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev</variable>
+              <variable>M1SafeStopInfo</variable>
             </contact>
             <contact localId="43" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -754,9 +817,107 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
+              <variable>M1ErrorInfo</variable>
+            </contact>
+            <coil localId="45" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="41" />
+                <connection refLocalId="43" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1BlockedBySafetyInfo</variable>
+            </coil>
+            <comment localId="55" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="56">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="67" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1InterlockEnable</variable>
+            </contact>
+            <contact localId="69" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
+            </contact>
+            <contact localId="71" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged</variable>
+            </contact>
+            <contact localId="73" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop</variable>
+            </contact>
+            <contact localId="75" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeFeedback</variable>
+            </contact>
+            <contact localId="77" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff</variable>
+            </contact>
+            <contact localId="79" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd</variable>
+            </contact>
+            <contact localId="81" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev</variable>
+            </contact>
+            <contact localId="83" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor1</variable>
             </contact>
-            <contact localId="45" negated="false" storage="none" edge="none">
+            <contact localId="85" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -764,7 +925,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor2</variable>
             </contact>
-            <contact localId="47" negated="false" storage="none" edge="none">
+            <contact localId="87" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -772,7 +933,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor3</variable>
             </contact>
-            <contact localId="49" negated="false" storage="none" edge="none">
+            <contact localId="89" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -780,77 +941,77 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor4</variable>
             </contact>
-            <inVariable localId="51">
+            <inVariable localId="91">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedStep</expression>
             </inVariable>
-            <block localId="17" typeName="FB_WinchOutputInterlock_LD" instanceName="instWinchOutputInterlockM1">
+            <block localId="57" typeName="FB_WinchOutputInterlock_LD" instanceName="instWinchOutputInterlockM1">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="27" />
+                    <connection refLocalId="67" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="29" />
+                    <connection refLocalId="69" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="31" />
+                    <connection refLocalId="71" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="SafeStop">
                   <connectionPointIn>
-                    <connection refLocalId="33" />
+                    <connection refLocalId="73" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BrakeFeedback">
                   <connectionPointIn>
-                    <connection refLocalId="35" />
+                    <connection refLocalId="75" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="FwdRevSpeedFeedbackOff">
                   <connectionPointIn>
-                    <connection refLocalId="37" />
+                    <connection refLocalId="77" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedRelayFwd">
                   <connectionPointIn>
-                    <connection refLocalId="39" />
+                    <connection refLocalId="79" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedRelayRev">
                   <connectionPointIn>
-                    <connection refLocalId="41" />
+                    <connection refLocalId="81" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedContactor1">
                   <connectionPointIn>
-                    <connection refLocalId="43" />
+                    <connection refLocalId="83" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedContactor2">
                   <connectionPointIn>
-                    <connection refLocalId="45" />
+                    <connection refLocalId="85" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedContactor3">
                   <connectionPointIn>
-                    <connection refLocalId="47" />
+                    <connection refLocalId="87" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedContactor4">
                   <connectionPointIn>
-                    <connection refLocalId="49" />
+                    <connection refLocalId="89" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedStep">
                   <connectionPointIn>
-                    <connection refLocalId="51" />
+                    <connection refLocalId="91" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -961,7 +1122,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </block>
-            <comment localId="53" height="0" width="0">
+            <comment localId="93" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT sur les DQ
@@ -969,7 +1130,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
 // sans ouvrir FB_WinchOutputInterlock_LD, meme doctrine que le reste de ce POU.</xhtml>
               </content>
             </comment>
-            <vendorElement localId="54">
+            <vendorElement localId="94">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -980,7 +1141,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="55" negated="false" storage="none" edge="none">
+            <contact localId="95" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -988,7 +1149,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>M1RelayFwd</variable>
             </contact>
-            <contact localId="57" negated="false" storage="none" edge="none">
+            <contact localId="97" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -996,22 +1157,22 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>M1RelayRev</variable>
             </contact>
-            <coil localId="59" negated="false" storage="none">
+            <coil localId="99" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="55" />
-                <connection refLocalId="57" />
+                <connection refLocalId="95" />
+                <connection refLocalId="97" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M1BrakeCmd</variable>
             </coil>
-            <comment localId="69" height="0" width="0">
+            <comment localId="109" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// ── Interlock final M2 (Treuil Benne) ────────────────────────────────────</xhtml>
               </content>
             </comment>
-            <vendorElement localId="70">
+            <vendorElement localId="110">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -1022,25 +1183,54 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="71">
+            <inVariable localId="111">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop AND NOT PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error</expression>
+              <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable AND NOT PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff</expression>
             </inVariable>
-            <outVariable localId="72">
+            <outVariable localId="112">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="71" />
+                <connection refLocalId="111" />
               </connectionPointIn>
               <expression>M2InterlockEnable</expression>
             </outVariable>
-            <comment localId="81" height="0" width="0">
+            <comment localId="121" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="122">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="123">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop</expression>
+            </inVariable>
+            <outVariable localId="124">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="123" />
+              </connectionPointIn>
+              <expression>M2SafeStopInfo</expression>
+            </outVariable>
+            <comment localId="133" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="82">
+            <vendorElement localId="134">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -1051,7 +1241,78 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="93" negated="false" storage="none" edge="none">
+            <inVariable localId="135">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error</expression>
+            </inVariable>
+            <outVariable localId="136">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="135" />
+              </connectionPointIn>
+              <expression>M2ErrorInfo</expression>
+            </outVariable>
+            <comment localId="145" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="146">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="147" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SafeStopInfo</variable>
+            </contact>
+            <contact localId="149" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2ErrorInfo</variable>
+            </contact>
+            <coil localId="151" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="147" />
+                <connection refLocalId="149" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2BlockedBySafetyInfo</variable>
+            </coil>
+            <comment localId="161" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="162">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="173" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1059,7 +1320,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>M2InterlockEnable</variable>
             </contact>
-            <contact localId="95" negated="false" storage="none" edge="none">
+            <contact localId="175" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1067,7 +1328,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
             </contact>
-            <contact localId="97" negated="false" storage="none" edge="none">
+            <contact localId="177" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1075,7 +1336,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
-            <contact localId="99" negated="false" storage="none" edge="none">
+            <contact localId="179" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1083,7 +1344,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop</variable>
             </contact>
-            <contact localId="101" negated="false" storage="none" edge="none">
+            <contact localId="181" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1091,7 +1352,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeFeedback</variable>
             </contact>
-            <contact localId="103" negated="false" storage="none" edge="none">
+            <contact localId="183" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1099,7 +1360,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff</variable>
             </contact>
-            <contact localId="105" negated="false" storage="none" edge="none">
+            <contact localId="185" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1107,7 +1368,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayFwd</variable>
             </contact>
-            <contact localId="107" negated="false" storage="none" edge="none">
+            <contact localId="187" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1115,7 +1376,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayRev</variable>
             </contact>
-            <contact localId="109" negated="false" storage="none" edge="none">
+            <contact localId="189" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1123,7 +1384,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor1</variable>
             </contact>
-            <contact localId="111" negated="false" storage="none" edge="none">
+            <contact localId="191" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1131,7 +1392,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor2</variable>
             </contact>
-            <contact localId="113" negated="false" storage="none" edge="none">
+            <contact localId="193" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1139,7 +1400,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor3</variable>
             </contact>
-            <contact localId="115" negated="false" storage="none" edge="none">
+            <contact localId="195" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1147,77 +1408,77 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor4</variable>
             </contact>
-            <inVariable localId="117">
+            <inVariable localId="197">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedStep</expression>
             </inVariable>
-            <block localId="83" typeName="FB_WinchOutputInterlock_LD" instanceName="instWinchOutputInterlockM2">
+            <block localId="163" typeName="FB_WinchOutputInterlock_LD" instanceName="instWinchOutputInterlockM2">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="93" />
+                    <connection refLocalId="173" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="95" />
+                    <connection refLocalId="175" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="97" />
+                    <connection refLocalId="177" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="SafeStop">
                   <connectionPointIn>
-                    <connection refLocalId="99" />
+                    <connection refLocalId="179" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BrakeFeedback">
                   <connectionPointIn>
-                    <connection refLocalId="101" />
+                    <connection refLocalId="181" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="FwdRevSpeedFeedbackOff">
                   <connectionPointIn>
-                    <connection refLocalId="103" />
+                    <connection refLocalId="183" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedRelayFwd">
                   <connectionPointIn>
-                    <connection refLocalId="105" />
+                    <connection refLocalId="185" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedRelayRev">
                   <connectionPointIn>
-                    <connection refLocalId="107" />
+                    <connection refLocalId="187" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedContactor1">
                   <connectionPointIn>
-                    <connection refLocalId="109" />
+                    <connection refLocalId="189" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedContactor2">
                   <connectionPointIn>
-                    <connection refLocalId="111" />
+                    <connection refLocalId="191" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedContactor3">
                   <connectionPointIn>
-                    <connection refLocalId="113" />
+                    <connection refLocalId="193" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedContactor4">
                   <connectionPointIn>
-                    <connection refLocalId="115" />
+                    <connection refLocalId="195" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedStep">
                   <connectionPointIn>
-                    <connection refLocalId="117" />
+                    <connection refLocalId="197" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -1328,13 +1589,13 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </block>
-            <comment localId="119" height="0" width="0">
+            <comment localId="199" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT, voir M1 ci-dessus.</xhtml>
               </content>
             </comment>
-            <vendorElement localId="120">
+            <vendorElement localId="200">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -1345,7 +1606,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="121" negated="false" storage="none" edge="none">
+            <contact localId="201" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1353,7 +1614,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>M2RelayFwd</variable>
             </contact>
-            <contact localId="123" negated="false" storage="none" edge="none">
+            <contact localId="203" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1361,16 +1622,16 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>M2RelayRev</variable>
             </contact>
-            <coil localId="125" negated="false" storage="none">
+            <coil localId="205" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="121" />
-                <connection refLocalId="123" />
+                <connection refLocalId="201" />
+                <connection refLocalId="203" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M2BrakeCmd</variable>
             </coil>
-            <comment localId="135" height="0" width="0">
+            <comment localId="215" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🔴🔧 REX 2026-08-07 (12) — retour terrain, GAP CONFIRMÉ : KoboldContactorCmd était déclaré
@@ -1381,7 +1642,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
 // M1_M2_KoboldMeasureEnable_DQ &lt;- PRG_06_Outputs_LD.KoboldContactorCmd.</xhtml>
               </content>
             </comment>
-            <vendorElement localId="136">
+            <vendorElement localId="216">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -1392,28 +1653,28 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="137">
+            <inVariable localId="217">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated</expression>
             </inVariable>
-            <outVariable localId="138">
+            <outVariable localId="218">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="137" />
+                <connection refLocalId="217" />
               </connectionPointIn>
               <expression>KoboldContactorCmd</expression>
             </outVariable>
-            <comment localId="147" height="0" width="0">
+            <comment localId="227" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 // 🛡️ 2026-08-06 (demande maintenance) : déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
-// M3InterlockEnable s'appuie désormais directement sur la sécurité dynamique de M3 (PowerCutOff / SafeStop / Error)
-// publiée sur PRG_05_Translation.TranslationSafetyHMI, rendant les motifs de coupure lisibles en direct.</xhtml>
+// 🔧 FIX 2026-08-14 : ne coupe plus que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête
+// de fichier (SafeStop/Error écrasaient la rampe rapide gérée en amont par FB_Translation).</xhtml>
               </content>
             </comment>
-            <vendorElement localId="148">
+            <vendorElement localId="228">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -1424,25 +1685,54 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="149">
+            <inVariable localId="229">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>PRG_05_Translation.TranslationFinalInterlockRequest.Enable AND NOT PRG_05_Translation.TranslationSafetyHMI.PowerCutOff AND NOT PRG_05_Translation.TranslationSafetyHMI.SafeStop AND NOT PRG_05_Translation.TranslationSafetyHMI.Error</expression>
+              <expression>PRG_05_Translation.TranslationFinalInterlockRequest.Enable AND NOT PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</expression>
             </inVariable>
-            <outVariable localId="150">
+            <outVariable localId="230">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="149" />
+                <connection refLocalId="229" />
               </connectionPointIn>
               <expression>M3InterlockEnable</expression>
             </outVariable>
-            <comment localId="159" height="0" width="0">
+            <comment localId="239" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.</xhtml>
+              </content>
+            </comment>
+            <vendorElement localId="240">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <inVariable localId="241">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>PRG_05_Translation.TranslationSafetyHMI.SafeStop</expression>
+            </inVariable>
+            <outVariable localId="242">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="241" />
+              </connectionPointIn>
+              <expression>M3SafeStopInfo</expression>
+            </outVariable>
+            <comment localId="251" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="160">
+            <vendorElement localId="252">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -1453,7 +1743,78 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="171" negated="false" storage="none" edge="none">
+            <inVariable localId="253">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>PRG_05_Translation.TranslationSafetyHMI.Error</expression>
+            </inVariable>
+            <outVariable localId="254">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="253" />
+              </connectionPointIn>
+              <expression>M3ErrorInfo</expression>
+            </outVariable>
+            <comment localId="263" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="264">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="265" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M3SafeStopInfo</variable>
+            </contact>
+            <contact localId="267" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M3ErrorInfo</variable>
+            </contact>
+            <coil localId="269" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="265" />
+                <connection refLocalId="267" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M3BlockedBySafetyInfo</variable>
+            </coil>
+            <comment localId="279" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="280">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="291" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1461,7 +1822,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>M3InterlockEnable</variable>
             </contact>
-            <contact localId="173" negated="false" storage="none" edge="none">
+            <contact localId="293" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1469,7 +1830,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
             </contact>
-            <contact localId="175" negated="false" storage="none" edge="none">
+            <contact localId="295" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1477,7 +1838,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
-            <contact localId="177" negated="false" storage="none" edge="none">
+            <contact localId="297" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1485,7 +1846,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop</variable>
             </contact>
-            <contact localId="179" negated="false" storage="none" edge="none">
+            <contact localId="299" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1493,7 +1854,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_05_Translation.TranslationFinalInterlockRequest.BrakeReleaseRequest</variable>
             </contact>
-            <contact localId="181" negated="false" storage="none" edge="none">
+            <contact localId="301" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -1501,57 +1862,57 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <connectionPointOut />
               <variable>PRG_05_Translation.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed</variable>
             </contact>
-            <inVariable localId="183">
+            <inVariable localId="303">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveControlWord</expression>
             </inVariable>
-            <inVariable localId="185">
+            <inVariable localId="305">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveFreqHz</expression>
             </inVariable>
-            <block localId="161" typeName="FB_TranslationOutputInterlock_LD" instanceName="instTranslationOutputInterlockM3">
+            <block localId="281" typeName="FB_TranslationOutputInterlock_LD" instanceName="instTranslationOutputInterlockM3">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="171" />
+                    <connection refLocalId="291" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="173" />
+                    <connection refLocalId="293" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="175" />
+                    <connection refLocalId="295" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="SafeStop">
                   <connectionPointIn>
-                    <connection refLocalId="177" />
+                    <connection refLocalId="297" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BrakeReleaseRequest">
                   <connectionPointIn>
-                    <connection refLocalId="179" />
+                    <connection refLocalId="299" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BrakeCommandOpenConfirmed">
                   <connectionPointIn>
-                    <connection refLocalId="181" />
+                    <connection refLocalId="301" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedDriveControlWord">
                   <connectionPointIn>
-                    <connection refLocalId="183" />
+                    <connection refLocalId="303" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="RequestedDriveFreqHz">
                   <connectionPointIn>
-                    <connection refLocalId="185" />
+                    <connection refLocalId="305" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -1632,7 +1993,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </block>
-            <comment localId="187" height="0" width="0">
+            <comment localId="307" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// === 🌐 Recopie GVL_Global (lecture publique diagnostic/simulation) ===
@@ -1640,7 +2001,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
 (PRG_02_Acquisition) pour rejouer les commandes finales en simulation banc.</xhtml>
               </content>
             </comment>
-            <vendorElement localId="188">
+            <vendorElement localId="308">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -1651,336 +2012,6 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 </data>
               </addData>
             </vendorElement>
-            <comment localId="189" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="190">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="191" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1RelayFwd</variable>
-            </contact>
-            <coil localId="192" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="191" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M1RelayFwd</variable>
-            </coil>
-            <comment localId="201" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="202">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="203" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1RelayRev</variable>
-            </contact>
-            <coil localId="204" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="203" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M1RelayRev</variable>
-            </coil>
-            <comment localId="213" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="214">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="215" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1SpeedContactor1</variable>
-            </contact>
-            <coil localId="216" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="215" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor1</variable>
-            </coil>
-            <comment localId="225" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="226">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="227" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1SpeedContactor2</variable>
-            </contact>
-            <coil localId="228" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="227" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor2</variable>
-            </coil>
-            <comment localId="237" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="238">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="239" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1SpeedContactor3</variable>
-            </contact>
-            <coil localId="240" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="239" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor3</variable>
-            </coil>
-            <comment localId="249" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="250">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="251" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1SpeedContactor4</variable>
-            </contact>
-            <coil localId="252" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="251" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M1SpeedContactor4</variable>
-            </coil>
-            <comment localId="261" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="262">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="263" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M1BrakeCmd</variable>
-            </contact>
-            <coil localId="264" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="263" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M1BrakeCmd</variable>
-            </coil>
-            <comment localId="273" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="274">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="275" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2RelayFwd</variable>
-            </contact>
-            <coil localId="276" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="275" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M2RelayFwd</variable>
-            </coil>
-            <comment localId="285" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="286">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="287" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2RelayRev</variable>
-            </contact>
-            <coil localId="288" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="287" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M2RelayRev</variable>
-            </coil>
-            <comment localId="297" height="0" width="0">
-              <position x="0" y="0" />
-              <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </content>
-            </comment>
-            <vendorElement localId="298">
-              <position x="0" y="0" />
-              <alternativeText>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
-              </alternativeText>
-              <addData>
-                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
-                  <ElementType xmlns="">networktitle</ElementType>
-                </data>
-              </addData>
-            </vendorElement>
-            <contact localId="299" negated="false" storage="none" edge="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="0" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>M2SpeedContactor1</variable>
-            </contact>
-            <coil localId="300" negated="false" storage="none">
-              <position x="0" y="0" />
-              <connectionPointIn>
-                <connection refLocalId="299" />
-              </connectionPointIn>
-              <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor1</variable>
-            </coil>
             <comment localId="309" height="0" width="0">
               <position x="0" y="0" />
               <content>
@@ -2004,7 +2035,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor2</variable>
+              <variable>M1RelayFwd</variable>
             </contact>
             <coil localId="312" negated="false" storage="none">
               <position x="0" y="0" />
@@ -2012,7 +2043,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="311" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor2</variable>
+              <variable>GVL_Global.M1RelayFwd</variable>
             </coil>
             <comment localId="321" height="0" width="0">
               <position x="0" y="0" />
@@ -2037,7 +2068,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor3</variable>
+              <variable>M1RelayRev</variable>
             </contact>
             <coil localId="324" negated="false" storage="none">
               <position x="0" y="0" />
@@ -2045,7 +2076,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="323" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor3</variable>
+              <variable>GVL_Global.M1RelayRev</variable>
             </coil>
             <comment localId="333" height="0" width="0">
               <position x="0" y="0" />
@@ -2070,7 +2101,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2SpeedContactor4</variable>
+              <variable>M1SpeedContactor1</variable>
             </contact>
             <coil localId="336" negated="false" storage="none">
               <position x="0" y="0" />
@@ -2078,7 +2109,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="335" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2SpeedContactor4</variable>
+              <variable>GVL_Global.M1SpeedContactor1</variable>
             </coil>
             <comment localId="345" height="0" width="0">
               <position x="0" y="0" />
@@ -2103,7 +2134,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>M2BrakeCmd</variable>
+              <variable>M1SpeedContactor2</variable>
             </contact>
             <coil localId="348" negated="false" storage="none">
               <position x="0" y="0" />
@@ -2111,7 +2142,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="347" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.M2BrakeCmd</variable>
+              <variable>GVL_Global.M1SpeedContactor2</variable>
             </coil>
             <comment localId="357" height="0" width="0">
               <position x="0" y="0" />
@@ -2136,7 +2167,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>TranslationBrakeCmd</variable>
+              <variable>M1SpeedContactor3</variable>
             </contact>
             <coil localId="360" negated="false" storage="none">
               <position x="0" y="0" />
@@ -2144,9 +2175,339 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="359" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_Global.TranslationBrakeCmd</variable>
+              <variable>GVL_Global.M1SpeedContactor3</variable>
             </coil>
             <comment localId="369" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="370">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="371" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1SpeedContactor4</variable>
+            </contact>
+            <coil localId="372" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="371" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M1SpeedContactor4</variable>
+            </coil>
+            <comment localId="381" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="382">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="383" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M1BrakeCmd</variable>
+            </contact>
+            <coil localId="384" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="383" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M1BrakeCmd</variable>
+            </coil>
+            <comment localId="393" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="394">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="395" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2RelayFwd</variable>
+            </contact>
+            <coil localId="396" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="395" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2RelayFwd</variable>
+            </coil>
+            <comment localId="405" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="406">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="407" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2RelayRev</variable>
+            </contact>
+            <coil localId="408" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="407" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2RelayRev</variable>
+            </coil>
+            <comment localId="417" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="418">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="419" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor1</variable>
+            </contact>
+            <coil localId="420" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="419" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2SpeedContactor1</variable>
+            </coil>
+            <comment localId="429" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="430">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="431" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor2</variable>
+            </contact>
+            <coil localId="432" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="431" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2SpeedContactor2</variable>
+            </coil>
+            <comment localId="441" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="442">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="443" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor3</variable>
+            </contact>
+            <coil localId="444" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="443" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2SpeedContactor3</variable>
+            </coil>
+            <comment localId="453" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="454">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="455" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2SpeedContactor4</variable>
+            </contact>
+            <coil localId="456" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="455" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2SpeedContactor4</variable>
+            </coil>
+            <comment localId="465" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="466">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="467" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>M2BrakeCmd</variable>
+            </contact>
+            <coil localId="468" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="467" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.M2BrakeCmd</variable>
+            </coil>
+            <comment localId="477" height="0" width="0">
+              <position x="0" y="0" />
+              <content>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </content>
+            </comment>
+            <vendorElement localId="478">
+              <position x="0" y="0" />
+              <alternativeText>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+              </alternativeText>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/fbdelementtype" handleUnknown="implementation">
+                  <ElementType xmlns="">networktitle</ElementType>
+                </data>
+              </addData>
+            </vendorElement>
+            <contact localId="479" negated="false" storage="none" edge="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>TranslationBrakeCmd</variable>
+            </contact>
+            <coil localId="480" negated="false" storage="none">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="479" />
+              </connectionPointIn>
+              <connectionPointOut />
+              <variable>GVL_Global.TranslationBrakeCmd</variable>
+            </coil>
+            <comment localId="489" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// === 🧪 Coil directe sur nom HW brut — essai 2026-08-06 (décision utilisateur) ===
@@ -2162,7 +2523,7 @@ ce canal précis. Cette coil directe est donc la première tentative réelle de
 piloter cette sortie depuis PRG_06.</xhtml>
               </content>
             </comment>
-            <vendorElement localId="370">
+            <vendorElement localId="490">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2173,13 +2534,13 @@ piloter cette sortie depuis PRG_06.</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <comment localId="371" height="0" width="0">
+            <comment localId="491" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="372">
+            <vendorElement localId="492">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2190,7 +2551,7 @@ piloter cette sortie depuis PRG_06.</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="373" negated="false" storage="none" edge="none">
+            <contact localId="493" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2198,21 +2559,21 @@ piloter cette sortie depuis PRG_06.</xhtml>
               <connectionPointOut />
               <variable>TranslationBrakeCmd</variable>
             </contact>
-            <coil localId="374" negated="false" storage="none">
+            <coil localId="494" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="373" />
+                <connection refLocalId="493" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M3_BrakeRelease_RQ</variable>
             </coil>
-            <comment localId="383" height="0" width="0">
+            <comment localId="503" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="384">
+            <vendorElement localId="504">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2223,25 +2584,25 @@ piloter cette sortie depuis PRG_06.</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="385">
+            <inVariable localId="505">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>M3_DriveControlWord</expression>
             </inVariable>
-            <outVariable localId="386">
+            <outVariable localId="506">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="385" />
+                <connection refLocalId="505" />
               </connectionPointIn>
               <expression>M3_CommandWord</expression>
             </outVariable>
-            <comment localId="395" height="0" width="0">
+            <comment localId="515" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="396">
+            <vendorElement localId="516">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2252,19 +2613,19 @@ piloter cette sortie depuis PRG_06.</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="397">
+            <inVariable localId="517">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>M3_DriveFreqRefWord</expression>
             </inVariable>
-            <outVariable localId="398">
+            <outVariable localId="518">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="397" />
+                <connection refLocalId="517" />
               </connectionPointIn>
               <expression>M3_SetpointFrequencyHz</expression>
             </outVariable>
-            <comment localId="407" height="0" width="0">
+            <comment localId="527" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🔴🔧 REX 2026-08-07 (12bis) — retour terrain, URGENT : ajouté au même titre que
@@ -2273,7 +2634,7 @@ piloter cette sortie depuis PRG_06.</xhtml>
 // en place, contrairement au remap qualifié seul (jamais appliqué manuellement pour ce canal).</xhtml>
               </content>
             </comment>
-            <vendorElement localId="408">
+            <vendorElement localId="528">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2284,7 +2645,7 @@ piloter cette sortie depuis PRG_06.</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="409" negated="false" storage="none" edge="none">
+            <contact localId="529" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2292,15 +2653,15 @@ piloter cette sortie depuis PRG_06.</xhtml>
               <connectionPointOut />
               <variable>KoboldContactorCmd</variable>
             </contact>
-            <coil localId="410" negated="false" storage="none">
+            <coil localId="530" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="409" />
+                <connection refLocalId="529" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>M1_M2_KoboldMeasureEnable_DQ</variable>
             </coil>
-            <comment localId="419" height="0" width="0">
+            <comment localId="539" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// === 🛡️ §3 SÉCURITÉ &amp; COUPURE PUISSANCE AMONT ===
@@ -2321,7 +2682,7 @@ OR WinchM2FinalInterlockRequest.PowerCutOff
 OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               </content>
             </comment>
-            <vendorElement localId="420">
+            <vendorElement localId="540">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2332,13 +2693,13 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <comment localId="421" height="0" width="0">
+            <comment localId="541" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="422">
+            <vendorElement localId="542">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2349,25 +2710,25 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="423">
+            <inVariable localId="543">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff</expression>
             </inVariable>
-            <outVariable localId="424">
+            <outVariable localId="544">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="423" />
+                <connection refLocalId="543" />
               </connectionPointIn>
               <expression>PowerCutOffReq</expression>
             </outVariable>
-            <comment localId="433" height="0" width="0">
+            <comment localId="553" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="434">
+            <vendorElement localId="554">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2378,12 +2739,12 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <inVariable localId="445">
+            <inVariable localId="565">
               <position x="0" y="0" />
               <connectionPointOut />
               <expression>1</expression>
             </inVariable>
-            <contact localId="447" negated="false" storage="none" edge="none">
+            <contact localId="567" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2391,7 +2752,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               <connectionPointOut />
               <variable>PRG_07_Supervision.FaultMachineReset_IHM</variable>
             </contact>
-            <contact localId="449" negated="false" storage="none" edge="none">
+            <contact localId="569" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2399,7 +2760,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyArming</variable>
             </contact>
-            <contact localId="451" negated="false" storage="none" edge="none">
+            <contact localId="571" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2407,7 +2768,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</variable>
             </contact>
-            <contact localId="453" negated="false" storage="none" edge="none">
+            <contact localId="573" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2415,7 +2776,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               <connectionPointOut />
               <variable>PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</variable>
             </contact>
-            <contact localId="455" negated="false" storage="none" edge="none">
+            <contact localId="575" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2423,7 +2784,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               <connectionPointOut />
               <variable>PowerCutOffReq</variable>
             </contact>
-            <contact localId="457" negated="false" storage="none" edge="none">
+            <contact localId="577" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2431,42 +2792,42 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               <connectionPointOut />
               <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
             </contact>
-            <block localId="435" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
+            <block localId="555" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
               <position x="0" y="0" />
               <inputVariables>
                 <variable formalParameter="Enable">
                   <connectionPointIn>
-                    <connection refLocalId="445" />
+                    <connection refLocalId="565" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="Reset">
                   <connectionPointIn>
-                    <connection refLocalId="447" />
+                    <connection refLocalId="567" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="ArmRequest">
                   <connectionPointIn>
-                    <connection refLocalId="449" />
+                    <connection refLocalId="569" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
-                    <connection refLocalId="451" />
+                    <connection refLocalId="571" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
-                    <connection refLocalId="453" />
+                    <connection refLocalId="573" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="PowerCutOffRequest">
                   <connectionPointIn>
-                    <connection refLocalId="455" />
+                    <connection refLocalId="575" />
                   </connectionPointIn>
                 </variable>
                 <variable formalParameter="BtnEmergencyCutOff">
                   <connectionPointIn>
-                    <connection refLocalId="457" />
+                    <connection refLocalId="577" />
                   </connectionPointIn>
                 </variable>
               </inputVariables>
@@ -2547,21 +2908,21 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 </data>
               </addData>
             </block>
-            <coil localId="459" negated="false" storage="none">
+            <coil localId="579" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="435" formalParameter="ArmPulse_RQ" />
+                <connection refLocalId="555" formalParameter="ArmPulse_RQ" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>EmergencyArmingPulseActive</variable>
             </coil>
-            <comment localId="469" height="0" width="0">
+            <comment localId="589" height="0" width="0">
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
               </content>
             </comment>
-            <vendorElement localId="470">
+            <vendorElement localId="590">
               <position x="0" y="0" />
               <alternativeText>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml" />
@@ -2572,7 +2933,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 </data>
               </addData>
             </vendorElement>
-            <contact localId="471" negated="false" storage="none" edge="none">
+            <contact localId="591" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
               <connectionPointIn>
                 <connection refLocalId="0" />
@@ -2580,10 +2941,10 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               <connectionPointOut />
               <variable>PowerCutOffReq</variable>
             </contact>
-            <coil localId="472" negated="false" storage="none">
+            <coil localId="592" negated="false" storage="none">
               <position x="0" y="0" />
               <connectionPointIn>
-                <connection refLocalId="471" />
+                <connection refLocalId="591" />
               </connectionPointIn>
               <connectionPointOut />
               <variable>PowerCutOffActive</variable>

@@ -75,6 +75,19 @@ VAR
     TargetPoints         : DINT;        // Écart signé CfgTopSensorPosM → points, figé pendant la séquence
     TargetPositionM      : REAL;        // Cible retenue : nominale ou unitaire
     RawDiffRestart       : DINT;        // Écart |RawPos - LastKnownRawPos| au redémarrage (§3.7)
+    // 🆕 REX audit 2026-08-14 : le homing s'exécutait sans AUCUNE condition (Mode, treuil
+    // sélectionné, capteur haut, bornage cible déclarés en interface mais jamais lus). Gate
+    // différencié par chemin, validé avec l'utilisateur : le nominal capture AU FRONT du
+    // capteur haut (répétable à vitesse d'accostage constante — ForbidAscent de FB_Safety_Winch
+    // coupe déjà la montée indépendamment, pas d'attente d'arrêt confirmé) ; l'unitaire exige
+    // le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt à l'appel
+    // (PRG_02_Acquisition.st, M2BucketRefRequested) — rien à ajouter ici pour ce chemin.
+    TopSensorEdge         : R_TRIG;      // Front montant TopPositionSensor — déclenche le nominal
+    HomingModeOk          : BOOL;        // Mode MAINT_N1/N2 requis, tous chemins
+    NominalHomingTrigger  : BOOL;
+    UnitaryHomingTrigger  : BOOL;
+    DynamicHomingTrigger  : BOOL;
+    HomingTrigger         : BOOL;
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
@@ -130,7 +143,39 @@ IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
 END_IF;
 
 PresetRequest := FALSE;
-IF HomeEdge.Q THEN
+TopSensorEdge(CLK := TopPositionSensor);
+
+// 🆕 Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
+// chaque scan, jamais latchées, aucun Reset requis pour les effacer.
+ErrorId := ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
+
+HomingModeOk := (Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2);
+
+IF HomeEdge.Q AND NOT HomingModeOk THEN
+    ErrorId := ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
+END_IF;
+IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
+    ErrorId := ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
+END_IF;
+
+// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — ForbidAscent
+// (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
+// attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
+// Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
+// quand Home est pressé.
+NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND NOT UnitaryMode
+                         AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
+
+// Unitaire (MAINT_N2 déjà garanti par UnitaryMode en amont, PRG_02_Acquisition) : bon treuil.
+UnitaryHomingTrigger := HomingModeOk AND UnitaryMode AND WinchSelected AND HomeEdge.Q;
+
+// Dynamique (benne) : Mode + arrêt confirmé (M1/M2 non Busy) déjà gardés à l'appel via
+// M2BucketRefRequested (PRG_02_Acquisition.st) — HomingModeOk reste vérifié ici en défense.
+DynamicHomingTrigger := HomingModeOk AND UseDynamicTarget AND HomeEdge.Q;
+
+HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
+
+IF HomingTrigger THEN
     IF UseDynamicTarget THEN
         TargetPositionM := DynamicHomingTargetM;
     ELSIF UnitaryMode THEN
@@ -139,24 +184,29 @@ IF HomeEdge.Q THEN
         TargetPositionM := CfgTopSensorPosM;
     END_IF;
 
-    // 🎯 Homing logiciel immédiat sans condition : mise à jour instantanée de HomingRefRaw
-    // (garantit que CablePosM passe à 0.0m ou TopSensorPosM immédiatement à l'écran IHM)
-    TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-    Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
-    Calib.Homed := TRUE;
-    Calib.HomingSuspect := FALSE;
-    Calib.LastKnownRawPos := RawPos;
-    HomingRefRaw := Calib.HomingRefRaw;
-    Homed := TRUE;
-    HomingSuspect := FALSE;
-    Done := TRUE;
-    ErrorId := 16#0000;
-    State := E_State.READY;
+    // 🆕 Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
+    // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
+    // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
+    IF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
+        ErrorId := ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+    ELSE
+        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
+        Calib.Homed := TRUE;
+        Calib.HomingSuspect := FALSE;
+        Calib.LastKnownRawPos := RawPos;
+        HomingRefRaw := Calib.HomingRefRaw;
+        Homed := TRUE;
+        HomingSuspect := FALSE;
+        Done := TRUE;
+        ErrorId := 16#0000;
+        State := E_State.READY;
 
-    // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
-    PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
-    PresetValue := PresetValueCalc;
-    PresetRequest := TRUE;
+        // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
+        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
+        PresetValue := PresetValueCalc;
+        PresetRequest := TRUE;
+    END_IF;
 END_IF;
 
 {endregion}

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:html="http://www.w3.org/1999/xhtml">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.764528" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T18:19:14.764528">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.359775" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.359775">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7383,7 +7383,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <html:xhtml>🧨 Demande coupure puissance (FB_Safety_Translation), agrégation en attente (lot M5)</html:xhtml>
+                <html:xhtml>🧨 Demande coupure puissance (FB_Safety_Translation) — consommée par PRG_06_Outputs_LD (Enable)</html:xhtml>
               </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
@@ -7427,8 +7427,10 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
    📥 Consommateur unique : PRG_06_Outputs_LD, avant
       FB_TranslationOutputInterlock_LD.
    🔒 Ne contient jamais une commande PDO autorisée.
-   🆕 PowerCutOff (2026-08-05, LOT M4) : demande safety M3 (FB_Safety_Translation),
-      pas encore consommée par PRG_06_Outputs_LD (lot séparé M5, agrégation PowerCutOff).
+   🆕 PowerCutOff (2026-08-05, LOT M4) : demande safety M3 (FB_Safety_Translation).
+      🔧 FIX 2026-08-14 : consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
+      d'Enable (barrière finale) — SafeStop n'y est plus lu, il reste géré en amont
+      par FB_Translation (rampe rapide, Enable maintenu, AF06 §5).
    ═══════════════════════════════════════════════════════════════</html:xhtml>
         </documentation>
       </dataType>
@@ -13956,6 +13958,49 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</html:xhtml>
                 <html:xhtml>Écart |RawPos - LastKnownRawPos| au redémarrage (§3.7)</html:xhtml>
               </documentation>
             </variable>
+            <variable name="TopSensorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <html:xhtml>🆕 REX audit 2026-08-14 : le homing s'exécutait sans AUCUNE condition (Mode, treuil
+sélectionné, capteur haut, bornage cible déclarés en interface mais jamais lus). Gate
+différencié par chemin, validé avec l'utilisateur : le nominal capture AU FRONT du
+capteur haut (répétable à vitesse d'accostage constante — ForbidAscent de FB_Safety_Winch
+coupe déjà la montée indépendamment, pas d'attente d'arrêt confirmé) ; l'unitaire exige
+le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt à l'appel
+(PRG_02_Acquisition.st, M2BucketRefRequested) — rien à ajouter ici pour ce chemin.
+Front montant TopPositionSensor — déclenche le nominal</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingModeOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <html:xhtml>Mode MAINT_N1/N2 requis, tous chemins</html:xhtml>
+              </documentation>
+            </variable>
+            <variable name="NominalHomingTrigger">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="UnitaryHomingTrigger">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DynamicHomingTrigger">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomingTrigger">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <html:xhtml>═══════════════════════════════════════════════════════════════
@@ -14030,7 +14075,39 @@ IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
 END_IF;
 
 PresetRequest := FALSE;
-IF HomeEdge.Q THEN
+TopSensorEdge(CLK := TopPositionSensor);
+
+// 🆕 Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
+// chaque scan, jamais latchées, aucun Reset requis pour les effacer.
+ErrorId := ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
+
+HomingModeOk := (Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2);
+
+IF HomeEdge.Q AND NOT HomingModeOk THEN
+    ErrorId := ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
+END_IF;
+IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
+    ErrorId := ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
+END_IF;
+
+// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — ForbidAscent
+// (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
+// attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
+// Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
+// quand Home est pressé.
+NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND NOT UnitaryMode
+                         AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
+
+// Unitaire (MAINT_N2 déjà garanti par UnitaryMode en amont, PRG_02_Acquisition) : bon treuil.
+UnitaryHomingTrigger := HomingModeOk AND UnitaryMode AND WinchSelected AND HomeEdge.Q;
+
+// Dynamique (benne) : Mode + arrêt confirmé (M1/M2 non Busy) déjà gardés à l'appel via
+// M2BucketRefRequested (PRG_02_Acquisition.st) — HomingModeOk reste vérifié ici en défense.
+DynamicHomingTrigger := HomingModeOk AND UseDynamicTarget AND HomeEdge.Q;
+
+HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
+
+IF HomingTrigger THEN
     IF UseDynamicTarget THEN
         TargetPositionM := DynamicHomingTargetM;
     ELSIF UnitaryMode THEN
@@ -14039,24 +14116,29 @@ IF HomeEdge.Q THEN
         TargetPositionM := CfgTopSensorPosM;
     END_IF;
 
-    // 🎯 Homing logiciel immédiat sans condition : mise à jour instantanée de HomingRefRaw
-    // (garantit que CablePosM passe à 0.0m ou TopSensorPosM immédiatement à l'écran IHM)
-    TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
-    Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
-    Calib.Homed := TRUE;
-    Calib.HomingSuspect := FALSE;
-    Calib.LastKnownRawPos := RawPos;
-    HomingRefRaw := Calib.HomingRefRaw;
-    Homed := TRUE;
-    HomingSuspect := FALSE;
-    Done := TRUE;
-    ErrorId := 16#0000;
-    State := E_State.READY;
+    // 🆕 Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
+    // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
+    // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
+    IF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
+        ErrorId := ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+    ELSE
+        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
+        Calib.Homed := TRUE;
+        Calib.HomingSuspect := FALSE;
+        Calib.LastKnownRawPos := RawPos;
+        HomingRefRaw := Calib.HomingRefRaw;
+        Homed := TRUE;
+        HomingSuspect := FALSE;
+        Done := TRUE;
+        ErrorId := 16#0000;
+        State := E_State.READY;
 
-    // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
-    PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
-    PresetValue := PresetValueCalc;
-    PresetRequest := TRUE;
+        // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
+        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
+        PresetValue := PresetValueCalc;
+        PresetRequest := TRUE;
+    END_IF;
 END_IF;
 
 {endregion}
