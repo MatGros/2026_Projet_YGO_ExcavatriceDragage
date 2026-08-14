@@ -12,6 +12,11 @@ STRUCT
     (* 2. Santé Matériel & Bus *)
     Step3_EncoderAvailable       : BOOL; (* TRUE = Codeur EtherCAT OK & E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimSafetyActive=1 *)
 
+    (* 2bis. Entrées physiques directes HwIn (vérité terrain) *)
+    HwIn_ContactorsReleased_DI   : BOOL; (* Retours contacteurs retombés issus de HwIn.Winch *)
+    HwIn_BrakeIsOpen_DI          : BOOL; (* Retour fin de course frein (1 = ouvert) issu de HwIn.Winch *)
+    HwIn_TopPositionFree_DI      : BOOL; (* Capteur position haute commun libre (1 = libre) issu de HwIn.Winch *)
+
     (* 3. État Physique Machine *)
     Step4_ContactorsReleased     : BOOL; (* TRUE = Tous les contacteurs retombés (attendre l'arrêt complet) *)
     Step5_BrakeApplied           : BOOL; (* TRUE = Frein serré (attendre l'arrêt complet) *)

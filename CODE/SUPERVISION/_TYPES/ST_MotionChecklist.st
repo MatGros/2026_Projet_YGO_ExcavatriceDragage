@@ -10,6 +10,11 @@ STRUCT
     Step2_ModeAuthorized         : BOOL; (* TRUE = Mode MAINT_N1 ou N2 actif (pas DISABLE) ➔ Commutateur Mode IHM *)
     Step3_NotBusyOtherTask       : BOOL; (* TRUE = Pas d'autre séquence en cours (Homing, Benne busy, etc.) *)
 
+    (* 1bis. Entrées physiques directes HwIn (vérité terrain) *)
+    HwIn_PowerContactorEngaged_DI: BOOL; (* Contacteur puissance principal issu de HwIn.Machine *)
+    HwIn_BrakeIsOpen_DI          : BOOL; (* Retour fin de course frein (1 = ouvert) issu de HwIn *)
+    Cmd_BrakeRelease             : BOOL; (* Ordre de commande d'ouverture de frein généré par l'automate *)
+
     (* 2. Intention & Demande *)
     Step4_MotionRequested        : BOOL; (* TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster doit être à 0 ! *)
     RequestedDirection           : INT;  (* +1 = Montée, -1 = Descente, 0 = Repos *)

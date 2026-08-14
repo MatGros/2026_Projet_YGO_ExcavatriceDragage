@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
    🎯 Polarité positive : TRUE = simulé/stimulus actif ; FALSE = réel/repos.
    🔒 Uniquement consommée à la frontière PRG_02_Acquisition et par le banc.
    ═══════════════════════════════════════════════════════════════ *)

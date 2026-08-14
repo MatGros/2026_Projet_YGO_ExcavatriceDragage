@@ -29,7 +29,7 @@ def test_view_projects_public_state_and_diagnostic_only() -> None:
     source = VIEW.read_text(encoding="utf-8")
     for name in ("EmergencyState", "EmergencyDiag", "PowerCutOffActive", "MaintainAActive", "MaintainBActive"):
         assert name in source
-    assert "Step4_ContactorReleased     := NOT EmergencyState.ContactorOk" in source
+    assert "Step4_ContactorReleased     := NOT HwIn.Machine.PowerContactorEngaged_DI" in source
     assert "EmergencyState.Armable" in source
     assert "EmergencyDiag.LockoutActive" in source
     assert "EmergencyDiag.ErrorId" in source

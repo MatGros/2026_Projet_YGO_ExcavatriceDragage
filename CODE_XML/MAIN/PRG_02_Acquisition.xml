@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:25.989433" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:25.989433">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T20:45:33.062888" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T20:45:33.062888">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1335,8 +1335,12 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§0 Session simulation"}
-// === 🧪 §0 SESSION SIMULATION ===
+{region "§0 Session simulation &amp; aiguillage"}
+// === 🧪 §0 SESSION SIMULATION &amp; AIGUILLAGE ===
+// 🔧 REX 2026-08-14 : les 4 flags d'aiguillage par domaine et la condition de simulation Machine
+// (§1bis) étaient calculés à 2 endroits différents du fichier (duplication de la même expression
+// GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive) — regroupés ici en
+// source unique, conforme CODE_QUALITY_STANDARDS.md §1 (producteur unique) et §2bis (lisibilité).
 // Le bit maître est commandé consciemment par l'opérateur. Ses fronts initialisent les
 // domaines et stimuli afin qu'un retour réel ne puisse pas laisser une simulation latente.
 SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
@@ -1370,6 +1374,12 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
     GVL_Simulation.SimKoboldContactValue := FALSE;
 END_IF;
+
+// Aiguillage par domaine — source unique, réutilisée en §1bis et en §2 (SEL final).
+WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
+OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
+MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}
@@ -1431,7 +1441,7 @@ HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // �
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING =&gt; module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive THEN
+IF MachineInputSourceSimulated THEN
     LocalDigitalIoOk := TRUE;
     Vh0800EndOk      := TRUE;
     Vh0808EtpOk      := TRUE;
@@ -1502,11 +1512,6 @@ HwSim.Winch       := instSimBench.Winch;
 HwSim.Translation := instSimBench.Translation;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
-
-WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
-OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
-MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
 
 IF NOT WinchInputSourceInitialized THEN
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
@@ -4696,7 +4701,7 @@ TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
    📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
@@ -5454,7 +5459,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -5590,7 +5595,7 @@ RawPosOut := RawPos;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
       (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
@@ -5731,7 +5736,7 @@ END_IF;
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md</xhtml>
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -5952,7 +5957,7 @@ SimContactorOk := ContactorLatch;
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
              DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T19:54:53.387046" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T19:54:53.387046">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T20:20:38.731641" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T20:20:38.731641">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -934,7 +934,7 @@ TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
    📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
@@ -1291,7 +1291,7 @@ Done := TRUE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -1427,7 +1427,7 @@ RawPosOut := RawPos;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
       (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
@@ -1568,7 +1568,7 @@ END_IF;
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md</xhtml>
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -1789,7 +1789,7 @@ SimContactorOk := ContactorLatch;
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
              DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>

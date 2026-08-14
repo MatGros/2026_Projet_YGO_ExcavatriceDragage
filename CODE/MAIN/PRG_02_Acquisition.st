@@ -114,8 +114,12 @@ VAR
     SimulationModeFall                : F_TRIG;
 END_VAR
 
-{region "§0 Session simulation"}
-// === 🧪 §0 SESSION SIMULATION ===
+{region "§0 Session simulation & aiguillage"}
+// === 🧪 §0 SESSION SIMULATION & AIGUILLAGE ===
+// 🔧 REX 2026-08-14 : les 4 flags d'aiguillage par domaine et la condition de simulation Machine
+// (§1bis) étaient calculés à 2 endroits différents du fichier (duplication de la même expression
+// GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive) — regroupés ici en
+// source unique, conforme CODE_QUALITY_STANDARDS.md §1 (producteur unique) et §2bis (lisibilité).
 // Le bit maître est commandé consciemment par l'opérateur. Ses fronts initialisent les
 // domaines et stimuli afin qu'un retour réel ne puisse pas laisser une simulation latente.
 SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
@@ -149,6 +153,12 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
     GVL_Simulation.SimKoboldContactValue := FALSE;
 END_IF;
+
+// Aiguillage par domaine — source unique, réutilisée en §1bis et en §2 (SEL final).
+WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
+OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
+MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}
@@ -210,7 +220,7 @@ HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // �
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING => module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive THEN
+IF MachineInputSourceSimulated THEN
     LocalDigitalIoOk := TRUE;
     Vh0800EndOk      := TRUE;
     Vh0808EtpOk      := TRUE;
@@ -281,11 +291,6 @@ HwSim.Winch       := instSimBench.Winch;
 HwSim.Translation := instSimBench.Translation;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
-
-WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
-OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
-MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
 
 IF NOT WinchInputSourceInitialized THEN
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;

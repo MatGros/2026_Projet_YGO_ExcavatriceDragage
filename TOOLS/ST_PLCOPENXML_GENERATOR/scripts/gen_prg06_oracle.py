@@ -148,6 +148,21 @@ FB_SAFETY_OUTPUT_ASSIGNS = {
     "ArmingSeqStep": "ArmingSeqStep",
     "RedundancyTestFailed": "RedundancyTestFailed",
     "EmergencyArmingFailed": "EmergencyArmingFailed",
+    # 🐛 FIX 2026-08-14 (REX troubleshooting AU, plusieurs heures de diagnostic) :
+    # "State"/"Diag" absents de cette table -> pin de sortie du bloc généré avec une
+    # <expression/> VIDE dans le Ladder réel (contrairement au .st source qui écrit
+    # EmergencyState/EmergencyDiag par copie de struct, PRG_06_Outputs_LD.st:339-340).
+    # PRG_06_Outputs_LD est TOUJOURS généré en Ladder par cet oracle, jamais compilé
+    # depuis le .st littéralement -- ce bug rendait EmergencyState/EmergencyDiag figés
+    # à leur valeur d'init (FALSE/0) en permanence sur le PLC réel, silencieusement :
+    # aucune erreur d'import, aucun gate ne le détectait (G200 preuve la liaison
+    # ST source, pas le contenu réel du <expression> Ladder généré). Tous les champs
+    # Troubleshooting sourcés depuis State/Diag (Step3 ChainOk, Step4, Step5,
+    # SafetyError, ArmingErrorId) restaient donc bloqués quoi qu'il arrive côté AU réel,
+    # alors que les sorties individuellement mappées ci-dessus (ArmingSeqStep,
+    # RedundancyTestFailed, EmergencyArmingFailed...) fonctionnaient normalement.
+    "State": "EmergencyState",
+    "Diag": "EmergencyDiag",
 }
 
 FB_SAFETY_INPUT_SOURCES = [

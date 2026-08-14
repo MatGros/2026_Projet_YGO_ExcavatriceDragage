@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T17:19:21.802983" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T17:19:21.802983">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T21:47:39.612023" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T21:47:39.612023">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -43,6 +43,31 @@ TRUE = bit maitre simu actif (GVL_Simulation.SimulationModeActive)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = domaine Safety simule ➔ Step1-3 lisent FB_Sim_Safety, pas les DI/comm reelles</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_EmergencyChainClosed_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0bis. Entrées physiques directes HwIn (vérité terrain)
+Boucle AU physique ou simulée issue de HwIn.Machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur de puissance issu de HwIn.Machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_EmergencyBtnCut_HMI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande coupure AU IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Step1_InputModulesOk">

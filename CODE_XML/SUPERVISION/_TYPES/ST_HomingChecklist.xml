@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:07:00.375327" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:07:00.375327">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T21:46:21.167793" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T21:46:21.167793">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -50,6 +50,31 @@ TRUE = Mode MAINT_N1 ou MAINT_N2 actif ➔ Commutateur Mode IHM : GVL_IHM.Modes<
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Santé Matériel &amp; Bus
 TRUE = Codeur EtherCAT OK &amp; E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimSafetyActive=1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2bis. Entrées physiques directes HwIn (vérité terrain)
+Retours contacteurs retombés issus de HwIn.Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour fin de course frein (1 = ouvert) issu de HwIn.Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun libre (1 = libre) issu de HwIn.Winch</xhtml>
               </documentation>
             </variable>
             <variable name="Step4_ContactorsReleased">

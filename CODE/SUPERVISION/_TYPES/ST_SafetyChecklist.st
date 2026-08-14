@@ -11,6 +11,11 @@ STRUCT
     SimulationModeActive         : BOOL; (* TRUE = bit maitre simu actif (GVL_Simulation.SimulationModeActive) *)
     SimSafetyActive              : BOOL; (* TRUE = domaine Safety simule ➔ Step1-3 lisent FB_Sim_Safety, pas les DI/comm reelles *)
 
+    (* 0bis. Entrées physiques directes HwIn (vérité terrain) *)
+    HwIn_EmergencyChainClosed_DI : BOOL; (* Boucle AU physique ou simulée issue de HwIn.Machine *)
+    HwIn_PowerContactorEngaged_DI: BOOL; (* Retour contacteur de puissance issu de HwIn.Machine *)
+    HwIn_EmergencyBtnCut_HMI     : BOOL; (* Commande coupure AU IHM *)
+
     (* 1. Intégrité matérielle & modules E/S *)
     Step1_InputModulesOk         : BOOL; (* TRUE = Les 3 cartes E/S physiques sont RUNNING ➔ En simu : GVL_Simulation.SimSafetyActive=1 *)
     Step2_EmergencyBtnNotCut     : BOOL; (* TRUE = Pas d'appui AU ➔ Déverrouiller le BP coup-de-poing physique ou IHM : GVL_IHM.Modes.Cmd.BtnEmergencyCutOff *)
