@@ -439,20 +439,93 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont activée</xhtml>
               </documentation>
             </variable>
-            <variable name="BrakeTimeoutFault">
+            <variable name="ErrorOperatorComm">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Défaut watchdog confirmation ouverture/fermeture frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Décomposition individuelle des défauts de sécurité (bits ErrorId)
+🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
               </documentation>
             </variable>
-            <variable name="CableOutOfBoundsFault">
+            <variable name="ErrorEncoder">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Dépassement des bornes physiques haute/basse du câble</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Perte de liaison ou incohérence codeur (bit1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Mauvaise rotation de phases électriques (bit4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Surchauffe thermique frein commun M1/M2/M3 (bit10)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Mouvement non commandé / roue libre (Méca A - bit7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Absence confirmation arrêt sans commande (Méca B - bit8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaC">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏋️ Glissement M1 pendant cycle benne (Méca C - bit9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaD">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Non-arrêt sur capteur haut (Méca D - bit11)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaE">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Écart de synchronisation critique M1/M2 (Méca E - bit12/13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorOppositeDir">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Sens réel opposé au sens commandé (bit14)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorNoMovement">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Absence de mouvement malgré commande (bit15)</xhtml>
               </documentation>
             </variable>
           </struct>

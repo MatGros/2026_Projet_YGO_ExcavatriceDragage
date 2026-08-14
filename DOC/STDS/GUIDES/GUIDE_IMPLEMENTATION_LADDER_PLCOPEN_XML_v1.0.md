@@ -678,4 +678,4 @@ Voici un exemple complet d'une POU en Ladder Diagram comprenant :
 - [`GUIDE_IMPLEMENTATION_ST_PLCOPEN_XML_v1.0.md`](GUIDE_IMPLEMENTATION_ST_PLCOPEN_XML_v1.0.md) — pendant ST de ce guide.
 - [`tc6_xml_v201_technical_doc.md`](tc6_xml_v201_technical_doc.md) — spec source intégrale (PLCopen TC6 XML v2.01), y compris les sections hors périmètre ici (§7 configuration/resource/task).
 - [`CODE_QUALITY_STANDARDS.md`](../CODE_QUALITY_STANDARDS.md) — pourquoi `G200_check_linkage.py` reste la seule preuve de câblage réel, y compris pour du LD généré.
-- `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` — implémentation Python consommant ces règles (REX 2026-08-04 : génération générique actuellement non fiable, contournée par un oracle dédié `PRG_06_Outputs_LD` — voir `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py`).
+- `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` — implémentation Python consommant ces règles (REX 2026-08-04 : génération générique actuellement non fiable, contournée par un oracle dédié `PRG_06_Outputs_LD` — voir `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`).

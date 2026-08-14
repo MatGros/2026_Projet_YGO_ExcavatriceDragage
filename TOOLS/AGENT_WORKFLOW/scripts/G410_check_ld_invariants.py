@@ -111,21 +111,24 @@ def _check_pou(pou: ET.Element) -> tuple[list[str], list[str]]:
     # Le bug était block=10 avec sources=3-9 -> IndexOutOfRangeException.
     for block in ld.findall("pou:block", NS):
         block_id = int(block.get("localId"))
-        connected: list[int] = []
-        for cpi in block.findall(".//pou:inputVariables/pou:variable/pou:connectionPointIn", NS):
-            conn = cpi.find("pou:connection", NS)
-            if conn is not None and conn.get("refLocalId"):
-                connected.append(int(conn.get("refLocalId")))
-        for ref in connected:
-            if ref <= block_id:
-                errors.append(
-                    pref(
-                        f"block {block.get('typeName')} (localId={block_id}) a une source "
-                        f"localId={ref} PLUS PETITE ou égale (doit être > lui) "
-                        f"[REX: IndexOutOfRangeException]"
-                    )
-                )
-                break
+        for var in block.findall(".//pou:inputVariables/pou:variable", NS):
+            fp = var.get("formalParameter")
+            cpi = var.find("pou:connectionPointIn", NS)
+            if cpi is not None:
+                conn = cpi.find("pou:connection", NS)
+                if conn is not None and conn.get("refLocalId"):
+                    ref = int(conn.get("refLocalId"))
+                    if fp == "EN" and ref == 0:
+                        continue  # EN relié au leftPowerRail (localId=0) est standard CODESYS
+                    if ref <= block_id:
+                        errors.append(
+                            pref(
+                                f"block {block.get('typeName')} (localId={block_id}) a une source "
+                                f"localId={ref} (param {fp}) PLUS PETITE ou égale (doit être > lui) "
+                                f"[REX: IndexOutOfRangeException]"
+                            )
+                        )
+                        break
 
     # --- 2. Pas de coil doublon sur un output assigné dans le bloc ---
     assigned_in_block = set()
