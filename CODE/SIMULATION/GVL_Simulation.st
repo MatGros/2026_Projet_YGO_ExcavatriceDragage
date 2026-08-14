@@ -1,9 +1,9 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
-   📄 Lot L6 : Refonte à 5 flags principaux (1 bit maître + 4 domaines)
-   🎯 Polarité positive : TRUE = simulé, FALSE = réel (par défaut).
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   🎯 Polarité positive : TRUE = simulé/stimulus actif ; FALSE = réel/repos.
+   🔒 Uniquement consommée à la frontière PRG_02_Acquisition et par le banc.
    ═══════════════════════════════════════════════════════════════ *)
 
 {attribute 'qualified_only'}
@@ -13,22 +13,30 @@ VAR_GLOBAL
 
     // 🌐 Activation par domaine (simulé si SimulationModeActive AND Sim<Domaine>Active)
     SimWinchActive              : BOOL := FALSE; // M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu
-    SimTranslationActive        : BOOL := FALSE; // AC600 : StatusWord/fréquence, 5 capteurs, frein M3
-    SimOperatorActive           : BOOL := FALSE; // Joystick : bus CANopen + RawX/RawY/Button
-    SimMachineActive            : BOOL := FALSE; // Chaîne AU, contacteur puissance, réarmement, phases, thermiques freins/hydraulique, Kobold
+    SimTranslationActive        : BOOL := FALSE; // M3 : AC600, fréquence, 5 capteurs et frein
+    SimOperatorActive           : BOOL := FALSE; // Joystick : bus CANopen, axes RawX/RawY et homme-mort brut
+    SimSafetyActive             : BOOL := FALSE; // AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs
 
-    // 🖐️ Stimuli de banc — ENTRÉES du modèle, jamais des forçages du programme
-    SimM3SensorsWordActive      : BOOL := FALSE;
-    SimM3SensorsWord            : BYTE := 16#01;
+    // ↔️ STIMULI TRANSLATION M3 — override manuel du mot capteurs, sinon modèle dynamique.
+    // Bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance ; 16#07 = position P2 (00111).
+    SimM3SensorsWordOverrideActive : BOOL := FALSE; // TRUE = SimM3SensorsWord remplace le modèle ; réserver aux injections ciblées
+    SimM3SensorsWord               : BYTE := 16#07; // Mot manuel valide nominal : P2
 
-    SimJoystickRawX             : INT := 5000;
-    SimJoystickRawY             : INT := 5000;
-    SimJoystickRawButton        : BOOL := FALSE;
+    // 🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
+    SimJoystickLeftActive       : BOOL := FALSE; // RawX=0, RawY=5000
+    SimJoystickRightActive      : BOOL := FALSE; // RawX=10000, RawY=5000
+    SimJoystickForwardActive    : BOOL := FALSE; // RawX=5000, RawY=10000
+    SimJoystickReverseActive    : BOOL := FALSE; // RawX=5000, RawY=0
+    SimJoystickRawX             : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
+    SimJoystickRawY             : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
+    SimJoystickRawButton        : BOOL := FALSE; // Homme-mort brut : TRUE = bouton joystick appuyé
 
-    SimKoboldContactValue       : BOOL := FALSE;
-    SimEncoderSpeedFactor       : REAL := 1.0;   // ⚠️ Remis à 1.0 (défaut nominal)
+    // 🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
+    SimEncoderSpeedFactor       : REAL := 1.0;  // Multiplicateur vitesse codeurs simulés ; 1.0 = nominal
+    SimSyncDeviationInjectM1    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M1 simulée
+    SimSyncDeviationInjectM2    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M2 simulée
+    SimSyncDeviationOffset_M    : REAL := 0.5; // Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset
 
-    SimSyncDeviationInjectM1    : BOOL := FALSE;
-    SimSyncDeviationInjectM2    : BOOL := FALSE;
-    SimSyncDeviationOffset_M    : REAL := 0.5;
+    // 🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
+    SimKoboldContactValue       : BOOL := FALSE; // TRUE = Kobold détecte un contact fond simulé
 END_VAR

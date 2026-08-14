@@ -1,4 +1,4 @@
-# Analyse Fonctionnelle — Partie 11 : Fonction Translation M3 (v2.1)
+# Analyse Fonctionnelle — Partie 11 : Fonction Translation M3 (v2.2)
 
 > 🎯 **Raison d'être & Responsabilité Unique** :
 > - **Problème résolu** : Positionnement transversal du chariot/pont le long de la digue (Moteur M3 via variateur AC600 EtherCAT) et sécurisation contre les collisions physiques.
@@ -26,7 +26,7 @@ Catalogue synthétique des **6 grands tests macro fonctionnels** du domaine Tran
 | <nobr><code>TC-P11-010</code></nobr> | **Pos. & Butées** | 5 capteurs ➔ pos. qualifiée (Travail/Trémie/Extrêmes). Incohérence ➔ Défaut imm. | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Translation_PositionDecoder</code></small> |
 | <nobr><code>TC-P11-020</code></nobr> | **Sécurité M3** | Défaut thermique M3 / AC600 ➔ rampe rapide + alarme. | <nobr><code>⚡ AUTO+SITE</code></nobr> | <small><code>FB_Safety_Translation</code></small> |
 | <nobr><code>TC-P11-030</code></nobr> | **Anti-télescopage** | Trans. bloquée si Benne bas (`BucketIsUpConfirmed=FALSE`). Descente bloquée si désaligné. | <nobr><code>⚡ AUTO+SITE</code></nobr> | <small><code>FB_Safety_Translation</code></small> |
-| <nobr><code>TC-P11-040</code></nobr> | **Vitesse & Rampes** | Joystick/SemiAuto ➔ Rampe ➔ AC600. Ralentissement auto sur PV. | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Translation</code></small> |
+| <nobr><code>TC-P11-040</code></nobr> | **Vitesse & Rampes** | Joystick/SemiAuto ➔ Rampe ➔ AC600. Ralentissement auto PV→Trémie, P2→P1 (Maintenance interdite) et P1→Maintenance (Maintenance autorisée). | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Translation</code></small> |
 | <nobr><code>TC-P11-050</code></nobr> | **Barrière Sorties** | Agrégation AU + Safety + Interlocks. Zéro redémarrage auto. | <nobr><code>⚡ AUTO+SITE</code></nobr> | <small><code>FB_TranslationOutputInterlock_LD</code></small> |
 | <nobr><code>TC-P11-060</code></nobr> | **Bypass & MAINT** | En `MAINT_N2`, sécurités actives par défaut. Neutralisation = action IHM dédiée. | <nobr><code>💻 AUTO</code></nobr> | <small><code>FB_Modes</code><br><code>FB_Translation</code></small> |
 
@@ -36,10 +36,10 @@ Catalogue synthétique des **6 grands tests macro fonctionnels** du domaine Tran
 
 | Fiche | FB détaillé | Contenu |
 |---|---|---|
-| [`FB_Translation_PositionDecoder_v1.0.md`](AF_Partie-11_Fonction_Translation/FB_Translation_PositionDecoder_v1.0.md) | `FB_Translation_PositionDecoder` | 5 capteurs → mot, position qualifiée, incohérence |
-| [`FB_Safety_Translation_v1.0.md`](AF_Partie-11_Fonction_Translation/FB_Safety_Translation_v1.0.md) | `FB_Safety_Translation` | 8 bits ErrorId, Méca A/B, anti-télescopage, bypass |
-| [`FB_Translation_v1.0.md`](AF_Partie-11_Fonction_Translation/FB_Translation_v1.0.md) | `FB_Translation` (+ `FB_Brake`, `FB_Ramp`) | Mouvement, rampe, mot AC600, ralentissement PV |
-| [`FB_TranslationOutputInterlock_LD_v1.0.md`](AF_Partie-11_Fonction_Translation/FB_TranslationOutputInterlock_LD_v1.0.md) | `FB_TranslationOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
+| [`FB_Translation_PositionDecoder_v1.1.md`](AF_Partie-11_Fonction_Translation/FB_Translation_PositionDecoder_v1.1.md) | `FB_Translation_PositionDecoder` | 5 capteurs → mot, position qualifiée, incohérence |
+| [`FB_Safety_Translation_v1.1.md`](AF_Partie-11_Fonction_Translation/FB_Safety_Translation_v1.1.md) | `FB_Safety_Translation` | 8 bits ErrorId, Méca A/B, anti-télescopage, bypass |
+| [`FB_Translation_v1.1.md`](AF_Partie-11_Fonction_Translation/FB_Translation_v1.1.md) | `FB_Translation` (+ `FB_Brake`, `FB_Ramp`) | Mouvement, rampe, mot AC600, ralentissement PV |
+| [`FB_TranslationOutputInterlock_LD_v1.1.md`](AF_Partie-11_Fonction_Translation/FB_TranslationOutputInterlock_LD_v1.1.md) | `FB_TranslationOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
 
 <div style="display:flex; flex-direction:column; align-items:stretch; width:100%; margin:12px 0;">
   <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:12px;">

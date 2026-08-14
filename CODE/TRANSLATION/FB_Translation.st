@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable > SafeStop > StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).

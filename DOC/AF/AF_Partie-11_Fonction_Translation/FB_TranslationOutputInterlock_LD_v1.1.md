@@ -1,6 +1,6 @@
-# FB_TranslationOutputInterlock_LD — Spec composant (v1.0)
+# FB_TranslationOutputInterlock_LD — Spec composant (v1.1)
 
-> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.0.md`](../AF_Partie-11_Fonction_Translation_v2.0.md) §5.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.2.md`](../AF_Partie-11_Fonction_Translation_v2.2.md) §5.
 > Rôle de **ce** document : barrière finale M3 (watchdog frein, gate double condition,
 > anti-redémarrage, mot AC600) — et **catalogue unique** des `TC-P11-006` à `TC-P11-009`.
 > Source code : `CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st` · instance `Outputs.instTranslationOutputInterlock_LD`.

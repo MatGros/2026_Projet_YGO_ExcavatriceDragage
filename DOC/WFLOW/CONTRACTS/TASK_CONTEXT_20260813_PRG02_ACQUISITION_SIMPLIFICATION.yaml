@@ -16,10 +16,10 @@ contract:
       statement: "Sans simulation d'un domaine, HwIn.<Domaine> est issu de HwReal.<Domaine>."
       verified_by: "Revue ST et Watch CODESYS des quatre domaines"
     - id: AC3
-      statement: "Avec SimulationModeActive et SimMachineActive, HwIn.Machine est issu de HwSim.Machine et les trois diagnostics DI sont OK pour le banc sans materiel."
+      statement: "Avec SimulationModeActive et SimSafetyActive, HwIn.Machine est issu de HwSim.Machine et les trois diagnostics DI sont OK pour le banc sans materiel."
       verified_by: "Watch CODESYS sans modules DI reels"
     - id: AC4
-      statement: "Une simulation partielle ne masque pas les diagnostics DI reels lorsque SimMachineActive est FALSE."
+      statement: "Une simulation partielle ne masque pas les diagnostics DI reels lorsque SimSafetyActive est FALSE."
       verified_by: "Watch CODESYS avec simulation Treuil ou Translation seulement"
     - id: AC5
       statement: "Les polarites et les appelants metier de HwIn restent inchanges."

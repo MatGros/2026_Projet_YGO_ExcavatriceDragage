@@ -53,7 +53,7 @@
         🎯 Rôle : Anti-télescopage Benne/Translation et verrous de sécurité M3
         🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
         🧩 Architecture : Composition interne Logic/Output
-        📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md
+        📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
      *)
      ```
    - **Guide des Émojis Sémantiques de Ligne** :

@@ -10,7 +10,7 @@ STRUCT
     Step2_WinchSelected          : BOOL; (* TRUE = Treuil sélectionné en MAINT_N2 ➔ Bouton IHM : GVL_IHM.Modes.Cmd.TglJoystickMaster / Selection Treuil *)
 
     (* 2. Santé Matériel & Bus *)
-    Step3_EncoderAvailable       : BOOL; (* TRUE = Codeur EtherCAT OK & E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimMachineActive=1 *)
+    Step3_EncoderAvailable       : BOOL; (* TRUE = Codeur EtherCAT OK & E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimSafetyActive=1 *)
 
     (* 3. État Physique Machine *)
     Step4_ContactorsReleased     : BOOL; (* TRUE = Tous les contacteurs retombés (attendre l'arrêt complet) *)

@@ -59,7 +59,7 @@ Un seul appel, dans `PRG_07_Supervision`, après que tous les domaines aient pub
 | `InputModuleFault` | `BOOL` | Agrégat modules DI (`PRG_02_Acquisition`) |
 | `LocalDigitalIoOk`, `Vh0800EndOk`, `Vh0808EtpOk` | `BOOL` | États modules individuels |
 | `Auth` | `ST_Modes_Autorisations` | Mode et autorisations (`PRG_03_Modes_Cycle`) |
-| `SimulationModeActive`, `SimWinchActive`, `SimTranslationActive`, `SimOperatorActive`, `SimMachineActive` | `BOOL` | Contexte simulation (`GVL_Simulation`) |
+| `SimulationModeActive`, `SimWinchActive`, `SimTranslationActive`, `SimOperatorActive`, `SimSafetyActive` | `BOOL` | Contexte simulation (`GVL_Simulation`) |
 | `WinchM1`, `WinchM2` | `ST_WinchHMI` | Image publique déjà produite (`GVL_IHM.M1TreuilRetenue`, `.M2TreuilBenne`) |
 | `Sync` | `ST_SyncHMI` | Image publique synchro (`GVL_IHM.M1M2Sync`) |
 | `Translation` | `ST_TranslationHMI` | Image publique translation (`GVL_IHM.TranslationM3`) |

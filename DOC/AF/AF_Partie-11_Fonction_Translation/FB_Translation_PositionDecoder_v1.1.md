@@ -1,6 +1,6 @@
-# FB_Translation_PositionDecoder — Spec composant (v1.0)
+# FB_Translation_PositionDecoder — Spec composant (v1.1)
 
-> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.0.md`](../AF_Partie-11_Fonction_Translation_v2.0.md) §2.
+> Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.2.md`](../AF_Partie-11_Fonction_Translation_v2.2.md) §2.
 > Rôle de **ce** document : décodage 5 capteurs TOR → mot de progression + butées extrêmes —
 > et **catalogue unique** des `TC-P11-001`, `TC-P11-002`.
 > Source code : `CODE/TRANSLATION/FB_Translation_PositionDecoder.st` · instance `Acquisition.instPositionDecoder`.

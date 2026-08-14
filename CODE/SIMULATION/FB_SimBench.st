@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
    📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
@@ -52,7 +52,6 @@ VAR_INPUT
     M3_Direction               : INT;              // 1 = Avant, -1 = Arrière, 0 = Arrêt
     M3_SpeedRefPct             : REAL;
     M3_BrakeCmd                : BOOL;             // TRUE = commande desserrage frein M3
-    M3_TargetNum               : INT;              // Cible sélectionnée (0..4)
 
     PowerKeepAlive_A           : BOOL;             // TRUE = relais A maintenu sagement par le PLC
     PowerKeepAlive_B           : BOOL;             // TRUE = relais B maintenu sagement par le PLC
@@ -64,9 +63,13 @@ VAR_INPUT
     SimSyncDeviationInjectM2   : BOOL := FALSE;
     SimSyncDeviationOffset_M   : REAL := 0.5;
 
-    SimM3SensorsWordActive     : BOOL := FALSE;
-    SimM3SensorsWord           : BYTE := 16#01;
+    SimM3SensorsWordOverrideActive : BOOL := FALSE;
+    SimM3SensorsWord               : BYTE := 16#07;
 
+    SimJoystickLeftActive      : BOOL := FALSE;
+    SimJoystickRightActive     : BOOL := FALSE;
+    SimJoystickForwardActive   : BOOL := FALSE;
+    SimJoystickReverseActive   : BOOL := FALSE;
     SimJoystickRawX            : INT := 5000;
     SimJoystickRawY            : INT := 5000;
     SimJoystickRawButton       : BOOL := FALSE;
@@ -99,6 +102,10 @@ VAR_IN_OUT
     RawPosM2                   : UDINT;            // Mémoire _SimEncoderRawPosM2 dans GVL_PERSISTENT
 END_VAR
 
+VAR CONSTANT
+    CST_M3FullTravelTimeS       : REAL := 8.0; // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
+END_VAR
+
 VAR
     // Modèles sous-jacents
     instSimEncoderM1           : FB_Sim_Encoder;
@@ -115,6 +122,8 @@ VAR
 
     M3_RelayFwd                : BOOL;
     M3_RelayRev                : BOOL;
+
+    SimJoystickDirectionCount  : INT;
 
     M3_ActualFreqHz            : UINT;
     M3_StatusWordSim           : WORD;
@@ -221,25 +230,24 @@ M3_RelayFwd := (M3_Direction = 1);
 M3_RelayRev := (M3_Direction = -1);
 
 instSimTranslation(
-    Enable      := TRUE,
-    TargetNum   := M3_TargetNum,
-    RelayFwd    := M3_RelayFwd,
-    RelayRev    := M3_RelayRev,
-    TravelTimeS := 8.0,
-    PVLeadTimeS := 2.0
+    Enable          := TRUE,
+    Direction       := M3_Direction,
+    SpeedRefPct     := M3_SpeedRefPct,
+    FullTravelTimeS := CST_M3FullTravelTimeS
 );
 
-// Remplissage capteurs de position M3 :
-IF SimM3SensorsWordActive THEN
-    Translation.M3_PosTremie_DI      := SimM3SensorsWord.0;
-    Translation.M3_PosPV_DI          := SimM3SensorsWord.1;
-    Translation.M3_PosP2_DI          := SimM3SensorsWord.2;
-    Translation.M3_PosP1_DI          := SimM3SensorsWord.3;
-    Translation.M3_PosMaintenance_DI := SimM3SensorsWord.4;
+// Remplissage capteurs de position M3 : l'override manuel conserve exactement le
+// même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
+IF SimM3SensorsWordOverrideActive THEN
+    Translation.M3_PosTremie_DI      := SimM3SensorsWord.4;
+    Translation.M3_PosPV_DI          := SimM3SensorsWord.3;
+    Translation.M3_PosPVP2_DI        := SimM3SensorsWord.2;
+    Translation.M3_PosP1_DI          := SimM3SensorsWord.1;
+    Translation.M3_PosMaintenance_DI := SimM3SensorsWord.0;
 ELSE
     Translation.M3_PosTremie_DI      := instSimTranslation.PosTremie;
     Translation.M3_PosPV_DI          := instSimTranslation.PosPV;
-    Translation.M3_PosP2_DI          := instSimTranslation.PosP2;
+    Translation.M3_PosPVP2_DI        := instSimTranslation.PosP2;
     Translation.M3_PosP1_DI          := instSimTranslation.PosP1;
     Translation.M3_PosMaintenance_DI := instSimTranslation.PosMaintenance;
 END_IF;
@@ -274,24 +282,37 @@ instSimJoystick(
     MaxRaw     := 10000
 );
 
-// Permet aux stimuli de banc de surcharger le retour du joystick si spécifié :
-IF SimJoystickRawX <> 5000 THEN
+// Les boutons directionnels simplifient les essais : une commande unique impose
+// une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
+SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeftActive)
+                           + BOOL_TO_INT(SimJoystickRightActive)
+                           + BOOL_TO_INT(SimJoystickForwardActive)
+                           + BOOL_TO_INT(SimJoystickReverseActive);
+IF SimJoystickDirectionCount = 1 THEN
+    IF SimJoystickLeftActive THEN
+        Operator.JoyXRaw_ANA1 := 0;
+        Operator.JoyYRaw_ANA2 := 5000;
+    ELSIF SimJoystickRightActive THEN
+        Operator.JoyXRaw_ANA1 := 10000;
+        Operator.JoyYRaw_ANA2 := 5000;
+    ELSIF SimJoystickForwardActive THEN
+        Operator.JoyXRaw_ANA1 := 5000;
+        Operator.JoyYRaw_ANA2 := 10000;
+    ELSE
+        Operator.JoyXRaw_ANA1 := 5000;
+        Operator.JoyYRaw_ANA2 := 0;
+    END_IF;
+ELSIF SimJoystickDirectionCount > 1 THEN
+    // Deux directions simultanées ne créent jamais une diagonale / un double mouvement implicite.
+    Operator.JoyXRaw_ANA1 := 5000;
+    Operator.JoyYRaw_ANA2 := 5000;
+ELSE
     Operator.JoyXRaw_ANA1 := SimJoystickRawX;
-ELSE
-    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
-END_IF;
-
-IF SimJoystickRawY <> 5000 THEN
     Operator.JoyYRaw_ANA2 := SimJoystickRawY;
-ELSE
-    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
 END_IF;
 
-IF SimJoystickRawButton THEN
-    Operator.JoyBtnRaw := TRUE;
-ELSE
-    Operator.JoyBtnRaw := instSimJoystick.RawButton;
-END_IF;
+// Homme-mort : stimulus brut amont, identique au bouton physique.
+Operator.JoyBtnRaw := SimJoystickRawButton;
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
 Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4

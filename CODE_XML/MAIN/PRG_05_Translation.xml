@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.367311" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.367311">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:25.991438" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:25.991438">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -911,7 +911,7 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5 (après PRG_04_Treuils_Benne).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md
+   📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🛡️ Sécurité : instSafetyTranslationM3 (FB_Safety_Translation) câblée en parallèle
       de instTranslationM3 depuis le 2026-08-05 (lot M4) — SafeStop/PowerCutOff réels.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1792,7 +1792,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
       thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
@@ -2538,7 +2538,7 @@ le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise 
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
@@ -3068,7 +3068,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
       la position estimée continue en mètres (0.0 m à la Maintenance -&gt; +X m à la Trémie),
       avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
