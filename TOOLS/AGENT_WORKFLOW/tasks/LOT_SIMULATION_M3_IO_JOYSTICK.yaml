@@ -1,0 +1,119 @@
+contract:
+  task_id: LOT_SIMULATION_M3_IO_JOYSTICK
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Rendre la simulation PLC déterministe et exploitable pour valider les mouvements M3,
+    tout en propageant le nouveau nom matériel M3_PosPVP2_DI sans modifier le mapping CODESYS.
+
+  acceptance:
+    - id: AC1
+      statement: "Toute référence ST ou documentaire active au point matériel M3_PosP2_DI est remplacée par M3_PosPVP2_DI ; les concepts métier SensorP2, TranslationPosP2 et TranslationAtP2 restent inchangés."
+      verified_by: "rg -n 'M3_PosP2_DI' CODE DOC --glob '!ARCHIVES/**' retourne vide ; rg -n 'M3_PosPVP2_DI' CODE DOC confirme l'acquisition, ST_HwTranslation et la documentation E/S."
+    - id: AC2
+      statement: "Aucun fichier sous PRJ_CODESYS/, notamment Device.export, n'est modifié ; le bundle est exclusivement régénéré depuis les sources ST/XML."
+      verified_by: "git diff --name-only -- PRJ_CODESYS doit retourner vide ; python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py ."
+    - id: AC3
+      statement: "SimMachineActive est renommé SimSafetyActive dans les sources et la documentation active, sans flag doublon ni référence restante."
+      verified_by: "rg -n 'SimMachineActive' CODE DOC --glob '!ARCHIVES/**' retourne vide ; rg -n 'SimSafetyActive' CODE DOC confirme les consommateurs."
+    - id: AC4
+      statement: "Un front montant de SimulationModeActive active les quatre domaines de simulation ; un front descendant désactive les domaines et remet les stimuli de simulation à leurs valeurs nominales documentées."
+      verified_by: "Revue ST de PRG_02_Acquisition/FB dédié et test manuel CODESYS : fronts montants/descendants observés dans GVL_Simulation et HwIn."
+    - id: AC5
+      statement: "Le modèle M3 ne publie que les six mots capteurs valides et traverse les zones dans les deux sens selon la commande ; les ralentissements PV→Trémie, P2→P1 et P1→Maintenance restent observables."
+      verified_by: "Test de simulation CODESYS : observation successive des mots 11111, 01111, 00111, 00011, 00001, 00000 ; vérification des ralentissements/arrêts dans PRG_05_Translation."
+    - id: AC6
+      statement: "Les stimuli joystick directionnels produisent uniquement 0, 5000 ou 10000 sur RawX/RawY ; SimJoystickRawButton conserve son rôle d'homme-mort brut."
+      verified_by: "Revue ST : table de sélection des boutons et SimJoystickRawButton câblé vers HwIn.Operator.JoyBtnRaw ; test manuel CODESYS avec FB_Joystick."
+    - id: AC7
+      statement: "GVL_Simulation est classée par domaine et chaque stimulus documente son rôle, sa polarité, sa valeur nominale et ses effets ; SimM3SensorsWordOverrideActive décrit explicitement l'override manuel."
+      verified_by: "Revue de CODE/SIMULATION/GVL_Simulation.st et DOC/AF/AF_Partie-13_Fonction_Simulation_vX.Y.md."
+    - id: AC8
+      statement: "La documentation active P11 décrit les trois zones de ralentissement et ne contient plus de lien vers AF_Partie-11_Fonction_Translation_v2.0.md."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py --fix ; rg -n 'Fonction_Translation_v2.0' DOC/AF CODE --glob '!ARCHIVES/**' retourne vide."
+    - id: AC9
+      statement: "Le nom de fichier est identique au nom de POU. CODE/MAIN/PRG_02_Acquisition.st déclare PROGRAM PRG_02_Acquisition ; aucun POU MAIN n'est renommé."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py"
+    - id: AC10
+      statement: "Le suffixe de chaque fichier MAIN modifié est identique au langage généré dans le bundle : PRG_02_Acquisition.st est généré en ST et PRG_06_Outputs_LD.st reste généré en LD."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py"
+
+  scope:
+    allowed:
+      - CODE/SIMULATION/GVL_Simulation.st
+      - CODE/SIMULATION/FB_SimBench.st
+      - CODE/SIMULATION/FB_Sim_Translation.st
+      - CODE/MAIN/PRG_02_Acquisition.st
+      - CODE/MAIN/PRG_05_Translation.st
+      - CODE/SUPERVISION/_TYPES/ST_HwTranslation.st
+      - CODE/SUPERVISION/_TYPES/ST_TranslationState.st
+      - CODE/SUPERVISION/_TYPES/ST_TranslationHMI.st
+      - CODE/DEPANNAGE/FB_TroubleshootingView.st
+      - CODE/MAIN/PRG_07_Supervision.st
+      - CODE/TRANSLATION/*.st
+      - DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+      - DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+      - DOC/AF/AF_Partie-11_Fonction_Translation/*.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting/*.md
+      - DOC/TESTS/CHECKLISTS/*.md
+      - ARCHIVES/Doc/** (uniquement déplacement des versions AF remplacées)
+      - TOOLS/AGENT_WORKFLOW/tests/test_simulation_m3_guard.py
+      - CODE_XML/**
+      - TOOLS/AGENT_WORKFLOW/tasks/LOT_SIMULATION_M3_IO_JOYSTICK.yaml
+    forbidden:
+      - PRJ_CODESYS/**
+      - ARCHIVES/** hors déplacement des versions AF explicitement autorisé
+      - TOOLS/AGENT_WORKFLOW/config/Device_IO_20260814.csv
+      - CODE/MAIN/PRG_06_Outputs_LD.st
+      - CODE/TREUILS/**
+      - CODE/JOYSTICK/FB_Joystick.st
+      - Tout commit, push, reset ou rebase
+
+  conservation:
+    must_survive:
+      - "Les six mots capteurs M3 valides et leurs polarités actuelles."
+      - "Les règles métier de PRG_05 : PV→Trémie, P2→P1 si Maintenance interdite, P1→Maintenance si autorisée."
+      - "SimJoystickRawButton reste l'unique stimulus homme-mort brut."
+      - "La barrière de sortie PRG_06_Outputs_LD et les mappings CODESYS ne sont pas modifiés."
+      - "Les concepts fonctionnels P2 ne sont pas renommés par le renommage du point matériel PVP2."
+    dropped_on_purpose:
+      - "Aucun comportement mouvement réel n'est supprimé."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - validation-output
+    - residual-risks
+
+  models_allowed:
+    - "ollama/deepseek-v4-flash"
+    - "zen/*"
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Toute ambiguïté de polarité, séquence capteur, arbitrage joystick, test impossible ou
+    impact hors scope est signalé immédiatement. Aucune modification de Device.export ou du
+    mapping CODESYS n'est autorisée.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: "Pi orchestrateur"
+  completed_at: "2026-08-14"
+  status: COMPLETED
+  summary: "Simulation M3/joystick, renommage PVP2, AF versionnées et bundle régénéré ; palier C vert."
+  evidence_submitted:
+    - "G200_check_linkage.py --report: PASS (67 OK, 0 KO)"
+    - "run_all_gates.py --palier C: PASS"
+    - "pytest test_simulation_m3_guard.py: PASS"
+
+validation:
+  status: PENDING
+  validated_by: "Utilisateur"
+  validated_at: ""
+  notes: "Plan validé par l'utilisateur : ST/docs/bundle seulement, aucun mapping CODESYS."

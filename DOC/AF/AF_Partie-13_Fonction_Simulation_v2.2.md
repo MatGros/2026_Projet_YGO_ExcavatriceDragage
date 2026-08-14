@@ -1,4 +1,4 @@
-# 🧪 Analyse Fonctionnelle — Partie 13 : Simulation (v2.1)
+# 🧪 Analyse Fonctionnelle — Partie 13 : Simulation (v2.2)
 
 > **Projet** : Excavatrice de dragage — CODESYS 3.5
 > **Statut** : référence active · décision documentaire préalable au retrait de `PRG_01/FB_Input`
@@ -67,18 +67,30 @@ et la preuve du filtrage matériel ou logiciel.
 ## 3. 🎛️ Commande de simulation
 
 `GVL_Simulation` est lu uniquement par l'acquisition ST actuelle, le banc et les publications/diagnostics
-autorisés. Polarité positive : `TRUE = simulation active`; tous les flags sont `FALSE` au démarrage.
+autorisés. Polarité positive : `TRUE = simulation/stimulus actif`; tous les flags sont `FALSE` au démarrage.
 
-| Signal | Domaine simulé |
+| Signal | Domaine ou rôle |
 |---|---|
-| `SimulationModeActive` | 🔑 bit maître : aucune simulation sans lui |
+| `SimulationModeActive` | 🔑 bit maître : front montant active les 4 domaines ; front descendant les désactive et remet les stimuli au nominal |
 | `SimWinchActive` | M1/M2 : codeurs, contacteurs, freins, thermiques, haut, câble |
-| `SimTranslationActive` | AC600 M3, fréquence et cinq positions |
-| `SimOperatorActive` | joystick CANopen et signaux bruts |
-| `SimMachineActive` | chaîne AU, contacteur, réarmement, phases, Kobold, hydrauliques |
+| `SimTranslationActive` | AC600 M3, fréquence, cinq capteurs et frein |
+| `SimOperatorActive` | joystick CANopen, axes bruts et homme-mort |
+| `SimSafetyActive` | chaîne AU, contacteur, réarmement, phases, thermiques, Kobold et auxiliaires communs |
 
 Le sélecteur est atomique par domaine : `HwIn.<Domaine> := HwSim.<Domaine>` ou
 `HwReal.<Domaine>`. Il interdit tout mélange réel/simulé dans un même domaine.
+
+### Stimuli de banc
+
+| Famille | Champs | Sémantique |
+|---|---|---|
+| ↔️ M3 | `SimM3SensorsWordOverrideActive`, `SimM3SensorsWord` | Override manuel uniquement ; bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance. Le modèle dynamique reste la source nominale. |
+| 🕹️ Joystick | `SimJoystickLeftActive`, `SimJoystickRightActive`, `SimJoystickForwardActive`, `SimJoystickReverseActive` | Un seul bouton impose `0`/`5000`/`10000`. Plusieurs boutons ⇒ neutre. |
+| 🕹️ Homme-mort | `SimJoystickRawButton` | TRUE simule le bouton brut ; le contrôle homme-mort de `FB_Joystick` reste actif. |
+| 🪝 Synchronisation | `SimSyncDeviationInjectM1/M2`, `SimSyncDeviationOffset_M` | Front montant : saut persistant de position simulée afin de tester l'écart M1/M2. |
+
+Au front descendant du bit maître, tous les flags de domaine et stimuli ci-dessus reprennent leurs
+valeurs nominales. Les positions codeurs persistantes ne sont pas des stimuli et ne sont pas effacées.
 
 ## 4. 🧩 Modèle de banc
 
@@ -88,7 +100,7 @@ précédent, les stimuli et `HwReal`; il ne lit aucune GVL. Il compose :
 | Bloc | Rôle | Convention critique |
 |---|---|---|
 | `FB_Sim_Encoder` ×2 | position COD1/COD2, presets et écart de synchro | les positions suivent les commandes treuil |
-| `FB_Sim_Translation` | trajet, positions M3 et état AC600 | mot de cinq capteurs cohérent ou stimulus explicite |
+| `FB_Sim_Translation` | trajet continu M3, positions et état AC600 | ne publie que les six mots thermomètre valides ; progression à vitesse commandée |
 | `FB_Sim_Joystick` | valeurs Hall et homme-mort simulables | neutre = 5000 ; le contrôle homme-mort reste actif |
 | `FB_Sim_Safety` | chaîne AU, contacteur et réarmement | commande maintenue `PowerKeepAlive_A/B` |
 
@@ -134,9 +146,10 @@ Les gates Python interdisent désormais :
 1. Importer le bundle unique `CODE_XML/CODE_Bundle.xml` dans `Application` via
    **Project → Import PLCopenXML**.
 2. En vue instance, ouvrir `PRG_02_Acquisition` et comparer `HwReal`, `HwSim`, `HwIn`.
-3. Machine arrêtée : activer le bit maître puis un seul domaine; contrôler que `HwIn` bascule
-   entièrement sur l'image attendue.
-4. Avant retour réel : désactiver les quatre domaines, puis `SimulationModeActive`; vérifier les
-   bypass RETAIN et l'absence de défaut actif.
+3. Machine arrêtée : activer le bit maître ; les quatre domaines sont activés automatiquement.
+   Contrôler que chaque `HwIn.<Domaine>` bascule entièrement sur son image simulée.
+4. Pour tester un domaine réel, désactiver explicitement son flag pendant la session.
+5. Avant retour réel : désactiver `SimulationModeActive`; le front descendant remet tous les
+   flags et stimuli au nominal. Vérifier les bypass RETAIN et l'absence de défaut actif.
 
 📌 Suivi organisationnel : `DOC/WFLOW/PLAN_TASK.md`.

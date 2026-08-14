@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-04T21:59:39.816163" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-04T21:59:39.816163">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:07:00.375327" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:07:00.375327">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -49,7 +49,7 @@ TRUE = Mode MAINT_N1 ou MAINT_N2 actif ➔ Commutateur Mode IHM : GVL_IHM.Modes<
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Santé Matériel &amp; Bus
-TRUE = Codeur EtherCAT OK &amp; E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimMachineActive=1</xhtml>
+TRUE = Codeur EtherCAT OK &amp; E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimSafetyActive=1</xhtml>
               </documentation>
             </variable>
             <variable name="Step4_ContactorsReleased">

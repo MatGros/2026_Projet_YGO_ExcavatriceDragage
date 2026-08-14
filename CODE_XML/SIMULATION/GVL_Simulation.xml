@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.370751" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.370751">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:08:41.539466" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:08:41.539466">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -62,7 +62,7 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">AC600 : StatusWord/fréquence, 5 capteurs, frein M3</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">M3 : AC600, fréquence, 5 capteurs et frein</xhtml>
           </documentation>
         </variable>
         <variable name="SimOperatorActive">
@@ -73,10 +73,10 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick : bus CANopen + RawX/RawY/Button</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick : bus CANopen, axes RawX/RawY et homme-mort brut</xhtml>
           </documentation>
         </variable>
-        <variable name="SimMachineActive">
+        <variable name="SimSafetyActive">
           <type>
             <BOOL />
           </type>
@@ -84,10 +84,10 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU, contacteur puissance, réarmement, phases, thermiques freins/hydraulique, Kobold</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs</xhtml>
           </documentation>
         </variable>
-        <variable name="SimM3SensorsWordActive">
+        <variable name="SimM3SensorsWordOverrideActive">
           <type>
             <BOOL />
           </type>
@@ -95,7 +95,9 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖐️ Stimuli de banc — ENTRÉES du modèle, jamais des forçages du programme</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ STIMULI TRANSLATION M3 — override manuel du mot capteurs, sinon modèle dynamique.
+Bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance ; 16#07 = position P2 (00111).
+TRUE = SimM3SensorsWord remplace le modèle ; réserver aux injections ciblées</xhtml>
           </documentation>
         </variable>
         <variable name="SimM3SensorsWord">
@@ -103,8 +105,56 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
             <BYTE />
           </type>
           <initialValue>
-            <simpleValue value="16#01" />
+            <simpleValue value="16#07" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot manuel valide nominal : P2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickLeftActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
+RawX=0, RawY=5000</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickRightActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">RawX=10000, RawY=5000</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickForwardActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">RawX=5000, RawY=10000</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickReverseActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">RawX=5000, RawY=0</xhtml>
+          </documentation>
         </variable>
         <variable name="SimJoystickRawX">
           <type>
@@ -113,6 +163,9 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
           <initialValue>
             <simpleValue value="5000" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel</xhtml>
+          </documentation>
         </variable>
         <variable name="SimJoystickRawY">
           <type>
@@ -121,6 +174,9 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
           <initialValue>
             <simpleValue value="5000" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel</xhtml>
+          </documentation>
         </variable>
         <variable name="SimJoystickRawButton">
           <type>
@@ -129,14 +185,9 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
           <initialValue>
             <simpleValue value="FALSE" />
           </initialValue>
-        </variable>
-        <variable name="SimKoboldContactValue">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Homme-mort brut : TRUE = bouton joystick appuyé</xhtml>
+          </documentation>
         </variable>
         <variable name="SimEncoderSpeedFactor">
           <type>
@@ -146,7 +197,8 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
             <simpleValue value="1" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Remis à 1.0 (défaut nominal)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
+Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
           </documentation>
         </variable>
         <variable name="SimSyncDeviationInjectM1">
@@ -156,6 +208,9 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
           <initialValue>
             <simpleValue value="FALSE" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant : ajoute SimSyncDeviationOffset_M à la position M1 simulée</xhtml>
+          </documentation>
         </variable>
         <variable name="SimSyncDeviationInjectM2">
           <type>
@@ -164,6 +219,9 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
           <initialValue>
             <simpleValue value="FALSE" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant : ajoute SimSyncDeviationOffset_M à la position M2 simulée</xhtml>
+          </documentation>
         </variable>
         <variable name="SimSyncDeviationOffset_M">
           <type>
@@ -172,6 +230,21 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
           <initialValue>
             <simpleValue value="0.5" />
           </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldContactValue">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
+TRUE = Kobold détecte un contact fond simulé</xhtml>
+          </documentation>
         </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
@@ -187,9 +260,9 @@ M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xh
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
-   📄 Lot L6 : Refonte à 5 flags principaux (1 bit maître + 4 domaines)
-   🎯 Polarité positive : TRUE = simulé, FALSE = réel (par défaut).
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   🎯 Polarité positive : TRUE = simulé/stimulus actif ; FALSE = réel/repos.
+   🔒 Uniquement consommée à la frontière PRG_02_Acquisition et par le banc.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </globalVars>

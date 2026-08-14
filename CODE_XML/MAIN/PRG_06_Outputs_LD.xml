@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T14:39:25.105175" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T14:39:25.105175">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:25.992439" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:25.992439">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -639,7 +639,7 @@ contournement documenté, PAS une préférence de style).</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📤 PRG_06_Outputs_LD — Écriture des SORTIES physiques (PROGRAMME LADDER)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §5
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
    ⚙️ Exécuté par la tâche PLC en position 6 (après PRG_05_Translation).
    📄 Converti automatiquement en Ladder Diagram (&lt;LD&gt;) dans CODESYS.
    🛡️ LOT_STRUCTURE_INTERLOCKS_LD (2026-08) : barrières finales M1/M2/M3

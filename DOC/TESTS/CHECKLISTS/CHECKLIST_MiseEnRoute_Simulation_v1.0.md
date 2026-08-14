@@ -17,7 +17,7 @@
                             └── commandes du scan précédent (boucle fermée)
 ```
 
-**5 variables pilotent tout** (`GVL_Simulation`) :
+**5 variables pilotent la session** (`GVL_Simulation`) :
 
 | Variable | Effet |
 |---|---|
@@ -25,7 +25,7 @@
 | `SimWinchActive` | M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu |
 | `SimTranslationActive` | AC600 : mot d'état, fréquence, 5 capteurs de position, frein M3 |
 | `SimOperatorActive` | Joystick : bus CANopen + `RawX`/`RawY`/`Button` |
-| `SimMachineActive` | Chaîne AU, contacteur de puissance, réarmement, phases, thermique frein, Kobold, hydraulique |
+| `SimSafetyActive` | Chaîne AU, contacteur de puissance, réarmement, phases, thermique frein, Kobold, hydraulique |
 
 👉 **Un domaine est simulé OU réel — jamais un mélange.** C'est volontaire : mélanger réel et
 simulé sur un même sous-ensemble est ce qui a masqué un vrai bug de polarité par le passé.
@@ -38,7 +38,7 @@ simulé sur un même sous-ensemble est ce qui a masqué un vrai bug de polarité
 |---|---|---|
 | 1 | Machine **à l'arrêt**, pas de mouvement en cours | — |
 | 2 | `GVL_Simulation.SimulationModeActive := TRUE` | rien ne doit bouger |
-| 3 | Activer **un seul domaine** pour commencer : `SimWinchActive := TRUE` | `GVL_IHM.Commun.Bypass.*` reflètent l'état simulé |
+| 3 | Vérifier les 4 domaines automatiquement activés ; désactiver explicitement ceux à laisser réels | `GVL_IHM.Commun.Bypass.*` reflètent l'état simulé |
 | 4 | Mode machine : `GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1` | `Modes.State.CurrentMode` suit |
 | 5 | Acquitter les défauts : front sur `GVL_IHM.Modes.Cmd.BtnFaultReset` | `Modes.State.AnyFaultActive = FALSE` |
 
@@ -69,7 +69,7 @@ contournée.
 |---|---|---|
 | 1 | « Aller à » P1, P2, Trémie, Maintenance | trajet simulé, position atteinte, arrêt |
 | 2 | Passage en zone PV avant Trémie | **ralentissement** avant l'arrêt trémie |
-| 3 | Forcer un mot valide : `SimM3SensorsWordActive := TRUE`, `SimM3SensorsWord := 2#11111` | position Trémie, `SensorWordIncoherent = FALSE` |
+| 3 | Forcer un mot valide : `SimM3SensorsWordOverrideActive := TRUE`, `SimM3SensorsWord := 2#11111` | position Trémie, `SensorWordIncoherent = FALSE` |
 | 4 | Forcer un mot **incohérent** : `2#10101` | `SensorWordIncoherent = TRUE` → `SafeStop` + `PowerCutOff` |
 | 5 | Butées extrêmes Trémie / Maintenance | mouvement bloqué dans le sens interdit |
 
@@ -77,11 +77,11 @@ contournée.
 
 | # | Test | Attendu |
 |---|---|---|
-| 1 | `SimJoystickRawX/Y := 10000`, `SimJoystickRawButton := TRUE` | déflexion vue par `FB_Joystick`, homme-mort armé |
+| 1 | Un bouton `SimJoystick*Active` unique + `SimJoystickRawButton := TRUE` | déflexion 100 % vue par `FB_Joystick`, homme-mort armé |
 | 2 | Retour à `5000` + relâcher | consigne nulle, désarmement après `NeutralHoldTime` (500 ms) |
 | 3 | Diagnostics bus | aucun faux défaut CANopen |
 
-### 3.4 🧨 Machine / AU — `SimMachineActive`
+### 3.4 🧨 Machine / AU — `SimSafetyActive`
 
 | # | Test | Attendu |
 |---|---|---|
@@ -123,9 +123,8 @@ Pour un verdict d'état machine, voir `FB_Acquisition_Preflight` (plan Ergonomie
 
 | # | Action |
 |---|---|
-| 1 | Passer les 4 `Sim<Domaine>Active` à `FALSE`, **un par un**, en vérifiant après chacun |
-| 2 | `SimulationModeActive := FALSE` |
-| 3 | Vérifier `SimEncoderSpeedFactor = 1.0` |
+| 1 | `SimulationModeActive := FALSE` — le front descendant désactive les 4 domaines et remet les stimuli au nominal |
+| 2 | Vérifier `SimEncoderSpeedFactor = 1.0` |
 | 4 | Relire les **bypass actifs** (`GVL_IHM.*.Bypass.*`) et les remettre à `FALSE` s'ils ne sont pas voulus — ils sont **RETAIN** |
 | 5 | Vérifier `Modes.State.AnyFaultActive = FALSE` avant tout mouvement réel |
 

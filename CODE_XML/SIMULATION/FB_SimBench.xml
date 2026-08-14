@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.367775" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.367775">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:08:41.536956" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:08:41.536956">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -235,12 +235,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position point de vitesse (pré-ralentissement)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_PosP2_DI">
+            <variable name="M3_PosPVP2_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2 / petite vitesse avant P1</xhtml>
               </documentation>
             </variable>
             <variable name="M3_PosP1_DI">
@@ -613,14 +613,6 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = commande desserrage frein M3</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_TargetNum">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible sélectionnée (0..4)</xhtml>
-              </documentation>
-            </variable>
             <variable name="PowerKeepAlive_A">
               <type>
                 <BOOL />
@@ -680,7 +672,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="0.5" />
               </initialValue>
             </variable>
-            <variable name="SimM3SensorsWordActive">
+            <variable name="SimM3SensorsWordOverrideActive">
               <type>
                 <BOOL />
               </type>
@@ -693,7 +685,39 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <BYTE />
               </type>
               <initialValue>
-                <simpleValue value="16#01" />
+                <simpleValue value="16#07" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickLeftActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickRightActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickForwardActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="SimJoystickReverseActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
               </initialValue>
             </variable>
             <variable name="SimJoystickRawX">
@@ -818,6 +842,17 @@ TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
             </variable>
           </inOutVars>
           <localVars>
+            <variable name="CST_M3FullTravelTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de Trémie à Maintenance à 100 %, modèle banc uniquement</xhtml>
+              </documentation>
+            </variable>
             <variable name="instSimEncoderM1">
               <type>
                 <derived name="FB_Sim_Encoder" />
@@ -879,6 +914,11 @@ TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="SimJoystickDirectionCount">
+              <type>
+                <INT />
+              </type>
+            </variable>
             <variable name="M3_ActualFreqHz">
               <type>
                 <UINT />
@@ -894,7 +934,7 @@ TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
    📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
@@ -1018,25 +1058,24 @@ M3_RelayFwd := (M3_Direction = 1);
 M3_RelayRev := (M3_Direction = -1);
 
 instSimTranslation(
-    Enable      := TRUE,
-    TargetNum   := M3_TargetNum,
-    RelayFwd    := M3_RelayFwd,
-    RelayRev    := M3_RelayRev,
-    TravelTimeS := 8.0,
-    PVLeadTimeS := 2.0
+    Enable          := TRUE,
+    Direction       := M3_Direction,
+    SpeedRefPct     := M3_SpeedRefPct,
+    FullTravelTimeS := CST_M3FullTravelTimeS
 );
 
-// Remplissage capteurs de position M3 :
-IF SimM3SensorsWordActive THEN
-    Translation.M3_PosTremie_DI      := SimM3SensorsWord.0;
-    Translation.M3_PosPV_DI          := SimM3SensorsWord.1;
-    Translation.M3_PosP2_DI          := SimM3SensorsWord.2;
-    Translation.M3_PosP1_DI          := SimM3SensorsWord.3;
-    Translation.M3_PosMaintenance_DI := SimM3SensorsWord.4;
+// Remplissage capteurs de position M3 : l'override manuel conserve exactement le
+// même ordre que FB_Translation_PositionDecoder (bit4=Trémie ... bit0=Maintenance).
+IF SimM3SensorsWordOverrideActive THEN
+    Translation.M3_PosTremie_DI      := SimM3SensorsWord.4;
+    Translation.M3_PosPV_DI          := SimM3SensorsWord.3;
+    Translation.M3_PosPVP2_DI        := SimM3SensorsWord.2;
+    Translation.M3_PosP1_DI          := SimM3SensorsWord.1;
+    Translation.M3_PosMaintenance_DI := SimM3SensorsWord.0;
 ELSE
     Translation.M3_PosTremie_DI      := instSimTranslation.PosTremie;
     Translation.M3_PosPV_DI          := instSimTranslation.PosPV;
-    Translation.M3_PosP2_DI          := instSimTranslation.PosP2;
+    Translation.M3_PosPVP2_DI        := instSimTranslation.PosP2;
     Translation.M3_PosP1_DI          := instSimTranslation.PosP1;
     Translation.M3_PosMaintenance_DI := instSimTranslation.PosMaintenance;
 END_IF;
@@ -1071,24 +1110,37 @@ instSimJoystick(
     MaxRaw     := 10000
 );
 
-// Permet aux stimuli de banc de surcharger le retour du joystick si spécifié :
-IF SimJoystickRawX &lt;&gt; 5000 THEN
+// Les boutons directionnels simplifient les essais : une commande unique impose
+// une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
+SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeftActive)
+                           + BOOL_TO_INT(SimJoystickRightActive)
+                           + BOOL_TO_INT(SimJoystickForwardActive)
+                           + BOOL_TO_INT(SimJoystickReverseActive);
+IF SimJoystickDirectionCount = 1 THEN
+    IF SimJoystickLeftActive THEN
+        Operator.JoyXRaw_ANA1 := 0;
+        Operator.JoyYRaw_ANA2 := 5000;
+    ELSIF SimJoystickRightActive THEN
+        Operator.JoyXRaw_ANA1 := 10000;
+        Operator.JoyYRaw_ANA2 := 5000;
+    ELSIF SimJoystickForwardActive THEN
+        Operator.JoyXRaw_ANA1 := 5000;
+        Operator.JoyYRaw_ANA2 := 10000;
+    ELSE
+        Operator.JoyXRaw_ANA1 := 5000;
+        Operator.JoyYRaw_ANA2 := 0;
+    END_IF;
+ELSIF SimJoystickDirectionCount &gt; 1 THEN
+    // Deux directions simultanées ne créent jamais une diagonale / un double mouvement implicite.
+    Operator.JoyXRaw_ANA1 := 5000;
+    Operator.JoyYRaw_ANA2 := 5000;
+ELSE
     Operator.JoyXRaw_ANA1 := SimJoystickRawX;
-ELSE
-    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
-END_IF;
-
-IF SimJoystickRawY &lt;&gt; 5000 THEN
     Operator.JoyYRaw_ANA2 := SimJoystickRawY;
-ELSE
-    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
 END_IF;
 
-IF SimJoystickRawButton THEN
-    Operator.JoyBtnRaw := TRUE;
-ELSE
-    Operator.JoyBtnRaw := instSimJoystick.RawButton;
-END_IF;
+// Homme-mort : stimulus brut amont, identique au bouton physique.
+Operator.JoyBtnRaw := SimJoystickRawButton;
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
 Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
@@ -1231,7 +1283,7 @@ Done := TRUE;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Encoder — Simulation physique d'un codeur absolu de treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
    🧩 Brique réduite (Partie3 §1bis, "briques E/S &amp; diagnostics") : pas de contrat
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
@@ -1367,7 +1419,7 @@ RawPosOut := RawPos;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Joystick — Simulation des entrées brutes joystick (bus CAN hors ligne)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
    🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
    🎯 Rôle : remplace l'ancien bypass homme-mort codé en dur dans `FB_Joystick`
       (`GVL_DEBUG.DBG_DeadmanBypass_TEST`, qui forçait `DeadmanArmed` en
@@ -1508,7 +1560,7 @@ END_IF;
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md</xhtml>
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md</xhtml>
           </documentation>
         </interface>
         <body>
@@ -1552,37 +1604,36 @@ SimContactorOk := ContactorLatch;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = modèle actif</xhtml>
+              </documentation>
             </variable>
-            <variable name="TargetNum">
+            <variable name="Direction">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position</xhtml>
+              </documentation>
             </variable>
-            <variable name="RelayFwd">
+            <variable name="SpeedRefPct">
               <type>
-                <BOOL />
+                <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Magnitude commande 0..100 %, bornée avant calcul</xhtml>
+              </documentation>
             </variable>
-            <variable name="RelayRev">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TravelTimeS">
+            <variable name="FullTravelTimeS">
               <type>
                 <REAL />
               </type>
               <initialValue>
                 <simpleValue value="8" />
               </initialValue>
-            </variable>
-            <variable name="PVLeadTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps complet Trémie→Maintenance à 100 %, simulation seulement</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -1590,165 +1641,220 @@ SimContactorOk := ContactorLatch;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit4 du mot capteurs</xhtml>
+              </documentation>
             </variable>
             <variable name="PosPV">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit3 du mot capteurs</xhtml>
+              </documentation>
             </variable>
             <variable name="PosP2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit2 du mot capteurs (point matériel PVP2)</xhtml>
+              </documentation>
             </variable>
             <variable name="PosP1">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit1 du mot capteurs</xhtml>
+              </documentation>
             </variable>
             <variable name="PosMaintenance">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit0 du mot capteurs</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="CycleTimeCalc">
+            <variable name="instCycleTime">
               <type>
                 <derived name="FB_CycleTime" />
               </type>
+            </variable>
+            <variable name="PositionProgress">
+              <type>
+                <REAL />
+              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📚 Réutilisation — pas de recalcul maison du temps de cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=Trémie ... 5=Maintenance</xhtml>
               </documentation>
             </variable>
-            <variable name="ElapsedS">
+            <variable name="SpeedPctBounded">
               <type>
                 <REAL />
               </type>
             </variable>
-            <variable name="LastTargetNum">
+            <variable name="PositionIncrement">
               <type>
-                <INT />
+                <REAL />
               </type>
             </variable>
-            <variable name="TargetChanged">
+            <variable name="Initialized">
               <type>
                 <BOOL />
               </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
             </variable>
-            <variable name="Reached">
+            <variable name="CST_PositionAtTremie">
               <type>
-                <BOOL />
+                <REAL />
               </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtPV">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtP2">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtP1">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionAtMaintenance">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+            </variable>
+            <variable name="CST_PositionSegmentCount">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+            </variable>
+            <variable name="CST_MinFullTravelTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Protection division : modèle sans dynamique sous ce seuil</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
+   🧪 FB_Sim_Translation — Progression capteurs simulés M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
-   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
-   🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
-      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
-      une simulation par temps de parcours : le translation "arrive" à la cible
-      sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
-      continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
-      (M3 translation) — treuils/benne/codeurs sont la priorité de ce lot.
-   📥 Enable      : simulation active (SimulationModeActive AND NOT SensorTranslationPositionIsReal)
-   📥 TargetNum   : cible sélectionnée (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)
-                    — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
-                    — 🆕 REX 2026-07-18 : PV n'est JAMAIS une cible sélectionnable (point de
-                    ralentissement uniquement, pas d'arrêt), voir AF_Partie-02 v2.12 §3bis
-   📥 RelayFwd/RelayRev : sens déduit du mot de commande EtherCAT M3
-   📥 TravelTimeS : temps de trajet simulé (s) — défaut 8.0 (fourchette 5-10s validée
-                    utilisateur, pas de donnée réelle pour calibrer plus précisément)
-   📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
-   📤 PosTremie/PosPV/PosP2/PosP1/PosMaintenance : TRUE quand la cible (ou le point de
-      ralentissement PV) correspondante est atteinte — à OR'er sur le `InputRaw` du capteur
-      réel correspondant (`PRG_02_Acquisition.HwIn`).
-   ⏱️ Changement de cible (`TargetNum`) → trajet remis à zéro (redémarre du début).
-      Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Translation) ===</xhtml>
+   🎯 Rôle : Produit les cinq capteurs de position M3 par progression continue
+      de Trémie vers Maintenance. Le modèle ne publie que les six mots valides
+      de FB_Translation_PositionDecoder : 11111 → 01111 → 00111 → 00011 →
+      00001 → 00000.
+   🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
+      aucune sortie réelle. Un override manuel valide est appliqué par
+      FB_SimBench, pas par ce FB.
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+             DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Translation) ===
+// === IMPLEMENTATION ===
 
 IF NOT Enable THEN
-    ElapsedS := 0.0;
-    LastTargetNum := TargetNum;
-    PosTremie := FALSE; PosPV := FALSE; PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
-    RETURN;
-END_IF;
-
-CycleTimeCalc(DefaultValueS := 0.010);
-
-// 🔁 Changement de cible = nouveau trajet, on repart de zéro
-TargetChanged := (TargetNum &lt;&gt; LastTargetNum);
-LastTargetNum := TargetNum;
-IF TargetChanged THEN
-    ElapsedS := 0.0;
-END_IF;
-
-// ⏱️ Progression du trajet UNIQUEMENT si un relais de sens est actif (mouvement réel demandé) ;
-// à l'arrêt, la progression reste EN PAUSE (pas remise à zéro).
-IF (RelayFwd OR RelayRev) AND (ElapsedS &lt; TravelTimeS) THEN
-    ElapsedS := ElapsedS + CycleTimeCalc.CycleTimeS;
-    IF ElapsedS &gt; TravelTimeS THEN
-        ElapsedS := TravelTimeS;
-    END_IF;
-END_IF;
-
-Reached := (ElapsedS &gt;= TravelTimeS);
-
-// 🆕 REX 2026-07-18 : les capteurs sont codés par progression monotone.
-// La simulation doit donc produire un mot valide à chaque instant, et non
-// uniquement activer le capteur de la cible. Le mot est :
-//   11111 Trémie | 01111 PV | 00111 P2 | 00011 P1 | 00001 approche Maintenance | 00000 Maintenance.
-// 🔧 REX 2026-07-21 : au repos / boot (TargetNum = 0), la position neutre par défaut
-// est positionnée sur P2 (00111) pour éviter d'être par défaut sur le fin de course extrême Maintenance (00000).
-PosTremie := FALSE;
-PosPV := FALSE;
-
-IF TargetNum = 0 THEN
-    // Position neutre par défaut au boot (P2 = 00111) — évite le fin de course extrême arrière au démarrage
-    PosP2 := TRUE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF TargetNum = 1 THEN
-    // Trajet vers Trémie : PV puis Trémie, avec les trois capteurs de droite actifs.
-    PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
-    IF ElapsedS &gt;= (TravelTimeS - PVLeadTimeS) THEN
-        PosPV := TRUE;
-        PosP2 := TRUE;
-        PosP1 := TRUE;
-        PosMaintenance := TRUE;
-    END_IF;
-    IF Reached THEN
-        PosTremie := TRUE;
-    END_IF;
-ELSIF TargetNum = 2 THEN
-    // P2 = 00111
-    PosP2 := TRUE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF TargetNum = 3 THEN
-    // P1 = 00011
-    PosP2 := FALSE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF TargetNum = 4 THEN
-    // Maintenance = 00000 : PosMaintenance reste FALSE pour respecter le codage.
+    // Prochain démarrage déterministe sur P2, comme l'ancien modèle de banc.
+    PositionProgress := CST_PositionAtP2;
+    Initialized := FALSE;
+    PosTremie := FALSE;
+    PosPV := FALSE;
     PosP2 := FALSE;
     PosP1 := FALSE;
     PosMaintenance := FALSE;
+    RETURN;
+END_IF;
+
+IF NOT Initialized THEN
+    PositionProgress := CST_PositionAtP2;
+    Initialized := TRUE;
+END_IF;
+
+instCycleTime(DefaultValueS := 0.010);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+
+// Une vitesse à 100 % parcourt les cinq segments uniformes pendant FullTravelTimeS.
+// Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.
+IF FullTravelTimeS &gt;= CST_MinFullTravelTimeS THEN
+    PositionIncrement := (SpeedPctBounded / 100.0)
+                         * (CST_PositionSegmentCount / FullTravelTimeS)
+                         * instCycleTime.CycleTimeS;
 ELSE
+    PositionIncrement := 0.0;
+END_IF;
+
+IF Direction = 1 THEN
+    PositionProgress := MAX(CST_PositionAtTremie, PositionProgress - PositionIncrement);
+ELSIF Direction = -1 THEN
+    PositionProgress := MIN(CST_PositionAtMaintenance, PositionProgress + PositionIncrement);
+END_IF;
+
+// Réinitialisation explicite : aucune valeur transitoire héritée d'une zone précédente.
+PosTremie := FALSE;
+PosPV := FALSE;
+PosP2 := FALSE;
+PosP1 := FALSE;
+PosMaintenance := FALSE;
+
+// Chaque intervalle correspond à un seul mot thermomètre valide.
+IF PositionProgress &lt;= CST_PositionAtTremie THEN
+    PosTremie := TRUE;
+    PosPV := TRUE;
     PosP2 := TRUE;
     PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF PositionProgress &lt;= CST_PositionAtPV THEN
+    PosPV := TRUE;
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF PositionProgress &lt;= CST_PositionAtP2 THEN
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF PositionProgress &lt;= CST_PositionAtP1 THEN
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF PositionProgress &lt; CST_PositionAtMaintenance THEN
     PosMaintenance := TRUE;
 END_IF;
 </xhtml>

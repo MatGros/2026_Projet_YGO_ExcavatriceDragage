@@ -322,7 +322,7 @@ instTroubleshootingView(
     SimWinchActive       := GVL_Simulation.SimWinchActive,
     SimTranslationActive := GVL_Simulation.SimTranslationActive,
     SimOperatorActive    := GVL_Simulation.SimOperatorActive,
-    SimMachineActive     := GVL_Simulation.SimMachineActive,
+    SimSafetyActive      := GVL_Simulation.SimSafetyActive,
     WinchM1              := GVL_IHM.M1TreuilRetenue,
     WinchM2              := GVL_IHM.M2TreuilBenne,
     Sync                 := GVL_IHM.M1M2Sync,

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.388318" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.388318">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:15:23.020188" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:15:23.020188">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -726,7 +726,7 @@ le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise 
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).

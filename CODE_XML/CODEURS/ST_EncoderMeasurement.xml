@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.357095" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.357095">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:25.978511" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:25.978511">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -101,7 +101,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    📏 ST_EncoderMeasurement — Mesures codeur qualifiées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §2ter
+   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2ter
    🎨 Facts de la chaîne de mesure pure : Abs → Scale → Safety → SpeedMeasure.
    🔗 Producteur : PRG_02_Acquisition_CFC (chaîne codeur du treuil concerné).
    ✅ Tout BOOL = TRUE état normalisé. Aucun brut EtherCAT (alarmes/warnings,

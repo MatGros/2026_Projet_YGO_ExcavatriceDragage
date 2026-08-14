@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    📡 PRG_02_Acquisition — Programme d'Acquisition et Qualification I/O
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §2
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2
    ⚙️ Exécuté en tête de la chaîne métier (après les initialisations système).
    🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
@@ -108,7 +108,48 @@ VAR
     (* ── Mémoire de détection de changement Winch ── *)
     PreviousWinchInputSourceSimulated : BOOL;
     WinchInputSourceInitialized       : BOOL;
+
+    (* ── Fronts session simulation ── *)
+    SimulationModeRise                : R_TRIG;
+    SimulationModeFall                : F_TRIG;
 END_VAR
+
+{region "§0 Session simulation"}
+// === 🧪 §0 SESSION SIMULATION ===
+// Le bit maître est commandé consciemment par l'opérateur. Ses fronts initialisent les
+// domaines et stimuli afin qu'un retour réel ne puisse pas laisser une simulation latente.
+SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
+SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
+
+IF SimulationModeRise.Q THEN
+    GVL_Simulation.SimWinchActive := TRUE;
+    GVL_Simulation.SimTranslationActive := TRUE;
+    GVL_Simulation.SimOperatorActive := TRUE;
+    GVL_Simulation.SimSafetyActive := TRUE;
+END_IF;
+
+IF SimulationModeFall.Q THEN
+    GVL_Simulation.SimWinchActive := FALSE;
+    GVL_Simulation.SimTranslationActive := FALSE;
+    GVL_Simulation.SimOperatorActive := FALSE;
+    GVL_Simulation.SimSafetyActive := FALSE;
+
+    GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
+    GVL_Simulation.SimM3SensorsWord := 16#07;
+    GVL_Simulation.SimJoystickLeftActive := FALSE;
+    GVL_Simulation.SimJoystickRightActive := FALSE;
+    GVL_Simulation.SimJoystickForwardActive := FALSE;
+    GVL_Simulation.SimJoystickReverseActive := FALSE;
+    GVL_Simulation.SimJoystickRawX := 5000;
+    GVL_Simulation.SimJoystickRawY := 5000;
+    GVL_Simulation.SimJoystickRawButton := FALSE;
+    GVL_Simulation.SimEncoderSpeedFactor := 1.0;
+    GVL_Simulation.SimSyncDeviationInjectM1 := FALSE;
+    GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
+    GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
+    GVL_Simulation.SimKoboldContactValue := FALSE;
+END_IF;
+{endregion}
 
 {region "§1 Acquisition brute — HwReal"}
 // === 📥 §1 ACQUISITION BRUTE (HwReal) ===
@@ -138,7 +179,7 @@ HwReal.Winch.COD2_DeviceState         := COD2_CODEUR.GetDeviceState();
 // Translation M3 et variateur AC600
 HwReal.Translation.M3_PosTremie_DI      := M3_PosTremie_DI;
 HwReal.Translation.M3_PosPV_DI          := M3_PosPV_DI;
-HwReal.Translation.M3_PosP2_DI          := M3_PosP2_DI;
+HwReal.Translation.M3_PosPVP2_DI        := M3_PosPVP2_DI;
 HwReal.Translation.M3_PosP1_DI          := M3_PosP1_DI;
 HwReal.Translation.M3_PosMaintenance_DI := M3_PosMaintenance_DI;
 HwReal.Translation.M3_BrakeIsOpen_DI    := M3_BrakeIsOpen_DI;
@@ -169,7 +210,7 @@ HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // �
 // 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (AF06 §3bis).
 // GetDeviceState() = RUNNING => module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
-IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive THEN
+IF GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive THEN
     LocalDigitalIoOk := TRUE;
     Vh0800EndOk      := TRUE;
     Vh0808EtpOk      := TRUE;
@@ -209,7 +250,6 @@ instSimBench(
     M3_Direction             := PRG_05_Translation.M3_Direction_Active,
     M3_SpeedRefPct           := PRG_05_Translation.M3_SpeedRef_Active,
     M3_BrakeCmd              := GVL_Global.TranslationBrakeCmd,
-    M3_TargetNum             := GVL_IHM.TranslationM3.Cmd.SelTarget,
     PowerKeepAlive_A         := PRG_06_Outputs_LD.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
@@ -220,9 +260,13 @@ instSimBench(
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
-    SimM3SensorsWordActive   := GVL_Simulation.SimM3SensorsWordActive,
-    SimM3SensorsWord         := GVL_Simulation.SimM3SensorsWord,
-    SimJoystickRawX          := GVL_Simulation.SimJoystickRawX,
+    SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
+    SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
+    SimJoystickLeftActive          := GVL_Simulation.SimJoystickLeftActive,
+    SimJoystickRightActive         := GVL_Simulation.SimJoystickRightActive,
+    SimJoystickForwardActive       := GVL_Simulation.SimJoystickForwardActive,
+    SimJoystickReverseActive       := GVL_Simulation.SimJoystickReverseActive,
+    SimJoystickRawX                := GVL_Simulation.SimJoystickRawX,
     SimJoystickRawY          := GVL_Simulation.SimJoystickRawY,
     SimJoystickRawButton     := GVL_Simulation.SimJoystickRawButton,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
@@ -241,7 +285,7 @@ HwSim.Machine     := instSimBench.Machine;
 WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
-MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimMachineActive;
+MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
 
 IF NOT WinchInputSourceInitialized THEN
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
@@ -479,7 +523,7 @@ M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
 instPosDecoderM3(
     SensorTremie      := HwIn.Translation.M3_PosTremie_DI,
     SensorPV          := HwIn.Translation.M3_PosPV_DI,
-    SensorP2          := HwIn.Translation.M3_PosP2_DI,
+    SensorP2          := HwIn.Translation.M3_PosPVP2_DI,
     SensorP1          := HwIn.Translation.M3_PosP1_DI,
     SensorMaintenance := HwIn.Translation.M3_PosMaintenance_DI
 );

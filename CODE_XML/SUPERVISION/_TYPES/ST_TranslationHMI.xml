@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.684370" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T14:02:33.684370">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:15:38.768427" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:15:38.768427">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -79,7 +79,7 @@
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
-      doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
+      doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>

@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Translation_M3_Stub — Entrées de simulation M3 restantes
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md §7
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §7
    🧹 REX 2026-07-18 : ancien mode relais `DEGRADED_IO` retiré. Les sorties relais,
       retours contacteurs, défaut TOR et cible générique sans consommateur sont supprimés.
       Restent uniquement PV (entrée réelle à mapper) et le sélecteur de trajet simulé.

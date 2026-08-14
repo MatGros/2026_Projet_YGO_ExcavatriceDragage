@@ -1,128 +1,112 @@
 (* ═══════════════════════════════════════════════════════════════
-   🧪 FB_Sim_Translation — Simulation dynamique du trajet translation M3 (temps de parcours)
+   🧪 FB_Sim_Translation — Progression capteurs simulés M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.1.md
-   🧩 Brique réduite (Partie3 §1bis) : outil de banc, pas du métier machine.
-   🎯 Rôle : remplace le forçage manuel du capteur de position cible en vue
-      instance CODESYS (voir `GVL_Translation_M3_Stub.st`, doc Partie11 §9bis) par
-      une simulation par temps de parcours : le translation "arrive" à la cible
-      sélectionnée (`TargetNum`) après `TravelTimeS` secondes de commande
-      continue dans le bon sens (`RelayFwd`/`RelayRev`). Non prioritaire
-      (M3 translation) — treuils/benne/codeurs sont la priorité de ce lot.
-   📥 Enable      : simulation active (SimulationModeActive AND NOT SensorTranslationPositionIsReal)
-   📥 TargetNum   : cible sélectionnée (0=Aucun, 1=Trémie, 2=P2, 3=P1, 4=Maintenance)
-                    — réutilise `GVL_Translation_M3_Stub.StubTranslationPositionSelect_IHM`
-                    — 🆕 REX 2026-07-18 : PV n'est JAMAIS une cible sélectionnable (point de
-                    ralentissement uniquement, pas d'arrêt), voir AF_Partie-02 v2.12 §3bis
-   📥 RelayFwd/RelayRev : sens déduit du mot de commande EtherCAT M3
-   📥 TravelTimeS : temps de trajet simulé (s) — défaut 8.0 (fourchette 5-10s validée
-                    utilisateur, pas de donnée réelle pour calibrer plus précisément)
-   📥 PVLeadTimeS : durée (s) avant la fin du trajet Trémie où PV s'active (approche)
-   📤 PosTremie/PosPV/PosP2/PosP1/PosMaintenance : TRUE quand la cible (ou le point de
-      ralentissement PV) correspondante est atteinte — à OR'er sur le `InputRaw` du capteur
-      réel correspondant (`PRG_02_Acquisition.HwIn`).
-   ⏱️ Changement de cible (`TargetNum`) → trajet remis à zéro (redémarre du début).
-      Relais retombés (ni Fwd ni Rev) → progression mise EN PAUSE (pas remise à zéro).
+   🎯 Rôle : Produit les cinq capteurs de position M3 par progression continue
+      de Trémie vers Maintenance. Le modèle ne publie que les six mots valides
+      de FB_Translation_PositionDecoder : 11111 → 01111 → 00111 → 00011 →
+      00001 → 00000.
+   🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
+      aucune sortie réelle. Un override manuel valide est appliqué par
+      FB_SimBench, pas par ce FB.
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+             DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Translation) ===
 
 FUNCTION_BLOCK PUBLIC FB_Sim_Translation
 VAR_INPUT
-    Enable      : BOOL;
-    TargetNum   : INT;
-    RelayFwd    : BOOL;
-    RelayRev    : BOOL;
-    TravelTimeS : REAL := 8.0;
-    PVLeadTimeS : REAL := 2.0;
+    Enable          : BOOL;              // TRUE = modèle actif
+    Direction       : INT;               // +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position
+    SpeedRefPct     : REAL;              // Magnitude commande 0..100 %, bornée avant calcul
+    FullTravelTimeS : REAL := 8.0;       // Temps complet Trémie→Maintenance à 100 %, simulation seulement
 END_VAR
 VAR_OUTPUT
-    PosTremie      : BOOL;
-    PosPV          : BOOL;
-    PosP2          : BOOL;
-    PosP1          : BOOL;
-    PosMaintenance : BOOL;
+    PosTremie      : BOOL;               // Bit4 du mot capteurs
+    PosPV          : BOOL;               // Bit3 du mot capteurs
+    PosP2          : BOOL;               // Bit2 du mot capteurs (point matériel PVP2)
+    PosP1          : BOOL;               // Bit1 du mot capteurs
+    PosMaintenance : BOOL;               // Bit0 du mot capteurs
 END_VAR
 VAR
-    CycleTimeCalc   : FB_CycleTime;   // 📚 Réutilisation — pas de recalcul maison du temps de cycle
-    ElapsedS        : REAL;
-    LastTargetNum   : INT;
-    TargetChanged   : BOOL;
-    Reached         : BOOL;
+    instCycleTime              : FB_CycleTime;
+    PositionProgress           : REAL;   // 0=Trémie ... 5=Maintenance
+    SpeedPctBounded            : REAL;
+    PositionIncrement          : REAL;
+    Initialized                : BOOL := FALSE;
+END_VAR
+VAR CONSTANT
+    CST_PositionAtTremie       : REAL := 0.0;
+    CST_PositionAtPV           : REAL := 1.0;
+    CST_PositionAtP2           : REAL := 2.0;
+    CST_PositionAtP1           : REAL := 3.0;
+    CST_PositionAtMaintenance  : REAL := 5.0;
+    CST_PositionSegmentCount   : REAL := 5.0;
+    CST_MinFullTravelTimeS     : REAL := 0.1; // Protection division : modèle sans dynamique sous ce seuil
 END_VAR
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Translation) ===
+// === IMPLEMENTATION ===
 
 IF NOT Enable THEN
-    ElapsedS := 0.0;
-    LastTargetNum := TargetNum;
-    PosTremie := FALSE; PosPV := FALSE; PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
-    RETURN;
-END_IF;
-
-CycleTimeCalc(DefaultValueS := 0.010);
-
-// 🔁 Changement de cible = nouveau trajet, on repart de zéro
-TargetChanged := (TargetNum <> LastTargetNum);
-LastTargetNum := TargetNum;
-IF TargetChanged THEN
-    ElapsedS := 0.0;
-END_IF;
-
-// ⏱️ Progression du trajet UNIQUEMENT si un relais de sens est actif (mouvement réel demandé) ;
-// à l'arrêt, la progression reste EN PAUSE (pas remise à zéro).
-IF (RelayFwd OR RelayRev) AND (ElapsedS < TravelTimeS) THEN
-    ElapsedS := ElapsedS + CycleTimeCalc.CycleTimeS;
-    IF ElapsedS > TravelTimeS THEN
-        ElapsedS := TravelTimeS;
-    END_IF;
-END_IF;
-
-Reached := (ElapsedS >= TravelTimeS);
-
-// 🆕 REX 2026-07-18 : les capteurs sont codés par progression monotone.
-// La simulation doit donc produire un mot valide à chaque instant, et non
-// uniquement activer le capteur de la cible. Le mot est :
-//   11111 Trémie | 01111 PV | 00111 P2 | 00011 P1 | 00001 approche Maintenance | 00000 Maintenance.
-// 🔧 REX 2026-07-21 : au repos / boot (TargetNum = 0), la position neutre par défaut
-// est positionnée sur P2 (00111) pour éviter d'être par défaut sur le fin de course extrême Maintenance (00000).
-PosTremie := FALSE;
-PosPV := FALSE;
-
-IF TargetNum = 0 THEN
-    // Position neutre par défaut au boot (P2 = 00111) — évite le fin de course extrême arrière au démarrage
-    PosP2 := TRUE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF TargetNum = 1 THEN
-    // Trajet vers Trémie : PV puis Trémie, avec les trois capteurs de droite actifs.
-    PosP2 := FALSE; PosP1 := FALSE; PosMaintenance := FALSE;
-    IF ElapsedS >= (TravelTimeS - PVLeadTimeS) THEN
-        PosPV := TRUE;
-        PosP2 := TRUE;
-        PosP1 := TRUE;
-        PosMaintenance := TRUE;
-    END_IF;
-    IF Reached THEN
-        PosTremie := TRUE;
-    END_IF;
-ELSIF TargetNum = 2 THEN
-    // P2 = 00111
-    PosP2 := TRUE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF TargetNum = 3 THEN
-    // P1 = 00011
-    PosP2 := FALSE;
-    PosP1 := TRUE;
-    PosMaintenance := TRUE;
-ELSIF TargetNum = 4 THEN
-    // Maintenance = 00000 : PosMaintenance reste FALSE pour respecter le codage.
+    // Prochain démarrage déterministe sur P2, comme l'ancien modèle de banc.
+    PositionProgress := CST_PositionAtP2;
+    Initialized := FALSE;
+    PosTremie := FALSE;
+    PosPV := FALSE;
     PosP2 := FALSE;
     PosP1 := FALSE;
     PosMaintenance := FALSE;
+    RETURN;
+END_IF;
+
+IF NOT Initialized THEN
+    PositionProgress := CST_PositionAtP2;
+    Initialized := TRUE;
+END_IF;
+
+instCycleTime(DefaultValueS := 0.010);
+SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
+
+// Une vitesse à 100 % parcourt les cinq segments uniformes pendant FullTravelTimeS.
+// Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.
+IF FullTravelTimeS >= CST_MinFullTravelTimeS THEN
+    PositionIncrement := (SpeedPctBounded / 100.0)
+                         * (CST_PositionSegmentCount / FullTravelTimeS)
+                         * instCycleTime.CycleTimeS;
 ELSE
+    PositionIncrement := 0.0;
+END_IF;
+
+IF Direction = 1 THEN
+    PositionProgress := MAX(CST_PositionAtTremie, PositionProgress - PositionIncrement);
+ELSIF Direction = -1 THEN
+    PositionProgress := MIN(CST_PositionAtMaintenance, PositionProgress + PositionIncrement);
+END_IF;
+
+// Réinitialisation explicite : aucune valeur transitoire héritée d'une zone précédente.
+PosTremie := FALSE;
+PosPV := FALSE;
+PosP2 := FALSE;
+PosP1 := FALSE;
+PosMaintenance := FALSE;
+
+// Chaque intervalle correspond à un seul mot thermomètre valide.
+IF PositionProgress <= CST_PositionAtTremie THEN
+    PosTremie := TRUE;
+    PosPV := TRUE;
     PosP2 := TRUE;
     PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF PositionProgress <= CST_PositionAtPV THEN
+    PosPV := TRUE;
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF PositionProgress <= CST_PositionAtP2 THEN
+    PosP2 := TRUE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF PositionProgress <= CST_PositionAtP1 THEN
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
+ELSIF PositionProgress < CST_PositionAtMaintenance THEN
     PosMaintenance := TRUE;
 END_IF;

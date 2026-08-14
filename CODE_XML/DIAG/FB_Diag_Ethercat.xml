@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.365026" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.365026">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:25.986931" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:25.986931">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -410,7 +410,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
    📡 FB_Diag_Ethercat — Diagnostic bus EtherCAT (3 esclaves)
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3
+              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
    🎯 Rôle : Décide Online/Operational pour variateur M3 + codeurs M1/M2.
       Publie ST_Diag_Device par device + state global.
    ═══════════════════════════════════════════════════════════════</xhtml>

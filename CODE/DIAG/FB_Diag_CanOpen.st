@@ -2,7 +2,7 @@
    📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3
+              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
    🎯 Rôle : Décide Online/Operational et publie ST_Diag_Device.
       Distinction explicite dans State :
       - INIT       : pas encore online (ni réel, ni bypass)

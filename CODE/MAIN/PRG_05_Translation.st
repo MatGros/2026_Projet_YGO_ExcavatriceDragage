@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    ⚙️ Exécuté par la tâche PLC en position 5 (après PRG_04_Treuils_Benne).
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
-   📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md
+   📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🛡️ Sécurité : instSafetyTranslationM3 (FB_Safety_Translation) câblée en parallèle
       de instTranslationM3 depuis le 2026-08-05 (lot M4) — SafeStop/PowerCutOff réels.
    ═══════════════════════════════════════════════════════════════ *)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.362574" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.362574">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:31.096750" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:31.096750">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -601,7 +601,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
    📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
-      doc métier : ARCHIVES/Doc/AF_Partie-11_Fonction_Translation_v2.0.md
+      doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1524,12 +1524,12 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position point de vitesse (pré-ralentissement)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_PosP2_DI">
+            <variable name="M3_PosPVP2_DI">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2 / petite vitesse avant P1</xhtml>
               </documentation>
             </variable>
             <variable name="M3_PosP1_DI">
@@ -1998,7 +1998,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3bis
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3bis
    🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
       pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
       TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
@@ -4959,7 +4959,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="SimMachineActive">
+            <variable name="SimSafetyActive">
               <type>
                 <BOOL />
               </type>
@@ -5036,7 +5036,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕵️♂️ FB_TroubleshootingView — Mise en forme lecture seule pour dépannage
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.0.md
+   📄 Doc : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.1.md
    🔗 Producteur unique de GVL_Troubleshooting.* — instancié UNE SEULE FOIS,
       dans PRG_07_Supervision, après §3 Projections IHM.
    🔒 Lecture seule stricte : aucune VAR_OUTPUT de commande, aucun calcul métier,

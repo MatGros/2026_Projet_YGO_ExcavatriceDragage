@@ -1,4 +1,4 @@
-# Analyse Fonctionnelle - Partie 6 : Acquisition & Qualification I/O (v2.2)
+# Analyse Fonctionnelle - Partie 6 : Acquisition & Qualification I/O (v2.3)
 
 > Role : definir la frontiere unique d'acquisition de `PRG_02_Acquisition` (ST).
 > Statut : décision documentaire préalable au retrait de `PRG_01_Inputs_LD` et `FB_Input`.
@@ -358,7 +358,7 @@ configuration matérielle ; aucun `InvertLogic` aval ne doit être ajouté.
 | 15 | `M1M2_TopPositionFree_DI` | Local_Digital_IO · 7 | Winch | NC | Position extrême haut libre — référencement, déclenche AU |
 | 16 | `M3_PosTremie_DI` | VH_0808ETP · 0 | Translation | NO | Chariot position Trémie |
 | 17 | `M3_PosPV_DI` | VH_0808ETP · 1 | Translation | NO | Chariot position PV (ralentissement Trémie) |
-| 18 | `M3_PosP2_DI` | VH_0808ETP · 2 | Translation | NO | Chariot position P2 |
+| 18 | `M3_PosPVP2_DI` | VH_0808ETP · 2 | Translation | NO | Chariot position P2 / petite vitesse avant P1 |
 | 19 | `M3_PosP1_DI` | VH_0808ETP · 3 | Translation | NO | Chariot position P1 |
 | 20 | `M3_PosMaintenance_DI` | VH_0808ETP · 4 | Translation | NO | Chariot position Maintenance |
 | 21 | `HydraulicThermalOk_DI` | VH_0808ETP · 6 | Machine | NC | Thermique moteur hydraulique OK *(nouveau vs legacy 19)* |

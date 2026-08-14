@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T10:10:49.365026" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T10:10:49.365026">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:25.985929" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:25.985929">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -348,7 +348,7 @@
    📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
    ───────────────────────────────────────────────────────────────
    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md §3
+              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
    🎯 Rôle : Décide Online/Operational et publie ST_Diag_Device.
       Distinction explicite dans State :
       - INIT       : pas encore online (ni réel, ni bypass)

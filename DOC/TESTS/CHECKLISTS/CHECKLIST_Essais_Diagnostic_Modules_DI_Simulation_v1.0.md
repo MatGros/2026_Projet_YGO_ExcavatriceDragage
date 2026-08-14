@@ -5,7 +5,7 @@
 > 📅 2026-08-04 · Version v1.0
 > 🔗 Code concerné : `PRG_02_Acquisition`, `PRG_04_Treuils_Benne`, `PRG_05_Translation`,
 > `PRG_07_Supervision`
-> 📖 Référence : `DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.2.md` §3bis
+> 📖 Référence : `DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md` §3bis
 
 ---
 
@@ -50,7 +50,7 @@ individuel est bon uniquement parce que son bit change.
 | `SimWinchActive` | Valeur relevée : __________________ |
 | `SimTranslationActive` | Valeur relevée : __________________ |
 | `SimOperatorActive` | Valeur relevée : __________________ |
-| `SimMachineActive` | Valeur relevée : __________________ |
+| `SimSafetyActive` | Valeur relevée : __________________ |
 | Mode avant essai | Valeur relevée : __________________ |
 | `Network.InputModules.LocalDigitalIoOk` | Valeur relevée : __________________ |
 | `Network.InputModules.Vh0800EndOk` | Valeur relevée : __________________ |
@@ -84,7 +84,7 @@ Procéder progressivement, un domaine à la fois :
 1. Machine arrêtée : mettre `SimulationModeActive := TRUE`.
 2. Vérifier qu'aucun mouvement ne démarre spontanément.
 3. Activer d'abord **un seul** domaine : `SimWinchActive`, `SimTranslationActive`,
-   `SimOperatorActive` ou `SimMachineActive`.
+   `SimOperatorActive` ou `SimSafetyActive`.
 4. Observer `HwReal`, `HwSim` et `HwIn` si disponibles dans la vue CODESYS.
 5. Vérifier que les valeurs utilisées par le programme correspondent au domaine choisi.
 6. Ajouter les autres domaines un par un et relever toute évolution inattendue.
