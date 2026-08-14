@@ -1,0 +1,59 @@
+contract:
+  task_id: LOT_VISUALIZATION_IHM_RENAMING
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rétablir la compilation de Visualization après le renommage IHM, sans modifier la logique PLC ni les contrats publics.
+  acceptance:
+    - id: AC1
+      statement: "Chaque liaison Visualization concernée pointe vers un symbole public existant de GVL_IHM ou GVL_Simulation."
+      verified_by: "analyse statique des valeurs de liaison dans Device.export et recherche des symboles actifs"
+    - id: AC2
+      statement: "Aucune référence legacy M2Benne, Sync ou PRG_01_Diagnostics ne subsiste dans Visualization."
+      verified_by: "recherche ciblée dans le seul objet Visualization de Device.export"
+    - id: AC3
+      statement: "Aucun contenu hors objet Visualization de Device.export ni aucun fichier CODE n'est modifié."
+      verified_by: "diff Git et contrôle de position des remplacements"
+    - id: AC4
+      statement: "L'affichage obsolète DeadmanTimer.ET ne reçoit aucune substitution sémantiquement fausse."
+      verified_by: "liaison de valeur retirée du seul élément concerné ; le reste de l'IHM est conservé"
+  scope:
+    allowed:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/AGENT_WORKFLOW/tasks/LOT_VISUALIZATION_IHM_RENAMING.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - DOC/
+      - TOOLS/OUTILS_ST2PY/
+  conservation:
+    must_survive:
+      - "Géométrie, textes et interactions Visualization non concernées."
+      - "Contrat IHM actuel exposé par GVL_IHM et GVL_Simulation."
+    dropped_on_purpose:
+      - "Liaison legacy PRG_01_Diagnostics.FB_Joystick_0.DeadmanTimer.ET, sans équivalent public typé TIME."
+  evidence_required:
+    - "diff-summary"
+    - "recherche des références legacy"
+    - "validation XML structurelle"
+  models_allowed:
+    - "pi"
+  alert_duty: >
+    Toute référence Visualization sans équivalent public sémantiquement valide est signalée et non remplacée arbitrairement.
+status: COMPLETED
+execution:
+  executed_by: "Pi"
+  completed_at: "2026-08-12T00:00:00+02:00"
+  status: COMPLETED
+  summary: >
+    119 liaisons Visualization migrées vers les contrats publics GVL_IHM/GVL_Simulation.
+    La liaison TIME legacy DeadmanTimer.ET a été retirée sans substitution sémantiquement fausse.
+  evidence_submitted:
+    - "XML Device.export: PASS"
+    - "Références legacy Visualization: 0"
+    - "check_task_contract.py: PASS"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation utilisateur donnée pour correction, commit et push."
