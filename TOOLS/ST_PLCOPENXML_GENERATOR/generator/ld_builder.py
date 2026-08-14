@@ -689,21 +689,122 @@ def build_ld_body(
 
             continue
 
-        # Expression AND
+        # ── Blocs Fonctionnels Standards IEC OR(...) et AND(...) ──
+        match_func_logic = re.match(r"^([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*:=\s*(OR|AND)\s*\((.*)\)$", stmt_clean, flags=re.DOTALL | re.IGNORECASE)
+        if match_func_logic:
+            out_var_name, func_name, args_str = match_func_logic.groups()
+            func_type = func_name.upper()
+            raw_args = [a.strip() for a in args_str.split(",") if a.strip()]
+            
+            parsed_func_args: list[tuple[str, bool]] = []
+            valid_func = True
+            for a in raw_args:
+                is_not = False
+                a_clean = a
+                if a.startswith("NOT "):
+                    is_not = True
+                    a_clean = a[4:].strip()
+                if re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", a_clean):
+                    parsed_func_args.append((a_clean, is_not))
+                else:
+                    valid_func = False
+                    break
+
+            if valid_func and len(parsed_func_args) >= 2:
+                # Invariant CODESYS : localId du bloc PLUS PETIT que ses sources
+                block_id = local_id_counter
+                local_id_counter += 2
+
+                # 1. Créer les inVariables d'entrée en amont (opérandes d'une fonction boîte)
+                param_ids: list[int] = []
+                for cond_name, is_not in parsed_func_args:
+                    src_id = local_id_counter
+                    local_id_counter += 2
+                    param_ids.append((src_id, is_not))
+
+                    input_var = ET.SubElement(ld, "inVariable")
+                    input_var.set("localId", str(src_id))
+                    input_var.set("negated", "false")
+                    ET.SubElement(input_var, "position", x="0", y="0")
+                    ET.SubElement(input_var, "connectionPointOut")
+                    expr_el = ET.SubElement(input_var, "expression")
+                    expr_el.text = cond_name
+
+                # 2. Créer le bloc opérateur AND / OR
+                block = ET.SubElement(ld, "block")
+                block.set("localId", str(block_id))
+                block.set("typeName", func_type)
+                ET.SubElement(block, "position", x="0", y="0")
+
+                in_vars = ET.SubElement(block, "inputVariables")
+                # Broche EN reliée au rail d'alimentation gauche (localId="0")
+                var_en = ET.SubElement(in_vars, "variable")
+                var_en.set("formalParameter", "EN")
+                c_in_en = ET.SubElement(var_en, "connectionPointIn")
+                c_ref_en = ET.SubElement(c_in_en, "connection")
+                c_ref_en.set("refLocalId", "0")
+
+                for idx, (src_id, is_not) in enumerate(param_ids, start=2):
+                    var_in = ET.SubElement(in_vars, "variable")
+                    var_in.set("formalParameter", f"In{idx}")
+                    if is_not:
+                        var_in.set("negated", "true")
+                    c_in_b = ET.SubElement(var_in, "connectionPointIn")
+                    c_ref_b = ET.SubElement(c_in_b, "connection")
+                    c_ref_b.set("refLocalId", str(src_id))
+
+                ET.SubElement(block, "inOutVariables")
+                out_vars = ET.SubElement(block, "outputVariables")
+                # Broche ENO (non câblée)
+                var_eno = ET.SubElement(out_vars, "variable")
+                var_eno.set("formalParameter", "ENO")
+                ET.SubElement(var_eno, "connectionPointOut")
+
+                # Broche Out2 avec target expression
+                var_out = ET.SubElement(out_vars, "variable")
+                var_out.set("formalParameter", "Out2")
+                c_out = ET.SubElement(var_out, "connectionPointOut")
+                expr_out = ET.SubElement(c_out, "expression")
+                expr_out.text = out_var_name
+
+                b_adddata = ET.SubElement(block, "addData")
+                d_b = ET.SubElement(b_adddata, "data")
+                d_b.set("name", "http://www.3s-software.com/plcopenxml/fbdcalltype")
+                d_b.set("handleUnknown", "implementation")
+                call_type = ET.SubElement(d_b, "CallType")
+                call_type.set("xmlns", "")
+                call_type.text = "operator"
+                continue
+
+        # Expression AND (contacts en série)
         if ":=" in stmt_clean and " AND " in stmt_clean:
             parts = stmt_clean.split(":=")
             out_var_name = parts[0].strip()
-            conds = [c.strip() for c in parts[1].split("AND")]
+            raw_conds = [c.strip() for c in parts[1].split("AND")]
+            
+            valid_and = True
+            parsed_conds: list[tuple[str, bool]] = []
+            for c in raw_conds:
+                is_not = False
+                c_clean = c
+                if c.startswith("NOT "):
+                    is_not = True
+                    c_clean = c[4:].strip()
+                if re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", c_clean):
+                    parsed_conds.append((c_clean, is_not))
+                else:
+                    valid_and = False
+                    break
 
-            if all(re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", c) and not c.startswith("PRG_") for c in conds):
+            if valid_and:
                 prev_id = 0
-                for cond in conds:
+                for cond_name, is_not in parsed_conds:
                     cnt_id = local_id_counter
                     local_id_counter += 2
 
                     contact = ET.SubElement(ld, "contact")
                     contact.set("localId", str(cnt_id))
-                    contact.set("negated", "false")
+                    contact.set("negated", "true" if is_not else "false")
                     contact.set("storage", "none")
                     contact.set("edge", "none")
                     ET.SubElement(contact, "position", x="0", y="0")
@@ -712,7 +813,7 @@ def build_ld_body(
                     c_ref.set("refLocalId", str(prev_id))
                     ET.SubElement(contact, "connectionPointOut")
                     var_el = ET.SubElement(contact, "variable")
-                    var_el.text = cond
+                    var_el.text = cond_name
                     prev_id = cnt_id
 
                 coil_id = local_id_counter
@@ -734,18 +835,32 @@ def build_ld_body(
         if ":=" in stmt_clean and " OR " in stmt_clean:
             parts = stmt_clean.split(":=")
             out_var_name = parts[0].strip()
-            conds = [c.strip() for c in parts[1].split("OR")]
+            raw_conds = [c.strip() for c in parts[1].split("OR")]
+            
+            valid_or = True
+            parsed_or_conds: list[tuple[str, bool]] = []
+            for c in raw_conds:
+                is_not = False
+                c_clean = c
+                if c.startswith("NOT "):
+                    is_not = True
+                    c_clean = c[4:].strip()
+                if re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", c_clean):
+                    parsed_or_conds.append((c_clean, is_not))
+                else:
+                    valid_or = False
+                    break
 
-            if all(re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", c) and not c.startswith("PRG_") for c in conds):
+            if valid_or:
                 branch_ids = []
-                for cond in conds:
+                for cond_name, is_not in parsed_or_conds:
                     cnt_id = local_id_counter
                     local_id_counter += 2
                     branch_ids.append(cnt_id)
 
                     contact = ET.SubElement(ld, "contact")
                     contact.set("localId", str(cnt_id))
-                    contact.set("negated", "false")
+                    contact.set("negated", "true" if is_not else "false")
                     contact.set("storage", "none")
                     contact.set("edge", "none")
                     ET.SubElement(contact, "position", x="0", y="0")
@@ -754,7 +869,7 @@ def build_ld_body(
                     c_ref.set("refLocalId", "0")
                     ET.SubElement(contact, "connectionPointOut")
                     var_el = ET.SubElement(contact, "variable")
-                    var_el.text = cond
+                    var_el.text = cond_name
 
                 coil_id = local_id_counter
                 local_id_counter += 10
@@ -763,14 +878,14 @@ def build_ld_body(
                 coil.set("negated", "false")
                 coil.set("storage", "none")
                 ET.SubElement(coil, "position", x="0", y="0")
-            c_in_c = ET.SubElement(coil, "connectionPointIn")
-            for b_id in branch_ids:
-                c_ref_c = ET.SubElement(c_in_c, "connection")
-                c_ref_c.set("refLocalId", str(b_id))
-            ET.SubElement(coil, "connectionPointOut")
-            var_el = ET.SubElement(coil, "variable")
-            var_el.text = out_var_name
-            continue
+                c_in_c = ET.SubElement(coil, "connectionPointIn")
+                for b_id in branch_ids:
+                    c_ref_c = ET.SubElement(c_in_c, "connection")
+                    c_ref_c.set("refLocalId", str(b_id))
+                ET.SubElement(coil, "connectionPointOut")
+                var_el = ET.SubElement(coil, "variable")
+                var_el.text = out_var_name
+                continue
 
         # Recopie booléenne connue : contact → bobine. Le type est pris dans
         # l'interface réellement parsée du POU, jamais déduit du nom de variable.
@@ -778,39 +893,30 @@ def build_ld_body(
             parts = stmt_clean.split(":=", 1)
             target_var = parts[0].strip()
             source_expression = parts[1].strip()
-            direct_identifier = re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", source_expression)
+            direct_identifier = bool(re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*", source_expression))
 
-            # REX 2026-08-04 (PRG_06_Outputs_LD) : recopie BOOL d'un output de FB
-            # (ex. DummyReady := instSafety.Ready). La source pointée n'est pas dans
-            # boolean_identifiers (noms simples) → elle tombait dans le fallback
-            # inVariable → outVariable, qui provoque IndexOutOfRangeException à
-            # l'import CODESYS. On résout le type de l'output du FB via
-            # instance_output_type_map : si BOOL → contact → coil.
-            if (
-                direct_identifier
-                and not source_expression.startswith("PRG_")
-                and source_expression not in boolean_identifiers
-                and "." in source_expression
-            ):
-                inst_name, member_name = source_expression.split(".", 1)
-                # REX 2026-08-04 : les chemins nested (ex. instSafety.Diag.LockoutActive)
-                # ont plus d un point et ne peuvent pas etre des contacts LD valides.
-                # Seuls les outputs DIRECTS (ex. instSafety.Ready) peuvent etre des contacts.
-                if "." not in member_name:
-                    member_type = instance_output_type_map.get(inst_name, {}).get(member_name)
-                    if member_type == "BOOL":
-                        boolean_identifiers.add(source_expression)
+            # Résolution du type booléen :
+            # 1. target ou source déclarée explicitement dans boolean_identifiers
+            # 2. membre résolu comme BOOL dans instance_output_type_map
+            # 3. par défaut pour les signaux booléens simples sans type non-BOOL explicite
+            src_is_bool = source_expression in boolean_identifiers
+            if "." in source_expression:
+                s_inst, _, s_mem = source_expression.rpartition(".")
+                s_type = instance_output_type_map.get(s_inst, {}).get(s_mem)
+                if s_type == "BOOL":
+                    src_is_bool = True
+                elif s_type in SCALAR_TYPES:
+                    src_is_bool = False
 
-            if direct_identifier and not source_expression.startswith("PRG_") and source_expression in boolean_identifiers:
-                # REX 2026-08-04 : si la source est un output d un bloc FB connu
-                # (ex. instSafety.MaintainA_RQ), on cable la coil DIRECTEMENT au bloc
-                # (refLocalId=block_id, formalParameter=member) au lieu de creer un
-                # contact fantome cable au rail gauche qui provoque IndexOutOfRangeException.
+            is_bool_assignment = direct_identifier and (
+                target_var in boolean_identifiers
+                or src_is_bool
+                or (source_expression.startswith("PRG_") and not any(source_expression.endswith(w) for w in ("Word", "Hz", "Speed", "Ref", "Step", "Count", "Time")))
+                or (source_expression.startswith("GVL_") and not any(source_expression.endswith(w) for w in ("Word", "Hz", "Speed", "Ref", "Step", "Count", "Time")))
+            )
+
+            if is_bool_assignment:
                 inst_name, _, member_name = source_expression.partition(".")
-                # REX 2026-08-04 : formalParameter ne peut pas contenir de point.
-                # Pour un output DIRECT (ex. MaintainA_RQ) -> coil cablee au bloc.
-                # Pour un membre de struct (ex. Diag.LockoutActive) -> le chemin nested
-                # n est pas un formalParameter valide -> fallback inVariable/outVariable.
                 is_direct_output = (
                     inst_name in instance_block_map
                     and member_name in instance_output_type_map.get(inst_name, {})
@@ -835,7 +941,7 @@ def build_ld_body(
                     coil_variable.text = target_var
                     continue
 
-                # Sinon fallback : contact -> coil (variable BOOL simple)
+                # Sinon contact -> coil (variable BOOL simple ou qualifiée)
                 contact_id = local_id_counter
                 coil_id = local_id_counter + 1
                 local_id_counter += 10
@@ -862,6 +968,7 @@ def build_ld_body(
                 ET.SubElement(coil, "connectionPointOut")
                 coil_variable = ET.SubElement(coil, "variable")
                 coil_variable.text = target_var
+                continue
                 continue
 
             # Contact inversé : NOT variable → contact negated=true → coil

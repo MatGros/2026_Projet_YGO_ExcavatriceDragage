@@ -102,16 +102,6 @@ VAR
     EmergencyArmingCmd  : BOOL; (* Impulsion réarmement — cible du mapping E/S *)
 
     instSafetyEmergencyManagement : FB_Safety_EmergencyManagement;
-
-    // 🆕 Relais locaux pour le réseau informatif M1/M2/M3BlockedBySafetyInfo — copie simple
-    // avant OR (bug générateur ST→LD confirmé sur un OR à 2 branches qualifiées PRG_xx.*.*,
-    // contournement documenté, PAS une préférence de style).
-    M1SafeStopInfo      : BOOL;
-    M1ErrorInfo         : BOOL;
-    M2SafeStopInfo      : BOOL;
-    M2ErrorInfo         : BOOL;
-    M3SafeStopInfo      : BOOL;
-    M3ErrorInfo         : BOOL;
 END_VAR
 
 // === 🛡️ §1 BARRIÈRES FINALES M1 / M2 / M3 — INTERLOCKS VISIBLES ===
@@ -125,9 +115,16 @@ M1InterlockEnable := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable
                       AND NOT PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff;
 
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
-M1SafeStopInfo := PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop;
-M1ErrorInfo := PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error;
-M1BlockedBySafetyInfo := M1SafeStopInfo OR M1ErrorInfo;
+M1BlockedBySafetyInfo := OR(
+    PRG_04_Treuils_Benne.WinchM1SafetyHMI.SafeStop,
+    PRG_04_Treuils_Benne.WinchM1SafetyHMI.Error,
+    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaA,
+    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaB,
+    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaC,
+    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaD,
+    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ErrorMecaE,
+    PRG_04_Treuils_Benne.WinchM1SafetyHMI.ThermalFault
+);
 
 instWinchOutputInterlockM1(
     Enable                     := M1InterlockEnable,
@@ -161,9 +158,16 @@ M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
                       AND NOT PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff;
 
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
-M2SafeStopInfo := PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop;
-M2ErrorInfo := PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error;
-M2BlockedBySafetyInfo := M2SafeStopInfo OR M2ErrorInfo;
+M2BlockedBySafetyInfo := OR(
+    PRG_04_Treuils_Benne.WinchM2SafetyHMI.SafeStop,
+    PRG_04_Treuils_Benne.WinchM2SafetyHMI.Error,
+    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaA,
+    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaB,
+    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaD,
+    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ErrorMecaE,
+    PRG_04_Treuils_Benne.WinchM2SafetyHMI.ThermalFault,
+    PRG_04_Treuils_Benne.WinchM2SafetyHMI.SlackCable
+);
 
 instWinchOutputInterlockM2(
     Enable                     := M2InterlockEnable,
@@ -206,9 +210,14 @@ M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
                       AND NOT PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
-M3SafeStopInfo := PRG_05_Translation.TranslationSafetyHMI.SafeStop;
-M3ErrorInfo := PRG_05_Translation.TranslationSafetyHMI.Error;
-M3BlockedBySafetyInfo := M3SafeStopInfo OR M3ErrorInfo;
+M3BlockedBySafetyInfo := OR(
+    PRG_05_Translation.TranslationSafetyHMI.SafeStop,
+    PRG_05_Translation.TranslationSafetyHMI.Error,
+    PRG_05_Translation.TranslationSafetyHMI.ErrorMecaA,
+    PRG_05_Translation.TranslationSafetyHMI.ErrorMecaB,
+    PRG_05_Translation.TranslationSafetyHMI.ErrorLimitSwitch,
+    PRG_05_Translation.TranslationSafetyHMI.ErrorSensorIncoherent
+);
 
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,
@@ -222,42 +231,34 @@ instTranslationOutputInterlockM3(
 );
 
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
-M3_DriveControlWord := instTranslationOutputInterlockM3.DriveControlWord;
-M3_DriveFreqRefWord := instTranslationOutputInterlockM3.DriveFreqRefWord;
+M3_CommandWord := instTranslationOutputInterlockM3.DriveControlWord;
+M3_SetpointFrequencyHz := instTranslationOutputInterlockM3.DriveFreqRefWord;
 
-// === ⚡ §2 SORTIES PHYSIQUES (M1 / M2 / M3) — MAPPING E/S CODESYS OBLIGATOIRE ===
-// 🐛 FIX 2026-08-05 (audit terrain M3, contacteur frein jamais piloté) : ce POU
-// NE DÉCLARE PLUS et NE CÂBLE PLUS de coil sur les noms Device bruts (*_DQ/*_RQ,
-// ex. M1_RelayFwd_Up_DQ, M3_BrakeRelease_RQ). Un coil dessus faisait planter
-// l'import CODESYS (ArgumentNullException, REX 2026-08-04) ; le fix appliqué
-// alors (les déclarer en VAR_OUTPUT du POU) évitait le crash mais créait une
-// COLLISION DE PORTÉE avec la variable GLOBALE homonyme créée par le mapping
-// E/S du device (Device.export) : un identificateur local masque toujours un
-// global de même nom (IEC 61131-3) — toute écriture ICI ne pilotait donc
-// JAMAIS le matériel réel, sans aucune erreur pour le signaler (confirmé par
-// test terrain : écrire le même nom depuis un AUTRE POU pilotait bien le HW).
-//
-// 🔧 NOTE D'APPLICATION UTILISATEUR OBLIGATOIRE (mapping E/S CODESYS, hors
-// périmètre bundle) : dans l'onglet Mapping E/S de chaque device, chaque canal
-// physique doit être associé au CHEMIN QUALIFIÉ PRG_06_Outputs_LD.<variable
-// locale> ci-dessous — jamais à un nom nu qui recréerait la collision :
-//   M1_RelayFwd_Up_DQ        <- PRG_06_Outputs_LD.M1RelayFwd
-//   M1_RelayRev_Down_DQ      <- PRG_06_Outputs_LD.M1RelayRev
-//   M1_SpeedContactor_1..4_DQ<- PRG_06_Outputs_LD.M1SpeedContactor1..4
-//   M1_BrakeRelease_RQ       <- PRG_06_Outputs_LD.M1BrakeCmd
-//   M2_RelayFwd_Up_Close_DQ  <- PRG_06_Outputs_LD.M2RelayFwd
-//   M2_RelayRev_Down_Open_DQ <- PRG_06_Outputs_LD.M2RelayRev
-//   M2_SpeedContactor_1..4_DQ<- PRG_06_Outputs_LD.M2SpeedContactor1..4
-//   M2_BrakeRelease_RQ       <- PRG_06_Outputs_LD.M2BrakeCmd
-//   M1_M2_KoboldMeasureEnable_DQ <- PRG_06_Outputs_LD.KoboldContactorCmd   (🆕 2026-08-07 (12))
-//   M3_CommandWord           <- PRG_06_Outputs_LD.M3_DriveControlWord   (0x3101, %QW6)
-//   M3_SetpointFrequencyHz   <- PRG_06_Outputs_LD.M3_DriveFreqRefWord   (0x3100, %QW7)
-//   PowerKeepAlive_A_RQ      <- PRG_06_Outputs_LD.PowerKeepAliveACmd
-//   PowerKeepAlive_B_RQ      <- PRG_06_Outputs_LD.PowerKeepAliveBCmd
-//   EmergencyArming_RQ       <- PRG_06_Outputs_LD.EmergencyArmingCmd
-// Sans ce mapping (re)fait sur CHAQUE canal, aucune sortie moteur/frein M1/M2/M3 ni
-// la chaîne AU (maintien puissance/réarmement) ne bouge, même une fois
-// SafetyStructureNotValidated levé.
+// === ⚡ §2 SORTIES PHYSIQUES DIRECTES (M1 / M2 / M3 / AU / KOBOLD) — COILS HW ===
+// Pilotage direct des variables de mapping E/S matérielles :
+M1_RelayFwd_Up_DQ            := M1RelayFwd;
+M1_RelayRev_Down_DQ          := M1RelayRev;
+M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
+M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
+M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
+M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
+M1_BrakeRelease_RQ           := M1BrakeCmd;
+
+M2_RelayFwd_Up_Close_DQ      := M2RelayFwd;
+M2_RelayRev_Down_Open_DQ     := M2RelayRev;
+M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
+M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
+M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
+M2_SpeedContactor_4_DQ       := M2SpeedContactor4;
+M2_BrakeRelease_RQ           := M2BrakeCmd;
+
+M3_BrakeRelease_RQ           := TranslationBrakeCmd;
+
+M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd;
+
+PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
+PowerKeepAlive_B_RQ          := PowerKeepAliveBCmd;
+EmergencyArming_RQ           := EmergencyArmingCmd;
 
 // === 🌐 Recopie GVL_Global (lecture publique diagnostic/simulation) ===
 // GVL_Global.M1RelayFwd..TranslationBrakeCmd sont consommés par FB_SimBench
@@ -278,25 +279,6 @@ GVL_Global.M2SpeedContactor4 := M2SpeedContactor4;
 GVL_Global.M2BrakeCmd        := M2BrakeCmd;
 GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
 
-// === 🧪 Coil directe sur nom HW brut — essai 2026-08-06 (décision utilisateur) ===
-// ⚠️ Scope minimal délibéré : frein M3 UNIQUEMENT, pas généralisé à M1/M2/AU tant
-// que CE réseau précis n'est pas validé à l'import CODESYS. Risque documenté :
-// voir gen_prg06_oracle.py DIRECT_HW_COILS. Si l'import plante, retirer ce réseau
-// (section 2ter dans gen_prg06_oracle.py) et revenir au remap manuel qualifié
-// (PRG_06_Outputs_LD.TranslationBrakeCmd -> M3_BrakeRelease_RQ côté Mapping E/S).
-// 🔍 Constat export CODESYS 2026-08-06 : M3_BrakeRelease_RQ (%QX27.2, VH_0008ER,
-// la VRAIE bobine frein) est resté sur son nom brut par défaut jusqu'ici — le
-// remap manuel qualifié demandé par le lot précédent n'a jamais été appliqué à
-// ce canal précis. Cette coil directe est donc la première tentative réelle de
-// piloter cette sortie depuis PRG_06.
-M3_BrakeRelease_RQ := TranslationBrakeCmd;
-M3_CommandWord := M3_DriveControlWord;
-M3_SetpointFrequencyHz := M3_DriveFreqRefWord;
-// 🔴🔧 REX 2026-08-07 (12bis) — retour terrain, URGENT : ajouté au même titre que
-// M3_BrakeRelease_RQ ci-dessus (coil directe, DIRECT_HW_COILS dans gen_prg06_oracle.py) --
-// confirmé par l'utilisateur que ce pattern fonctionne réellement sur d'autres sorties HW déjà
-// en place, contrairement au remap qualifié seul (jamais appliqué manuellement pour ce canal).
-M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd;
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
 
@@ -331,7 +313,6 @@ PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;
 PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;
 EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;
 
-EmergencyArmingPulseActive := instSafetyEmergencyManagement.ArmPulse_RQ;
 EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
 ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
 RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;

@@ -175,8 +175,7 @@ Une restitution sans ce bloc est incomplète, quel que soit l'agent qui l'écrit
 > heures de diagnostic terrain avant identification. Le même schéma touchait aussi la
 > **chaîne AU** (`PowerKeepAlive_A_RQ`/`PowerKeepAlive_B_RQ`/`EmergencyArming_RQ`, confirmé
 > câblé réel par l'utilisateur) — corrigé dans le même lot. Détail complet et fix :
-> `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py` (`_build_actuator_network`
-> et `FB_SAFETY_OUTPUT_ASSIGNS`).
+> `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`.
 
 **Règle** : un `PROGRAM` ne déclare **jamais** de variable (`VAR`/`VAR_INPUT`/`VAR_OUTPUT`)
 portant le **nom exact** d'un point matériel du mapping E/S (`TOOLS/AGENT_WORKFLOW/config/
@@ -447,27 +446,52 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
   **aucun** `inVariable` ni `outVariable` — uniquement des `contact`, `coil`,
   `block` et `comment`.
 
-#### Structure confirmée du bloc `AND`/`OR` — REX 2026-08-13 (import CODESYS réel réussi)
+#### Structure confirmée du bloc opérateur `AND`/`OR` — REX 2026-08-15 (export/import CODESYS réel réussi)
 
-> 📌 **Portée** : cette structure produit une **valeur** (argument de fonction, condition ≥3
-> termes isolée pour le Watch). Pour câbler une condition **directement** vers une bobine/un
-> contact suivant dans le même rung, voir la convergence de contacts documentée dans
-> `GUIDES/GUIDE_IMPLEMENTATION_LADDER_PLCOPEN_XML_v1.0.md §4.1` — pas de bloc `AND`/`OR` là,
-> juste plusieurs `<connection>` dans un même `connectionPointIn`.
+> 📌 **Portée** : cette structure produit un bloc opérateur compact multi-entrées dans le réseau Ladder.
+> Utilisé lorsque le code ST contient explicitement `Target := OR(A, B, C, ...)` ou `Target := AND(A, B, C, ...)`.
 
-Premier pattern de condition composée **confirmé par un import CODESYS réel** dans ce projet
-(branches visibles dans l'éditeur LD, compilation propre) :
+Structure exacte confirmée par export réel CODESYS V3.5 SP19 Patch 1 (`TOOLS/SAMPLES_CODESYS/PRG_OR_AND_BLOC.xml`) :
 
 | Élément | Règle |
 |---|---|
-| `<block typeName="AND"\|"OR">` | `localId` **plus petit** que celui de toutes ses sources (même règle que pour un bloc FB, REX 2026-08-04) |
-| Broches d'entrée | `formalParameter="IN1"`, `"IN2"`, ... — une par opérande, jamais de chaîne série/parallèle |
-| Opérande `NOT x` | `negated="true"` sur la broche `INn`, jamais de texte `NOT` dans une expression |
-| Broche de sortie | `formalParameter="OUT"`, `connectionPointOut` sans expression — le bloc consommateur référence directement le `localId` du bloc `AND`/`OR` |
-| Imbrication (`A AND B OR C`) | un bloc peut être l'opérande d'un autre bloc — le `localId` du bloc source doit toujours rester supérieur à celui de son consommateur |
+| `<block typeName="AND"\|"OR">` | `localId` **plus petit** que celui de toutes ses sources |
+| `<addData>` CallType | `<CallType>operator</CallType>` (et non `function`) |
+| Broche `EN` (Entrée 1) | `formalParameter="EN"`, reliée au rail gauche `<connection refLocalId="0"/>` |
+| Broches d'entrée opérandes | `formalParameter="In2"`, `"In3"`, `"In4"`, ... — reliées aux `inVariable` d'entrée |
+| Opérande `NOT x` | `negated="true"` sur la broche `Inn` |
+| Broche `ENO` (Sortie 1) | `formalParameter="ENO"`, `<connectionPointOut/>` sans connexion |
+| Broche de résultat (Sortie 2) | `formalParameter="Out2"`, `<connectionPointOut><expression>TargetVar</expression></connectionPointOut>` |
+| Opérandes sources | `inVariable` déclarées en amont avec leur propre `localId` |
 
-Chaque opérande simple (variable, littéral `TRUE`/`FALSE`) reste un `inVariable` ; seul un
-sous-groupe `AND`/`OR` imbriqué devient lui-même un bloc.
+```xml
+<block localId="3" typeName="OR">
+  <position x="0" y="0"/>
+  <inputVariables>
+    <variable formalParameter="EN">
+      <connectionPointIn><connection refLocalId="0"/></connectionPointIn>
+    </variable>
+    <variable formalParameter="In2">
+      <connectionPointIn><connection refLocalId="4"/></connectionPointIn>
+    </variable>
+    <variable formalParameter="In3">
+      <connectionPointIn><connection refLocalId="5"/></connectionPointIn>
+    </variable>
+  </inputVariables>
+  <inOutVariables/>
+  <outputVariables>
+    <variable formalParameter="ENO"><connectionPointOut/></variable>
+    <variable formalParameter="Out2">
+      <connectionPointOut><expression>M1BlockedBySafetyInfo</expression></connectionPointOut>
+    </variable>
+  </outputVariables>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/fbdcalltype" handleUnknown="implementation">
+      <CallType xmlns="">operator</CallType>
+    </data>
+  </addData>
+</block>
+```
 
 ### Structures conditionnelles (`IF/ELSE`) — REX 2026-08-13
 

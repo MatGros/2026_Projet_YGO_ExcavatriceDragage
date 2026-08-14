@@ -122,11 +122,7 @@ dans le bloc lui-même** (`outputVariables/variable/connectionPointOut/expressio
 via son propre réseau séparé (ex. coil de recopie `GVL_Global.*`), jamais via un
 contact pointé sur la broche du bloc producteur.
 
-**Fichier concerné** : `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py`
-(fonctions `_build_winch_interlock_network` / `_build_translation_interlock_network`
-— assignation directe par expression ; la fonction intermédiaire
-`_build_interlock_output_networks` / `_make_contact_from_block_output`, source
-du bug, a été retirée).
+**Fichier concerné** : `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`
 
 **Preuve de non-régression** : vérifier après toute génération qu'aucun
 `<contact>` du bundle ne porte `connection[@formalParameter]` pointant vers un
@@ -150,9 +146,7 @@ du bug, a été retirée).
 |---|---|
 | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/file_discovery.py` | filtre `Bundle_*` (cause #1) |
 | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | coils→blocs, outputs dans bloc (causes 2-3) |
-| `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py` | script oracle : localId bloc, coils locales, pas de doublon, commentaires textuels |
-| `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/prg06_oracle_postprocess.py` | injection dans le bundle + ObjectId conservé |
-| `TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py` | applique le postprocess |
+| `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | Le convertisseur universel ST→LD traite désormais directement l'ensemble des POU `_LD`. |
 | `TOOLS/AGENT_WORKFLOW/scripts/G390_check_bundle_freshness.py` | vérifie le bundle frais |
 | `CODE/MAIN/PRG_06_Outputs_LD.st` | outputs directs du FB (au lieu de chemins nested) |
 

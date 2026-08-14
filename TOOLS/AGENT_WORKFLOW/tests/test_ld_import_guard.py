@@ -405,6 +405,8 @@ def test_bundle_prg06_outputs_ld_valid_invariables_and_block_refs() -> None:
             fp = iv.attrib.get("formalParameter")
             conn = iv.find(".//{http://www.plcopen.org/xml/tc6_0200}connection")
             ref = conn.attrib.get("refLocalId") if conn is not None else None
+            if fp == "EN" and ref == "0":
+                continue  # Broche EN connectée au leftPowerRail (localId="0")
             assert ref != "0", f"Block {b_name} parameter {fp} a un refLocalId='0' invalide"
 
     # 2. Vérifier qu'aucun inVariable ne contient 'TRUE' ou 'FALSE' en chaîne brute
