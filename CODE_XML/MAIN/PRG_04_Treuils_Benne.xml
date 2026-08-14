@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T23:18:50.322824" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T23:18:50.322824">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T23:37:27.765097" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T23:37:27.765097">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1824,32 +1824,32 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="WinchM1StateHMI">
+            <variable name="WinchM1State">
               <type>
                 <derived name="ST_WinchState" />
               </type>
             </variable>
-            <variable name="WinchM2StateHMI">
+            <variable name="WinchM2State">
               <type>
                 <derived name="ST_WinchState" />
               </type>
             </variable>
-            <variable name="WinchM1SafetyHMI">
+            <variable name="WinchM1Safety">
               <type>
                 <derived name="ST_SafetyWinch" />
               </type>
             </variable>
-            <variable name="WinchM2SafetyHMI">
+            <variable name="WinchM2Safety">
               <type>
                 <derived name="ST_SafetyWinch" />
               </type>
             </variable>
-            <variable name="SyncStateHMI">
+            <variable name="SyncState">
               <type>
                 <derived name="ST_SyncState" />
               </type>
             </variable>
-            <variable name="BucketStateHMI">
+            <variable name="BucketState">
               <type>
                 <derived name="ST_BucketHMIState" />
               </type>
@@ -3115,197 +3115,197 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 // l'agent (M1-M2, faux sens) -- le commentaire du type (ST_WinchState.st) dit explicitement
 // "variation de vitesse ENTRE DEUX SCANS", pas un écart M1/M2 (qui existe déjà ailleurs via
 // SyncStateHMI.DeltaPos_M/instWinchSync). Delta temporel via mémoire scan précédent.
-WinchM1StateHMI.MeasuredSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
-WinchM1StateHMI.SpeedDelta_Mps    := PRG_02_Acquisition.M1_Speed_Mps - M1_PrevSpeed_Mps;
+WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
+WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.M1_Speed_Mps - M1_PrevSpeed_Mps;
 M1_PrevSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
 
-WinchM1StateHMI.Position_M := PRG_02_Acquisition.CablePosM1;
-WinchM1StateHMI.SpeedRef_Pct := M1_SpeedRef_Active;
-WinchM1StateHMI.StepNumber := instWinchM1.StepNumber;
-WinchM1StateHMI.FBState := instWinchM1.State;
-WinchM1StateHMI.Ready := instWinchM1.Ready;
-WinchM1StateHMI.Busy := instWinchM1.Busy;
-WinchM1StateHMI.Done := instWinchM1.Done;
-WinchM1StateHMI.Error := instWinchM1.Error;
-WinchM1StateHMI.ErrorId := instWinchM1.ErrorId;
-WinchM1StateHMI.RelayFwd := instWinchM1.RelayFwd;
-WinchM1StateHMI.RelayRev := instWinchM1.RelayRev;
-WinchM1StateHMI.Contactor1 := instWinchM1.Contactor1;
-WinchM1StateHMI.Contactor2 := instWinchM1.Contactor2;
-WinchM1StateHMI.Contactor3 := instWinchM1.Contactor3;
-WinchM1StateHMI.Contactor4 := instWinchM1.Contactor4;
-WinchM1StateHMI.BrakeCmd := PRG_06_Outputs_LD.instWinchOutputInterlockM1.BrakeCmd;
-WinchM1StateHMI.BrakeCommandOpenConfirmed := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;
-WinchM1StateHMI.FinalAuthorizedStep := instWinchM1.RequestedStep;
-WinchM1StateHMI.ContactorsCheck := instWinchM1.ContactorsCheck;
-WinchM1StateHMI.FinalInterlockState := PRG_06_Outputs_LD.instWinchOutputInterlockM1.State;
-WinchM1StateHMI.FinalInterlockReason := PRG_06_Outputs_LD.instWinchOutputInterlockM1.Reason;
-WinchM1StateHMI.FinalInterlockError := PRG_06_Outputs_LD.instWinchOutputInterlockM1.Error;
-WinchM1StateHMI.FinalInterlockErrorId := PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId;
-WinchM1StateHMI.FinalRestartInhibit := PRG_06_Outputs_LD.instWinchOutputInterlockM1.RestartInhibit;
-WinchM1StateHMI.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
-WinchM1StateHMI.FinalRestartDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.RestartDelayElapsed;
-WinchM1StateHMI.FinalStepDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.StepDelayElapsed;
-WinchM1StateHMI.Encoder.RawPos := PRG_02_Acquisition.instEncoderAbsM1.RawPos;
-WinchM1StateHMI.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
-WinchM1StateHMI.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
-WinchM1StateHMI.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
-WinchM1StateHMI.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderAbsM1.PresetTriggerCmd;
-WinchM1StateHMI.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderAbsM1.PresetValueOut;
-WinchM1StateHMI.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM1.Error;
-WinchM1StateHMI.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM1.ErrorId;
-WinchM1StateHMI.Encoder.Homed := PRG_02_Acquisition.instHomingM1.Homed;
-WinchM1StateHMI.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM1.Busy;
-WinchM1StateHMI.Encoder.HomingDone := PRG_02_Acquisition.instHomingM1.Done;
-WinchM1StateHMI.Encoder.HomingError := PRG_02_Acquisition.instHomingM1.Error;
-WinchM1StateHMI.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM1.ErrorId;
-WinchM1StateHMI.Encoder.HomingState := PRG_02_Acquisition.instHomingM1.State;
-WinchM1StateHMI.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM1.StateAtError;
-WinchM1StateHMI.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM1.HomingSuspect;
-WinchM1StateHMI.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM1.HomingRefRaw;
-WinchM1StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
-WinchM1StateHMI.BottomLimitActiveM := BottomLimitM1_Active;
-WinchM1StateHMI.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
-WinchM1StateHMI.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
-WinchM1StateHMI.CommandedDirection := instWinchM1.CommandedDirection;
-WinchM1StateHMI.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElapsed;
-WinchM1StateHMI.DirectionChangePending := instWinchM1.DirectionChangePending;
+WinchM1State.Position_M := PRG_02_Acquisition.CablePosM1;
+WinchM1State.SpeedRef_Pct := M1_SpeedRef_Active;
+WinchM1State.StepNumber := instWinchM1.StepNumber;
+WinchM1State.FBState := instWinchM1.State;
+WinchM1State.Ready := instWinchM1.Ready;
+WinchM1State.Busy := instWinchM1.Busy;
+WinchM1State.Done := instWinchM1.Done;
+WinchM1State.Error := instWinchM1.Error;
+WinchM1State.ErrorId := instWinchM1.ErrorId;
+WinchM1State.RelayFwd := instWinchM1.RelayFwd;
+WinchM1State.RelayRev := instWinchM1.RelayRev;
+WinchM1State.Contactor1 := instWinchM1.Contactor1;
+WinchM1State.Contactor2 := instWinchM1.Contactor2;
+WinchM1State.Contactor3 := instWinchM1.Contactor3;
+WinchM1State.Contactor4 := instWinchM1.Contactor4;
+WinchM1State.BrakeCmd := PRG_06_Outputs_LD.instWinchOutputInterlockM1.BrakeCmd;
+WinchM1State.BrakeCommandOpenConfirmed := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;
+WinchM1State.FinalAuthorizedStep := instWinchM1.RequestedStep;
+WinchM1State.ContactorsCheck := instWinchM1.ContactorsCheck;
+WinchM1State.FinalInterlockState := PRG_06_Outputs_LD.instWinchOutputInterlockM1.State;
+WinchM1State.FinalInterlockReason := PRG_06_Outputs_LD.instWinchOutputInterlockM1.Reason;
+WinchM1State.FinalInterlockError := PRG_06_Outputs_LD.instWinchOutputInterlockM1.Error;
+WinchM1State.FinalInterlockErrorId := PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId;
+WinchM1State.FinalRestartInhibit := PRG_06_Outputs_LD.instWinchOutputInterlockM1.RestartInhibit;
+WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
+WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.RestartDelayElapsed;
+WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.StepDelayElapsed;
+WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderAbsM1.RawPos;
+WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
+WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
+WinchM1State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
+WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderAbsM1.PresetTriggerCmd;
+WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderAbsM1.PresetValueOut;
+WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM1.Error;
+WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM1.ErrorId;
+WinchM1State.Encoder.Homed := PRG_02_Acquisition.instHomingM1.Homed;
+WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM1.Busy;
+WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM1.Done;
+WinchM1State.Encoder.HomingError := PRG_02_Acquisition.instHomingM1.Error;
+WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM1.ErrorId;
+WinchM1State.Encoder.HomingState := PRG_02_Acquisition.instHomingM1.State;
+WinchM1State.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM1.StateAtError;
+WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM1.HomingSuspect;
+WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM1.HomingRefRaw;
+WinchM1State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
+WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
+WinchM1State.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
+WinchM1State.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
+WinchM1State.CommandedDirection := instWinchM1.CommandedDirection;
+WinchM1State.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElapsed;
+WinchM1State.DirectionChangePending := instWinchM1.DirectionChangePending;
 
 // 🔧 2026-08-07 (27) : voir bandeau M1 ci-dessus, même correctif.
-WinchM2StateHMI.MeasuredSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
-WinchM2StateHMI.SpeedDelta_Mps    := PRG_02_Acquisition.M2_Speed_Mps - M2_PrevSpeed_Mps;
+WinchM2State.MeasuredSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
+WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.M2_Speed_Mps - M2_PrevSpeed_Mps;
 M2_PrevSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
 
-WinchM2StateHMI.Position_M := PRG_02_Acquisition.CablePosM2;
-WinchM2StateHMI.SpeedRef_Pct := M2_SpeedRef_Active;
-WinchM2StateHMI.StepNumber := instWinchM2.StepNumber;
-WinchM2StateHMI.FBState := instWinchM2.State;
-WinchM2StateHMI.Ready := instWinchM2.Ready;
-WinchM2StateHMI.Busy := instWinchM2.Busy;
-WinchM2StateHMI.Done := instWinchM2.Done;
-WinchM2StateHMI.Error := instWinchM2.Error;
-WinchM2StateHMI.ErrorId := instWinchM2.ErrorId;
-WinchM2StateHMI.RelayFwd := instWinchM2.RelayFwd;
-WinchM2StateHMI.RelayRev := instWinchM2.RelayRev;
-WinchM2StateHMI.Contactor1 := instWinchM2.Contactor1;
-WinchM2StateHMI.Contactor2 := instWinchM2.Contactor2;
-WinchM2StateHMI.Contactor3 := instWinchM2.Contactor3;
-WinchM2StateHMI.Contactor4 := instWinchM2.Contactor4;
-WinchM2StateHMI.BrakeCmd := PRG_06_Outputs_LD.instWinchOutputInterlockM2.BrakeCmd;
-WinchM2StateHMI.BrakeCommandOpenConfirmed := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;
-WinchM2StateHMI.FinalAuthorizedStep := instWinchM2.RequestedStep;
-WinchM2StateHMI.ContactorsCheck := instWinchM2.ContactorsCheck;
-WinchM2StateHMI.FinalInterlockState := PRG_06_Outputs_LD.instWinchOutputInterlockM2.State;
-WinchM2StateHMI.FinalInterlockReason := PRG_06_Outputs_LD.instWinchOutputInterlockM2.Reason;
-WinchM2StateHMI.FinalInterlockError := PRG_06_Outputs_LD.instWinchOutputInterlockM2.Error;
-WinchM2StateHMI.FinalInterlockErrorId := PRG_06_Outputs_LD.instWinchOutputInterlockM2.ErrorId;
-WinchM2StateHMI.FinalRestartInhibit := PRG_06_Outputs_LD.instWinchOutputInterlockM2.RestartInhibit;
-WinchM2StateHMI.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
-WinchM2StateHMI.FinalRestartDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.RestartDelayElapsed;
-WinchM2StateHMI.FinalStepDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.StepDelayElapsed;
-WinchM2StateHMI.Encoder.RawPos := PRG_02_Acquisition.instEncoderAbsM2.RawPos;
-WinchM2StateHMI.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
-WinchM2StateHMI.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
-WinchM2StateHMI.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
-WinchM2StateHMI.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderAbsM2.PresetTriggerCmd;
-WinchM2StateHMI.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderAbsM2.PresetValueOut;
-WinchM2StateHMI.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM2.Error;
-WinchM2StateHMI.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM2.ErrorId;
-WinchM2StateHMI.Encoder.Homed := PRG_02_Acquisition.instHomingM2.Homed;
-WinchM2StateHMI.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM2.Busy;
-WinchM2StateHMI.Encoder.HomingDone := PRG_02_Acquisition.instHomingM2.Done;
-WinchM2StateHMI.Encoder.HomingError := PRG_02_Acquisition.instHomingM2.Error;
-WinchM2StateHMI.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM2.ErrorId;
-WinchM2StateHMI.Encoder.HomingState := PRG_02_Acquisition.instHomingM2.State;
-WinchM2StateHMI.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM2.StateAtError;
-WinchM2StateHMI.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM2.HomingSuspect;
-WinchM2StateHMI.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM2.HomingRefRaw;
-WinchM2StateHMI.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
-WinchM2StateHMI.BottomLimitActiveM := BottomLimitM2_Active;
-WinchM2StateHMI.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
-WinchM2StateHMI.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
-WinchM2StateHMI.CommandedDirection := instWinchM2.CommandedDirection;
-WinchM2StateHMI.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElapsed;
-WinchM2StateHMI.DirectionChangePending := instWinchM2.DirectionChangePending;
+WinchM2State.Position_M := PRG_02_Acquisition.CablePosM2;
+WinchM2State.SpeedRef_Pct := M2_SpeedRef_Active;
+WinchM2State.StepNumber := instWinchM2.StepNumber;
+WinchM2State.FBState := instWinchM2.State;
+WinchM2State.Ready := instWinchM2.Ready;
+WinchM2State.Busy := instWinchM2.Busy;
+WinchM2State.Done := instWinchM2.Done;
+WinchM2State.Error := instWinchM2.Error;
+WinchM2State.ErrorId := instWinchM2.ErrorId;
+WinchM2State.RelayFwd := instWinchM2.RelayFwd;
+WinchM2State.RelayRev := instWinchM2.RelayRev;
+WinchM2State.Contactor1 := instWinchM2.Contactor1;
+WinchM2State.Contactor2 := instWinchM2.Contactor2;
+WinchM2State.Contactor3 := instWinchM2.Contactor3;
+WinchM2State.Contactor4 := instWinchM2.Contactor4;
+WinchM2State.BrakeCmd := PRG_06_Outputs_LD.instWinchOutputInterlockM2.BrakeCmd;
+WinchM2State.BrakeCommandOpenConfirmed := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;
+WinchM2State.FinalAuthorizedStep := instWinchM2.RequestedStep;
+WinchM2State.ContactorsCheck := instWinchM2.ContactorsCheck;
+WinchM2State.FinalInterlockState := PRG_06_Outputs_LD.instWinchOutputInterlockM2.State;
+WinchM2State.FinalInterlockReason := PRG_06_Outputs_LD.instWinchOutputInterlockM2.Reason;
+WinchM2State.FinalInterlockError := PRG_06_Outputs_LD.instWinchOutputInterlockM2.Error;
+WinchM2State.FinalInterlockErrorId := PRG_06_Outputs_LD.instWinchOutputInterlockM2.ErrorId;
+WinchM2State.FinalRestartInhibit := PRG_06_Outputs_LD.instWinchOutputInterlockM2.RestartInhibit;
+WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
+WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.RestartDelayElapsed;
+WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.StepDelayElapsed;
+WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderAbsM2.RawPos;
+WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
+WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
+WinchM2State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
+WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderAbsM2.PresetTriggerCmd;
+WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderAbsM2.PresetValueOut;
+WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM2.Error;
+WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM2.ErrorId;
+WinchM2State.Encoder.Homed := PRG_02_Acquisition.instHomingM2.Homed;
+WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM2.Busy;
+WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM2.Done;
+WinchM2State.Encoder.HomingError := PRG_02_Acquisition.instHomingM2.Error;
+WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM2.ErrorId;
+WinchM2State.Encoder.HomingState := PRG_02_Acquisition.instHomingM2.State;
+WinchM2State.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM2.StateAtError;
+WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM2.HomingSuspect;
+WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM2.HomingRefRaw;
+WinchM2State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
+WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
+WinchM2State.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
+WinchM2State.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
+WinchM2State.CommandedDirection := instWinchM2.CommandedDirection;
+WinchM2State.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElapsed;
+WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
 
-WinchM1SafetyHMI.SafeStop := SafeStopM1_Active;
-WinchM1SafetyHMI.ForbidAscent := ForbidAscentM1_Active;
-WinchM1SafetyHMI.ForbidDescent := ForbidDescentM1_Active;
-WinchM1SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
-WinchM1SafetyHMI.PowerCutOff := instSafetyWinchM1.PowerCutOff;
-WinchM1SafetyHMI.BrakeTimeoutFault := (PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId AND 16#0001) &lt;&gt; 0;
-WinchM1SafetyHMI.Error := instWinchM1.Error OR instSafetyWinchM1.Error;
-WinchM1SafetyHMI.ErrorId := instSafetyWinchM1.ErrorId;
-WinchM1SafetyHMI.ErrorOperatorComm  := (instSafetyWinchM1.ErrorId AND 16#0001) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorEncoder       := (instSafetyWinchM1.ErrorId AND 16#0002) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorPhaseRotation := (instSafetyWinchM1.ErrorId AND 16#0010) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorBrakeThermal  := (instSafetyWinchM1.ErrorId AND 16#0400) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorMecaA         := (instSafetyWinchM1.ErrorId AND 16#0080) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorMecaB         := (instSafetyWinchM1.ErrorId AND 16#0100) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorMecaC         := (instSafetyWinchM1.ErrorId AND 16#0200) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorMecaD         := (instSafetyWinchM1.ErrorId AND 16#0800) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorMecaE         := (instSafetyWinchM1.ErrorId AND 16#3000) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorOppositeDir   := (instSafetyWinchM1.ErrorId AND 16#4000) &lt;&gt; 0;
-WinchM1SafetyHMI.ErrorNoMovement    := (instSafetyWinchM1.ErrorId AND 16#8000) &lt;&gt; 0;
-WinchM1SafetyHMI.PowerCutOffSafety  := PRG_06_Outputs_LD.M1PowerCutOffSafetyInfo;
-WinchM1SafetyHMI.SafeStopSafety     := PRG_06_Outputs_LD.M1SafeStopSafetyInfo;
-WinchM1SafetyHMI.BlockedBySafety    := PRG_06_Outputs_LD.M1BlockedBySafetyInfo;
+WinchM1Safety.SafeStop := SafeStopM1_Active;
+WinchM1Safety.ForbidAscent := ForbidAscentM1_Active;
+WinchM1Safety.ForbidDescent := ForbidDescentM1_Active;
+WinchM1Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
+WinchM1Safety.PowerCutOff := instSafetyWinchM1.PowerCutOff;
+WinchM1Safety.BrakeTimeoutFault := (PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM1Safety.Error := instWinchM1.Error OR instSafetyWinchM1.Error;
+WinchM1Safety.ErrorId := instSafetyWinchM1.ErrorId;
+WinchM1Safety.ErrorOperatorComm  := (instSafetyWinchM1.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM1Safety.ErrorEncoder       := (instSafetyWinchM1.ErrorId AND 16#0002) &lt;&gt; 0;
+WinchM1Safety.ErrorPhaseRotation := (instSafetyWinchM1.ErrorId AND 16#0010) &lt;&gt; 0;
+WinchM1Safety.ErrorBrakeThermal  := (instSafetyWinchM1.ErrorId AND 16#0400) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaA         := (instSafetyWinchM1.ErrorId AND 16#0080) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaB         := (instSafetyWinchM1.ErrorId AND 16#0100) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaC         := (instSafetyWinchM1.ErrorId AND 16#0200) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaD         := (instSafetyWinchM1.ErrorId AND 16#0800) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaE         := (instSafetyWinchM1.ErrorId AND 16#3000) &lt;&gt; 0;
+WinchM1Safety.ErrorOppositeDir   := (instSafetyWinchM1.ErrorId AND 16#4000) &lt;&gt; 0;
+WinchM1Safety.ErrorNoMovement    := (instSafetyWinchM1.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM1Safety.PowerCutOffSafety  := PRG_06_Outputs_LD.M1PowerCutOffSafetyInfo;
+WinchM1Safety.SafeStopSafety     := PRG_06_Outputs_LD.M1SafeStopSafetyInfo;
+WinchM1Safety.BlockedBySafety    := PRG_06_Outputs_LD.M1BlockedBySafetyInfo;
 
-WinchM2SafetyHMI.SafeStop := SafeStopM2_Active;
-WinchM2SafetyHMI.ForbidAscent := ForbidAscentM2_Active;
-WinchM2SafetyHMI.ForbidDescent := ForbidDescentM2_Active;
-WinchM2SafetyHMI.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
-WinchM2SafetyHMI.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
-WinchM2SafetyHMI.PowerCutOff := instSafetyWinchM2.PowerCutOff;
-WinchM2SafetyHMI.Error := instWinchM2.Error OR instSafetyWinchM2.Error;
-WinchM2SafetyHMI.ErrorId := instSafetyWinchM2.ErrorId;
-WinchM2SafetyHMI.ErrorOperatorComm  := (instSafetyWinchM2.ErrorId AND 16#0001) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorEncoder       := (instSafetyWinchM2.ErrorId AND 16#0002) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorPhaseRotation := (instSafetyWinchM2.ErrorId AND 16#0010) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorBrakeThermal  := (instSafetyWinchM2.ErrorId AND 16#0400) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorMecaA         := (instSafetyWinchM2.ErrorId AND 16#0080) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorMecaB         := (instSafetyWinchM2.ErrorId AND 16#0100) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorMecaC         := (instSafetyWinchM2.ErrorId AND 16#0200) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorMecaD         := (instSafetyWinchM2.ErrorId AND 16#0800) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorMecaE         := (instSafetyWinchM2.ErrorId AND 16#3000) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorOppositeDir   := (instSafetyWinchM2.ErrorId AND 16#4000) &lt;&gt; 0;
-WinchM2SafetyHMI.ErrorNoMovement    := (instSafetyWinchM2.ErrorId AND 16#8000) &lt;&gt; 0;
-WinchM2SafetyHMI.PowerCutOffSafety  := PRG_06_Outputs_LD.M2PowerCutOffSafetyInfo;
-WinchM2SafetyHMI.SafeStopSafety     := PRG_06_Outputs_LD.M2SafeStopSafetyInfo;
-WinchM2SafetyHMI.BlockedBySafety    := PRG_06_Outputs_LD.M2BlockedBySafetyInfo;
+WinchM2Safety.SafeStop := SafeStopM2_Active;
+WinchM2Safety.ForbidAscent := ForbidAscentM2_Active;
+WinchM2Safety.ForbidDescent := ForbidDescentM2_Active;
+WinchM2Safety.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
+WinchM2Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
+WinchM2Safety.PowerCutOff := instSafetyWinchM2.PowerCutOff;
+WinchM2Safety.Error := instWinchM2.Error OR instSafetyWinchM2.Error;
+WinchM2Safety.ErrorId := instSafetyWinchM2.ErrorId;
+WinchM2Safety.ErrorOperatorComm  := (instSafetyWinchM2.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM2Safety.ErrorEncoder       := (instSafetyWinchM2.ErrorId AND 16#0002) &lt;&gt; 0;
+WinchM2Safety.ErrorPhaseRotation := (instSafetyWinchM2.ErrorId AND 16#0010) &lt;&gt; 0;
+WinchM2Safety.ErrorBrakeThermal  := (instSafetyWinchM2.ErrorId AND 16#0400) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaA         := (instSafetyWinchM2.ErrorId AND 16#0080) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaB         := (instSafetyWinchM2.ErrorId AND 16#0100) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaC         := (instSafetyWinchM2.ErrorId AND 16#0200) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaD         := (instSafetyWinchM2.ErrorId AND 16#0800) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaE         := (instSafetyWinchM2.ErrorId AND 16#3000) &lt;&gt; 0;
+WinchM2Safety.ErrorOppositeDir   := (instSafetyWinchM2.ErrorId AND 16#4000) &lt;&gt; 0;
+WinchM2Safety.ErrorNoMovement    := (instSafetyWinchM2.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM2Safety.PowerCutOffSafety  := PRG_06_Outputs_LD.M2PowerCutOffSafetyInfo;
+WinchM2Safety.SafeStopSafety     := PRG_06_Outputs_LD.M2SafeStopSafetyInfo;
+WinchM2Safety.BlockedBySafety    := PRG_06_Outputs_LD.M2BlockedBySafetyInfo;
 
-SyncStateHMI.DeltaPos_M := instWinchSync.SignedDeltaPosM;
-SyncStateHMI.SyncActive := instWinchSync.SyncActive;
-SyncStateHMI.SyncWarn := instWinchSync.SyncWarn;
-SyncStateHMI.Ready := instWinchSync.Ready;
-SyncStateHMI.Error := instWinchSync.Error;
-SyncStateHMI.ErrorId := instWinchSync.ErrorId;
-SyncStateHMI.FBState := instWinchSync.State;
+SyncState.DeltaPos_M := instWinchSync.SignedDeltaPosM;
+SyncState.SyncActive := instWinchSync.SyncActive;
+SyncState.SyncWarn := instWinchSync.SyncWarn;
+SyncState.Ready := instWinchSync.Ready;
+SyncState.Error := instWinchSync.Error;
+SyncState.ErrorId := instWinchSync.ErrorId;
+SyncState.FBState := instWinchSync.State;
 
-BucketStateHMI.MechState := _BucketState;
-BucketStateHMI.FBState := instBucket.State;
-BucketStateHMI.ActiveOffset_M := instBucket.ActiveOffsetM;
-BucketStateHMI.M2StartStop := instBucket.M2_StartStop;
-BucketStateHMI.M2Direction := instBucket.M2_Direction;
-BucketStateHMI.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
-BucketStateHMI.M2PositionCorrected := PRG_02_Acquisition.CablePosM2 - instBucket.ActiveOffsetM;
-BucketStateHMI.Ready := instBucket.Ready;
-BucketStateHMI.Busy := instBucket.Busy;
-BucketStateHMI.Done := instBucket.Done;
-BucketStateHMI.Error := instBucket.Error;
-BucketStateHMI.ErrorId := instBucket.ErrorId;
-BucketStateHMI.RemainingTravel_M := instBucket.RemainingTravelM;
-BucketStateHMI.CloseActive := instBucket.CloseReq;
-BucketStateHMI.OpenActive := instBucket.OpenReq;
+BucketState.MechState := _BucketState;
+BucketState.FBState := instBucket.State;
+BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
+BucketState.M2StartStop := instBucket.M2_StartStop;
+BucketState.M2Direction := instBucket.M2_Direction;
+BucketState.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
+BucketState.M2PositionCorrected := PRG_02_Acquisition.CablePosM2 - instBucket.ActiveOffsetM;
+BucketState.Ready := instBucket.Ready;
+BucketState.Busy := instBucket.Busy;
+BucketState.Done := instBucket.Done;
+BucketState.Error := instBucket.Error;
+BucketState.ErrorId := instBucket.ErrorId;
+BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
+BucketState.CloseActive := instBucket.CloseReq;
+BucketState.OpenActive := instBucket.OpenReq;
 // 🔧 2026-08-07 : corrigé -- pointait sur DumpAtTremieBucketOpenArmed (mauvais signal, deviné
 // par l'agent Fiche 02 avant que la Fiche 01 ne soit committée). Reflète maintenant le vrai
 // séquencement auto Fiche 01 : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
 // vitesse contrôlée post-fermeture.
-BucketStateHMI.AutoBucketSeqActive := (instBucket.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
-BucketStateHMI.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
-BucketStateHMI.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
-BucketStateHMI.ControlAscentActive := ControlAscentActive;
-BucketStateHMI.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
+BucketState.AutoBucketSeqActive := (instBucket.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
+BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
+BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
+BucketState.ControlAscentActive := ControlAscentActive;
+BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 

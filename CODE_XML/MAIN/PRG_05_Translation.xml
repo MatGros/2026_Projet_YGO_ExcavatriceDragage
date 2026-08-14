@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T23:18:52.755679" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T23:18:52.755679">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T23:38:11.232496" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T23:38:11.232496">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -772,12 +772,12 @@
                 <derived name="ST_TranslationFinalInterlockRequest" />
               </type>
             </variable>
-            <variable name="TranslationStateHMI">
+            <variable name="TranslationState">
               <type>
                 <derived name="ST_TranslationState" />
               </type>
             </variable>
-            <variable name="TranslationSafetyHMI">
+            <variable name="TranslationSafety">
               <type>
                 <derived name="ST_SafetyTranslation" />
               </type>
@@ -1268,71 +1268,71 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
 
 {region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
-TranslationStateHMI.FBState := instTranslationM3.State;
-TranslationStateHMI.Ready := instTranslationM3.Ready;
-TranslationStateHMI.Busy := instTranslationM3.Busy;
-TranslationStateHMI.Done := instTranslationM3.Done;
-TranslationStateHMI.Error := instTranslationM3.Error;
-TranslationStateHMI.ErrorId := instTranslationM3.ErrorId;
-TranslationStateHMI.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
-TranslationStateHMI.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
-TranslationStateHMI.PositionReached := instTranslationM3.TargetReached;
-TranslationStateHMI.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
-TranslationStateHMI.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
-TranslationStateHMI.ActiveDirection := M3_Direction_Active;
-TranslationStateHMI.ActiveSpeedRef_Pct := M3_SpeedRef_Active;
-TranslationStateHMI.PositionTremie := PRG_02_Acquisition.TranslationPosTremie;
-TranslationStateHMI.PositionPV := PRG_02_Acquisition.TranslationPosPV;
-TranslationStateHMI.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
-TranslationStateHMI.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
-TranslationStateHMI.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
+TranslationState.FBState := instTranslationM3.State;
+TranslationState.Ready := instTranslationM3.Ready;
+TranslationState.Busy := instTranslationM3.Busy;
+TranslationState.Done := instTranslationM3.Done;
+TranslationState.Error := instTranslationM3.Error;
+TranslationState.ErrorId := instTranslationM3.ErrorId;
+TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
+TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
+TranslationState.PositionReached := instTranslationM3.TargetReached;
+TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
+TranslationState.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
+TranslationState.ActiveDirection := M3_Direction_Active;
+TranslationState.ActiveSpeedRef_Pct := M3_SpeedRef_Active;
+TranslationState.PositionTremie := PRG_02_Acquisition.TranslationPosTremie;
+TranslationState.PositionPV := PRG_02_Acquisition.TranslationPosPV;
+TranslationState.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
+TranslationState.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
+TranslationState.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
 // 🆕 2026-08-06 (design opérateur) : affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
 // (direction-dépendant), libéré sur mouvement réel confirmé ≥1.5s (pas juste un rebond capteur
 // ni un changement de sens instantané). Même signal que celui consommé par M3_PositionSensorTarget.
-TranslationStateHMI.AtTremie := M3_AtTremieStable;
-TranslationStateHMI.AtPV := M3_AtPVStable;
-TranslationStateHMI.AtP2 := M3_AtP2Stable;
-TranslationStateHMI.AtP1 := M3_AtP1Stable;
-TranslationStateHMI.AtMaintenance := M3_AtMaintenanceStable;
-TranslationStateHMI.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
-TranslationStateHMI.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
-TranslationStateHMI.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
-TranslationStateHMI.LimitSwitchFwd := M3_LimitSwitchFwdStable;
-TranslationStateHMI.LimitSwitchRev := M3_LimitSwitchRevStable;
-TranslationStateHMI.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
-TranslationStateHMI.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
-TranslationStateHMI.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
-TranslationStateHMI.FinalInterlockState := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State;
-TranslationStateHMI.FinalInterlockReason := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason;
-TranslationStateHMI.FinalInterlockError := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Error;
-TranslationStateHMI.FinalInterlockErrorId := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.ErrorId;
-TranslationStateHMI.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
-TranslationStateHMI.DriveCommReady := (PRG_02_Acquisition.M3_StatusWord_Filtered AND 16#0080) &lt;&gt; 0;
-TranslationStateHMI.DrivePowerReady := (PRG_02_Acquisition.M3_StatusWord_Filtered AND 16#0001) &lt;&gt; 0;
-TranslationStateHMI.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
-TranslationStateHMI.SimulationModeActive := GVL_Simulation.SimulationModeActive;
+TranslationState.AtTremie := M3_AtTremieStable;
+TranslationState.AtPV := M3_AtPVStable;
+TranslationState.AtP2 := M3_AtP2Stable;
+TranslationState.AtP1 := M3_AtP1Stable;
+TranslationState.AtMaintenance := M3_AtMaintenanceStable;
+TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
+TranslationState.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
+TranslationState.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
+TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
+TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
+TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
+TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
+TranslationState.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
+TranslationState.FinalInterlockState := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State;
+TranslationState.FinalInterlockReason := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason;
+TranslationState.FinalInterlockError := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Error;
+TranslationState.FinalInterlockErrorId := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.ErrorId;
+TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
+TranslationState.DriveCommReady := (PRG_02_Acquisition.M3_StatusWord_Filtered AND 16#0080) &lt;&gt; 0;
+TranslationState.DrivePowerReady := (PRG_02_Acquisition.M3_StatusWord_Filtered AND 16#0001) &lt;&gt; 0;
+TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
+TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 
 // 🛡️ Producteur unique (CODE_QUALITY_STANDARDS §5) : la safety M3 (instSafetyTranslationM3)
 // est désormais la source de tous les diagnostics de sécurité — ErrorLimitSwitch/
 // ErrorSensorIncoherent ne sont plus recalculés ici (ancien calcul ignorait les bypass,
 // pouvait afficher un défaut alors qu'il était sciemment bypassé). Les erreurs propres au
-// mouvement (frein, variateur AC600) restent sur TranslationStateHMI.ErrorId ci-dessus,
+// mouvement (frein, variateur AC600) restent sur TranslationState.ErrorId ci-dessus,
 // bitfield différent, jamais mélangé.
-TranslationSafetyHMI.SafeStop := M3_SafeStop_Aggregate;
-TranslationSafetyHMI.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
-TranslationSafetyHMI.Error := instSafetyTranslationM3.Error;
-TranslationSafetyHMI.ErrorId := instSafetyTranslationM3.ErrorId;
-TranslationSafetyHMI.ErrorOperatorComm := instSafetyTranslationM3.ErrorOperatorComm;
-TranslationSafetyHMI.ErrorDriveComm := instSafetyTranslationM3.ErrorDriveComm;
-TranslationSafetyHMI.ErrorPhaseRotation := instSafetyTranslationM3.ErrorPhaseRotation;
-TranslationSafetyHMI.ErrorBrakeThermal := instSafetyTranslationM3.ErrorBrakeThermal;
-TranslationSafetyHMI.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
-TranslationSafetyHMI.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
-TranslationSafetyHMI.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
-TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
-TranslationSafetyHMI.PowerCutOffSafety := PRG_06_Outputs_LD.M3PowerCutOffSafetyInfo;
-TranslationSafetyHMI.SafeStopSafety := PRG_06_Outputs_LD.M3SafeStopSafetyInfo;
-TranslationSafetyHMI.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
+TranslationSafety.SafeStop := M3_SafeStop_Aggregate;
+TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
+TranslationSafety.Error := instSafetyTranslationM3.Error;
+TranslationSafety.ErrorId := instSafetyTranslationM3.ErrorId;
+TranslationSafety.ErrorOperatorComm := instSafetyTranslationM3.ErrorOperatorComm;
+TranslationSafety.ErrorDriveComm := instSafetyTranslationM3.ErrorDriveComm;
+TranslationSafety.ErrorPhaseRotation := instSafetyTranslationM3.ErrorPhaseRotation;
+TranslationSafety.ErrorBrakeThermal := instSafetyTranslationM3.ErrorBrakeThermal;
+TranslationSafety.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
+TranslationSafety.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
+TranslationSafety.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
+TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
+TranslationSafety.PowerCutOffSafety := PRG_06_Outputs_LD.M3PowerCutOffSafetyInfo;
+TranslationSafety.SafeStopSafety := PRG_06_Outputs_LD.M3SafeStopSafetyInfo;
+TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
 
 {endregion}
 </xhtml>
