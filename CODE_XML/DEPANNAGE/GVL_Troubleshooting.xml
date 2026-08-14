@@ -843,6 +843,31 @@ TRUE = Mode MAINT_N1 ou MAINT_N2 actif ➔ Commutateur Mode IHM : GVL_IHM.Modes<
 TRUE = Codeur EtherCAT OK &amp; E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimSafetyActive=1</xhtml>
               </documentation>
             </variable>
+            <variable name="HwIn_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2bis. Entrées physiques directes HwIn (vérité terrain)
+Retours contacteurs retombés issus de HwIn.Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour fin de course frein (1 = ouvert) issu de HwIn.Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun libre (1 = libre) issu de HwIn.Winch</xhtml>
+              </documentation>
+            </variable>
             <variable name="Step4_ContactorsReleased">
               <type>
                 <BOOL />
@@ -961,6 +986,31 @@ TRUE = Bus CANopen en état ACTIVE</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Esclave JOY1 en état RUNNING</xhtml>
               </documentation>
             </variable>
+            <variable name="HwIn_JoyBtnRaw_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1bis. Entrées physiques directes HwIn
+Bouton brut homme-mort issu de HwIn.Operator</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXAct">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe X au neutre (PRG_02_Acquisition.JoystickXNeutral)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralYAct">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe Y au neutre (PRG_02_Acquisition.JoystickYNeutral)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Step3_DeadmanPressed">
               <type>
                 <BOOL />
@@ -1069,6 +1119,31 @@ TRUE = Contacteur principal sous tension (PowerContactorEngaged_DI) ➔ Armer pu
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Pas d'autre séquence en cours (Homing, Benne busy, etc.)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1bis. Entrées physiques directes HwIn (vérité terrain)
+Contacteur puissance principal issu de HwIn.Machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour fin de course frein (1 = ouvert) issu de HwIn</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cmd_BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre de commande d'ouverture de frein généré par l'automate</xhtml>
               </documentation>
             </variable>
             <variable name="Step4_MotionRequested">
@@ -1197,6 +1272,31 @@ TRUE = bit maitre simu actif (GVL_Simulation.SimulationModeActive)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = domaine Safety simule ➔ Step1-3 lisent FB_Sim_Safety, pas les DI/comm reelles</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_EmergencyChainClosed_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0bis. Entrées physiques directes HwIn (vérité terrain)
+Boucle AU physique ou simulée issue de HwIn.Machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur de puissance issu de HwIn.Machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_EmergencyBtnCut_HMI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande coupure AU IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Step1_InputModulesOk">

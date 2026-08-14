@@ -15,7 +15,7 @@
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
 *)
 FUNCTION_BLOCK FB_Sim_Safety
 VAR_INPUT

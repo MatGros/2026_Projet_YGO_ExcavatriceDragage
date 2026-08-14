@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:08:41.539466" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:08:41.539466">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T20:20:49.195816" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T20:20:49.195816">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -114,7 +114,7 @@
         et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
       - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.2.md</xhtml>
+   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md</xhtml>
           </documentation>
         </interface>
         <body>

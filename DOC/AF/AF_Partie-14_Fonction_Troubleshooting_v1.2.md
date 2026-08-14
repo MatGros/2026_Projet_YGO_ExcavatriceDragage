@@ -116,8 +116,12 @@ safety formelle.
 > ⚠️ Cette table ne valide pas les fonctions de limite haute, de frein, d'AU ou de SafeStop. Elle
 > indique les observations à relever ; chaque fonction nécessite encore sa recette dédiée.
 
-## 2.4 Diagnostic réarmement AU — vue unique
+## 2.4 Diagnostic réarmement AU & Checklist chronologique — vue unique
 
-La checklist `GVL_Troubleshooting.Safety` suit l'ordre AF01 §5.3 : modules, demande AU, boucle fermée, contacteur relâché, puis état armable. Elle expose aussi `ArmingStep`, `ArmingBusy`, `LockoutActive`, `ArmingErrorId`, `PowerCutOffActive` et les maintiens A/B.
+La checklist `GVL_Troubleshooting.Safety` suit l'ordre AF01 §5.3 : modules, demande AU, boucle fermée, contacteur relâché, puis état armable.
+Pour éviter tout masquage ou ambiguïté en diagnostic, la structure sépare explicitement :
+1. **Les entrées directes `HwIn` (vérité terrain instantanée)** : `HwIn_EmergencyChainClosed_DI`, `HwIn_PowerContactorEngaged_DI`, `HwIn_EmergencyBtnCut_IHM`.
+2. **Les étapes chronologiques de pré-conditions** : `Step1..5`. `Step3_EmergencyChainClosed` et `Step4_ContactorReleased` sont basés directement sur les entrées `HwIn` (non filtrées par l'automate de sécurité), tandis que `Step5_ArmingAllowed` reflète l'autorisation calculée du bloc AU.
+3. **La séquence et les états internes du bloc AU** : `ArmingStep`, `ArmingBusy`, `LockoutActive`, `ArmingErrorId`, `PowerCutOffActive` et les maintiens A/B.
 
 `AllConditionsMet` décrit uniquement l'état final chaîne fermée + contacteur engagé ; ce n'est pas une précondition d'armement. Après acquittement éventuel, l'opérateur doit générer un **front `BtnEmergencyArming`**. Aucun réarmement automatique n'est autorisé.

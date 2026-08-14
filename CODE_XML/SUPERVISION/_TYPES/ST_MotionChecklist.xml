@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-04T23:05:01.422356" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-04T23:05:01.422356">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T21:46:24.490096" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T21:46:24.490096">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -49,6 +49,31 @@ TRUE = Contacteur principal sous tension (PowerContactorEngaged_DI) ➔ Armer pu
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Pas d'autre séquence en cours (Homing, Benne busy, etc.)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1bis. Entrées physiques directes HwIn (vérité terrain)
+Contacteur puissance principal issu de HwIn.Machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour fin de course frein (1 = ouvert) issu de HwIn</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cmd_BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre de commande d'ouverture de frein généré par l'automate</xhtml>
               </documentation>
             </variable>
             <variable name="Step4_MotionRequested">
