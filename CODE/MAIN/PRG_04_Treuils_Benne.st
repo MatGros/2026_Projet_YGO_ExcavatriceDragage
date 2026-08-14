@@ -1078,6 +1078,9 @@ WinchM1SafetyHMI.ErrorMecaD         := (instSafetyWinchM1.ErrorId AND 16#0800) <
 WinchM1SafetyHMI.ErrorMecaE         := (instSafetyWinchM1.ErrorId AND 16#3000) <> 0;
 WinchM1SafetyHMI.ErrorOppositeDir   := (instSafetyWinchM1.ErrorId AND 16#4000) <> 0;
 WinchM1SafetyHMI.ErrorNoMovement    := (instSafetyWinchM1.ErrorId AND 16#8000) <> 0;
+WinchM1SafetyHMI.PowerCutOffSafety  := PRG_06_Outputs_LD.M1PowerCutOffSafetyInfo;
+WinchM1SafetyHMI.SafeStopSafety     := PRG_06_Outputs_LD.M1SafeStopSafetyInfo;
+WinchM1SafetyHMI.BlockedBySafety    := PRG_06_Outputs_LD.M1BlockedBySafetyInfo;
 
 WinchM2SafetyHMI.SafeStop := SafeStopM2_Active;
 WinchM2SafetyHMI.ForbidAscent := ForbidAscentM2_Active;
@@ -1098,6 +1101,9 @@ WinchM2SafetyHMI.ErrorMecaD         := (instSafetyWinchM2.ErrorId AND 16#0800) <
 WinchM2SafetyHMI.ErrorMecaE         := (instSafetyWinchM2.ErrorId AND 16#3000) <> 0;
 WinchM2SafetyHMI.ErrorOppositeDir   := (instSafetyWinchM2.ErrorId AND 16#4000) <> 0;
 WinchM2SafetyHMI.ErrorNoMovement    := (instSafetyWinchM2.ErrorId AND 16#8000) <> 0;
+WinchM2SafetyHMI.PowerCutOffSafety  := PRG_06_Outputs_LD.M2PowerCutOffSafetyInfo;
+WinchM2SafetyHMI.SafeStopSafety     := PRG_06_Outputs_LD.M2SafeStopSafetyInfo;
+WinchM2SafetyHMI.BlockedBySafety    := PRG_06_Outputs_LD.M2BlockedBySafetyInfo;
 
 SyncStateHMI.DeltaPos_M := instWinchSync.SignedDeltaPosM;
 SyncStateHMI.SyncActive := instWinchSync.SyncActive;

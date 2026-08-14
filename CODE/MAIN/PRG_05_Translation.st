@@ -440,6 +440,9 @@ TranslationSafetyHMI.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafetyHMI.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafetyHMI.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafetyHMI.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
+TranslationSafetyHMI.PowerCutOffSafety := PRG_06_Outputs_LD.M3PowerCutOffSafetyInfo;
+TranslationSafetyHMI.SafeStopSafety := PRG_06_Outputs_LD.M3SafeStopSafetyInfo;
+TranslationSafetyHMI.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
 
 {endregion}
 END_PROGRAM

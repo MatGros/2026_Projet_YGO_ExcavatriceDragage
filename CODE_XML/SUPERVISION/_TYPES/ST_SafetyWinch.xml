@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T22:46:34.296675" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T22:46:34.296675">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T23:18:28.644563" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T23:18:28.644563">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -144,6 +144,30 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont activée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockedBySafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚫 Synthèse globale : actionneur bloqué par la sécurité (PowerCutOff OU SafeStop/Error)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Synthèse sécurités critiques entraînant une coupure puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorOperatorComm">
