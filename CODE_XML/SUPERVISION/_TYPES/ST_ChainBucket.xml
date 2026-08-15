@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.670054" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T14:02:33.670054">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T06:49:59.248996" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T06:49:59.248996">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -88,6 +88,38 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Dernière position M2 mémorisée "fermé"</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx109_BucketTooOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance (Enrouler M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx110_BucketTooClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance (Dérouler M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx111_BucketIsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entrebâillée entre ouvert et fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx112_DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) en direct</xhtml>
               </documentation>
             </variable>
             <variable name="Idx201_HmiCmd_BtnOpen">

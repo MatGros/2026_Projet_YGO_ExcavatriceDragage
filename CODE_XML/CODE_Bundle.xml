@@ -883,6 +883,14 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance restante avant cible (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM</xhtml>
+              </documentation>
+            </variable>
             <variable name="CloseActive">
               <type>
                 <BOOL />
@@ -977,6 +985,30 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne fermé mémorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entre Ouvert et Fermé)</xhtml>
               </documentation>
             </variable>
             <variable name="LastPosM2Open">
@@ -1643,6 +1675,38 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Dernière position M2 mémorisée "fermé"</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx109_BucketTooOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance (Enrouler M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx110_BucketTooClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance (Dérouler M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx111_BucketIsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entrebâillée entre ouvert et fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx112_DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) en direct</xhtml>
               </documentation>
             </variable>
             <variable name="Idx201_HmiCmd_BtnOpen">
@@ -5315,6 +5379,14 @@ TRUE = Bouton Homme-Mort appuyé</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Repassé par le neutre (autorisation mouvement)</xhtml>
               </documentation>
             </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Homme-Mort armé avec passage au neutre validé</xhtml>
+              </documentation>
+            </variable>
             <variable name="AllConditionsMet">
               <type>
                 <BOOL />
@@ -5330,6 +5402,14 @@ TRUE = Joystick prêt pour piloter un axe</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Joystick maître sélectionné IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelJoystickWinch">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection Treuil (0=Couplé M1+M2, 1=M1 seul, 2=M2 seul)</xhtml>
               </documentation>
             </variable>
             <variable name="RawX">
@@ -5363,6 +5443,22 @@ Valeur brute axe X (0..10000)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée Y (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée X (-1 / 0 / +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée Y (-1 / 0 / +1)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -9781,10 +9877,10 @@ END_IF;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#30s0ms" />
+                <simpleValue value="TIME#60s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout de mouvement configurable</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout de mouvement configurable (60s par défaut pour confort d'essai)</xhtml>
               </documentation>
             </variable>
             <variable name="M1SlipToleranceM">
@@ -9946,6 +10042,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Décalage cible à injecter dans FB_WinchSync</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_StartStop">
@@ -10239,78 +10343,85 @@ ELSE
 END_IF;
 
 // 🆕 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE (mise en service, REX 2026-07-08) — voir bandeau
-// Action de CONFIRMATION pure (aucun mouvement, ne pilote pas M2) : mémorise BucketState.IsOpen
-// directement, à utiliser juste après le référencement des codeurs (M1=M2, benne physiquement
-// ouvert vérifié par l'opérateur). Gardée comme BtnConfirmCoherence (FB_Encoder_Homing) : front,
-// MAINT_N1/N2 uniquement, codeurs déjà référencés, treuils à l'arrêt (pas de séquence en cours).
+// Action de CONFIRMATION (aucun mouvement, ne pilote pas M2) : acquitte les défauts et réinitialise
+// les demandes. L'état IsOpen/IsClosed reste STRICTEMENT évalué en continu (§3bis-quater) selon la position codeur réelle.
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
 IF ConfirmOpenEdge.Q
    AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
    AND NOT M1_Busy AND NOT M2_Busy THEN
-    BucketState.IsOpen := TRUE;
-    BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
-    BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
-    BucketState.StateIncoherent := FALSE;
+    BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM;
     ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
 
 // 🆕 3bis-ter. CONFIRMATION MANUELLE POSITION FERMÉE (mise en service, REX 2026-07-08)
-// Même principe que ConfirmOpenPosition, mais pour initialiser le benne comme FERMÉ.
+// Même principe que ConfirmOpenPosition pour acquitter et réinitialiser.
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
 IF ConfirmCloseEdge.Q
    AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
    AND NOT M1_Busy AND NOT M2_Busy THEN
-    BucketState.IsOpen := FALSE;
-    BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
-    BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
-    BucketState.StateIncoherent := FALSE;
+    BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM;
     ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
 
-// 🆕 3bis-quater. DÉTECTION AUTOMATIQUE EN CONTINU (REX 2026-08-07, demande client) : contrairement
-// aux 2 blocs ConfirmXxx ci-dessus (action MANUELLE ponctuelle), ceci recalcule IsOpen/IsClosed en
-// PERMANENCE dès que les positions correspondent à un état connu -- sans bouton, sans mode MAINT
-// requis. Nécessaire car les séquencements automatiques (PRG_04, "descente uniquement benne
-// ouverte") s'appuient sur BucketState.IsOpen/IsClosed : si les positions convergent SANS passer
-// par une séquence FB_Bucket commandée (ex. recalage manuel en pilotage unitaire, ou positions
-// déjà alignées au premier boot), l'état restait bloqué à FALSE indéfiniment sans action opérateur
-// -- bloquant en pratique une fois le séquencement auto en place. Actif uniquement à l'arrêt
-// (NOT M1_Busy/M2_Busy), hors séquence benne en cours (State &lt;&gt; BUSY, où IsOpen/IsClosed sont
-// volontairement forcés à FALSE par BusyEdge ci-dessus -- ne rentre jamais en conflit), codeurs
-// référencés. Réutilise la tolérance déjà existante Config.CoherenceLimitM -- pas de nouveau seuil.
+// 🆕 3bis-quater. DÉTECTION AUTOMATIQUE EN CONTINU (5 ZONES CLAIRES OPÉRATEUR) :
+// Recalcule IsOpen, IsClosed, TooOpen, TooClosed, IsIntermediate en PERMANENCE à partir de
+// l'écart réel Delta = CablePosM2 - CablePosM1 et de la tolérance Config.CoherenceLimitM.
+// Actif à l'arrêt (NOT M1_Busy/M2_Busy), hors séquence active (State &lt;&gt; BUSY), codeurs référencés.
 IF (State &lt;&gt; E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND HomedM2
    AND (Config.CoherenceLimitM &gt; 0.01) THEN
+
+    // 1. Zone Benne Ouverte (Delta proche de OffsetOpenM)
     IF ABS((CablePosM2 - CablePosM1) - Config.OffsetOpenM) &lt;= Config.CoherenceLimitM THEN
-        IF NOT BucketState.IsOpen THEN
-            BucketState.IsOpen := TRUE;
-            BucketState.IsClosed := FALSE;
-            BucketState.LastPosM2Open := CablePosM2;
-            BucketState.StateIncoherent := FALSE;
-        END_IF;
+        BucketState.IsOpen := TRUE;
+        BucketState.IsClosed := FALSE;
+        BucketState.TooOpen := FALSE;
+        BucketState.TooClosed := FALSE;
+        BucketState.IsIntermediate := FALSE;
+        BucketState.LastPosM2Open := CablePosM2;
+        BucketState.StateIncoherent := FALSE;
+
+    // 2. Zone Benne Fermée (Delta proche de OffsetCloseM)
     ELSIF ABS((CablePosM2 - CablePosM1) - Config.OffsetCloseM) &lt;= Config.CoherenceLimitM THEN
-        IF NOT BucketState.IsClosed THEN
-            BucketState.IsClosed := TRUE;
-            BucketState.IsOpen := FALSE;
-            BucketState.LastPosM2Close := CablePosM2;
-            BucketState.StateIncoherent := FALSE;
-        END_IF;
-    // 🔴🔧 REX 2026-08-07 (21) — retour terrain, BUG CONFIRMÉ : IsOpen/IsClosed restait figé sur
-    // sa dernière valeur mémorisée quand la position s'éloignait des DEUX fenêtres (aucune des 2
-    // IF/ELSIF ci-dessus ne match) -- ex. jog unitaire M2 loin de la position ouverte/fermée sans
-    // repasser par instBucket. L'IHM affichait "ouvert" alors que la position réelle n'avait plus
-    // rien à voir. Corrigé : hors des 2 fenêtres connues, l'état devient explicitement inconnu.
+        BucketState.IsClosed := TRUE;
+        BucketState.IsOpen := FALSE;
+        BucketState.TooOpen := FALSE;
+        BucketState.TooClosed := FALSE;
+        BucketState.IsIntermediate := FALSE;
+        BucketState.LastPosM2Close := CablePosM2;
+        BucketState.StateIncoherent := FALSE;
+
+    // 3. Zone Trop Ouvert (Dépassement en ouverture : Delta &lt; OffsetOpenM - Tolerance)
+    ELSIF (CablePosM2 - CablePosM1) &lt; (Config.OffsetOpenM - Config.CoherenceLimitM) THEN
+        BucketState.IsOpen := FALSE;
+        BucketState.IsClosed := FALSE;
+        BucketState.TooOpen := TRUE;
+        BucketState.TooClosed := FALSE;
+        BucketState.IsIntermediate := FALSE;
+        BucketState.StateIncoherent := TRUE;
+
+    // 4. Zone Trop Fermé (Dépassement en fermeture : Delta &gt; OffsetCloseM + Tolerance)
+    ELSIF (CablePosM2 - CablePosM1) &gt; (Config.OffsetCloseM + Config.CoherenceLimitM) THEN
+        BucketState.IsOpen := FALSE;
+        BucketState.IsClosed := FALSE;
+        BucketState.TooOpen := FALSE;
+        BucketState.TooClosed := TRUE;
+        BucketState.IsIntermediate := FALSE;
+        BucketState.StateIncoherent := TRUE;
+
+    // 5. Zone Intermédiaire / Entrebâillée (entre OffsetOpenM + Tol et OffsetCloseM - Tol)
     ELSE
-        IF BucketState.IsOpen OR BucketState.IsClosed THEN
-            BucketState.IsOpen := FALSE;
-            BucketState.IsClosed := FALSE;
-            BucketState.StateIncoherent := TRUE;
-        END_IF;
+        BucketState.IsOpen := FALSE;
+        BucketState.IsClosed := FALSE;
+        BucketState.TooOpen := FALSE;
+        BucketState.TooClosed := FALSE;
+        BucketState.IsIntermediate := TRUE;
+        BucketState.StateIncoherent := FALSE;
     END_IF;
 END_IF;
 
@@ -10557,6 +10668,9 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+
+// Calcul continu de l'écart réel signé M2 - M1 pour l'affichage IHM et l'aide au pilotage
+DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
 // (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
@@ -14168,6 +14282,14 @@ le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt
 Front montant TopPositionSensor — déclenche le nominal</xhtml>
               </documentation>
             </variable>
+            <variable name="DynamicTargetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant UseDynamicTarget — déclenche le homing dynamique</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingModeOk">
               <type>
                 <BOOL />
@@ -14271,6 +14393,7 @@ END_IF;
 
 PresetRequest := FALSE;
 TopSensorEdge(CLK := TopPositionSensor);
+DynamicTargetEdge(CLK := UseDynamicTarget);
 
 // 🆕 Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
@@ -14298,7 +14421,7 @@ UnitaryHomingTrigger := HomingModeOk AND UnitaryMode AND WinchSelected AND HomeE
 
 // Dynamique (benne) : Mode + arrêt confirmé (M1/M2 non Busy) déjà gardés à l'appel via
 // M2BucketRefRequested (PRG_02_Acquisition.st) — HomingModeOk reste vérifié ici en défense.
-DynamicHomingTrigger := HomingModeOk AND UseDynamicTarget AND HomeEdge.Q;
+DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
 HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
 
@@ -23993,6 +24116,14 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : GVL_IHM.DredgingAssist</xhtml>
               </documentation>
             </variable>
+            <variable name="JoystickHMI">
+              <type>
+                <derived name="ST_JoystickHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ GVL_IHM.JOY1Joystick</xhtml>
+              </documentation>
+            </variable>
             <variable name="EmergencyState">
               <type>
                 <derived name="ST_Safety_Emergency_State" />
@@ -24218,6 +24349,10 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx105_StateIncoherent := WinchM2.Bu
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx106_FBState := WinchM2.Bucket.State.FBState;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx107_LastPosM2Open_M := WinchM2.Bucket.State.MechState.LastPosM2Open;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx108_LastPosM2Close_M := WinchM2.Bucket.State.MechState.LastPosM2Close;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx109_BucketTooOpen := WinchM2.Bucket.State.MechState.TooOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx110_BucketTooClosed := WinchM2.Bucket.State.MechState.TooClosed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx111_BucketIsIntermediate := WinchM2.Bucket.State.MechState.IsIntermediate;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx112_DeltaPosition_M := WinchM2.Bucket.State.DeltaPosition_M;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := FALSE; // TBD non câblé - voir fiche §6 (pas de sortie Cycle Open publiée)
@@ -24417,15 +24552,21 @@ GVL_Troubleshooting.Joystick.HwIn_JoyBtnRaw_DI         := HwIn.Operator.JoyBtnRa
 GVL_Troubleshooting.Joystick.NeutralXAct               := (HwIn.Operator.JoyXRaw_ANA1 &gt;= 4800 AND HwIn.Operator.JoyXRaw_ANA1 &lt;= 5200);
 GVL_Troubleshooting.Joystick.NeutralYAct               := (HwIn.Operator.JoyYRaw_ANA2 &gt;= 4800 AND HwIn.Operator.JoyYRaw_ANA2 &lt;= 5200);
 GVL_Troubleshooting.Joystick.Step3_DeadmanPressed      := HwIn.Operator.JoyBtnRaw;
-GVL_Troubleshooting.Joystick.Step4_NeutralAcquired     := GVL_Troubleshooting.Joystick.NeutralXAct AND GVL_Troubleshooting.Joystick.NeutralYAct;
+GVL_Troubleshooting.Joystick.Step4_NeutralAcquired     := JoystickHMI.State.AtNeutral;
+GVL_Troubleshooting.Joystick.DeadmanArmed             := JoystickHMI.State.DeadmanArmed;
 
 GVL_Troubleshooting.Joystick.AllConditionsMet := GVL_Troubleshooting.Joystick.Step1_CanBusActive
                                               AND GVL_Troubleshooting.Joystick.Step2_JoystickOperational
-                                              AND GVL_Troubleshooting.Joystick.Step3_DeadmanPressed;
+                                              AND GVL_Troubleshooting.Joystick.DeadmanArmed;
 
 GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+GVL_Troubleshooting.Joystick.SelJoystickWinch := GVL_IHM.Modes.Cmd.SelJoystickWinch;
 GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
+GVL_Troubleshooting.Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.SpeedRef;
+GVL_Troubleshooting.Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.Joystick.DirectionX        := JoystickHMI.State.AxisCmdX.Direction;
+GVL_Troubleshooting.Joystick.DirectionY        := JoystickHMI.State.AxisCmdY.Direction;
 
 {endregion}
 
@@ -29385,6 +29526,7 @@ BucketState.Done := instBucket.Done;
 BucketState.Error := instBucket.Error;
 BucketState.ErrorId := instBucket.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
+BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
 // 🔧 2026-08-07 : corrigé -- pointait sur DumpAtTremieBucketOpenArmed (mauvais signal, deviné
@@ -34149,6 +34291,7 @@ instTroubleshootingView(
     Commun               := GVL_IHM.Commun,
     Network              := GVL_IHM.Network,
     DredgingAssist       := GVL_IHM.DredgingAssist,
+    JoystickHMI          := GVL_IHM.JOY1Joystick,
     EmergencyState       := PRG_06_Outputs_LD.EmergencyState,
     EmergencyDiag        := PRG_06_Outputs_LD.EmergencyDiag,
     PowerCutOffActive    := PRG_06_Outputs_LD.PowerCutOffActive,

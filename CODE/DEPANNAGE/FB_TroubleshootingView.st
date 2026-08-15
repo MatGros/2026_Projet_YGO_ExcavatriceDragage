@@ -47,6 +47,7 @@ VAR_INPUT
     Commun                   : ST_CommunHMI;     (* GVL_IHM.Commun *)
     Network                  : ST_NetworkDiagHMI;(* GVL_IHM.Network *)
     DredgingAssist           : ST_DredgingAssistHMI; (* 🆕 2026-08-07 : GVL_IHM.DredgingAssist *)
+    JoystickHMI              : ST_JoystickHMI;   (* 🕹️ GVL_IHM.JOY1Joystick *)
 
     (* 🛡️ Sorties publiques AU produites par PRG_06_Outputs_LD *)
     EmergencyState           : ST_Safety_Emergency_State;
@@ -215,6 +216,10 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx105_StateIncoherent := WinchM2.Bu
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx106_FBState := WinchM2.Bucket.State.FBState;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx107_LastPosM2Open_M := WinchM2.Bucket.State.MechState.LastPosM2Open;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx108_LastPosM2Close_M := WinchM2.Bucket.State.MechState.LastPosM2Close;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx109_BucketTooOpen := WinchM2.Bucket.State.MechState.TooOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx110_BucketTooClosed := WinchM2.Bucket.State.MechState.TooClosed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx111_BucketIsIntermediate := WinchM2.Bucket.State.MechState.IsIntermediate;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx112_DeltaPosition_M := WinchM2.Bucket.State.DeltaPosition_M;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := FALSE; // TBD non câblé - voir fiche §6 (pas de sortie Cycle Open publiée)
@@ -414,15 +419,21 @@ GVL_Troubleshooting.Joystick.HwIn_JoyBtnRaw_DI         := HwIn.Operator.JoyBtnRa
 GVL_Troubleshooting.Joystick.NeutralXAct               := (HwIn.Operator.JoyXRaw_ANA1 >= 4800 AND HwIn.Operator.JoyXRaw_ANA1 <= 5200);
 GVL_Troubleshooting.Joystick.NeutralYAct               := (HwIn.Operator.JoyYRaw_ANA2 >= 4800 AND HwIn.Operator.JoyYRaw_ANA2 <= 5200);
 GVL_Troubleshooting.Joystick.Step3_DeadmanPressed      := HwIn.Operator.JoyBtnRaw;
-GVL_Troubleshooting.Joystick.Step4_NeutralAcquired     := GVL_Troubleshooting.Joystick.NeutralXAct AND GVL_Troubleshooting.Joystick.NeutralYAct;
+GVL_Troubleshooting.Joystick.Step4_NeutralAcquired     := JoystickHMI.State.AtNeutral;
+GVL_Troubleshooting.Joystick.DeadmanArmed             := JoystickHMI.State.DeadmanArmed;
 
 GVL_Troubleshooting.Joystick.AllConditionsMet := GVL_Troubleshooting.Joystick.Step1_CanBusActive
                                               AND GVL_Troubleshooting.Joystick.Step2_JoystickOperational
-                                              AND GVL_Troubleshooting.Joystick.Step3_DeadmanPressed;
+                                              AND GVL_Troubleshooting.Joystick.DeadmanArmed;
 
 GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+GVL_Troubleshooting.Joystick.SelJoystickWinch := GVL_IHM.Modes.Cmd.SelJoystickWinch;
 GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
+GVL_Troubleshooting.Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.SpeedRef;
+GVL_Troubleshooting.Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.Joystick.DirectionX        := JoystickHMI.State.AxisCmdX.Direction;
+GVL_Troubleshooting.Joystick.DirectionY        := JoystickHMI.State.AxisCmdY.Direction;
 
 {endregion}
 

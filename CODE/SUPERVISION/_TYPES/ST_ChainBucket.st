@@ -8,6 +8,10 @@ STRUCT
     Idx106_FBState               : E_State; // 🆕 2026-08-07 : État machine FB_Bucket (READY/BUSY/DONE/DISABLED)
     Idx107_LastPosM2Open_M       : REAL; // 🆕 2026-08-07 : Dernière position M2 mémorisée "ouvert"
     Idx108_LastPosM2Close_M      : REAL; // 🆕 2026-08-07 : Dernière position M2 mémorisée "fermé"
+    Idx109_BucketTooOpen         : BOOL; // ⚠️ Dépassement ouverture : Delta < OffsetOpen - Tolerance (Enrouler M2)
+    Idx110_BucketTooClosed       : BOOL; // ⚠️ Dépassement fermeture : Delta > OffsetClose + Tolerance (Dérouler M2)
+    Idx111_BucketIsIntermediate  : BOOL; // ↔️ Position intermédiaire (entrebâillée entre ouvert et fermé)
+    Idx112_DeltaPosition_M       : REAL; // 📏 Écart réel signé M2 - M1 (mètres) en direct
 
     Idx201_HmiCmd_BtnOpen        : BOOL; // 1 = Demande Ouverture IHM | 0 = Relâché
     Idx202_HmiCmd_BtnClose       : BOOL; // 1 = Demande Fermeture IHM | 0 = Relâché

@@ -278,6 +278,14 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance restante avant cible (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM</xhtml>
+              </documentation>
+            </variable>
             <variable name="CloseActive">
               <type>
                 <BOOL />
@@ -545,6 +553,30 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne fermé mémorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entre Ouvert et Fermé)</xhtml>
               </documentation>
             </variable>
             <variable name="LastPosM2Open">

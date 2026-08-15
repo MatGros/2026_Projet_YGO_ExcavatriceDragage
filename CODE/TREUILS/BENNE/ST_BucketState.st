@@ -8,6 +8,9 @@ TYPE ST_BucketState :
 STRUCT
     IsOpen          : BOOL;    (* TRUE = Benne ouvert mémorisé *)
     IsClosed        : BOOL;    (* TRUE = Benne fermé mémorisé *)
+    TooOpen         : BOOL;    (* ⚠️ Dépassement ouverture : Delta < OffsetOpen - Tolerance *)
+    TooClosed       : BOOL;    (* ⚠️ Dépassement fermeture : Delta > OffsetClose + Tolerance *)
+    IsIntermediate  : BOOL;    (* ↔️ Position intermédiaire (entre Ouvert et Fermé) *)
     LastPosM2Open   : REAL;    (* Dernière position M2 mémorisée ouvert *)
     LastPosM2Close  : REAL;    (* Dernière position M2 mémorisée fermé *)
     StateIncoherent : BOOL;    (* État non sûr (divergence boot/réel) *)

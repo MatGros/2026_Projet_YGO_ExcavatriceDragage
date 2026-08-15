@@ -30,8 +30,8 @@ from pathlib import Path
 
 
 def run(cmd: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
-    r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
-    return r.returncode, r.stdout, r.stderr
+    r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return r.returncode, r.stdout or "", r.stderr or ""
 
 
 # ── Paliers (GUIDE_GATES_ET_TESTS_v1.2.md §2) — tranche d'ID par palier ──────────
@@ -158,13 +158,13 @@ def main() -> int:
 
     def gate(title: str, cmd: list[str]) -> bool:
         print("\n" + "=" * 60)
-        print(title)
+        print(title.encode("ascii", "replace").decode("ascii"))
         print("=" * 60)
         code, out, err = run(cmd, project_root)
         if out.strip():
-            print(out.strip())
+            print(out.strip().encode("ascii", "replace").decode("ascii"))
         if err.strip():
-            print(err.strip(), file=sys.stderr)
+            print(err.strip().encode("ascii", "replace").decode("ascii"), file=sys.stderr)
         results.append((title, code == 0))
         return code == 0
 
