@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.668053" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-11T14:02:33.668053">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T07:24:15.156168" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T07:24:15.156168">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,6 +26,14 @@
       <dataType name="ST_BypassCommun">
         <baseType>
           <struct>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Commun (toutes sécurités communes M1+M2)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SlackCable">
               <type>
                 <BOOL />
@@ -64,6 +72,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisé au boot</xhtml>
               </documentation>
             </variable>
           </struct>

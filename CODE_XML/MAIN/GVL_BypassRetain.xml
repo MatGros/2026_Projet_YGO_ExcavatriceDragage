@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-12T21:43:48.380896" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-12T21:43:48.380896">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T07:25:14.460164" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T07:25:14.460164">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -95,6 +95,86 @@
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Benne (FB_Bucket)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassCommunGlobal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Commun M1+M2 (GVL_IHM.Commun.Bypass.Global)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassLimitLegal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ BYPASS RAPIDES UNITAIRES COMMUMS (Levée immédiate des sécurités d'essai)
+📐 Bypass Limite Légale de Profondeur</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassTopLimitSwitch">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass Capteur Fin de Course Haut Physique</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassTopLimitSoftware">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Bypass Butée Logicielle Haute</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassCableLimitSwitch">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Bypass Butée Basse Câble</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassSlackCable">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Bypass Mou de Câble M1/M2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimulationBypassActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 INTERRUPTEUR GÉNÉRAL ESSAIS SIMULATION
+TRUE  -&gt; Active instantanément les bypass essentiels d'essais (BypassCommunGlobal, BypassLimitLegal, BypassTopLimitSoftware...)
+FALSE (front descendant) -&gt; Désactive TOUS les bypass pour retour strict à la sécurité</xhtml>
           </documentation>
         </variable>
         <addData>

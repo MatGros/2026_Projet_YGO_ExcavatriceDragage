@@ -30,6 +30,8 @@ VAR
     instPreflight        : FB_Acquisition_Preflight;
     instHmiBannerFormatter : FB_Hmi_BannerFormatter;
     instTroubleshootingView : FB_TroubleshootingView;
+    SimBypassRiseEdge    : R_TRIG;
+    SimBypassFallEdge    : F_TRIG;
 END_VAR
 
 {region "§1 Horloge et reset machine"}
@@ -182,6 +184,28 @@ IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
     GVL_IHM.M1M2Sync.Bypass.Initialized := TRUE;
 END_IF;
 
+IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
+    IF BypassCommunGlobal THEN
+        GVL_IHM.Commun.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassLimitLegal THEN
+        GVL_IHM.Commun.Bypass.LimitLegal := TRUE;
+    END_IF;
+    IF BypassTopLimitSwitch THEN
+        GVL_IHM.Commun.Bypass.TopLimitSwitch := TRUE;
+    END_IF;
+    IF BypassTopLimitSoftware THEN
+        GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
+    END_IF;
+    IF BypassCableLimitSwitch THEN
+        GVL_IHM.Commun.Bypass.CableLimitSwitch := TRUE;
+    END_IF;
+    IF BypassSlackCable THEN
+        GVL_IHM.Commun.Bypass.SlackCable := TRUE;
+    END_IF;
+    GVL_IHM.Commun.Bypass.Initialized := TRUE;
+END_IF;
+
 IF GVL_IHM.TranslationM3.Bypass.Global <> BypassTranslationGlobal THEN
     BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
 END_IF;
@@ -193,6 +217,42 @@ IF GVL_IHM.M2TreuilBenne.Bypass.Global <> BypassWinchM2Global THEN
 END_IF;
 IF GVL_IHM.M1M2Sync.Bypass.Global <> BypassSyncGlobal THEN
     BypassSyncGlobal := GVL_IHM.M1M2Sync.Bypass.Global;
+END_IF;
+IF GVL_IHM.Commun.Bypass.Global <> BypassCommunGlobal THEN
+    BypassCommunGlobal := GVL_IHM.Commun.Bypass.Global;
+END_IF;
+IF GVL_IHM.Commun.Bypass.LimitLegal <> BypassLimitLegal THEN
+    BypassLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
+END_IF;
+IF GVL_IHM.Commun.Bypass.TopLimitSwitch <> BypassTopLimitSwitch THEN
+    BypassTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
+END_IF;
+IF GVL_IHM.Commun.Bypass.TopLimitSoftware <> BypassTopLimitSoftware THEN
+    BypassTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
+END_IF;
+IF GVL_IHM.Commun.Bypass.CableLimitSwitch <> BypassCableLimitSwitch THEN
+    BypassCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
+END_IF;
+IF GVL_IHM.Commun.Bypass.SlackCable <> BypassSlackCable THEN
+    BypassSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+END_IF;
+
+// 🎭 GESTION DU MASTER BYPASS DE SIMULATION :
+SimBypassRiseEdge(CLK := SimulationBypassActive);
+SimBypassFallEdge(CLK := SimulationBypassActive);
+
+// 🟢 Front Montant : Active UNIQUEMENT les bypass nécessaires aux essais (Limite Légale + Limite Haute)
+IF SimBypassRiseEdge.Q THEN
+    GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
+END_IF;
+
+// 🔴 Front Descendant : Désactive les bypass (retour aux sécurités)
+IF SimBypassFallEdge.Q THEN
+    GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
 END_IF;
 
 

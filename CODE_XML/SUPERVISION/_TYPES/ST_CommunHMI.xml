@@ -236,6 +236,14 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
       <dataType name="ST_BypassCommun">
         <baseType>
           <struct>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Commun (toutes sécurités communes M1+M2)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SlackCable">
               <type>
                 <BOOL />
@@ -274,6 +282,14 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisé au boot</xhtml>
               </documentation>
             </variable>
           </struct>
