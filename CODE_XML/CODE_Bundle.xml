@@ -27349,7 +27349,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
             </variable>
             <variable name="ENCODER_POINTS_PER_REV">
               <type>
-                <DINT />
+                <UDINT />
               </type>
               <initialValue>
                 <simpleValue value="8192" />
@@ -27361,7 +27361,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
             </variable>
             <variable name="ENCODER_MULTITURN_REVS_MAX">
               <type>
-                <DINT />
+                <UDINT />
               </type>
               <initialValue>
                 <simpleValue value="4096" />
@@ -27677,7 +27677,7 @@ instEncoderScaleM1(
     RawPos        := instEncoderAbsM1.RawPos,
     HomingRefRaw  := instHomingM1.HomingRefRaw,
     CableM_PerRev := WINCH_CABLE_M_PER_REV,
-    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
+    PointsPerRev  := ENCODER_POINTS_PER_REV
 );
 
 instEncoderSafetyM1(
@@ -27760,7 +27760,7 @@ instEncoderScaleM2(
     RawPos        := instEncoderAbsM2.RawPos,
     HomingRefRaw  := instHomingM2.HomingRefRaw,
     CableM_PerRev := WINCH_CABLE_M_PER_REV,
-    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
+    PointsPerRev  := ENCODER_POINTS_PER_REV
 );
 
 instEncoderSafetyM2(

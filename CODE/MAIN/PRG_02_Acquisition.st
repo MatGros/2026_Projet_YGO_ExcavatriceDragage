@@ -111,9 +111,9 @@ END_VAR
 
 VAR CONSTANT
     // ⚙️ Constantes mécaniques & électriques chaîne codeurs treuils (DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §2)
-    ENCODER_POINTS_PER_REV     : DINT := 8192; // 13 bits single-turn (8192 pts/tour)
-    ENCODER_MULTITURN_REVS_MAX : DINT := 4096; // 12 bits multi-turn (4096 tours max)
-    WINCH_CABLE_M_PER_REV      : REAL := 2.0;  // 2.0 mètres de câble par tour de tambour treuil
+    ENCODER_POINTS_PER_REV     : UDINT := 8192; // 13 bits single-turn (8192 pts/tour)
+    ENCODER_MULTITURN_REVS_MAX : UDINT := 4096; // 12 bits multi-turn (4096 tours max)
+    WINCH_CABLE_M_PER_REV      : REAL  := 2.0;  // 2.0 mètres de câble par tour de tambour treuil
 END_VAR
 
 {region "§0 Session simulation & aiguillage"}
@@ -395,7 +395,7 @@ instEncoderScaleM1(
     RawPos        := instEncoderAbsM1.RawPos,
     HomingRefRaw  := instHomingM1.HomingRefRaw,
     CableM_PerRev := WINCH_CABLE_M_PER_REV,
-    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
+    PointsPerRev  := ENCODER_POINTS_PER_REV
 );
 
 instEncoderSafetyM1(
@@ -478,7 +478,7 @@ instEncoderScaleM2(
     RawPos        := instEncoderAbsM2.RawPos,
     HomingRefRaw  := instHomingM2.HomingRefRaw,
     CableM_PerRev := WINCH_CABLE_M_PER_REV,
-    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
+    PointsPerRev  := ENCODER_POINTS_PER_REV
 );
 
 instEncoderSafetyM2(

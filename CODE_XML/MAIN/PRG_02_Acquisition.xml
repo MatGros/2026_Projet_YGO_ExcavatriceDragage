@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T04:37:59.753460" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T04:37:59.753460">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T04:57:46.110031" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T04:57:46.110031">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1302,7 +1302,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
             </variable>
             <variable name="ENCODER_POINTS_PER_REV">
               <type>
-                <DINT />
+                <UDINT />
               </type>
               <initialValue>
                 <simpleValue value="8192" />
@@ -1314,7 +1314,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
             </variable>
             <variable name="ENCODER_MULTITURN_REVS_MAX">
               <type>
-                <DINT />
+                <UDINT />
               </type>
               <initialValue>
                 <simpleValue value="4096" />
@@ -1630,7 +1630,7 @@ instEncoderScaleM1(
     RawPos        := instEncoderAbsM1.RawPos,
     HomingRefRaw  := instHomingM1.HomingRefRaw,
     CableM_PerRev := WINCH_CABLE_M_PER_REV,
-    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
+    PointsPerRev  := ENCODER_POINTS_PER_REV
 );
 
 instEncoderSafetyM1(
@@ -1713,7 +1713,7 @@ instEncoderScaleM2(
     RawPos        := instEncoderAbsM2.RawPos,
     HomingRefRaw  := instHomingM2.HomingRefRaw,
     CableM_PerRev := WINCH_CABLE_M_PER_REV,
-    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
+    PointsPerRev  := ENCODER_POINTS_PER_REV
 );
 
 instEncoderSafetyM2(
