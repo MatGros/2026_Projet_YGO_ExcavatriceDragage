@@ -264,6 +264,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T108 | 🟡 Interlock Translation M3 si Trémie pleine (`HopperFull_OR_GateRaised_DI`) | Projet / Translation M3 | `PRG_05_Translation.st` |
 | T109 | 🟡 Formaliser convention polarité positive (`*Permit` / `Allowed`) pour arbitrages | Projet / Convention | `NAMING_CONVENTION.md` |
 | T110 | 🔴 Clarifier sémantique `DriveStatusWord.0` AC600 ("Power Ready" vs "Mouvement" Méca B) | Projet / Sécurité | `FB_Safety_Translation.st` |
+| T115 | 🟠 Bandeau IHM champ 2 « Cycle » : `CycleStep` non alimenté (`FB_Cycle` non instancié) → affiche toujours `INIT` | Projet / IHM | `PRG_07_Supervision.st`, `FB_Hmi_BannerFormatter.st`, reliquat session 2026-08-15 — à câbler au lot Cycle Auto |
 
 ---
 
