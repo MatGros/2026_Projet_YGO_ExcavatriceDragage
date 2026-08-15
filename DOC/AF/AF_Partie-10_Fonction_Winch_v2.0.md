@@ -285,11 +285,35 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 
 **Consommation IHM / Diagnostic** : Ces données alimentent `ST_WinchSymmetryHMI` et la page Diagnostic de l'IHM pour orienter la maintenance terrain.
 
-### 6.4 Ne pas faire sans étude terrain (rappel)
+### 6.5 🪢 Spécification mécanique — Mou de Câble (`SlackCable`) & Récupération
 
-- Ne pas trancher `DelayMotorDecel` (supprimer vs implémenter) sans les essais MES-006 (audit C4)
-- Ne pas activer `SpeedGuardEnable` avant calibration réelle (T94 dépend de T95)
-- Ne pas remplacer la rampe %/s sans valider l'impact sur `FB_Cycle`, IHM, `GVL_PERSISTENT`
+> 📌 **Principe physique** : Le contacteur physique `M2_TensionedCable_DI` (tambour M2) détecte la perte de tension d'un câble (ex: contact fond d'eau, benne posée).
+
+1. **Mode Synchronisé Normal (`SyncEnable = TRUE`)** :
+   - Détection d'un mou de câble (`SlackCable = TRUE`) ➔ Déclenche un **`SafeStop` complet (rampe rapide)** sur M1 et M2 pour stopper la descente et préserver l'enroulement des tambours.
+2. **Mode Récupération Unitaire / Maintenance (`SyncEnable = FALSE` ou Manuel MAINT)** :
+   - ❌ **Interdiction formelle de DESCENDRE (`ForbidDescent`)** : Continuer à dérouler aggrave le mou, fait sortir le câble des gorges et risque d'emmêler le tambour.
+   - ✅ **Autorisation d'ENROULER / MONTER (Vitesse lente / Palier 1)** : L'enroulement permet à l'opérateur de retendre le câble détendu et/ou de fermer la benne pour reprendre prise.
+   - Dès que la tension mécanique est rétablie (`M2_TensionedCable_DI` repasse à TRUE), le blocage de descente est levé.
+
+### 6.6 🪣 Sécurité Benne partiellement fermée / Obstruée & Remontée Palier 1
+
+> 📌 **Problème terrain** : Un bloc rocheux, du bois ou un décalage d'usure câble peut empêcher `FB_Bucket` d'atteindre l'état `IsClosed` à 100%. Interdire la remontée bloquerait l'excavatrice au fond.
+
+1. **Benne confirmée fermée (`IsClosed = TRUE`)** :
+   - Montée normale autorisée à toutes les vitesses (Paliers 1 à 5).
+2. **Benne partiellement fermée / Obstruée (`NOT IsClosed` mais demande de montée)** :
+   - ❌ **Montée rapide interdite** (Paliers 2 à 5 verrouillés).
+   - ✅ **Remontée autorisée en Palier 1 (Vitesse lente)** : Permet de ramener la benne en surface en sécurité sans forcer sur la cinématique ni casser le câble.
+
+### 6.7 ⚖️ Synchronisation M1/M2 étagée (`FB_WinchSync`)
+
+> 📌 **Constat** : Un arrêt brutal (`SafeStop`) sur un léger écart transitoire rend la machine inexploitable en production.
+
+L'asservissement synchro est découpé en 3 zones d'action :
+- **Zone 1 (Écart nominal < Seuil 1, ex: 0.3 m)** : Fonctionnement normal sans restriction.
+- **Zone 2 (Écart modéré Seuil 1 .. Seuil 2, ex: 0.3 m .. 0.8 m)** : **Dégradation automatique au Palier 1 (vitesse lente)** sur les deux treuils sans couper le mouvement.
+- **Zone 3 (Écart critique > Seuil 2, ex: > 1.2 m)** : Déclenchement du **`SafeStop` (rampe rapide)** avec alarme Méca E.
 
 ---
 
