@@ -91,7 +91,7 @@ Tous `ST_*` (`SUPERVISION/_TYPES` + domaines) · `GVL_IHM` · `GVL_PERSISTENT`.
 |---|---|---|
 | `ARCHIVES/Code/ACQUISITION/FB_AcquisitionLegacyBridge.st` | implémentation cible `PRG_02` (SEL inline + gate + chaîne codeurs) | M1 |
 | `CODE/MAIN/PRG_02_Acquisition.st` | nouveau `PRG_02_Acquisition_CFC` | M1 |
-| `CODE/SUPERVISION/GVL_IHM_AU.st` | supprimé (décision T99) | lot dédié |
+| `ARCHIVES/Code/SUPERVISION/GVL_IHM_AU.st` | supprimé (décision T99) | lot dédié |
 
 🔴 **Références pendantes à résoudre au M1** (POU absents du dépôt) :
 `PRG_01_Diagnostics` (84 réf), `PRG_02_Encoders` (142 réf), `PRG_05_Cycle` (24 réf),

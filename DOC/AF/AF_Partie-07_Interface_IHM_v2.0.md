@@ -88,23 +88,59 @@ Le mapping, la persistance et d'eventuels agregats restent **TBD**. Ils ne justi
 
 ---
 
-## 💬 4. Messages operateur
+## 💬 4. Bandeau d'information et messages opérateur
 
-Deux familles a distinguer :
+Pour éviter toute ambiguïté de conduite et assister l'opérateur en temps réel (en exploitation comme en simulation/maintenance), l'IHM dispose d'un bandeau structuré en **4 champs de texte dédiés** à responsabilités disjointes :
 
-| Famille | Sens |
-|---|---|
-| 🎮 Action attendue | L'operateur doit faire quelque chose maintenant. |
-| 🧭 Etat machine | Information d'etat, sans demande d'action. |
+```mermaid
+flowchart LR
+    subgraph SOURCES ["📊 Sources Métier Typées (POU Procédés)"]
+        S1["⚙️ Modes & Contexte<br><i>Auth.Mode, SimActive</i>"]
+        S2["🔄 Cycles & Séquences<br><i>FB_Cycle, FB_DiveSearch</i>"]
+        S3["🛡️ Dérogations & Bypass<br><i>FB_Safety_*, Retain</i>"]
+        S4["🎮 Arbitrage Consignes<br><i>ActionId, JoyNeutral</i>"]
+    end
 
-Cette distinction recoupe celle des defauts domaine : **Warning** (etat machine, s'efface seul
-avec la cause, pas d'action requise) vs **Fault** (action attendue = acquittement conscient,
-meme cause disparue). Pattern `Cause`/`Ack`, temporisation d'affichage anti-clignotement et regle
-complete : `DOC/STDS/CODE_QUALITY_STANDARDS.md §9`. Pas reformule ici.
+    subgraph FORMATTER ["🧠 PRG_07_Supervision"]
+        BF["<b>FB_Hmi_BannerFormatter</b><br>• Concaténation normalisée<br>• Arbitrage des priorités<br>• Filtrage anti-clignotement"]
+    end
 
-Format, priorites, concatenation et proprietaire exact : **TBD**.
+    subgraph BANNER ["🖥️ IHM Opérateur (GVL_IHM.Banner)"]
+        direction TB
+        B1["<b>1. GlobalContextText</b> (STRING 80)<br><code>[RÉEL/SIMU] [MODE] [COUPLAGE]</code>"]
+        B2["<b>2. SequenceProgressText</b> (STRING 120)<br><code>Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;</code>"]
+        B3["<b>3. SpecialConditionText</b> (STRING 120)<br><code>⚠️ &lt;Dérogation / Bridage / Alerte&gt;</code>"]
+        B4["<b>4. OperatorActionText</b> (STRING 120)<br><code>[ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;</code>"]
+    end
 
-Les alarmes restent portees par `Error` / `ErrorId` des domaines.
+    S1 --> BF
+    S2 --> BF
+    S3 --> BF
+    S4 --> BF
+
+    BF --> B1
+    BF --> B2
+    BF --> B3
+    BF --> B4
+
+    style BANNER fill:#f8fafc,stroke:#334155,stroke-width:2px
+    style FORMATTER fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+    style SOURCES fill:#f1f5f9,stroke:#64748b,stroke-width:1px
+```
+
+### 📋 4.1 Responsabilités des 4 champs
+
+| # | Champ | Rôle / Responsabilité unique | Format / Grammaire | Exemples d'affichage |
+|---|---|---|---|---|
+| **1** | **`GlobalContextText`** *(Macro)* | Contexte d'exécution, mode de marche actif et sélection axes. | `[Contexte] [Mode] [Axes]` | • `[RÉEL] [SEMI-AUTO] [M1+M2 SYNCHRO]`<br>• `[SIMULATION] [MAINT_N2] [TREUIL M2 SEUL]` |
+| **2** | **`SequenceProgressText`** *(Micro)* | Étape courante du cycle maître **ET** de la sous-séquence active (Kobold, arrachage, homing). | `Macro: <Étape> > Sous-cycle: <Sous-étape>` | • `Cycle: DESCENTE > Kobold: 02_IMMERSION_SURFACE`<br>• `Homing: M1_RECHERCHE_INDEX_HAUT` |
+| **3** | **`SpecialConditionText`** *(Dérogations)* | Régimes dérogatoires de maintenance, sécurités neutralisées, bridages actifs (*vide si nominal*). | `⚠️ <Type> : <Détail>` ou `ℹ️ <Type> : <Détail>` | • `⚠️ DÉROGATION : Butées logicielles M2 inactives`<br>• `ℹ️ BRIDAGE : Palier 1 forcé (Désynchronisme 0.4m)` |
+| **4** | **`OperatorActionText`** *(Action)* | Consigne d'action physique attendue immédiatement du conducteur. | `[Organe] <Verbe d'action> > <Condition de fin>` | • `[JOYSTICK] Pousser Y- (Descente) > Attendre contact fond`<br>• `[PUPITRE] Appuyer sur Bouton HOMING M2` |
+
+### 🧩 4.2 Principes de génération & Typage fort
+* **Pas de manipulation de texte dans les FB procédé** : Les FB métier (`FB_Cycle`, `FB_DiveSearch`, `FB_Safety_Winch`, etc.) publient exclusivement des états typés (`E_CycleStep`, `E_DiveSearchState`, `ActionId : WORD`, flags booléens de bypass).
+* **Arbitre central dans `PRG_07_Supervision`** : Le POU `PRG_07_Supervision` instancie un formateur dédié (`FB_Hmi_BannerFormatter`) qui assemble les 4 champs selon les priorités machine et met à jour `GVL_IHM.Banner`.
+* **Séparation stricte avec les alarmes** : Les alarmes et pannes restent publiées dans `Error`/`ErrorId` et traitées par le gestionnaire d'alarmes / journal de supervision IHM. Le bandeau d'information ne remplace pas le journal d'alarmes.
 
 ---
 

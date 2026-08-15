@@ -4401,7 +4401,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble bornée [-99;+99] m — gelée sur doute</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble (m) — mesure instantanée réelle validée par EncoderIncoherent</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderIncoherent">
@@ -4409,7 +4409,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incohérence redémarrage → refuse SEMI_AUTO</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incohérence redémarrage ou hors bornes → refuse SEMI_AUTO</xhtml>
               </documentation>
             </variable>
             <variable name="Speed_Mps">
@@ -4445,7 +4445,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📏 ST_EncoderMeasurement — Mesures codeur qualifiées (1 sous-DUT par treuil)
+   📏 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
    📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2ter
    🎨 Facts de la chaîne de mesure pure : Abs → Scale → Safety → SpeedMeasure.
@@ -4604,6 +4604,58 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    ───────────────────────────────────────────────────────────────
    📄 Lot L5 (Frontière unique HwIn)
    🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HmiBanner">
+        <baseType>
+          <struct>
+            <variable name="GlobalContextText">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Macro : [RÉEL/SIMU] [MODE] [COUPLAGE]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SequenceProgressText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Micro : Cycle Maître &gt; Sous-cycle / Étape active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpecialConditionText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Dérogations : Bypass, bridages, butées inactives</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b1f57cf5-2e15-510f-acf6-8dd4b570c447</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
+      IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -6856,167 +6908,6 @@ TRUE = Défaut sécurité actif</xhtml>
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
               DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_Safety_Emergency_HmiCmd">
-        <baseType>
-          <struct>
-            <variable name="BtnEmergencyArming">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front demande rearmement contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnEmergencyCutOff">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Niveau coupure IHM maintenue</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnFaultReset">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement defauts</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>5668ac3d-88e6-55e2-b44c-612e1bf40a6b</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
-   [IHM] ST_Safety_Emergency_HmiCmd -- Commandes IHM pour la chaine AU
-   --------------------------------------------------------------
-   Role : structure d'echange pour les commandes operateur
-          de la chaine d'arret d'urgence (miroir ST_ModesCmd).
-   Pattern : identique a GVL_IHM.Modes.Cmd dans le projet reel.
-          L'IHM ecrit ces champs, le programme les consomme.
-   ==============================================================
-    Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-           DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_Safety_Emergency_HmiState">
-        <baseType>
-          <struct>
-            <variable name="ChainOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[OK] Etats generaux
-Boucle AU fermee (saine)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ContactorOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance engage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerCutOffActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance demandee par une safety metier</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Armable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[AU] Sequence de rearmement
-Pret au rearmement (chain OK + pas de lockout + pas de defaut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmingBusy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Step">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence (0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[KO] Diagnostics
-Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0=RedundancyTestFailed, bit1=ArmingFailed</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Auto-test A/B a echoue (canal colle/shunte)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmingFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement echoue (timeout confirmation)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LockoutActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage 5s entre tentatives</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>5488551c-eaa1-56ec-847b-781e247f8eab</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
-   [IHM] ST_Safety_Emergency_HmiState -- Retours d'etat IHM pour chaine AU
-   --------------------------------------------------------------
-   Role : structure d'echange pour les retours d'etat de la
-          chaine d'arret d'urgence (miroir ST_ModesState).
-   Pattern : identique a GVL_IHM.Modes.State dans le projet reel.
-          Le programme ecrit ces champs, l'IHM les lit.
-   ==============================================================
-    Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-           DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_Safety_Emergency_InternalCmd">
@@ -14502,7 +14393,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le bloc</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -14510,7 +14401,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front) — bit0 uniquement (bit1 suit HomingSuspect, voir §7bis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -14518,7 +14409,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ligne puissance enclenchée</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -14526,7 +14417,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard (contexte, pas encore exploité ce lot)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode d'exploitation</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosM">
@@ -14534,7 +14425,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Scale DE CE TREUIL</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position calculée (FB_Encoder_Scale)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingSuspect">
@@ -14542,7 +14433,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Homing DE CE TREUIL (§3.7, déjà calculé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alerte incohérence redémarrage (FB_Encoder_Homing)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionMinM">
@@ -14553,7 +14444,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <simpleValue value="-99" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bornage physique dur (Partie10 §3.6)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bornage physique bas</xhtml>
               </documentation>
             </variable>
             <variable name="PositionMaxM">
@@ -14563,6 +14454,9 @@ HomingRefRaw := Calib.HomingRefRaw;
               <initialValue>
                 <simpleValue value="99" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bornage physique haut</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassGlobal">
               <type>
@@ -14572,7 +14466,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Force ErrorId=0, ignore bornage (mise en service)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mise en service : neutralise le défaut de bornage</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -14602,7 +14496,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Position câble hors plage" - position hors plage physique ; bit1: "Incohérence position boot" - incohérence redémarrage (miroir HomingSuspect)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Position hors bornes [-99..+99]m ; bit1: Incohérence boot (HomingSuspect)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -14620,7 +14514,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">CablePosM gelée sur dernière valeur plausible si hors plage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble instantanée (non figée)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderIncoherent">
@@ -14628,7 +14522,7 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">= Error — consommé par FB_Modes (refuse SEMI_AUTO)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">= Error — consommé par FB_Modes et IHM</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -14643,37 +14537,28 @@ HomingRefRaw := Calib.HomingRefRaw;
                 <derived name="R_TRIG" />
               </type>
             </variable>
-            <variable name="LastPlausibleCablePosM">
-              <type>
-                <REAL />
-              </type>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ FB_Encoder_Safety — Bornage physique &amp; relais incohérence redémarrage
+   🛡️ FB_Encoder_Safety — Bornage physique &amp; surveillance cohérence
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3.6/§3.7
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3.6/§3.7
    🎯 Rôle :
-      - Bornage absolu [-99.00 ; +99.00] m (CablePosMSafe gelée sur dernière valeur plausible).
-      - Relais de HomingSuspect (ErrorId bit1).
-      - Expose EncoderIncoherent (= Error) consommé par FB_Modes.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Safety) ===</xhtml>
+      - Surveillance bornage absolu [-99.00 ; +99.00] m
+      - Relais de HomingSuspect (ErrorId bit1)
+      - Expose EncoderIncoherent (= Error) et transmet CablePosMSafe
+   ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Safety) ===
-
-// 🛑 1. GATE — expose la dernière valeur plausible connue même désactivé
+// 🛑 1. GATE
 IF NOT Enable THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     State := E_State.DISABLED;
-    CablePosMSafe := LastPlausibleCablePosM;
+    CablePosMSafe := CablePosM;
     EncoderIncoherent := FALSE;
     RETURN;
 END_IF;
@@ -14684,21 +14569,19 @@ State := E_State.READY;
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
-// 🌐 BYPASS GLOBAL : force ErrorId = 0, ignore bornage et incohérence
+// 🌐 3. BYPASS GLOBAL
 IF BypassGlobal THEN
     ErrorId := 16#0000;
 END_IF;
 
-// 🔍 3. BORNAGE PHYSIQUE ABSOLU (§3.6) — bit0
+// 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
 IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
     ErrorId := ErrorId OR 16#0001;
 ELSE
-    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que la position revient dans la plage valide *)
+    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
 END_IF;
 
-// 🔍 4. RELAIS INCOHÉRENCE REDÉMARRAGE (§3.7, calculée par FB_Encoder_Homing) — bit1
-// Pas d'acquittement ici : la levée se fait via BtnConfirmCoherence/nouveau Home côté
-// FB_Encoder_Homing (source), ce FB ne fait QUE relayer l'information pour FB_Modes.
+// 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
 IF NOT BypassGlobal THEN
     IF HomingSuspect THEN
         ErrorId := ErrorId OR 16#0002;
@@ -14707,13 +14590,10 @@ IF NOT BypassGlobal THEN
     END_IF;
 END_IF;
 
-// 🧊 5. GELER SUR DOUTE (§6) — CablePosMSafe ne suit PAS CablePosM si hors plage
-IF (ErrorId AND 16#0001) = 16#0000 THEN
-    LastPlausibleCablePosM := CablePosM;
-END_IF;
-CablePosMSafe := LastPlausibleCablePosM;
+// 📏 6. TRANSMISSION DE LA MESURE (Toujours réelle, non figée)
+CablePosMSafe := CablePosM;
 
-// 📤 6. SORTIES ÉTAT
+// 📤 7. SORTIES ÉTAT &amp; SÉCURITÉ
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
@@ -15750,6 +15630,340 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_Hmi_BannerFormatter" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="SimulationModeActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CurrentMode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+            </variable>
+            <variable name="BothAxesCoupled">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WinchSelected">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = M1, 2 = M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStep">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Cycle &amp; Sous-cycles</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+            </variable>
+            <variable name="ExtractionState">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+            </variable>
+            <variable name="HomingActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomingStepM1">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="HomingStepM2">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="BypassGlobalActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Dérogations &amp; Particularités</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassWinchM1Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BypassWinchM2Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BypassTranslation">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BypassSyncActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SyncDegradedActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LegalLimitReached">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Sécurité &amp; Consignes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SafeStopActiveAny">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerCutOffActiveAny">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="JoystickAtNeutral">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CycleAutoBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Banner">
+              <type>
+                <derived name="ST_HmiBanner" />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="PrefixContext">
+              <type>
+                <string length="20" />
+              </type>
+            </variable>
+            <variable name="ModeStr">
+              <type>
+                <string length="30" />
+              </type>
+            </variable>
+            <variable name="CouplingStr">
+              <type>
+                <string length="30" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧠 FB_Hmi_BannerFormatter — Formateur du bandeau d'information IHM
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   🎯 Responsabilité : assemble et arbitre les 4 champs de texte
+      normalisés du bandeau supérieur à partir des états typés des procédés.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Banner.GlobalContextText    := '';
+    Banner.SequenceProgressText := '';
+    Banner.SpecialConditionText := '';
+    Banner.OperatorActionText   := '';
+    RETURN;
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 1. GLOBAL CONTEXT TEXT [RÉEL/SIMU] [MODE] [COUPLAGE]
+// ═══════════════════════════════════════════════════════════════
+IF SimulationModeActive THEN
+    PrefixContext := '[SIMULATION] ';
+ELSE
+    PrefixContext := '[RÉEL] ';
+END_IF;
+
+CASE CurrentMode OF
+    E_Mode.DISABLE:
+        ModeStr := '[DÉSACTIVÉ]';
+    E_Mode.MAINT_N1:
+        ModeStr := '[MAINT_N1]';
+    E_Mode.MAINT_N2:
+        ModeStr := '[MAINT_N2]';
+    E_Mode.SEMI_AUTO:
+        ModeStr := '[SEMI-AUTO]';
+ELSE
+    ModeStr := '[MODE INCONNU]';
+END_CASE;
+
+IF CurrentMode = E_Mode.SEMI_AUTO THEN
+    CouplingStr := ' [CYCLE AUTO]';
+ELSIF BothAxesCoupled THEN
+    CouplingStr := ' [M1+M2 COUPLÉS]';
+ELSIF WinchSelected = 1 THEN
+    CouplingStr := ' [M1 RETENUE SEUL]';
+ELSIF WinchSelected = 2 THEN
+    CouplingStr := ' [M2 BENNE SEULE]';
+ELSE
+    CouplingStr := ' [AUCUN AXE]';
+END_IF;
+
+Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
+
+// ═══════════════════════════════════════════════════════════════
+// 2. SEQUENCE PROGRESS TEXT (Micro / Progression)
+// ═══════════════════════════════════════════════════════════════
+IF HomingActive THEN
+    IF HomingStepM1 &gt; 0 THEN
+        Banner.SequenceProgressText := 'Homing: RECHERCHE INDEX M1 EN COURS';
+    ELSIF HomingStepM2 &gt; 0 THEN
+        Banner.SequenceProgressText := 'Homing: RECHERCHE INDEX M2 EN COURS';
+    ELSE
+        Banner.SequenceProgressText := 'Homing: ATTENTE DECLENCHEMENT CAPTEUR HAUT';
+    END_IF;
+ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
+    CASE CycleStep OF
+        E_CycleStep.INIT:
+            Banner.SequenceProgressText := 'Cycle: INITIALISATION (ATTENTE START)';
+        E_CycleStep.WORK_POS_SELECT:
+            Banner.SequenceProgressText := 'Cycle: SELECTION POSITION TRAVAIL';
+        E_CycleStep.DESCENDING_OPEN:
+            IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 02_RECHERCHE_IMMERSION';
+            ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 03_PLONGEE_RECHERCHE_FOND';
+            ELSIF DiveState = E_DiveSearchState.BOTTOM_CONFIRMED THEN
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 04_FOND_TOUCHE_CONFIRME';
+            ELSE
+                Banner.SequenceProgressText := 'Cycle: 01_DESCENTE_BENNE_OUVERTE';
+            END_IF;
+        E_CycleStep.BOTTOM_TOUCH_WAIT:
+            Banner.SequenceProgressText := 'Cycle: 02_ATTENTE_FOND_TOUCHE';
+        E_CycleStep.SYNCHRO_ADJUST:
+            Banner.SequenceProgressText := 'Cycle: 03_FERMETURE_BENNE_AU_FOND';
+        E_CycleStep.CTRL_ASCENDING:
+            Banner.SequenceProgressText := 'Cycle: 04_ARRACHAGE_ET_REMONTEE_LENTE_PALIER_1';
+        E_CycleStep.ASCENDING_LOADED:
+            Banner.SequenceProgressText := 'Cycle: 05_REMONTEE_NOMINALE_CHARGE';
+        E_CycleStep.DRAINING_PAUSE:
+            Banner.SequenceProgressText := 'Cycle: 06_EGOUTTAGE_TEMPORISE';
+        E_CycleStep.TRANSLATION_MOVE:
+            Banner.SequenceProgressText := 'Cycle: 07_DEPLACEMENT_TRANSLATION_VERS_TREMIE';
+        E_CycleStep.DESCENDING_OPEN_DUMP:
+            Banner.SequenceProgressText := 'Cycle: 08_DESCENTE_ET_OUVERTURE_BENNE_TREMIE';
+        E_CycleStep.RETURN_WORK_POS:
+            Banner.SequenceProgressText := 'Cycle: 09_RETOUR_POSITION_TRAVAIL';
+        E_CycleStep.READY:
+            Banner.SequenceProgressText := 'Cycle: 10_CYCLE_TERMINE_PRET';
+        E_CycleStep.ERROR_HOLD:
+            Banner.SequenceProgressText := 'Cycle: EN PAUSE SUR DEFAUT OU HOMME-MORT';
+    ELSE
+        Banner.SequenceProgressText := 'Cycle: ETAPE EN COURS';
+    END_CASE;
+ELSE
+    IF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
+        Banner.SequenceProgressText := 'Manuel: PILOTAGE DIRECT JOYSTICK / PUPITRE';
+    ELSE
+        Banner.SequenceProgressText := 'Machine: ARRETEE / NEUTRALISEE';
+    END_IF;
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 3. SPECIAL CONDITION TEXT (Dérogations &amp; Avertissements)
+// ═══════════════════════════════════════════════════════════════
+IF BypassGlobalActive THEN
+    Banner.SpecialConditionText := '[DEROGATION] : Bypass global securite actif';
+ELSIF BypassWinchM1Active OR BypassWinchM2Active THEN
+    Banner.SpecialConditionText := '[DEROGATION] : Bypass treuil actif (surveillance inhibee)';
+ELSIF BypassTranslation THEN
+    Banner.SpecialConditionText := '[DEROGATION] : Bypass translation actif';
+ELSIF SyncDegradedActive THEN
+    Banner.SpecialConditionText := '[BRIDAGE] : Vitesse limitee Palier 1 (Ecart synchro M1/M2)';
+ELSIF LegalLimitReached THEN
+    Banner.SpecialConditionText := '[LIMITE] : Profondeur legale de dragage atteinte';
+ELSE
+    Banner.SpecialConditionText := 'Nominal : Aucune derogation active';
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 4. OPERATOR ACTION TEXT (Consigne d'action requise)
+// ═══════════════════════════════════════════════════════════════
+IF NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
+    Banner.OperatorActionText := '[PUPITRE] Réarmer la chaîne AU physique et enclencher la puissance';
+ELSIF SafeStopActiveAny THEN
+    Banner.OperatorActionText := '[PUPITRE] Acquitter le défaut (Reset) et ramener le joystick au neutre';
+ELSIF CurrentMode = E_Mode.DISABLE THEN
+    Banner.OperatorActionText := '[IHM] Sélectionner un mode de marche actif (MAINT_N1, MAINT_N2 ou AUTO)';
+ELSIF NOT DeadmanArmed THEN
+    Banner.OperatorActionText := '[JOYSTICK] Maintenir la gâchette homme-mort au neutre pour armer';
+ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
+    IF CycleStep = E_CycleStep.INIT THEN
+        Banner.OperatorActionText := '[IHM] Appuyer sur Start Cycle pour lancer la séquence';
+    ELSIF CycleStep = E_CycleStep.ERROR_HOLD THEN
+        Banner.OperatorActionText := '[JOYSTICK] Réarmer homme-mort puis réengager déflexion pour reprise';
+    ELSE
+        Banner.OperatorActionText := '[JOYSTICK] Maintenir déflexion active pour déroulement du cycle';
+    END_IF;
+ELSIF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
+    Banner.OperatorActionText := '[JOYSTICK] Actionner l axe souhaité avec homme-mort maintenu';
+ELSE
+    Banner.OperatorActionText := '[AUCUNE ACTION ATTENDUE]';
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>84039c85-4845-567a-8eb6-932818f2daf4</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Joystick" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -15873,7 +16087,7 @@ END_IF;
                 <simpleValue value="300" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-08-07 (demande client) : zone morte en compte brut ADC (0..10000), remplace l'ancien % — mesure terrain bruit neutre ±200, marge à ±300</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Zone morte en points ADC bruts (0..10000)</xhtml>
               </documentation>
             </variable>
             <variable name="FilterTime">
@@ -15883,16 +16097,8 @@ END_IF;
               <initialValue>
                 <simpleValue value="TIME#0ms" />
               </initialValue>
-            </variable>
-            <variable name="DeadmanRearmTimeout">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#10S" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai max entre 2 appuis en mouvement (si reconfirmation activée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Filtrage premier ordre axe</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralHoldTime">
@@ -15903,7 +16109,7 @@ END_IF;
                 <simpleValue value="TIME#100MS" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps continu au neutre avant désarmement (100 ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien continu au neutre avant désarmement</xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmHoldTime">
@@ -15914,7 +16120,7 @@ END_IF;
                 <simpleValue value="TIME#100MS" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Temps d'appui continu avant armement (indépendant position axes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui continu bouton requis pour armer</xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmGraceTime">
@@ -15925,18 +16131,7 @@ END_IF;
                 <simpleValue value="TIME#3S" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Délai après armement avant que le désarmement "neutre tenu" (NeutralHoldTime) puisse s'appliquer — laisse le temps de sortir de la zone morte après un appui au centre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeadmanReconfEnable">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-03 : FALSE = bouton = consentement au démarrage (mouvement libre, défaut cible) ; TRUE = reconfirmation périodique en mouvement (comportement historique)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai de grâce post-armement avant application du désarmement neutre</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -16141,11 +16336,6 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <derived name="R_TRIG" />
               </type>
             </variable>
-            <variable name="DeadmanTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
             <variable name="NeutralHoldTimer">
               <type>
                 <derived name="TON" />
@@ -16213,13 +16403,12 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     SpeedXPct := 0.0; DirectionX := 0;
     SpeedYPct := 0.0; DirectionY := 0;
     Button := FALSE;
-    AtNeutral := TRUE;   // 🆕 2026-08-07 — pas de commande possible pendant la neutralisation
-    DeadmanArmed := FALSE;   // 🆕 Désarmé sur toute neutralisation — nouvel appui au neutre exigé
-    DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — annule toute tentative d'armement en cours
-    DeadmanTimer(IN := FALSE, PT := DeadmanRearmTimeout);   // 🆕 2026-07-03decies — pas d'accumulation à froid
-    NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);   // 🆕 2026-07-03duodecies — idem
-    DeadmanArmTimer(IN := FALSE, PT := DeadmanArmHoldTime);   // 🆕 2026-08-07 — idem
-    DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);   // 🆕 2026-08-07 — idem
+    AtNeutral := TRUE;
+    DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;
+    NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);
+    DeadmanArmTimer(IN := FALSE, PT := DeadmanArmHoldTime);
+    DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
     LastMode := Mode;   // 🆕 REX 2026-07-08 — pas de faux changement détecté à la réactivation
@@ -16311,39 +16500,12 @@ IF DeadmanArmTimer.Q THEN
     DeadmanArmPending := FALSE;
 END_IF;
 
-// 🔧 2026-08-06 (retour terrain) : décision 2026-08-03 ("l'opérateur a le temps qu'il veut
-// pour démarrer après armement") ANNULÉE explicitement — un armement resté au neutre sans
-// mouvement démarré ne désarmait JAMAIS (LeftNeutralSinceArm restait FALSE indéfiniment),
-// laissant DeadmanArmed collé à TRUE d'une session à l'autre. Neutre tenu NeutralHoldTime
-// désarme désormais TOUJOURS, qu'un mouvement ait été démarré ou non depuis l'armement.
-// 🔧 2026-08-07 (retour terrain) : SANS garde-fou, ce désarmement se déclenchait ~100-200ms après
-// CHAQUE armement (l'appui se fait typiquement AU neutre depuis le nouvel armement par maintien —
-// voir §4ter — donc AtNeutral est déjà vrai dès l'instant où DeadmanArmed passe à TRUE, et
-// NeutralHoldTime=100ms est trop court pour laisser le temps de sortir de la zone morte). Ajout
-// DeadmanArmGraceTimer (3s) : le désarmement neutre ne peut s'appliquer qu'APRÈS ce délai suivant
-// l'armement — le risque du 2026-08-06 (armement collé indéfiniment) reste couvert, juste avec
-// une marge de départ au lieu de 100ms. Aucun risque moteur pendant la grâce : au neutre,
-// CmdXVal/CmdYVal restent à 0 (deadband), armé ou non.
+// ⏱️ 4bis. GESTION DU DÉSARMEMENT PAR MAINTIEN AU NEUTRE
 DeadmanArmGraceTimer(IN := DeadmanArmed, PT := DeadmanArmGraceTime);
 NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q,
                  PT := NeutralHoldTime);
 IF NeutralHoldTimer.Q THEN
-    DeadmanArmed := FALSE;      // Neutre tenu assez longtemps (après la grâce) = désarmement
-END_IF;
-
-// 4quater. RECONFIRMATION PÉRIODIQUE (optionnelle) — activée uniquement si DeadmanReconfEnable := TRUE.
-// 🆕 2026-08-03 : par défaut FALSE → bouton = CONSENTEMENT AU DÉMARRAGE : une fois armé, le mouvement
-// est libre SANS surveillance du bouton ; seuls gate/mode/fin benne/neutre 500ms désarment.
-// ⚠️ CORRECTIF (garde-fou si réactivé) : le 1er jet ne détectait qu'un FRONT (`DeadmanEdge.Q`) — un
-// opérateur qui MAINTIENT le bouton enfoncé en continu (réflexe naturel homme-mort) ne générait
-// plus jamais de front après le 1er appui → désarmement surprise au bout de 3s MALGRÉ la présence
-// continue. Corrigé : `NOT RawButton` (niveau, pas front) — maintenir OU réappuyer dans le délai
-// remettent tous les deux `IN` à FALSE (TON.ET repart de 0), seul un RELÂCHEMENT PROLONGÉ désarme.
-DeadmanTimer(IN := DeadmanReconfEnable AND DeadmanArmed
-                   AND NOT AtNeutral AND NOT RawButton,
-             PT := DeadmanRearmTimeout);
-IF DeadmanTimer.Q THEN
-    DeadmanArmed := FALSE;      // Pas de reconfirmation dans le délai → désarmement (décélération sûre)
+    DeadmanArmed := FALSE;      // Neutre maintenu après la grâce = désarmement
 END_IF;
 
 {endregion}
@@ -20656,8 +20818,9 @@ ELSE
     Operator.JoyYRaw_ANA2 := SimJoystickRawY;
 END_IF;
 
-// Homme-mort : stimulus brut amont, identique au bouton physique.
-Operator.JoyBtnRaw := SimJoystickRawButton;
+// Homme-mort : stimulus brut amont. En simulation avec boutons directionnels actifs,
+// l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
+Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount &gt; 0);
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
 Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
@@ -27135,24 +27298,6 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
                 <derived name="FB_Translation_PositionDecoder" />
               </type>
             </variable>
-            <variable name="instCycleTimeAcq">
-              <type>
-                <derived name="FB_CycleTime" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Filtrage retours variateur M3 ──</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instFilterM3StatusWord">
-              <type>
-                <derived name="FB_Filter_PT1" />
-              </type>
-            </variable>
-            <variable name="instFilterM3ActualFreqHz">
-              <type>
-                <derived name="FB_Filter_PT1" />
-              </type>
-            </variable>
             <variable name="WinchInputSourceSimulated">
               <type>
                 <BOOL />
@@ -27202,13 +27347,47 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
                 <derived name="F_TRIG" />
               </type>
             </variable>
+            <variable name="ENCODER_POINTS_PER_REV">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Constantes mécaniques &amp; électriques chaîne codeurs treuils (DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §2)
+13 bits single-turn (8192 pts/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ENCODER_MULTITURN_REVS_MAX">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="4096" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">12 bits multi-turn (4096 tours max)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WINCH_CABLE_M_PER_REV">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2.0 mètres de câble par tour de tambour treuil</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 PRG_02_Acquisition — Programme d'Acquisition et Qualification I/O
+   📡 PRG_02_Acquisition — Programme d'Acquisition et Conditionnement I/O
    ───────────────────────────────────────────────────────────────
+   ⚙️ Exécuté par la tâche PLC en position 1 (premier POU du cycle).
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2
-   ⚙️ Exécuté en tête de la chaîne métier (après les initialisations système).
    🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
       et publier les retours.
@@ -27220,13 +27399,10 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 {region "§0 Session simulation &amp; aiguillage"}
-// === 🧪 §0 SESSION SIMULATION &amp; AIGUILLAGE ===
-// 🔧 REX 2026-08-14 : les 4 flags d'aiguillage par domaine et la condition de simulation Machine
-// (§1bis) étaient calculés à 2 endroits différents du fichier (duplication de la même expression
-// GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive) — regroupés ici en
-// source unique, conforme CODE_QUALITY_STANDARDS.md §1 (producteur unique) et §2bis (lisibilité).
-// Le bit maître est commandé consciemment par l'opérateur. Ses fronts initialisent les
-// domaines et stimuli afin qu'un retour réel ne puisse pas laisser une simulation latente.
+// === 🧪 §0 SIMULATION &amp; SÉLECTION DE SOURCE ===
+// 🎯 Producteur unique des aiguillages Réel/Simu par domaine (HwReal vs HwSim -&gt; HwIn).
+// ⚡ Fronts maître : initialisent/nettoient les stimuli banc sans état résiduel.
+
 SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
 
@@ -27235,6 +27411,7 @@ IF SimulationModeRise.Q THEN
     GVL_Simulation.SimTranslationActive := TRUE;
     GVL_Simulation.SimOperatorActive := TRUE;
     GVL_Simulation.SimSafetyActive := TRUE;
+    GVL_Simulation.SimJoystickRawButton := TRUE;
 END_IF;
 
 IF SimulationModeFall.Q THEN
@@ -27259,7 +27436,7 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimKoboldContactValue := FALSE;
 END_IF;
 
-// Aiguillage par domaine — source unique, réutilisée en §1bis et en §2 (SEL final).
+// 🔀 Aiguillages de source uniques par domaine
 WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
@@ -27267,7 +27444,7 @@ MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_S
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}
-// === 📥 §1 ACQUISITION BRUTE (HwReal) ===
+// === 📥 §1 ACQUISITION BRUTE MATÉRIELLE (HwReal) ===
 
 // Winch M1 / M2 et codeurs
 HwReal.Winch.M1_ContactorsReleased_DI := M1_ContactorsReleased_DI;
@@ -27438,79 +27615,71 @@ instJoystick(
     InvertY                   := _JoystickInvertY,
     DeadbandRaw               := _JoystickDeadbandRaw,
     FilterTime                := _JoystickFilterTime,
-    DeadmanRearmTimeout       := T#10S,
-    NeutralHoldTime           := T#100MS, // 🔧 2026-08-07 (demande client) : réduit de 500ms — désarme plus vite au retour neutre
-    DeadmanArmHoldTime        := T#100MS, // 🆕 2026-08-07 (demande client) : appui maintenu 100ms arme, indépendamment de la position des axes
-    DeadmanArmGraceTime       := T#3S,    // 🆕 2026-08-07 (retour terrain) : grâce avant que le désarmement neutre puisse s'appliquer après un armement
-    DeadmanReconfEnable       := FALSE,
+    NeutralHoldTime           := T#100MS,
+    DeadmanArmHoldTime        := T#100MS,
+    DeadmanArmGraceTime       := T#3S,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
 );
 
-// 🔫 AF08 §6 : DeadmanArmed jusqu'ici jamais publié hors instJoystick (instance privée) —
-// exigé par Translation/Winch/Cycle en aval (T106, audit M3 2026-08-05).
+// 📤 Publication des états et axes joystick
 JoystickDeadmanArmed := instJoystick.DeadmanArmed;
-JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prérequis FB_Safety_Winch Méca B
-JoystickDirectionX := instJoystick.DirectionX;
-JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
-JoystickXNeutral := (instJoystick.DirectionX = 0);
+JoystickYNeutral     := (instJoystick.DirectionY = 0);
+JoystickDirectionX   := instJoystick.DirectionX;
+JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);
+JoystickXNeutral     := (instJoystick.DirectionX = 0);
 {endregion}
 
 {region "§4 Codeurs et homing — M1/M2"}
 // === 🧲 §4 CODEURS &amp; HOMING (M1 / M2) ===
 
+// ── TREUIL M1 (Retenue) ──
 instEncoderAbsM1(
-    Enable              := TRUE,
-    Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                := PRG_03_Modes_Cycle.Auth.Mode,
-    RawPosIn            := HwIn.Winch.COD1_PosValue,
-    AlarmsIn            := HwIn.Winch.COD1_Alarms,
-    WarningsIn          := HwIn.Winch.COD1_Warnings,
-    SlaveOperational    := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
-    PresetRequest       := instHomingM1.PresetRequest,
-    PresetValue         := instHomingM1.PresetValue
+    Enable                := TRUE,
+    Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
+    RawPosIn              := HwIn.Winch.COD1_PosValue,
+    AlarmsIn              := HwIn.Winch.COD1_Alarms,
+    WarningsIn            := HwIn.Winch.COD1_Warnings,
+    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
+    PresetRequest         := instHomingM1.PresetRequest,
+    PresetValue           := instHomingM1.PresetValue
 );
 
 instHomingM1(
-    Enable               := TRUE,
-    Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
-    Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
-    UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 0),
-    WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1),
-    CfgHomingTargetM        := _WinchM1CfgPersist.CfgHomingTarget_M,
-    BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
-    TopPositionSensor    := HwIn.Winch.M1M2_TopPositionFree_DI,
-    CfgTopSensorPosM   := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
+    Enable                 := TRUE,
+    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged  := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
+    Home                   := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
+    UnitaryMode            := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                              AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 0),
+    WinchSelected          := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1),
+    CfgHomingTargetM       := _WinchM1CfgPersist.CfgHomingTarget_M,
+    BtnConfirmCoherence    := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
+    TopPositionSensor      := HwIn.Winch.M1M2_TopPositionFree_DI,
+    CfgTopSensorPosM       := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
     FwdRevSpeedFeedbackOff := HwIn.Winch.M1_ContactorsReleased_DI,
-    BrakeFeedback        := HwIn.Winch.M1_BrakeIsOpen_DI,
-    RawPos               := instEncoderAbsM1.RawPos,
-    EncoderAvailable     := instEncoderAbsM1.EncoderAvailable,
-    PresetAck            := instEncoderAbsM1.PresetAck,
-    PresetNak            := instEncoderAbsM1.PresetNak,
-    PointsPerRev         := 8192,
-    MultiTurnRevsMax     := 4096,
-    CableM_PerRev        := 2.0,
-    BypassGlobal         := GVL_IHM.M1TreuilRetenue.Bypass.Global,
-    Calib                := _CalibM1
+    BrakeFeedback          := HwIn.Winch.M1_BrakeIsOpen_DI,
+    RawPos                 := instEncoderAbsM1.RawPos,
+    EncoderAvailable       := instEncoderAbsM1.EncoderAvailable,
+    PresetAck              := instEncoderAbsM1.PresetAck,
+    PresetNak              := instEncoderAbsM1.PresetNak,
+    PointsPerRev           := ENCODER_POINTS_PER_REV,
+    MultiTurnRevsMax       := ENCODER_MULTITURN_REVS_MAX,
+    CableM_PerRev          := WINCH_CABLE_M_PER_REV,
+    BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
+    Calib                  := _CalibM1
 );
 
 instEncoderScaleM1(
-    RawPos          := instEncoderAbsM1.RawPos,
-    HomingRefRaw    := instHomingM1.HomingRefRaw,
-    CableM_PerRev   := 2.0,
-    PointsPerRev    := 8192
+    RawPos        := instEncoderAbsM1.RawPos,
+    HomingRefRaw  := instHomingM1.HomingRefRaw,
+    CableM_PerRev := WINCH_CABLE_M_PER_REV,
+    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
 );
 
-// 🆕 2026-08-05 : bornage physique ±99m + gel sur doute (audit sécurité M3) — CablePosM1
-// (producteur unique position, consommé machine entière) n'était protégé par AUCUN étage
-// avant ce lot, contrairement à ce qu'affirmait AF_Partie-09 §4.1 (écart doc/code trouvé
-// par l'audit). Sémantique inchangée en fonctionnement normal (position dans la plage) ;
-// seul un doute (hors plage ou homing suspect) fige désormais la valeur au lieu de la
-// laisser divaguer.
 instEncoderSafetyM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -27520,12 +27689,9 @@ instEncoderSafetyM1(
     HomingSuspect         := instHomingM1.HomingSuspect,
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
-CablePosM1 := instEncoderSafetyM1.CablePosMSafe;
+CablePosM1           := instEncoderSafetyM1.CablePosMSafe;
 M1_EncoderIncoherent := instEncoderSafetyM1.EncoderIncoherent;
 
-// 🆕 2026-08-05 : vitesse câble mesurée — prérequis FB_Safety_Winch Méca A/F/G (audit sécurité M3).
-// PositionValid combine disponibilité codeur ET cohérence position (gel sur doute ci-dessus) :
-// une position figée par FB_Encoder_Safety ne doit jamais alimenter un calcul de vitesse réel.
 instEncoderSpeedMeasureM1(
     Enable        := TRUE,
     Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -27536,26 +27702,21 @@ M1_Speed_Mps       := instEncoderSpeedMeasureM1.Speed_Mps;
 M1_SignedSpeed_Mps := instEncoderSpeedMeasureM1.SignedSpeed_Mps;
 M1_SpeedValid      := instEncoderSpeedMeasureM1.Valid;
 
+// ── TREUIL M2 (Benne) ──
 instEncoderAbsM2(
-    Enable              := TRUE,
-    Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                := PRG_03_Modes_Cycle.Auth.Mode,
-    RawPosIn            := HwIn.Winch.COD2_PosValue,
-    AlarmsIn            := HwIn.Winch.COD2_Alarms,
-    WarningsIn          := HwIn.Winch.COD2_Warnings,
-    SlaveOperational    := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
-    PresetRequest       := instHomingM2.PresetRequest,
-    PresetValue         := instHomingM2.PresetValue
+    Enable                := TRUE,
+    Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
+    RawPosIn              := HwIn.Winch.COD2_PosValue,
+    AlarmsIn              := HwIn.Winch.COD2_Alarms,
+    WarningsIn            := HwIn.Winch.COD2_Warnings,
+    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
+    PresetRequest         := instHomingM2.PresetRequest,
+    PresetValue           := instHomingM2.PresetValue
 );
 
-// 🆕 2026-08-07 (19) — retour terrain, demande client : BtnConfirmOpenPos/ClosePos (benne)
-// doivent AUSSI référencer le codeur M2, comme BtnHome -- pas seulement mémoriser IsOpen/IsClosed
-// (FB_Bucket.st, inchangé, continue de le faire en parallèle). Cible dynamique : ouverture =
-// position réelle actuelle de M1 (offset 0) ; fermeture = M1 + OffsetCloseM (config benne, 15m
-// actuellement). Mêmes gardes que le Confirm logique (Mode MAINT_N1/N2, M1/M2 à l'arrêt) --
-// lecture 1 scan en retard sur PRG_03/PRG_04 (pattern déjà accepté ailleurs, action manuelle
-// ponctuelle, pas un mouvement).
+// Synchronisation référencement M2 sur ouverture/fermeture benne
 M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
@@ -27568,41 +27729,40 @@ ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
 END_IF;
 
 instHomingM2(
-    Enable               := TRUE,
-    Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
-    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero OR M2BucketRefRequested,
-    UseDynamicTarget     := M2BucketRefRequested,
-    DynamicHomingTargetM := M2BucketRefTargetM,
-    UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 0),
-    WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
-    CfgHomingTargetM        := _WinchM2CfgPersist.CfgHomingTarget_M,
-    BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
-    TopPositionSensor    := HwIn.Winch.M1M2_TopPositionFree_DI,
-    CfgTopSensorPosM   := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
+    Enable                 := TRUE,
+    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged  := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
+    Home                   := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero OR M2BucketRefRequested,
+    UseDynamicTarget       := M2BucketRefRequested,
+    DynamicHomingTargetM   := M2BucketRefTargetM,
+    UnitaryMode            := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                              AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 0),
+    WinchSelected          := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
+    CfgHomingTargetM       := _WinchM2CfgPersist.CfgHomingTarget_M,
+    BtnConfirmCoherence    := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
+    TopPositionSensor      := HwIn.Winch.M1M2_TopPositionFree_DI,
+    CfgTopSensorPosM       := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
     FwdRevSpeedFeedbackOff := HwIn.Winch.M2_ContactorsReleased_DI,
-    BrakeFeedback        := HwIn.Winch.M2_BrakeIsOpen_DI,
-    RawPos               := instEncoderAbsM2.RawPos,
-    EncoderAvailable     := instEncoderAbsM2.EncoderAvailable,
-    PresetAck            := instEncoderAbsM2.PresetAck,
-    PresetNak            := instEncoderAbsM2.PresetNak,
-    PointsPerRev         := 8192,
-    MultiTurnRevsMax     := 4096,
-    CableM_PerRev        := 2.0,
-    BypassGlobal         := GVL_IHM.M2TreuilBenne.Bypass.Global,
-    Calib                := _CalibM2
+    BrakeFeedback          := HwIn.Winch.M2_BrakeIsOpen_DI,
+    RawPos                 := instEncoderAbsM2.RawPos,
+    EncoderAvailable       := instEncoderAbsM2.EncoderAvailable,
+    PresetAck              := instEncoderAbsM2.PresetAck,
+    PresetNak              := instEncoderAbsM2.PresetNak,
+    PointsPerRev           := ENCODER_POINTS_PER_REV,
+    MultiTurnRevsMax       := ENCODER_MULTITURN_REVS_MAX,
+    CableM_PerRev          := WINCH_CABLE_M_PER_REV,
+    BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
+    Calib                  := _CalibM2
 );
 
 instEncoderScaleM2(
-    RawPos          := instEncoderAbsM2.RawPos,
-    HomingRefRaw    := instHomingM2.HomingRefRaw,
-    CableM_PerRev   := 2.0,
-    PointsPerRev    := 8192
+    RawPos        := instEncoderAbsM2.RawPos,
+    HomingRefRaw  := instHomingM2.HomingRefRaw,
+    CableM_PerRev := WINCH_CABLE_M_PER_REV,
+    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
 );
 
-// 🆕 2026-08-05 : bornage physique ±99m + gel sur doute (audit sécurité M3) — voir M1 ci-dessus.
 instEncoderSafetyM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -27612,10 +27772,9 @@ instEncoderSafetyM2(
     HomingSuspect         := instHomingM2.HomingSuspect,
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
-CablePosM2 := instEncoderSafetyM2.CablePosMSafe;
+CablePosM2           := instEncoderSafetyM2.CablePosMSafe;
 M2_EncoderIncoherent := instEncoderSafetyM2.EncoderIncoherent;
 
-// 🆕 2026-08-05 : vitesse câble mesurée — prérequis FB_Safety_Winch Méca A/F/G (audit sécurité M3).
 instEncoderSpeedMeasureM2(
     Enable        := TRUE,
     Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -27651,27 +27810,12 @@ TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
 M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
-M3_SensorsWord          := instPosDecoderM3.SensorsWord;
 {endregion}
 
-{region "§6 Filtrage PT1 retours variateur — M3"}
-// === 📊 §6 FILTRAGE PT1 RETOURS VARIATEUR (M3) ===
-
-instCycleTimeAcq(DefaultValueS := 0.010);
-
-instFilterM3StatusWord(
-    ValueIn    := UINT_TO_REAL(WORD_TO_UINT(HwIn.Translation.M3_StatusWord)),
-    TimeConst  := T#0MS,
-    CycleTimeS := instCycleTimeAcq.CycleTimeS
-);
-M3_StatusWord_Filtered := REAL_TO_UINT(instFilterM3StatusWord.ValueOut);
-
-instFilterM3ActualFreqHz(
-    ValueIn    := UINT_TO_REAL(HwIn.Translation.M3_ActualFrequencyHz),
-    TimeConst  := T#0MS,
-    CycleTimeS := instCycleTimeAcq.CycleTimeS
-);
-M3_ActualFrequencyHz_Filtered := REAL_TO_UINT(instFilterM3ActualFreqHz.ValueOut);
+{region "§6 Retours variateur — M3"}
+// === 📊 §6 RETOURS VARIATEUR (M3) CONDITIONNÉS ===
+M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
+M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
 {endregion}
 </xhtml>
           </ST>
@@ -33653,6 +33797,11 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <derived name="FB_Acquisition_Preflight" />
               </type>
             </variable>
+            <variable name="instHmiBannerFormatter">
+              <type>
+                <derived name="FB_Hmi_BannerFormatter" />
+              </type>
+            </variable>
             <variable name="instTroubleshootingView">
               <type>
                 <derived name="FB_TroubleshootingView" />
@@ -33944,8 +34093,35 @@ GVL_IHM.Network.EcatErrorId := instDiagEthercat.ErrorId;
 GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigitalIoOk;
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
-GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.InputModuleFault;
-
+// 🖥️ Bandeau IHM 4 champs (AF-07 §4)
+instHmiBannerFormatter(
+    Enable                := TRUE,
+    SimulationModeActive  := GVL_Simulation.SimulationModeActive,
+    CurrentMode           := PRG_03_Modes_Cycle.Auth.Mode,
+    BothAxesCoupled       := (GVL_IHM.Modes.Cmd.SelJoystickWinch = 0),
+    WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
+    CycleStep             := GVL_IHM.Cycle.State.CycleStep,
+    DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
+    ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
+    HomingActive          := (NOT PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed),
+    HomingStepM1          := 0,
+    HomingStepM2          := 0,
+    BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
+    BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
+    BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
+    BypassTranslation     := GVL_IHM.TranslationM3.Bypass.Global,
+    BypassSyncActive      := GVL_IHM.M1M2Sync.Bypass.Global,
+    SyncDegradedActive    := PRG_04_Treuils_Benne.SyncState.SyncDegradedStep1,
+    LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
+    EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
+    PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    SafeStopActiveAny     := GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop OR GVL_IHM.TranslationM3.Safety.SafeStop,
+    PowerCutOffActiveAny  := PRG_06_Outputs_LD.PowerCutOffActive,
+    DeadmanArmed          := PRG_02_Acquisition.JoystickDeadmanArmed,
+    JoystickAtNeutral     := PRG_02_Acquisition.instJoystick.AtNeutral,
+    CycleAutoBusy         := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO)
+);
+GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 
 {endregion}
 
@@ -34279,6 +34455,14 @@ Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERV
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🪨 Assistance plongée/extraction MAINT_N1/N2</xhtml>
           </documentation>
         </variable>
+        <variable name="Banner">
+          <type>
+            <derived name="ST_HmiBanner" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4)</xhtml>
+          </documentation>
+        </variable>
         <variable name="OperatorAction">
           <type>
             <derived name="ST_OperatorAction" />
@@ -34326,51 +34510,6 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
    📄 Lot A : Mise en service et calibration de la machine de dragage.
    💾 Déclaré en RETAIN pour la persistance des configurations opérateur.
    ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_IHM_AU">
-        <variable name="Cmd">
-          <type>
-            <derived name="ST_Safety_Emergency_HmiCmd" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">[IHM] Commandes operateur (Write)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="State">
-          <type>
-            <derived name="ST_Safety_Emergency_HmiState" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">[IHM] Retours d'etat (Read)</xhtml>
-          </documentation>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e10b0c31-1883-5130-8f9d-688cce5b308f</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">==============================================================
-   [IHM] GVL_IHM_AU -- Interface IHM pour le test de la chaine AU
-   --------------------------------------------------------------
-   Role : point d'echange unique entre l'IHM (Watch/visu) et
-          le programme de test de la chaine d'arret d'urgence.
-   Pattern : identique a GVL_IHM.Modes (Cmd + State) dans le
-          projet reel.
-   Usage :
-     GVL_IHM_AU.Cmd.BtnEmergencyArming   -&gt; ecrit par l'IHM
-     GVL_IHM_AU.State.ContactorOk         -&gt; lu par l'IHM
-   ==============================================================
-    Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-           DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md</xhtml>
         </documentation>
       </globalVars>
     </data>
@@ -34875,41 +35014,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
           <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
         </Folder>
-        <Folder Name="AU">
-          <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
-          <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
-          <Object Name="FB_Safety_EmergencyManagementOutput" ObjectId="d3f89721-8269-5526-aac8-48009a2f16a2" />
-          <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
-          <Object Name="ST_Safety_Emergency_InternalCmd" ObjectId="231a5be8-1708-5e9a-a840-cc0ec056946d" />
-          <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
-        </Folder>
-        <Folder Name="SIMULATION">
-          <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
-          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
-          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
-          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
-          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
-          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
-        </Folder>
-        <Folder Name="DEPANNAGE">
-          <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
-          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
-        </Folder>
-        <Folder Name="MAIN">
-          <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
-          <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
-          <Object Name="PRG_02_Acquisition" ObjectId="212fd0f8-509e-536e-99de-b75543d86add" />
-          <Object Name="PRG_03_Modes_Cycle" ObjectId="93d4e8d3-42c7-55b2-97a6-95726c0b028f" />
-          <Object Name="PRG_04_Treuils_Benne" ObjectId="8dae74a3-6bd7-5bdb-8b05-9ae37b0ffd4d" />
-          <Object Name="PRG_05_Translation" ObjectId="95eac511-a67e-587f-8b68-f1908c57a87a" />
-          <Object Name="PRG_06_Outputs_LD" ObjectId="53276475-eafc-5c22-bbb7-6266f2b95c27" />
-          <Object Name="PRG_07_Supervision" ObjectId="06b3a23e-a531-55de-8ebc-c46206de9eb2" />
-        </Folder>
         <Folder Name="SUPERVISION">
+          <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
           <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
-          <Object Name="GVL_IHM_AU" ObjectId="e10b0c31-1883-5130-8f9d-688cce5b308f" />
-          <Object Name="ST_Safety_Emergency_HmiCmd" ObjectId="5668ac3d-88e6-55e2-b44c-612e1bf40a6b" />
-          <Object Name="ST_Safety_Emergency_HmiState" ObjectId="5488551c-eaa1-56ec-847b-781e247f8eab" />
           <Folder Name="_TYPES">
             <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
             <Object Name="ST_BucketCmd" ObjectId="758915ca-bb53-5f1a-ae3f-b495527bc5f4" />
@@ -34949,6 +35056,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_DredgingAssistState" ObjectId="4230b7ec-508c-5fc4-9124-31b8ff9632ea" />
             <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
             <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
+            <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
             <Object Name="ST_HomingChecklist" ObjectId="2d6561f4-76da-5ede-affd-bb7892225e3b" />
             <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
             <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
@@ -34987,6 +35095,36 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
             <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
           </Folder>
+        </Folder>
+        <Folder Name="AU">
+          <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
+          <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
+          <Object Name="FB_Safety_EmergencyManagementOutput" ObjectId="d3f89721-8269-5526-aac8-48009a2f16a2" />
+          <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
+          <Object Name="ST_Safety_Emergency_InternalCmd" ObjectId="231a5be8-1708-5e9a-a840-cc0ec056946d" />
+          <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
+        </Folder>
+        <Folder Name="SIMULATION">
+          <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
+          <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
+          <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
+          <Object Name="FB_Sim_Safety" ObjectId="9ab5b810-a798-5ced-ad58-9e4d01ab66eb" />
+          <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
+          <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
+        </Folder>
+        <Folder Name="DEPANNAGE">
+          <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
+        </Folder>
+        <Folder Name="MAIN">
+          <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
+          <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
+          <Object Name="PRG_02_Acquisition" ObjectId="212fd0f8-509e-536e-99de-b75543d86add" />
+          <Object Name="PRG_03_Modes_Cycle" ObjectId="93d4e8d3-42c7-55b2-97a6-95726c0b028f" />
+          <Object Name="PRG_04_Treuils_Benne" ObjectId="8dae74a3-6bd7-5bdb-8b05-9ae37b0ffd4d" />
+          <Object Name="PRG_05_Translation" ObjectId="95eac511-a67e-587f-8b68-f1908c57a87a" />
+          <Object Name="PRG_06_Outputs_LD" ObjectId="53276475-eafc-5c22-bbb7-6266f2b95c27" />
+          <Object Name="PRG_07_Supervision" ObjectId="06b3a23e-a531-55de-8ebc-c46206de9eb2" />
         </Folder>
         <Folder Name="">
           <Object Name="GVL_PERSISTENT" ObjectId="b404450e-105f-5aa6-8c01-cbf582c5f3ce" />

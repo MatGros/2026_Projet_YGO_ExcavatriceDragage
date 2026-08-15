@@ -79,12 +79,6 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
         "decidee (cf. header CODE/COMMUN/FB_Output.st) — retirer de cette liste "
         "des qu'elle est instanciee ou supprimee"
     ),
-    "GVL_IHM_AU": (
-        "orpheline constatee 2026-08-01 (LOT_A_SUPPRESSION_CODE_MORT) : meme "
-        "origine que FB_Sim_AU_ChainFeedback/GVL_Simulation_AU (banc de test AU "
-        "jamais raccorde), mais HORS perimetre de ce lot — suppression a valider "
-        "explicitement par l'utilisateur avant tout retrait"
-    ),
     # 2026-08-05 — orphelins constates lors de l'audit Translation M3 (session
     # M3, aucun n'a ete introduit par cette session : lecture seule des
     # domaines Winch/Cycle/Encodeurs). Surfacent ici uniquement parce que

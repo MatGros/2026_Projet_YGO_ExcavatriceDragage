@@ -1,8 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
-   📡 PRG_02_Acquisition — Programme d'Acquisition et Qualification I/O
+   📡 PRG_02_Acquisition — Programme d'Acquisition et Conditionnement I/O
    ───────────────────────────────────────────────────────────────
+   ⚙️ Exécuté par la tâche PLC en position 1 (premier POU du cycle).
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2
-   ⚙️ Exécuté en tête de la chaîne métier (après les initialisations système).
    🎯 Rôle unique : Produire les images HwReal/HwSim/HwIn,
       acquérir et traiter les mesures codeurs (M1/M2), décoder M3, traiter le joystick
       et publier les retours.
@@ -94,11 +94,6 @@ VAR
     instEncoderSpeedMeasureM2: FB_Encoder_SpeedMeasure;  // 🆕 2026-08-05
     instPosDecoderM3         : FB_Translation_PositionDecoder;
 
-    (* ── Filtrage retours variateur M3 ── *)
-    instCycleTimeAcq            : FB_CycleTime;
-    instFilterM3StatusWord      : FB_Filter_PT1;
-    instFilterM3ActualFreqHz    : FB_Filter_PT1;
-
     (* ── Sélection de source par domaine ── *)
     WinchInputSourceSimulated         : BOOL;
     TranslationInputSourceSimulated   : BOOL;
@@ -114,14 +109,18 @@ VAR
     SimulationModeFall                : F_TRIG;
 END_VAR
 
+VAR CONSTANT
+    // ⚙️ Constantes mécaniques & électriques chaîne codeurs treuils (DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §2)
+    ENCODER_POINTS_PER_REV     : DINT := 8192; // 13 bits single-turn (8192 pts/tour)
+    ENCODER_MULTITURN_REVS_MAX : DINT := 4096; // 12 bits multi-turn (4096 tours max)
+    WINCH_CABLE_M_PER_REV      : REAL := 2.0;  // 2.0 mètres de câble par tour de tambour treuil
+END_VAR
+
 {region "§0 Session simulation & aiguillage"}
-// === 🧪 §0 SESSION SIMULATION & AIGUILLAGE ===
-// 🔧 REX 2026-08-14 : les 4 flags d'aiguillage par domaine et la condition de simulation Machine
-// (§1bis) étaient calculés à 2 endroits différents du fichier (duplication de la même expression
-// GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive) — regroupés ici en
-// source unique, conforme CODE_QUALITY_STANDARDS.md §1 (producteur unique) et §2bis (lisibilité).
-// Le bit maître est commandé consciemment par l'opérateur. Ses fronts initialisent les
-// domaines et stimuli afin qu'un retour réel ne puisse pas laisser une simulation latente.
+// === 🧪 §0 SIMULATION & SÉLECTION DE SOURCE ===
+// 🎯 Producteur unique des aiguillages Réel/Simu par domaine (HwReal vs HwSim -> HwIn).
+// ⚡ Fronts maître : initialisent/nettoient les stimuli banc sans état résiduel.
+
 SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
 
@@ -130,6 +129,7 @@ IF SimulationModeRise.Q THEN
     GVL_Simulation.SimTranslationActive := TRUE;
     GVL_Simulation.SimOperatorActive := TRUE;
     GVL_Simulation.SimSafetyActive := TRUE;
+    GVL_Simulation.SimJoystickRawButton := TRUE;
 END_IF;
 
 IF SimulationModeFall.Q THEN
@@ -154,7 +154,7 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimKoboldContactValue := FALSE;
 END_IF;
 
-// Aiguillage par domaine — source unique, réutilisée en §1bis et en §2 (SEL final).
+// 🔀 Aiguillages de source uniques par domaine
 WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
@@ -162,7 +162,7 @@ MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_S
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}
-// === 📥 §1 ACQUISITION BRUTE (HwReal) ===
+// === 📥 §1 ACQUISITION BRUTE MATÉRIELLE (HwReal) ===
 
 // Winch M1 / M2 et codeurs
 HwReal.Winch.M1_ContactorsReleased_DI := M1_ContactorsReleased_DI;
@@ -333,79 +333,71 @@ instJoystick(
     InvertY                   := _JoystickInvertY,
     DeadbandRaw               := _JoystickDeadbandRaw,
     FilterTime                := _JoystickFilterTime,
-    DeadmanRearmTimeout       := T#10S,
-    NeutralHoldTime           := T#100MS, // 🔧 2026-08-07 (demande client) : réduit de 500ms — désarme plus vite au retour neutre
-    DeadmanArmHoldTime        := T#100MS, // 🆕 2026-08-07 (demande client) : appui maintenu 100ms arme, indépendamment de la position des axes
-    DeadmanArmGraceTime       := T#3S,    // 🆕 2026-08-07 (retour terrain) : grâce avant que le désarmement neutre puisse s'appliquer après un armement
-    DeadmanReconfEnable       := FALSE,
+    NeutralHoldTime           := T#100MS,
+    DeadmanArmHoldTime        := T#100MS,
+    DeadmanArmGraceTime       := T#3S,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
 );
 
-// 🔫 AF08 §6 : DeadmanArmed jusqu'ici jamais publié hors instJoystick (instance privée) —
-// exigé par Translation/Winch/Cycle en aval (T106, audit M3 2026-08-05).
+// 📤 Publication des états et axes joystick
 JoystickDeadmanArmed := instJoystick.DeadmanArmed;
-JoystickYNeutral := (instJoystick.DirectionY = 0);   // 🆕 2026-08-05 : prérequis FB_Safety_Winch Méca B
-JoystickDirectionX := instJoystick.DirectionX;
-JoystickSpeedPctX := ABS(instJoystick.SpeedXPct);
-JoystickXNeutral := (instJoystick.DirectionX = 0);
+JoystickYNeutral     := (instJoystick.DirectionY = 0);
+JoystickDirectionX   := instJoystick.DirectionX;
+JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);
+JoystickXNeutral     := (instJoystick.DirectionX = 0);
 {endregion}
 
 {region "§4 Codeurs et homing — M1/M2"}
 // === 🧲 §4 CODEURS & HOMING (M1 / M2) ===
 
+// ── TREUIL M1 (Retenue) ──
 instEncoderAbsM1(
-    Enable              := TRUE,
-    Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                := PRG_03_Modes_Cycle.Auth.Mode,
-    RawPosIn            := HwIn.Winch.COD1_PosValue,
-    AlarmsIn            := HwIn.Winch.COD1_Alarms,
-    WarningsIn          := HwIn.Winch.COD1_Warnings,
-    SlaveOperational    := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
-    PresetRequest       := instHomingM1.PresetRequest,
-    PresetValue         := instHomingM1.PresetValue
+    Enable                := TRUE,
+    Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
+    RawPosIn              := HwIn.Winch.COD1_PosValue,
+    AlarmsIn              := HwIn.Winch.COD1_Alarms,
+    WarningsIn            := HwIn.Winch.COD1_Warnings,
+    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
+    PresetRequest         := instHomingM1.PresetRequest,
+    PresetValue           := instHomingM1.PresetValue
 );
 
 instHomingM1(
-    Enable               := TRUE,
-    Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
-    Home                 := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
-    UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 0),
-    WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1),
-    CfgHomingTargetM        := _WinchM1CfgPersist.CfgHomingTarget_M,
-    BtnConfirmCoherence     := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
-    TopPositionSensor    := HwIn.Winch.M1M2_TopPositionFree_DI,
-    CfgTopSensorPosM   := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
+    Enable                 := TRUE,
+    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged  := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
+    Home                   := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
+    UnitaryMode            := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                              AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 0),
+    WinchSelected          := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1),
+    CfgHomingTargetM       := _WinchM1CfgPersist.CfgHomingTarget_M,
+    BtnConfirmCoherence    := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
+    TopPositionSensor      := HwIn.Winch.M1M2_TopPositionFree_DI,
+    CfgTopSensorPosM       := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
     FwdRevSpeedFeedbackOff := HwIn.Winch.M1_ContactorsReleased_DI,
-    BrakeFeedback        := HwIn.Winch.M1_BrakeIsOpen_DI,
-    RawPos               := instEncoderAbsM1.RawPos,
-    EncoderAvailable     := instEncoderAbsM1.EncoderAvailable,
-    PresetAck            := instEncoderAbsM1.PresetAck,
-    PresetNak            := instEncoderAbsM1.PresetNak,
-    PointsPerRev         := 8192,
-    MultiTurnRevsMax     := 4096,
-    CableM_PerRev        := 2.0,
-    BypassGlobal         := GVL_IHM.M1TreuilRetenue.Bypass.Global,
-    Calib                := _CalibM1
+    BrakeFeedback          := HwIn.Winch.M1_BrakeIsOpen_DI,
+    RawPos                 := instEncoderAbsM1.RawPos,
+    EncoderAvailable       := instEncoderAbsM1.EncoderAvailable,
+    PresetAck              := instEncoderAbsM1.PresetAck,
+    PresetNak              := instEncoderAbsM1.PresetNak,
+    PointsPerRev           := ENCODER_POINTS_PER_REV,
+    MultiTurnRevsMax       := ENCODER_MULTITURN_REVS_MAX,
+    CableM_PerRev          := WINCH_CABLE_M_PER_REV,
+    BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
+    Calib                  := _CalibM1
 );
 
 instEncoderScaleM1(
-    RawPos          := instEncoderAbsM1.RawPos,
-    HomingRefRaw    := instHomingM1.HomingRefRaw,
-    CableM_PerRev   := 2.0,
-    PointsPerRev    := 8192
+    RawPos        := instEncoderAbsM1.RawPos,
+    HomingRefRaw  := instHomingM1.HomingRefRaw,
+    CableM_PerRev := WINCH_CABLE_M_PER_REV,
+    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
 );
 
-// 🆕 2026-08-05 : bornage physique ±99m + gel sur doute (audit sécurité M3) — CablePosM1
-// (producteur unique position, consommé machine entière) n'était protégé par AUCUN étage
-// avant ce lot, contrairement à ce qu'affirmait AF_Partie-09 §4.1 (écart doc/code trouvé
-// par l'audit). Sémantique inchangée en fonctionnement normal (position dans la plage) ;
-// seul un doute (hors plage ou homing suspect) fige désormais la valeur au lieu de la
-// laisser divaguer.
 instEncoderSafetyM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -415,12 +407,9 @@ instEncoderSafetyM1(
     HomingSuspect         := instHomingM1.HomingSuspect,
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
-CablePosM1 := instEncoderSafetyM1.CablePosMSafe;
+CablePosM1           := instEncoderSafetyM1.CablePosMSafe;
 M1_EncoderIncoherent := instEncoderSafetyM1.EncoderIncoherent;
 
-// 🆕 2026-08-05 : vitesse câble mesurée — prérequis FB_Safety_Winch Méca A/F/G (audit sécurité M3).
-// PositionValid combine disponibilité codeur ET cohérence position (gel sur doute ci-dessus) :
-// une position figée par FB_Encoder_Safety ne doit jamais alimenter un calcul de vitesse réel.
 instEncoderSpeedMeasureM1(
     Enable        := TRUE,
     Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -431,26 +420,21 @@ M1_Speed_Mps       := instEncoderSpeedMeasureM1.Speed_Mps;
 M1_SignedSpeed_Mps := instEncoderSpeedMeasureM1.SignedSpeed_Mps;
 M1_SpeedValid      := instEncoderSpeedMeasureM1.Valid;
 
+// ── TREUIL M2 (Benne) ──
 instEncoderAbsM2(
-    Enable              := TRUE,
-    Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                := PRG_03_Modes_Cycle.Auth.Mode,
-    RawPosIn            := HwIn.Winch.COD2_PosValue,
-    AlarmsIn            := HwIn.Winch.COD2_Alarms,
-    WarningsIn          := HwIn.Winch.COD2_Warnings,
-    SlaveOperational    := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
-    PresetRequest       := instHomingM2.PresetRequest,
-    PresetValue         := instHomingM2.PresetValue
+    Enable                := TRUE,
+    Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
+    RawPosIn              := HwIn.Winch.COD2_PosValue,
+    AlarmsIn              := HwIn.Winch.COD2_Alarms,
+    WarningsIn            := HwIn.Winch.COD2_Warnings,
+    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
+    PresetRequest         := instHomingM2.PresetRequest,
+    PresetValue           := instHomingM2.PresetValue
 );
 
-// 🆕 2026-08-07 (19) — retour terrain, demande client : BtnConfirmOpenPos/ClosePos (benne)
-// doivent AUSSI référencer le codeur M2, comme BtnHome -- pas seulement mémoriser IsOpen/IsClosed
-// (FB_Bucket.st, inchangé, continue de le faire en parallèle). Cible dynamique : ouverture =
-// position réelle actuelle de M1 (offset 0) ; fermeture = M1 + OffsetCloseM (config benne, 15m
-// actuellement). Mêmes gardes que le Confirm logique (Mode MAINT_N1/N2, M1/M2 à l'arrêt) --
-// lecture 1 scan en retard sur PRG_03/PRG_04 (pattern déjà accepté ailleurs, action manuelle
-// ponctuelle, pas un mouvement).
+// Synchronisation référencement M2 sur ouverture/fermeture benne
 M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
@@ -463,41 +447,40 @@ ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
 END_IF;
 
 instHomingM2(
-    Enable               := TRUE,
-    Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                 := PRG_03_Modes_Cycle.Auth.Mode,
-    Home                 := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero OR M2BucketRefRequested,
-    UseDynamicTarget     := M2BucketRefRequested,
-    DynamicHomingTargetM := M2BucketRefTargetM,
-    UnitaryMode          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                            AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 0),
-    WinchSelected        := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
-    CfgHomingTargetM        := _WinchM2CfgPersist.CfgHomingTarget_M,
-    BtnConfirmCoherence     := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
-    TopPositionSensor    := HwIn.Winch.M1M2_TopPositionFree_DI,
-    CfgTopSensorPosM   := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
+    Enable                 := TRUE,
+    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    PowerContactorEngaged  := HwIn.Machine.PowerContactorEngaged_DI,
+    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
+    Home                   := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero OR M2BucketRefRequested,
+    UseDynamicTarget       := M2BucketRefRequested,
+    DynamicHomingTargetM   := M2BucketRefTargetM,
+    UnitaryMode            := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                              AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated <> 0),
+    WinchSelected          := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
+    CfgHomingTargetM       := _WinchM2CfgPersist.CfgHomingTarget_M,
+    BtnConfirmCoherence    := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
+    TopPositionSensor      := HwIn.Winch.M1M2_TopPositionFree_DI,
+    CfgTopSensorPosM       := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
     FwdRevSpeedFeedbackOff := HwIn.Winch.M2_ContactorsReleased_DI,
-    BrakeFeedback        := HwIn.Winch.M2_BrakeIsOpen_DI,
-    RawPos               := instEncoderAbsM2.RawPos,
-    EncoderAvailable     := instEncoderAbsM2.EncoderAvailable,
-    PresetAck            := instEncoderAbsM2.PresetAck,
-    PresetNak            := instEncoderAbsM2.PresetNak,
-    PointsPerRev         := 8192,
-    MultiTurnRevsMax     := 4096,
-    CableM_PerRev        := 2.0,
-    BypassGlobal         := GVL_IHM.M2TreuilBenne.Bypass.Global,
-    Calib                := _CalibM2
+    BrakeFeedback          := HwIn.Winch.M2_BrakeIsOpen_DI,
+    RawPos                 := instEncoderAbsM2.RawPos,
+    EncoderAvailable       := instEncoderAbsM2.EncoderAvailable,
+    PresetAck              := instEncoderAbsM2.PresetAck,
+    PresetNak              := instEncoderAbsM2.PresetNak,
+    PointsPerRev           := ENCODER_POINTS_PER_REV,
+    MultiTurnRevsMax       := ENCODER_MULTITURN_REVS_MAX,
+    CableM_PerRev          := WINCH_CABLE_M_PER_REV,
+    BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
+    Calib                  := _CalibM2
 );
 
 instEncoderScaleM2(
-    RawPos          := instEncoderAbsM2.RawPos,
-    HomingRefRaw    := instHomingM2.HomingRefRaw,
-    CableM_PerRev   := 2.0,
-    PointsPerRev    := 8192
+    RawPos        := instEncoderAbsM2.RawPos,
+    HomingRefRaw  := instHomingM2.HomingRefRaw,
+    CableM_PerRev := WINCH_CABLE_M_PER_REV,
+    PointsPerRev  := DINT_TO_UDINT(ENCODER_POINTS_PER_REV)
 );
 
-// 🆕 2026-08-05 : bornage physique ±99m + gel sur doute (audit sécurité M3) — voir M1 ci-dessus.
 instEncoderSafetyM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -507,10 +490,9 @@ instEncoderSafetyM2(
     HomingSuspect         := instHomingM2.HomingSuspect,
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
-CablePosM2 := instEncoderSafetyM2.CablePosMSafe;
+CablePosM2           := instEncoderSafetyM2.CablePosMSafe;
 M2_EncoderIncoherent := instEncoderSafetyM2.EncoderIncoherent;
 
-// 🆕 2026-08-05 : vitesse câble mesurée — prérequis FB_Safety_Winch Méca A/F/G (audit sécurité M3).
 instEncoderSpeedMeasureM2(
     Enable        := TRUE,
     Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -546,27 +528,12 @@ TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
 M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
 M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
 M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
-M3_SensorsWord          := instPosDecoderM3.SensorsWord;
 {endregion}
 
-{region "§6 Filtrage PT1 retours variateur — M3"}
-// === 📊 §6 FILTRAGE PT1 RETOURS VARIATEUR (M3) ===
-
-instCycleTimeAcq(DefaultValueS := 0.010);
-
-instFilterM3StatusWord(
-    ValueIn    := UINT_TO_REAL(WORD_TO_UINT(HwIn.Translation.M3_StatusWord)),
-    TimeConst  := T#0MS,
-    CycleTimeS := instCycleTimeAcq.CycleTimeS
-);
-M3_StatusWord_Filtered := REAL_TO_UINT(instFilterM3StatusWord.ValueOut);
-
-instFilterM3ActualFreqHz(
-    ValueIn    := UINT_TO_REAL(HwIn.Translation.M3_ActualFrequencyHz),
-    TimeConst  := T#0MS,
-    CycleTimeS := instCycleTimeAcq.CycleTimeS
-);
-M3_ActualFrequencyHz_Filtered := REAL_TO_UINT(instFilterM3ActualFreqHz.ValueOut);
+{region "§6 Retours variateur — M3"}
+// === 📊 §6 RETOURS VARIATEUR (M3) CONDITIONNÉS ===
+M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
+M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
 {endregion}
 
 END_PROGRAM

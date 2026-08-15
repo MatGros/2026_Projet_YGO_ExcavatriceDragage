@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T20:20:38.731641" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T20:20:38.731641">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T04:12:29.810750" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T04:12:29.810750">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1147,8 +1147,9 @@ ELSE
     Operator.JoyYRaw_ANA2 := SimJoystickRawY;
 END_IF;
 
-// Homme-mort : stimulus brut amont, identique au bouton physique.
-Operator.JoyBtnRaw := SimJoystickRawButton;
+// Homme-mort : stimulus brut amont. En simulation avec boutons directionnels actifs,
+// l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
+Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount &gt; 0);
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
 Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4

@@ -94,6 +94,22 @@ Détail complet (préfixes, suffixes d'unité, polarité booléenne, constructio
 
 ---
 
+## 2ter. 💬 Politique de Rédaction des Commentaires (Zéro « Journal Intime / REX » dans le Code)
+
+1. **Le Code ST est un Livrable Industriel Client** :
+   - Les commentaires dans `CODE/*.st` doivent décrire **exclusivement ce que fait le code**, les plages, unités, algorithmes et rôles physiques.
+   - **Interdiction Formelle des Commentaires de type « Journal Intime / REX »** :
+     - ❌ *« n'était protégé par AUCUN étage avant ce lot, contrairement à ce qu'affirmait AF... »*
+     - ❌ *« suite demande client du 07/08... »*
+     - ❌ *« correctif bug trouvé par audit M3... »*
+2. **La Traçabilité Vit dans la Documentation** :
+   - Tout l'historique des arbitrages, analyses de cause racine, REX, décisions de réunions et comparatifs avant/après est consigné dans `DOC/` (`DOC/VERSION_HISTORY.md`, `DOC/AF/`, `DOC/WFLOW/PLAN_TASK.md`, `ARCHIVES/Doc/AUDIT_*`).
+3. **Style de Commentaire dans le Code** :
+   - **Concis, direct, TDAH-friendly** avec repères visuels emojis (`🎯 Rôle`, `⚡ Front`, `🔀 Aiguillage`, `📏 Mesure`, `🛡️ Sécurité`).
+   - L'explication porte sur le **« Pourquoi » métier / physique**, jamais sur les péripéties de développement passées.
+
+---
+
 ## 2bis. Lisibilité des conditions booléennes (REX 2026-08-12)
 
 > 🚨 Cas vécu (`PRG_04_Treuils_Benne.st`) : `M1_StartStop_Active` combine 7 termes

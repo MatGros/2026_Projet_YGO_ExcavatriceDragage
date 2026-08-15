@@ -319,8 +319,9 @@ ELSE
     Operator.JoyYRaw_ANA2 := SimJoystickRawY;
 END_IF;
 
-// Homme-mort : stimulus brut amont, identique au bouton physique.
-Operator.JoyBtnRaw := SimJoystickRawButton;
+// Homme-mort : stimulus brut amont. En simulation avec boutons directionnels actifs,
+// l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
+Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount > 0);
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
 Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
