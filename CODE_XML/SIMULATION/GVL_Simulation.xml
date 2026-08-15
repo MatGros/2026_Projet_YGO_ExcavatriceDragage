@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T13:15:12.484271" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T13:15:12.484271">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T14:34:06.866535" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T14:34:06.866535">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -40,6 +40,17 @@
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 Bit maître — rien n'est simulé si FALSE (machine réelle)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimulationBypassActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Master Bypass Essais Banc — arme LimitLegal + TopLimits en mode MAINT (inopérant sur machine réelle)</xhtml>
           </documentation>
         </variable>
         <variable name="SimWinchActive">
@@ -111,7 +122,7 @@ TRUE = SimM3SensorsWord remplace le modèle ; réserver aux injections ciblées<
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot manuel valide nominal : P2</xhtml>
           </documentation>
         </variable>
-        <variable name="SimJoystickLeftActive">
+        <variable name="SimJoystickLeft_Rev_TREMIE_Active">
           <type>
             <BOOL />
           </type>
@@ -120,10 +131,10 @@ TRUE = SimM3SensorsWord remplace le modèle ; réserver aux injections ciblées<
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
-RawX=0, RawY=5000</xhtml>
+Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)</xhtml>
           </documentation>
         </variable>
-        <variable name="SimJoystickRightActive">
+        <variable name="SimJoystickRight_Fwd_MAINT_Active">
           <type>
             <BOOL />
           </type>
@@ -131,10 +142,10 @@ RawX=0, RawY=5000</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">RawX=10000, RawY=5000</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation M3 Avant vers Maintenance (RawX=10000, RawY=5000)</xhtml>
           </documentation>
         </variable>
-        <variable name="SimJoystickForwardActive">
+        <variable name="SimJoystickFwd_Up_Close_Active">
           <type>
             <BOOL />
           </type>
@@ -142,10 +153,10 @@ RawX=0, RawY=5000</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">RawX=5000, RawY=10000</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Treuils Montée M1/M2 / Fermeture Benne M2 (RawX=5000, RawY=10000)</xhtml>
           </documentation>
         </variable>
-        <variable name="SimJoystickReverseActive">
+        <variable name="SimJoystickRev_Down_Open_Active">
           <type>
             <BOOL />
           </type>
@@ -153,7 +164,7 @@ RawX=0, RawY=5000</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">RawX=5000, RawY=0</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Treuils Descente M1/M2 / Ouverture Benne M2 (RawX=5000, RawY=0)</xhtml>
           </documentation>
         </variable>
         <variable name="SimJoystickRawX">
@@ -244,18 +255,6 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
 TRUE = Kobold détecte un contact fond simulé</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimulationBypassActive">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 MASTER BYPASS SIMULATION (Miroir direct accessible depuis le banc d'essais)
-TRUE = Arme LimitLegal + TopLimitSoftware + TopLimitSwitch en mode MAINT</xhtml>
           </documentation>
         </variable>
         <addData>

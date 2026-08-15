@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T04:12:29.810750" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T04:12:29.810750">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T13:27:21.134945" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T13:27:21.134945">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -688,7 +688,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="16#07" />
               </initialValue>
             </variable>
-            <variable name="SimJoystickLeftActive">
+            <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
               </type>
@@ -696,7 +696,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
             </variable>
-            <variable name="SimJoystickRightActive">
+            <variable name="SimJoystickRight_Fwd_MAINT_Active">
               <type>
                 <BOOL />
               </type>
@@ -704,7 +704,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
             </variable>
-            <variable name="SimJoystickForwardActive">
+            <variable name="SimJoystickFwd_Up_Close_Active">
               <type>
                 <BOOL />
               </type>
@@ -712,7 +712,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
             </variable>
-            <variable name="SimJoystickReverseActive">
+            <variable name="SimJoystickRev_Down_Open_Active">
               <type>
                 <BOOL />
               </type>
@@ -1120,18 +1120,18 @@ instSimJoystick(
 
 // Les boutons directionnels simplifient les essais : une commande unique impose
 // une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
-SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeftActive)
-                           + BOOL_TO_INT(SimJoystickRightActive)
-                           + BOOL_TO_INT(SimJoystickForwardActive)
-                           + BOOL_TO_INT(SimJoystickReverseActive);
+SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
+                           + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
+                           + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
+                           + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
 IF SimJoystickDirectionCount = 1 THEN
-    IF SimJoystickLeftActive THEN
+    IF SimJoystickLeft_Rev_TREMIE_Active THEN
         Operator.JoyXRaw_ANA1 := 0;
         Operator.JoyYRaw_ANA2 := 5000;
-    ELSIF SimJoystickRightActive THEN
+    ELSIF SimJoystickRight_Fwd_MAINT_Active THEN
         Operator.JoyXRaw_ANA1 := 10000;
         Operator.JoyYRaw_ANA2 := 5000;
-    ELSIF SimJoystickForwardActive THEN
+    ELSIF SimJoystickFwd_Up_Close_Active THEN
         Operator.JoyXRaw_ANA1 := 5000;
         Operator.JoyYRaw_ANA2 := 10000;
     ELSE

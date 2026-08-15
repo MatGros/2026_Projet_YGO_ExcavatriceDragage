@@ -66,13 +66,13 @@ VAR_INPUT
     SimM3SensorsWordOverrideActive : BOOL := FALSE;
     SimM3SensorsWord               : BYTE := 16#07;
 
-    SimJoystickLeftActive      : BOOL := FALSE;
-    SimJoystickRightActive     : BOOL := FALSE;
-    SimJoystickForwardActive   : BOOL := FALSE;
-    SimJoystickReverseActive   : BOOL := FALSE;
-    SimJoystickRawX            : INT := 5000;
-    SimJoystickRawY            : INT := 5000;
-    SimJoystickRawButton       : BOOL := FALSE;
+    SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;
+    SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;
+    SimJoystickFwd_Up_Close_Active     : BOOL := FALSE;
+    SimJoystickRev_Down_Open_Active    : BOOL := FALSE;
+    SimJoystickRawX                    : INT := 5000;
+    SimJoystickRawY                    : INT := 5000;
+    SimJoystickRawButton               : BOOL := FALSE;
 
     SimKoboldContactValue      : BOOL := FALSE;
     BtnEmergencyStop           : BOOL := FALSE;    // Simulation appui coup-de-poing AU
@@ -292,18 +292,18 @@ instSimJoystick(
 
 // Les boutons directionnels simplifient les essais : une commande unique impose
 // une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
-SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeftActive)
-                           + BOOL_TO_INT(SimJoystickRightActive)
-                           + BOOL_TO_INT(SimJoystickForwardActive)
-                           + BOOL_TO_INT(SimJoystickReverseActive);
+SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
+                           + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
+                           + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
+                           + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
 IF SimJoystickDirectionCount = 1 THEN
-    IF SimJoystickLeftActive THEN
+    IF SimJoystickLeft_Rev_TREMIE_Active THEN
         Operator.JoyXRaw_ANA1 := 0;
         Operator.JoyYRaw_ANA2 := 5000;
-    ELSIF SimJoystickRightActive THEN
+    ELSIF SimJoystickRight_Fwd_MAINT_Active THEN
         Operator.JoyXRaw_ANA1 := 10000;
         Operator.JoyYRaw_ANA2 := 5000;
-    ELSIF SimJoystickForwardActive THEN
+    ELSIF SimJoystickFwd_Up_Close_Active THEN
         Operator.JoyXRaw_ANA1 := 5000;
         Operator.JoyYRaw_ANA2 := 10000;
     ELSE

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T04:57:46.110031" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T04:57:46.110031">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T14:34:10.448680" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T14:34:10.448680">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1375,10 +1375,10 @@ IF SimulationModeFall.Q THEN
 
     GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
     GVL_Simulation.SimM3SensorsWord := 16#07;
-    GVL_Simulation.SimJoystickLeftActive := FALSE;
-    GVL_Simulation.SimJoystickRightActive := FALSE;
-    GVL_Simulation.SimJoystickForwardActive := FALSE;
-    GVL_Simulation.SimJoystickReverseActive := FALSE;
+    GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active := FALSE;
+    GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active := FALSE;
+    GVL_Simulation.SimJoystickFwd_Up_Close_Active := FALSE;
+    GVL_Simulation.SimJoystickRev_Down_Open_Active := FALSE;
     GVL_Simulation.SimJoystickRawX := 5000;
     GVL_Simulation.SimJoystickRawY := 5000;
     GVL_Simulation.SimJoystickRawButton := FALSE;
@@ -1507,13 +1507,13 @@ instSimBench(
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
-    SimJoystickLeftActive          := GVL_Simulation.SimJoystickLeftActive,
-    SimJoystickRightActive         := GVL_Simulation.SimJoystickRightActive,
-    SimJoystickForwardActive       := GVL_Simulation.SimJoystickForwardActive,
-    SimJoystickReverseActive       := GVL_Simulation.SimJoystickReverseActive,
-    SimJoystickRawX                := GVL_Simulation.SimJoystickRawX,
-    SimJoystickRawY          := GVL_Simulation.SimJoystickRawY,
-    SimJoystickRawButton     := GVL_Simulation.SimJoystickRawButton,
+    SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
+    SimJoystickRight_Fwd_MAINT_Active  := GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active,
+    SimJoystickFwd_Up_Close_Active     := GVL_Simulation.SimJoystickFwd_Up_Close_Active,
+    SimJoystickRev_Down_Open_Active    := GVL_Simulation.SimJoystickRev_Down_Open_Active,
+    SimJoystickRawX                    := GVL_Simulation.SimJoystickRawX,
+    SimJoystickRawY                    := GVL_Simulation.SimJoystickRawY,
+    SimJoystickRawButton               := GVL_Simulation.SimJoystickRawButton,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
     BtnEmergencyStop         := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff,
     HwReal                   := HwReal,
@@ -3880,6 +3880,10 @@ END_IF;
 IF NOT RawButton THEN
     DeadmanArmPending := FALSE;
 END_IF;
+
+// 🛡️ SÉCURITÉ C4 (ISO 13849) : armement STRICTEMENT conditionné par DeadmanArmPending.
+// Tout désarmement (changement de mode, fin de cycle benne, passage neutre prolongé)
+// efface DeadmanArmPending et EXIGE un nouvel appui conscient (front montant de RawButton).
 DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed, PT := DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
@@ -4195,7 +4199,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="16#07" />
               </initialValue>
             </variable>
-            <variable name="SimJoystickLeftActive">
+            <variable name="SimJoystickLeft_Rev_TREMIE_Active">
               <type>
                 <BOOL />
               </type>
@@ -4203,7 +4207,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
             </variable>
-            <variable name="SimJoystickRightActive">
+            <variable name="SimJoystickRight_Fwd_MAINT_Active">
               <type>
                 <BOOL />
               </type>
@@ -4211,7 +4215,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
             </variable>
-            <variable name="SimJoystickForwardActive">
+            <variable name="SimJoystickFwd_Up_Close_Active">
               <type>
                 <BOOL />
               </type>
@@ -4219,7 +4223,7 @@ palier est encore engagé (fausse condition d'armement Méca A).</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
             </variable>
-            <variable name="SimJoystickReverseActive">
+            <variable name="SimJoystickRev_Down_Open_Active">
               <type>
                 <BOOL />
               </type>
@@ -4627,18 +4631,18 @@ instSimJoystick(
 
 // Les boutons directionnels simplifient les essais : une commande unique impose
 // une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
-SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeftActive)
-                           + BOOL_TO_INT(SimJoystickRightActive)
-                           + BOOL_TO_INT(SimJoystickForwardActive)
-                           + BOOL_TO_INT(SimJoystickReverseActive);
+SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
+                           + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
+                           + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
+                           + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
 IF SimJoystickDirectionCount = 1 THEN
-    IF SimJoystickLeftActive THEN
+    IF SimJoystickLeft_Rev_TREMIE_Active THEN
         Operator.JoyXRaw_ANA1 := 0;
         Operator.JoyYRaw_ANA2 := 5000;
-    ELSIF SimJoystickRightActive THEN
+    ELSIF SimJoystickRight_Fwd_MAINT_Active THEN
         Operator.JoyXRaw_ANA1 := 10000;
         Operator.JoyYRaw_ANA2 := 5000;
-    ELSIF SimJoystickForwardActive THEN
+    ELSIF SimJoystickFwd_Up_Close_Active THEN
         Operator.JoyXRaw_ANA1 := 5000;
         Operator.JoyYRaw_ANA2 := 10000;
     ELSE

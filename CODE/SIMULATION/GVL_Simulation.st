@@ -12,6 +12,8 @@
 VAR_GLOBAL
     // 🔑 Bit maître — rien n'est simulé si FALSE (machine réelle)
     SimulationModeActive        : BOOL := FALSE;
+    // 🎭 Master Bypass Essais Banc — arme LimitLegal + TopLimits en mode MAINT (inopérant sur machine réelle)
+    SimulationBypassActive      : BOOL := FALSE;
 
     // 🌐 Activation par domaine (simulé si SimulationModeActive AND Sim<Domaine>Active)
     SimWinchActive              : BOOL := FALSE; // M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu
@@ -25,13 +27,13 @@ VAR_GLOBAL
     SimM3SensorsWord               : BYTE := 16#07; // Mot manuel valide nominal : P2
 
     // 🕹️ STIMULI OPÉRATEUR — les boutons directionnels imposent 0/5000/10000 ; combinaison = neutre.
-    SimJoystickLeftActive       : BOOL := FALSE; // RawX=0, RawY=5000
-    SimJoystickRightActive      : BOOL := FALSE; // RawX=10000, RawY=5000
-    SimJoystickForwardActive    : BOOL := FALSE; // RawX=5000, RawY=10000
-    SimJoystickReverseActive    : BOOL := FALSE; // RawX=5000, RawY=0
-    SimJoystickRawX             : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
-    SimJoystickRawY             : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
-    SimJoystickRawButton        : BOOL := FALSE; // Homme-mort brut : TRUE = bouton joystick appuyé
+    SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE; // Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)
+    SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE; // Translation M3 Avant vers Maintenance (RawX=10000, RawY=5000)
+    SimJoystickFwd_Up_Close_Active     : BOOL := FALSE; // Treuils Montée M1/M2 / Fermeture Benne M2 (RawX=5000, RawY=10000)
+    SimJoystickRev_Down_Open_Active    : BOOL := FALSE; // Treuils Descente M1/M2 / Ouverture Benne M2 (RawX=5000, RawY=0)
+    SimJoystickRawX                    : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
+    SimJoystickRawY                    : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
+    SimJoystickRawButton               : BOOL := FALSE; // Homme-mort brut : TRUE = bouton joystick appuyé
 
     // 🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
     SimEncoderSpeedFactor       : REAL := 1.0;  // Multiplicateur vitesse codeurs simulés ; 1.0 = nominal
@@ -41,7 +43,4 @@ VAR_GLOBAL
 
     // 🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
     SimKoboldContactValue       : BOOL := FALSE; // TRUE = Kobold détecte un contact fond simulé
-
-    // 🎭 MASTER BYPASS SIMULATION (Miroir direct accessible depuis le banc d'essais)
-    SimulationBypassActive      : BOOL := FALSE; // TRUE = Arme LimitLegal + TopLimitSoftware + TopLimitSwitch en mode MAINT
 END_VAR
