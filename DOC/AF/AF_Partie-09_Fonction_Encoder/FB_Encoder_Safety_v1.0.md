@@ -16,7 +16,7 @@
 
 | ID | Intention / Comportement attendu | Type |
 |---|---|---|
-| <nobr><code>TC-P09-010</code></nobr> | Bornage [-99;+99] m dépassé ➔ position gelée + `EncoderIncoherent = TRUE` | `💻 AUTO` |
+| <nobr><code>TC-P09-010</code></nobr> | Bornage [-99;+99] m dépassé ➔ `EncoderIncoherent = TRUE` + `CablePosMSafe` suit la mesure réelle (non figée) | `💻 AUTO` |
 | <nobr><code>TC-P09-011</code></nobr> | `EncoderFaultPresent = TRUE` interdit la bascule en mode `SEMI_AUTO` | `⚡ AUTO_PLC` |
 | <nobr><code>TC-P09-012</code></nobr> | Méca D (Capteur haut sans arrêt) ➔ `SafeStop` + `PowerCutOff` après 3s | `🟢 SITE` |
 
@@ -24,7 +24,7 @@
 
 ## 1. Rôle et profil
 
-Brique de **sécurité et de qualification de mesure** : vérifie que la position mesurée reste dans l'enveloppe physique acceptable (intervalle `[-99.0 ; +99.0]` mètres) et qualifie les défauts codeur qui doivent interdire le mode automatique.
+Brique de **surveillance de cohérence de mesure** : vérifie que la position mesurée reste dans l'enveloppe physique acceptable (intervalle `[-99.0 ; +99.0]` mètres) et qualifie les défauts codeur qui doivent interdire le mode automatique (`EncoderIncoherent`). La mesure instantanée `CablePosMSafe` continue de refléter la valeur physique réelle (jamais figée) pour l'observation IHM et le diagnostic.
 
 ---
 
@@ -38,16 +38,16 @@ Brique de **sécurité et de qualification de mesure** : vérifie que la positio
 | `Mode` | E_Mode | Contexte (pas encore exploité ce lot) |
 | `CablePosM` | REAL | Position mesurée issue de `FB_Encoder_Scale` |
 | `HomingSuspect` | BOOL | Sortie `FB_Encoder_Homing` DE CE TREUIL (déjà calculé, §3.7) |
-| `PositionMinM` | REAL := -99.0 | Bornage physique dur |
-| `PositionMaxM` | REAL := 99.0 | Bornage physique dur |
+| `PositionMinM` | REAL := -99.0 | Bornage physique bas |
+| `PositionMaxM` | REAL := 99.0 | Bornage physique haut |
 | `BypassGlobal` | BOOL := FALSE | 🌐 Force `ErrorId = 0`, ignore le bornage — doctrine projet (voir fiche Homing §3bis) |
 
 ⚠️ **Pas de port `EncoderAvailable` ni `Homed`** en entrée de ce FB — la disponibilité bus est
-gérée en amont (`FB_Encoder_Abs` gèle déjà `RawPos`), et `Homed` seul n'entre pas dans le calcul
+gérée en amont (`FB_Encoder_Abs` traite la perte de communication), et `Homed` seul n'entre pas dans le calcul
 d'incohérence de ce FB (voir §3).
 
 **Sorties** :
-- `CablePosMSafe : REAL` : `CablePosM` gelée sur dernière valeur plausible si hors plage.
+- `CablePosMSafe : REAL` : Position câble instantanée transmise (valeur réelle non figée).
 - `EncoderIncoherent : BOOL` : `TRUE` si position hors `[PositionMinM ; PositionMaxM]` OU
   `HomingSuspect` (= `Error`).
 
@@ -57,8 +57,7 @@ d'incohérence de ce FB (voir §3).
 
 ## 3. Bornage et levée d'alarme
 
-- Si la position mesurée dépasse `PositionMaxM`/`PositionMinM`, `CablePosMSafe` est **gelée** à la
-  dernière valeur valide et `EncoderIncoherent` est activé.
+- Si la position mesurée dépasse `PositionMaxM`/`PositionMinM`, `EncoderIncoherent` est activé immédiatement, interdisant le mode automatique, tandis que `CablePosMSafe` continue de transmettre la position courante pour affichage et diagnostic.
 - `ErrorId` (numérotation **locale**, différente de `FB_Encoder_Homing`) : bit0 = "Position câble
   hors plage" (hors plage physique) ; bit1 = "Incohérence position boot" (miroir `HomingSuspect`).
 - 🔴 **`EncoderFaultPresent` n'est PAS une sortie de ce FB** : dans le legacy, le POU ST

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-04T14:34:33.518399" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-04T14:34:33.518399">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T03:55:53.946792" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T03:55:53.946792">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -297,6 +297,58 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪨 ST_DredgingAssistHMI — Échange IHM assistants prélèvement
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HmiBanner">
+        <baseType>
+          <struct>
+            <variable name="GlobalContextText">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Macro : [RÉEL/SIMU] [MODE] [COUPLAGE]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SequenceProgressText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Micro : Cycle Maître &gt; Sous-cycle / Étape active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpecialConditionText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Dérogations : Bypass, bridages, butées inactives</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b1f57cf5-2e15-510f-acf6-8dd4b570c447</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
+      IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -5480,6 +5532,14 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🪨 Assistance plongée/extraction MAINT_N1/N2</xhtml>
           </documentation>
         </variable>
+        <variable name="Banner">
+          <type>
+            <derived name="ST_HmiBanner" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4)</xhtml>
+          </documentation>
+        </variable>
         <variable name="OperatorAction">
           <type>
             <derived name="ST_OperatorAction" />
@@ -5538,6 +5598,7 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
             <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
             <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
             <Object Name="ST_DredgingAssistHMI" ObjectId="2165844b-2b77-5f87-808e-1dbe0ee8505b" />
+            <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
             <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
             <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
             <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />

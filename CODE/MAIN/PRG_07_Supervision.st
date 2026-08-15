@@ -28,6 +28,7 @@ VAR
     instDiagEthercat : FB_Diag_Ethercat;
     instDiagIhmHeartbeat : FB_Diag_IhmHeartbeat;
     instPreflight        : FB_Acquisition_Preflight;
+    instHmiBannerFormatter : FB_Hmi_BannerFormatter;
     instTroubleshootingView : FB_TroubleshootingView;
 END_VAR
 
@@ -301,8 +302,35 @@ GVL_IHM.Network.EcatErrorId := instDiagEthercat.ErrorId;
 GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigitalIoOk;
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
-GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.InputModuleFault;
-
+// 🖥️ Bandeau IHM 4 champs (AF-07 §4)
+instHmiBannerFormatter(
+    Enable                := TRUE,
+    SimulationModeActive  := GVL_Simulation.SimulationModeActive,
+    CurrentMode           := PRG_03_Modes_Cycle.Auth.Mode,
+    BothAxesCoupled       := (GVL_IHM.Modes.Cmd.SelJoystickWinch = 0),
+    WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
+    CycleStep             := GVL_IHM.Cycle.State.CycleStep,
+    DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
+    ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
+    HomingActive          := (NOT PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed),
+    HomingStepM1          := 0,
+    HomingStepM2          := 0,
+    BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
+    BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
+    BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
+    BypassTranslation     := GVL_IHM.TranslationM3.Bypass.Global,
+    BypassSyncActive      := GVL_IHM.M1M2Sync.Bypass.Global,
+    SyncDegradedActive    := PRG_04_Treuils_Benne.SyncState.SyncDegradedStep1,
+    LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
+    EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
+    PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    SafeStopActiveAny     := GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop OR GVL_IHM.TranslationM3.Safety.SafeStop,
+    PowerCutOffActiveAny  := PRG_06_Outputs_LD.PowerCutOffActive,
+    DeadmanArmed          := PRG_02_Acquisition.JoystickDeadmanArmed,
+    JoystickAtNeutral     := PRG_02_Acquisition.instJoystick.AtNeutral,
+    CycleAutoBusy         := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO)
+);
+GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 
 {endregion}
 

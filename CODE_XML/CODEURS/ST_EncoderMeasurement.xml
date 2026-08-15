@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T16:11:25.978511" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T16:11:25.978511">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T04:54:36.752860" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T04:54:36.752860">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -55,7 +55,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble bornée [-99;+99] m — gelée sur doute</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble (m) — mesure instantanée réelle validée par EncoderIncoherent</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderIncoherent">
@@ -63,7 +63,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incohérence redémarrage → refuse SEMI_AUTO</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incohérence redémarrage ou hors bornes → refuse SEMI_AUTO</xhtml>
               </documentation>
             </variable>
             <variable name="Speed_Mps">
@@ -99,7 +99,7 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📏 ST_EncoderMeasurement — Mesures codeur qualifiées (1 sous-DUT par treuil)
+   📏 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
    📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2ter
    🎨 Facts de la chaîne de mesure pure : Abs → Scale → Safety → SpeedMeasure.

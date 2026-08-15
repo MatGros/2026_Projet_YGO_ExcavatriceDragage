@@ -13,6 +13,7 @@ VAR_GLOBAL RETAIN
     TranslationM3 : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
     Cycle   : ST_CycleHMI;    (* 🔄 Commandes, états et diagnostic cycle semi-automatique *)
     DredgingAssist : ST_DredgingAssistHMI; (* 🪨 Assistance plongée/extraction MAINT_N1/N2 *)
+    Banner  : ST_HmiBanner; (* 🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4) *)
     OperatorAction : ST_OperatorAction; (* 🎮 Unique consigne conduite, arbitré en supervision *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
     Commun  : ST_CommunHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)

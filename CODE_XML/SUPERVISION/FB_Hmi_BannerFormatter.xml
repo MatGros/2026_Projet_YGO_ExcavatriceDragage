@@ -1,0 +1,734 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T03:57:48.105728" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T03:57:48.105728">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_CycleStep">
+        <baseType>
+          <enum>
+            <values>
+              <value name="INIT" value="0" />
+              <value name="WORK_POS_SELECT" value="1" />
+              <value name="DESCENDING_OPEN" value="2" />
+              <value name="BOTTOM_TOUCH_WAIT" value="3" />
+              <value name="SYNCHRO_ADJUST" value="4" />
+              <value name="CTRL_ASCENDING" value="5" />
+              <value name="ASCENDING_LOADED" value="6" />
+              <value name="DRAINING_PAUSE" value="7" />
+              <value name="TRANSLATION_MOVE" value="8" />
+              <value name="DESCENDING_OPEN_DUMP" value="9" />
+              <value name="RETURN_WORK_POS" value="10" />
+              <value name="READY" value="11" />
+              <value name="ERROR_HOLD" value="12" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vérifs cohérence états + sécurités, mise en position init</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WORK_POS_SELECT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Choix opérateur pos travail 1/2 + déplacement validé joystick</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DESCENDING_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne déjà ouvert, M1+M2 synchro</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BOTTOM_TOUCH_WAIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente info BOOL capteur "fond touché"</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SYNCHRO_ADJUST</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désynchro M2 petite vitesse (offset X) → fermeture benne</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CTRL_ASCENDING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée lente de contrôle (vérification fermeture)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ASCENDING_LOADED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée pleine vitesse charge</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DRAINING_PAUSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé (durée RETAIN)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>TRANSLATION_MOVE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Déplacement translation M3 vers trémie</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DESCENDING_OPEN_DUMP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente de vidage + ouverture benne</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RETURN_WORK_POS</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour position travail (remontée synchro)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle terminé, prêt à reboucler</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR_HOLD</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrêt sûr figé sur défaut (SafeStop)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6cb965ad-bf44-5119-9acc-50ecd5c9f87b</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_DiveSearchState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="WAIT_PRECONDITIONS" value="0" />
+              <value name="READY_TO_DESCEND" value="1" />
+              <value name="SEARCHING_IMMERSION" value="2" />
+              <value name="SEARCHING_BOTTOM" value="3" />
+              <value name="BOTTOM_CONFIRMED" value="4" />
+              <value name="ERROR_HOLD" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>WAIT_PRECONDITIONS</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente benne ouverte, positions et Kobold au repos</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY_TO_DESCEND</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à assister une demande de descente</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEARCHING_IMMERSION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0→1 dans fenêtre eau</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEARCHING_BOTTOM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1→0 au fond</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BOTTOM_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé ; extraction peut être demandée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR_HOLD</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence invalide, descente assistée interdite</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>31b3ae05-ab16-51e7-b786-307d668b63e5</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_ExtractionSequenceState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="WAIT_BOTTOM_CONFIRMATION" value="0" />
+              <value name="READY_TO_CLOSE" value="1" />
+              <value name="CLOSING_BUCKET" value="2" />
+              <value name="CONTROL_ASCENT" value="3" />
+              <value name="NOMINAL_ASCENT" value="4" />
+              <value name="ERROR_HOLD" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>WAIT_BOTTOM_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente fond Kobold ou attestation opérateur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY_TO_CLOSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à fermer la benne</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CLOSING_BUCKET</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Bucket ferme M2 seul</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CONTROL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">M1/M2 synchronisés au palier sans contacteur vitesse</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>NOMINAL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montée couplée avec vitesse demandée opérateur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR_HOLD</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut extraction, reprise interdite avant reset</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6ae0d8f0-4bfe-5792-a167-697e4476a91d</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_HmiBanner">
+        <baseType>
+          <struct>
+            <variable name="GlobalContextText">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Macro : [RÉEL/SIMU] [MODE] [COUPLAGE]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SequenceProgressText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Micro : Cycle Maître &gt; Sous-cycle / Étape active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpecialConditionText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Dérogations : Bypass, bridages, butées inactives</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b1f57cf5-2e15-510f-acf6-8dd4b570c447</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
+      IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_Hmi_BannerFormatter" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+            </variable>
+            <variable name="SimulationModeActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CurrentMode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+            </variable>
+            <variable name="BothAxesCoupled">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WinchSelected">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = M1, 2 = M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStep">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Cycle &amp; Sous-cycles</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+            </variable>
+            <variable name="ExtractionState">
+              <type>
+                <derived name="E_ExtractionSequenceState" />
+              </type>
+            </variable>
+            <variable name="HomingActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="HomingStepM1">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="HomingStepM2">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="BypassGlobalActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Dérogations &amp; Particularités</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassWinchM1Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BypassWinchM2Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BypassTranslation">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BypassSyncActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SyncDegradedActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LegalLimitReached">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Sécurité &amp; Consignes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SafeStopActiveAny">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerCutOffActiveAny">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="JoystickAtNeutral">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CycleAutoBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Banner">
+              <type>
+                <derived name="ST_HmiBanner" />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="PrefixContext">
+              <type>
+                <string length="20" />
+              </type>
+            </variable>
+            <variable name="ModeStr">
+              <type>
+                <string length="30" />
+              </type>
+            </variable>
+            <variable name="CouplingStr">
+              <type>
+                <string length="30" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧠 FB_Hmi_BannerFormatter — Formateur du bandeau d'information IHM
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   🎯 Responsabilité : assemble et arbitre les 4 champs de texte
+      normalisés du bandeau supérieur à partir des états typés des procédés.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Banner.GlobalContextText    := '';
+    Banner.SequenceProgressText := '';
+    Banner.SpecialConditionText := '';
+    Banner.OperatorActionText   := '';
+    RETURN;
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 1. GLOBAL CONTEXT TEXT [RÉEL/SIMU] [MODE] [COUPLAGE]
+// ═══════════════════════════════════════════════════════════════
+IF SimulationModeActive THEN
+    PrefixContext := '[SIMULATION] ';
+ELSE
+    PrefixContext := '[RÉEL] ';
+END_IF;
+
+CASE CurrentMode OF
+    E_Mode.DISABLE:
+        ModeStr := '[DÉSACTIVÉ]';
+    E_Mode.MAINT_N1:
+        ModeStr := '[MAINT_N1]';
+    E_Mode.MAINT_N2:
+        ModeStr := '[MAINT_N2]';
+    E_Mode.SEMI_AUTO:
+        ModeStr := '[SEMI-AUTO]';
+ELSE
+    ModeStr := '[MODE INCONNU]';
+END_CASE;
+
+IF CurrentMode = E_Mode.SEMI_AUTO THEN
+    CouplingStr := ' [CYCLE AUTO]';
+ELSIF BothAxesCoupled THEN
+    CouplingStr := ' [M1+M2 COUPLÉS]';
+ELSIF WinchSelected = 1 THEN
+    CouplingStr := ' [M1 RETENUE SEUL]';
+ELSIF WinchSelected = 2 THEN
+    CouplingStr := ' [M2 BENNE SEULE]';
+ELSE
+    CouplingStr := ' [AUCUN AXE]';
+END_IF;
+
+Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
+
+// ═══════════════════════════════════════════════════════════════
+// 2. SEQUENCE PROGRESS TEXT (Micro / Progression)
+// ═══════════════════════════════════════════════════════════════
+IF HomingActive THEN
+    IF HomingStepM1 &gt; 0 THEN
+        Banner.SequenceProgressText := 'Homing: RECHERCHE INDEX M1 EN COURS';
+    ELSIF HomingStepM2 &gt; 0 THEN
+        Banner.SequenceProgressText := 'Homing: RECHERCHE INDEX M2 EN COURS';
+    ELSE
+        Banner.SequenceProgressText := 'Homing: ATTENTE DECLENCHEMENT CAPTEUR HAUT';
+    END_IF;
+ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
+    CASE CycleStep OF
+        E_CycleStep.INIT:
+            Banner.SequenceProgressText := 'Cycle: INITIALISATION (ATTENTE START)';
+        E_CycleStep.WORK_POS_SELECT:
+            Banner.SequenceProgressText := 'Cycle: SELECTION POSITION TRAVAIL';
+        E_CycleStep.DESCENDING_OPEN:
+            IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 02_RECHERCHE_IMMERSION';
+            ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 03_PLONGEE_RECHERCHE_FOND';
+            ELSIF DiveState = E_DiveSearchState.BOTTOM_CONFIRMED THEN
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 04_FOND_TOUCHE_CONFIRME';
+            ELSE
+                Banner.SequenceProgressText := 'Cycle: 01_DESCENTE_BENNE_OUVERTE';
+            END_IF;
+        E_CycleStep.BOTTOM_TOUCH_WAIT:
+            Banner.SequenceProgressText := 'Cycle: 02_ATTENTE_FOND_TOUCHE';
+        E_CycleStep.SYNCHRO_ADJUST:
+            Banner.SequenceProgressText := 'Cycle: 03_FERMETURE_BENNE_AU_FOND';
+        E_CycleStep.CTRL_ASCENDING:
+            Banner.SequenceProgressText := 'Cycle: 04_ARRACHAGE_ET_REMONTEE_LENTE_PALIER_1';
+        E_CycleStep.ASCENDING_LOADED:
+            Banner.SequenceProgressText := 'Cycle: 05_REMONTEE_NOMINALE_CHARGE';
+        E_CycleStep.DRAINING_PAUSE:
+            Banner.SequenceProgressText := 'Cycle: 06_EGOUTTAGE_TEMPORISE';
+        E_CycleStep.TRANSLATION_MOVE:
+            Banner.SequenceProgressText := 'Cycle: 07_DEPLACEMENT_TRANSLATION_VERS_TREMIE';
+        E_CycleStep.DESCENDING_OPEN_DUMP:
+            Banner.SequenceProgressText := 'Cycle: 08_DESCENTE_ET_OUVERTURE_BENNE_TREMIE';
+        E_CycleStep.RETURN_WORK_POS:
+            Banner.SequenceProgressText := 'Cycle: 09_RETOUR_POSITION_TRAVAIL';
+        E_CycleStep.READY:
+            Banner.SequenceProgressText := 'Cycle: 10_CYCLE_TERMINE_PRET';
+        E_CycleStep.ERROR_HOLD:
+            Banner.SequenceProgressText := 'Cycle: EN PAUSE SUR DEFAUT OU HOMME-MORT';
+    ELSE
+        Banner.SequenceProgressText := 'Cycle: ETAPE EN COURS';
+    END_CASE;
+ELSE
+    IF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
+        Banner.SequenceProgressText := 'Manuel: PILOTAGE DIRECT JOYSTICK / PUPITRE';
+    ELSE
+        Banner.SequenceProgressText := 'Machine: ARRETEE / NEUTRALISEE';
+    END_IF;
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 3. SPECIAL CONDITION TEXT (Dérogations &amp; Avertissements)
+// ═══════════════════════════════════════════════════════════════
+IF BypassGlobalActive THEN
+    Banner.SpecialConditionText := '[DEROGATION] : Bypass global securite actif';
+ELSIF BypassWinchM1Active OR BypassWinchM2Active THEN
+    Banner.SpecialConditionText := '[DEROGATION] : Bypass treuil actif (surveillance inhibee)';
+ELSIF BypassTranslation THEN
+    Banner.SpecialConditionText := '[DEROGATION] : Bypass translation actif';
+ELSIF SyncDegradedActive THEN
+    Banner.SpecialConditionText := '[BRIDAGE] : Vitesse limitee Palier 1 (Ecart synchro M1/M2)';
+ELSIF LegalLimitReached THEN
+    Banner.SpecialConditionText := '[LIMITE] : Profondeur legale de dragage atteinte';
+ELSE
+    Banner.SpecialConditionText := 'Nominal : Aucune derogation active';
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 4. OPERATOR ACTION TEXT (Consigne d'action requise)
+// ═══════════════════════════════════════════════════════════════
+IF NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
+    Banner.OperatorActionText := '[PUPITRE] Réarmer la chaîne AU physique et enclencher la puissance';
+ELSIF SafeStopActiveAny THEN
+    Banner.OperatorActionText := '[PUPITRE] Acquitter le défaut (Reset) et ramener le joystick au neutre';
+ELSIF CurrentMode = E_Mode.DISABLE THEN
+    Banner.OperatorActionText := '[IHM] Sélectionner un mode de marche actif (MAINT_N1, MAINT_N2 ou AUTO)';
+ELSIF NOT DeadmanArmed THEN
+    Banner.OperatorActionText := '[JOYSTICK] Maintenir la gâchette homme-mort au neutre pour armer';
+ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
+    IF CycleStep = E_CycleStep.INIT THEN
+        Banner.OperatorActionText := '[IHM] Appuyer sur Start Cycle pour lancer la séquence';
+    ELSIF CycleStep = E_CycleStep.ERROR_HOLD THEN
+        Banner.OperatorActionText := '[JOYSTICK] Réarmer homme-mort puis réengager déflexion pour reprise';
+    ELSE
+        Banner.OperatorActionText := '[JOYSTICK] Maintenir déflexion active pour déroulement du cycle';
+    END_IF;
+ELSIF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
+    Banner.OperatorActionText := '[JOYSTICK] Actionner l axe souhaité avec homme-mort maintenu';
+ELSE
+    Banner.OperatorActionText := '[AUCUNE ACTION ATTENDUE]';
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>84039c85-4845-567a-8eb6-932818f2daf4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="SUPERVISION">
+          <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
+          </Folder>
+        </Folder>
+        <Folder Name="CYCLE">
+          <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+          <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
+          <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+        </Folder>
+        <Folder Name="MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
