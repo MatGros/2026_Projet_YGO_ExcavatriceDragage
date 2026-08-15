@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T01:12:13.201320" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T01:12:13.201320">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T07:08:51.950307" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T07:08:51.950307">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -312,6 +312,36 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ───────────────────────────────────────────────────────────────
    📄 Lot L5 (Frontière unique HwIn)
    🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_JoystickHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_JoystickCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_JoystickState" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5f006dc4-3bb9-55fd-9755-c378359d9979</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_ModesHMI.
+   Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
+   Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1873,6 +1903,150 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    ───────────────────────────────────────────────────────────────
    📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_JoystickCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnCalibrate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Demande de recalage au neutre</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>486d3dcf-ebc5-586d-9a94-ea39a076f411</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_JoystickCmd — Commandes IHM pour le Joystick
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_JoystickState">
+        <baseType>
+          <struct>
+            <variable name="RawX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Axe X brut du joystick (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Axe Y brut du joystick (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawButton">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔘 Bouton homme-mort brut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisCmdX">
+              <type>
+                <derived name="ST_Joystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe X normalisée (sortie FB_Joystick)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisCmdY">
+              <type>
+                <derived name="ST_Joystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Consigne d'axe Y normalisée (sortie FB_Joystick)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Neutre X calibré actuel (lecture seule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralYAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Neutre Y calibré actuel (lecture seule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔫 Geste homme-mort armé (FB_Joystick.DeadmanArmed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AtNeutral">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Online">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Liaison CAN joystick active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Joystick opérationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Joystick en défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code défaut joystick</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f7e9804f-8654-5e66-a418-611d9f5fae02</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚦 ST_JoystickState — États et diagnostics IHM du Joystick
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4258,6 +4432,62 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_Joystick_AxisCmd">
+        <baseType>
+          <struct>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation FB (FALSE = neutralisation, sorties coupées)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération normale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedRef">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   🎯 4 champs exactement :
+      - Enable    : Autorisation globale du pipeline
+      - StartStop : RAMPE (TRUE = accélération, FALSE = décélération normale)
+      - SpeedRef  : Consigne vitesse signée (-100.0 .. +100.0 %)
+      - Direction : Sens d'axe (-1 = Rev, 0 = Neutre, +1 = Fwd)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_Diag_State">
         <baseType>
           <enum>
@@ -4625,6 +4855,14 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance restante avant cible (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM</xhtml>
               </documentation>
             </variable>
             <variable name="CloseActive">
@@ -5088,6 +5326,30 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne fermé mémorisé</xhtml>
               </documentation>
             </variable>
+            <variable name="TooOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TooClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entre Ouvert et Fermé)</xhtml>
+              </documentation>
+            </variable>
             <variable name="LastPosM2Open">
               <type>
                 <REAL />
@@ -5273,6 +5535,14 @@ GVL_IHM.M1TreuilRetenue</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : GVL_IHM.DredgingAssist</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickHMI">
+              <type>
+                <derived name="ST_JoystickHMI" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ GVL_IHM.JOY1Joystick</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyState">
@@ -5500,6 +5770,10 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx105_StateIncoherent := WinchM2.Bu
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx106_FBState := WinchM2.Bucket.State.FBState;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx107_LastPosM2Open_M := WinchM2.Bucket.State.MechState.LastPosM2Open;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx108_LastPosM2Close_M := WinchM2.Bucket.State.MechState.LastPosM2Close;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx109_BucketTooOpen := WinchM2.Bucket.State.MechState.TooOpen;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx110_BucketTooClosed := WinchM2.Bucket.State.MechState.TooClosed;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx111_BucketIsIntermediate := WinchM2.Bucket.State.MechState.IsIntermediate;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx112_DeltaPosition_M := WinchM2.Bucket.State.DeltaPosition_M;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := FALSE; // TBD non câblé - voir fiche §6 (pas de sortie Cycle Open publiée)
@@ -5699,15 +5973,21 @@ GVL_Troubleshooting.Joystick.HwIn_JoyBtnRaw_DI         := HwIn.Operator.JoyBtnRa
 GVL_Troubleshooting.Joystick.NeutralXAct               := (HwIn.Operator.JoyXRaw_ANA1 &gt;= 4800 AND HwIn.Operator.JoyXRaw_ANA1 &lt;= 5200);
 GVL_Troubleshooting.Joystick.NeutralYAct               := (HwIn.Operator.JoyYRaw_ANA2 &gt;= 4800 AND HwIn.Operator.JoyYRaw_ANA2 &lt;= 5200);
 GVL_Troubleshooting.Joystick.Step3_DeadmanPressed      := HwIn.Operator.JoyBtnRaw;
-GVL_Troubleshooting.Joystick.Step4_NeutralAcquired     := GVL_Troubleshooting.Joystick.NeutralXAct AND GVL_Troubleshooting.Joystick.NeutralYAct;
+GVL_Troubleshooting.Joystick.Step4_NeutralAcquired     := JoystickHMI.State.AtNeutral;
+GVL_Troubleshooting.Joystick.DeadmanArmed             := JoystickHMI.State.DeadmanArmed;
 
 GVL_Troubleshooting.Joystick.AllConditionsMet := GVL_Troubleshooting.Joystick.Step1_CanBusActive
                                               AND GVL_Troubleshooting.Joystick.Step2_JoystickOperational
-                                              AND GVL_Troubleshooting.Joystick.Step3_DeadmanPressed;
+                                              AND GVL_Troubleshooting.Joystick.DeadmanArmed;
 
 GVL_Troubleshooting.Joystick.JoystickSelected := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+GVL_Troubleshooting.Joystick.SelJoystickWinch := GVL_IHM.Modes.Cmd.SelJoystickWinch;
 GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
+GVL_Troubleshooting.Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.SpeedRef;
+GVL_Troubleshooting.Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.SpeedRef;
+GVL_Troubleshooting.Joystick.DirectionX        := JoystickHMI.State.AxisCmdX.Direction;
+GVL_Troubleshooting.Joystick.DirectionY        := JoystickHMI.State.AxisCmdY.Direction;
 
 {endregion}
 
@@ -5842,6 +6122,7 @@ GVL_Troubleshooting.Inputs := HwIn;
             <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
             <Object Name="ST_DredgingAssistHMI" ObjectId="2165844b-2b77-5f87-808e-1dbe0ee8505b" />
             <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
+            <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
             <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
             <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
             <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
@@ -5859,6 +6140,8 @@ GVL_Troubleshooting.Inputs := HwIn;
             <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
             <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
             <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+            <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
+            <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
             <Object Name="ST_BypassNetwork" ObjectId="b983f7fc-8c50-586b-bda1-7708d152c981" />
             <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
             <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
@@ -5897,6 +6180,9 @@ GVL_Troubleshooting.Inputs := HwIn;
         <Folder Name="CYCLE">
           <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
           <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+        </Folder>
+        <Folder Name="JOYSTICK">
+          <Object Name="ST_Joystick_AxisCmd" ObjectId="cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068" />
         </Folder>
         <Folder Name="COMMUN">
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />

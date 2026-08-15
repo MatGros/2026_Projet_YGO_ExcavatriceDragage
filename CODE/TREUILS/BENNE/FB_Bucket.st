@@ -53,8 +53,8 @@ VAR_INPUT
     HomedM1             : BOOL;             // Codeur M1 référencé (instHomingM1.Homed) — REX 2026-07-07
     HomedM2             : BOOL;             // Codeur M2 référencé (instHomingM2.Homed) — REX 2026-07-07
     Config              : ST_BucketConfig; // Configuration (RETAIN site)
-    CfgTimeoutDuration     : TIME := T#30s;    // Timeout de mouvement configurable
-    M1SlipToleranceM    : REAL := 1.0;      // 🔧 REX 2026-07-07 : tolérance glissement M1 pendant Busy (m)
+    CfgTimeoutDuration  : TIME := T#60s;   // Timeout de mouvement configurable (60s par défaut pour confort d'essai)
+    M1SlipToleranceM    : REAL := 1.0;     // 🔧 REX 2026-07-07 : tolérance glissement M1 pendant Busy (m)
     M1_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM1.Busy — doit être à l'arrêt pour armer une demande
     M2_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM2.Busy — doit être à l'arrêt pour armer une demande
      ConfirmOpenPosition : BOOL;             // 🆕 REX 2026-07-08 : bouton IHM référencement benne ouvert (front, mise en service — voir bandeau)
@@ -76,6 +76,7 @@ VAR_OUTPUT
     State               : E_State;          // État opérationnel du FB
     StateAtError        : E_State;          // État lors de l'apparition de l'erreur
     ActiveOffsetM       : REAL;             // Décalage cible à injecter dans FB_WinchSync
+    DeltaPosition_M     : REAL;             // 📏 Écart réel signé M2 - M1 (mètres)
     M2_StartStop        : BOOL;             // Sortie consigne StartStop vers Winch M2
     M2_Direction        : INT;              // Sortie consigne Direction vers Winch M2
     M2_ForceSlowSpeed   : BOOL;             // TRUE = Bloque les contacteurs de vitesse de M2
@@ -187,78 +188,85 @@ ELSE
 END_IF;
 
 // 🆕 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE (mise en service, REX 2026-07-08) — voir bandeau
-// Action de CONFIRMATION pure (aucun mouvement, ne pilote pas M2) : mémorise BucketState.IsOpen
-// directement, à utiliser juste après le référencement des codeurs (M1=M2, benne physiquement
-// ouvert vérifié par l'opérateur). Gardée comme BtnConfirmCoherence (FB_Encoder_Homing) : front,
-// MAINT_N1/N2 uniquement, codeurs déjà référencés, treuils à l'arrêt (pas de séquence en cours).
+// Action de CONFIRMATION (aucun mouvement, ne pilote pas M2) : acquitte les défauts et réinitialise
+// les demandes. L'état IsOpen/IsClosed reste STRICTEMENT évalué en continu (§3bis-quater) selon la position codeur réelle.
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
 IF ConfirmOpenEdge.Q
    AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
    AND NOT M1_Busy AND NOT M2_Busy THEN
-    BucketState.IsOpen := TRUE;
-    BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
-    BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
-    BucketState.StateIncoherent := FALSE;
+    BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM;
     ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
 
 // 🆕 3bis-ter. CONFIRMATION MANUELLE POSITION FERMÉE (mise en service, REX 2026-07-08)
-// Même principe que ConfirmOpenPosition, mais pour initialiser le benne comme FERMÉ.
+// Même principe que ConfirmOpenPosition pour acquitter et réinitialiser.
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
 IF ConfirmCloseEdge.Q
    AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
    AND NOT M1_Busy AND NOT M2_Busy THEN
-    BucketState.IsOpen := FALSE;
-    BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
-    BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM; // 🆕 Initialisation théorique cohérente avec les offsets configurés
-    BucketState.StateIncoherent := FALSE;
+    BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM;
     ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
 
-// 🆕 3bis-quater. DÉTECTION AUTOMATIQUE EN CONTINU (REX 2026-08-07, demande client) : contrairement
-// aux 2 blocs ConfirmXxx ci-dessus (action MANUELLE ponctuelle), ceci recalcule IsOpen/IsClosed en
-// PERMANENCE dès que les positions correspondent à un état connu -- sans bouton, sans mode MAINT
-// requis. Nécessaire car les séquencements automatiques (PRG_04, "descente uniquement benne
-// ouverte") s'appuient sur BucketState.IsOpen/IsClosed : si les positions convergent SANS passer
-// par une séquence FB_Bucket commandée (ex. recalage manuel en pilotage unitaire, ou positions
-// déjà alignées au premier boot), l'état restait bloqué à FALSE indéfiniment sans action opérateur
-// -- bloquant en pratique une fois le séquencement auto en place. Actif uniquement à l'arrêt
-// (NOT M1_Busy/M2_Busy), hors séquence benne en cours (State <> BUSY, où IsOpen/IsClosed sont
-// volontairement forcés à FALSE par BusyEdge ci-dessus -- ne rentre jamais en conflit), codeurs
-// référencés. Réutilise la tolérance déjà existante Config.CoherenceLimitM -- pas de nouveau seuil.
+// 🆕 3bis-quater. DÉTECTION AUTOMATIQUE EN CONTINU (5 ZONES CLAIRES OPÉRATEUR) :
+// Recalcule IsOpen, IsClosed, TooOpen, TooClosed, IsIntermediate en PERMANENCE à partir de
+// l'écart réel Delta = CablePosM2 - CablePosM1 et de la tolérance Config.CoherenceLimitM.
+// Actif à l'arrêt (NOT M1_Busy/M2_Busy), hors séquence active (State <> BUSY), codeurs référencés.
 IF (State <> E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND HomedM2
    AND (Config.CoherenceLimitM > 0.01) THEN
+
+    // 1. Zone Benne Ouverte (Delta proche de OffsetOpenM)
     IF ABS((CablePosM2 - CablePosM1) - Config.OffsetOpenM) <= Config.CoherenceLimitM THEN
-        IF NOT BucketState.IsOpen THEN
-            BucketState.IsOpen := TRUE;
-            BucketState.IsClosed := FALSE;
-            BucketState.LastPosM2Open := CablePosM2;
-            BucketState.StateIncoherent := FALSE;
-        END_IF;
+        BucketState.IsOpen := TRUE;
+        BucketState.IsClosed := FALSE;
+        BucketState.TooOpen := FALSE;
+        BucketState.TooClosed := FALSE;
+        BucketState.IsIntermediate := FALSE;
+        BucketState.LastPosM2Open := CablePosM2;
+        BucketState.StateIncoherent := FALSE;
+
+    // 2. Zone Benne Fermée (Delta proche de OffsetCloseM)
     ELSIF ABS((CablePosM2 - CablePosM1) - Config.OffsetCloseM) <= Config.CoherenceLimitM THEN
-        IF NOT BucketState.IsClosed THEN
-            BucketState.IsClosed := TRUE;
-            BucketState.IsOpen := FALSE;
-            BucketState.LastPosM2Close := CablePosM2;
-            BucketState.StateIncoherent := FALSE;
-        END_IF;
-    // 🔴🔧 REX 2026-08-07 (21) — retour terrain, BUG CONFIRMÉ : IsOpen/IsClosed restait figé sur
-    // sa dernière valeur mémorisée quand la position s'éloignait des DEUX fenêtres (aucune des 2
-    // IF/ELSIF ci-dessus ne match) -- ex. jog unitaire M2 loin de la position ouverte/fermée sans
-    // repasser par instBucket. L'IHM affichait "ouvert" alors que la position réelle n'avait plus
-    // rien à voir. Corrigé : hors des 2 fenêtres connues, l'état devient explicitement inconnu.
+        BucketState.IsClosed := TRUE;
+        BucketState.IsOpen := FALSE;
+        BucketState.TooOpen := FALSE;
+        BucketState.TooClosed := FALSE;
+        BucketState.IsIntermediate := FALSE;
+        BucketState.LastPosM2Close := CablePosM2;
+        BucketState.StateIncoherent := FALSE;
+
+    // 3. Zone Trop Ouvert (Dépassement en ouverture : Delta < OffsetOpenM - Tolerance)
+    ELSIF (CablePosM2 - CablePosM1) < (Config.OffsetOpenM - Config.CoherenceLimitM) THEN
+        BucketState.IsOpen := FALSE;
+        BucketState.IsClosed := FALSE;
+        BucketState.TooOpen := TRUE;
+        BucketState.TooClosed := FALSE;
+        BucketState.IsIntermediate := FALSE;
+        BucketState.StateIncoherent := TRUE;
+
+    // 4. Zone Trop Fermé (Dépassement en fermeture : Delta > OffsetCloseM + Tolerance)
+    ELSIF (CablePosM2 - CablePosM1) > (Config.OffsetCloseM + Config.CoherenceLimitM) THEN
+        BucketState.IsOpen := FALSE;
+        BucketState.IsClosed := FALSE;
+        BucketState.TooOpen := FALSE;
+        BucketState.TooClosed := TRUE;
+        BucketState.IsIntermediate := FALSE;
+        BucketState.StateIncoherent := TRUE;
+
+    // 5. Zone Intermédiaire / Entrebâillée (entre OffsetOpenM + Tol et OffsetCloseM - Tol)
     ELSE
-        IF BucketState.IsOpen OR BucketState.IsClosed THEN
-            BucketState.IsOpen := FALSE;
-            BucketState.IsClosed := FALSE;
-            BucketState.StateIncoherent := TRUE;
-        END_IF;
+        BucketState.IsOpen := FALSE;
+        BucketState.IsClosed := FALSE;
+        BucketState.TooOpen := FALSE;
+        BucketState.TooClosed := FALSE;
+        BucketState.IsIntermediate := TRUE;
+        BucketState.StateIncoherent := FALSE;
     END_IF;
 END_IF;
 
@@ -505,6 +513,9 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+
+// Calcul continu de l'écart réel signé M2 - M1 pour l'affichage IHM et l'aide au pilotage
+DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
 // (M2PositionCorrected, côté PRG_SUPERVISION_CFC).

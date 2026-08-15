@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T21:46:17.902126" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T21:46:17.902126">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T07:03:49.192386" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T07:03:49.192386">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -85,6 +85,14 @@ TRUE = Bouton Homme-Mort appuyé</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Repassé par le neutre (autorisation mouvement)</xhtml>
               </documentation>
             </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Homme-Mort armé avec passage au neutre validé</xhtml>
+              </documentation>
+            </variable>
             <variable name="AllConditionsMet">
               <type>
                 <BOOL />
@@ -100,6 +108,14 @@ TRUE = Joystick prêt pour piloter un axe</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Joystick maître sélectionné IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelJoystickWinch">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection Treuil (0=Couplé M1+M2, 1=M1 seul, 2=M2 seul)</xhtml>
               </documentation>
             </variable>
             <variable name="RawX">
@@ -133,6 +149,22 @@ Valeur brute axe X (0..10000)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée Y (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée X (-1 / 0 / +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée Y (-1 / 0 / +1)</xhtml>
               </documentation>
             </variable>
           </struct>

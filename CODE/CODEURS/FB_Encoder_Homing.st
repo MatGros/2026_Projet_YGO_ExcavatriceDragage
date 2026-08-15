@@ -83,6 +83,7 @@ VAR
     // le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt à l'appel
     // (PRG_02_Acquisition.st, M2BucketRefRequested) — rien à ajouter ici pour ce chemin.
     TopSensorEdge         : R_TRIG;      // Front montant TopPositionSensor — déclenche le nominal
+    DynamicTargetEdge     : R_TRIG;      // Front montant UseDynamicTarget — déclenche le homing dynamique
     HomingModeOk          : BOOL;        // Mode MAINT_N1/N2 requis, tous chemins
     NominalHomingTrigger  : BOOL;
     UnitaryHomingTrigger  : BOOL;
@@ -144,6 +145,7 @@ END_IF;
 
 PresetRequest := FALSE;
 TopSensorEdge(CLK := TopPositionSensor);
+DynamicTargetEdge(CLK := UseDynamicTarget);
 
 // 🆕 Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
@@ -171,7 +173,7 @@ UnitaryHomingTrigger := HomingModeOk AND UnitaryMode AND WinchSelected AND HomeE
 
 // Dynamique (benne) : Mode + arrêt confirmé (M1/M2 non Busy) déjà gardés à l'appel via
 // M2BucketRefRequested (PRG_02_Acquisition.st) — HomingModeOk reste vérifié ici en défense.
-DynamicHomingTrigger := HomingModeOk AND UseDynamicTarget AND HomeEdge.Q;
+DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
 HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
 

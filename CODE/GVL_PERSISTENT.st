@@ -75,7 +75,7 @@ VAR_GLOBAL PERSISTENT RETAIN
             // matchait quasiment plus jamais.
             CoherenceLimitM  := 1.0
         ),
-        CfgTimeoutDuration := T#30s
+        CfgTimeoutDuration := T#60s
     ); // 🌉 Pont FB_CfgPersistBridge_BucketCfg
     _BucketState : ST_BucketState; // État mécanique mémorisé (ouvert/fermé)
 

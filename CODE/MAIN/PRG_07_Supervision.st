@@ -358,6 +358,7 @@ instTroubleshootingView(
     Commun               := GVL_IHM.Commun,
     Network              := GVL_IHM.Network,
     DredgingAssist       := GVL_IHM.DredgingAssist,
+    JoystickHMI          := GVL_IHM.JOY1Joystick,
     EmergencyState       := PRG_06_Outputs_LD.EmergencyState,
     EmergencyDiag        := PRG_06_Outputs_LD.EmergencyDiag,
     PowerCutOffActive    := PRG_06_Outputs_LD.PowerCutOffActive,

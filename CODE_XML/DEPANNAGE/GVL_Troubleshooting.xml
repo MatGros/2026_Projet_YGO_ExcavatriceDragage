@@ -90,6 +90,38 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Dernière position M2 mémorisée "fermé"</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx109_BucketTooOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance (Enrouler M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx110_BucketTooClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance (Dérouler M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx111_BucketIsIntermediate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entrebâillée entre ouvert et fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx112_DeltaPosition_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) en direct</xhtml>
+              </documentation>
+            </variable>
             <variable name="Idx201_HmiCmd_BtnOpen">
               <type>
                 <BOOL />
@@ -1028,6 +1060,14 @@ TRUE = Bouton Homme-Mort appuyé</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Repassé par le neutre (autorisation mouvement)</xhtml>
               </documentation>
             </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Homme-Mort armé avec passage au neutre validé</xhtml>
+              </documentation>
+            </variable>
             <variable name="AllConditionsMet">
               <type>
                 <BOOL />
@@ -1043,6 +1083,14 @@ TRUE = Joystick prêt pour piloter un axe</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Joystick maître sélectionné IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelJoystickWinch">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection Treuil (0=Couplé M1+M2, 1=M1 seul, 2=M2 seul)</xhtml>
               </documentation>
             </variable>
             <variable name="RawX">
@@ -1076,6 +1124,22 @@ Valeur brute axe X (0..10000)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée Y (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée X (-1 / 0 / +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée Y (-1 / 0 / +1)</xhtml>
               </documentation>
             </variable>
           </struct>

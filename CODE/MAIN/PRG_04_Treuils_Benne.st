@@ -1122,6 +1122,7 @@ BucketState.Done := instBucket.Done;
 BucketState.Error := instBucket.Error;
 BucketState.ErrorId := instBucket.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
+BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
 // 🔧 2026-08-07 : corrigé -- pointait sur DumpAtTremieBucketOpenArmed (mauvais signal, deviné

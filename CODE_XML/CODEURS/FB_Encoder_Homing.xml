@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T15:14:40.771613" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T15:14:40.771613">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T05:39:25.076270" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T05:39:25.076270">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -591,6 +591,14 @@ le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt
 Front montant TopPositionSensor — déclenche le nominal</xhtml>
               </documentation>
             </variable>
+            <variable name="DynamicTargetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant UseDynamicTarget — déclenche le homing dynamique</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingModeOk">
               <type>
                 <BOOL />
@@ -694,6 +702,7 @@ END_IF;
 
 PresetRequest := FALSE;
 TopSensorEdge(CLK := TopPositionSensor);
+DynamicTargetEdge(CLK := UseDynamicTarget);
 
 // 🆕 Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
@@ -721,7 +730,7 @@ UnitaryHomingTrigger := HomingModeOk AND UnitaryMode AND WinchSelected AND HomeE
 
 // Dynamique (benne) : Mode + arrêt confirmé (M1/M2 non Busy) déjà gardés à l'appel via
 // M2BucketRefRequested (PRG_02_Acquisition.st) — HomingModeOk reste vérifié ici en défense.
-DynamicHomingTrigger := HomingModeOk AND UseDynamicTarget AND HomeEdge.Q;
+DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
 HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
 
