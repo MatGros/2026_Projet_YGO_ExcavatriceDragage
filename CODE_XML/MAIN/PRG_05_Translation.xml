@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T23:38:11.232496" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T23:38:11.232496">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T03:27:48.158593" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T03:27:48.158593">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -960,7 +960,7 @@ M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
                             AND NOT PRG_02_Acquisition.M2_EncoderIncoherent
                             AND (PRG_02_Acquisition.CablePosM1 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
                             AND (PRG_02_Acquisition.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
-TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
+TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 {endregion}
 

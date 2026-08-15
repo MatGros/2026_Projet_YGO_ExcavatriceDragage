@@ -70,7 +70,7 @@ M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
                             AND NOT PRG_02_Acquisition.M2_EncoderIncoherent
                             AND (PRG_02_Acquisition.CablePosM1 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
                             AND (PRG_02_Acquisition.CablePosM2 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
-TranslationStateHMI.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
+TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 {endregion}
 

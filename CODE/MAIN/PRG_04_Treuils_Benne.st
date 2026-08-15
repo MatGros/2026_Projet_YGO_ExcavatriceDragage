@@ -1060,7 +1060,6 @@ WinchM1Safety.AscentPermit := AscentPermitM1_Active;
 WinchM1Safety.DescendPermit := DescendPermitM1_Active;
 WinchM1Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
 WinchM1Safety.PowerCutOff := instSafetyWinchM1.PowerCutOff;
-WinchM1Safety.BrakeTimeoutFault := (PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId AND 16#0001) <> 0;
 WinchM1Safety.Error := instWinchM1.Error OR instSafetyWinchM1.Error;
 WinchM1Safety.ErrorId := instSafetyWinchM1.ErrorId;
 WinchM1Safety.ErrorOperatorComm  := (instSafetyWinchM1.ErrorId AND 16#0001) <> 0;
