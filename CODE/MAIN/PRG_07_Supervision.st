@@ -30,8 +30,6 @@ VAR
     instPreflight        : FB_Acquisition_Preflight;
     instHmiBannerFormatter : FB_Hmi_BannerFormatter;
     instTroubleshootingView : FB_TroubleshootingView;
-    SimBypassRiseEdge    : R_TRIG;
-    SimBypassFallEdge    : F_TRIG;
 END_VAR
 
 {region "§1 Horloge et reset machine"}
@@ -237,31 +235,6 @@ IF GVL_IHM.Commun.Bypass.SlackCable <> BypassSlackCable THEN
     BypassSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
 END_IF;
 
-// 🎭 GESTION DU MASTER BYPASS DE SIMULATION :
-// 🔒 SÉCURITÉ CHANTIER : Le bypass RETAIN est STRICTEMENT VERROUILLÉ aux modes maintenance (MAINT_N1 / MAINT_N2).
-// Hors mode maintenance (ex: PROD_AUTO, ARRET, etc.), il est forcé à FALSE et désactive immédiatement toutes les dérogations.
-IF (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.MAINT_N1 AND PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.MAINT_N2) THEN
-    SimulationBypassActive := FALSE;
-END_IF;
-
-SimBypassRiseEdge(CLK := SimulationBypassActive);
-SimBypassFallEdge(CLK := SimulationBypassActive);
-
-// 🟢 Front Montant (en mode MAINT uniquement) : Active les bypass nécessaires aux essais (Limite Légale + Limite Haute)
-IF SimBypassRiseEdge.Q AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2) THEN
-    GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
-    GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
-    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
-END_IF;
-
-// 🔴 Front Descendant ou sortie du mode maintenance : Désactive les bypass (retour aux sécurités)
-IF SimBypassFallEdge.Q OR (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.MAINT_N1 AND PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.MAINT_N2) THEN
-    GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
-    GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
-    GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
-END_IF;
-
-
 {endregion}
 
 {region "§3 Projections IHM et mapping"}
@@ -369,6 +342,32 @@ GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigital
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
 // 🖥️ Bandeau IHM 4 champs (AF-07 §4)
+// 🆕 Publication des états du cycle semi-auto (lecture seule) — alimente le bandeau (T115)
+GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
+GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy;
+GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Done;
+GVL_IHM.Cycle.State.Error                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Error;
+GVL_IHM.Cycle.State.ErrorId                := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId;
+GVL_IHM.Cycle.State.CycleStep              := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep;
+GVL_IHM.Cycle.State.CycleStateStr          := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStateStr;
+GVL_IHM.Cycle.State.CycleStepAtError       := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError;
+GVL_IHM.Cycle.State.SampleCount            := _CycleSampleCount;
+GVL_IHM.Cycle.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
+GVL_IHM.Cycle.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
+GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
+GVL_IHM.Cycle.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
+GVL_IHM.Cycle.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
+GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.instWinchSync.Error;
+GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM;
+GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchMps;
+GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive;
+GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchConfirmed;
+GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.CablePosM1;
+GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.CablePosM2;
+GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.JoystickDeadmanArmed;
+GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
+GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
+
 instHmiBannerFormatter(
     Enable                := TRUE,
     SimulationModeActive  := GVL_Simulation.SimulationModeActive,

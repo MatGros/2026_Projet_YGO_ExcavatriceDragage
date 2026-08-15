@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎮 ST_WinchCmdDemand — Demande de commande treuil (depuis cycle/sequenceur)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
             DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
    🎯 Demande de mouvement pour treuil M1 ou M2 (depuis FB_Cycle).
    ═══════════════════════════════════════════════════════════════ *)

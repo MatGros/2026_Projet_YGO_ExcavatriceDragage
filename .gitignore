@@ -85,6 +85,8 @@ node_modules/
 /_*.log
 /zz_*
 /scratch/
+# Dossier temp de gates sandbox (artefact d'exécution agent, vide) - ne jamais commiter
+/.tmp_gates/
 
 # Snapshot fige (reference fonctionnelle v0.5.25_DepartSoirEssai 2026-08-07) - ne plus modifier
 CODE_v0.5.25_20260807/

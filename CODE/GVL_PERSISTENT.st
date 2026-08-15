@@ -146,6 +146,9 @@ VAR_GLOBAL PERSISTENT RETAIN
     _BlinkTimeOn  : TIME := T#1s;    // Durée allumé horloge clignotement système (voyants IHM/diag)
     _BlinkTimeOff : TIME := T#800ms; // Durée éteint — asymétrique par défaut (REX 2026-07-16)
 
+    // 🔄 CYCLE SEMI-AUTO
+    _CycleSampleCount : INT := 0;    // 🆕 Compteur de prélèvements (Q3bis) — RETAIN, survit à la coupure ; reset MAINT only
+
     // 🧪 SIMULATION (Banc de test uniquement)
     _SimEncoderRawPosM1 : UDINT := 1000000; // Simulation : survit au reset froid
     _SimEncoderRawPosM2 : UDINT := 1000000; // Simulation : survit au reset froid

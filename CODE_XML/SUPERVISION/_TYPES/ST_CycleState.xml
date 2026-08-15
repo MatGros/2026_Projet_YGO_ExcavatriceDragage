@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-23T22:58:16.029913" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-07-23T22:58:16.029913">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T10:44:17.136082" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T10:44:17.136082">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -202,6 +202,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Homme-mort + axe Y actif (CycleMotionPermit)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleStepAtError">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Étape spécifique au moment du défaut (R9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCount">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -219,19 +235,20 @@
         <baseType>
           <enum>
             <values>
-              <value name="INIT" value="0" />
-              <value name="WORK_POS_SELECT" value="1" />
-              <value name="DESCENDING_OPEN" value="2" />
-              <value name="BOTTOM_TOUCH_WAIT" value="3" />
-              <value name="SYNCHRO_ADJUST" value="4" />
-              <value name="CTRL_ASCENDING" value="5" />
-              <value name="ASCENDING_LOADED" value="6" />
-              <value name="DRAINING_PAUSE" value="7" />
-              <value name="TRANSLATION_MOVE" value="8" />
-              <value name="DESCENDING_OPEN_DUMP" value="9" />
-              <value name="RETURN_WORK_POS" value="10" />
-              <value name="READY" value="11" />
-              <value name="ERROR_HOLD" value="12" />
+              <value name="X0_PREPARATION" value="0" />
+              <value name="X1_HOMING" value="1" />
+              <value name="X2_WORK_POS_SELECT" value="2" />
+              <value name="X3_OPEN_BUCKET" value="3" />
+              <value name="X4_DESCEND_OPEN" value="4" />
+              <value name="X5_BOTTOM_CONFIRMED" value="5" />
+              <value name="X6_CLOSE_BUCKET" value="6" />
+              <value name="X7_CTRL_ASCENT" value="7" />
+              <value name="X8_ASCENT_LOADED" value="8" />
+              <value name="X9_DRAIN_PAUSE" value="9" />
+              <value name="X10_TRANSLATE_DUMP" value="10" />
+              <value name="X11_OPEN_DUMP" value="11" />
+              <value name="X13_DONE_SYNC" value="13" />
+              <value name="STABILIZING" value="14" />
             </values>
           </enum>
         </baseType>
@@ -239,81 +256,87 @@
           <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
             <EnumValueDocumentation>
               <EnumValue>
-                <Name>INIT</Name>
+                <Name>X0_PREPARATION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vérifs cohérence états + sécurités, mise en position init</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>WORK_POS_SELECT</Name>
+                <Name>X1_HOMING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Choix opérateur pos travail 1/2 + déplacement validé joystick</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 vitesses lentes pour chercher capteur top + référencement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>DESCENDING_OPEN</Name>
+                <Name>X2_WORK_POS_SELECT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne déjà ouvert, M1+M2 synchro</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>BOTTOM_TOUCH_WAIT</Name>
+                <Name>X3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente info BOOL capteur "fond touché"</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 ouverture benne (si déjà ouverte → passe vite)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>SYNCHRO_ADJUST</Name>
+                <Name>X4_DESCEND_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désynchro M2 petite vitesse (offset X) → fermeture benne</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>CTRL_ASCENDING</Name>
+                <Name>X5_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée lente de contrôle (vérification fermeture)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>ASCENDING_LOADED</Name>
+                <Name>X6_CLOSE_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée pleine vitesse charge</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fermeture benne — tolérance « à peu près fermé »</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>DRAINING_PAUSE</Name>
+                <Name>X7_CTRL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé (durée RETAIN)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée palier 1 de contrôle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>TRANSLATION_MOVE</Name>
+                <Name>X8_ASCENT_LOADED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Déplacement translation M3 vers trémie</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée nominale jusqu'à limite haute</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>DESCENDING_OPEN_DUMP</Name>
+                <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente de vidage + ouverture benne</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">égouttage temporisé — temps affiché IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>RETURN_WORK_POS</Name>
+                <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour position travail (remontée synchro)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">translation vers trémie + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>READY</Name>
+                <Name>X11_OPEN_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle terminé, prêt à reboucler</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>ERROR_HOLD</Name>
+                <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrêt sûr figé sur défaut (SafeStop)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STABILIZING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 état d'attente/stabilisation (ex-ERROR_HOLD) — pas une erreur</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

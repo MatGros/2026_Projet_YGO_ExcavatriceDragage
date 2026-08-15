@@ -3,7 +3,9 @@
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
    🎯 Polarité positive : TRUE = simulé/stimulus actif ; FALSE = réel/repos.
-   🔒 Uniquement consommée à la frontière PRG_02_Acquisition et par le banc.
+   🔒 Consommée à la frontière PRG_02_Acquisition, par le banc, et par PRG_04_Treuils_Benne
+   🔒 (SimulationBypassActive : n'arme les bypass de sécurité QUE si SimulationModeActive
+   🔒  ET SimWinchActive — strictement inopérant sur machine réelle).
    ═══════════════════════════════════════════════════════════════ *)
 
 {attribute 'qualified_only'}
@@ -39,4 +41,7 @@ VAR_GLOBAL
 
     // 🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
     SimKoboldContactValue       : BOOL := FALSE; // TRUE = Kobold détecte un contact fond simulé
+
+    // 🎭 MASTER BYPASS SIMULATION (Miroir direct accessible depuis le banc d'essais)
+    SimulationBypassActive      : BOOL := FALSE; // TRUE = Arme LimitLegal + TopLimitSoftware + TopLimitSwitch en mode MAINT
 END_VAR

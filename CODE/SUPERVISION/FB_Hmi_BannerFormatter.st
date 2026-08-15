@@ -105,11 +105,15 @@ IF HomingActive THEN
     END_IF;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     CASE CycleStep OF
-        E_CycleStep.INIT:
-            Banner.SequenceProgressText := 'Cycle: INITIALISATION (ATTENTE START)';
-        E_CycleStep.WORK_POS_SELECT:
+        E_CycleStep.X0_PREPARATION:
+            Banner.SequenceProgressText := 'Cycle: PREPARATION (ATTENTE START)';
+        E_CycleStep.X1_HOMING:
+            Banner.SequenceProgressText := 'Cycle: REFERENCEMENT CODEURS';
+        E_CycleStep.X2_WORK_POS_SELECT:
             Banner.SequenceProgressText := 'Cycle: SELECTION POSITION TRAVAIL';
-        E_CycleStep.DESCENDING_OPEN:
+        E_CycleStep.X3_OPEN_BUCKET:
+            Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
+        E_CycleStep.X4_DESCEND_OPEN:
             IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
                 Banner.SequenceProgressText := 'Cycle: DESCENTE > Kobold: 02_RECHERCHE_IMMERSION';
             ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
@@ -119,26 +123,24 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             ELSE
                 Banner.SequenceProgressText := 'Cycle: 01_DESCENTE_BENNE_OUVERTE';
             END_IF;
-        E_CycleStep.BOTTOM_TOUCH_WAIT:
+        E_CycleStep.X5_BOTTOM_CONFIRMED:
             Banner.SequenceProgressText := 'Cycle: 02_ATTENTE_FOND_TOUCHE';
-        E_CycleStep.SYNCHRO_ADJUST:
+        E_CycleStep.X6_CLOSE_BUCKET:
             Banner.SequenceProgressText := 'Cycle: 03_FERMETURE_BENNE_AU_FOND';
-        E_CycleStep.CTRL_ASCENDING:
+        E_CycleStep.X7_CTRL_ASCENT:
             Banner.SequenceProgressText := 'Cycle: 04_ARRACHAGE_ET_REMONTEE_LENTE_PALIER_1';
-        E_CycleStep.ASCENDING_LOADED:
+        E_CycleStep.X8_ASCENT_LOADED:
             Banner.SequenceProgressText := 'Cycle: 05_REMONTEE_NOMINALE_CHARGE';
-        E_CycleStep.DRAINING_PAUSE:
+        E_CycleStep.X9_DRAIN_PAUSE:
             Banner.SequenceProgressText := 'Cycle: 06_EGOUTTAGE_TEMPORISE';
-        E_CycleStep.TRANSLATION_MOVE:
+        E_CycleStep.X10_TRANSLATE_DUMP:
             Banner.SequenceProgressText := 'Cycle: 07_DEPLACEMENT_TRANSLATION_VERS_TREMIE';
-        E_CycleStep.DESCENDING_OPEN_DUMP:
+        E_CycleStep.X11_OPEN_DUMP:
             Banner.SequenceProgressText := 'Cycle: 08_DESCENTE_ET_OUVERTURE_BENNE_TREMIE';
-        E_CycleStep.RETURN_WORK_POS:
-            Banner.SequenceProgressText := 'Cycle: 09_RETOUR_POSITION_TRAVAIL';
-        E_CycleStep.READY:
+        E_CycleStep.X13_DONE_SYNC:
             Banner.SequenceProgressText := 'Cycle: 10_CYCLE_TERMINE_PRET';
-        E_CycleStep.ERROR_HOLD:
-            Banner.SequenceProgressText := 'Cycle: EN PAUSE SUR DEFAUT OU HOMME-MORT';
+        E_CycleStep.STABILIZING:
+            Banner.SequenceProgressText := 'Cycle: EN ATTENTE / STABILISATION';
     ELSE
         Banner.SequenceProgressText := 'Cycle: ETAPE EN COURS';
     END_CASE;
@@ -179,9 +181,9 @@ ELSIF CurrentMode = E_Mode.DISABLE THEN
 ELSIF NOT DeadmanArmed THEN
     Banner.OperatorActionText := '[JOYSTICK] Maintenir la gâchette homme-mort au neutre pour armer';
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    IF CycleStep = E_CycleStep.INIT THEN
+    IF CycleStep = E_CycleStep.X0_PREPARATION THEN
         Banner.OperatorActionText := '[IHM] Appuyer sur Start Cycle pour lancer la séquence';
-    ELSIF CycleStep = E_CycleStep.ERROR_HOLD THEN
+    ELSIF CycleStep = E_CycleStep.STABILIZING THEN
         Banner.OperatorActionText := '[JOYSTICK] Réarmer homme-mort puis réengager déflexion pour reprise';
     ELSE
         Banner.OperatorActionText := '[JOYSTICK] Maintenir déflexion active pour déroulement du cycle';

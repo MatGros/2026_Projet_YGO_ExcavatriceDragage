@@ -18,6 +18,7 @@ VAR_OUTPUT
     WinchM2Safety : ST_SafetyWinch;
     SyncState : ST_SyncState;
     BucketState : ST_BucketHMIState;
+    Benne_IsRoughlyClosed : BOOL;  // 🆕 TRUE = benne jugée fermée (tolérance matière 2 m) ; FALSE = ouverte/intermédiaire (revue SEMI_AUTO)
 END_VAR
 
 VAR
@@ -297,7 +298,8 @@ CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequen
     AND NOT _BucketState.IsClosed;
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    CmdBucketCloseArbitrated := FALSE;
+    // 🆕 Pont SEMI_AUTO (L3) : fermeture benne pilotée par le séquenceur de cycle.
+    CmdBucketCloseArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Close;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
     CmdBucketCloseArbitrated := TRUE;
 ELSIF CoupledAscentBucketCloseArmed THEN
@@ -312,7 +314,8 @@ END_IF;
 // calibrés). Avec le bypass (TglBypassDiveSearchSequence), le contacteur doit être piloté
 // INDÉPENDAMMENT de ces préconditions dès qu'on descend réellement.
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    KoboldContactorCmdArbitrated := FALSE;
+    // 🆕 Pont SEMI_AUTO (L3) : contacteur Kobold piloté par le séquenceur de cycle.
+    KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
 ELSE
     KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
         OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
@@ -338,7 +341,8 @@ instBucket(
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_03_Modes_Cycle.Auth.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR DumpAtTremieBucketOpenArmed OR CoupledDiveBucketOpenArmed,
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR DumpAtTremieBucketOpenArmed OR CoupledDiveBucketOpenArmed
+                           OR (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open),
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := MaintenanceMotionRequestActive,
     MotionDirection     := MaintenanceMotionDirection,
@@ -401,9 +405,11 @@ END_IF;
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    M1_Direction_Active := 0;
-    M1_StartStop_Active := FALSE;
-    M1_SpeedRef_Active  := 0.0;
+    // 🆕 Pont SEMI_AUTO (L3) : consomme les demandes du séquenceur de cycle.
+    // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
+    M1_Direction_Active := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
+    M1_StartStop_Active := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
+    M1_SpeedRef_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
 ELSE
     IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Mode Boutons IHM
@@ -449,9 +455,10 @@ IF instBucket.Busy AND instBucket.M2_StartStop THEN
     M2_SpeedRef_Active  := 15.0;
 ELSE
     IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-        M2_Direction_Active := 0;
-        M2_StartStop_Active := FALSE;
-        M2_SpeedRef_Active  := 0.0;
+        // 🆕 Pont SEMI_AUTO (L3) : consomme les demandes du séquenceur de cycle.
+        M2_Direction_Active := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
+        M2_StartStop_Active := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
+        M2_SpeedRef_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
     ELSE
         IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
             // Mode Boutons IHM
@@ -722,10 +729,14 @@ instSafetyWinchM1(
     // 🆕 2026-08-07 (demande client) : OR avec le bypass commun (Commun.Bypass) -- leve la
     // protection sur les 2 treuils simultanement pour le pilotage "both", sans retirer le
     // bypass individuel pour le pilotage a l'unite.
-    BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
-    BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
+    // 🔒 SÉCURITÉ : GVL_Simulation.SimulationBypassActive n'agit QUE si SimulationModeActive=TRUE (strictement inopérant sur machine réelle).
+    BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch
+                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
+    BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware
+                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
     BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
-    BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal,
+    BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal
+                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
@@ -776,10 +787,14 @@ instSafetyWinchM2(
     BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
     BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
     // 🆕 2026-08-07 : OR avec le bypass commun (Commun.Bypass) -- voir M1 ci-dessus
-    BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch,
-    BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware,
+    // 🔒 SÉCURITÉ : GVL_Simulation.SimulationBypassActive n'agit QUE si SimulationModeActive=TRUE (strictement inopérant sur machine réelle).
+    BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch
+                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
+    BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware
+                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
     BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
-    BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal,
+    BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal
+                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
@@ -1136,6 +1151,13 @@ BucketState.ControlAscentActive := ControlAscentActive;
 BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
+
+// 🆕 Tolérance matière benne (revue SEMI_AUTO) : « à peu près fermée » = fermée OU
+// intermédiaire proche de l'offset fermé (tolérance 2 m). Évite le blocage au fond sur
+// matière dense (galets) qui ne ferme jamais à 100% de la consigne fine.
+Benne_IsRoughlyClosed := _BucketState.IsClosed
+    OR (_BucketState.IsIntermediate
+        AND (instBucket.DeltaPosition_M >= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
 
 {endregion}
 END_PROGRAM

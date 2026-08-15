@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T03:27:48.158593" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T03:27:48.158593">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T11:18:13.756095" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T11:18:13.756095">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1024,16 +1024,14 @@ END_IF;
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // ⚠️ T106 : SelTarget forcé à 0 et jamais réarbitré par un séquenceur (FB_Cycle n'est pas
-    // instancié — audit M3 2026-08-05) → M3_StartStop_Active reste FALSE en pratique. Le
-    // AND PRG_02_Acquisition.JoystickDeadmanArmed exigé par AF08 §6 devra être ajouté ici
-    // au moment où le cycle SEMI_AUTO M3 sera réellement câblé, pas avant (rien à protéger
-    // aujourd'hui, ne pas figer une condition sur du code mort).
+    // 🆕 Pont SEMI_AUTO (L4) : consomme la demande du séquenceur de cycle.
+    // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M3_PositioningActive  := TRUE;
-    SelTarget    := 0;
-    M3_StartStop_Active  := FALSE;
-    M3_SpeedRef_Active   := 0.0;
+    SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
+    M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
+    M3_SpeedRef_Active   := 100.0;
 
+    // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
     IF SelTarget = 1 THEN
         M3_Direction_Active := 1;
     ELSE
@@ -3384,7 +3382,7 @@ Temps de fermeture contacteur de puissance</xhtml>
    🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
-                   (règles issues de DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §4)
+                   (règles issues de DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §4)
    🛠️ Frein à manque de courant : colle au repos (sécurité positive).
    📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
    📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)

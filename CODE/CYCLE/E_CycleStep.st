@@ -1,23 +1,26 @@
 (* ═══════════════════════════════════════════════════════════════
    🔄 E_CycleStep — Étapes de la machine d'état du cycle automatique
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §1
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3
+   🆕 v2.1 : refonte conforme §11bis R1-R9 — labels Xn, STABILIZING,
+      X12 supprimé (rebouclage trémie/treuils hauts).
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE E_CycleStep :
 (
-  INIT                 := 0,   (* Vérifs cohérence états + sécurités, mise en position init *)
-  WORK_POS_SELECT      := 1,   (* Choix opérateur pos travail 1/2 + déplacement validé joystick *)
-  DESCENDING_OPEN      := 2,   (* Plongée benne déjà ouvert, M1+M2 synchro *)
-  BOTTOM_TOUCH_WAIT    := 3,   (* Attente info BOOL capteur "fond touché" *)
-  SYNCHRO_ADJUST       := 4,   (* Désynchro M2 petite vitesse (offset X) → fermeture benne *)
-  CTRL_ASCENDING       := 5,   (* Remontée lente de contrôle (vérification fermeture) *)
-  ASCENDING_LOADED     := 6,   (* Remontée pleine vitesse charge *)
-  DRAINING_PAUSE       := 7,   (* Égouttage temporisé (durée RETAIN) *)
-  TRANSLATION_MOVE         := 8,   (* Déplacement translation M3 vers trémie *)
-  DESCENDING_OPEN_DUMP := 9,   (* Descente de vidage + ouverture benne *)
-  RETURN_WORK_POS      := 10,  (* Retour position travail (remontée synchro) *)
-  READY                := 11,  (* Cycle terminé, prêt à reboucler *)
-  ERROR_HOLD           := 12   (* Arrêt sûr figé sur défaut (SafeStop) *)
+  X0_PREPARATION      := 0,   (* 🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE *)
+  X1_HOMING           := 1,   (* 🆕 vitesses lentes pour chercher capteur top + référencement *)
+  X2_WORK_POS_SELECT  := 2,   (* sélection cible Trémie/P1/Maintenance + translation validée *)
+  X3_OPEN_BUCKET      := 3,   (* 🆕 ouverture benne (si déjà ouverte → passe vite) *)
+  X4_DESCEND_OPEN     := 4,   (* plongée benne ouverte, M1+M2 synchro, Kobold mesure ON *)
+  X5_BOTTOM_CONFIRMED := 5,   (* fond validé (FB_DiveSearch) ; arrêt descente *)
+  X6_CLOSE_BUCKET     := 6,   (* fermeture benne — tolérance « à peu près fermé » *)
+  X7_CTRL_ASCENT      := 7,   (* remontée palier 1 de contrôle *)
+  X8_ASCENT_LOADED    := 8,   (* remontée nominale jusqu'à limite haute *)
+  X9_DRAIN_PAUSE      := 9,   (* égouttage temporisé — temps affiché IHM *)
+  X10_TRANSLATE_DUMP  := 10,  (* translation vers trémie + avertissements IHM *)
+  X11_OPEN_DUMP       := 11,  (* ouverture benne = vidage ; montée possible, descente ouvre *)
+  X13_DONE_SYNC       := 13,  (* fin de cycle, synchronisation finale (R4) + compteur *)
+  STABILIZING         := 14   (* 🆕 état d'attente/stabilisation (ex-ERROR_HOLD) — pas une erreur *)
 );
 END_TYPE

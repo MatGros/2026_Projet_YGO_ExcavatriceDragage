@@ -2,7 +2,7 @@
    ↔️ ST_TranslationCmdDemand — Demande de commande translation M3 (depuis cycle)
    ───────────────────────────────────────────────────────────────
    📄 Doc : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
-            DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
+            DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
    🎯 Demande de mouvement pour translation M3 (depuis FB_Cycle).
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_TranslationCmdDemand :
