@@ -146,6 +146,11 @@ Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document :
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
 - [PLAN_TASK](DOC/WFLOW/PLAN_TASK.md) — 🗂️ **pilotage, pas une spec** : état des tâches, reliquats, TBD
+- [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
+  `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),
+  méthode `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md`, gabarit `TEMPLATE_Troubleshooting.md`,
+  fiches `TROUBLESHOOTING_<Sujet>_<date>.md`. Déclenché par « cherche le blocage » / « diagnostic » /
+  « troubleshooting » — bannière `MODE DÉPANNAGE / TROUBLESHOOTING ACTIF` au lancement.
 - [AUDIT_Coherence_Documentaire](ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md) — historique des décisions de conception
 
 **Plan de numérotation** : 1–3 fondations · 4–6 specs transverses (Cycle/Modes/E-S) · 8+ fonctions
