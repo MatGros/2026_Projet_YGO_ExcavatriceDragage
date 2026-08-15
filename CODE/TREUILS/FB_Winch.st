@@ -77,8 +77,8 @@ VAR_INPUT
     Mode                    : E_Mode;
     StartStop               : BOOL;
     SafeStop                : BOOL;
-    ForbidDescent           : BOOL;
-    ForbidAscent            : BOOL;
+    DescendPermit           : BOOL := TRUE;
+    AscentPermit            : BOOL := TRUE;
     Direction               : INT;
     SpeedRefPct             : REAL;
     SpeedStepTable          : ST_SpeedStepTable;
@@ -202,13 +202,13 @@ ResetEdge(CLK := Reset);
 
 DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirection <> 0);
 
-// 🆕 Mou de câble (ForbidDescent) et Fin de course haut (ForbidAscent) intégrés à une VRAIE
-// décélération rapide (comme SafeStop) :
-// - ForbidDescent est INHIBÉ si CommandedDirection = 1 (montée libre pour reprendre le mou)
-// - ForbidAscent est INHIBÉ si CommandedDirection = -1 (descente libre pour dégager le câble)
+// 🆕 Mou de câble / limite basse (DescendPermit=FALSE) et Fin de course haut (AscentPermit=FALSE)
+// intégrés à une VRAIE décélération rapide (comme SafeStop) :
+// - NOT DescendPermit est INHIBÉ si CommandedDirection = 1 (montée libre pour reprendre le mou)
+// - NOT AscentPermit est INHIBÉ si CommandedDirection = -1 (descente libre pour dégager le câble)
 EffectiveSafeStop := SafeStop 
-                     OR (ForbidDescent AND (CommandedDirection <> 1))
-                     OR (ForbidAscent AND (CommandedDirection <> -1));
+                     OR (NOT DescendPermit AND (CommandedDirection <> 1))
+                     OR (NOT AscentPermit AND (CommandedDirection <> -1));
 
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
@@ -366,11 +366,11 @@ END_IF;
 RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep > 0);
 RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep > 0);
 
-IF ForbidDescent THEN
+IF NOT DescendPermit THEN
     RelayRev := FALSE;
 END_IF;
 
-IF ForbidAscent THEN
+IF NOT AscentPermit THEN
     RelayFwd := FALSE;
 END_IF;
 

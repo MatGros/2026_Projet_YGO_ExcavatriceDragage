@@ -343,20 +343,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 Arrêt rapide activé par la sécurité</xhtml>
               </documentation>
             </variable>
-            <variable name="ForbidDescent">
+            <variable name="DescendPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚯 Descente interdite (détecteur mou de câble / limites)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Descente autorisée (TRUE = OK | FALSE = mou de câble / limite basse)</xhtml>
               </documentation>
             </variable>
-            <variable name="ForbidAscent">
+            <variable name="AscentPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚯 Montée interdite (fin de course haut)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Montée autorisée (TRUE = OK | FALSE = fin de course haut)</xhtml>
               </documentation>
             </variable>
             <variable name="SlackCable">
