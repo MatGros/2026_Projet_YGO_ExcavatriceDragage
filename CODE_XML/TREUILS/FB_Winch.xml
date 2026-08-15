@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:13:36.937524" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-13T23:13:36.937524">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T00:31:07.401328" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T00:31:07.401328">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -386,15 +386,21 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
             </variable>
-            <variable name="ForbidDescent">
+            <variable name="DescendPermit">
               <type>
                 <BOOL />
               </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
             </variable>
-            <variable name="ForbidAscent">
+            <variable name="AscentPermit">
               <type>
                 <BOOL />
               </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
             </variable>
             <variable name="Direction">
               <type>
@@ -981,13 +987,13 @@ ResetEdge(CLK := Reset);
 
 DirectionChangePending := (Direction &lt;&gt; CommandedDirection) AND (CommandedDirection &lt;&gt; 0);
 
-// 🆕 Mou de câble (ForbidDescent) et Fin de course haut (ForbidAscent) intégrés à une VRAIE
-// décélération rapide (comme SafeStop) :
-// - ForbidDescent est INHIBÉ si CommandedDirection = 1 (montée libre pour reprendre le mou)
-// - ForbidAscent est INHIBÉ si CommandedDirection = -1 (descente libre pour dégager le câble)
+// 🆕 Mou de câble / limite basse (DescendPermit=FALSE) et Fin de course haut (AscentPermit=FALSE)
+// intégrés à une VRAIE décélération rapide (comme SafeStop) :
+// - NOT DescendPermit est INHIBÉ si CommandedDirection = 1 (montée libre pour reprendre le mou)
+// - NOT AscentPermit est INHIBÉ si CommandedDirection = -1 (descente libre pour dégager le câble)
 EffectiveSafeStop := SafeStop 
-                     OR (ForbidDescent AND (CommandedDirection &lt;&gt; 1))
-                     OR (ForbidAscent AND (CommandedDirection &lt;&gt; -1));
+                     OR (NOT DescendPermit AND (CommandedDirection &lt;&gt; 1))
+                     OR (NOT AscentPermit AND (CommandedDirection &lt;&gt; -1));
 
 RampTargetPct := 0.0;
 IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
@@ -1145,11 +1151,11 @@ END_IF;
 RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep &gt; 0);
 RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep &gt; 0);
 
-IF ForbidDescent THEN
+IF NOT DescendPermit THEN
     RelayRev := FALSE;
 END_IF;
 
-IF ForbidAscent THEN
+IF NOT AscentPermit THEN
     RelayFwd := FALSE;
 END_IF;
 

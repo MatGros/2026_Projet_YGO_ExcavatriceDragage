@@ -226,8 +226,8 @@ VAR_OUTPUT
     State               : E_State;
     StateAtError        : E_State;
     SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si NOT SyncEnable)
-    ForbidDescent       : BOOL;        // ⬇️ Interdit descente uniquement — bit6 (limite basse câble)
-    ForbidAscent        : BOOL;        // ⬆️ Interdit montée uniquement — bit5 (fin course haut) OU bit3+(NOT SyncEnable) (récupération mou câble)
+    DescendPermit       : BOOL;        // 🟢 Autorise descente — TRUE = OK, FALSE = interdit (bit6 limite basse câble, mou câble mode récup)
+    AscentPermit        : BOOL;        // 🟢 Autorise montée — TRUE = OK, FALSE = interdit (bit5 fin course haut)
     PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont réelle — bits 2/7/8/9/10/11 (voir bandeau en-tête)
 
     // 🆕 REX 2026-07-08 : diagnostic/réglage tolérances — miroirs des bricks internes, à consommer
@@ -578,48 +578,23 @@ ELSE
     SafeStop := (ErrorId AND 16#FF9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
-// ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) OU bit3+(NOT SyncEnable) (mou de câble en mode récupération) ou si contacteur coupé
-// 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur bas activé
-// 🔧 REX 2026-08-07 (demande client, audit confirmé) : terme INDÉPENDANT ajouté — check brut sur
-// la limite basse physique (même condition que le calcul du bit6 ci-dessus §3septies, mais évalué
-// HORS du bloc masqué par BypassGlobal), gardé UNIQUEMENT par BypassCableLimitSwitch. Même doctrine
-// que le check brut ForbidAscent ci-dessous (déjà présent) : BypassGlobal M1/M2 continue de masquer
-// Méca A-E/thermique/phase/comm/sync comme aujourd'hui, mais ne doit plus jamais désactiver l'arrêt
-// physique sur fin de course haute/basse — sécurité positive, seul un bypass individuel conscient
-// (BypassCableLimitSwitch) peut lever CETTE protection précise.
-// 🆕 2026-08-07 (demande client) : LimitLegalReached n'était câblé QUE dans FB_Cycle (séquenceur
-// semi-auto), jamais ici — la descente manuelle au joystick pouvait dépasser la profondeur légale
-// sans aucun blocage réel. Pas de nouveau bit ErrorId (WORD déjà plein, bits 0-15 tous utilisés) :
-// même doctrine que le terme câble ci-dessus, un OR direct sur ForbidDescent. Bypassable par
-// BypassProcess (groupé) ou BypassLimitLegal (individuel, MAINT_N2) — jamais par BypassGlobal seul
-// (cohérent avec la doctrine 2026-08-07 : BypassGlobal ne masque plus les protections de position).
-// 🆕 2026-08-15 (T111) : Mou de câble en mode récupération (bit3 + NOT SyncEnable) bloque la
-// DESCENDRE (ForbidDescent) pour éviter de dérouler du câble dans le vide au tambour. L'enroulement
-// (Montée) est au contraire autorisé pour retendre le câble ou fermer la benne.
-ForbidDescent := (((ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
-              OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
-              OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
-              OR (((ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal));
+// ⬇️ DescendPermit : TRUE = descente autorisée (pas de limite basse, pas de mou câble en mode récup, contacteur engagé)
+// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (Permit = NOT Forbid).
+DescendPermit := NOT (
+    (((ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
+    OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
+    OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
+    OR (((ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
+);
 
-// ⬆️ ForbidAscent : bit5 (fin course haut) (bypasser si BypassTopLimitSwitch)
-// 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement
-// 🔧 REX 2026-08-07 (demande client, audit confirmé) : BypassGlobal RETIRÉ du ET final — la ligne
-// "Sécurité positive maintenue" ci-dessus était contredite par l'ancien `AND NOT (BypassGlobal OR
-// BypassTopLimitSwitch)` qui masquait quand même le check brut sous BypassGlobal M1/M2. Désormais
-// seul BypassTopLimitSwitch (individuel, conscient) peut lever cette protection précise — le reste
-// du domaine (Méca A-E/thermique/phase/comm/sync) reste masqué par BypassGlobal comme avant.
-// 🆕 2026-08-07 (2) (demande client) : jusqu'ici AUCUN blocage immédiat en montée ne reposait sur
-// la position calculée (CablePosM >= TopLimitM) — seul Méca D (bit11) la surveillait, en escalade
-// DIFFÉRÉE (SafeStop+PowerCutOff après PostRampTimeout), pas un ForbidAscent immédiat. Si le
-// capteur physique reste bloqué "libre" (défaut NC jamais détecté), rien n'arrêtait la montée avant
-// Méca D. Ajout d'un second terme, symétrique au check logiciel déjà présent côté ForbidDescent
-// (CfgCableLimitDescentM ci-dessus) : blocage immédiat dès CablePosM >= TopLimitM (si référencé et
-// non suspect), gardé UNIQUEMENT par BypassTopLimitSoftware (jamais par BypassGlobal, même doctrine
-// que le reste des protections de position 2026-08-07).
-ForbidAscent := (((ErrorId AND 16#0020) <> 16#0000
-             OR (NOT TopPositionSensor AND NOT InReferencingMode))
-             AND NOT BypassTopLimitSwitch)
-             OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM)) AND NOT BypassTopLimitSoftware);
+// ⬆️ AscentPermit : TRUE = montée autorisée (pas de fin course haut, pas de dépassement position)
+// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (Permit = NOT Forbid).
+AscentPermit := NOT (
+    (((ErrorId AND 16#0020) <> 16#0000
+    OR (NOT TopPositionSensor AND NOT InReferencingMode))
+    AND NOT BypassTopLimitSwitch)
+    OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM)) AND NOT BypassTopLimitSoftware)
+);
 
 // 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,

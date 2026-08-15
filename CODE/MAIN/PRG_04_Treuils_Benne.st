@@ -77,8 +77,8 @@ VAR
 
     BottomLimitM1_Active    : REAL;
     BottomLimitM2_Active    : REAL;
-    ForbidDescentM1_Active  : BOOL;
-    ForbidDescentM2_Active  : BOOL;
+    DescendPermitM1_Active  : BOOL;
+    DescendPermitM2_Active  : BOOL;
 
     CableLimitAscentM1Reached : BOOL;
     CableLimitAscentM2Reached : BOOL;
@@ -87,12 +87,12 @@ VAR
     SafeStopM2_Raw          : BOOL;
     SafeStopM1_Active       : BOOL;
     SafeStopM2_Active       : BOOL;
-    ForbidDescentM1_Raw     : BOOL;
-    ForbidDescentM2_Raw     : BOOL;
-    ForbidAscentM1_Raw      : BOOL;
-    ForbidAscentM2_Raw      : BOOL;
-    ForbidAscentM1_Active   : BOOL;
-    ForbidAscentM2_Active   : BOOL;
+    DescendPermitM1_Raw     : BOOL;
+    DescendPermitM2_Raw     : BOOL;
+    AscentPermitM1_Raw      : BOOL;
+    AscentPermitM2_Raw      : BOOL;
+    AscentPermitM1_Active   : BOOL;
+    AscentPermitM2_Active   : BOOL;
 
     BenneBusyFallEdge     : F_TRIG;
 
@@ -101,10 +101,10 @@ VAR
     KoboldAutoStopFallEdge  : F_TRIG;
     KoboldImmersionConfirmed: BOOL;
     KoboldBottomTouchLatched: BOOL;
-    ForbidDescentDiveBucketClosed : BOOL; // 🆕 2026-08-07 (10) : mode Dive actif + benne pas ouverte -- interdit descente
+    DescendPermitDiveBucketOpen : BOOL; // 🆕 2026-08-07 (10) / 2026-08-15 : mode Dive actif + benne ouverte = descente permise
     // 🆕 2026-08-07 (18) : pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1
     ManualBucketLimitsActive : BOOL;
-    ForbidAscentExtractionBottomNotConfirmed : BOOL; // 🆕 2026-08-07 (11) : mode Extraction actif + fond pas confirmé -- interdit montée
+    AscentPermitExtractionBottomConfirmed : BOOL; // 🆕 2026-08-07 (11) / 2026-08-15 : mode Extraction actif
     CoupledAscentBucketNotClosedSlowSpeed : BOOL; // 🆕 2026-08-15 (T114) : benne pas fermée à 100% à la montée -- force palier 1 au lieu de bloquer
 
     // 🆕 2026-08-07 (9) : bypass simplifié séquence FB_DiveSearch (demande client) -- front montant
@@ -637,11 +637,11 @@ END_IF;
 // 🔴🔧 REX 2026-08-07 (10) — retour terrain, GAP RÉEL CONFIRMÉ : instDiveSearch.DescendPermit
 // était calculé (FB_DiveSearch.st) mais JAMAIS consommé nulle part dans PRG_04/PRG_06 -- en
 // mode Dive actif, rien n'empêchait réellement de descendre benne fermée, malgré la précondition
-// FB_DiveSearch (BucketIsOpen requis pour READY_TO_DESCEND). Ajouté : interdiction directe et
+// FB_DiveSearch (BucketIsOpen requis pour READY_TO_DESCEND). Ajouté : autorisation directe et
 // explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif) -- indépendante du
 // timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
-ForbidDescentDiveBucketClosed := instDiveSearch.Enable AND MaintenanceMotionRequestActive
-    AND (MaintenanceMotionDirection = -1) AND NOT _BucketState.IsOpen;
+DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND MaintenanceMotionRequestActive
+    AND (MaintenanceMotionDirection = -1) AND NOT _BucketState.IsOpen);
 
 // 🔴🔧 REX 2026-08-07 (17) — retour terrain : BypassKoboldBottomTouched confirmait le fond
 // (pour Extraction) mais ne bloquait pas la descente elle-même -- seul KoboldBottomTouchLatched
@@ -654,13 +654,13 @@ ForbidDescentDiveBucketClosed := instDiveSearch.Enable AND MaintenanceMotionRequ
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
 
-ForbidDescentM1_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched;
+DescendPermitM1_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
 // 🔴🔧 REX 2026-08-07 (21bis) — retour terrain, DÉPASSEMENT CONFIRMÉ : ce chemin (pilotage
 // unitaire M2, hors instBucket) n'avait AUCUNE anticipation d'inertie, contrairement au CASE
 // BUSY de FB_Bucket (correctif 20) -- même OpenAnticipationM/CloseAnticipationM réutilisé ici
 // pour couvrir aussi le jog unitaire.
-ForbidDescentM2_Raw := KoboldBottomTouchLatched OR ForbidDescentDiveBucketClosed OR BypassKoboldBottomTouched
-    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 <= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
+DescendPermitM2_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 <= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
@@ -782,8 +782,8 @@ instSafetyWinchM2(
 
 SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
 SafeStopM2_Raw := SafeStopM2_Raw OR instSafetyWinchM2.SafeStop;
-ForbidDescentM1_Raw := ForbidDescentM1_Raw OR instSafetyWinchM1.ForbidDescent;
-ForbidDescentM2_Raw := ForbidDescentM2_Raw OR instSafetyWinchM2.ForbidDescent;
+DescendPermitM1_Raw := DescendPermitM1_Raw AND instSafetyWinchM1.DescendPermit;
+DescendPermitM2_Raw := DescendPermitM2_Raw AND instSafetyWinchM2.DescendPermit;
 
 // 🆕 2026-08-07 (mode "vidage à la trémie", demande client) : descente M1 ET M2 interdite tant
 // que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
@@ -791,8 +791,8 @@ ForbidDescentM2_Raw := ForbidDescentM2_Raw OR instSafetyWinchM2.ForbidDescent;
 GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked :=
     DumpAtTremieAssistActive AND NOT (PRG_05_Translation.M3_AtP1Stable OR PRG_05_Translation.M3_AtMaintenanceStable);
 IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
-    ForbidDescentM1_Raw := TRUE;
-    ForbidDescentM2_Raw := TRUE;
+    DescendPermitM1_Raw := FALSE;
+    DescendPermitM2_Raw := FALSE;
 END_IF;
 // 🔴🔧 REX 2026-08-07 (11) — MÊME CLASSE DE BUG QUE (10) : instExtractionSequence.AscentPermit
 // calculé (FB_ExtractionSequence.st) mais jamais consommé -- rien n'empêchait réellement de monter
@@ -802,23 +802,23 @@ END_IF;
 // instBucket.Busy et M2 doit continuer sans coupure).
 // 🔴🔧 REX 2026-08-07 (22) — retour terrain, demande client explicite : retiré. L'interdiction de
 // montée sans fond confirmé (correctif 11) gênait les essais même sans mode assistance actif.
-// ForbidAscentExtractionBottomNotConfirmed reste calculé (diagnostic IHM), mais n'est plus
-// appliqué à ForbidAscentM1_Raw/M2_Raw.
-ForbidAscentExtractionBottomNotConfirmed := instExtractionSequence.Enable
+// AscentPermitExtractionBottomConfirmed reste calculé (diagnostic IHM), mais n'est plus
+// appliqué à AscentPermitM1_Raw/M2_Raw.
+AscentPermitExtractionBottomConfirmed := NOT (instExtractionSequence.Enable
     AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)
-    AND (instExtractionSequence.ExtractionState = E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION);
+    AND (instExtractionSequence.ExtractionState = E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION));
 
-ForbidAscentM1_Raw  := instSafetyWinchM1.ForbidAscent;
-ForbidAscentM2_Raw  := instSafetyWinchM2.ForbidAscent
-    // 🔴🔧 REX 2026-08-07 (21bis) — même correctif d'anticipation que ForbidDescentM2_Raw ci-dessus.
-    OR (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 >= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
+AscentPermitM1_Raw  := instSafetyWinchM1.AscentPermit;
+AscentPermitM2_Raw  := instSafetyWinchM2.AscentPermit
+    // 🔴🔧 REX 2026-08-07 (21bis) — même correctif d'anticipation que DescendPermitM2_Raw ci-dessus.
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 >= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
-ForbidDescentM1_Active := ForbidDescentM1_Raw OR (instWinchSync.SyncActive AND ForbidDescentM2_Raw);
-ForbidDescentM2_Active := ForbidDescentM2_Raw OR (instWinchSync.SyncActive AND ForbidDescentM1_Raw);
-ForbidAscentM1_Active  := ForbidAscentM1_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM2_Raw);
-ForbidAscentM2_Active  := ForbidAscentM2_Raw  OR (instWinchSync.SyncActive AND ForbidAscentM1_Raw);
+DescendPermitM1_Active := DescendPermitM1_Raw AND (NOT instWinchSync.SyncActive OR DescendPermitM2_Raw);
+DescendPermitM2_Active := DescendPermitM2_Raw AND (NOT instWinchSync.SyncActive OR DescendPermitM1_Raw);
+AscentPermitM1_Active  := AscentPermitM1_Raw  AND (NOT instWinchSync.SyncActive OR AscentPermitM2_Raw);
+AscentPermitM2_Active  := AscentPermitM2_Raw  AND (NOT instWinchSync.SyncActive OR AscentPermitM1_Raw);
 
 
 {endregion}
@@ -833,8 +833,8 @@ instWinchM1(
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
     StartStop               := M1_StartStop_Active,
     SafeStop                := SafeStopM1_Active,
-    ForbidDescent           := ForbidDescentM1_Active,
-    ForbidAscent            := ForbidAscentM1_Active,
+    DescendPermit           := DescendPermitM1_Active,
+    AscentPermit            := AscentPermitM1_Active,
     Direction               := M1_Direction_Active,
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := _WinchSpeedStepTable,
@@ -863,8 +863,8 @@ instWinchM2(
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
     StartStop               := M2_StartStop_Active,
     SafeStop                := SafeStopM2_Active,
-    ForbidDescent           := ForbidDescentM2_Active,
-    ForbidAscent            := ForbidAscentM2_Active,
+    DescendPermit           := DescendPermitM2_Active,
+    AscentPermit            := AscentPermitM2_Active,
     Direction               := M2_Direction_Active,
     SpeedRefPct             := M2_SpeedRef_Active,
     SpeedStepTable          := M2_SpeedStepTableActive,
@@ -1058,8 +1058,8 @@ WinchM2State.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElap
 WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
 
 WinchM1Safety.SafeStop := SafeStopM1_Active;
-WinchM1Safety.ForbidAscent := ForbidAscentM1_Active;
-WinchM1Safety.ForbidDescent := ForbidDescentM1_Active;
+WinchM1Safety.AscentPermit := AscentPermitM1_Active;
+WinchM1Safety.DescendPermit := DescendPermitM1_Active;
 WinchM1Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
 WinchM1Safety.PowerCutOff := instSafetyWinchM1.PowerCutOff;
 WinchM1Safety.BrakeTimeoutFault := (PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId AND 16#0001) <> 0;
@@ -1081,8 +1081,8 @@ WinchM1Safety.SafeStopSafety     := PRG_06_Outputs_LD.M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := PRG_06_Outputs_LD.M1BlockedBySafetyInfo;
 
 WinchM2Safety.SafeStop := SafeStopM2_Active;
-WinchM2Safety.ForbidAscent := ForbidAscentM2_Active;
-WinchM2Safety.ForbidDescent := ForbidDescentM2_Active;
+WinchM2Safety.AscentPermit := AscentPermitM2_Active;
+WinchM2Safety.DescendPermit := DescendPermitM2_Active;
 WinchM2Safety.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
 WinchM2Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
 WinchM2Safety.PowerCutOff := instSafetyWinchM2.PowerCutOff;
