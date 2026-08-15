@@ -28180,6 +28180,14 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (11) : mode Extraction actif + fond pas confirmé -- interdit montée</xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledAscentBucketNotClosedSlowSpeed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-15 (T114) : benne pas fermée à 100% à la montée -- force palier 1 au lieu de bloquer</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassKoboldFallEdge">
               <type>
                 <derived name="F_TRIG" />
@@ -28486,19 +28494,14 @@ instBucket(
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
 
-// 🔴🔧 REX 2026-08-07 (retour terrain, TROU DE SÉCURITÉ RÉEL CONFIRMÉ SUR MACHINE) : la Fiche 01
-// bloquait M1 UNIQUEMENT via "NOT instBucket.Busy" (voir M1_StartStop_Active/M2_StartStop_Active
-// plus bas) -- en pariant que instBucket passerait bien en BUSY dès que CmdOpen_IHM/CmdClose_IHM
-// est armé. Si instBucket a un DÉFAUT ACTIF (Error/SevereError, ex. timeout d'une tentative
-// précédente), FB_Bucket refuse d'armer CloseReq/OpenReq (`AND NOT SevereError`) -- Busy reste
-// FALSE en PERMANENCE, et plus RIEN ne bloque M1 ni M2 : confirmé en test réel, la benne restée
-// ouverte n'empêchait plus la montée des 2 treuils après un 2e appui. Corrigé : blocage DIRECT,
-// INDÉPENDANT de FB_Bucket -- si l'auto-séquencement a été armé (Coupled*Armed) mais que
-// instBucket n'est PAS effectivement occupé à l'exécuter (Busy=FALSE, quelle qu'en soit la
-// raison : défaut, précondition non remplie, timing), le mouvement couplé reste bloqué. Défense
-// en profondeur : la règle tient même si FB_Bucket est en défaut, jamais uniquement "pariée" sur
-// son bon fonctionnement.
-CoupledMotionBlockedByBucket := (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed) AND NOT instBucket.Busy;
+// 🔴🔧 REX 2026-08-07 / 2026-08-15 (T114) : Auto-séquencement benne &amp; Dégradation Palier 1
+// Si la benne est en cours de fermeture/ouverture (instBucket.Busy), le mouvement couplé attend.
+// 🆕 T114 : Si la benne n'est pas fermée (NOT IsClosed) à la montée (CoupledAscentBucketCloseArmed)
+// et que instBucket n'est plus occupé (Busy=FALSE, ex: benne bloquée sur obstacle, timeout ou
+// décalage codeur), on NE BLOQUE PLUS TOTALEMENT la remontée (ce qui bloquerait la benne au fond),
+// mais on dégrade automatiquement la montée au Palier 1 (Vitesse lente, voir instWinchM1/M2).
+CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Busy;
+CoupledAscentBucketNotClosedSlowSpeed := CoupledAscentBucketCloseArmed AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
 
 SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000;
 SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &gt; 0.0);
@@ -28972,7 +28975,7 @@ instWinchM1(
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepAscent, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1 OR CoupledAscentBucketNotClosedSlowSpeed, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := NOT instWinchSync.Error,
@@ -29009,8 +29012,9 @@ instWinchM2(
     // CfgMaxStepDescente n'avait AUCUN plafond, jamais. Corrigé : les deux suivent maintenant
     // instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
     // 🆕 2026-08-15 (T113) : instWinchSync.SyncDegradedStep1 dégrade M2 au Palier 1 sur écart modéré.
+    // 🆕 2026-08-15 (T114) : CoupledAscentBucketNotClosedSlowSpeed dégrade la montée au Palier 1 si benne non fermée/obstruée.
     CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepAscent, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1 OR CoupledAscentBucketNotClosedSlowSpeed, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Error,
