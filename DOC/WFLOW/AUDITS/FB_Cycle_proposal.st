@@ -1,7 +1,8 @@
 (* ═══════════════════════════════════════════════════════════════
    🔄 FB_Cycle — Séquenceur du Cycle Automatique (Grafcet de dragage)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md
+            DOC/WFLOW/AUDITS/DESIGN_SEMI_AUTO_CYCLE_v0.1.md
    🔌 Conforme au contrat FB standard (Partie3 §1bis) + §11bis R1-R9.
    🧩 Deux instances : instCycleMaintenance (MAINT_N1/N2) et
       instCycleSemiAuto (SEMI_AUTO) — gating sorties par mode.
@@ -85,9 +86,7 @@ VAR_OUTPUT
     CycleStep               : E_CycleStep;  // Étape active du Grafcet
     CycleStateStr           : STRING(80);   // Libellé en clair de l'étape (Xn - texte)
     CycleStepAtError        : E_CycleStep;  // 🧊 Étape spécifique au moment du défaut (R9)
-END_VAR
-VAR_IN_OUT
-    SampleCount             : INT;          // 🆕 Compteur de prélèvements (RETAIN, Q3bis) — référence vers _CycleSampleCount
+    SampleCount             : INT;          // 🆕 Compteur de prélèvements (RETAIN, Q3bis)
 END_VAR
 VAR
     ResetEdge               : R_TRIG;
@@ -233,10 +232,8 @@ CASE State OF
         BucketCmd.Open := FALSE; BucketCmd.Close := FALSE; BucketCmd.KoboldContactorCmd := FALSE;
         Busy := FALSE; Done := FALSE;
 
-        // Transition si système sain et réarmé (front reset ou démarrage).
-        // 🔫 D2 : l'appui homme-mort (DeadmanArmed) est requis pour INITIER le cycle ;
-        // la continuité des mouvements ne dépend que de CycleMotionPermit (manche défléchi).
-        IF StartEdge.Q AND DeadmanArmed THEN
+        // Transition si système sain et réarmé (front reset ou démarrage)
+        IF StartEdge.Q THEN
             State := E_CycleStep.X1_HOMING;
         END_IF;
 
@@ -264,7 +261,7 @@ CASE State OF
 
     E_CycleStep.X2_WORK_POS_SELECT:
         CycleStep := E_CycleStep.X2_WORK_POS_SELECT;
-        CycleStateStr := 'X2 - Sélection position travail';
+        CycleStateStr := 'X2 - Sélection position travail (P1)';
         Busy := TRUE;
 
         // 🆕 Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).

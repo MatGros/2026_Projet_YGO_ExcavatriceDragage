@@ -1,6 +1,6 @@
 (* ═══════════════════════════════════════════════════════════════
    🌊 E_DiveSearchState — Phases internes de recherche du fond Kobold
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.0.md §3ter
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
    ═══════════════════════════════════════════════════════════════ *)
 TYPE E_DiveSearchState :
 (

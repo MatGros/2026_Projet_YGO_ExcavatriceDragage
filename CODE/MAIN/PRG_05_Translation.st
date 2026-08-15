@@ -134,16 +134,14 @@ END_IF;
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // ⚠️ T106 : SelTarget forcé à 0 et jamais réarbitré par un séquenceur (FB_Cycle n'est pas
-    // instancié — audit M3 2026-08-05) → M3_StartStop_Active reste FALSE en pratique. Le
-    // AND PRG_02_Acquisition.JoystickDeadmanArmed exigé par AF08 §6 devra être ajouté ici
-    // au moment où le cycle SEMI_AUTO M3 sera réellement câblé, pas avant (rien à protéger
-    // aujourd'hui, ne pas figer une condition sur du code mort).
+    // 🆕 Pont SEMI_AUTO (L4) : consomme la demande du séquenceur de cycle.
+    // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M3_PositioningActive  := TRUE;
-    SelTarget    := 0;
-    M3_StartStop_Active  := FALSE;
-    M3_SpeedRef_Active   := 0.0;
+    SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
+    M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
+    M3_SpeedRef_Active   := 100.0;
 
+    // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
     IF SelTarget = 1 THEN
         M3_Direction_Active := 1;
     ELSE

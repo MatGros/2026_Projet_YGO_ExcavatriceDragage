@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T03:57:48.105728" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T03:57:48.105728">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T11:18:52.069699" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T11:18:52.069699">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -27,19 +27,20 @@
         <baseType>
           <enum>
             <values>
-              <value name="INIT" value="0" />
-              <value name="WORK_POS_SELECT" value="1" />
-              <value name="DESCENDING_OPEN" value="2" />
-              <value name="BOTTOM_TOUCH_WAIT" value="3" />
-              <value name="SYNCHRO_ADJUST" value="4" />
-              <value name="CTRL_ASCENDING" value="5" />
-              <value name="ASCENDING_LOADED" value="6" />
-              <value name="DRAINING_PAUSE" value="7" />
-              <value name="TRANSLATION_MOVE" value="8" />
-              <value name="DESCENDING_OPEN_DUMP" value="9" />
-              <value name="RETURN_WORK_POS" value="10" />
-              <value name="READY" value="11" />
-              <value name="ERROR_HOLD" value="12" />
+              <value name="X0_PREPARATION" value="0" />
+              <value name="X1_HOMING" value="1" />
+              <value name="X2_WORK_POS_SELECT" value="2" />
+              <value name="X3_OPEN_BUCKET" value="3" />
+              <value name="X4_DESCEND_OPEN" value="4" />
+              <value name="X5_BOTTOM_CONFIRMED" value="5" />
+              <value name="X6_CLOSE_BUCKET" value="6" />
+              <value name="X7_CTRL_ASCENT" value="7" />
+              <value name="X8_ASCENT_LOADED" value="8" />
+              <value name="X9_DRAIN_PAUSE" value="9" />
+              <value name="X10_TRANSLATE_DUMP" value="10" />
+              <value name="X11_OPEN_DUMP" value="11" />
+              <value name="X13_DONE_SYNC" value="13" />
+              <value name="STABILIZING" value="14" />
             </values>
           </enum>
         </baseType>
@@ -47,81 +48,87 @@
           <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
             <EnumValueDocumentation>
               <EnumValue>
-                <Name>INIT</Name>
+                <Name>X0_PREPARATION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vérifs cohérence états + sécurités, mise en position init</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>WORK_POS_SELECT</Name>
+                <Name>X1_HOMING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Choix opérateur pos travail 1/2 + déplacement validé joystick</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 vitesses lentes pour chercher capteur top + référencement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>DESCENDING_OPEN</Name>
+                <Name>X2_WORK_POS_SELECT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne déjà ouvert, M1+M2 synchro</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>BOTTOM_TOUCH_WAIT</Name>
+                <Name>X3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente info BOOL capteur "fond touché"</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 ouverture benne (si déjà ouverte → passe vite)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>SYNCHRO_ADJUST</Name>
+                <Name>X4_DESCEND_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désynchro M2 petite vitesse (offset X) → fermeture benne</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>CTRL_ASCENDING</Name>
+                <Name>X5_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée lente de contrôle (vérification fermeture)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>ASCENDING_LOADED</Name>
+                <Name>X6_CLOSE_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée pleine vitesse charge</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fermeture benne — tolérance « à peu près fermé »</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>DRAINING_PAUSE</Name>
+                <Name>X7_CTRL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé (durée RETAIN)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée palier 1 de contrôle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>TRANSLATION_MOVE</Name>
+                <Name>X8_ASCENT_LOADED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Déplacement translation M3 vers trémie</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée nominale jusqu'à limite haute</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>DESCENDING_OPEN_DUMP</Name>
+                <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente de vidage + ouverture benne</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">égouttage temporisé — temps affiché IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>RETURN_WORK_POS</Name>
+                <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour position travail (remontée synchro)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">translation vers trémie + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>READY</Name>
+                <Name>X11_OPEN_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle terminé, prêt à reboucler</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>ERROR_HOLD</Name>
+                <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrêt sûr figé sur défaut (SafeStop)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STABILIZING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 état d'attente/stabilisation (ex-ERROR_HOLD) — pas une erreur</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -611,11 +618,15 @@ IF HomingActive THEN
     END_IF;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     CASE CycleStep OF
-        E_CycleStep.INIT:
-            Banner.SequenceProgressText := 'Cycle: INITIALISATION (ATTENTE START)';
-        E_CycleStep.WORK_POS_SELECT:
+        E_CycleStep.X0_PREPARATION:
+            Banner.SequenceProgressText := 'Cycle: PREPARATION (ATTENTE START)';
+        E_CycleStep.X1_HOMING:
+            Banner.SequenceProgressText := 'Cycle: REFERENCEMENT CODEURS';
+        E_CycleStep.X2_WORK_POS_SELECT:
             Banner.SequenceProgressText := 'Cycle: SELECTION POSITION TRAVAIL';
-        E_CycleStep.DESCENDING_OPEN:
+        E_CycleStep.X3_OPEN_BUCKET:
+            Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
+        E_CycleStep.X4_DESCEND_OPEN:
             IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
                 Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 02_RECHERCHE_IMMERSION';
             ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
@@ -625,26 +636,24 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             ELSE
                 Banner.SequenceProgressText := 'Cycle: 01_DESCENTE_BENNE_OUVERTE';
             END_IF;
-        E_CycleStep.BOTTOM_TOUCH_WAIT:
+        E_CycleStep.X5_BOTTOM_CONFIRMED:
             Banner.SequenceProgressText := 'Cycle: 02_ATTENTE_FOND_TOUCHE';
-        E_CycleStep.SYNCHRO_ADJUST:
+        E_CycleStep.X6_CLOSE_BUCKET:
             Banner.SequenceProgressText := 'Cycle: 03_FERMETURE_BENNE_AU_FOND';
-        E_CycleStep.CTRL_ASCENDING:
+        E_CycleStep.X7_CTRL_ASCENT:
             Banner.SequenceProgressText := 'Cycle: 04_ARRACHAGE_ET_REMONTEE_LENTE_PALIER_1';
-        E_CycleStep.ASCENDING_LOADED:
+        E_CycleStep.X8_ASCENT_LOADED:
             Banner.SequenceProgressText := 'Cycle: 05_REMONTEE_NOMINALE_CHARGE';
-        E_CycleStep.DRAINING_PAUSE:
+        E_CycleStep.X9_DRAIN_PAUSE:
             Banner.SequenceProgressText := 'Cycle: 06_EGOUTTAGE_TEMPORISE';
-        E_CycleStep.TRANSLATION_MOVE:
+        E_CycleStep.X10_TRANSLATE_DUMP:
             Banner.SequenceProgressText := 'Cycle: 07_DEPLACEMENT_TRANSLATION_VERS_TREMIE';
-        E_CycleStep.DESCENDING_OPEN_DUMP:
+        E_CycleStep.X11_OPEN_DUMP:
             Banner.SequenceProgressText := 'Cycle: 08_DESCENTE_ET_OUVERTURE_BENNE_TREMIE';
-        E_CycleStep.RETURN_WORK_POS:
-            Banner.SequenceProgressText := 'Cycle: 09_RETOUR_POSITION_TRAVAIL';
-        E_CycleStep.READY:
+        E_CycleStep.X13_DONE_SYNC:
             Banner.SequenceProgressText := 'Cycle: 10_CYCLE_TERMINE_PRET';
-        E_CycleStep.ERROR_HOLD:
-            Banner.SequenceProgressText := 'Cycle: EN PAUSE SUR DEFAUT OU HOMME-MORT';
+        E_CycleStep.STABILIZING:
+            Banner.SequenceProgressText := 'Cycle: EN ATTENTE / STABILISATION';
     ELSE
         Banner.SequenceProgressText := 'Cycle: ETAPE EN COURS';
     END_CASE;
@@ -685,9 +694,9 @@ ELSIF CurrentMode = E_Mode.DISABLE THEN
 ELSIF NOT DeadmanArmed THEN
     Banner.OperatorActionText := '[JOYSTICK] Maintenir la gâchette homme-mort au neutre pour armer';
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    IF CycleStep = E_CycleStep.INIT THEN
+    IF CycleStep = E_CycleStep.X0_PREPARATION THEN
         Banner.OperatorActionText := '[IHM] Appuyer sur Start Cycle pour lancer la séquence';
-    ELSIF CycleStep = E_CycleStep.ERROR_HOLD THEN
+    ELSIF CycleStep = E_CycleStep.STABILIZING THEN
         Banner.OperatorActionText := '[JOYSTICK] Réarmer homme-mort puis réengager déflexion pour reprise';
     ELSE
         Banner.OperatorActionText := '[JOYSTICK] Maintenir déflexion active pour déroulement du cycle';

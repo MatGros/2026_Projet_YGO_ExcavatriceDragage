@@ -28,9 +28,4 @@ VAR_GLOBAL RETAIN
     BypassCableLimitSwitch      : BOOL := FALSE; // 📏 Bypass Butée Basse Câble
     BypassSlackCable            : BOOL := FALSE; // ⚠️ Bypass Mou de Câble M1/M2
 
-    // 🎭 INTERRUPTEUR GÉNÉRAL ESSAIS SIMULATION
-    // TRUE  -> Active instantanément les bypass essentiels d'essais (BypassCommunGlobal, BypassLimitLegal, BypassTopLimitSoftware...)
-    // FALSE (front descendant) -> Désactive TOUS les bypass pour retour strict à la sécurité
-    SimulationBypassActive      : BOOL := FALSE;
-
 END_VAR

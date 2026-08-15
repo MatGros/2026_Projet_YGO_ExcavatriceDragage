@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T07:25:14.460164" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T07:25:14.460164">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T13:03:58.193298" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T13:03:58.193298">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -162,19 +162,6 @@
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Bypass Mou de Câble M1/M2</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimulationBypassActive">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 INTERRUPTEUR GÉNÉRAL ESSAIS SIMULATION
-TRUE  -&gt; Active instantanément les bypass essentiels d'essais (BypassCommunGlobal, BypassLimitLegal, BypassTopLimitSoftware...)
-FALSE (front descendant) -&gt; Désactive TOUS les bypass pour retour strict à la sécurité</xhtml>
           </documentation>
         </variable>
         <addData>

@@ -25,5 +25,7 @@ STRUCT
     DeadmanArmed           : BOOL;        (* 🔫 Homme-mort joystick armé *)
     JoystickMotionActive   : BOOL;        (* 🕹️ Mouvement joystick actif *)
     MotionPermit           : BOOL;        (* 🟢 Homme-mort + axe Y actif (CycleMotionPermit) *)
+    CycleStepAtError       : E_CycleStep; (* 🧊 Étape spécifique au moment du défaut (R9) *)
+    SampleCount            : INT;         (* 🆕 Compteur de prélèvements (RETAIN, Q3bis) *)
 END_STRUCT
 END_TYPE
