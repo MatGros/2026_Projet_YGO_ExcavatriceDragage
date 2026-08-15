@@ -149,7 +149,7 @@ Acquisition  ← PRODUCTEUR UNIQUE position/vitesse
 Safety  instSpeedMonitorM1/M2 (diagnostic, seuils=0 actuellement)
 PRG_02_Encoders  agrège EncoderFaultPresentM1/M2 := EncoderIncoherent → EncoderFaultPresent
 Modes  EncoderFaultPresent → bloque SEMI_AUTO (repli MAINT_N1) — lu 1 scan après Acquisition
-Treuils  ForbidAscent, TopLimitM:=CfgCableLimitAscent_M (≠ CfgTopSensorPos_M — limite exploit. ≠ cible homing)
+Treuils  AscentPermit, TopLimitM:=CfgCableLimitAscent_M (≠ CfgTopSensorPos_M — limite exploit. ≠ cible homing)
 Supervision  copie vers IHM
 ```
 

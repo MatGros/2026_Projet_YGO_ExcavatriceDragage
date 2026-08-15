@@ -59,7 +59,7 @@ mesures surveillées (codeurs, contacteurs restent produits ailleurs).
 | `JoystickYNeutral` | Arme Méca B (variante neutre) |
 | `PhaseRotationOk`/`BrakeThermalFeedback` | Bits socle (rotation, thermique) |
 
-**Sorties** : `SafeStop`, `ForbidDescent`, `ForbidAscent`, `PowerCutOff`, `ErrorId` (WORD, 16 bits), `Error`.
+**Sorties** : `SafeStop`, `DescendPermit`, `AscentPermit`, `PowerCutOff`, `ErrorId` (WORD, 16 bits), `Error`.
 
 ---
 
@@ -71,7 +71,7 @@ mesures surveillées (codeurs, contacteurs restent produits ailleurs).
 | **B** Pilotage sans commande | 8 (0100) | perte CAN OU joystick neutre | non confirmé arrêté sous délai | SafeStop+**PowerCutOff** | `PostRampTimeout`=3s |
 | **C** Glissement M1/benne | 9 (0200) | `BenneHoldStillActive` (M1 seul) | dérive M1 > tolérance | SafeStop+**PowerCutOff** | `BenneSlipToleranceM`=2.0m |
 | **D** Capteur haut non confirmé | 11 (0800) | capteur/limite log. atteint, hors homing, montée | non confirmé arrêté sous délai | SafeStop+**PowerCutOff** | `PostRampTimeout`=3s, marge +0.10m |
-| **E** Sync critique (2 bits) | 12/13 (1000/2000) | SyncEnable, hors benne/homing | écart>tolérance (bit12) puis non confirmé (bit13) | bit12: SafeStop seul ; bit13: +**PowerCutOff** | `CriticalSyncToleranceM`=2.0m |
+| **E** Sync critique (2 bits) | 12/13 (1000/2000) | SyncEnable, hors benne/homing | écart>tolérance (bit12) puis non confirmé (bit13) | bit12: SafeStop seul ; bit13: +**PowerCutOff** | `CriticalSyncToleranceM`=2.5m |
 | **F** Sens opposé | 14 (4000) | mouvement commandé, hors homing | signe vitesse opposé, confirmé | SafeStop seul | seuil 0.02 m/s, délai 500ms |
 | **G** Absence mouvement | 15 (8000) | idem F | vitesse sous seuil malgré commande | SafeStop seul | délai 3s |
 
@@ -81,10 +81,10 @@ mesures surveillées (codeurs, contacteurs restent produits ailleurs).
 | 0 | Perte com opérateur | SafeStop |
 | 1 | Perte codeur treuil | SafeStop |
 | 2 | Surchauffe moteur | SafeStop+PowerCutOff |
-| 3 | Mou câble | SafeStop (sauf `SyncEnable=FALSE`→ForbidAscent seul) |
+| 3 | Mou câble | SafeStop (sauf `SyncEnable=FALSE` $\rightarrow$ `DescendPermit := FALSE` seul) |
 | 4 | Rotation phase incorrecte | SafeStop |
-| 5 | Fin de course haut | ForbidAscent |
-| 6 | Limite basse câble | ForbidDescent |
+| 5 | Fin de course haut | `AscentPermit := FALSE` |
+| 6 | Limite basse câble | `DescendPermit := FALSE` |
 | 10 | Thermique frein commun | SafeStop+PowerCutOff |
 
 **Défense en profondeur Méca C** (lien Benne, fiche [`FB_Bucket_v1.0.md`](FB_Bucket_v1.0.md)) : couche 1 (`FB_Bucket`, 1.0m) coupe M2 en
@@ -98,8 +98,8 @@ premier ; Méca C (2.0m) coupe la puissance amont si la couche 1 ne suffit pas.
 SafeStop      = NOT PowerContactorEngaged OR (ErrorId AND 16#FF9F)  [SyncEnable=TRUE]
               = NOT PowerContactorEngaged OR (ErrorId AND 16#FF97)  [SyncEnable=FALSE, exclut bit3]
 PowerCutOff   = (ErrorId AND 16#2F84) <> 0   → bits 2,7,8,9,10,11,13
-ForbidDescent = bit6 OR NOT PowerContactorEngaged
-ForbidAscent  = bit5 OR (capteur haut hors homing) OR (bit3 ET NOT SyncEnable)
+DescendPermit = NOT (bit6 OR (bit3 ET NOT SyncEnable) OR NOT PowerContactorEngaged OR ...)
+AscentPermit  = NOT (bit5 OR (capteur haut physique atteint) OR (limite haute atteinte) OR ...)
 ```
 
 ---

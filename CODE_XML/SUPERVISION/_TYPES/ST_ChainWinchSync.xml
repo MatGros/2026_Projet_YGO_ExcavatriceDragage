@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-27T14:10:20.694840" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-07-27T14:10:20.694840">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T01:12:10.694977" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T01:12:10.694977">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -90,20 +90,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Synchro OK | 1 = Écart Synchro Bloquant 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx303_M1_ForbidAscent">
+            <variable name="Idx303_M1_AscentPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M1 Bloquée (Fdc/Safety) 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M1 Autorisée | 0 = Bloquée (Fdc/Safety) 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx304_M2_ForbidAscent">
+            <variable name="Idx304_M2_AscentPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M2 Bloquée (Fdc/Safety) 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M2 Autorisée | 0 = Bloquée (Fdc/Safety) 🔴</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_SyncMotionAllowed">

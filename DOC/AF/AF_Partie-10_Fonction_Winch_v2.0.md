@@ -192,7 +192,7 @@ de leur **combinaison**. Une seule page les porte, avec leur safety.
 | `instSafetyWinchM1/M2`, `instSpeedMonitorM1/M2`, `instLoadEstimatorM1/M2` | partie M1/M2/benne de `PRG_SAFETY_CFC` |
 
 ⚠️ **Aucune sémantique safety ne change** : les mécanismes Méca A→E, les bits `ErrorId` 14/15,
-`ForbidAscent`/`ForbidDescent`, les seuils et les polarités restent ceux décrits dans les fiches FB.
+`AscentPermit`/`DescendPermit` (logique positive fail-safe), les seuils et les polarités restent ceux décrits dans les fiches FB.
 Seule **l'affectation POU** change : la safety devient visible en parallèle des blocs métier sur
 la même page, ce qui supprime par construction le cycle prouvé `Safety ↔ Treuils`.
 
@@ -292,8 +292,8 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 1. **Mode Synchronisé Normal (`SyncEnable = TRUE`)** :
    - Détection d'un mou de câble (`SlackCable = TRUE`) ➔ Déclenche un **`SafeStop` complet (rampe rapide)** sur M1 et M2 pour stopper la descente et préserver l'enroulement des tambours.
 2. **Mode Récupération Unitaire / Maintenance (`SyncEnable = FALSE` ou Manuel MAINT)** :
-   - ❌ **Interdiction formelle de DESCENDRE (`ForbidDescent`)** : Continuer à dérouler aggrave le mou, fait sortir le câble des gorges et risque d'emmêler le tambour.
-   - ✅ **Autorisation d'ENROULER / MONTER (Vitesse lente / Palier 1)** : L'enroulement permet à l'opérateur de retendre le câble détendu et/ou de fermer la benne pour reprendre prise.
+   - ❌ **Interdiction formelle de DESCENDRE (`DescendPermit := FALSE`)** : Continuer à dérouler aggrave le mou, fait sortir le câble des gorges et risque d'emmêler le tambour.
+   - ✅ **Autorisation d'ENROULER / MONTER (Vitesse lente / Palier 1)** : L'enroulement permet à l'opérateur de retendre le câble détendu et/ou de fermer la benne pour reprendre prise (`SlackCableAscentStep1`).
    - Dès que la tension mécanique est rétablie (`M2_TensionedCable_DI` repasse à TRUE), le blocage de descente est levé.
 
 ### 6.6 🪣 Sécurité Benne partiellement fermée / Obstruée & Remontée Palier 1
@@ -310,10 +310,10 @@ Suivi pilotage : `PLAN_TASK.md` T96.
 
 > 📌 **Constat** : Un arrêt brutal (`SafeStop`) sur un léger écart transitoire rend la machine inexploitable en production.
 
-L'asservissement synchro est découpé en 3 zones d'action :
-- **Zone 1 (Écart nominal < Seuil 1, ex: 0.3 m)** : Fonctionnement normal sans restriction.
-- **Zone 2 (Écart modéré Seuil 1 .. Seuil 2, ex: 0.3 m .. 0.8 m)** : **Dégradation automatique au Palier 1 (vitesse lente)** sur les deux treuils sans couper le mouvement.
-- **Zone 3 (Écart critique > Seuil 2, ex: > 1.2 m)** : Déclenchement du **`SafeStop` (rampe rapide)** avec alarme Méca E.
+L'asservissement synchro est découpé en 3 zones d'action calibrées sur site :
+- **Zone 1 (Écart nominal $< 0.8\,\text{m}$)** : Fonctionnement normal sans restriction (Paliers 1 à 5).
+- **Zone 2 (Écart modéré $0.8\,\text{m} \dots 2.5\,\text{m}$)** : **Dégradation automatique au Palier 1 (vitesse lente)** sur les deux treuils sans couper le mouvement (`SyncDegradedStep1 := TRUE`). Alarme préventive IHM (`SyncWarn`).
+- **Zone 3 (Écart critique $\ge 2.5\,\text{m}$)** : Déclenchement du **`SafeStop` (rampe rapide)** avec alarme Méca E (`CriticalSyncToleranceM := 2.5`).
 
 ---
 

@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_SyncCfg :
 STRUCT
-    CfgSyncTolerance_M : REAL := 0.25;  (* 📐 Tolérance max d'écart (m) *)
+    CfgSyncTolerance_M : REAL := 0.8;   (* 📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m *)
     Initialized        : BOOL := FALSE; (* 🚦 flag restauration boot, ex-CfgInitialized renommé pour cohérence avec ST_WinchCfg *)
 END_STRUCT
 END_TYPE

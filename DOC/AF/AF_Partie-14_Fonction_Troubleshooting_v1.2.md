@@ -98,8 +98,8 @@ Fiches : `AF_Partie-06` (Preflight) et `AF_Partie-10` (Symmetry).
 | `PRG_05_Translation.M3_SafeStop_Active` | `FALSE` au repos sain | `TRUE` | `InputModuleFault` selon implémentation actuelle | Vérifier les cartes DI et la rampe SafeStop | Forcer à `FALSE` |
 | `PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI` | Selon position réelle/simulée | Valeur incohérente | Capteur, polarité ou modèle de simulation | Comparer `HwReal` / `HwSim` / `HwIn` | Conclure à la santé de la carte |
 | `PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI` | Selon position réelle/simulée | Valeur incohérente | Capteur, polarité ou modèle de simulation | Comparer `HwReal` / `HwSim` / `HwIn` | Conclure à la santé de la carte |
-| `PRG_04_Treuils_Benne.ForbidAscentM1_Raw` | Selon limite haute validée | À confirmer | Liaison limite haute à vérifier | Bloquer l'essai de montée limite tant que non validé | Déclarer le test conforme sans preuve |
-| `PRG_04_Treuils_Benne.ForbidAscentM2_Raw` | Selon limite haute validée | À confirmer | Liaison limite haute à vérifier | Bloquer l'essai de montée limite tant que non validé | Déclarer le test conforme sans preuve |
+| `PRG_04_Treuils_Benne.AscentPermitM1_Raw` | Selon limite haute validée | `FALSE` si limite atteinte | Liaison limite haute à vérifier | Bloquer l'essai de montée limite tant que non validé | Déclarer le test conforme sans preuve |
+| `PRG_04_Treuils_Benne.AscentPermitM2_Raw` | Selon limite haute validée | `FALSE` si limite atteinte | Liaison limite haute à vérifier | Bloquer l'essai de montée limite tant que non validé | Déclarer le test conforme sans preuve |
 | `GVL_IHM.Modes.Cmd.BtnFaultReset` | Appui bref / front | Maintenu ou sans effet | Cause encore présente ou traitement Reset à vérifier | Relâcher, corriger la cause, générer un nouvel appui | Utiliser un niveau maintenu comme bypass |
 
 ### 2.3 Règle d'interprétation
