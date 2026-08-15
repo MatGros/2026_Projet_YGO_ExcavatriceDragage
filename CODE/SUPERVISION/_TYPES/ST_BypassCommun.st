@@ -16,10 +16,12 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_BypassCommun :
 STRUCT
+    Global            : BOOL; (* 🌐 Bypass Global Commun (toutes sécurités communes M1+M2) *)
     SlackCable        : BOOL; (* ⚠️ Bypass capteur mou de câble — capteur unique M1/M2, OR avec bypass individuel *)
     TopLimitSwitch    : BOOL; (* 🚧 Bypass fin de course physique haute (capteur, bit5), OR avec bypass individuel *)
     TopLimitSoftware  : BOOL; (* 🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel *)
     CableLimitSwitch  : BOOL; (* 🆕 2026-08-07 : Bypass limite basse physique (longueur câble), OR avec bypass individuel *)
     LimitLegal        : BOOL; (* 🆕 2026-08-07 : Bypass limite légale de profondeur, OR avec bypass individuel *)
+    Initialized       : BOOL; (* Initialisé au boot *)
 END_STRUCT
 END_TYPE

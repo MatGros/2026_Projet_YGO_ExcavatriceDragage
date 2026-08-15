@@ -18,5 +18,19 @@ VAR_GLOBAL RETAIN
     BypassNetworkGlobal         : BOOL := FALSE;
     // 🌐 Bypass Global Benne (FB_Bucket)
     BypassBucketGlobal          : BOOL := FALSE;
+    // 🌐 Bypass Global Commun M1+M2 (GVL_IHM.Commun.Bypass.Global)
+    BypassCommunGlobal          : BOOL := FALSE;
+
+    // ⚡ BYPASS RAPIDES UNITAIRES COMMUMS (Levée immédiate des sécurités d'essai)
+    BypassLimitLegal            : BOOL := FALSE; // 📐 Bypass Limite Légale de Profondeur
+    BypassTopLimitSwitch        : BOOL := FALSE; // 🚧 Bypass Capteur Fin de Course Haut Physique
+    BypassTopLimitSoftware      : BOOL := FALSE; // 📐 Bypass Butée Logicielle Haute
+    BypassCableLimitSwitch      : BOOL := FALSE; // 📏 Bypass Butée Basse Câble
+    BypassSlackCable            : BOOL := FALSE; // ⚠️ Bypass Mou de Câble M1/M2
+
+    // 🎭 INTERRUPTEUR GÉNÉRAL ESSAIS SIMULATION
+    // TRUE  -> Active instantanément les bypass essentiels d'essais (BypassCommunGlobal, BypassLimitLegal, BypassTopLimitSoftware...)
+    // FALSE (front descendant) -> Désactive TOUS les bypass pour retour strict à la sécurité
+    SimulationBypassActive      : BOOL := FALSE;
 
 END_VAR

@@ -1093,6 +1093,14 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
       <dataType name="ST_BypassCommun">
         <baseType>
           <struct>
+            <variable name="Global">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Commun (toutes sécurités communes M1+M2)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SlackCable">
               <type>
                 <BOOL />
@@ -1131,6 +1139,14 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisé au boot</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -33949,6 +33965,16 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <derived name="FB_TroubleshootingView" />
               </type>
             </variable>
+            <variable name="SimBypassRiseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="SimBypassFallEdge">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -34115,6 +34141,28 @@ IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
     GVL_IHM.M1M2Sync.Bypass.Initialized := TRUE;
 END_IF;
 
+IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
+    IF BypassCommunGlobal THEN
+        GVL_IHM.Commun.Bypass.Global := TRUE;
+    END_IF;
+    IF BypassLimitLegal THEN
+        GVL_IHM.Commun.Bypass.LimitLegal := TRUE;
+    END_IF;
+    IF BypassTopLimitSwitch THEN
+        GVL_IHM.Commun.Bypass.TopLimitSwitch := TRUE;
+    END_IF;
+    IF BypassTopLimitSoftware THEN
+        GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
+    END_IF;
+    IF BypassCableLimitSwitch THEN
+        GVL_IHM.Commun.Bypass.CableLimitSwitch := TRUE;
+    END_IF;
+    IF BypassSlackCable THEN
+        GVL_IHM.Commun.Bypass.SlackCable := TRUE;
+    END_IF;
+    GVL_IHM.Commun.Bypass.Initialized := TRUE;
+END_IF;
+
 IF GVL_IHM.TranslationM3.Bypass.Global &lt;&gt; BypassTranslationGlobal THEN
     BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
 END_IF;
@@ -34126,6 +34174,42 @@ IF GVL_IHM.M2TreuilBenne.Bypass.Global &lt;&gt; BypassWinchM2Global THEN
 END_IF;
 IF GVL_IHM.M1M2Sync.Bypass.Global &lt;&gt; BypassSyncGlobal THEN
     BypassSyncGlobal := GVL_IHM.M1M2Sync.Bypass.Global;
+END_IF;
+IF GVL_IHM.Commun.Bypass.Global &lt;&gt; BypassCommunGlobal THEN
+    BypassCommunGlobal := GVL_IHM.Commun.Bypass.Global;
+END_IF;
+IF GVL_IHM.Commun.Bypass.LimitLegal &lt;&gt; BypassLimitLegal THEN
+    BypassLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
+END_IF;
+IF GVL_IHM.Commun.Bypass.TopLimitSwitch &lt;&gt; BypassTopLimitSwitch THEN
+    BypassTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
+END_IF;
+IF GVL_IHM.Commun.Bypass.TopLimitSoftware &lt;&gt; BypassTopLimitSoftware THEN
+    BypassTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
+END_IF;
+IF GVL_IHM.Commun.Bypass.CableLimitSwitch &lt;&gt; BypassCableLimitSwitch THEN
+    BypassCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
+END_IF;
+IF GVL_IHM.Commun.Bypass.SlackCable &lt;&gt; BypassSlackCable THEN
+    BypassSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+END_IF;
+
+// 🎭 GESTION DU MASTER BYPASS DE SIMULATION :
+SimBypassRiseEdge(CLK := SimulationBypassActive);
+SimBypassFallEdge(CLK := SimulationBypassActive);
+
+// 🟢 Front Montant : Active UNIQUEMENT les bypass nécessaires aux essais (Limite Légale + Limite Haute)
+IF SimBypassRiseEdge.Q THEN
+    GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
+END_IF;
+
+// 🔴 Front Descendant : Désactive les bypass (retour aux sécurités)
+IF SimBypassFallEdge.Q THEN
+    GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
 END_IF;
 
 
@@ -34382,6 +34466,86 @@ instTroubleshootingView(
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Benne (FB_Bucket)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassCommunGlobal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Commun M1+M2 (GVL_IHM.Commun.Bypass.Global)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassLimitLegal">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ BYPASS RAPIDES UNITAIRES COMMUMS (Levée immédiate des sécurités d'essai)
+📐 Bypass Limite Légale de Profondeur</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassTopLimitSwitch">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass Capteur Fin de Course Haut Physique</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassTopLimitSoftware">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Bypass Butée Logicielle Haute</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassCableLimitSwitch">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Bypass Butée Basse Câble</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassSlackCable">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Bypass Mou de Câble M1/M2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimulationBypassActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 INTERRUPTEUR GÉNÉRAL ESSAIS SIMULATION
+TRUE  -&gt; Active instantanément les bypass essentiels d'essais (BypassCommunGlobal, BypassLimitLegal, BypassTopLimitSoftware...)
+FALSE (front descendant) -&gt; Désactive TOUS les bypass pour retour strict à la sécurité</xhtml>
           </documentation>
         </variable>
         <addData>
