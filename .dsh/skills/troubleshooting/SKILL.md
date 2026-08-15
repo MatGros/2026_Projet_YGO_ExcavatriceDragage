@@ -61,7 +61,7 @@ Type de symptôme (sortie ne s'émet pas / ne se coupe pas / valeur fausse / ét
 Remonter du symptôme à la source. Lire les variables de décision dans `GVL_Troubleshooting` (lecture seule). Éliminer les branches par FAIT. S'arrêter au critère d'arrêt (§6).
 
 ### Étape 6 — Conclure + mettre à jour la fiche
-Cause racine + correction proposée. Mettre à jour la fiche (verdicts, journal, conclusion). **Ne pas modifier le code sans validation.**
+Cause racine + correction proposée. Remplir la **section 6bis (Proposition de correction)** : Option 1 (immédiat, sans code) + Option 2 (définitif) + validation requise. Mettre à jour la fiche (verdicts, journal, conclusion). **Ne pas modifier le code sans validation.**
 
 ---
 
