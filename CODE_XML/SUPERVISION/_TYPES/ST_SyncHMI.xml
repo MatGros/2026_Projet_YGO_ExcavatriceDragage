@@ -193,6 +193,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ LED d'alarme écart hors tolérance</xhtml>
               </documentation>
             </variable>
+            <variable name="SyncDegradedStep1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart modéré actif : limitation forcée au Palier 1</xhtml>
+              </documentation>
+            </variable>
             <variable name="Ready">
               <type>
                 <BOOL />

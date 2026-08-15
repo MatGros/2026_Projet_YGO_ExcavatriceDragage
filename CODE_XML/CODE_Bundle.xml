@@ -7415,6 +7415,14 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ LED d'alarme écart hors tolérance</xhtml>
               </documentation>
             </variable>
+            <variable name="SyncDegradedStep1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart modéré actif : limitation forcée au Palier 1</xhtml>
+              </documentation>
+            </variable>
             <variable name="Ready">
               <type>
                 <BOOL />
@@ -26350,6 +26358,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Avertissement IHM uniquement (Partie5 §6) — PAS de SafeStop</xhtml>
               </documentation>
             </variable>
+            <variable name="SyncDegradedStep1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 2026-08-15 (T113) : Écart modéré actif -&gt; force le Palier 1 sur les 2 treuils</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -26447,6 +26463,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE;
+    SyncDegradedStep1 := FALSE;
     Error := FALSE;
     ErrorId := 16#0000;
     RETURN;
@@ -26498,6 +26515,9 @@ IF NOT BypassGlobal THEN
 // 🔧 REX 2026-07-08 (5) : filtre temporel (même pattern que MismatchTimer bit1) — absorbe le
 // transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2), évite le blocage
 // intempestif constaté sur incident terrain (0.24m transitoire).
+// 🆕 2026-08-15 (T113) : Si écart &gt; CfgSyncToleranceM -&gt; alarme d'écart (SyncWarn / bit0) et
+// dégradation en vitesse lente Palier 1 (SyncDegradedStep1). L'arrêt brutal SafeStop est
+// réservé à l'écart critique Méca E (&gt; CriticalSyncToleranceM).
 DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM &gt; CfgSyncToleranceM);
 DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
 IF DeviationTimer.Q THEN
@@ -26505,6 +26525,9 @@ IF DeviationTimer.Q THEN
 ELSIF ResetEdge.Q AND NOT DeviationActive THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
+
+// 🐢 T113 : Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
+SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM &gt; CfgSyncToleranceM) OR ((ErrorId AND 16#0001) &lt;&gt; 16#0000));
 
 // 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1
 // Vérifie que les commandes envoyées aux deux treuils sont identiques (sens et contacteurs)
@@ -26526,6 +26549,8 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFD;
 END_IF; // fin du IF MismatchActive
 
+ELSE
+    SyncDegradedStep1 := FALSE;
 END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
@@ -28946,8 +28971,8 @@ instWinchM1(
     Direction               := M1_Direction_Active,
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := _WinchSpeedStepTable,
-    CfgMaxStepDescente      := EffectiveMaxStepDescente,
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive, EffectiveMaxStepAscent, 1),
+    CfgMaxStepDescente      := SEL(instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := NOT instWinchSync.Error,
@@ -28983,8 +29008,9 @@ instWinchM2(
     // CONTROL_ASCENT (ForceMinSpeedStep) mais pas pendant le mouvement benne lui-même ;
     // CfgMaxStepDescente n'avait AUCUN plafond, jamais. Corrigé : les deux suivent maintenant
     // instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
-    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive, EffectiveMaxStepAscent, 1),
+    // 🆕 2026-08-15 (T113) : instWinchSync.SyncDegradedStep1 dégrade M2 au Palier 1 sur écart modéré.
+    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Error,
@@ -29212,6 +29238,7 @@ WinchM2Safety.BlockedBySafety    := PRG_06_Outputs_LD.M2BlockedBySafetyInfo;
 SyncState.DeltaPos_M := instWinchSync.SignedDeltaPosM;
 SyncState.SyncActive := instWinchSync.SyncActive;
 SyncState.SyncWarn := instWinchSync.SyncWarn;
+SyncState.SyncDegradedStep1 := instWinchSync.SyncDegradedStep1;
 SyncState.Ready := instWinchSync.Ready;
 SyncState.Error := instWinchSync.Error;
 SyncState.ErrorId := instWinchSync.ErrorId;
