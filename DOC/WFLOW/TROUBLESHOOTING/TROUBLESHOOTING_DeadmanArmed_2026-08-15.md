@@ -1,4 +1,4 @@
-# 🕵️ Session de Recherche de Blocage — DeadmanArmed tombe à 0 en commande descente
+# 🕵️ Session de Troubleshooting — Recherche de Blocage et de Panne — DeadmanArmed tombe à 0 en commande descente
 
 > 📅 Date : 2026-08-15 · 🧊 Situation : [SIMULATION BANC]
 > 📄 Statut : [RÉSOLUE — cause identifiée, correction à appliquer]

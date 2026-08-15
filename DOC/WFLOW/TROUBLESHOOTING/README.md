@@ -9,6 +9,7 @@ Ce dossier regroupe les gabarits et fiches d analyse de resolution d incidents /
 | Fichier | Role / Description |
 |---|---|
 | [TEMPLATE_Troubleshooting.md](TEMPLATE_Troubleshooting.md) | Gabarit standardise pour toute nouvelle fiche d incident / depannage |
+| [GUIDE_Troubleshooting.md](GUIDE_Troubleshooting.md) | Documentation complete : comment remplir chaque section, exemples, cas limites CODESYS, lecture materiel/fieldbus |
 | [TROUBLESHOOTING_DeadmanArmed_2026-08-15.md](TROUBLESHOOTING_DeadmanArmed_2026-08-15.md) | Fiche d analyse : Invariant Safety DeadmanArmed (ISO 13849) & confort banc de simulation |
 
 ---

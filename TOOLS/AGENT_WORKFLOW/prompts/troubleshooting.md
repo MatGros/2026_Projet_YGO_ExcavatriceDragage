@@ -60,6 +60,8 @@ SYMPTÔME
 
 **Règle d'or** : à chaque nœud, répondre *« quelle variable prouve/réfute cette branche, où la lire ? »*. Sinon branche **non testable** → le marquer, ne pas deviner.
 
+**💡 Exhaustivité & vitesse** : pour parcourir rapidement toutes les branches, déléguer l'exploration de branches **indépendantes** à des **sous-agents** (en parallèle), chacun remontant une branche jusqu'à sa source et rendant son verdict (cause confirmée / éliminée + preuve).
+
 ## 5. 🔄 TRACAGE INVERSE (reverse) — algorithme
 
 ```
