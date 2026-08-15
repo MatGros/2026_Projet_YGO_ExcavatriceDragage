@@ -363,11 +363,15 @@ instBucket(
 // 🆕 T114 : Si la benne n'est pas fermée (NOT IsClosed) et que instBucket n'est plus occupé (Busy=FALSE),
 // toute demande de montée est automatiquement dégradée au Palier 1 (Vitesse lente, voir instWinchM1/M2),
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
+// 📌 Note d'architecture (lag 1 scan) : M1/M2_Direction_Active est consommé ici avant son calcul arbitré
+// en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
 CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Busy;
 BucketNotClosedAscentStep1 := (M1_Direction_Active = 1 OR M2_Direction_Active = 1) AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
 
 // 🆕 T111 : En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
+// 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
+// au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
 SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Auth.SyncEnable AND (
     ((instSafetyWinchM1.ErrorId AND 16#0008) <> 16#0000) OR
     ((instSafetyWinchM2.ErrorId AND 16#0008) <> 16#0000) OR
