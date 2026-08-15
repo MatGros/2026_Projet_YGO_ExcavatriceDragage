@@ -77,6 +77,7 @@ VAR_OUTPUT
     SignedDeltaPosM : REAL;        // 🆕 REX 2026-07-08 (5) : signé, > 0 = M1 plus haut que M2 — pour arbitrage directionnel PRG_06
     SyncActive      : BOOL;        // Surveillance imposée/activable selon Mode (voir en-tête)
     SyncWarn        : BOOL;        // ⚠️ Avertissement IHM uniquement (Partie5 §6) — PAS de SafeStop
+    SyncDegradedStep1 : BOOL;      // 🐢 2026-08-15 (T113) : Écart modéré actif -> force le Palier 1 sur les 2 treuils
 END_VAR
 VAR
     ResetEdge       : R_TRIG;
@@ -97,6 +98,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE;
+    SyncDegradedStep1 := FALSE;
     Error := FALSE;
     ErrorId := 16#0000;
     RETURN;
@@ -148,6 +150,9 @@ IF NOT BypassGlobal THEN
 // 🔧 REX 2026-07-08 (5) : filtre temporel (même pattern que MismatchTimer bit1) — absorbe le
 // transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2), évite le blocage
 // intempestif constaté sur incident terrain (0.24m transitoire).
+// 🆕 2026-08-15 (T113) : Si écart > CfgSyncToleranceM -> alarme d'écart (SyncWarn / bit0) et
+// dégradation en vitesse lente Palier 1 (SyncDegradedStep1). L'arrêt brutal SafeStop est
+// réservé à l'écart critique Méca E (> CriticalSyncToleranceM).
 DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM > CfgSyncToleranceM);
 DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
 IF DeviationTimer.Q THEN
@@ -155,6 +160,9 @@ IF DeviationTimer.Q THEN
 ELSIF ResetEdge.Q AND NOT DeviationActive THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
+
+// 🐢 T113 : Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
+SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM > CfgSyncToleranceM) OR ((ErrorId AND 16#0001) <> 16#0000));
 
 // 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1
 // Vérifie que les commandes envoyées aux deux treuils sont identiques (sens et contacteurs)
@@ -176,6 +184,8 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFFD;
 END_IF; // fin du IF MismatchActive
 
+ELSE
+    SyncDegradedStep1 := FALSE;
 END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
