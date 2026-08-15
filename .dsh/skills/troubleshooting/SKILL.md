@@ -55,13 +55,16 @@ Lire la fiche existante si elle existe (contexte déjà figé). Sinon, demander 
 Type de symptôme (sortie ne s'émet pas / ne se coupe pas / valeur fausse / état bloqué / intermittent / aucune réaction).
 
 ### Étape 4 — Construire l'arbre des causes (§4)
-Énumérer TOUTES les branches (6 catégories). Pour chaque nœud : variable de décision + où la lire + valeur attendue.
+Énumérer TOUTES les branches (6 catégories). Pour chaque nœud : variable de décision + où la lire + valeur attendue. **Pour l'exhaustivité & la vitesse** : déléguer l'exploration de branches **indépendantes** à des **sous-agents** (en parallèle), chacun remontant une branche jusqu'à sa source.
 
 ### Étape 5 — Tracage inverse + élimination par preuve (§5, §6)
 Remonter du symptôme à la source. Lire les variables de décision dans `GVL_Troubleshooting` (lecture seule). Éliminer les branches par FAIT. S'arrêter au critère d'arrêt (§6).
 
 ### Étape 6 — Conclure + mettre à jour la fiche
-Cause racine + correction proposée. Remplir la **section 6bis (Proposition de correction)** : Option 1 (immédiat, sans code) + Option 2 (définitif) + validation requise. Mettre à jour la fiche (verdicts, journal, conclusion). **Ne pas modifier le code sans validation.**
+Cause racine + correction proposée. Remplir la **section 8 (Proposition de correction)** : Option 1 (immédiat, sans code) + Option 2 (définitif) + validation requise. Mettre à jour la fiche (verdicts, journal, conclusion). **Ne pas modifier le code sans validation.**
+
+### Étape 7 — Vérification / non-régression
+Après correction (validée), remplir la **section 9** : le symptôme est-il résolu ? rien d'autre cassé ? (aligné `fix:` + `guard:`).
 
 ---
 
@@ -69,6 +72,7 @@ Cause racine + correction proposée. Remplir la **section 6bis (Proposition de c
 
 - Méthode : `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md`
 - Gabarit : `DOC/WFLOW/TROUBLESHOOTING/TEMPLATE_Troubleshooting.md`
+- **Guide de remplissage** : `DOC/WFLOW/TROUBLESHOOTING/GUIDE_Troubleshooting.md`
 - Exemple : `DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_DeadmanArmed_2026-08-15.md`
 - Carte de lecture : `GVL_Troubleshooting` (ContexteMachineGlobal, BenneOuvertureFermeture, Joystick, LevageUnitaireM1/M2, TranslationPontM3, AssistanceDragage)
 - Ordre d'exécution : `PRG_02 → PRG_03 → PRG_04/05 → PRG_06 → PRG_07`

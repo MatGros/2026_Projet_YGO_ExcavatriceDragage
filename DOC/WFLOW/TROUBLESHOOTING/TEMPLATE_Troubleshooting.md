@@ -1,20 +1,19 @@
-# 🕵️ Session de Recherche de Blocage — <Sujet>
+# 🕵️ Session de Troubleshooting — Recherche de Blocage et de Panne — <Sujet>
 
-> 📅 Date : <AAAA-MM-JJ> · 🧊 Situation : [SIMULATION BANC] / [SITE]
-> 📄 Statut : [OUVERTE] / [EN COURS] / [RÉSOLUE]
+> 📅 Date : <AAAA-MM-JJ> · 🧊 Situation : [SIMULATION BANC] / [SITE] · 📄 Statut : [OUVERTE] / [EN COURS] / [RÉSOLUE]
 
-## 1. 🧊 Contexte figé
+## 1. 🧊 Contexte figé (horodaté)
 
-> ⚠️ L'agent NE re-pose PAS ces questions — il lit ce bloc. Toute valeur non listée = défaut (redémarrage).
+> Snapshot horodaté. **Re-figer** si > X min ou événement (redémarrage, changement de mode) avant de conclure.
+> Toute valeur non listée = **à vérifier** (ne pas supposer).
 
-| Élément | Valeur |
-|---|---|
-| SimulationModeActive | TRUE / FALSE |
-| SimulationBypassActive | TRUE / FALSE |
-| Référencement axes (homing) | fait / non fait |
-| Mode machine | MAINT_N1 / MAINT_N2 / SEMI_AUTO / DISABLE |
-| Redémarrage | chaud / froid / download |
-| Autre | ... |
+### Texte de contexte
+<...>
+
+### Variables & valeurs
+| <nobr>Élément</nobr> | <nobr>Variable complète</nobr> | Valeur | <nobr>Horodatage</nobr> |
+|---|---|---|---|
+| ... | ... | ... | ... |
 
 ## 2. 🎯 Symptôme
 
@@ -22,55 +21,66 @@
 
 ## 3. 🧩 Indices / historique
 
-- Derniers changements (code, config, câblage, HMI) : ...
-- Déjà essayé (et résultat) : ...
-- Conditions d'apparition (mode, charge, position) : ...
-- Alarmes / historique d'alarmes : ...
+- Derniers changements : ...
+- Déjà essayé : ...
+- Conditions d'apparition : ...
+- Alarmes : ...
 
 ## 4. 🌳 Arbre des causes & hypothèses
 
-| # | Hypothèse | Variable de décision | Valeur attendue | Valeur lue | Verdict |
+> Liste **EXHAUSTIVE** (ne rien oublier). Chaque « valeur attendue » doit avoir une **SOURCE** (spec `AF_Partie-XX`, code `.st`, logique) — sinon « attente non justifiée ».
+
+| # | <nobr>Hypothèse</nobr> | <nobr>Variable de décision</nobr> | <nobr>Valeur attendue (source)</nobr> | <nobr>Valeur lue</nobr> | Verdict |
 |---|---|---|---|---|---|
-| 1 | ... | `GVL_Troubleshooting.X` | TRUE | FALSE | ❌ éliminée |
-| 2 | ... | ... | ... | ... | ✅ **cause** |
+| 1 | ... | ... | ... (AF_Partie-XX §Y) | ... | ❌ / ✅ |
 
-## 4bis. 📊 Diagramme de flux compact
+## 5. 📊 Arbre vertical des hypothèses (flux de données) — OBLIGATOIRE
 
-> Vue d'un coup d'œil : chemin du signal, chaque nœud marqué **✓ (conforme)** ou **✗ (bloqué)**.
-> Le **premier ✗** = cause racine ; les ✗ suivants = conséquences.
-> Noms **condensés** — le nom complet n'apparaît que dans le reste du diagnostic.
+> Chaque branche = hypothèse, parcourue verticalement. Nœud = signal + type + valeur.
+> Émojis : ✅ attendu · ❌ blocage · ❓ ambigu (investigation obligatoire).
+> **+ résumé compact une ligne** en bas.
 
-### Légende
-| Symbole | Sens |
-|---|---|
-| `[A ✓]` / `[A ✗]` | nœud conforme / bloqué |
-| `→` | séquence (flux) |
-| `OR` | branches parallèles (au moins une doit passer) |
-| `[X=12.5]` | valeur numérique (entier/réel) — ✓/✗ selon la plage attendue |
+```text
+<arbre vertical>
+```
 
-### Exemples
-- **Séquence** : `[StimRevDown ✓] → [RawY ✓] → [AtNeutral ✗] → [DeadmanArmed ✗]`
-- **OR (branches)** : `([BtnOpen ✓] OR [CycleOpen ✓]) → [CmdOpen ✓]`
-- **Numérique** : `[Pos=12.5] → [Mode=2] → [Speed=45%]`
+**Résumé une ligne** : `[A:BOOL=1] → [B:INT=0] → [C:BOOL=1] ❌`
 
-## 5. 📊 Données / interactions
+## 6. 📊 Données / interactions & chronogramme (🟡)
 
-- <lectures, essais, résultats, chronologie>
+> Lectures, essais, résultats. Chronogramme = séquences **observées/rapportées** (🟡), jamais présenté comme acquisition.
 
-## 6. 🏁 Conclusion
+### Lectures & essais
+- <lecture/essai> : <résultat>
+
+### Chronogramme (tableau vertical — événements × signaux)
+| <nobr>Événement</nobr> | <nobr>Signal 1</nobr> | <nobr>Signal 2</nobr> | <nobr>Signal 3</nobr> |
+|:---:|:---:|:---:|:---:|
+| T1 | █ | █ | 12.5 |
+| → <tempo> | | | |
+| T2 | █ |   | 12.0 |
+
+## 7. 🏁 Conclusion
 
 - **Cause racine** : ...
-- **Correction** : ...
 - **Statut** : RÉSOLUE / à valider
 
-## 6bis. 🛠️ Proposition de correction
+## 8. 🛠️ Proposition de correction
 
-> ⚠️ À remplir **plus tard dans le diagnostic**, une fois la cause racine confirmée — pas avant.
+> À remplir **plus tard**, une fois la cause racine confirmée.
 
 - **Option 1 (immédiat, sans code)** : <action> — <impact/risque>
 - **Option 2 (définitif)** : <action> — <impact/risque>
 - **⚠️ Validation requise** : [humaine] — ne pas modifier le code / forcer une variable sans validation
 
-## 7. 📝 Journal (chronologique)
+## 9. ✅ Vérification de la correction / non-régression
+
+- <test de non-régression après correction : le symptôme est-il résolu ? rien d'autre cassé ?>
+
+## 10. 📝 Journal (chronologique)
 
 - <AAAA-MM-JJ> : <action / observation>
+
+---
+
+📖 **Documentation complète** (comment remplir chaque section, exemples) : `GUIDE_Troubleshooting.md` (même dossier).
