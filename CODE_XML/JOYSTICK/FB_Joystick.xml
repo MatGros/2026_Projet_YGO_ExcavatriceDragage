@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T04:37:35.649894" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T04:37:35.649894">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T14:41:18.168777" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T14:41:18.168777">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -791,6 +791,10 @@ END_IF;
 IF NOT RawButton THEN
     DeadmanArmPending := FALSE;
 END_IF;
+
+// 🛡️ SÉCURITÉ C4 (ISO 13849) : armement STRICTEMENT conditionné par DeadmanArmPending.
+// Tout désarmement (changement de mode, fin de cycle benne, passage neutre prolongé)
+// efface DeadmanArmPending et EXIGE un nouvel appui conscient (front montant de RawButton).
 DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed, PT := DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;

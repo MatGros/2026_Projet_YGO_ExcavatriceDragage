@@ -111,7 +111,7 @@ Le sélecteur est atomique par domaine : `HwIn.<Domaine> := HwSim.<Domaine>` ou
 | Famille | Champs | Sémantique |
 |---|---|---|
 | ↔️ M3 | `SimM3SensorsWordOverrideActive`, `SimM3SensorsWord` | Override manuel uniquement ; bit4=Trémie, bit3=PV, bit2=PVP2, bit1=P1, bit0=Maintenance. Le modèle dynamique reste la source nominale. |
-| 🕹️ Joystick | `SimJoystickLeftActive`, `SimJoystickRightActive`, `SimJoystickForwardActive`, `SimJoystickReverseActive` | Un seul bouton impose `0`/`5000`/`10000` (plusieurs ⇒ neutre). **Auto-armement inclus** : l'activation d'un bouton directionnel simule automatiquement l'appui homme-mort `JoyBtnRaw` pour fluidifier les essais sur banc. |
+| 🕹️ Joystick | `SimJoystickLeft_Rev_TREMIE_Active`, `SimJoystickRight_Fwd_MAINT_Active`, `SimJoystickFwd_Up_Close_Active`, `SimJoystickRev_Down_Open_Active` | Un seul bouton impose `0`/`5000`/`10000` (plusieurs ⇒ neutre). **Auto-armement inclus** : l'activation d'un bouton directionnel simule automatiquement l'appui homme-mort `JoyBtnRaw` pour fluidifier les essais sur banc. |
 | 🕹️ Homme-mort | `SimJoystickRawButton` | TRUE simule le bouton brut indépendant (pour essais spécifiques neutre/homme-mort) ; le contrôle homme-mort de `FB_Joystick` reste actif. |
 | 🪝 Synchronisation | `SimSyncDeviationInjectM1/M2`, `SimSyncDeviationOffset_M` | Front montant : saut persistant de position simulée afin de tester l'écart M1/M2. |
 

@@ -140,10 +140,10 @@ IF SimulationModeFall.Q THEN
 
     GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
     GVL_Simulation.SimM3SensorsWord := 16#07;
-    GVL_Simulation.SimJoystickLeftActive := FALSE;
-    GVL_Simulation.SimJoystickRightActive := FALSE;
-    GVL_Simulation.SimJoystickForwardActive := FALSE;
-    GVL_Simulation.SimJoystickReverseActive := FALSE;
+    GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active := FALSE;
+    GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active := FALSE;
+    GVL_Simulation.SimJoystickFwd_Up_Close_Active := FALSE;
+    GVL_Simulation.SimJoystickRev_Down_Open_Active := FALSE;
     GVL_Simulation.SimJoystickRawX := 5000;
     GVL_Simulation.SimJoystickRawY := 5000;
     GVL_Simulation.SimJoystickRawButton := FALSE;
@@ -272,13 +272,13 @@ instSimBench(
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
-    SimJoystickLeftActive          := GVL_Simulation.SimJoystickLeftActive,
-    SimJoystickRightActive         := GVL_Simulation.SimJoystickRightActive,
-    SimJoystickForwardActive       := GVL_Simulation.SimJoystickForwardActive,
-    SimJoystickReverseActive       := GVL_Simulation.SimJoystickReverseActive,
-    SimJoystickRawX                := GVL_Simulation.SimJoystickRawX,
-    SimJoystickRawY          := GVL_Simulation.SimJoystickRawY,
-    SimJoystickRawButton     := GVL_Simulation.SimJoystickRawButton,
+    SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
+    SimJoystickRight_Fwd_MAINT_Active  := GVL_Simulation.SimJoystickRight_Fwd_MAINT_Active,
+    SimJoystickFwd_Up_Close_Active     := GVL_Simulation.SimJoystickFwd_Up_Close_Active,
+    SimJoystickRev_Down_Open_Active    := GVL_Simulation.SimJoystickRev_Down_Open_Active,
+    SimJoystickRawX                    := GVL_Simulation.SimJoystickRawX,
+    SimJoystickRawY                    := GVL_Simulation.SimJoystickRawY,
+    SimJoystickRawButton               := GVL_Simulation.SimJoystickRawButton,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
     BtnEmergencyStop         := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff,
     HwReal                   := HwReal,

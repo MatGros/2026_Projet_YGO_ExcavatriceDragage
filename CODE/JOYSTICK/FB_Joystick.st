@@ -185,6 +185,10 @@ END_IF;
 IF NOT RawButton THEN
     DeadmanArmPending := FALSE;
 END_IF;
+
+// 🛡️ SÉCURITÉ C4 (ISO 13849) : armement STRICTEMENT conditionné par DeadmanArmPending.
+// Tout désarmement (changement de mode, fin de cycle benne, passage neutre prolongé)
+// efface DeadmanArmPending et EXIGE un nouvel appui conscient (front montant de RawButton).
 DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed, PT := DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
