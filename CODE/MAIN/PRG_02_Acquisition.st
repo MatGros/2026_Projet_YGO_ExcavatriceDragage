@@ -129,7 +129,11 @@ IF SimulationModeRise.Q THEN
     GVL_Simulation.SimTranslationActive := TRUE;
     GVL_Simulation.SimOperatorActive := TRUE;
     GVL_Simulation.SimSafetyActive := TRUE;
-    GVL_Simulation.SimJoystickRawButton := TRUE;
+    // 🔧 2026-08-15 : plus d'auto-arm `SimJoystickRawButton := TRUE` — il masquait le vrai
+    // homme-mort (DeadmanArmed restait armé en permanence → rien de testé en sim). Le bouton
+    // suit désormais le stimulus directionnel (FB_SimBench : JoyBtnRaw := SimJoystickRawButton
+    // OR DirectionCount>0), ce qui rejoue fidèlement l'armement au commandement, la grâce 3 s
+    // et la retombée au neutre. SimJoystickRawButton reste un appui manuel (défaut FALSE).
 END_IF;
 
 IF SimulationModeFall.Q THEN
