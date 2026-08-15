@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T00:31:00.036678" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T00:31:00.036678">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T00:44:29.852872" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T00:44:29.852872">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1053,8 +1053,8 @@ IF NOT Enable THEN
     Busy := FALSE;
     Done := FALSE;
     SafeStop := TRUE;
-    ForbidDescent := TRUE;
-    ForbidAscent := TRUE; // 🛡️ T86 : sortie safety déterministe pendant neutralisation
+    DescendPermit := FALSE; // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
+    AscentPermit := FALSE;  // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
     Error := FALSE;

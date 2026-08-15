@@ -19623,8 +19623,8 @@ IF NOT Enable THEN
     Busy := FALSE;
     Done := FALSE;
     SafeStop := TRUE;
-    ForbidDescent := TRUE;
-    ForbidAscent := TRUE; // 🛡️ T86 : sortie safety déterministe pendant neutralisation
+    DescendPermit := FALSE; // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
+    AscentPermit := FALSE;  // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
     Error := FALSE;
