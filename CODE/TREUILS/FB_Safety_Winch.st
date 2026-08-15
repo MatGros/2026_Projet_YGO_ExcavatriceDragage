@@ -184,7 +184,7 @@ VAR_INPUT
                                              // ce FB ne fait qu'un ABS(CablePosM - ExpectedOtherWinchPosM)
     BenneBusy             : BOOL;         // instBucket.Busy (les 2 instances) — suppression pendant
                                              // le trajet actif (écart transitoire normal, pas un défaut)
-    CriticalSyncToleranceM  : REAL := 2.0;  // 🔧 Méca E — théorique, à ajuster sur site
+    CriticalSyncToleranceM  : REAL := 2.5;  // 🔧 Méca E — écart critique SafeStop (Zone 3 dès 2.5m)
     // 🆕 REX 2026-07-08 (7) : retour terrain — InhibitM1 côté instance M1 (Enable global) ne suffit
     // pas : si c'est l'AUTRE treuil qui est inhibé (ex. M2 en maintenance), M1 continue de comparer
     // sa position à ExpectedOtherWinchPosM (calculé depuis la position figée de M2) — écart croît

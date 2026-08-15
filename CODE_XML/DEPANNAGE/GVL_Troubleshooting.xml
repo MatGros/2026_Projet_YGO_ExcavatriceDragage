@@ -699,20 +699,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Synchro OK | 1 = Écart Synchro Bloquant 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx303_M1_ForbidAscent">
+            <variable name="Idx303_M1_AscentPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M1 Bloquée (Fdc/Safety) 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M1 Autorisée | 0 = Bloquée (Fdc/Safety) 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx304_M2_ForbidAscent">
+            <variable name="Idx304_M2_AscentPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M2 Bloquée (Fdc/Safety) 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M2 Autorisée | 0 = Bloquée (Fdc/Safety) 🔴</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_SyncMotionAllowed">
@@ -1185,7 +1185,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens non interdit (ForbidAscent/ForbidDescent)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens autorisé (AscentPermit/DescendPermit)</xhtml>
               </documentation>
             </variable>
             <variable name="Step7_BrakeReleased">

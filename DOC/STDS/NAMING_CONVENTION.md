@@ -230,13 +230,13 @@ complète sur ce projet (voir incident ci-dessous).
 |---|---|---|---|
 | **Capteur de sécurité** (entrée brute, suffixe `Ok` ou assimilé fail-safe) | `TRUE` = état OK/nominal ; `FALSE` = défaut | `PowerContactorEngaged`, `GVL_IN.SlackCableSwitch`, `GVL_IN.PhaseRotationOk`, `GVL_IN.TopPositionSensor` (sain si non atteint), `GVL_IN.DriveFaultOk` | Câblage NF/energized-to-run : une coupure de câble ou un contact ouvert retombe naturellement à `FALSE` → détecté comme défaut sans câblage supplémentaire. |
 | **Information / état classique** (entrée brute) | `FALSE` = repos ; `TRUE` = capteur atteint/déclenché | `M3_PosTremie_DI`/`PosPV_DI`/`PosP2_DI`/`PosP1_DI`/`PosMaintenance_DI` (ex-Fosse1/Fosse2, renommés 2026-07-18) | Logique directe : "je suis arrivé à la position" = `TRUE`. Pas d'enjeu fail-safe. |
-| **Sortie de COMMANDE d'un bloc Safety** (calculée, PAS un capteur) | `TRUE` = **déclenche** l'action | `SafeStop` (déclenche décél. rapide), `ForbidDescent` (déclenche l'interdiction), `PowerCutOff` (déclenche la coupure) | Nom = un verbe d'action, pas un état de capteur — c'est l'inverse de la famille "sécurité" ci-dessus, volontairement. |
+| **Sortie de COMMANDE / AUTORISATION d'un bloc Safety** (calculée) | `SafeStop` / `PowerCutOff` : `TRUE` = **déclenche** l'action d'arrêt.<br>`AscentPermit` / `DescendPermit` : `TRUE` = **mouvement autorisé**, `FALSE` = **bloqué** (défaut/fail-safe). | `SafeStop`, `PowerCutOff`, `AscentPermit`, `DescendPermit` (décision T109/T112 — remplace les anciens `Forbid*`) | Cohérence fail-safe : la rupture de liaison ou la désactivation d'un FB passe naturellement les autorisations de mouvement à `FALSE`. |
 
 📖 **Deux incidents réels** ont fondé ces règles (SafeStop forcé manuellement · `SlackCableSwitch`
 câblé sans inversion · `PhaseRotationOk` non initialisé) : récits complets dans
 [`ARCHIVES/Doc/AUDITS/REX_Nommage_v1.0.md`](AUDITS/REX_Nommage_v1.0.md).
 
-🚫 **Règle** : ne JAMAIS forcer manuellement une sortie de COMMANDE (`SafeStop`, `ForbidDescent`,
+🚫 **Règle** : ne JAMAIS forcer manuellement une sortie de COMMANDE/AUTORISATION (`SafeStop`, `AscentPermit`, `DescendPermit`,
 `PowerCutOff`) — elle est TOUJOURS calculée par son bloc Safety. Pour un test banc, forcer
 l'entrée CAPTEUR en amont, jamais la sortie de commande.
 

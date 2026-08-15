@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-14T21:46:24.490096" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-14T21:46:24.490096">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T01:12:17.402982" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T01:12:17.402982">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -115,7 +115,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens non interdit (ForbidAscent/ForbidDescent)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens autorisé (AscentPermit/DescendPermit)</xhtml>
               </documentation>
             </variable>
             <variable name="Step7_BrakeReleased">

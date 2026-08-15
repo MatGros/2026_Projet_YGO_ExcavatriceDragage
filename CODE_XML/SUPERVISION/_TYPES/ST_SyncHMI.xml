@@ -109,10 +109,10 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.25" />
+                <simpleValue value="0.8" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

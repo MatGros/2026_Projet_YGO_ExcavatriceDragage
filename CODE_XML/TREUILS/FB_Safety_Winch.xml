@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T00:44:29.852872" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T00:44:29.852872">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T01:11:49.747171" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T01:11:49.747171">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -437,11 +437,11 @@ instBucket.Busy (les 2 instances) — suppression pendant</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="2.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">le trajet actif (écart transitoire normal, pas un défaut)
-🔧 Méca E — théorique, à ajuster sur site</xhtml>
+🔧 Méca E — écart critique SafeStop (Zone 3 dès 2.5m)</xhtml>
               </documentation>
             </variable>
             <variable name="OtherWinchInhibited">

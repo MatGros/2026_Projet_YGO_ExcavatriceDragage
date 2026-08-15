@@ -49,7 +49,7 @@ FB_Winch
 |---|---|---|
 | `Enable/Reset/PowerContactorEngaged/Mode` | — | Standard |
 | `StartStop/SafeStop` | BOOL | Standard mouvement |
-| `ForbidDescent`/`ForbidAscent` | BOOL | Interdictions dédiées (≠ SafeStop, sortie `FB_Safety_Winch`) |
+| `DescendPermit`/`AscentPermit` | BOOL | Autorisations dédiées fail-safe (≠ SafeStop, sortie `FB_Safety_Winch`) |
 | `Direction`/`SpeedRefPct` | INT/REAL | Consigne |
 | `SpeedStepTable` | ST_SpeedStepTable | Table 5 paliers propre au treuil |
 | `CfgMaxStepDescente` :=3 / `MaxStepAscent` :=5 | INT | Plafonds palier |

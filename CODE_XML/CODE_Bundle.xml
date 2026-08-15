@@ -2254,20 +2254,20 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Synchro OK | 1 = Écart Synchro Bloquant 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx303_M1_ForbidAscent">
+            <variable name="Idx303_M1_AscentPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M1 Bloquée (Fdc/Safety) 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M1 Autorisée | 0 = Bloquée (Fdc/Safety) 🔴</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx304_M2_ForbidAscent">
+            <variable name="Idx304_M2_AscentPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = OK | 1 = Montée M2 Bloquée (Fdc/Safety) 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée M2 Autorisée | 0 = Bloquée (Fdc/Safety) 🔴</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_SyncMotionAllowed">
@@ -5944,7 +5944,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens non interdit (ForbidAscent/ForbidDescent)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens autorisé (AscentPermit/DescendPermit)</xhtml>
               </documentation>
             </variable>
             <variable name="Step7_BrakeReleased">
@@ -7293,10 +7293,10 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.25" />
+                <simpleValue value="0.8" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -19007,11 +19007,11 @@ instBucket.Busy (les 2 instances) — suppression pendant</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="2.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">le trajet actif (écart transitoire normal, pas un défaut)
-🔧 Méca E — théorique, à ajuster sur site</xhtml>
+🔧 Méca E — écart critique SafeStop (Zone 3 dès 2.5m)</xhtml>
               </documentation>
             </variable>
             <variable name="OtherWinchInhibited">
@@ -23933,6 +23933,8 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx103_SyncDelta_M    := Sync.State.De
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx202_SyncEnabled_IHM := Sync.Cmd.SelSyncEnable;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx302_SyncFaultActive := Sync.State.Error;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx303_M1_AscentPermit := WinchM1.Safety.AscentPermit;
+GVL_Troubleshooting.LevageSynchroniseM1M2.Idx304_M2_AscentPermit := WinchM2.Safety.AscentPermit;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := WinchM1.State.RelayFwd;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.State.RelayFwd;
 // Idx201_JoyYRaw_Pct / Idx203_ArbitratedSpeed_Pct / Idx303-304_ForbidAscent / Idx401_SyncMotionAllowed /
@@ -28153,20 +28155,20 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (18) : pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1</xhtml>
               </documentation>
             </variable>
-            <variable name="AscentPermitExtractionBottomConfirmed">
+            <variable name="SlackCableAscentStep1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (11) / 2026-08-15 : mode Extraction actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-15 (T111) : mou de câble en récupération -- bride la montée au Palier 1</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledAscentBucketNotClosedSlowSpeed">
+            <variable name="BucketNotClosedAscentStep1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-15 (T114) : benne pas fermée à 100% à la montée -- force palier 1 au lieu de bloquer</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-15 (T114) : benne non fermée à 100% à la montée -- bride la montée au Palier 1</xhtml>
               </documentation>
             </variable>
             <variable name="BypassKoboldFallEdge">
@@ -28477,12 +28479,19 @@ instBucket(
 
 // 🔴🔧 REX 2026-08-07 / 2026-08-15 (T114) : Auto-séquencement benne &amp; Dégradation Palier 1
 // Si la benne est en cours de fermeture/ouverture (instBucket.Busy), le mouvement couplé attend.
-// 🆕 T114 : Si la benne n'est pas fermée (NOT IsClosed) à la montée (CoupledAscentBucketCloseArmed)
-// et que instBucket n'est plus occupé (Busy=FALSE, ex: benne bloquée sur obstacle, timeout ou
-// décalage codeur), on NE BLOQUE PLUS TOTALEMENT la remontée (ce qui bloquerait la benne au fond),
-// mais on dégrade automatiquement la montée au Palier 1 (Vitesse lente, voir instWinchM1/M2).
+// 🆕 T114 : Si la benne n'est pas fermée (NOT IsClosed) et que instBucket n'est plus occupé (Busy=FALSE),
+// toute demande de montée est automatiquement dégradée au Palier 1 (Vitesse lente, voir instWinchM1/M2),
+// protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
 CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Busy;
-CoupledAscentBucketNotClosedSlowSpeed := CoupledAscentBucketCloseArmed AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
+BucketNotClosedAscentStep1 := (M1_Direction_Active = 1 OR M2_Direction_Active = 1) AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
+
+// 🆕 T111 : En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
+// la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
+SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Auth.SyncEnable AND (
+    ((instSafetyWinchM1.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
+    ((instSafetyWinchM2.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
+    (NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI)
+);
 
 SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000;
 SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &gt; 0.0);
@@ -28911,20 +28920,6 @@ IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
     DescendPermitM1_Raw := FALSE;
     DescendPermitM2_Raw := FALSE;
 END_IF;
-// 🔴🔧 REX 2026-08-07 (11) — MÊME CLASSE DE BUG QUE (10) : instExtractionSequence.AscentPermit
-// calculé (FB_ExtractionSequence.st) mais jamais consommé -- rien n'empêchait réellement de monter
-// sans fond confirmé quand le mode Extraction est actif (Enable=TRUE) mais encore en
-// WAIT_BOTTOM_CONFIRMATION. Restreint volontairement à CET état précis (pas READY_TO_CLOSE, où le
-// fond est déjà confirmé par construction, ni CLOSING_BUCKET, où M1 est déjà bloqué par
-// instBucket.Busy et M2 doit continuer sans coupure).
-// 🔴🔧 REX 2026-08-07 (22) — retour terrain, demande client explicite : retiré. L'interdiction de
-// montée sans fond confirmé (correctif 11) gênait les essais même sans mode assistance actif.
-// AscentPermitExtractionBottomConfirmed reste calculé (diagnostic IHM), mais n'est plus
-// appliqué à AscentPermitM1_Raw/M2_Raw.
-AscentPermitExtractionBottomConfirmed := NOT (instExtractionSequence.Enable
-    AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)
-    AND (instExtractionSequence.ExtractionState = E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION));
-
 AscentPermitM1_Raw  := instSafetyWinchM1.AscentPermit;
 AscentPermitM2_Raw  := instSafetyWinchM2.AscentPermit
     // 🔴🔧 REX 2026-08-07 (21bis) — même correctif d'anticipation que DescendPermitM2_Raw ci-dessus.
@@ -28956,7 +28951,8 @@ instWinchM1(
     SpeedRefPct             := M1_SpeedRef_Active,
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1 OR CoupledAscentBucketNotClosedSlowSpeed, EffectiveMaxStepAscent, 1),
+    // 🆕 2026-08-15 (T111 / T113 / T114) : Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := NOT instWinchSync.Error,
@@ -28993,9 +28989,9 @@ instWinchM2(
     // CfgMaxStepDescente n'avait AUCUN plafond, jamais. Corrigé : les deux suivent maintenant
     // instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
     // 🆕 2026-08-15 (T113) : instWinchSync.SyncDegradedStep1 dégrade M2 au Palier 1 sur écart modéré.
-    // 🆕 2026-08-15 (T114) : CoupledAscentBucketNotClosedSlowSpeed dégrade la montée au Palier 1 si benne non fermée/obstruée.
+    // 🆕 2026-08-15 (T114 / T111) : BucketNotClosedAscentStep1 et SlackCableAscentStep1 dégradent la montée au Palier 1.
     CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1 OR CoupledAscentBucketNotClosedSlowSpeed, EffectiveMaxStepAscent, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Error,

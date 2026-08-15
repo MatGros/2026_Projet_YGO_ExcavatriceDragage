@@ -22,7 +22,7 @@ STRUCT
 
     (* 3. Chaîne de Sécurité & Verrous *)
     Step5_NoSafetyFault          : BOOL; (* TRUE = Pas de SafeStop ni AU actif sur cet axe *)
-    Step6_DirectionAllowed       : BOOL; (* TRUE = Sens non interdit (ForbidAscent/ForbidDescent) *)
+    Step6_DirectionAllowed       : BOOL; (* TRUE = Sens autorisé (AscentPermit/DescendPermit) *)
     Step7_BrakeReleased          : BOOL; (* TRUE = Commande frein activée & retour frein OK *)
     Step8_OutputInterlockOk      : BOOL; (* TRUE = Étage de sortie LD débloqué (pas d'interlock actif) *)
 
