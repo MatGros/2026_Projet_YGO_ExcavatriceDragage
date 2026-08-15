@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T14:34:10.448680" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T14:34:10.448680">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T15:07:47.294879" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T15:07:47.294879">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1364,7 +1364,11 @@ IF SimulationModeRise.Q THEN
     GVL_Simulation.SimTranslationActive := TRUE;
     GVL_Simulation.SimOperatorActive := TRUE;
     GVL_Simulation.SimSafetyActive := TRUE;
-    GVL_Simulation.SimJoystickRawButton := TRUE;
+    // 🔧 2026-08-15 : plus d'auto-arm `SimJoystickRawButton := TRUE` — il masquait le vrai
+    // homme-mort (DeadmanArmed restait armé en permanence → rien de testé en sim). Le bouton
+    // suit désormais le stimulus directionnel (FB_SimBench : JoyBtnRaw := SimJoystickRawButton
+    // OR DirectionCount&gt;0), ce qui rejoue fidèlement l'armement au commandement, la grâce 3 s
+    // et la retombée au neutre. SimJoystickRawButton reste un appui manuel (défaut FALSE).
 END_IF;
 
 IF SimulationModeFall.Q THEN
