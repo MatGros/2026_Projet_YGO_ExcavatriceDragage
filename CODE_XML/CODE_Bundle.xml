@@ -19749,7 +19749,7 @@ END_IF;
 
 // 🔍 3quater. MOU DE CÂBLE (physiquement sur tambour M2, câblé sur les 2 instances Safety)
 // Mode NORMAL (SyncEnable=TRUE) → SafeStop M1+M2 (bit3 inclus dans SafeStop)
-// Mode RÉCUPÉRATION (SyncEnable=FALSE) → ForbidAscent uniquement (montée interdite, descente OK)
+// Mode RÉCUPÉRATION (SyncEnable=FALSE) → ForbidDescent uniquement (descente interdite pour ne pas dérouler, montée OK pour retendre/fermer)
 IF NOT BypassProcess AND SlackCableDetected THEN
     ErrorId := ErrorId OR 16#0008;
 ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
@@ -19918,8 +19918,9 @@ ELSE
     SafeStop := (ErrorId AND 16#FF9F) &lt;&gt; 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
-// ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) ou si contacteur coupé (bypasser si BypassGlobal ou BypassCableLimitSwitch)
-// 🆕 REX 2026-08-07 (demande client, audit confirmé) : terme INDÉPENDANT ajouté — check brut sur
+// ⬇️ ForbidDescent : bit6 uniquement (limite basse câble) OU bit3+(NOT SyncEnable) (mou de câble en mode récupération) ou si contacteur coupé
+// 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur bas activé
+// 🔧 REX 2026-08-07 (demande client, audit confirmé) : terme INDÉPENDANT ajouté — check brut sur
 // la limite basse physique (même condition que le calcul du bit6 ci-dessus §3septies, mais évalué
 // HORS du bloc masqué par BypassGlobal), gardé UNIQUEMENT par BypassCableLimitSwitch. Même doctrine
 // que le check brut ForbidAscent ci-dessous (déjà présent) : BypassGlobal M1/M2 continue de masquer
@@ -19932,11 +19933,15 @@ END_IF;
 // même doctrine que le terme câble ci-dessus, un OR direct sur ForbidDescent. Bypassable par
 // BypassProcess (groupé) ou BypassLimitLegal (individuel, MAINT_N2) — jamais par BypassGlobal seul
 // (cohérent avec la doctrine 2026-08-07 : BypassGlobal ne masque plus les protections de position).
+// 🆕 2026-08-15 (T111) : Mou de câble en mode récupération (bit3 + NOT SyncEnable) bloque la
+// DESCENDRE (ForbidDescent) pour éviter de dérouler du câble dans le vide au tambour. L'enroulement
+// (Montée) est au contraire autorisé pour retendre le câble ou fermer la benne.
 ForbidDescent := (((ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
               OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
-              OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal));
+              OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
+              OR (((ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal));
 
-// ⬆️ ForbidAscent : bit5 (fin course haut) OU bit3+(NOT SyncEnable) (bypasser si BypassTopLimitSwitch)
+// ⬆️ ForbidAscent : bit5 (fin course haut) (bypasser si BypassTopLimitSwitch)
 // 🆕 REX 2026-07-08 : Sécurité positive maintenue si capteur haut physiquement activé hors référencement
 // 🔧 REX 2026-08-07 (demande client, audit confirmé) : BypassGlobal RETIRÉ du ET final — la ligne
 // "Sécurité positive maintenue" ci-dessus était contredite par l'ancien `AND NOT (BypassGlobal OR
@@ -19952,8 +19957,7 @@ ForbidDescent := (((ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorE
 // non suspect), gardé UNIQUEMENT par BypassTopLimitSoftware (jamais par BypassGlobal, même doctrine
 // que le reste des protections de position 2026-08-07).
 ForbidAscent := (((ErrorId AND 16#0020) &lt;&gt; 16#0000
-             OR (NOT TopPositionSensor AND NOT InReferencingMode)
-             OR ((ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable))
+             OR (NOT TopPositionSensor AND NOT InReferencingMode))
              AND NOT BypassTopLimitSwitch)
              OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM)) AND NOT BypassTopLimitSoftware);
 
