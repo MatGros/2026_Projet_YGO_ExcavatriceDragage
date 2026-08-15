@@ -83,7 +83,7 @@ d'incohérence de ce FB (voir §3).
 
 ## 4. Alertes et écarts
 
-- Le gel de position empêche des dérives catastrophiques dans la machine d'état du cycle en cas de rupture de signal codeur.
+- 🟢 **Décision Terrain (2026-08-05)** : La position `CablePosMSafe` n'est plus figée artificiellement (`CablePosMSafe := CablePosM`) afin d'éviter tout saut ou à-coup lors de la réacquisition. La sécurité machine repose sur le signal `EncoderIncoherent := TRUE` qui déclenche instantanément le `SafeStop` amont et refuse le mode `SEMI_AUTO`.
 - Voir §3 pour le trou de sécurité perte-bus non couvert par ce FB.
 - 🟠 **Nommage** : `PositionMinM`/`PositionMaxM`/`CablePosM` sans underscore avant le suffixe
   d'unité `M` — non conforme `NAMING_CONVENTION.md` §Suffixes d'unité. Ne pas renommer au fil de

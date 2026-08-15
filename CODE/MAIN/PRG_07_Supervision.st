@@ -238,18 +238,24 @@ IF GVL_IHM.Commun.Bypass.SlackCable <> BypassSlackCable THEN
 END_IF;
 
 // 🎭 GESTION DU MASTER BYPASS DE SIMULATION :
+// 🔒 SÉCURITÉ CHANTIER : Le bypass RETAIN est STRICTEMENT VERROUILLÉ aux modes maintenance (MAINT_N1 / MAINT_N2).
+// Hors mode maintenance (ex: PROD_AUTO, ARRET, etc.), il est forcé à FALSE et désactive immédiatement toutes les dérogations.
+IF (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.MAINT_N1 AND PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.MAINT_N2) THEN
+    SimulationBypassActive := FALSE;
+END_IF;
+
 SimBypassRiseEdge(CLK := SimulationBypassActive);
 SimBypassFallEdge(CLK := SimulationBypassActive);
 
-// 🟢 Front Montant : Active UNIQUEMENT les bypass nécessaires aux essais (Limite Légale + Limite Haute)
-IF SimBypassRiseEdge.Q THEN
+// 🟢 Front Montant (en mode MAINT uniquement) : Active les bypass nécessaires aux essais (Limite Légale + Limite Haute)
+IF SimBypassRiseEdge.Q AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2) THEN
     GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
 END_IF;
 
-// 🔴 Front Descendant : Désactive les bypass (retour aux sécurités)
-IF SimBypassFallEdge.Q THEN
+// 🔴 Front Descendant ou sortie du mode maintenance : Désactive les bypass (retour aux sécurités)
+IF SimBypassFallEdge.Q OR (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.MAINT_N1 AND PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.MAINT_N2) THEN
     GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
@@ -373,8 +379,8 @@ instHmiBannerFormatter(
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
     HomingActive          := (NOT PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed),
-    HomingStepM1          := 0,
-    HomingStepM2          := 0,
+    HomingStepM1          := SEL(PRG_02_Acquisition.instHomingM1.Busy, 0, 1),
+    HomingStepM2          := SEL(PRG_02_Acquisition.instHomingM2.Busy, 0, 1),
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
