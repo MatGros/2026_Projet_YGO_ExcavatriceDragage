@@ -167,6 +167,19 @@ Pi qualifie et propose, l'humain valide en 1 mot.
   `start → handshake → wait → read → mission → wait → read → contrôle` décrit dans
   `INTEGRATIONS.md`.
 
+## 🕵️ Diagnostic / Recherche de blocage
+
+> Déclenché par « cherche le blocage », « pourquoi ça bloque », « diagnostic », « troubleshooting ».
+> Skill : `.claude/skills/troubleshooting/SKILL.md` · Méthode : `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md`
+> Fiches : `DOC/WFLOW/TROUBLESHOOTING/` (gabarit `TEMPLATE_Troubleshooting.md`).
+
+1. **Créer/mettre à jour la fiche** `TROUBLESHOOTING_<Sujet>_<AAAA-MM-JJ>.md` (contexte figé, symptôme, indices, arbre d'hypothèses, journal).
+2. **Contexte figé** : lire la fiche existante ; ne re-pose pas les questions (banc/site, mode, bits, référencement).
+3. **Méthode** : caractériser le symptôme → arbre des causes (6 catégories) → traçage inverse → élimination par **preuve** (lecture `GVL_Troubleshooting`, jamais forcer).
+4. **Critère d'arrêt** : cause racine prouvée, ou frontière au-delà du PLC, ou étape suivante = modifier/forcer → **hand-off humain**.
+5. **Règle `fix:` + `guard:`** : toute cause racine confirmée donne correction **et** garde-fou (cf. double boucle ci-dessous).
+6. **Ne jamais modifier le code ni forcer une variable sans validation humaine.**
+
 ## 🔄 Règle d'apprentissage continu (Double boucle)
 
 Toute erreur détectée — **à n'importe quelle étape** (édition, gate, compilation, test, audit, terrain) — déclenche **deux actions** :

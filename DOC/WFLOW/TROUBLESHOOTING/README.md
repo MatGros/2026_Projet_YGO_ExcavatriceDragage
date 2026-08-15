@@ -19,3 +19,12 @@ Toute nouvelle fiche de depannage doit etre creee a partir de [TEMPLATE_Troubles
 2. **Chaine causale & Diagnostic racine** (Analyse de code ST / Safety).
 3. **Impacts & Decision Safety** (Respect ISO 13849 vs Confort de banc).
 4. **Action corrective & Garde-fous** (Regle ix: + guard:).
+
+---
+
+## 🕵️ Skill & Prompt associes
+
+- **Skill** : `.claude/skills/troubleshooting/SKILL.md` — declenchee par « cherche le blocage » / « pourquoi ca bloque » / « diagnostic » / « troubleshooting ».
+- **Methode complete** : `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md` (contexte fige, arbre des causes 6 categories, tracage inverse, critere d'arret, cas limites CODESYS).
+- **Workflow** : etape « Diagnostic / Recherche de blocage » dans `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`.
+
