@@ -83,10 +83,53 @@ dans la même boîte de dialogue :
 
 ---
 
-## 📚 5. Documents liés
+## 🖱️ 6. Ajouter un bouton de barre d'outils pour lancer un script Python
+
+> 📌 Ajouté le 2026-08-16, utilisé pour les scripts `TOOLS/PLC_LIVE_READER/codesys_console/`
+> (voir [`TOOLS/PLC_LIVE_READER/README.md`](../../../TOOLS/PLC_LIVE_READER/README.md) pour
+> le détail des scripts eux-mêmes — cette section ne couvre que la config IDE générique,
+> réutilisable pour n'importe quel script de scripting engine).
+
+CODESYS permet d'ajouter un bouton personnalisé qui lance un script Python (moteur de
+scripting IronPython intégré) directement, sans repasser par la console de scripting à
+chaque fois.
+
+**Emplacement** : `C:\Program Files\CODESYS 3.5.19.10\CODESYS\Script Commands\`
+(alternative sans droits admin : `%LocalAppData%\CODESYS\Script Commands\`)
+
+**Fichiers requis dans ce dossier** :
+- `config.json` — décrit les boutons (max 16 par emplacement)
+- `<nom>.ico` — icône 16x16 par bouton
+- le script `.py` cible (chemin absolu ou relatif au dossier)
+
+**Format `config.json`** (un objet par bouton) :
+```json
+[
+    {
+        "Name": "Snapshot Troubleshooting",
+        "Desc": "Lance codesys_snapshot_troubleshooting.py",
+        "Icon": "snapshot_troubleshooting.ico",
+        "Path": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\PLC_LIVE_READER\\codesys_console\\codesys_snapshot_troubleshooting.py"
+    }
+]
+```
+
+**Procédure côté IDE** :
+1. Relancer CODESYS après avoir écrit `config.json`.
+2. **Outils → Personnaliser → Icônes de commande** → catégorie *Commandes du moteur de script*.
+3. Onglet **Barres d'outils** → sélectionner/créer une barre → glisser la commande dessus.
+4. Fermer la boîte de dialogue → cliquer l'icône → sortie visible dans la vue **Messages**.
+
+⚠️ Écrire dans `Program Files` nécessite les droits admin (UAC) — préférer l'alternative
+`%LocalAppData%\CODESYS\Script Commands\` si pas de droits admin.
+
+---
+
+## 📚 7. Documents liés
 
 | Document | Rôle |
 |---|---|
 | [`DOC/STDS/CODE_QUALITY_STANDARDS.md §7bis`](DOC/STDS/CODE_QUALITY_STANDARDS.md) | Convention d'écriture des Regions Pragma |
 | [`DOC/STDS/NAMING_CONVENTION.md`](DOC/STDS/NAMING_CONVENTION.md) | Nommage des sections commentées ST |
 | [`DOC/WFLOW/CONTRACTS/TASK_CONTEXT_20260814_REGIONS_PRAGMA_PROJECT.yaml`](DOC/WFLOW/CONTRACTS/TASK_CONTEXT_20260814_REGIONS_PRAGMA_PROJECT.yaml) | Contrat du lot d'introduction des Regions |
+| [`TOOLS/PLC_LIVE_READER/README.md`](../../../TOOLS/PLC_LIVE_READER/README.md) | Scripts concrets utilisant le bouton toolbar (§6) |

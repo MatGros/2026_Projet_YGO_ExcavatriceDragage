@@ -62,37 +62,8 @@ Référence API utilisée (stubs installés avec l'IDE, lues pour ce projet — 
 
 ### 🖱️ Confort — bouton de barre d'outils au lieu de `execfile()` manuel
 
-CODESYS permet d'ajouter un bouton personnalisé qui lance un script Python directement,
-sans repasser par la console de scripting à chaque fois.
-
-**Emplacement** : `C:\Program Files\CODESYS 3.5.19.10\CODESYS\Script Commands\`
-(alternative sans droits admin : `%LocalAppData%\CODESYS\Script Commands\`)
-
-**Fichiers requis dans ce dossier** :
-- `config.json` — décrit les boutons (max 16 par emplacement)
-- `<nom>.ico` — icône 16x16 par bouton
-- le script `.py` cible (chemin absolu ou relatif au dossier)
-
-**Format `config.json`** (un objet par bouton) :
-```json
-[
-    {
-        "Name": "Snapshot Troubleshooting",
-        "Desc": "Lance codesys_snapshot_troubleshooting.py",
-        "Icon": "snapshot_troubleshooting.ico",
-        "Path": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\PLC_LIVE_READER\\codesys_console\\codesys_snapshot_troubleshooting.py"
-    }
-]
-```
-
-**Procédure côté IDE** :
-1. Relancer CODESYS après avoir écrit `config.json`.
-2. **Outils → Personnaliser → Icônes de commande** → catégorie *Commandes du moteur de script*.
-3. Onglet **Barres d'outils** → sélectionner/créer une barre → glisser la commande dessus.
-4. Fermer la boîte de dialogue → cliquer l'icône → sortie visible dans la vue **Messages**.
-
-⚠️ Écrire dans `Program Files` nécessite les droits admin (UAC) — préférer l'alternative
-`%LocalAppData%\CODESYS\Script Commands\` si pas de droits admin.
+Config CODESYS générique (pas spécifique à cet outil) documentée dans
+[`DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md §6`](../../DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md).
 
 ## 🅱️ Mode B — scripts `external_python/`, pour plus tard (test sur site avec HW réel)
 
