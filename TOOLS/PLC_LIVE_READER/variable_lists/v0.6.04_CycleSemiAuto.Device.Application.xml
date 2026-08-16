@@ -1,0 +1,1128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Symbolconfiguration xmlns="http://www.3s-software.com/schemas/Symbolconfiguration.xsd">
+  <Header>
+    <Version>3.5.14.0</Version>
+    <SymbolConfigObject version="4.3.0.0" runtimeid="3.5.19.10" libversion="4.3.0.0" compiler="3.5.19.10" lmm="3.5.19.10" profile="CODESYS V3.5 SP19 Patch 1+" settings="SupportOPCUA, EnableDirectIoAccess, LayoutCalculator=OptimizedClientSideLayoutCalculator" />
+    <ProjectInfo name="v0.6.04_CycleSemiAuto" devicename="Device" appname="Application" />
+  </Header>
+  <TypeList>
+    <TypeArray name="T_ARRAY__0__1048575__OF_WORD" size="0" nativesize="2097152" typeclass="Array" iecname="ARRAY [0..1048575] OF WORD" basetype="T_WORD">
+      <ArrayDim minrange="0" maxrange="1048575" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__131071__OF_WORD" size="0" nativesize="262144" typeclass="Array" iecname="ARRAY [0..131071] OF WORD" basetype="T_WORD">
+      <ArrayDim minrange="0" maxrange="131071" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__2097151__OF_BYTE" size="0" nativesize="2097152" typeclass="Array" iecname="ARRAY [0..2097151] OF BYTE" basetype="T_BYTE">
+      <ArrayDim minrange="0" maxrange="2097151" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__2097151__OF_IecVarAccessLibrary_SymbolicVarsBase_DirectIOBits8" size="0" nativesize="2097152" typeclass="Array" iecname="ARRAY [0..2097151] OF IecVarAccessLibrary.SymbolicVarsBase.DirectIOBits8" basetype="T_DirectIOBits8">
+      <ArrayDim minrange="0" maxrange="2097151" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__262143__OF_BYTE" size="0" nativesize="262144" typeclass="Array" iecname="ARRAY [0..262143] OF BYTE" basetype="T_BYTE">
+      <ArrayDim minrange="0" maxrange="262143" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__262143__OF_IecVarAccessLibrary_SymbolicVarsBase_DirectIOBits8" size="0" nativesize="262144" typeclass="Array" iecname="ARRAY [0..262143] OF IecVarAccessLibrary.SymbolicVarsBase.DirectIOBits8" basetype="T_DirectIOBits8">
+      <ArrayDim minrange="0" maxrange="262143" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__262143__OF_LWORD" size="0" nativesize="2097152" typeclass="Array" iecname="ARRAY [0..262143] OF LWORD" basetype="T_LWORD">
+      <ArrayDim minrange="0" maxrange="262143" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__32767__OF_LWORD" size="0" nativesize="262144" typeclass="Array" iecname="ARRAY [0..32767] OF LWORD" basetype="T_LWORD">
+      <ArrayDim minrange="0" maxrange="32767" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__524287__OF_DWORD" size="0" nativesize="2097152" typeclass="Array" iecname="ARRAY [0..524287] OF DWORD" basetype="T_DWORD">
+      <ArrayDim minrange="0" maxrange="524287" />
+    </TypeArray>
+    <TypeArray name="T_ARRAY__0__65535__OF_DWORD" size="0" nativesize="262144" typeclass="Array" iecname="ARRAY [0..65535] OF DWORD" basetype="T_DWORD">
+      <ArrayDim minrange="0" maxrange="65535" />
+    </TypeArray>
+    <TypeUserDef name="T_DirectIOBits8" size="0" nativesize="1" typeclass="Userdef" pouclass="STRUCTURE" iecname="DirectIOBits8">
+      <UserDefElement iecname="x0" type="T_BIT_X_0" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="x1" type="T_BIT_X_1" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="x2" type="T_BIT_X_2" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="x3" type="T_BIT_X_3" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="x4" type="T_BIT_X_4" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="x5" type="T_BIT_X_5" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="x6" type="T_BIT_X_6" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="x7" type="T_BIT_X_7" byteoffset="0" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeSimple name="T_BIT_X_0" size="0" swapsize="0" typeclass="Bit" iecname="BIT" bitoffset="0" />
+    <TypeSimple name="T_BIT_X_1" size="0" swapsize="0" typeclass="Bit" iecname="BIT" bitoffset="1" />
+    <TypeSimple name="T_BIT_X_2" size="0" swapsize="0" typeclass="Bit" iecname="BIT" bitoffset="2" />
+    <TypeSimple name="T_BIT_X_3" size="0" swapsize="0" typeclass="Bit" iecname="BIT" bitoffset="3" />
+    <TypeSimple name="T_BIT_X_4" size="0" swapsize="0" typeclass="Bit" iecname="BIT" bitoffset="4" />
+    <TypeSimple name="T_BIT_X_5" size="0" swapsize="0" typeclass="Bit" iecname="BIT" bitoffset="5" />
+    <TypeSimple name="T_BIT_X_6" size="0" swapsize="0" typeclass="Bit" iecname="BIT" bitoffset="6" />
+    <TypeSimple name="T_BIT_X_7" size="0" swapsize="0" typeclass="Bit" iecname="BIT" bitoffset="7" />
+    <TypeSimple name="T_BOOL" size="1" swapsize="0" typeclass="Bool" iecname="BOOL" />
+    <TypeSimple name="T_BYTE" size="1" swapsize="1" typeclass="Byte" iecname="BYTE" />
+    <TypeSimple name="T_DINT" size="4" swapsize="4" typeclass="DInt" iecname="DINT" />
+    <TypeSimple name="T_DWORD" size="0" swapsize="0" typeclass="DWord" iecname="DWORD" />
+    <TypeSimple name="T_INT" size="2" swapsize="2" typeclass="Int" iecname="INT" />
+    <TypeSimple name="T_LWORD" size="0" swapsize="0" typeclass="LWord" iecname="LWORD" />
+    <TypeSimple name="T_REAL" size="4" swapsize="4" typeclass="Real" iecname="REAL" />
+    <TypeSimple name="T_STRING_120_" size="121" swapsize="0" typeclass="String" iecname="STRING(120)" />
+    <TypeSimple name="T_STRING_80_" size="81" swapsize="0" typeclass="String" iecname="STRING(80)" />
+    <TypeSimple name="T_TIME" size="4" swapsize="4" typeclass="Time" iecname="TIME" />
+    <TypeSimple name="T_UDINT" size="4" swapsize="4" typeclass="UDInt" iecname="UDINT" />
+    <TypeSimple name="T_UINT" size="2" swapsize="2" typeclass="UInt" iecname="UINT" />
+    <TypeSimple name="T_WORD" size="2" swapsize="2" typeclass="Word" iecname="WORD" />
+    <TypeUserDef name="T_DEVICE_STATE" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="DEVICE_STATE" basetype="T_INT">
+      <UserDefElement type="T_DEVICE_STATE" iecname="UNKNOWN" enumvalue="0" />
+      <UserDefElement type="T_DEVICE_STATE" iecname="STOPPED" enumvalue="1" />
+      <UserDefElement type="T_DEVICE_STATE" iecname="RUNNING" enumvalue="2" />
+      <UserDefElement type="T_DEVICE_STATE" iecname="ERROR" enumvalue="3" />
+      <UserDefElement type="T_DEVICE_STATE" iecname="DISABLED" enumvalue="4" />
+      <UserDefElement type="T_DEVICE_STATE" iecname="NOT_CONFIGURED" enumvalue="5" />
+      <UserDefElement type="T_DEVICE_STATE" iecname="CONFIGURED" enumvalue="6" />
+      <UserDefElement type="T_DEVICE_STATE" iecname="NOT_FOUND" enumvalue="7" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_CycleStep" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_CycleStep" basetype="T_INT">
+      <UserDefElement type="T_E_CycleStep" iecname="X0_PREPARATION" enumvalue="0" />
+      <UserDefElement type="T_E_CycleStep" iecname="X1_HOMING" enumvalue="1" />
+      <UserDefElement type="T_E_CycleStep" iecname="X2_WORK_POS_SELECT" enumvalue="2" />
+      <UserDefElement type="T_E_CycleStep" iecname="X3_OPEN_BUCKET" enumvalue="3" />
+      <UserDefElement type="T_E_CycleStep" iecname="X4_DESCEND_OPEN" enumvalue="4" />
+      <UserDefElement type="T_E_CycleStep" iecname="X5_BOTTOM_CONFIRMED" enumvalue="5" />
+      <UserDefElement type="T_E_CycleStep" iecname="X6_CLOSE_BUCKET" enumvalue="6" />
+      <UserDefElement type="T_E_CycleStep" iecname="X7_CTRL_ASCENT" enumvalue="7" />
+      <UserDefElement type="T_E_CycleStep" iecname="X8_ASCENT_LOADED" enumvalue="8" />
+      <UserDefElement type="T_E_CycleStep" iecname="X9_DRAIN_PAUSE" enumvalue="9" />
+      <UserDefElement type="T_E_CycleStep" iecname="X10_TRANSLATE_DUMP" enumvalue="10" />
+      <UserDefElement type="T_E_CycleStep" iecname="X11_OPEN_DUMP" enumvalue="11" />
+      <UserDefElement type="T_E_CycleStep" iecname="X13_DONE_SYNC" enumvalue="13" />
+      <UserDefElement type="T_E_CycleStep" iecname="STABILIZING" enumvalue="14" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_Diag_State" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_Diag_State" basetype="T_INT">
+      <UserDefElement type="T_E_Diag_State" iecname="DISABLED" enumvalue="0" />
+      <UserDefElement type="T_E_Diag_State" iecname="READY" enumvalue="1" />
+      <UserDefElement type="T_E_Diag_State" iecname="INIT" enumvalue="2" />
+      <UserDefElement type="T_E_Diag_State" iecname="MONITORING" enumvalue="3" />
+      <UserDefElement type="T_E_Diag_State" iecname="ERROR" enumvalue="4" />
+      <UserDefElement type="T_E_Diag_State" iecname="SIMULATED" enumvalue="5" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_DiveSearchState" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_DiveSearchState" basetype="T_INT">
+      <UserDefElement type="T_E_DiveSearchState" iecname="WAIT_PRECONDITIONS" enumvalue="0" />
+      <UserDefElement type="T_E_DiveSearchState" iecname="READY_TO_DESCEND" enumvalue="1" />
+      <UserDefElement type="T_E_DiveSearchState" iecname="SEARCHING_IMMERSION" enumvalue="2" />
+      <UserDefElement type="T_E_DiveSearchState" iecname="SEARCHING_BOTTOM" enumvalue="3" />
+      <UserDefElement type="T_E_DiveSearchState" iecname="BOTTOM_CONFIRMED" enumvalue="4" />
+      <UserDefElement type="T_E_DiveSearchState" iecname="ERROR_HOLD" enumvalue="5" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_ExtractionSequenceState" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_ExtractionSequenceState" basetype="T_INT">
+      <UserDefElement type="T_E_ExtractionSequenceState" iecname="WAIT_BOTTOM_CONFIRMATION" enumvalue="0" />
+      <UserDefElement type="T_E_ExtractionSequenceState" iecname="READY_TO_CLOSE" enumvalue="1" />
+      <UserDefElement type="T_E_ExtractionSequenceState" iecname="CLOSING_BUCKET" enumvalue="2" />
+      <UserDefElement type="T_E_ExtractionSequenceState" iecname="CONTROL_ASCENT" enumvalue="3" />
+      <UserDefElement type="T_E_ExtractionSequenceState" iecname="NOMINAL_ASCENT" enumvalue="4" />
+      <UserDefElement type="T_E_ExtractionSequenceState" iecname="ERROR_HOLD" enumvalue="5" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_Mode" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_Mode" basetype="T_INT">
+      <UserDefElement type="T_E_Mode" iecname="DISABLE" enumvalue="0" />
+      <UserDefElement type="T_E_Mode" iecname="MAINT_N1" enumvalue="1" />
+      <UserDefElement type="T_E_Mode" iecname="MAINT_N2" enumvalue="2" />
+      <UserDefElement type="T_E_Mode" iecname="SEMI_AUTO" enumvalue="3" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_State" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_State" basetype="T_INT">
+      <UserDefElement type="T_E_State" iecname="DISABLED" enumvalue="0" />
+      <UserDefElement type="T_E_State" iecname="INIT" enumvalue="1" />
+      <UserDefElement type="T_E_State" iecname="READY" enumvalue="2" />
+      <UserDefElement type="T_E_State" iecname="BUSY" enumvalue="3" />
+      <UserDefElement type="T_E_State" iecname="DONE" enumvalue="4" />
+      <UserDefElement type="T_E_State" iecname="STOPPING" enumvalue="5" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_TranslationFinalInterlockReason" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_TranslationFinalInterlockReason" basetype="T_INT">
+      <UserDefElement type="T_E_TranslationFinalInterlockReason" iecname="NONE" enumvalue="0" />
+      <UserDefElement type="T_E_TranslationFinalInterlockReason" iecname="BRAKE_COMMAND_NOT_CONFIRMED" enumvalue="1" />
+      <UserDefElement type="T_E_TranslationFinalInterlockReason" iecname="RESTART_INHIBITED" enumvalue="2" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_WinchFinalInterlockReason" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_WinchFinalInterlockReason" basetype="T_INT">
+      <UserDefElement type="T_E_WinchFinalInterlockReason" iecname="NONE" enumvalue="0" />
+      <UserDefElement type="T_E_WinchFinalInterlockReason" iecname="BRAKE_COMMAND_NOT_CONFIRMED" enumvalue="1" />
+      <UserDefElement type="T_E_WinchFinalInterlockReason" iecname="RESTART_INHIBITED" enumvalue="2" />
+    </TypeUserDef>
+    <TypeUserDef name="T_E_WinchFinalInterlockState" size="2" nativesize="2" swapsize="2" typeclass="Enum" iecname="E_WinchFinalInterlockState" basetype="T_INT">
+      <UserDefElement type="T_E_WinchFinalInterlockState" iecname="DISABLED" enumvalue="0" />
+      <UserDefElement type="T_E_WinchFinalInterlockState" iecname="READY" enumvalue="1" />
+      <UserDefElement type="T_E_WinchFinalInterlockState" iecname="WAIT_BRAKE_COMMAND_CONFIRMATION" enumvalue="2" />
+      <UserDefElement type="T_E_WinchFinalInterlockState" iecname="WAIT_STEP_DELAY" enumvalue="3" />
+      <UserDefElement type="T_E_WinchFinalInterlockState" iecname="WAIT_RESTART_DELAY" enumvalue="4" />
+      <UserDefElement type="T_E_WinchFinalInterlockState" iecname="FAULT" enumvalue="5" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BucketCmd" size="6" nativesize="6" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BucketCmd">
+      <UserDefElement iecname="BtnOpen" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnClose" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnReset" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnConfirmOpenPos" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnConfirmClosePos" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglManualBucketLimits" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BucketConfig" size="20" nativesize="20" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BucketConfig">
+      <UserDefElement iecname="OffsetOpenM" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="OffsetCloseM" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CoherenceLimitM" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CloseAnticipationM" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="OpenAnticipationM" type="T_REAL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BucketState" size="17" nativesize="20" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BucketState">
+      <UserDefElement iecname="IsOpen" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="IsClosed" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TooOpen" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TooClosed" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="IsIntermediate" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LastPosM2Open" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LastPosM2Close" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="StateIncoherent" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BypassBucket" size="2" nativesize="2" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BypassBucket">
+      <UserDefElement iecname="Global" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BypassCommun" size="7" nativesize="7" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BypassCommun">
+      <UserDefElement iecname="Global" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SlackCable" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TopLimitSwitch" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TopLimitSoftware" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CableLimitSwitch" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitLegal" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BypassNetwork" size="7" nativesize="7" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BypassNetwork">
+      <UserDefElement iecname="Joystick" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EncoderM1" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EncoderM2" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="VariateurM3" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="IhmHeartbeat" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Global" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BypassSync" size="2" nativesize="2" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BypassSync">
+      <UserDefElement iecname="Global" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BypassTranslation" size="14" nativesize="14" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BypassTranslation">
+      <UserDefElement iecname="OperatorComm" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DriveComm" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ContactorFeedback" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PhaseRotation" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeThermal" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitSwitch" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SensorIncoherent" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MinHeight" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaA" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaB" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Safety" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Process" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Global" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BypassWinch" size="19" nativesize="19" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BypassWinch">
+      <UserDefElement iecname="OperatorComm" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EncoderFault" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ContactorFeedback" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PhaseRotation" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeThermal" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MotorThermal" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TopLimitSwitch" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TopLimitSoftware" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CableLimitSwitch" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitLegal" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaA" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaB" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaC" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaD" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaE" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Safety" type="T_BOOL" byteoffset="15" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Process" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Global" type="T_BOOL" byteoffset="17" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ChainWinchSync" size="42" nativesize="44" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ChainWinchSync">
+      <UserDefElement iecname="Idx101_M1_CablePos_M" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx102_M2_CablePos_M" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx103_SyncDelta_M" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx201_JoyYRaw_Pct" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx202_SyncEnabled_IHM" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx203_ArbitratedSpeed_Pct" type="T_REAL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx301_EmergencyChainClosed" type="T_BOOL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx302_SyncFaultActive" type="T_BOOL" byteoffset="25" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx303_M1_AscentPermit" type="T_BOOL" byteoffset="26" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx304_M2_AscentPermit" type="T_BOOL" byteoffset="27" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx401_SyncMotionAllowed" type="T_BOOL" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx402_M1_SetpointSpeed_Pct" type="T_REAL" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx403_M2_SetpointSpeed_Pct" type="T_REAL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx501_M1_CmdRelayFwd_DQ" type="T_BOOL" byteoffset="40" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx502_M2_CmdRelayFwd_DQ" type="T_BOOL" byteoffset="41" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Translation_Inputs" size="16" nativesize="16" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Translation_Inputs">
+      <UserDefElement iecname="Idx101_PosTremie_DI" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx102_PosPV_DI" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx103_PosP2_DI" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx104_PosP1_DI" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx105_PosMaintenance_DI" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx106_DriveActualFreq_Hz" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx107_DriveStatusWord" type="T_WORD" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx108_BrakeApplied" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx109_DriveThermalOk" type="T_BOOL" byteoffset="15" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Translation_Outputs" size="5" nativesize="6" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Translation_Outputs">
+      <UserDefElement iecname="Idx501_CmdDriveControlWord" type="T_WORD" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx502_CmdDriveFreq_Hz" type="T_UINT" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx503_CmdBrakeRelease_RQ" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Translation_Safety" size="8" nativesize="8" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Translation_Safety">
+      <UserDefElement iecname="Idx301_EmergencyChainClosed" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx302_SafeStopActive" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx303_PowerCutOffActive" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx304_LimitSwitchFwdActive" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx305_LimitSwitchRevActive" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx306_BypassLimitSwitch" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx307_PositionDecoderIncoherent" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx308_HeightInterlockBlocking" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Winch_Inputs" size="11" nativesize="12" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Winch_Inputs">
+      <UserDefElement iecname="Idx101_EncoderRawPos" type="T_DINT" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx102_CablePos_M" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx103_ContactorsReleased_DI" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx104_BrakeApplied" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx105_ThermalOk_DI" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Winch_Outputs" size="5" nativesize="5" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Winch_Outputs">
+      <UserDefElement iecname="Idx501_CmdRelayFwd_Up_DQ" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx502_CmdRelayRev_Down_DQ" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx503_CmdSpeedContactor1_DQ" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx504_CmdSpeedContactor4_DQ" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx505_CmdBrakeRelease_RQ" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Winch_Safety" size="12" nativesize="12" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Winch_Safety">
+      <UserDefElement iecname="Idx301_EmergencyChainClosed" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx302_SafeStopActive" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx303_PowerCutOffActive" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx304_TopSensorPhysical_DI" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx305_TopSensorBypassActive" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx306_ForbidAscentEffective" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx307_SlackCablePhysical_DI" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx308_SlackCableBypassActive" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx309_ForbidDescentEffective" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx310_MecaFaultMask" type="T_WORD" byteoffset="10" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_CommunCfg" size="21" nativesize="24" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_CommunCfg">
+      <UserDefElement iecname="LimitLegalDepthMinAllowed_M" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitLegalEnabled" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SelHomingApproachEnable" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchMaxStepDescente" type="T_INT" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchMaxStepAscent" type="T_INT" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchSlowdownDistance_M" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchSlowdownMaxStep" type="T_INT" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglEnableKoboldAutoStopDescent" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglEnableCoupledBucketSequencing" type="T_BOOL" byteoffset="19" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ContactorCheck" size="4" nativesize="4" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ContactorCheck">
+      <UserDefElement iecname="Command" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Feedback" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="StuckClosed" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="StuckOpen" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_CycleCfg" size="9" nativesize="12" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_CycleCfg">
+      <UserDefElement iecname="SetDepth_M" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SetOffset_M" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_CycleCmd" size="4" nativesize="4" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_CycleCmd">
+      <UserDefElement iecname="BtnStart" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnPause" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnAbort" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnReset" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_DredgingAssistCfg" size="20" nativesize="20" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_DredgingAssistCfg">
+      <UserDefElement iecname="DiveStartMin_M" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ImmersionUpper_M" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ImmersionLower_M" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ExtractionControlDistance_M" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglEnableDiveSearch" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglEnableExtractionSequence" type="T_BOOL" byteoffset="17" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglEnableDumpAtTremie" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="19" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_DredgingAssistCmd" size="5" nativesize="5" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_DredgingAssistCmd">
+      <UserDefElement iecname="TglEnableDiveSearch" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglEnableExtractionSequence" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglBucketAtBottomConfirmed" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglBypassDiveSearchSequence" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglEnableDumpAtTremie" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_HomingChecklist" size="18" nativesize="18" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_HomingChecklist">
+      <UserDefElement iecname="Step1_ModeAuthorized" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step2_WinchSelected" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step3_EncoderAvailable" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_ContactorsReleased_DI" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_BrakeIsOpen_DI" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_TopPositionFree_DI" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step4_ContactorsReleased" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step5_BrakeApplied" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TopPositionSensorActive" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BucketIsOpen" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AllConditionsMet" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingBusy" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingDone" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingHomed" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingSuspect" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RejectErrorMask" type="T_WORD" byteoffset="16" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_HwMachine" size="8" nativesize="8" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_HwMachine">
+      <UserDefElement iecname="PowerContactorEngaged_DI" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EmergencyChainClosed_DI" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PhaseRotationOk_DI" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_M3_BrakeThermalOk_DI" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_M2_KoboldBottomTouch_DI" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HydraulicThermalOk_DI" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ConveyorInfeedReady_DI" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HopperFull_OR_GateRaised_DI" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_InputModuleDiagHMI" size="4" nativesize="4" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_InputModuleDiagHMI">
+      <UserDefElement iecname="LocalDigitalIoOk" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Vh0800EndOk" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Vh0808EtpOk" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Fault" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_JoystickChecklist" size="28" nativesize="28" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_JoystickChecklist">
+      <UserDefElement iecname="Step1_CanBusActive" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step2_JoystickOperational" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_JoyBtnRaw_DI" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="NeutralXAct" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="NeutralYAct" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step3_DeadmanPressed" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step4_NeutralAcquired" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeadmanArmed" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AllConditionsMet" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="JoystickSelected" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SelJoystickWinch" type="T_INT" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RawX" type="T_INT" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RawY" type="T_INT" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeflectionX_Pct" type="T_REAL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeflectionY_Pct" type="T_REAL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DirectionX" type="T_INT" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DirectionY" type="T_INT" byteoffset="26" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_JoystickCmd" size="1" nativesize="1" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_JoystickCmd">
+      <UserDefElement iecname="BtnCalibrate" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Joystick_AxisCmd" size="10" nativesize="12" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Joystick_AxisCmd">
+      <UserDefElement iecname="Enable" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="StartStop" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedRef" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Direction" type="T_INT" byteoffset="8" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_MotionChecklist" size="24" nativesize="24" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_MotionChecklist">
+      <UserDefElement iecname="Step1_PowerEngaged" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step2_ModeAuthorized" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step3_NotBusyOtherTask" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_PowerContactorEngaged_DI" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_BrakeIsOpen_DI" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cmd_BrakeRelease" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step4_MotionRequested" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RequestedDirection" type="T_INT" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RequestedSpeedPct" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step5_NoSafetyFault" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step6_DirectionAllowed" type="T_BOOL" byteoffset="17" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step7_BrakeReleased" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step8_OutputInterlockOk" type="T_BOOL" byteoffset="19" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AllConditionsMet" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RelayFwdActive" type="T_BOOL" byteoffset="21" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RelayRevActive" type="T_BOOL" byteoffset="22" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedContactor1Active" type="T_BOOL" byteoffset="23" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_OperatorAction" size="123" nativesize="124" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_OperatorAction">
+      <UserDefElement iecname="ActionId" type="T_WORD" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Text" type="T_STRING_120_" byteoffset="2" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_PreflightHMI" size="6" nativesize="6" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_PreflightHMI">
+      <UserDefElement iecname="BtnRun" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PreflightOk" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PreflightDone" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PreflightBusy" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PreflightErrorId" type="T_WORD" byteoffset="4" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_SafetyChecklist" size="26" nativesize="26" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_SafetyChecklist">
+      <UserDefElement iecname="SimulationModeActive" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SimSafetyActive" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_EmergencyChainClosed_DI" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_PowerContactorEngaged_DI" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HwIn_EmergencyBtnCut_HMI" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step1_InputModulesOk" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step2_EmergencyBtnNotCut" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step3_EmergencyChainClosed" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step4_ContactorReleased" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Step5_ArmingAllowed" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ArmingStep" type="T_INT" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ArmingPulseActive" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ArmingBusy" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LockoutActive" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerContactorEngaged" type="T_BOOL" byteoffset="15" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerCutOffActive" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MaintainAActive" type="T_BOOL" byteoffset="17" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MaintainBActive" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AllConditionsMet" type="T_BOOL" byteoffset="19" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafetyError" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ArmingErrorId" type="T_WORD" byteoffset="22" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RedundancyTestFailed" type="T_BOOL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ArmingFailed" type="T_BOOL" byteoffset="25" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_SafetyTranslation" size="17" nativesize="18" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_SafetyTranslation">
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorOperatorComm" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorDriveComm" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorPhaseRotation" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorBrakeThermal" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorMecaB" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorMecaA" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorLimitSwitch" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorSensorIncoherent" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafeStop" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerCutOff" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BlockedBySafety" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerCutOffSafety" type="T_BOOL" byteoffset="15" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafeStopSafety" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_SafetyWinch" size="43" nativesize="44" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_SafetyWinch">
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafeStop" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DescendPermit" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AscentPermit" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SlackCable" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ThermalFault" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EncoderFault" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BypassActive" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CableLimitDescent" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CableLimitAscent" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaADrift_M" type="T_REAL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaCDrift_M" type="T_REAL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MecaBElapsedTime" type="T_TIME" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerCutOff" type="T_BOOL" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BlockedBySafety" type="T_BOOL" byteoffset="29" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerCutOffSafety" type="T_BOOL" byteoffset="30" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SafeStopSafety" type="T_BOOL" byteoffset="31" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorOperatorComm" type="T_BOOL" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorEncoder" type="T_BOOL" byteoffset="33" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorPhaseRotation" type="T_BOOL" byteoffset="34" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorBrakeThermal" type="T_BOOL" byteoffset="35" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorMecaA" type="T_BOOL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorMecaB" type="T_BOOL" byteoffset="37" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorMecaC" type="T_BOOL" byteoffset="38" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorMecaD" type="T_BOOL" byteoffset="39" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorMecaE" type="T_BOOL" byteoffset="40" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorOppositeDir" type="T_BOOL" byteoffset="41" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorNoMovement" type="T_BOOL" byteoffset="42" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_SyncCfg" size="5" nativesize="8" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_SyncCfg">
+      <UserDefElement iecname="CfgSyncTolerance_M" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_SyncCmd" size="1" nativesize="1" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_SyncCmd">
+      <UserDefElement iecname="SelSyncEnable" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_TranslationCfg" size="13" nativesize="16" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_TranslationCfg">
+      <UserDefElement iecname="CfgApproachSpeedTremie_Hz" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgApproachSpeedMaintenance_Hz" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgApproachSpeedP1_Hz" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_TranslationCmd" size="15" nativesize="16" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_TranslationCmd">
+      <UserDefElement iecname="SelPositioning" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SelTarget" type="T_INT" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnFwd" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnRev" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SetFreq_Hz" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="InvertDirection" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglMaintenanceZoneAccess" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_WinchCfg" size="29" nativesize="32" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchCfg">
+      <UserDefElement iecname="CfgTopSensorPos_M" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgHomingTarget_M" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgRampAccelRate" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgRampDecelNormalRate" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgRampDecelFastRate" type="T_REAL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgCableLimitDescent_M" type="T_REAL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgCableLimitAscent_M" type="T_REAL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="28" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_WinchCmd" size="7" nativesize="7" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchCmd">
+      <UserDefElement iecname="BtnUp" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnDown" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnReset" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnHome" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnConfirmCoherence" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnInhibit" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnHomingAtZero" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_WinchSymmetryHMI" size="28" nativesize="28" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchSymmetryHMI">
+      <UserDefElement iecname="BtnReset" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SymmetryOk" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SymmetryValid" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeltaStartDelay_Ms" type="T_UDINT" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeltaBrakeReleaseTime_Ms" type="T_UDINT" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeltaBrakeApplyTime_Ms" type="T_UDINT" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeltaStopDistance_M" type="T_REAL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeltaStopTime_Ms" type="T_UDINT" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MaxSyncDeviation_M" type="T_REAL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BucketCfg" size="25" nativesize="28" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BucketCfg">
+      <UserDefElement iecname="Config" type="T_ST_BucketConfig" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CfgTimeoutDuration" type="T_TIME" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Initialized" type="T_BOOL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BucketHMIState" size="57" nativesize="64" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BucketHMIState">
+      <UserDefElement iecname="MechState" type="T_ST_BucketState" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FBState" type="T_E_State" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ActiveOffset_M" type="T_REAL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2StartStop" type="T_BOOL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2Direction" type="T_INT" byteoffset="26" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2ForceSlowSpeed" type="T_BOOL" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Ready" type="T_BOOL" byteoffset="29" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Busy" type="T_BOOL" byteoffset="30" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Done" type="T_BOOL" byteoffset="31" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="34" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RemainingTravel_M" type="T_REAL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeltaPosition_M" type="T_REAL" byteoffset="40" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CloseActive" type="T_BOOL" byteoffset="44" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="OpenActive" type="T_BOOL" byteoffset="45" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2PositionCorrected" type="T_REAL" byteoffset="48" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AutoBucketSeqActive" type="T_BOOL" byteoffset="52" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CoupledDiveOpenArmed" type="T_BOOL" byteoffset="53" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CoupledAscentCloseArmed" type="T_BOOL" byteoffset="54" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ControlAscentActive" type="T_BOOL" byteoffset="55" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CoupledMotionBlockedByBucket" type="T_BOOL" byteoffset="56" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ChainBucket" size="48" nativesize="48" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ChainBucket">
+      <UserDefElement iecname="Idx101_BucketIsOpen" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx102_BucketIsClosed" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx103_OffsetPos_M" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx104_AutoSeqActive" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx105_StateIncoherent" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx106_FBState" type="T_E_State" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx107_LastPosM2Open_M" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx108_LastPosM2Close_M" type="T_REAL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx109_BucketTooOpen" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx110_BucketTooClosed" type="T_BOOL" byteoffset="21" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx111_BucketIsIntermediate" type="T_BOOL" byteoffset="22" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx112_DeltaPosition_M" type="T_REAL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx201_HmiCmd_BtnOpen" type="T_BOOL" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx202_HmiCmd_BtnClose" type="T_BOOL" byteoffset="29" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx203_CycleCmd_Open" type="T_BOOL" byteoffset="30" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx204_CoupledDiveOpenArmed" type="T_BOOL" byteoffset="31" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx205_CoupledAscentCloseArmed" type="T_BOOL" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx206_CloseReqActive" type="T_BOOL" byteoffset="33" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx207_OpenReqActive" type="T_BOOL" byteoffset="34" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx208_MotionBlockedByBucket" type="T_BOOL" byteoffset="35" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx301_EmergencyChainClosed" type="T_BOOL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx302_BucketFaultActive" type="T_BOOL" byteoffset="37" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx303_KoboldAutoStopEnabled" type="T_BOOL" byteoffset="38" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx304_KoboldImmersionConfirmed" type="T_BOOL" byteoffset="39" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx305_KoboldBottomTouchLatched" type="T_BOOL" byteoffset="40" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx306_ErrorIdRaw" type="T_WORD" byteoffset="42" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx401_BucketBusy" type="T_BOOL" byteoffset="44" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx402_BucketDone" type="T_BOOL" byteoffset="45" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx403_ControlAscentActive" type="T_BOOL" byteoffset="46" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx501_M2_CmdRev_DQ" type="T_BOOL" byteoffset="47" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ChainContextGlobal" size="13" nativesize="14" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ChainContextGlobal">
+      <UserDefElement iecname="Idx101_ModeActive" type="T_E_Mode" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx102_SimulationEnabled" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx103_JoystickCommOk" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx201_JoystickSelected" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx202_BypassNetworkGlobal" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx203_BypassSensorsGlobal" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx301_EmergencyChainClosed" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx302_PowerContactorEngaged" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx303_SafeStopActiveAny" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx304_PowerCutOffActiveAny" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx401_HmiHeartbeatOk" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx402_CycleAutoBusy" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ChainDredgingAssist" size="152" nativesize="152" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ChainDredgingAssist">
+      <UserDefElement iecname="Idx101_EnableDiveSearch" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx102_EnableExtractionSequence" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx103_EnableDumpAtTremie" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx201_DiveReady" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx202_DiveBusy" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx203_DiveDone" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx204_DiveState" type="T_E_DiveSearchState" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx205_DiveError" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx206_DiveErrorId" type="T_WORD" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx207_BottomTouchConfirmed" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx301_ExtractionReady" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx302_ExtractionBusy" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx303_ExtractionDone" type="T_BOOL" byteoffset="15" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx304_ExtractionState" type="T_E_ExtractionSequenceState" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx305_ExtractionError" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx306_ExtractionErrorId" type="T_WORD" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx401_OperatorActionId" type="T_WORD" byteoffset="22" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx402_OperatorAction" type="T_STRING_120_" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx501_DumpAtTremieArmed" type="T_BOOL" byteoffset="145" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx502_DumpAtTremieAssistActive" type="T_BOOL" byteoffset="146" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx503_DumpAtTremieAtTremie" type="T_BOOL" byteoffset="147" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx504_DumpAtTremieBucketOpenArmed" type="T_BOOL" byteoffset="148" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx505_DumpAtTremieDescentLocked" type="T_BOOL" byteoffset="149" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx601_BypassDiveActive" type="T_BOOL" byteoffset="150" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx602_BypassKoboldBottomTouched" type="T_BOOL" byteoffset="151" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Translation_Control" size="20" nativesize="20" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Translation_Control">
+      <UserDefElement iecname="Idx401_MotionAllowed" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx402_SetpointFreq_Hz" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx403_DriveControlWord" type="T_WORD" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx404_FinalInterlockState" type="T_E_State" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx405_FinalInterlockReason" type="T_E_TranslationFinalInterlockReason" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx406_BrakeCommandOpenConfirmed" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx407_BrakeTimeoutElapsed" type="T_TIME" byteoffset="16" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Translation_Demandes" size="24" nativesize="24" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Translation_Demandes">
+      <UserDefElement iecname="Idx201_JoyXRaw_ANA" type="T_INT" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx202_JoyXScaled_Pct" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx203_HmiCmd_BtnFwd" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx204_HmiCmd_BtnRev" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx205_HmiTargetPosition" type="T_INT" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx206_CycleTargetPosition" type="T_INT" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx207_ModeActive" type="T_E_Mode" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx208_BypassNetworkActive" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx209_ArbitratedSpeed_Pct" type="T_REAL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Winch_Control" size="40" nativesize="40" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Winch_Control">
+      <UserDefElement iecname="Idx401_MotionAllowed" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx402_SpeedStepCalculated" type="T_INT" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx403_SpeedRamp_Pct" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx404_BrakeReleaseAuthorized" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx405_FinalInterlockState" type="T_E_WinchFinalInterlockState" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx406_FinalInterlockReason" type="T_E_WinchFinalInterlockReason" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx407_FinalAuthorizedStep" type="T_INT" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx408_BrakeCommandOpenConfirmed" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx409_BrakeTimeoutElapsed" type="T_TIME" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx410_RestartDelayElapsed" type="T_TIME" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx411_StepDelayElapsed" type="T_TIME" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx412_InTopSlowdownZone" type="T_BOOL" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx413_InBottomSlowdownZone" type="T_BOOL" byteoffset="33" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx414_BottomLimitActiveM" type="T_REAL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Chain_Winch_Demandes" size="26" nativesize="28" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Chain_Winch_Demandes">
+      <UserDefElement iecname="Idx201_JoyRawPhysical_ANA" type="T_INT" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx202_JoyScaledPhysical_Pct" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx203_HmiManualCmd_BtnUp" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx204_HmiManualCmd_BtnDown" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx205_CycleAutoCmd_Pct" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx206_ModeActive" type="T_E_Mode" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx207_BypassOperatorComm" type="T_BOOL" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx208_ArbitratedSpeed_Pct" type="T_REAL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Idx209_ArbitratedDirection" type="T_INT" byteoffset="24" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_CommunHMI" size="86" nativesize="92" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_CommunHMI">
+      <UserDefElement iecname="TopPositionSensorActive" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeThermalFault" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PhaseRotationFault" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitLegalReached" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cfg" type="T_ST_CommunCfg" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HydraulicThermalFault" type="T_BOOL" byteoffset="25" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Bypass" type="T_ST_BypassCommun" byteoffset="26" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SimTopSensorBypassActive" type="T_BOOL" byteoffset="33" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SimSlackCableBypassActive" type="T_BOOL" byteoffset="34" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglHeartbeatIhm" type="T_BOOL" byteoffset="35" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglHeartbeatPlc" type="T_BOOL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HeartbeatIhmOk" type="T_BOOL" byteoffset="37" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HeartbeatIhmTimeout" type="T_BOOL" byteoffset="38" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HeartbeatIhmElapsed" type="T_TIME" byteoffset="40" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnWinchBothUp" type="T_BOOL" byteoffset="44" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnWinchBothDown" type="T_BOOL" byteoffset="45" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ConfigRestoredFromPersistent" type="T_BOOL" byteoffset="46" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnAckConfigRestored" type="T_BOOL" byteoffset="47" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Preflight" type="T_ST_PreflightHMI" byteoffset="48" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchSymmetry" type="T_ST_WinchSymmetryHMI" byteoffset="56" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="KoboldImmersionConfirmed" type="T_BOOL" byteoffset="84" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="KoboldBottomTouchLatched" type="T_BOOL" byteoffset="85" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_CycleState" size="132" nativesize="132" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_CycleState">
+      <UserDefElement iecname="Ready" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Busy" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Done" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CycleStep" type="T_E_CycleStep" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CycleStateStr" type="T_STRING_80_" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SelTarget" type="T_INT" byteoffset="90" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="KoboldContactFond" type="T_BOOL" byteoffset="92" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="KoboldContactorCmd" type="T_BOOL" byteoffset="93" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitLegalReached" type="T_BOOL" byteoffset="94" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitLegalDepth_M" type="T_REAL" byteoffset="96" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchSyncError" type="T_BOOL" byteoffset="100" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="WinchSyncDelta_M" type="T_REAL" byteoffset="104" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedMismatch_Mps" type="T_REAL" byteoffset="108" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedMismatchActive" type="T_BOOL" byteoffset="112" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedMismatchConfirmed" type="T_BOOL" byteoffset="113" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1Position_M" type="T_REAL" byteoffset="116" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2Position_M" type="T_REAL" byteoffset="120" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeadmanArmed" type="T_BOOL" byteoffset="124" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="JoystickMotionActive" type="T_BOOL" byteoffset="125" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MotionPermit" type="T_BOOL" byteoffset="126" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CycleStepAtError" type="T_E_CycleStep" byteoffset="128" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SampleCount" type="T_INT" byteoffset="130" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_Diag_Device" size="10" nativesize="10" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_Diag_Device">
+      <UserDefElement iecname="Online" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Operational" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_E_Diag_State" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="StateAtError" type="T_E_Diag_State" byteoffset="8" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_DredgingAssistState" size="148" nativesize="148" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_DredgingAssistState">
+      <UserDefElement iecname="DiveReady" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DiveBusy" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DiveDone" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DiveError" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DiveErrorId" type="T_WORD" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DiveState" type="T_E_DiveSearchState" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BottomTouchConfirmed" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ExtractionReady" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ExtractionBusy" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ExtractionDone" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ExtractionError" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ExtractionErrorId" type="T_WORD" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ExtractionState" type="T_E_ExtractionSequenceState" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="OperatorActionId" type="T_WORD" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="OperatorAction" type="T_STRING_120_" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DumpAtTremieArmed" type="T_BOOL" byteoffset="141" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DumpAtTremieAssistActive" type="T_BOOL" byteoffset="142" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DumpAtTremieAtTremie" type="T_BOOL" byteoffset="143" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DumpAtTremieBucketOpenArmed" type="T_BOOL" byteoffset="144" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DumpAtTremieDescentLocked" type="T_BOOL" byteoffset="145" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BypassDiveActive" type="T_BOOL" byteoffset="146" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BypassKoboldBottomTouched" type="T_BOOL" byteoffset="147" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_EncoderHMI" size="36" nativesize="36" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_EncoderHMI">
+      <UserDefElement iecname="RawPos" type="T_UDINT" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Alarms" type="T_UINT" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Warnings" type="T_UINT" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SlaveOperational" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PresetTriggerCmd" type="T_WORD" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PresetValueOut" type="T_UDINT" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="18" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Homed" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingBusy" type="T_BOOL" byteoffset="21" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingDone" type="T_BOOL" byteoffset="22" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingError" type="T_BOOL" byteoffset="23" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingErrorId" type="T_WORD" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingState" type="T_E_State" byteoffset="26" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingStateAtError" type="T_E_State" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingSuspect" type="T_BOOL" byteoffset="30" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HomingRefRaw" type="T_UDINT" byteoffset="32" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_HwOperator" size="10" nativesize="10" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_HwOperator">
+      <UserDefElement iecname="JoyXRaw_ANA1" type="T_INT" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="JoyYRaw_ANA2" type="T_INT" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="JoyBtnRaw" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CanBusState" type="T_INT" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="JOY1_DeviceState" type="T_DEVICE_STATE" byteoffset="8" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_HwTranslation" size="14" nativesize="14" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_HwTranslation">
+      <UserDefElement iecname="M3_PosTremie_DI" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_PosPV_DI" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_PosPVP2_DI" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_PosP1_DI" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_PosMaintenance_DI" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_BrakeIsOpen_DI" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_ThermalOK_DI" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_StatusWord" type="T_WORD" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M3_ActualFrequencyHz" type="T_UINT" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AC600_DeviceState" type="T_DEVICE_STATE" byteoffset="12" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_HwWinch" size="30" nativesize="32" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_HwWinch">
+      <UserDefElement iecname="M1_ContactorsReleased_DI" type="T_BOOL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_ThermalOk_DI" type="T_BOOL" byteoffset="1" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1_BrakeIsOpen_DI" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2_ContactorsReleased_DI" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2_ThermalOk_DI" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2_BrakeIsOpen_DI" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M1M2_TopPositionFree_DI" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="M2_TensionedCable_DI" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="COD1_PosValue" type="T_UDINT" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="COD1_Alarms" type="T_UINT" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="COD1_Warnings" type="T_UINT" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="COD1_DeviceState" type="T_DEVICE_STATE" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="COD2_PosValue" type="T_UDINT" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="COD2_Alarms" type="T_UINT" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="COD2_Warnings" type="T_UINT" byteoffset="26" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="COD2_DeviceState" type="T_DEVICE_STATE" byteoffset="28" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_JoystickState" size="42" nativesize="44" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_JoystickState">
+      <UserDefElement iecname="RawX" type="T_INT" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RawY" type="T_INT" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RawButton" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AxisCmdX" type="T_ST_Joystick_AxisCmd" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AxisCmdY" type="T_ST_Joystick_AxisCmd" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="NeutralXAct" type="T_INT" byteoffset="30" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="NeutralYAct" type="T_INT" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DeadmanArmed" type="T_BOOL" byteoffset="34" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AtNeutral" type="T_BOOL" byteoffset="35" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Online" type="T_BOOL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Operational" type="T_BOOL" byteoffset="37" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="38" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="40" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ModesCmd" size="9" nativesize="10" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ModesCmd">
+      <UserDefElement iecname="SelMode" type="T_E_Mode" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnFaultReset" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnModeReset" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnEmergencyArming" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BtnEmergencyCutOff" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SelJoystickWinch" type="T_INT" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="TglJoystickMaster" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ModesState" size="11" nativesize="12" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ModesState">
+      <UserDefElement iecname="CurrentMode" type="T_E_Mode" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerContactorEngaged" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AnyFaultActive" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerCutOffActive" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EmergencyChainOk" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PowerContactorOk" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EmergencyArmable" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EmergencyArmingBusy" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RedundancyTestFailed" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EmergencyArmingFailed" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_SyncState" size="14" nativesize="16" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_SyncState">
+      <UserDefElement iecname="DeltaPos_M" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SyncActive" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SyncWarn" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SyncDegradedStep1" type="T_BOOL" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Ready" type="T_BOOL" byteoffset="7" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FBState" type="T_E_State" byteoffset="12" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_TranslationState" size="76" nativesize="76" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_TranslationState">
+      <UserDefElement iecname="FBState" type="T_E_State" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Ready" type="T_BOOL" byteoffset="2" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Busy" type="T_BOOL" byteoffset="3" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Done" type="T_BOOL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="5" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="6" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeCmd" type="T_BOOL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeFeedback" type="T_BOOL" byteoffset="9" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionSensorTarget" type="T_BOOL" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionReached" type="T_BOOL" byteoffset="11" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="JoystickDeflection_Pct" type="T_REAL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DriveActualFreq_Hz" type="T_REAL" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DriveControlWord" type="T_WORD" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DriveFreqRef_Hz" type="T_REAL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ActiveDirection" type="T_INT" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ActiveSpeedRef_Pct" type="T_REAL" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalInterlockState" type="T_E_State" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalInterlockReason" type="T_E_TranslationFinalInterlockReason" byteoffset="38" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalInterlockError" type="T_BOOL" byteoffset="40" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalInterlockErrorId" type="T_WORD" byteoffset="42" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeCommandOpenConfirmed" type="T_BOOL" byteoffset="44" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalBrakeTimeoutElapsed" type="T_TIME" byteoffset="48" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DriveCommReady" type="T_BOOL" byteoffset="52" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DrivePowerReady" type="T_BOOL" byteoffset="53" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionTremie" type="T_BOOL" byteoffset="54" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionPV" type="T_BOOL" byteoffset="55" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionP2" type="T_BOOL" byteoffset="56" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionP1" type="T_BOOL" byteoffset="57" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="PositionMaintenance" type="T_BOOL" byteoffset="58" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AtTremie" type="T_BOOL" byteoffset="59" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AtPV" type="T_BOOL" byteoffset="60" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AtP2" type="T_BOOL" byteoffset="61" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AtP1" type="T_BOOL" byteoffset="62" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="AtMaintenance" type="T_BOOL" byteoffset="63" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EstimatedPosM3_M" type="T_REAL" byteoffset="64" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SensorsWord" type="T_BYTE" byteoffset="68" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SensorWordIncoherent" type="T_BOOL" byteoffset="69" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitSwitchFwd" type="T_BOOL" byteoffset="70" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LimitSwitchRev" type="T_BOOL" byteoffset="71" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DriveThermalOk" type="T_BOOL" byteoffset="72" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MaintenanceTargetEnable" type="T_BOOL" byteoffset="73" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SimulationModeActive" type="T_BOOL" byteoffset="74" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="HeightInterlockBlocking" type="T_BOOL" byteoffset="75" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_BucketHMI" size="95" nativesize="104" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_BucketHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_BucketCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_BucketHMIState" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cfg" type="T_ST_BucketCfg" byteoffset="68" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Bypass" type="T_ST_BypassBucket" byteoffset="93" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ChainTranslation" size="73" nativesize="76" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ChainTranslation">
+      <UserDefElement iecname="Inputs_100" type="T_ST_Chain_Translation_Inputs" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Demandes_200" type="T_ST_Chain_Translation_Demandes" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Safety_300" type="T_ST_Chain_Translation_Safety" byteoffset="40" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Control_400" type="T_ST_Chain_Translation_Control" byteoffset="48" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Outputs_500" type="T_ST_Chain_Translation_Outputs" byteoffset="68" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ChainWinch" size="97" nativesize="100" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ChainWinch">
+      <UserDefElement iecname="Inputs_100" type="T_ST_Chain_Winch_Inputs" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Demandes_200" type="T_ST_Chain_Winch_Demandes" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Safety_300" type="T_ST_Chain_Winch_Safety" byteoffset="38" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Control_400" type="T_ST_Chain_Winch_Control" byteoffset="52" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Outputs_500" type="T_ST_Chain_Winch_Outputs" byteoffset="92" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_CycleHMI" size="145" nativesize="148" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_CycleHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_CycleCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_CycleState" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cfg" type="T_ST_CycleCfg" byteoffset="136" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_DredgingAssistHMI" size="176" nativesize="176" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_DredgingAssistHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_DredgingAssistCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cfg" type="T_ST_DredgingAssistCfg" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_DredgingAssistState" byteoffset="28" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_HardwareImage" size="62" nativesize="64" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_HardwareImage">
+      <UserDefElement iecname="Winch" type="T_ST_HwWinch" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Translation" type="T_ST_HwTranslation" byteoffset="30" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Operator" type="T_ST_HwOperator" byteoffset="44" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Machine" type="T_ST_HwMachine" byteoffset="54" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_JoystickHMI" size="46" nativesize="48" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_JoystickHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_JoystickCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_JoystickState" byteoffset="4" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_ModesHMI" size="21" nativesize="22" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_ModesHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_ModesCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_ModesState" byteoffset="10" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_NetworkDiagHMI" size="79" nativesize="80" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_NetworkDiagHMI">
+      <UserDefElement iecname="BusCanOpen" type="T_ST_Diag_Device" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Joystick" type="T_ST_Diag_Device" byteoffset="10" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CanError" type="T_BOOL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CanErrorId" type="T_WORD" byteoffset="22" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BusEthercat" type="T_ST_Diag_Device" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EncoderM1" type="T_ST_Diag_Device" byteoffset="34" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EncoderM2" type="T_ST_Diag_Device" byteoffset="44" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="VariateurM3" type="T_ST_Diag_Device" byteoffset="54" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EcatError" type="T_BOOL" byteoffset="64" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EcatErrorId" type="T_WORD" byteoffset="66" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="InputModules" type="T_ST_InputModuleDiagHMI" byteoffset="68" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Bypass" type="T_ST_BypassNetwork" byteoffset="72" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_SyncHMI" size="27" nativesize="32" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_SyncHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_SyncCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_SyncState" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cfg" type="T_ST_SyncCfg" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Bypass" type="T_ST_BypassSync" byteoffset="25" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_TranslationHMI" size="137" nativesize="140" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_TranslationHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_TranslationCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_TranslationState" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cfg" type="T_ST_TranslationCfg" byteoffset="92" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Bypass" type="T_ST_BypassTranslation" byteoffset="105" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Safety" type="T_ST_SafetyTranslation" byteoffset="120" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_WinchState" size="137" nativesize="140" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchState">
+      <UserDefElement iecname="Position_M" type="T_REAL" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="MeasuredSpeed_Mps" type="T_REAL" byteoffset="4" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedDelta_Mps" type="T_REAL" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedVariationDetected" type="T_BOOL" byteoffset="12" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedVariationConfirmed" type="T_BOOL" byteoffset="13" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedStable" type="T_BOOL" byteoffset="14" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedMonitorError" type="T_BOOL" byteoffset="15" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedMonitorErrorId" type="T_WORD" byteoffset="16" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="EstimatedLoadPct" type="T_REAL" byteoffset="20" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="LoadEstimateConfigured" type="T_BOOL" byteoffset="24" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedGuardLimited" type="T_BOOL" byteoffset="25" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="SpeedRef_Pct" type="T_REAL" byteoffset="28" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="StepNumber" type="T_INT" byteoffset="32" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FBState" type="T_E_State" byteoffset="34" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Ready" type="T_BOOL" byteoffset="36" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Busy" type="T_BOOL" byteoffset="37" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Done" type="T_BOOL" byteoffset="38" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Error" type="T_BOOL" byteoffset="39" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ErrorId" type="T_WORD" byteoffset="40" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RelayFwd" type="T_BOOL" byteoffset="42" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="RelayRev" type="T_BOOL" byteoffset="43" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Contactor1" type="T_BOOL" byteoffset="44" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Contactor2" type="T_BOOL" byteoffset="45" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Contactor3" type="T_BOOL" byteoffset="46" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Contactor4" type="T_BOOL" byteoffset="47" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeCmd" type="T_BOOL" byteoffset="48" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalInterlockState" type="T_E_WinchFinalInterlockState" byteoffset="50" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalInterlockReason" type="T_E_WinchFinalInterlockReason" byteoffset="52" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalInterlockError" type="T_BOOL" byteoffset="54" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalInterlockErrorId" type="T_WORD" byteoffset="56" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalRestartInhibit" type="T_BOOL" byteoffset="58" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeCommandOpenConfirmed" type="T_BOOL" byteoffset="59" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalAuthorizedStep" type="T_INT" byteoffset="60" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalBrakeTimeoutElapsed" type="T_TIME" byteoffset="64" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalRestartDelayElapsed" type="T_TIME" byteoffset="68" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="FinalStepDelayElapsed" type="T_TIME" byteoffset="72" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Encoder" type="T_ST_EncoderHMI" byteoffset="76" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="ContactorsCheck" type="T_ST_ContactorCheck" byteoffset="112" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BrakeContactorCheck" type="T_ST_ContactorCheck" byteoffset="116" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="InhibitActive" type="T_BOOL" byteoffset="120" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="BottomLimitActiveM" type="T_REAL" byteoffset="124" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="InTopSlowdownZone" type="T_BOOL" byteoffset="128" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="InBottomSlowdownZone" type="T_BOOL" byteoffset="129" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="CommandedDirection" type="T_INT" byteoffset="130" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DirectionChangeDelayElapsed" type="T_TIME" byteoffset="132" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="DirectionChangePending" type="T_BOOL" byteoffset="136" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_WinchBenneHMI" size="339" nativesize="348" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchBenneHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_WinchCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_WinchState" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cfg" type="T_ST_WinchCfg" byteoffset="148" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Safety" type="T_ST_SafetyWinch" byteoffset="180" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Bypass" type="T_ST_BypassWinch" byteoffset="223" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Bucket" type="T_ST_BucketHMI" byteoffset="244" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+    <TypeUserDef name="T_ST_WinchHMI" size="242" nativesize="244" typeclass="Userdef" pouclass="STRUCTURE" iecname="ST_WinchHMI">
+      <UserDefElement iecname="Cmd" type="T_ST_WinchCmd" byteoffset="0" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="State" type="T_ST_WinchState" byteoffset="8" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Cfg" type="T_ST_WinchCfg" byteoffset="148" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Safety" type="T_ST_SafetyWinch" byteoffset="180" vartype="VAR" access="ReadWrite" />
+      <UserDefElement iecname="Bypass" type="T_ST_BypassWinch" byteoffset="223" vartype="VAR" access="ReadWrite" />
+    </TypeUserDef>
+  </TypeList>
+  <NodeList>
+    <Node name="__MIO">
+      <Node name="InfoAreaSizeInput" type="T_DWORD" access="Read" />
+      <Node name="InfoAreaSizeMemory" type="T_DWORD" access="Read" />
+      <Node name="InfoAreaSizeOutput" type="T_DWORD" access="Read" />
+      <Node name="InfoBitWordAddressing" type="T_BOOL" access="Read" />
+      <Node name="InfoByteAddressing" type="T_BOOL" access="Read" />
+      <Node name="InfoWriteableInputs" type="T_BOOL" access="Read" />
+    </Node>
+    <Node name="Application">
+      <Node name="GVL_IHM">
+        <Node name="Commun" type="T_ST_CommunHMI" access="ReadWrite" />
+        <Node name="Cycle" type="T_ST_CycleHMI" access="ReadWrite" />
+        <Node name="DredgingAssist" type="T_ST_DredgingAssistHMI" access="ReadWrite" />
+        <Node name="HmiInitDone" type="T_BOOL" access="ReadWrite" />
+        <Node name="JOY1Joystick" type="T_ST_JoystickHMI" access="ReadWrite" />
+        <Node name="M1M2Sync" type="T_ST_SyncHMI" access="ReadWrite" />
+        <Node name="M1TreuilRetenue" type="T_ST_WinchHMI" access="ReadWrite" />
+        <Node name="M2TreuilBenne" type="T_ST_WinchBenneHMI" access="ReadWrite" />
+        <Node name="Modes" type="T_ST_ModesHMI" access="ReadWrite" />
+        <Node name="Network" type="T_ST_NetworkDiagHMI" access="ReadWrite" />
+        <Node name="OperatorAction" type="T_ST_OperatorAction" access="ReadWrite" />
+        <Node name="TranslationM3" type="T_ST_TranslationHMI" access="ReadWrite" />
+      </Node>
+      <Node name="GVL_Troubleshooting">
+        <Node name="AssistanceDragage" type="T_ST_ChainDredgingAssist" access="ReadWrite" />
+        <Node name="BenneOuvertureFermeture" type="T_ST_ChainBucket" access="ReadWrite" />
+        <Node name="ContexteMachineGlobal" type="T_ST_ChainContextGlobal" access="ReadWrite" />
+        <Node name="HomingM1" type="T_ST_HomingChecklist" access="ReadWrite" />
+        <Node name="HomingM2" type="T_ST_HomingChecklist" access="ReadWrite" />
+        <Node name="Inputs" type="T_ST_HardwareImage" access="ReadWrite" />
+        <Node name="Joystick" type="T_ST_JoystickChecklist" access="ReadWrite" />
+        <Node name="LevageSynchroniseM1M2" type="T_ST_ChainWinchSync" access="ReadWrite" />
+        <Node name="LevageUnitaireM1" type="T_ST_ChainWinch" access="ReadWrite" />
+        <Node name="LevageUnitaireM2" type="T_ST_ChainWinch" access="ReadWrite" />
+        <Node name="MotionM1" type="T_ST_MotionChecklist" access="ReadWrite" />
+        <Node name="MotionM2" type="T_ST_MotionChecklist" access="ReadWrite" />
+        <Node name="MotionM3" type="T_ST_MotionChecklist" access="ReadWrite" />
+        <Node name="Safety" type="T_ST_SafetyChecklist" access="ReadWrite" />
+        <Node name="TranslationPontM3" type="T_ST_ChainTranslation" access="ReadWrite" />
+      </Node>
+    </Node>
+  </NodeList>
+</Symbolconfiguration>
