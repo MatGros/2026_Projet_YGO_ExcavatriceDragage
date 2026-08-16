@@ -5,8 +5,7 @@ A executer DANS la console de scripting CODESYS (Tools > Scripting), projet en l
 (Login fait). Lit la liste de variables generee par generate_variable_list.py et ecrit un
 CSV horodate dans le meme dossier.
 
-Encodage CSV aligne sur FB_SnapshotTroubleshooting (DOC/AF/AF_Partie-12_Fonction_Diagnostic/
-FB_SnapshotTroubleshooting_v1.0.md) : separateur ";", decimale ".", fin de ligne CRLF.
+Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_LIVE_READER/README.md.
 """
 import os
 import time

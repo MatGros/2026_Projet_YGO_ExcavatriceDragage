@@ -3,9 +3,11 @@
 > 🎯 Objectif : lire en live des variables du programme (HW réel ou simulation) et produire un
 > CSV pour un agent de dépannage.
 >
-> Complémentaire à `FB_SnapshotTroubleshooting` (export CSV côté PLC, déclenché par bit IHM,
-> voir `DOC/AF/AF_Partie-12_Fonction_Diagnostic/FB_SnapshotTroubleshooting_v1.0.md`) : ces
+> Remplace l'ancien `FB_SnapshotTroubleshooting` (export CSV côté PLC, FB supprimé — voir
+> `ARCHIVES/Doc/AF_Partie-12_Fonction_Diagnostic/FB_SnapshotTroubleshooting_v1.0.md`) : ces
 > scripts lisent en direct depuis l'extérieur, sans avoir besoin de déclencher un snapshot PLC.
+>
+> 🗄️ **Encodage CSV** (figé) : séparateur `;` · décimale `.` · fin de ligne `CRLF`.
 
 ## 📁 Organisation
 

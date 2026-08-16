@@ -11,8 +11,7 @@ d'arriere-plan gere le minutage (time.sleep), et ne repasse sur le thread princi
 pour les tres breves lectures read_values() - la console CODESYS reste utilisable entre
 deux lectures.
 
-Encodage CSV aligne sur FB_SnapshotTroubleshooting (DOC/AF/AF_Partie-12_Fonction_Diagnostic/
-FB_SnapshotTroubleshooting_v1.0.md) : separateur ";", decimale ".", fin de ligne CRLF.
+Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_LIVE_READER/README.md.
 """
 import os
 import threading

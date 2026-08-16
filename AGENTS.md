@@ -145,6 +145,7 @@ d'application → `4bis.` vérification mécanique **bloquante** → `5.` REX ve
 Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document : [DOC/README.md](DOC/README.md).
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
+- [DSH_PROVIDERS](DOC/WFLOW/DSH_PROVIDERS.md) — 🔌 provider `omniroute` + délégation multi-modèles (workflow `provider`/`model`)
 - [PLAN_TASK](DOC/WFLOW/PLAN_TASK.md) — 🗂️ **pilotage, pas une spec** : état des tâches, reliquats, TBD
 - [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
   `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),
