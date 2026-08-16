@@ -4,8 +4,7 @@
 A executer DANS la console de scripting CODESYS (Tools > Scripting), projet en ligne
 (Login fait). Reutilise la meme session en ligne pour les deux GVL (un seul login).
 
-Encodage CSV aligne sur FB_SnapshotTroubleshooting (DOC/AF/AF_Partie-12_Fonction_Diagnostic/
-FB_SnapshotTroubleshooting_v1.0.md) : separateur ";", decimale ".", fin de ligne CRLF.
+Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_LIVE_READER/README.md.
 """
 import os
 import time
