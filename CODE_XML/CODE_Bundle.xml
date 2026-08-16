@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T10:38:34.846022" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T10:38:34.846022">
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-15T10:38:34.846022">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
+          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -7152,45 +7152,6 @@ TRUE = Défaut sécurité actif</xhtml>
    ═══════════════════════════════════════════════════════════════
     📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
               DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_SnapshotColumn">
-        <baseType>
-          <struct>
-            <variable name="Name">
-              <type>
-                <string length="80" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nom de la colonne (condensé)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Value">
-              <type>
-                <string length="80" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur convertie en texte</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>f16b41e5-29d4-57f5-819b-5ead73ecf2be</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💾 FB_SnapshotExporter — Moteur fichier CSV commun (CAA File)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : écrit un snapshot CSV sur front de bit, machine d'état
-      multi-scan (IDLE→OPEN→WRITE→CLOSE→DONE/ERROR), 1 chunk/scan.
-   🔒 Polarité : TRUE = action/état actif ; FALSE = repos.
-   🧩 Architecture : FB technique non-mouvement, lecture seule + fichier.
-   📄 Docs : DOC/AF/AF_Partie-12_Fonction_Diagnostic/FB_SnapshotTroubleshooting_v1.0.md
-      · DOC/AF/AF_Partie-12_Fonction_Diagnostic/FB_SnapshotIHM_v1.0.md
-   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_SpeedStepTable">
@@ -34710,198 +34671,6 @@ instTroubleshootingView(
           </data>
         </addData>
       </pou>
-      <pou name="PRG_Pool" pouType="program">
-        <interface>
-          <inputVars />
-          <outputVars />
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💾 PRG_Pool — Traitement des jobs async CAA File
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : appelle le pool extender chaque cycle (dans la tâche
-      'myPoolExtender') pour traiter les jobs async d'écriture fichier.
-   📄 Docs : bibliothèque RSU + CAA File.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">GVL_Pool.myPoolExtender;   // traite les jobs async chaque cycle
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>1ef86f90-6a27-50b0-9cba-d261a15b6dab</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="PRG_PoolInit" pouType="program">
-        <interface>
-          <inputVars />
-          <outputVars />
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💾 PRG_PoolInit — Initialisation du pool de ressources CAA File
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : configure FILE.g_FileClass + pool extender (UNE fois, au boot).
-   📄 Docs : CAA File 3.5.19 « Resource Management » · bibliothèque RSU.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">IF NOT GVL_Pool.PoolInitDone THEN
-    GVL_Pool.myPoolExtender.Reset(RSU.g_AsyncProperty);
-    FILE.g_FileClass.Reset(
-        udiInitialPoolSize    := 40 * SIZEOF(__XWORD),
-        udiNumExtensionBlocks := 20,
-        itfPoolExtender       := GVL_Pool.myPoolExtender
-    );
-    GVL_Pool.PoolInitDone := TRUE;
-END_IF
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>054ec182-fe65-56b3-9de0-3bf488da226c</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="PRG_TestCaaFile" pouType="program">
-        <interface>
-          <inputVars />
-          <outputVars />
-          <localVars>
-            <variable name="sFileName">
-              <type>
-                <string length="120" />
-              </type>
-              <initialValue>
-                <simpleValue value="" />
-              </initialValue>
-            </variable>
-            <variable name="sCsvLine">
-              <type>
-                <string length="255" />
-              </type>
-            </variable>
-            <variable name="xStart">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-            </variable>
-            <variable name="TestDone">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-            </variable>
-            <variable name="TestError">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-            </variable>
-            <variable name="iStep">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-            </variable>
-            <variable name="iGood">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="520" />
-              </initialValue>
-            </variable>
-            <variable name="iBad">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="41" />
-              </initialValue>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧪 PRG_TestCaaFile — Test écriture CSV avec CAA File
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : sur front xStart, ouvre/écrit/ferme un fichier CSV
-      (avec le pool async CAA File initialisé par PRG_PoolInit).
-   📄 Docs : bibliothèque CAA File 3.5.19 (namespace FILE).
-   ═══════════════════════════════════════════════════════════════</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-CASE iStep OF
-    0:
-        TestDone := FALSE;
-        IF xStart THEN
-            xStart := FALSE;
-            sCsvLine := CONCAT('Pieces_OK;', TO_STRING(iGood));
-            sCsvLine := CONCAT(sCsvLine, '$NPieces_NOK;');
-            sCsvLine := CONCAT(sCsvLine, TO_STRING(iBad));
-            sCsvLine := CONCAT(sCsvLine, '$N');
-            iStep := 10;
-        END_IF;
-
-    10:  // Open
-        fbOpen(xExecute := TRUE, sFileName := sFileName, eFileMode := FILE.MODE.MWRITE);
-        IF fbOpen.xDone THEN
-            hFile := fbOpen.hFile;
-            fbOpen(xExecute := FALSE);
-            iStep := 11;
-        ELSIF fbOpen.xError THEN
-            TestError := TRUE; iStep := 99;
-        END_IF;
-
-    11:  // Write
-        fbWrite(xExecute := TRUE, hFile := hFile,
-                pBuffer := ADR(sCsvLine), szSize := TO_UDINT(LEN(sCsvLine)));
-        IF fbWrite.xDone THEN
-            fbWrite(xExecute := FALSE); iStep := 12;
-        ELSIF fbWrite.xError THEN
-            TestError := TRUE; iStep := 99;
-        END_IF;
-
-    12:  // Close
-        fbClose(xExecute := TRUE, hFile := hFile);
-        IF fbClose.xDone THEN
-            fbClose(xExecute := FALSE); TestDone := TRUE; iStep := 0;
-        ELSIF fbClose.xError THEN
-            TestError := TRUE; iStep := 99;
-        END_IF;
-
-    99:  // Erreur → reset
-        fbOpen(xExecute := FALSE); fbWrite(xExecute := FALSE); fbClose(xExecute := FALSE);
-        iStep := 0;
-END_CASE;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e39978ba-cafa-5124-9f06-b33a0760ad82</ObjectId>
-          </data>
-        </addData>
-      </pou>
     </pous>
   </types>
   <instances>
@@ -35311,35 +35080,6 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
    ───────────────────────────────────────────────────────────────
    📄 Lot A : Mise en service et calibration de la machine de dragage.
    💾 Déclaré en RETAIN pour la persistance des configurations opérateur.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </globalVars>
-    </data>
-    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_Pool">
-        <variable name="PoolInitDone">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">init exécutée une seule fois</xhtml>
-          </documentation>
-        </variable>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e1fea29a-0231-564a-9437-7407ed23a0cc</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💾 GVL_Pool — Pool de ressources CAA File (RSU)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : instance globale du pool extender CAA File, pour traiter
-      les jobs async d'écriture fichier (évite ASM_CREATEJOB_FAILED).
-   📄 Docs : bibliothèque RSU (CAA Resource Management) + CAA File.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </globalVars>
@@ -35786,7 +35526,6 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
           <Object Name="FB_Diag_IhmHeartbeat" ObjectId="7e9589ba-412d-5501-80d5-184905e87d23" />
           <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
-          <Object Name="ST_SnapshotColumn" ObjectId="f16b41e5-29d4-57f5-819b-5ead73ecf2be" />
         </Folder>
         <Folder Name="MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
@@ -35970,13 +35709,9 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="PRG_05_Translation" ObjectId="95eac511-a67e-587f-8b68-f1908c57a87a" />
           <Object Name="PRG_06_Outputs_LD" ObjectId="53276475-eafc-5c22-bbb7-6266f2b95c27" />
           <Object Name="PRG_07_Supervision" ObjectId="06b3a23e-a531-55de-8ebc-c46206de9eb2" />
-          <Object Name="PRG_Pool" ObjectId="1ef86f90-6a27-50b0-9cba-d261a15b6dab" />
-          <Object Name="PRG_PoolInit" ObjectId="054ec182-fe65-56b3-9de0-3bf488da226c" />
-          <Object Name="PRG_TestCaaFile" ObjectId="e39978ba-cafa-5124-9f06-b33a0760ad82" />
         </Folder>
         <Folder Name="">
           <Object Name="GVL_PERSISTENT" ObjectId="b404450e-105f-5aa6-8c01-cbf582c5f3ce" />
-          <Object Name="GVL_Pool" ObjectId="e1fea29a-0231-564a-9437-7407ed23a0cc" />
         </Folder>
       </ProjectStructure>
     </data>
