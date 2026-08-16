@@ -27,7 +27,9 @@
 
 **Problème 1 (résolu)** : en simulation non référencé, descente bloquée par interlock Dive (benne non ouverte).
 
-**Problème 2 (en cours, même contexte)** : codeurs M1/M2 **référencés**, défauts **acquittés**, **synchro activée** → **aucun mouvement montée/descente** sur l'IHM. Deadman s'arme correctement à la commande joystick, mais **aucun mouvement** — quelque chose est interdit. Permits montée/descente affichés OK sur l'IHM.
+**Problème 2 (résolu)** : codeurs référencés, benne fermée, synchro activée → descente bloquée par interlock Dive, montée par limite haute. Pas de bug.
+
+**Problème 3 (en cours, même contexte)** : **changement de mode** — passage MAINT_N1 → MAINT_N2 OK, mais demande du **mode 3 (SEMI_AUTO / automatique)** → **reste à MAINT_N1**. Le mode ne commute pas.
 
 ## 3. 🧩 Indices / historique
 
@@ -66,8 +68,12 @@ Commande descente (Direction=-1)
 
 ## 7. 🏁 Conclusion
 
-- **Cause racine** : la descente est bloquée par l'interlock Dive (`DescendPermitDiveBucketOpen`), qui exige la benne **confirmée ouverte** (`_BucketState.IsOpen=TRUE`). Or la benne n'est pas référencée (`StateIncoherent=TRUE`, `IsOpen=FALSE`).
-- **Statut** : cause confirmée par lecture. Correction à valider.
+**Problème 1** : la descente est bloquée par l'interlock Dive (`DescendPermitDiveBucketOpen`), qui exige la benne **confirmée ouverte** (`_BucketState.IsOpen=TRUE`). Or la benne n'est pas référencée (`StateIncoherent=TRUE`, `IsOpen=FALSE`). ✅ Résolu (comportement normal).
+
+**Problème 2** : codeurs référencés, benne référencée **fermée**, synchro activée. Commande descente → **bloquée par l'interlock Dive** (exige benne ouverte, or benne fermée). Montée → bloquée par **limite haute** (8.5m, normal). **Pas de bug** — comportement conforme. ✅ Cause confirmée par lecture.
+
+**Amélioration IHM identifiée** : quand un mouvement est bloqué par un interlock, l'IHM doit afficher la **cause + l'action** (ex. « Ouvrir la benne ») — voir T118.
+- **Statut** : RÉSOLUE (comportement normal, pas de bug). Amélioration IHM → T118.
 
 ## 8. 🛠️ Proposition de correction
 
@@ -85,3 +91,5 @@ Commande descente (Direction=-1)
 
 - 2026-08-16 : ouverture session. Snapshot repos + commande analysés. Cause racine identifiée (interlock Dive + benne non référencée).
 - 2026-08-16 : **Problème 2** — codeurs référencés, défauts acquittés, synchro activée, mais aucun mouvement montée/descente malgré Deadman armé et permits OK. En cours d'analyse.
+- 2026-08-16 : **Problème 2 résolu** — pas de bug. Descente bloquée par interlock Dive (benne fermée), montée bloquée par limite haute (8.5m). Amélioration IHM (cause + action) → T118.
+- 2026-08-16 : **Problème 3** — changement de mode MAINT_N1→N2 OK, mais demande mode 3 (SEMI_AUTO) → reste à MAINT_N1. En cours d'analyse.
