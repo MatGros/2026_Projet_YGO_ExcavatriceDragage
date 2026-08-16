@@ -60,10 +60,10 @@ execfile(r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\
 Référence API utilisée (stubs installés avec l'IDE, lues pour ce projet — pas devinées) :
 `C:\Program Files\CODESYS 3.5.19.10\CODESYS\ScriptLib\Stubs\scriptengine\ScriptOnline.pyi`
 
-### 🖱️ Confort — bouton de barre d'outils au lieu de `execfile()` manuel
+### 🖱️ Confort — bouton de barre d'outils & raccourci clavier direct
 
-Config CODESYS générique (pas spécifique à cet outil) documentée dans
-[`DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md §6`](../../DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md).
+- **Bouton Toolbar** : Configuré via Script Commands (voir [`DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md §6`](../../DOC/STDS/GUIDES/GUIDE_CONFIGURATION_IDE_CODESYS_v1.0.md)).
+- **Raccourci clavier** : `Ctrl + W` configuré pour déclencher immédiatement `codesys_snapshot_troubleshooting.py` (export instantané de `GVL_Troubleshooting` vers `RESULTS/snapshot/`).
 
 ## 🅱️ Mode B — scripts `external_python/`, pour plus tard (test sur site avec HW réel)
 

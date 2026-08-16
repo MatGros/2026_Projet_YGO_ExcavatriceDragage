@@ -31,6 +31,7 @@
 | `Ctrl + E` | **Étendre tout** — déplie toutes les Regions du POU courant | Éditeur de texte ST |
 | `Shift + Ctrl + C` | **Importer** un fichier XML (import PLCopenXML dans le projet) | Projet / Fichier |
 | `Shift + Ctrl + V` | **Exporter** un fichier XML (export PLCopenXML du projet) | Projet / Fichier |
+| `Ctrl + W` | **Snapshot Live Troubleshooting** — lance l'export CSV depuis `GVL_Troubleshooting` via `codesys_snapshot_troubleshooting.py` | Global / Script Engine |
 
 - Les Regions repliées ne montrent que le titre `§N Rôle fonctionnel` ; le contenu est masqué
   mais **toujours présent** dans le code (recherche texte et compilation incluses).
@@ -65,9 +66,17 @@ dans la même boîte de dialogue :
 | **Commande** | `Importer` (Shift+Ctrl+C) · `Exporter` (Shift+Ctrl+V) |
 | **Nouveau raccourci** | saisir la combinaison, cliquer **Affecter** |
 
+Le raccourci **Snapshot Live Troubleshooting** (`Ctrl+W`) s'assigne sur la commande de script (§6) :
+
+| Champ | Valeur |
+|---|---|
+| **Catégorie** | `Commandes du moteur de script` (ou *Script Engine Commands*) |
+| **Commande** | `Snapshot Troubleshooting` (nom déclaré dans `config.json`) |
+| **Nouveau raccourci** | saisir `Ctrl + W`, cliquer **Affecter** |
+
 > 💡 Ces raccourcis couplent la boucle d'itération documentée dans `AGENTS.md` : édition ST →
 > génération du bundle PLCopenXML → **importer** le XML dans CODESYS 3.5 → **exporter** un XML
-> de contrôle, le tout sans naviguer dans les menus.
+> de contrôle, et capture de dépannage instantanée avec `Ctrl + W`, le tout sans naviguer dans les menus.
 
 ---
 
