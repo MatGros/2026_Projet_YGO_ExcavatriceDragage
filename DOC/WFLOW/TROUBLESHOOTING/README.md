@@ -25,7 +25,7 @@ Toute nouvelle fiche de depannage doit etre creee a partir de [TEMPLATE_Troubles
 
 ## 🕵️ Skill & Prompt associes
 
-- **Skill** : `.claude/skills/troubleshooting/SKILL.md` — declenchee par « cherche le blocage » / « pourquoi ca bloque » / « diagnostic » / « troubleshooting ».
+- **Skill** : `.dsh/skills/troubleshooting/SKILL.md` (DeepSeek Harness) et `.claude/skills/troubleshooting/SKILL.md` (Claude Code) — declenchee par « cherche le blocage » / « pourquoi ca bloque » / « diagnostic » / « troubleshooting ».
 - **Methode complete** : `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md` (contexte fige, arbre des causes 6 categories, tracage inverse, critere d'arret, cas limites CODESYS).
 - **Workflow** : etape « Diagnostic / Recherche de blocage » dans `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`.
 

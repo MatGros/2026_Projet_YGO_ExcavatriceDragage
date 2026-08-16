@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T23:16:29.358315" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T23:16:29.358315">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_SnapshotColumn">
+        <baseType>
+          <struct>
+            <variable name="Name">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nom de la colonne (condensé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Value">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur convertie en texte</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f16b41e5-29d4-57f5-819b-5ead73ecf2be</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   💾 FB_SnapshotExporter — Moteur fichier CSV commun (CAA File)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : écrit un snapshot CSV sur front de bit, machine d'état
+      multi-scan (IDLE→OPEN→WRITE→CLOSE→DONE/ERROR), 1 chunk/scan.
+   🔒 Polarité : TRUE = action/état actif ; FALSE = repos.
+   🧩 Architecture : FB technique non-mouvement, lecture seule + fichier.
+   📄 Docs : DOC/AF/AF_Partie-12_Fonction_Diagnostic/FB_SnapshotTroubleshooting_v1.0.md
+      · DOC/AF/AF_Partie-12_Fonction_Diagnostic/FB_SnapshotIHM_v1.0.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="DIAG">
+          <Object Name="ST_SnapshotColumn" ObjectId="f16b41e5-29d4-57f5-819b-5ead73ecf2be" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

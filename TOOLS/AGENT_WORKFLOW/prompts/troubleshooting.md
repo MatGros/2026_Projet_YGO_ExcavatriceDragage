@@ -4,9 +4,18 @@
 > L'agent NE PEUT PAS exécuter le PLC : il lit des variables de diagnostic et raisonne par arbre de décision.
 > Fiche de session : `DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_<Sujet>_<AAAA-MM-JJ>.md` (depuis `TEMPLATE_Troubleshooting.md`).
 
+## 0. 📥 ACQUISITION DES VALEURS (canal)
+
+> **Comment l'agent obtient les valeurs du PLC sans l'exécuter.**
+
+- **Demander à l'utilisateur l'état des variables automate** — **UNIQUEMENT** si c'est nécessaire pour décider / identifier la cause, et qu'aucun autre moyen n'existe.
+- **Toujours demander depuis `GVL_Troubleshooting` et ses structures** (jamais des internes de FB).
+- ⚠️ **Si tu dois demander plus de 2-3 structures différentes** → le troubleshooting est **mal conçu** OU il faut **créer une structure dédiée** à ce type de problématique. Le signaler.
+- 🚫 **Ne JAMAIS se baser sur `Device.export`** (souvent périmé). Sources fiables : `CODE/*.st` + `GVL_Troubleshooting`.
+
 ## 1. 🧊 CONTEXTE FIGÉ (à remplir UNE fois selon la situation)
 
-> ⚠️ **L'agent NE DOIT PAS re-demander ces infos.** Si un point manque → « contexte incomplet », STOP, ne pas deviner. Vérifier la **fraîcheur** (mode actuel, redémarrage chaud/froid depuis le dernier contexte).
+> ⚠️ **L'agent NE DOIT PAS re-demander ces infos.** Si un point manque → « contexte incomplet », STOP, ne pas deviner. Vérifier la **fraîcheur** : **re-figer si > 5 min** ou si un événement (redémarrage, changement de mode) est survenu depuis le dernier contexte.
 
 **Situation :** `[SIMULATION BANC]` / `[SITE MACHINE RÉELLE]`
 
@@ -61,6 +70,7 @@ SYMPTÔME
 **Règle d'or** : à chaque nœud, répondre *« quelle variable prouve/réfute cette branche, où la lire ? »*. Sinon branche **non testable** → le marquer, ne pas deviner.
 
 **💡 Exhaustivité & vitesse** : pour parcourir rapidement toutes les branches, déléguer l'exploration de branches **indépendantes** à des **sous-agents** (en parallèle), chacun remontant une branche jusqu'à sa source et rendant son verdict (cause confirmée / éliminée + preuve).
+> ⚠️ **Délégation par CONTRAT clair** : objectif précis, **mesurable et évaluable** (ex. « éliminer ou confirmer la branche X, preuve = lecture de la variable Y »). **Analyse statique** (code `.st`) = déléguable. **Lecture live** (demander à l'utilisateur) = **non déléguable** (l'orchestrateur la fait). Si le contrat n'est pas mesurable → **faire soi-même**.
 
 ## 5. 🔄 TRACAGE INVERSE (reverse) — algorithme
 
@@ -114,6 +124,26 @@ TRACE_INVERSE(S):
 - Étiqueter la force des preuves (🟢/🟡/🔴).
 - **Journal auditable** : chaque hypothèse → preuve → verdict.
 - **Ne jamais inventer un nom de variable** : vérifier l'existence contre le code/spec réel.
+
+## 8bis. 🗺️ CARTE DE LECTURE — `GVL_Troubleshooting`
+
+> Toutes les structures du GVL réel (`CODE/DEPANNAGE/GVL_Troubleshooting.st`). Lire dans ces structures, jamais dans des internes de FB.
+
+| Structure | Contenu |
+|---|---|
+| `ContexteMachineGlobal` | Mode, simulation, joystick maître, AU, power, heartbeat |
+| `LevageSynchroniseM1M2` | Synchro M1+M2 (mode couplé) |
+| `LevageUnitaireM1` / `LevageUnitaireM2` | Treuils M1 / M2 |
+| `BenneOuvertureFermeture` | Benne (Busy, IsOpen, état, défauts) |
+| `TranslationPontM3` | Translation M3 (variateur) |
+| `AssistanceDragage` | Plongée / extraction / vidage trémie |
+| `HomingM1` / `HomingM2` | Référencement M1 / M2 |
+| `Safety` | Chaîne de sécurité & réarmement AU |
+| `Joystick` | Bus CANopen & homme-mort |
+| `MotionM1` / `MotionM2` / `MotionM3` | Mouvement M1 / M2 / M3 |
+| `Inputs` | Image entrées réelles / qualifiées / simulées |
+
+> 🛠️ **Ergonomie maintenance** : le dépanneur ouvre **une structure = tout sur une page**. Si une variable manque pour ce dépannage → **proposer son intégration**. Si une variable est présente mais inutile → **proposer son retrait**. Si une variable devrait être dans une autre structure pour l'ergonomie → **le signaler**.
 
 ## 9. ✅ RÈGLES DE L'AGENT
 - Ne pas re-demander le contexte figé (§1).

@@ -4,8 +4,9 @@
 
 ## 1. 🧊 Contexte figé (horodaté)
 
-> Snapshot horodaté. **Re-figer** si > X min ou événement (redémarrage, changement de mode) avant de conclure.
+> Snapshot horodaté. **Re-figer si > 5 min** ou si un événement (redémarrage, changement de mode) avant de conclure.
 > Toute valeur non listée = **à vérifier** (ne pas supposer).
+> 📥 **Acquisition** : demander l'état des variables à l'utilisateur **uniquement si nécessaire**, depuis `GVL_Troubleshooting`. Si > 2-3 structures → troubleshooting mal conçu ou structure dédiée à créer.
 
 ### Texte de contexte
 <...>
@@ -74,6 +75,8 @@
 - **⚠️ Validation requise** : [humaine] — ne pas modifier le code / forcer une variable sans validation
 
 ## 9. ✅ Vérification de la correction / non-régression
+
+> ⚠️ **Hand-off humain** : la correction (§8) doit être **validée par l'humain** avant application. L'agent ne modifie pas le code / ne force pas de variable sans validation.
 
 - <test de non-régression après correction : le symptôme est-il résolu ? rien d'autre cassé ?>
 

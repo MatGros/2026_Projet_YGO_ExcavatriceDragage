@@ -23,6 +23,16 @@
 
 ---
 
+## 📥 Acquisition des valeurs (canal)
+
+**Comment l'agent obtient les valeurs du PLC sans l'exécuter** :
+- **Demander à l'utilisateur l'état des variables** — **UNIQUEMENT** si nécessaire pour décider / identifier la cause, et qu'aucun autre moyen n'existe.
+- **Toujours depuis `GVL_Troubleshooting` et ses structures** (jamais des internes de FB).
+- ⚠️ **Si > 2-3 structures nécessaires** → le troubleshooting est **mal conçu** OU il faut **créer une structure dédiée** → le signaler.
+- 🚫 **Ne JAMAIS se baser sur `Device.export`** (souvent périmé).
+
+---
+
 ## 1. 🧊 Contexte figé (horodaté)
 
 **Pourquoi** : l'agent ne re-pose pas les questions. Mais l'état machine **change** (mode, homing, redémarrage, opérateur).
@@ -161,6 +171,28 @@ Après correction, vérifier :
 ## 10. 📝 Journal (chronologique)
 
 Chaque action/observation datée. Permet l'audit et l'historique.
+
+---
+
+## 🗺️ Carte de lecture — `GVL_Troubleshooting`
+
+> Toutes les structures du GVL réel. Lire dans ces structures, jamais dans des internes de FB.
+
+| Structure | Contenu |
+|---|---|
+| `ContexteMachineGlobal` | Mode, simulation, joystick maître, AU, power, heartbeat |
+| `LevageSynchroniseM1M2` | Synchro M1+M2 (mode couplé) |
+| `LevageUnitaireM1` / `LevageUnitaireM2` | Treuils M1 / M2 |
+| `BenneOuvertureFermeture` | Benne (Busy, IsOpen, état, défauts) |
+| `TranslationPontM3` | Translation M3 (variateur) |
+| `AssistanceDragage` | Plongée / extraction / vidage trémie |
+| `HomingM1` / `HomingM2` | Référencement M1 / M2 |
+| `Safety` | Chaîne de sécurité & réarmement AU |
+| `Joystick` | Bus CANopen & homme-mort |
+| `MotionM1` / `MotionM2` / `MotionM3` | Mouvement M1 / M2 / M3 |
+| `Inputs` | Image entrées réelles / qualifiées / simulées |
+
+> 🛠️ **Ergonomie maintenance** : le dépanneur ouvre **une structure = tout sur une page**. Si une variable manque pour ce dépannage → **proposer son intégration**. Si une variable est présente mais inutile → **proposer son retrait**. Si une variable devrait être dans une autre structure pour l'ergonomie → **le signaler**.
 
 ---
 

@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-16T00:43:02.247998" />
+  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-16T00:43:02.247998">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="PRG_TestCaaFile" pouType="program">
+        <interface>
+          <inputVars />
+          <outputVars />
+          <localVars>
+            <variable name="sFileName">
+              <type>
+                <string length="120" />
+              </type>
+              <initialValue>
+                <simpleValue value="" />
+              </initialValue>
+            </variable>
+            <variable name="sCsvLine">
+              <type>
+                <string length="255" />
+              </type>
+            </variable>
+            <variable name="xStart">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="TestDone">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="TestError">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+            </variable>
+            <variable name="iStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+            </variable>
+            <variable name="iGood">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="520" />
+              </initialValue>
+            </variable>
+            <variable name="iBad">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="41" />
+              </initialValue>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧪 PRG_TestCaaFile — Test écriture CSV avec CAA File
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : sur front xStart, ouvre/écrit/ferme un fichier CSV
+      (avec le pool async CAA File initialisé par PRG_PoolInit).
+   📄 Docs : bibliothèque CAA File 3.5.19 (namespace FILE).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+CASE iStep OF
+    0:
+        TestDone := FALSE;
+        IF xStart THEN
+            xStart := FALSE;
+            sCsvLine := CONCAT('Pieces_OK;', TO_STRING(iGood));
+            sCsvLine := CONCAT(sCsvLine, '$NPieces_NOK;');
+            sCsvLine := CONCAT(sCsvLine, TO_STRING(iBad));
+            sCsvLine := CONCAT(sCsvLine, '$N');
+            iStep := 10;
+        END_IF;
+
+    10:  // Open
+        fbOpen(xExecute := TRUE, sFileName := sFileName, eFileMode := FILE.MODE.MWRITE);
+        IF fbOpen.xDone THEN
+            hFile := fbOpen.hFile;
+            fbOpen(xExecute := FALSE);
+            iStep := 11;
+        ELSIF fbOpen.xError THEN
+            TestError := TRUE; iStep := 99;
+        END_IF;
+
+    11:  // Write
+        fbWrite(xExecute := TRUE, hFile := hFile,
+                pBuffer := ADR(sCsvLine), szSize := TO_UDINT(LEN(sCsvLine)));
+        IF fbWrite.xDone THEN
+            fbWrite(xExecute := FALSE); iStep := 12;
+        ELSIF fbWrite.xError THEN
+            TestError := TRUE; iStep := 99;
+        END_IF;
+
+    12:  // Close
+        fbClose(xExecute := TRUE, hFile := hFile);
+        IF fbClose.xDone THEN
+            fbClose(xExecute := FALSE); TestDone := TRUE; iStep := 0;
+        ELSIF fbClose.xError THEN
+            TestError := TRUE; iStep := 99;
+        END_IF;
+
+    99:  // Erreur → reset
+        fbOpen(xExecute := FALSE); fbWrite(xExecute := FALSE); fbClose(xExecute := FALSE);
+        iStep := 0;
+END_CASE;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e39978ba-cafa-5124-9f06-b33a0760ad82</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="MAIN">
+          <Object Name="PRG_TestCaaFile" ObjectId="e39978ba-cafa-5124-9f06-b33a0760ad82" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
