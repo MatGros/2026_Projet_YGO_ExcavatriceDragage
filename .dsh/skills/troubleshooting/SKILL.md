@@ -55,7 +55,10 @@ Lire la fiche existante si elle existe (contexte déjà figé). Sinon, demander 
 Type de symptôme (sortie ne s'émet pas / ne se coupe pas / valeur fausse / état bloqué / intermittent / aucune réaction).
 
 ### Étape 4 — Construire l'arbre des causes (§4)
-Énumérer TOUTES les branches (6 catégories). Pour chaque nœud : variable de décision + où la lire + valeur attendue. **Pour l'exhaustivité & la vitesse** : déléguer l'exploration de branches **indépendantes** à des **sous-agents** (en parallèle), chacun remontant une branche jusqu'à sa source.
+Énumérer TOUTES les branches (6 catégories). Pour chaque nœud : variable de décision + où la lire + valeur attendue. **Pour l'exhaustivité & la vitesse** : déléguer l'exploration de branches **indépendantes** à des **sous-agents** (en parallèle), chacun remontant une branche jusqu'à sa source. ⚠️ **Délégation par CONTRAT clair** (objectif mesurable/évaluable) ; **analyse statique** = déléguable, **lecture live** = non déléguable (l'orchestrateur la fait). Si le contrat n'est pas mesurable → faire soi-même.
+
+### Étape 4bis — Acquisition des valeurs (canal)
+Demander à l'utilisateur l'état des variables **UNIQUEMENT** si nécessaire pour décider/identifier la cause, et **toujours depuis `GVL_Troubleshooting`**. Si > 2-3 structures nécessaires → le troubleshooting est mal conçu OU il faut une structure dédiée → le signaler.
 
 ### Étape 5 — Tracage inverse + élimination par preuve (§5, §6)
 Remonter du symptôme à la source. Lire les variables de décision dans `GVL_Troubleshooting` (lecture seule). Éliminer les branches par FAIT. S'arrêter au critère d'arrêt (§6).
@@ -74,7 +77,7 @@ Après correction (validée), remplir la **section 9** : le symptôme est-il ré
 - Gabarit : `DOC/WFLOW/TROUBLESHOOTING/TEMPLATE_Troubleshooting.md`
 - **Guide de remplissage** : `DOC/WFLOW/TROUBLESHOOTING/GUIDE_Troubleshooting.md`
 - Exemple : `DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_DeadmanArmed_2026-08-15.md`
-- Carte de lecture : `GVL_Troubleshooting` (ContexteMachineGlobal, BenneOuvertureFermeture, Joystick, LevageUnitaireM1/M2, TranslationPontM3, AssistanceDragage)
+- Carte de lecture : `GVL_Troubleshooting` — `ContexteMachineGlobal`, `LevageSynchroniseM1M2`, `LevageUnitaireM1/M2`, `BenneOuvertureFermeture`, `TranslationPontM3`, `AssistanceDragage`, `HomingM1/M2`, `Safety`, `Joystick`, `MotionM1/M2/M3`, `Inputs`
 - Ordre d'exécution : `PRG_02 → PRG_03 → PRG_04/05 → PRG_06 → PRG_07`
 
 ## ✅ Checklist de restitution
