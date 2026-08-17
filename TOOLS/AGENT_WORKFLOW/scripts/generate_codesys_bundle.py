@@ -8,6 +8,7 @@ an existing bundle unless --project-name is provided.
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -46,6 +47,13 @@ def main() -> int:
         print("ERROR: --project-name is required when no valid existing bundle is available.", file=sys.stderr)
         return 2
 
+    # Purge preventive (REX 2026-08-17) : sans elle, un .xml dont le .st source a ete
+    # renomme/supprime reste orphelin en silence dans CODE_XML/ (ni generation ni gate
+    # ne le detectait -- 4 fichiers morts trouves : FB_DigitalInputFilter, GVL_IHM_AU,
+    # ST_Safety_Emergency_HmiCmd/HmiState). CODE_XML/ doit etre un miroir strict de
+    # CODE/, jamais un historique. Purge APRES la lecture du nom de projet ci-dessus :
+    # existing_project_name() a besoin de l'ancien bundle si --project-name est omis.
+    shutil.rmtree(out_dir, ignore_errors=True)
     out_dir.mkdir(parents=True, exist_ok=True)
     command = [
         sys.executable, "-m", "generator.cli",

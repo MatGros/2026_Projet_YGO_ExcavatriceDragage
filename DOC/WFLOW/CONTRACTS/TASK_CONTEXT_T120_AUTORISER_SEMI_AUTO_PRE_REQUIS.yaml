@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T120_AUTORISER_SEMI_AUTO_PRE_REQUIS
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T120_AUTORISER_SEMI_AUTO_PRE_REQUIS
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Autoriser le mode SEMI_AUTO même si les prérequis (codeur, homing) ne sont pas
+    prêts, au lieu de rester bloqué en MAINT_N1. Le séquenceur (FB_Cycle) gère
+    l'attente des prérequis avec des messages/erreurs explicites. Modification
+    profonde de la logique machine — audit sécurité obligatoire.
+    Critères structurels : nom de fichier = nom de POU
+    suffixe de langage = langage bundle (ST, pas de suffixe _CFC/_LD)
+
+  acceptance:
+    - id: AC1
+      statement: "FB_Modes n'force plus Auth.Mode := MAINT_N1 quand EncoderFaultPresent est TRUE et SelMode = SEMI_AUTO — SEMI_AUTO est sélectionnable."
+      verified_by: "Lecture FB_Modes.st — le bloc de refus SEMI_AUTO est retiré/neutralisé."
+    - id: AC2
+      statement: "Le séquenceur FB_Cycle gère l'attente des prérequis (codeur, homing) avec un état explicite et des messages IHM."
+      verified_by: "Lecture FB_Cycle.st — état d'attente prérequis + message."
+    - id: AC3
+      statement: "La sécurité est préservée : SEMI_AUTO ne démarre pas le cycle tant que les prérequis ne sont pas satisfaits (pas de mouvement sans codeur/homing)."
+      verified_by: "Audit sécurité — le cycle reste en attente, aucun mouvement avant prérequis."
+    - id: AC4
+      statement: "EncoderFaultPresent n'est plus un blocage de mode mais un état d'attente du cycle."
+      verified_by: "Lecture code — EncoderFaultPresent consommé par FB_Cycle (attente), pas par FB_Modes (blocage)."
+    - id: AC5
+      statement: "La liaison passe (G200)."
+      verified_by: "python G200_check_linkage.py --report — PASS."
+    - id: AC6
+      statement: "nom de fichier est identique au nom de POU et suffixe de langage est identique au langage bundle pour les POU de CODE/MAIN modifiés"
+      verified_by: "G200_check_linkage.py --report"
+
+  scope:
+    allowed:
+      - CODE/MODES/FB_Modes.st
+      - CODE/MAIN/PRG_03_Modes_Cycle.st
+      - CODE/CYCLE/FB_Cycle.st
+      - CODE/SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/MAIN/PRG_07_Supervision.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_T120_AUTORISER_SEMI_AUTO_PRE_REQUIS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE_XML/ (fichiers générés hors scope)
+
+  conservation:
+    must_survive:
+      - "La sécurité : aucun mouvement sans codeur/homing (le cycle reste en attente)."
+      - "Les variables safety (SafeStop, PowerCutOff, AscentPermit, DescendPermit) inchangées."
+      - "Le comportement MAINT_N1/N2 inchangé."
+    dropped_on_purpose:
+      - "Le blocage de SEMI_AUTO par EncoderFaultPresent (remplacé par un état d'attente du cycle)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - human_validation_c4
+
+  models_allowed:
+    - "codex/gpt-5.6-luna"
+    - "codex/gpt-5.6-sol"
+
+  alert_duty: >
+    Tout risque de sécurité (mouvement sans codeur/homing, redémarrage auto) est
+    remonté immédiatement et bloque. Ne pas élargir le périmètre.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: IN_PROGRESS
+
+execution:
+  executed_by: "codex/gpt-5.6-luna"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat cree. Delegation T120."
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "DeepSeek (Orchestrateur)"
+  validated_at: ""
+  notes: ""

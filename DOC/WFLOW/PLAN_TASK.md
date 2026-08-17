@@ -8,18 +8,30 @@
 
 ## 🧭 Plan d’implémentation orchestré — état courant
 
-> Source unique de suivi des lots automate. Mise à jour uniquement aux changements d’état significatifs.
+> 📌 **Protocole Multi-Agents & Verrouillage (Lock Agent)** :
+> Avant de démarrer un travail, l'agent **DOIT** inscrire son identifiant dans la colonne `Lock Agent` et passer le `Statut` à 🔍 ou 🔒 pour signaler la prise en charge et éviter tout travail en doublon.
+>
+> **Légende des Statuts** :
+> - `⬜` : **Libre / À faire** (non commencé, disponible)
+> - `🔍` : **Étude / Analyse** (analyse/spec en cours, lecture seule)
+> - `🔒` : **En cours de dev (Verrou)** (code en cours d'édition par l'agent)
+> - `⏳` : **En attente validation / tests** (codé & bundle généré, en attente de test CODESYS ou confirmation humaine)
+> - `⏸️` : **Bloqué / Prérequis** (dépendance externe, décision client ou matériel)
+> - `✅` : **Clôturé & Validé** (validé formellement par l'humain et archivé)
+>
+> **Légende des Identifiants Agents (`Lock Agent`)** :
+> `CC-01`/`CC-02` (Claude Code) · `AGY-01`/`AGY-02` (Antigravity/Gemini) · `CDX-01` (Codex/OpenAI) · `PI-01` (Pi/OmniRoute) · `HUM` (Humain/Terrain) · `—` (Libre).
 
-| Ordre | Lot fonctionnel | Tâches | Dépendances / décision | État | Agent | Validation utilisateur |
-|---:|---|---|---|---|---|---|
-| 1 | Fiabilisation mesure Winch | T84 + T85 + T86 | Fenêtre interne 50 ms ; producteur chaîne codeur ; pulse source générique depuis `PRG_00` ; T87 reporté au lot étude 4 (T91/T93) | 🟠 Implémenté et revu, validation CODESYS/terrain requise | Pi via OmniRoute | ⏳ Validation code attendue |
-| 2 | Assistants Kobold maintenance | T81 + T82 | `FB_DiveSearch` : `0→1→0` ; `FB_ExtractionSequence` : fermeture, palier 1 sur 2 m puis nominal ; hors `FB_Cycle` | 🟠 Implémenté, tests PLC créés ; compilation/essais CODESYS requis | Pi + revue Sonnet 5 | ⏳ Validation CODESYS/terrain requise |
-| 3 | Garde-fou et calibration paliers | T94 + T95 + T96 | Dépend du lot 1 : mesure vitesse fiabilisée avant calibration ; T96 = mode apprentissage auto (remplace saisie manuelle T95) | ⬜ En attente lot 1 | — | — |
-| 4 | Frein et commande par paliers | T91 + T93 + décision T87 | Étude montée/descente avant code ; ne pas choisir arbitrairement le sort de `DelayMotorDecel` | ⬜ Étude à préparer | — | — |
-| 5 | Reliquats safety | T72 + T73 + T74 | Réévaluer l’état réel du code après les lots précédents | ⬜ À réévaluer | — | — |
-| 2A | Interlocks finaux frein / puissance | Lot 3A | `FB_WinchOutputInterlock_LD` + `FB_TranslationOutputInterlock_LD` ; `SafeStop` reste la rampe rapide métier, tests PLC préparés ; qualification CODESYS/simulation à faire | 🟠 Implémenté, revue C4 et essais requis | Pi | ⏳ Validation CODESYS/terrain requise |
-| 7 | Translation M3 — sécurité, sortie moteur, homme-mort | T104 + T105 + T106 + T107 | Audit 2026-08-05 (session M3), 4 lots implémentés dans l'ordre LOT0 → M4 → LOT3 → LOT2, `check_linkage.py`/`check_ld_invariants.py`/bundle PASS à chaque lot | ✅ Codé, lié, vérifié — reste le mapping E/S CODESYS manuel (T105) et les essais terrain (`TROUBLESHOOTING_Translation_M3_v1.0.md`) | — | 🟢 Prêt à tester (mise en service) |
-| 6 | Améliorations secondaires | T75 + T76 + T77 + T79 + T88 | T78 attend la décision T93 (T84/T85/T86 déjà implémentés au lot 1, T87 reporté au lot 4) | ⬜ Différé | — | — |
+| Ordre | Lot fonctionnel | Tâches | Dépendances / décision | Statut | Lock Agent | Validation utilisateur |
+|---:|---|---|---|:---:|:---:|---|
+| 1 | Fiabilisation mesure Winch | T84 + T85 + T86 | Fenêtre interne 50 ms ; producteur chaîne codeur ; pulse source générique depuis `PRG_00` ; T87 reporté au lot étude 4 (T91/T93) | ⏳ | PI-01 | ⏳ Validation code attendue |
+| 2 | Assistants Kobold maintenance | T81 + T82 | `FB_DiveSearch` : `0→1→0` ; `FB_ExtractionSequence` : fermeture, palier 1 sur 2 m puis nominal ; hors `FB_Cycle` | ⏳ | PI-01 | ⏳ Validation CODESYS/terrain requise |
+| 3 | Garde-fou et calibration paliers | T94 + T95 + T96 | Dépend du lot 1 : mesure vitesse fiabilisée avant calibration ; T96 = mode apprentissage auto (remplace saisie manuelle T95) | ⬜ | — | — |
+| 4 | Frein et commande par paliers | T91 + T93 + décision T87 | Étude montée/descente avant code ; ne pas choisir arbitrairement le sort de `DelayMotorDecel` | ⬜ | — | — |
+| 5 | Reliquats safety | T72 + T73 + T74 | Réévaluer l’état réel du code après les lots précédents | ⬜ | — | — |
+| 2A | Interlocks finaux frein / puissance | Lot 3A | `FB_WinchOutputInterlock_LD` + `FB_TranslationOutputInterlock_LD` ; `SafeStop` reste la rampe rapide métier, tests PLC préparés ; qualification CODESYS/simulation à faire | ⏳ | PI-01 | ⏳ Validation CODESYS/terrain requise |
+| 7 | Translation M3 — sécurité, sortie moteur, homme-mort | T104 + T105 + T106 + T107 | Audit 2026-08-05 (session M3), 4 lots implémentés dans l'ordre LOT0 → M4 → LOT3 → LOT2, `check_linkage.py`/`check_ld_invariants.py`/bundle PASS à chaque lot | ⏳ | HUM | 🟢 Prêt à tester (mise en service) |
+| 6 | Améliorations secondaires | T75 + T76 + T77 + T79 + T88 | T78 attend la décision T93 (T84/T85/T86 déjà implémentés au lot 1, T87 reporté au lot 4) | ⏸️ | — | — |
 
 ### Règles de conduite
 
@@ -204,75 +216,77 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 
 ## ❓ 3. Reliquats, TBD & actions ouvertes
 
-> 🎯 **Règle de conduite** : Cette table ne conserve que les reliquats actifs, études ouvertes et actions de qualification terrain (MES). Les tâches traitées et validées sont consignées au §3.1.
+> 🎯 **Règle de conduite & Lock Agent** :
+> Avant de démarrer une tâche, l'agent **DOIT** poser son verrou dans `Lock Agent` (`CC-01`, `AGY-01`, `CDX-01`, `PI-01`) et passer le `Statut` à 🔍 ou 🔒.
+> - `⬜` : Libre / À faire · `🔍` : Étude / Analyse · `🔒` : Code en cours (Verrou) · `⏳` : Attente validation/tests · `⏸️` : Bloqué · `✅` : Validé
 
-| # | Sujet | Qui tranche | Source / État |
-|---|---|---|---|
-| T1 | Détail séquence `INIT` (sous-vérifications position/cohérence) | Projet | AF_Partie-04 §2, D22 |
-| T4 | Protocole registre AC600 (`DriveControlWord`/`StatusWord`) | **Constructeur variateur** | Translation/Safety_Translation |
-| T6 | Périmètre `PRG_08` Auxiliaire | **Client** (en cours, différé assumé) | v1.1 §3 |
-| T8 | Rôle de `CodeSeqTriggerCmd` (codeurs) | À vérifier terrain | AF_Partie-10 |
-| T9 | Comportement frein en montée chargée | Différé après essais terrain | AF_Partie-09 §4undecies |
-| T11 | `EmergencyStopOk` : confirmation temporisée post-réarmement | Projet | AUDIT D93 |
-| T15 | Validation câblage réel `EmergencyStopOk_DI` et réarmement | Projet / Terrain | AF_Partie-01, `PRG_02_Acquisition` |
-| T17 | 🟠 Checklist Joystick : exécution terrain et verdict signé | Projet / Terrain | `CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.1.md` |
-| T20 | Sélecteur treuil IHM : widget visu physique restant | Projet | AF_Partie-05 §2, AF_Partie-09 §1 |
-| T21 | Checklist validation Winch v1.7 terrain | Terrain | AF_Partie-09 §8 |
-| T22 | Tolérance de calibration `TopSensorPositionM` à fixer sur site | Terrain | AF_Partie-10 §7bis |
-| T25 | 🟠 Suite Encoder/Homing : essais CODESYS scénarios bornage/redémarrage | Projet / Terrain | AF_Partie-10 §10 |
-| T26 | 🟠 Checklist Translation AC600 terrain (EtherCAT, sens, PV, 5 capteurs) | Terrain | `CHECKLISTS/CHECKLIST_MiseEnService_Translation_v1.1.md` |
-| T27 | Benne : essais MES terrain (cinématique, offsets) | Terrain | AF_Partie-11 §6 |
-| T39 | 🟠 Interfaces Homing nominale et unitaire : essais opérateur CODESYS | Projet / Terrain | AF_Partie-10 |
-| T43 | 🟠 Comparaison vitesse M1/M2 au cycle remontée : régler seuils/tempo (inactif à 0) | Projet / Client | AF_Partie-04 §3quater, `FB_Cycle` |
-| T47 | 🟠 Garde-fou palier vitesse treuils : à documenter métier, calibrer et activer | Projet / Sécurité / Terrain | `FB_SpeedStep`, `GVL_PERSISTENT._WinchSpeedConfig` |
-| T48 | 🟠 Matrice validation pannes treuils V1–V7 en simulation/terrain | Projet / Terrain | `REGISTRE_Suivi_MiseEnService_v1.0.md` |
-| T52 | 🔴 Valider chaîne `PowerCutOff` physique et temps coupure réel | Électricité + Projet | `PRG_06_Outputs_LD.st` |
-| T54 | 🟠 Intégrer latence boucle automate (~10 ms) au calcul temps d'arrêt | Projet | AUDIT Winch §3.2 |
-| T55 | 🟠 Stratégie synchronisme unique (info / mineur / majeur / critique) | Projet | `FB_WinchSync` |
-| T56 | 🟠 Caractériser seuils sécurité terrain (0,02 m/s, 2 m, 3 s, 800 ms, 500 ms) | Projet / Terrain | `FB_Safety_Winch` |
-| T57 | 🟠 Unifier limite haute M2 selon offset benne | Projet | `PRG_04_Treuils_Benne` |
-| T58 | 🟠 Séparation Config/Commands/Status/Alarms post-maquette IHM | Projet + IHM | AUDIT Winch §5.2 |
-| T59 | 🟡 IHM : afficher arrêt croisé effectif (`ForbidAscentM1_Active`) | IHM | `PRG_07_Supervision` |
-| T64 | 🟠 Plafond palier vitesse essais : restaurer valeur d'exploitation | Projet / Terrain | MES-003 |
-| T72 | 🟠 Interverrouillage commande/frein : bloquer `RelayFwd/Rev` si frein non ouvert | Projet / Sécurité | `FB_Winch.st`, `FB_Translation.st` |
-| T73 | 🟠 Winch : ajouter confirmation temporisée + escalade PowerCutOff sur limite basse | Projet / Sécurité | `FB_Safety_Winch.st` |
-| T74 | 🟠 Translation : temporiser l'escalade PowerCutOff sur `LimitSwitch` | Projet / Sécurité | `FB_Safety_Translation.st` |
-| T75 | 🟡 `G100_check_code_style.py` : nettoyer exemptions obsolètes | Projet | Outillage |
-| T76 | 🟡 `FB_Cycle.st` : raccorder `DrainingTime` au persistant/IHM | Projet | `FB_Cycle.st` |
-| T77 | 🟠 POO Diagnostics : passer statuts bruts aux FB au lieu d'expressions pré-calculées | Projet / Architecture | `PRG_02_Acquisition`, `FB_Diag_*` |
-| T78 | 🟠 Rampe Treuils : passer à 10%/s par défaut et égaliser en mode couplé | Projet / Commande Treuils | `FB_Winch.st`, `PRG_04_Treuils_Benne.st` |
-| T79 | 🟠 Configurer Trace CODESYS 10ms pour diagnostic arrêt différencié M1/M2 | Projet / Terrain | MES-008 |
-| T81 | 🔴 Séquence détection fond Kobold à 4 étapes (hors eau -> immersion -> libre -> fond) | Projet / Client | `AF_Partie-04`, `FB_DiveSearch` |
-| T82 | 🔴 Arrêt sécurisé si séquence Kobold invalide | Projet / Sécurité | `FB_ExtractionSequence` |
-| T83 | 🟠 Repasser `ST_BypassNetwork.IhmHeartbeat` à `FALSE` dès visu opérationnelle | Projet / IHM | `ST_BypassNetwork.st` |
-| T84 | 🟠 Validation CODESYS/terrain mesure vitesse 50 ms (`FB_Encoder_SpeedMeasure`) | Projet / Sécurité | `FB_Encoder_SpeedMeasure.st` |
-| T85 | 🟠 Validation chaîne producteur codeur unique (`PRG_02_Acquisition`) | Projet / Architecture | `PRG_02_Acquisition.st` |
-| T86 | 🟠 Validation blocage déterministe si `Enable=FALSE` (`FB_Safety_Winch`) | Projet / Sécurité | `FB_Safety_Winch.st` |
-| T87 | 🟠 Sort de `DelayMotorDecel` (code mort dans `FB_Brake` TON à FALSE) | Projet / Sécurité | Lot étude T91/T93 |
-| T88 | 🔵 Bouclage `TIME()` (49,7j) dans `FB_CycleTime` : garde-fou `DeltaTimeMs > 1000` | Projet | `FB_CycleTime.st` |
-| T89 | 🟡 Valider sur site offset benne fermée ≈ 15 m (grandeur d'état mécanique) | Terrain / Projet | MES-010 |
-| T90 | 🟡 Valider sur site cote capteur haut 8.0 m et limite 7.5 m au premier homing | Terrain / Sécurité | MES-009 |
-| T91 | 🔴 ÉTUDE : Séquence frein/puissance asymétrique (montée: frein d'abord / descente: immédiat) | Projet / Sécurité / Terrain | MES-006, `FB_Brake` |
-| T92 | 🟠 Qualification terrain persistance bypass RETAIN et homing à 0 m | Terrain / Sécurité | MES-002 |
-| T93 | 🟠 Remplacer rampe %/s par temporisations de maintien entre paliers contacteurs | Projet / Maintenance | `FB_SpeedStep`, `FB_Winch` |
-| T94 | 🟠 Rendre `SpeedGuardEnable` persistant et exposé IHM MAINT_N2 | Projet / Terrain | `PRG_04_Treuils_Benne`, `GVL_PERSISTENT` |
-| T95 | 🟠 Table `VitesseMax[1..5]` de calibration dans `FB_Winch_Symmetry` | Projet / Terrain | `FB_Winch_Symmetry.st` |
-| T96 | 🟡 Mode apprentissage automatique des bandes de vitesse à vide et en charge | Projet / Terrain | `AF_Partie-10_v2.0` §9bis.3 |
-| T97 | 🟠 Rationalisation acquisition / retrait contrôlé `PRG_01_Inputs_LD` et `FB_Input` | Projet / Sécurité | `AF_Partie-06_v2.3` |
-| T98 | 🟠 Câbler `BrakeThermalFault`/`PhaseRotationFault` vers `GVL_IHM.Commun` | Projet | `PRG_07_Supervision.st` |
-| T102 | 🔴 Migration architecture acquisition : validation dossier remappage | Projet / Sécurité | `AF_Partie-02_v3.1` |
-| T108 | 🟡 Interlock Translation M3 si Trémie pleine (`HopperFull_OR_GateRaised_DI`) | Projet / Translation M3 | `PRG_05_Translation.st` |
-| T109 | 🟡 Formaliser convention polarité positive (`*Permit` / `Allowed`) pour arbitrages | Projet / Convention | `NAMING_CONVENTION.md` |
-| T110 | 🔴 Clarifier sémantique `DriveStatusWord.0` AC600 ("Power Ready" vs "Mouvement" Méca B) | Projet / Sécurité | `FB_Safety_Translation.st` |
-| T115 | 🟠 Bandeau IHM champ 2 « Cycle » : `CycleStep` non alimenté (`FB_Cycle` non instancié) → affiche toujours `INIT` | Projet / IHM | `PRG_07_Supervision.st`, `FB_Hmi_BannerFormatter.st`, reliquat session 2026-08-15 — à câbler au lot Cycle Auto |
-| T116 | 🟡 IHM : message homme-mort/neutre trompeur — texte à rendre **dynamique selon l'état réel** au lieu de « actionner l'axe avec homme mort maintenu » figé. **3 états de message** : ① **Non armé** → « Appuyer sur l'homme-mort au neutre pour armer » · ② **Armé / neutre** → « Armé — actionner l'axe » · ③ **Déplacement** → « Déplacement en cours ». ⚠️ Ces états devront **exister dans le code** (enum/flags dérivés de `DeadmanArmed` + `AtNeutral` + `Direction` dans `FB_Joystick`/`PRG_07`) — sémantique homme-mort vérifiée : armement au neutre, mouvement libre sans maintien (REX 2026-08-16) | Projet / IHM | `PRG_07_Supervision.st`, `FB_Hmi_BannerFormatter.st`, `FB_Joystick.st`, reliquat session 2026-08-16 |
-| T117 | 🟡 Renommage/élimination des variables `Forbid*` (`ForbidDescent`/`ForbidAscent`/`ForbidDescentEffective`/`ForbidAscentEffective`) — logique inverse, risque de confusion au démarrage | Projet / Convention | `NAMING_CONVENTION.md`, `T109`, grep `CODE/` + `DOC/AF/` — ⚠️ la logique est **déjà** en polarité positive (`Permit = NOT Forbid`, REX T112) ; reste surtout des **noms de diagnostic** et commentaires à homogénéiser, pas un bug de logique |
-| T118 | 🟡 **Refonte des textes IHM du bandeau** (`FB_Hmi_BannerFormatter`) — afficher la **cause + l'action** d'un blocage, avec des textes **concis et dynamiques**. **Analyse faite (2026-08-16)** : enrichir les textes (Option A) plutôt que des voyants seuls. **Exigences détaillées** : ① **Concision** — textes courts et directs (ex. « Acquitter le défaut » → « ACQ défaut » ; « Maintenir la gâchette homme-mort au neutre pour armer » → plus court) ; ② **Dynamique/personnalisé** selon l'état (textes qui s'updatent) ; ③ **GlobalContextText** — **ne PAS y ajouter le numéro d'étape** (reste dans `SequenceProgressText`) ; ④ **SpecialConditionText** — **un seul indicateur « bypass actif »** si au moins un bypass OU une simulation est active (pas la liste de tous les bypass) ; l'utiliser aussi pour les **causes de blocage** (ex. Dive + benne fermée → « Ouvrir la benne ») ; ⑤ **OperatorActionText** — actions concises ; en maintenance, plus général (l'utilisateur choisit son mouvement), mais précis dans un sous-cycle ; ⑥ **Taille de champ** — afficher **en fixe** le blocage courant (ex. « Descente non permise »), et **optionnellement en rotation** pour montrer tous les cas de l'interdiction courante (bascule 1-2 s) ; ⑦ exposer les **signaux de cause** à `FB_Hmi_BannerFormatter` (DescendPermit, AscentPermit, BucketIsOpen, DiveActive, TopLimitReached, SafeStop, etc.) et **hiérarchiser** les causes (sécurité d'abord : AU, SafeStop, puis blocages métier) | Projet / IHM | `FB_Hmi_BannerFormatter.st`, `PRG_07_Supervision.st`, `ST_HmiBanner.st`, reliquat session 2026-08-16 — lié à T116 |
-| T119 | 🟡 Analyse comportement Dive / référencement benne **dans le cycle semi-auto (MAINT_N1)** : clarifier l'interlock descente benne fermée et le retour IHM (étape « descendre » du cycle) | Projet / Sécurité / IHM | reliquat session 2026-08-16 — à instruire après essai du cycle automatique ; lié à T118 |
-| T120 | 🔴 **Autoriser SEMI_AUTO même si prérequis non prêts** — le cycle affiche « en attente de prérequis » (codeur, homing, etc.) au lieu de rester bloqué en MAINT_N1. **Modification profonde de la logique machine** : `FB_Modes` refuse actuellement SEMI_AUTO si `EncoderFaultPresent` (force `Auth.Mode := MAINT_N1`). Objectif : laisser le mode SEMI_AUTO s'activer, et le séquenceur (`FB_Cycle`) gérer l'attente des prérequis avec des messages/erreurs explicites à l'utilisateur. **Détail pour les agents** : ① remplacer la constante magique `COD1_DeviceState <> 8` (PRG_03 ligne 41) par `<> DEVICE_STATE.RUNNING` ou le signal diag `DeviceEncoderM1.Online` (FB_Diag_Ethercat, gère déjà le bypass simu) — **pas de constante magique** ; ② décider si `EncoderFaultPresent` doit rester un **blocage** ou devenir un **état d'attente** du cycle ; ③ vérifier l'impact sur `FB_Cycle` (états INIT/attente) et l'IHM (messages) ; ④ auditer la sécurité (ne pas autoriser SEMI_AUTO avec codeurs réellement HS sur machine réelle) | Projet / Sécurité / IHM | `FB_Modes.st`, `PRG_03_Modes_Cycle.st`, `FB_Cycle.st`, `FB_Diag_Ethercat.st`, reliquat session 2026-08-16 |
-| T121 | 🔴 **Audit & élimination des constantes magiques** — remplacer les comparaisons à des valeurs numériques brutes (ex. `COD1_DeviceState <> 8`) par les **symboles/DUT existants** (`DEVICE_STATE.RUNNING`, `ST_Diag_Device`, etc.). **Risque identifié** : deux concepts coexistent (constantes magiques + DUT/structures) → code qui se comporte mal si une structure est modifiée (la constante ne suit pas). **Détail pour les agents** : ① grep systématique des comparaisons à des entiers/enums bruts dans `CODE/` (ex. `<> 8`, `= 4`, `16#...` sur des champs typés `DEVICE_STATE`/`E_*`) ; ② pour chaque occurrence, remplacer par le symbole de l'enum ou le signal DUT dédié ; ③ vérifier que les DUT/structures sont **cohérents** (pas de doublon de concept) ; ④ auditer la propagation (une modif de structure doit se propager partout, pas laisser de constante orpheline) ; ⑤ gate de non-régression (bundle + `G200_check_linkage.py`) | Projet / Convention / Sécurité | `CODE/` (grep), `NAMING_CONVENTION.md`, `CODE_QUALITY_STANDARDS.md`, reliquat session 2026-08-16 |
-| T122 | 🔴 **Renommage du flux de données joystick → actionneurs** — distinguer intention utilisateur (`UserRequest`) vs demande logique (`LogicRequest`) vs sortie autorisée (`FinalOutput`). **Analyse faite par Codex Luna (2026-08-16)** : 3 niveaux sémantiques. **Renommages recommandés** : `MaintenanceMotionDirection` → `CoupledUserRequestDirection` · `MaintenanceMotionRequestActive` → `CoupledUserRequestActive` · `M1/M2_Direction_Active` → `M1/M2LogicRequestDirection` · `M1/M2_StartStop_Active` → `M1/M2LogicRequestStartStop` · `M1/M2_SpeedRef_Active` → `M1/M2LogicRequestSpeedRef_Pct`. **Supprimer `MaintenanceMotionSpeed_Pct`** (mort : assigné 100.0, jamais lu). **⚠️ Ne pas renommer les variables safety** (`SafeStop`, `PowerCutOff`, `AscentPermit`, `DescendPermit` — décisions safety séparées). **Effort** : `MaintenanceMotion*` seul = 1-2h ; refonte complète des bus = 1-3 jours (lot architecture dédié). **Gates requis** : bundle + `G200_check_linkage.py` + `run_all_gates.py` ; zéro ancienne occurrence ; producteur unique conservé ; valeurs -1/0/+1 inchangées ; import humain CODESYS. **✅ Phases 1-2 APPLIQUÉES (2026-08-16), revue Codex Luna PASS** ; Phase 3 (refonte complète des bus) différée | Projet / Convention / Sécurité | `PRG_04_Treuils_Benne.st`, `NAMING_CONVENTION.md`, analyse Codex Luna session 2026-08-16 |
-| T123 | 🟠 **Compléter la vue Troubleshooting (flux chronologique)** — câbler les champs TBD pour que la vue montre le flux complet de haut en bas (intention → arbitrage → commande → sortie). **Investigé (2026-08-16)** : 18 champs TBD dans `FB_TroubleshootingView.st`. **Priorités** : ① câbler **l'intention** (`CoupledUserRequestDirection`/`CoupledUserRequestActive`) dans `Demandes_200.Idx201/202` (joystick brut/scalé) — permettre de voir « l'utilisateur veut descendre » avant l'arbitrage ; ② câbler **M2 arbitré** (`M2LogicRequestSpeedRef_Pct`/`M2LogicRequestDirection`) dans `Idx208/209` (actuellement seul M1 est câblé) ; ③ traiter les autres TBD où un producteur existe (BypassSensorsGlobal, CycleAutoBusy, EncoderRawPos, CycleAutoCmd_Pct, CycleCmd_Open, CycleTargetPosition, CmdDriveFreq_Hz) ; ④ le champ SlackCable M1 reste à FALSE (capteur seulement M2 — documenter). **Respecter le principe chronologique** : chaque étape du flux visible | Projet / Diagnostic | `FB_TroubleshootingView.st`, `ST_ChainWinch.st`, `GVL_Troubleshooting.st`, reliquat session 2026-08-16 |
+| # | Sujet | Qui tranche / Domaine | Statut | Lock Agent | Source & Détails |
+|---|---|---|:---:|:---:|---|
+| T1 | Détail séquence `INIT` (sous-vérifications position/cohérence) | Projet | ⏸️ | — | AF_Partie-04 §2, D22 |
+| T4 | Protocole registre AC600 (`DriveControlWord`/`StatusWord`) | Constructeur variateur | ⏸️ | — | Translation/Safety_Translation |
+| T6 | Périmètre `PRG_08` Auxiliaire | Client | ⏸️ | — | v1.1 §3 (différé assumé) |
+| T8 | Rôle de `CodeSeqTriggerCmd` (codeurs) | Terrain | ⏸️ | — | AF_Partie-10 |
+| T9 | Comportement frein en montée chargée | Terrain | ⏸️ | — | AF_Partie-09 §4undecies (différé après essais) |
+| T11 | `EmergencyStopOk` : confirmation temporisée post-réarmement | Projet | ⬜ | — | AUDIT D93 |
+| T15 | Validation câblage réel `EmergencyStopOk_DI` et réarmement | Projet / Terrain | ⏳ | HUM | AF_Partie-01, `PRG_02_Acquisition` |
+| T17 | Checklist Joystick : exécution terrain et verdict signé | Projet / Terrain | ⏳ | HUM | `ARCHIVES/Doc/CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.1.md` |
+| T20 | Sélecteur treuil IHM : widget visu physique restant | Projet | ⬜ | — | AF_Partie-05 §2, AF_Partie-09 §1 |
+| T21 | Checklist validation Winch v1.7 terrain | Terrain | ⏳ | HUM | AF_Partie-09 §8 |
+| T22 | Tolérance de calibration `TopSensorPositionM` à fixer sur site | Terrain | ⏳ | HUM | AF_Partie-10 §7bis |
+| T25 | Suite Encoder/Homing : essais CODESYS bornage/redémarrage | Projet / Terrain | ⏳ | HUM | AF_Partie-10 §10 |
+| T26 | Checklist Translation AC600 terrain (EtherCAT, sens, PV, 5 capteurs) | Terrain | ⏳ | HUM | `ARCHIVES/Doc/CHECKLISTS/CHECKLIST_MiseEnService_Translation_v1.1.md` |
+| T27 | Benne : essais MES terrain (cinématique, offsets) | Terrain | ⏳ | HUM | AF_Partie-11 §6 |
+| T39 | Interfaces Homing nominale et unitaire : essais opérateur CODESYS | Projet / Terrain | ⏳ | HUM | AF_Partie-10 |
+| T43 | Comparaison vitesse M1/M2 remontée : régler seuils/tempo (inactif à 0) | Projet / Client | ⏸️ | — | AF_Partie-04 §3quater, `FB_Cycle` |
+| T47 | Garde-fou palier vitesse treuils : documenter métier, calibrer et activer | Projet / Sécurité / Terrain | ⏳ | HUM | `FB_SpeedStep`, `GVL_PERSISTENT._WinchSpeedConfig` |
+| T48 | Matrice validation pannes treuils V1–V7 en simulation/terrain | Projet / Terrain | ⏳ | HUM | `REGISTRE_Suivi_MiseEnService_v1.0.md` |
+| T52 | Valider chaîne `PowerCutOff` physique et temps coupure réel | Électricité + Projet | ⏳ | HUM | `PRG_06_Outputs_LD.st` |
+| T54 | Intégrer latence boucle automate (~10 ms) au calcul temps d'arrêt | Projet | ⬜ | — | AUDIT Winch §3.2 |
+| T55 | Stratégie synchronisme unique (info / mineur / majeur / critique) | Projet | ⬜ | — | `FB_WinchSync` |
+| T56 | Caractériser seuils sécurité terrain (0,02 m/s, 2 m, 3 s, 800 ms, 500 ms) | Projet / Terrain | ⏳ | HUM | `FB_Safety_Winch` |
+| T57 | Unifier limite haute M2 selon offset benne | Projet | ⬜ | — | `PRG_04_Treuils_Benne` |
+| T58 | Séparation Config/Commands/Status/Alarms post-maquette IHM | Projet + IHM | ⏸️ | — | AUDIT Winch §5.2 |
+| T59 | IHM : afficher arrêt croisé effectif (`ForbidAscentM1_Active`) | IHM | ⬜ | — | `PRG_07_Supervision` |
+| T64 | Plafond palier vitesse essais : restaurer valeur d'exploitation | Projet / Terrain | ⏳ | HUM | MES-003 |
+| T72 | Interverrouillage commande/frein : bloquer `RelayFwd/Rev` si frein fermé | Projet / Sécurité | ⬜ | — | `FB_Winch.st`, `FB_Translation.st` |
+| T73 | Winch : confirmation temporisée + escalade PowerCutOff limite basse | Projet / Sécurité | ⬜ | — | `FB_Safety_Winch.st` |
+| T74 | Translation : temporiser escalade PowerCutOff sur `LimitSwitch` | Projet / Sécurité | ⬜ | — | `FB_Safety_Translation.st` |
+| T75 | `G100_check_code_style.py` : nettoyer exemptions obsolètes | Projet | ⬜ | — | Outillage |
+| T76 | `FB_Cycle.st` : raccorder `DrainingTime` au persistant/IHM | Projet | ⬜ | — | `FB_Cycle.st` |
+| T77 | POO Diagnostics : passer statuts bruts aux FB (retrait expressions) | Projet / Architecture | ⬜ | — | `PRG_02_Acquisition`, `FB_Diag_*` |
+| T78 | Rampe Treuils : passer à 10%/s par défaut et égaliser en couplé | Projet / Commande Treuils | ⬜ | — | `FB_Winch.st`, `PRG_04_Treuils_Benne.st` |
+| T79 | Configurer Trace CODESYS 10ms diagnostic arrêt différencié M1/M2 | Projet / Terrain | ⏳ | HUM | MES-008 |
+| T81 | Séquence détection fond Kobold à 4 étapes | Projet / Client | ⏳ | PI-01 | `AF_Partie-04`, `FB_DiveSearch` (codé, attente essais) |
+| T82 | Arrêt sécurisé si séquence Kobold invalide | Projet / Sécurité | ⏳ | PI-01 | `FB_ExtractionSequence` (codé, attente essais) |
+| T83 | Repasser `ST_BypassNetwork.IhmHeartbeat` à `FALSE` dès visu opérationnelle | Projet / IHM | ⏳ | HUM | `ST_BypassNetwork.st` |
+| T84 | Validation CODESYS/terrain mesure vitesse 50 ms (`FB_Encoder_SpeedMeasure`) | Projet / Sécurité | ⏳ | PI-01 | `FB_Encoder_SpeedMeasure.st` |
+| T85 | Validation chaîne producteur codeur unique (`PRG_02_Acquisition`) | Projet / Architecture | ⏳ | PI-01 | `PRG_02_Acquisition.st` |
+| T86 | Validation blocage déterministe si `Enable=FALSE` (`FB_Safety_Winch`) | Projet / Sécurité | ⏳ | PI-01 | `FB_Safety_Winch.st` |
+| T87 | Sort de `DelayMotorDecel` (code mort dans `FB_Brake` TON à FALSE) | Projet / Sécurité | ⏸️ | — | Lot étude T91/T93 |
+| T88 | Bouclage `TIME()` (49,7j) dans `FB_CycleTime` : garde-fou `DeltaTimeMs > 1000` | Projet | ⬜ | — | `FB_CycleTime.st` |
+| T89 | Valider sur site offset benne fermée ≈ 15 m (grandeur d'état mécanique) | Terrain / Projet | ⏳ | HUM | MES-010 |
+| T90 | Valider sur site cote capteur haut 8.0 m et limite 7.5 m au premier homing | Terrain / Sécurité | ⏳ | HUM | MES-009 |
+| T91 | ÉTUDE : Séquence frein/puissance asymétrique (montée frein d'abord / descente immédiat) | Projet / Sécurité / Terrain | ⬜ | — | MES-006, `FB_Brake` |
+| T92 | Qualification terrain persistance bypass RETAIN et homing à 0 m | Terrain / Sécurité | ⏳ | HUM | MES-002 |
+| T93 | Remplacer rampe %/s par temporisations de maintien entre paliers contacteurs | Projet / Maintenance | ⬜ | — | `FB_SpeedStep`, `FB_Winch` |
+| T94 | Rendre `SpeedGuardEnable` persistant et exposé IHM MAINT_N2 | Projet / Terrain | ⏳ | PI-01 | `PRG_04_Treuils_Benne`, `GVL_PERSISTENT` |
+| T95 | Table `VitesseMax[1..5]` de calibration dans `FB_Winch_Symmetry` | Projet / Terrain | ⏳ | PI-01 | `FB_Winch_Symmetry.st` |
+| T96 | Mode apprentissage automatique des bandes de vitesse à vide et en charge | Projet / Terrain | ⏸️ | — | `AF_Partie-10_v2.0` §9bis.3 |
+| T97 | Rationalisation acquisition / retrait contrôlé `PRG_01_Inputs_LD` et `FB_Input` | Projet / Sécurité | ⬜ | — | `AF_Partie-06_v2.3` |
+| T98 | Câbler `BrakeThermalFault`/`PhaseRotationFault` vers `GVL_IHM.Commun` | Projet | ⬜ | — | `PRG_07_Supervision.st` |
+| T102 | Migration architecture acquisition : validation dossier remappage | Projet / Sécurité | ⬜ | — | `AF_Partie-02_v3.1` |
+| T108 | Interlock Translation M3 si Trémie pleine (`HopperFull_OR_GateRaised_DI`) | Projet / Translation M3 | ⬜ | — | `PRG_05_Translation.st` |
+| T109 | Formaliser convention polarité positive (`*Permit` / `Allowed`) pour arbitrages | Projet / Convention | ⬜ | — | `NAMING_CONVENTION.md` |
+| T110 | Clarifier sémantique `DriveStatusWord.0` AC600 ("Power Ready" vs "Mouvement" Méca B) | Projet / Sécurité | ⬜ | — | `FB_Safety_Translation.st` |
+| T115 | Bandeau IHM champ 2 « Cycle » : `CycleStep` non alimenté → affiche `INIT` | Projet / IHM | ⏸️ | — | `PRG_07_Supervision.st`, lié au lot Cycle Auto |
+| T116 | IHM : message homme-mort/neutre dynamique selon l'état réel (3 états) | Projet / IHM | ⬜ | — | `PRG_07_Supervision.st`, `FB_Hmi_BannerFormatter.st`, `FB_Joystick.st` |
+| T117 | Renommage/élimination des variables `Forbid*` (`ForbidDescent`/`ForbidAscent`) | Projet / Convention | ⬜ | — | `NAMING_CONVENTION.md`, `T109` |
+| T118 | Refonte des textes IHM du bandeau (`FB_Hmi_BannerFormatter`) : cause + action | Projet / IHM | ⬜ | — | `FB_Hmi_BannerFormatter.st`, `PRG_07_Supervision.st`, Option A |
+| T119 | Analyse comportement Dive / référencement benne dans le cycle semi-auto | Projet / Sécurité / IHM | ⏸️ | — | Reliquat session 2026-08-16, lié à T118 |
+| T120 | Autoriser SEMI_AUTO même si prérequis non prêts (attente explicite cycle) | Projet / Sécurité / IHM | ⬜ | — | `FB_Modes.st`, `PRG_03_Modes_Cycle.st`, `FB_Cycle.st` |
+| T121 | Audit & élimination des constantes magiques (`<> 8` → symboles DUT/enums) | Projet / Convention / Sécurité | ⬜ | — | `CODE/` (grep), `NAMING_CONVENTION.md` |
+| T122 | Renommage flux joystick → actionneurs (CoupledUserRequest / LogicRequest) | Projet / Convention / Sécurité | ⏳ | CDX-01 | `PRG_04_Treuils_Benne.st` (Phases 1-2 faites, phase 3 différée) |
+| T123 | Compléter la vue Troubleshooting (flux chronologique, 18 TBD) | Projet / Diagnostic | ⏳ | CDX-01 | `FB_TroubleshootingView.st`, `ST_ChainWinch.st`, `GVL_Troubleshooting.st` |
 
 ---
 

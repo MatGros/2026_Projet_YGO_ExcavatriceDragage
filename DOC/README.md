@@ -66,8 +66,8 @@ Ils restent des **POU du code actuel**, cibles de migration, jamais des cibles d
 | Mise en service | [TESTS/REGISTRES/REGISTRE_Suivi_MiseEnService.md](TESTS/REGISTRES/REGISTRE_Suivi_MiseEnService.md) |
 | Post-mise en service | [TESTS/REGISTRES/REGISTRE_Suivi_PostMES.md](TESTS/REGISTRES/REGISTRE_Suivi_PostMES.md) |
 | Fiches d'essais | `TESTS/CHECKLISTS/` · Audits ouverts : `WFLOW/AUDITS/` · Schémas : `DIA/` |
-| Décision d'architecture actée | [WFLOW/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md](WFLOW/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md) |
-| Plan d'exécution de la migration | [WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md](WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md) |
+| Décision d'architecture actée | `AF_Partie-02` §2/§4 (source unique, voir ci-dessus) — décision historique dans [ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/RU_C4_ARCHITECTURE_PROCEDES.md](../ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/RU_C4_ARCHITECTURE_PROCEDES.md) (archive) |
+| Migration 7 POU (M0→M8) | **Terminée** — `CODE/MAIN/` contient `PRG_02..07` ; plan archivé dans [ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/](../ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/) |
 
 ## 🧪 Points de validation (`TC-`)
 
