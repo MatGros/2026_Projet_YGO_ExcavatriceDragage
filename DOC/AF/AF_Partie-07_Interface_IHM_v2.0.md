@@ -109,7 +109,7 @@ flowchart LR
         direction TB
         B1["<b>1. GlobalContextText</b> (STRING 80)<br><code>[RÉEL/SIMU] [MODE] [COUPLAGE]</code>"]
         B2["<b>2. SequenceProgressText</b> (STRING 120)<br><code>Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;</code>"]
-        B3["<b>3. SpecialConditionText</b> (STRING 120)<br><code>⚠️ &lt;Dérogation / Bridage / Alerte&gt;</code>"]
+        B3["<b>3. SpecialConditionText</b> (STRING 120)<br><code>ATTENTION: &lt;Dérogation / Bridage / Alerte&gt;</code>"]
         B4["<b>4. OperatorActionText</b> (STRING 120)<br><code>[ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;</code>"]
     end
 
@@ -134,13 +134,33 @@ flowchart LR
 |---|---|---|---|---|
 | **1** | **`GlobalContextText`** *(Macro)* | Contexte d'exécution, mode de marche actif et sélection axes. | `[Contexte] [Mode] [Axes]` | • `[RÉEL] [SEMI-AUTO] [M1+M2 SYNCHRO]`<br>• `[SIMULATION] [MAINT_N2] [TREUIL M2 SEUL]` |
 | **2** | **`SequenceProgressText`** *(Micro)* | Étape courante du cycle maître **ET** de la sous-séquence active (Kobold, arrachage, homing). | `Macro: <Étape> > Sous-cycle: <Sous-étape>` | • `Cycle: DESCENTE > Kobold: 02_IMMERSION_SURFACE`<br>• `Homing: M1_RECHERCHE_INDEX_HAUT` |
-| **3** | **`SpecialConditionText`** *(Dérogations)* | Régimes dérogatoires de maintenance, sécurités neutralisées, bridages actifs (*vide si nominal*). | `⚠️ <Type> : <Détail>` ou `ℹ️ <Type> : <Détail>` | • `⚠️ DÉROGATION : Butées logicielles M2 inactives`<br>• `ℹ️ BRIDAGE : Palier 1 forcé (Désynchronisme 0.4m)` |
+| **3** | **`SpecialConditionText`** *(Dérogations)* | Régimes dérogatoires de maintenance, sécurités neutralisées, bridages actifs (*vide si nominal*). | `ATTENTION: <Type> : <Détail>` ou `INFO: <Type> : <Détail>` | • `ATTENTION: DÉROGATION : Butées logicielles M2 inactives`<br>• `INFO: BRIDAGE : Palier 1 forcé (Désynchronisme 0.4m)` |
 | **4** | **`OperatorActionText`** *(Action)* | Consigne d'action physique attendue immédiatement du conducteur. | `[Organe] <Verbe d'action> > <Condition de fin>` | • `[JOYSTICK] Pousser Y- (Descente) > Attendre contact fond`<br>• `[PUPITRE] Appuyer sur Bouton HOMING M2` |
 
 ### 🧩 4.2 Principes de génération & Typage fort
 * **Pas de manipulation de texte dans les FB procédé** : Les FB métier (`FB_Cycle`, `FB_DiveSearch`, `FB_Safety_Winch`, etc.) publient exclusivement des états typés (`E_CycleStep`, `E_DiveSearchState`, `ActionId : WORD`, flags booléens de bypass).
 * **Arbitre central dans `PRG_07_Supervision`** : Le POU `PRG_07_Supervision` instancie un formateur dédié (`FB_Hmi_BannerFormatter`) qui assemble les 4 champs selon les priorités machine et met à jour `GVL_IHM.Banner`.
 * **Séparation stricte avec les alarmes** : Les alarmes et pannes restent publiées dans `Error`/`ErrorId` et traitées par le gestionnaire d'alarmes / journal de supervision IHM. Le bandeau d'information ne remplace pas le journal d'alarmes.
+
+### 🧊 4.3 Stratégie anti-clignotement (décision 2026-08-17)
+
+Le bandeau est recalculé à chaque scan (10 ms). Un signal qui oscille (ex. `SafeStopActive` qui
+passe ON/OFF en boucle, warning transitoire) ferait **clignoter** le texte → illisible pour
+l'opérateur. Stratégie **hybride** :
+
+| Type de message | Traitement | Rythme |
+|---|---|---|
+| **Défaut** (latché + acquitté) | Affiché **immédiatement**, pas de délai | scan |
+| **Warning / état** (peut disparaître) | **Maintien min** avant changement (TON ~500 ms) | anti-clignotement |
+
+- **Champs concernés** : `OperatorActionText` et `SpecialConditionText` (les plus sujets à
+  oscillation). `GlobalContextText`/`SequenceProgressText` changent moins souvent → pas de maintien.
+- **Principe** : un message warning/état est **maintenu un temps minimum** (500 ms) avant de
+  laisser le texte changer. Un signal qui oscille plus vite que 500 ms → texte stable. Un vrai
+  changement → s'affiche après 500 ms max (acceptable pour un warning, jamais pour un défaut).
+- **Défauts** : passent en direct (pas de maintien) — un défaut AU/puissance doit être visible
+  immédiatement, sans latence.
+- **Seuil** : 500 ms par défaut, à calibrer sur site (REX terrain).
 
 ---
 

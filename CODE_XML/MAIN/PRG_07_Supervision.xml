@@ -7870,6 +7870,42 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
+            <variable name="CriticalActionActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SpecialConditionCandidate">
+              <type>
+                <string length="120" />
+              </type>
+            </variable>
+            <variable name="OperatorActionCandidate">
+              <type>
+                <string length="120" />
+              </type>
+            </variable>
+            <variable name="TonSpecialCondition">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TonOperatorAction">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="CST_BannerHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Anti-clignotement warnings/états (AF-07 §4.3)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -7980,13 +8016,18 @@ AnyBypassActive := SimulationModeActive
                 OR BypassTranslation
                 OR BypassSyncActive;
 IF AnyBypassActive THEN
-    Banner.SpecialConditionText := '⚠️ Bypass actif';
+    SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
-    Banner.SpecialConditionText := '⚠️ Synchro bridée';
+    SpecialConditionCandidate := 'ATTENTION: Synchro bridée';
 ELSIF LegalLimitReached THEN
-    Banner.SpecialConditionText := '⚠️ Limite légale';
+    SpecialConditionCandidate := 'ATTENTION: Limite légale';
 ELSE
-    Banner.SpecialConditionText := '';
+    SpecialConditionCandidate := '';
+END_IF;
+// 🧊 Anti-clignotement (AF-07 §4.3) : maintien min avant changement
+TonSpecialCondition(IN := (SpecialConditionCandidate &lt;&gt; Banner.SpecialConditionText), PT := CST_BannerHoldTime);
+IF TonSpecialCondition.Q THEN
+    Banner.SpecialConditionText := SpecialConditionCandidate;
 END_IF;
 
 // ═══════════════════════════════════════════════════════════════
@@ -8008,31 +8049,43 @@ DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
                 OR (CurrentDirection &gt; 0 AND NOT AscentPermit);
 
 IF NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
-    Banner.OperatorActionText := '[PUPITRE] Réarmer AU et puissance';
+    OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
-    Banner.OperatorActionText := '[PUPITRE] Acquitter SafeStop';
+    OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
 ELSIF DirectionBlocked THEN
     IF CurrentDirection &lt; 0 THEN
-        Banner.OperatorActionText := '[TREUIL] Descente interdite';
+        OperatorActionCandidate := '[TREUIL] Descente interdite';
     ELSE
-        Banner.OperatorActionText := '[TREUIL] Montée interdite';
+        OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
 ELSIF DiveActive AND CurrentDirection &lt; 0 THEN
-    Banner.OperatorActionText := '[TREUIL] Attendre fin du Dive';
+    OperatorActionCandidate := '[TREUIL] Attendre fin du Dive';
 ELSIF NOT BucketIsOpen AND CurrentDirection &lt; 0 THEN
-    Banner.OperatorActionText := '[BENNE] Ouvrir la benne';
+    OperatorActionCandidate := '[BENNE] Ouvrir la benne';
 ELSIF TopLimitReached AND CurrentDirection &gt; 0 THEN
-    Banner.OperatorActionText := '[TREUIL] Limite haute';
+    OperatorActionCandidate := '[TREUIL] Limite haute';
 ELSIF NOT DeadmanArmed THEN
-    Banner.OperatorActionText := '[JOYSTICK] Appuyer homme-mort au neutre';
+    OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF CurrentMode = E_Mode.DISABLE THEN
-    Banner.OperatorActionText := '[IHM] Sélectionner un mode';
+    OperatorActionCandidate := '[IHM] Sélectionner un mode';
 ELSIF CurrentMode = E_Mode.SEMI_AUTO AND CycleStep = E_CycleStep.X0_PREPARATION THEN
-    Banner.OperatorActionText := '[IHM] Démarrer le cycle';
+    OperatorActionCandidate := '[IHM] Démarrer le cycle';
 ELSIF JoystickAtNeutral THEN
-    Banner.OperatorActionText := '[JOYSTICK] Armé — actionner l''axe';
+    OperatorActionCandidate := '[JOYSTICK] Armé - actionner l''axe';
 ELSE
-    Banner.OperatorActionText := '[JOYSTICK] Déplacement en cours';
+    OperatorActionCandidate := '[JOYSTICK] Déplacement en cours';
+END_IF;
+
+// 🧊 Anti-clignotement (AF-07 §4.3) : défauts (AU/SafeStop) en direct, warnings/états maintenus
+CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny OR SafeStopActive);
+IF CriticalActionActive THEN
+    Banner.OperatorActionText := OperatorActionCandidate;
+    TonOperatorAction(IN := FALSE);
+ELSE
+    TonOperatorAction(IN := (OperatorActionCandidate &lt;&gt; Banner.OperatorActionText), PT := CST_BannerHoldTime);
+    IF TonOperatorAction.Q THEN
+        Banner.OperatorActionText := OperatorActionCandidate;
+    END_IF;
 END_IF;
 </xhtml>
           </ST>
