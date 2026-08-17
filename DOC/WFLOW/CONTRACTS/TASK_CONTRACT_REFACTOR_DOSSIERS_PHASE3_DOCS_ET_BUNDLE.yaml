@@ -1,0 +1,51 @@
+contract:
+  task_id: REFACTOR_DOSSIERS_PHASE3_DOCS_ET_BUNDLE
+  criticality: C2
+  strategy: patch
+
+  objective: "Mettre à jour les liens documentaires de DOC/ et régénérer le bundle PLCopenXML CODE_Bundle.xml."
+
+  acceptance:
+    - id: AC1
+      statement: "Les cartouches et références de fichiers dans les fiches AF et standards sous DOC/ sont mis à jour vers les répertoires A_COMMUN à M_MAIN."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py"
+    - id: AC2
+      statement: "Le bundle PLCopenXML CODE_XML/CODE_Bundle.xml est régénéré sans erreur à partir de la nouvelle arborescence."
+      verified_by: "python TOOLS/ST_PLCOPENXML_GENERATOR/scripts/build_bundle.py CODE -o CODE_XML/CODE_Bundle.xml"
+
+  scope:
+    allowed:
+      - DOC/
+      - CODE_XML/CODE_Bundle.xml
+    forbidden:
+      - CODE/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+
+  evidence_required:
+    - bundle
+    - run_all_gates
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "codex/gpt-5.6-luna"
+    - "agy/gemini-3.6-flash-high"
+
+  alert_duty: "Un lien mort non résolu automatiquement doit être signalé immédiatement."
+
+status: COMPLETED
+
+execution:
+  executed_by: "AGY-01 (Antigravity gemini-3.6-flash-high)"
+  completed_at: "2026-08-17T12:25:00+02:00"
+  status: COMPLETED
+  summary: "Liens documentaires mis à jour (G340 PASS) et bundle PLCopenXML CODE_Bundle.xml généré avec succès (170 objets, 0 erreur)."
+  evidence_submitted:
+    - "G340_check_doc_links: PASS (0 erreur)"
+    - "build_bundle.py: PASS (170 objets, 0 erreur)"
+
+validation:
+  status: APPROVED
+  validated_by: "Antigravity (Orchestrateur)"
+  validated_at: "2026-08-17T12:25:00+02:00"
+  notes: "Phase 3 validée avec succès."

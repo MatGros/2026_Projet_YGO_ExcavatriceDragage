@@ -22,26 +22,28 @@ def test_synthetic_enum_keyword_form():
 
 
 def test_real_e_cyclestep_parenthesized_form():
-    path = CODE_DIR / "CYCLE" / "E_CycleStep.st"
+    cycle_dir = "G_CYCLE" if (CODE_DIR / "G_CYCLE").is_dir() else "CYCLE"
+    path = CODE_DIR / cycle_dir / "E_CycleStep.st"
     source = path.read_text(encoding="utf-8")
     diag = DiagnosticCollector()
     obj = parse_file(
-        source, folder="CYCLE", stem="E_CycleStep", mtime=1.0, source_label="E_CycleStep.st", diagnostics=diag
+        source, folder=cycle_dir, stem="E_CycleStep", mtime=1.0, source_label="E_CycleStep.st", diagnostics=diag
     )
     assert obj is not None
     assert obj.kind == "enum"
-    assert obj.enum_values[0].name == "INIT"
+    assert obj.enum_values[0].name == "X0_PREPARATION"
     assert obj.enum_values[0].value == 0
-    assert obj.enum_values[-1].name == "ERROR_HOLD"
-    assert obj.enum_values[-1].value == 12
+    assert obj.enum_values[-1].name == "STABILIZING"
+    assert obj.enum_values[-1].value == 14
     assert not diag.has_errors()
 
 
 def test_real_e_mode_keyword_enum_form():
-    path = CODE_DIR / "MODES" / "E_Mode.st"
+    mode_dir = "F_MODES" if (CODE_DIR / "F_MODES").is_dir() else "MODES"
+    path = CODE_DIR / mode_dir / "E_Mode.st"
     source = path.read_text(encoding="utf-8")
     diag = DiagnosticCollector()
-    obj = parse_file(source, folder="MODES", stem="E_Mode", mtime=1.0, source_label="E_Mode.st", diagnostics=diag)
+    obj = parse_file(source, folder=mode_dir, stem="E_Mode", mtime=1.0, source_label="E_Mode.st", diagnostics=diag)
     assert obj is not None
     assert obj.kind == "enum"
     names = [v.name for v in obj.enum_values]

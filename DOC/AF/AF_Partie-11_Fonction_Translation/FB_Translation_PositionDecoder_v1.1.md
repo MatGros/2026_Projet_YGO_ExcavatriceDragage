@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.2.md`](../AF_Partie-11_Fonction_Translation_v2.2.md) §2.
 > Rôle de **ce** document : décodage 5 capteurs TOR → mot de progression + butées extrêmes —
 > et **catalogue unique** des `TC-P11-001`, `TC-P11-002`.
-> Source code : `CODE/TRANSLATION/FB_Translation_PositionDecoder.st` · instance `Acquisition.instPositionDecoder`.
+> Source code : `CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st` · instance `Acquisition.instPositionDecoder`.
 
 ## 🧭 Sommaire
 
@@ -126,4 +126,4 @@ a été validé en direct le 2026-08-06) — à vérifier avant d'activer un `Se
 | AF11 (chapô) | Rôle machine, intégration programme |
 | AF11 / FB_Safety_Translation | Consommateur `Incoherent`, `LimitSwitchFwd/Rev` |
 | AF06 | 5 capteurs TOR M3 (E/S physiques) |
-| Code | `CODE/TRANSLATION/FB_Translation_PositionDecoder.st` |
+| Code | `CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st` |

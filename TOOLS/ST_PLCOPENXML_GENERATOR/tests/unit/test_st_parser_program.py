@@ -16,11 +16,12 @@ def test_synthetic_program():
 
 
 def test_real_prg_acquisition_parses_end_to_end():
-    path = CODE_DIR / "MAIN" / "PRG_02_Acquisition.st"
+    main_dir = "M_MAIN" if (CODE_DIR / "M_MAIN").is_dir() else "MAIN"
+    path = CODE_DIR / main_dir / "PRG_02_Acquisition.st"
     source = path.read_text(encoding="utf-8")
     diag = DiagnosticCollector()
     obj = parse_file(
-        source, folder="MAIN", stem="PRG_02_Acquisition", mtime=1.0,
+        source, folder=main_dir, stem="PRG_02_Acquisition", mtime=1.0,
         source_label="PRG_02_Acquisition.st", diagnostics=diag
     )
     assert obj is not None

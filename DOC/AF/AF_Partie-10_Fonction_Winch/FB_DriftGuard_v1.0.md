@@ -2,7 +2,7 @@
 
 > **Rôle** : Détection de dérive de position de référence sous armement (Méca A & Méca C).  
 > **Catégorie** : Brique technique de sécurité (utilisée exclusivement par `FB_Safety_Winch`).  
-> **Code Source** : `CODE/TREUILS/FB_DriftGuard.st`  
+> **Code Source** : `CODE/H_TREUILS_BENNE/FB_DriftGuard.st`  
 
 ---
 

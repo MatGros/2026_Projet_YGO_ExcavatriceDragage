@@ -312,23 +312,23 @@ NC-070 (GVL_PERSISTENT préfixé '_')      : Conformes=38   | Recensés=0    | T
 
 | Fichier relatif | Ligne | Extrait de code concerné | Nom détecté |
 |---|---|---|---|
-| `CODE/AU/FB_Safety_EmergencyManagement.st` | L45 | `Logic               : FB_Safety_EmergencyManagementLogic;` | `Logic` |
-| `CODE/AU/FB_Safety_EmergencyManagement.st` | L46 | `Output              : FB_Safety_EmergencyManagementOutput;` | `Output` |
-| `CODE/JOYSTICK/FB_Joystick.st` | L70 | `CycleTimeCalc   : FB_CycleTime;` | `CycleTimeCalc` |
-| `CODE/JOYSTICK/FB_Joystick.st` | L71 | `ScaleX          : FB_AxisScale;` | `ScaleX` |
-| `CODE/JOYSTICK/FB_Joystick.st` | L72 | `ScaleY          : FB_AxisScale;` | `ScaleY` |
-| `CODE/JOYSTICK/FB_Joystick.st` | L73 | `FilterX         : FB_Filter_PT1;` | `FilterX` |
-| `CODE/JOYSTICK/FB_Joystick.st` | L74 | `FilterY         : FB_Filter_PT1;` | `FilterY` |
-| `CODE/SIMULATION/FB_Sim_Translation.st` | L47 | `CycleTimeCalc   : FB_CycleTime;` | `CycleTimeCalc` |
-| `CODE/TRANSLATION/FB_Translation.st` | L90 | `Brake                : FB_Brake;` | `Brake` |
-| `CODE/TRANSLATION/FB_Translation.st` | L91 | `CycleTimeCalc        : FB_CycleTime;` | `CycleTimeCalc` |
-| `CODE/TRANSLATION/FB_Translation.st` | L92 | `SpeedRamp             : FB_Ramp;` | `SpeedRamp` |
-| `CODE/TRANSLATION/FB_Translation_PositionEstimator.st` | L54 | `CycleTimeCalc         : FB_CycleTime;` | `CycleTimeCalc` |
-| `CODE/TREUILS/FB_Safety_Winch.st` | L245 | `DriftGuardA         : FB_DriftGuard;` | `DriftGuardA` |
-| `CODE/TREUILS/FB_Safety_Winch.st` | L255 | `DriftGuardC         : FB_DriftGuard;` | `DriftGuardC` |
-| `CODE/TREUILS/FB_Winch.st` | L145 | `SpeedStep           : FB_SpeedStep;` | `SpeedStep` |
-| `CODE/TREUILS/FB_Winch.st` | L146 | `CycleTimeCalc       : FB_CycleTime;` | `CycleTimeCalc` |
-| `CODE/TREUILS/FB_Winch_Symmetry.st` | L26 | `CycleTime : FB_CycleTime;` | `CycleTime` |
+| `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` | L45 | `Logic               : FB_Safety_EmergencyManagementLogic;` | `Logic` |
+| `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` | L46 | `Output              : FB_Safety_EmergencyManagementOutput;` | `Output` |
+| `CODE/D_JOYSTICK/FB_Joystick.st` | L70 | `CycleTimeCalc   : FB_CycleTime;` | `CycleTimeCalc` |
+| `CODE/D_JOYSTICK/FB_Joystick.st` | L71 | `ScaleX          : FB_AxisScale;` | `ScaleX` |
+| `CODE/D_JOYSTICK/FB_Joystick.st` | L72 | `ScaleY          : FB_AxisScale;` | `ScaleY` |
+| `CODE/D_JOYSTICK/FB_Joystick.st` | L73 | `FilterX         : FB_Filter_PT1;` | `FilterX` |
+| `CODE/D_JOYSTICK/FB_Joystick.st` | L74 | `FilterY         : FB_Filter_PT1;` | `FilterY` |
+| `CODE/L_SIMULATION/FB_Sim_Translation.st` | L47 | `CycleTimeCalc   : FB_CycleTime;` | `CycleTimeCalc` |
+| `CODE/I_TRANSLATION/FB_Translation.st` | L90 | `Brake                : FB_Brake;` | `Brake` |
+| `CODE/I_TRANSLATION/FB_Translation.st` | L91 | `CycleTimeCalc        : FB_CycleTime;` | `CycleTimeCalc` |
+| `CODE/I_TRANSLATION/FB_Translation.st` | L92 | `SpeedRamp             : FB_Ramp;` | `SpeedRamp` |
+| `CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st` | L54 | `CycleTimeCalc         : FB_CycleTime;` | `CycleTimeCalc` |
+| `CODE/H_TREUILS_BENNE/FB_Safety_Winch.st` | L245 | `DriftGuardA         : FB_DriftGuard;` | `DriftGuardA` |
+| `CODE/H_TREUILS_BENNE/FB_Safety_Winch.st` | L255 | `DriftGuardC         : FB_DriftGuard;` | `DriftGuardC` |
+| `CODE/H_TREUILS_BENNE/FB_Winch.st` | L145 | `SpeedStep           : FB_SpeedStep;` | `SpeedStep` |
+| `CODE/H_TREUILS_BENNE/FB_Winch.st` | L146 | `CycleTimeCalc       : FB_CycleTime;` | `CycleTimeCalc` |
+| `CODE/H_TREUILS_BENNE/FB_Winch_Symmetry.st` | L26 | `CycleTime : FB_CycleTime;` | `CycleTime` |
 
 ### NC-020 — Notation hongroise (0 occurrence recensée)
 
@@ -341,17 +341,17 @@ Les 122 variables ci-dessous utilisent un suffixe d'unité direct (`CablePosM`, 
 *Exemples représentatifs du registre :*
 | Fichier relatif | Ligne | Extrait de code concerné | Nom détecté |
 |---|---|---|---|
-| `CODE/CODEURS/FB_Encoder_Homing.st` | L25 | `CfgHomingTargetM        : REAL;` | `CfgHomingTargetM` |
-| `CODE/CODEURS/FB_Encoder_Homing.st` | L32 | `DynamicHomingTargetM    : REAL := 0.0;` | `DynamicHomingTargetM` |
-| `CODE/CODEURS/FB_Encoder_Homing.st` | L38 | `CfgTopSensorPosM   : REAL := 8.5;` | `CfgTopSensorPosM` |
-| `CODE/CODEURS/FB_Encoder_Safety.st` | L20 | `CablePosM        : REAL;` | `CablePosM` |
-| `CODE/CODEURS/FB_Encoder_SpeedMonitor.st` | L20 | `SpeedMps                   : REAL;` | `SpeedMps` |
-| `CODE/COMMUN/FB_CycleTime.st` | L17 | `DeltaTimeMs   : UDINT;` | `DeltaTimeMs` |
-| `CODE/CYCLE/FB_Cycle.st` | L22 | `SetDepthM               : REAL;` | `SetDepthM` |
-| `CODE/CYCLE/FB_Cycle.st` | L31 | `WinchSyncDeltaM         : REAL;` | `WinchSyncDeltaM` |
-| `CODE/MAIN/PRG_02_Acquisition.st` | L73 | `M3_ActualFrequencyHz       : UINT;` | `M3_ActualFrequencyHz` |
-| `CODE/TRANSLATION/FB_Translation.st` | L40 | `DriveActualFreqHz            : REAL;` | `DriveActualFreqHz` |
-| `CODE/TREUILS/FB_Winch.st` | L83 | `SpeedRefPct             : REAL;` | `SpeedRefPct` |
+| `CODE/E_CODEURS/FB_Encoder_Homing.st` | L25 | `CfgHomingTargetM        : REAL;` | `CfgHomingTargetM` |
+| `CODE/E_CODEURS/FB_Encoder_Homing.st` | L32 | `DynamicHomingTargetM    : REAL := 0.0;` | `DynamicHomingTargetM` |
+| `CODE/E_CODEURS/FB_Encoder_Homing.st` | L38 | `CfgTopSensorPosM   : REAL := 8.5;` | `CfgTopSensorPosM` |
+| `CODE/E_CODEURS/FB_Encoder_Safety.st` | L20 | `CablePosM        : REAL;` | `CablePosM` |
+| `CODE/E_CODEURS/FB_Encoder_SpeedMonitor.st` | L20 | `SpeedMps                   : REAL;` | `SpeedMps` |
+| `CODE/A_COMMUN/FB_CycleTime.st` | L17 | `DeltaTimeMs   : UDINT;` | `DeltaTimeMs` |
+| `CODE/G_CYCLE/FB_Cycle.st` | L22 | `SetDepthM               : REAL;` | `SetDepthM` |
+| `CODE/G_CYCLE/FB_Cycle.st` | L31 | `WinchSyncDeltaM         : REAL;` | `WinchSyncDeltaM` |
+| `CODE/M_MAIN/PRG_02_Acquisition.st` | L73 | `M3_ActualFrequencyHz       : UINT;` | `M3_ActualFrequencyHz` |
+| `CODE/I_TRANSLATION/FB_Translation.st` | L40 | `DriveActualFreqHz            : REAL;` | `DriveActualFreqHz` |
+| `CODE/H_TREUILS_BENNE/FB_Winch.st` | L83 | `SpeedRefPct             : REAL;` | `SpeedRefPct` |
 | *(... 111 autres occurrences identiques conservées en baseline)* | | | |
 
 ---
@@ -373,13 +373,13 @@ Variables locales ou d'interface portant `Cmd`/`Req`/`Request` en suffixe (ex: `
 *Exemples représentatifs :*
 | Fichier relatif | Ligne | Extrait de code concerné | Nom détecté |
 |---|---|---|---|
-| `CODE/AU/FB_Safety_EmergencyManagement.st` | L15 | `ArmRequest          : BOOL;` | `ArmRequest` |
-| `CODE/AU/FB_Safety_EmergencyManagement.st` | L18 | `PowerCutOffRequest  : BOOL;` | `PowerCutOffRequest` |
-| `CODE/AU/ST_Safety_Emergency_InternalCmd.st` | L14 | `MaintainA_Cmd    : BOOL;` | `MaintainA_Cmd` |
-| `CODE/CODEURS/FB_Encoder_Abs.st` | L25 | `PresetRequest       : BOOL;` | `PresetRequest` |
-| `CODE/MAIN/PRG_04_Treuils_Benne.st` | L12 | `WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest;` | `WinchM1FinalInterlockRequest` |
-| `CODE/TRANSLATION/FB_Translation.st` | L85 | `BrakeReleaseRequest       : BOOL;` | `BrakeReleaseRequest` |
-| `CODE/TREUILS/FB_Safety_Winch.st` | L248 | `MecaB_NoOperatorCmd : BOOL;` | `MecaB_NoOperatorCmd` |
+| `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` | L15 | `ArmRequest          : BOOL;` | `ArmRequest` |
+| `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` | L18 | `PowerCutOffRequest  : BOOL;` | `PowerCutOffRequest` |
+| `CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st` | L14 | `MaintainA_Cmd    : BOOL;` | `MaintainA_Cmd` |
+| `CODE/E_CODEURS/FB_Encoder_Abs.st` | L25 | `PresetRequest       : BOOL;` | `PresetRequest` |
+| `CODE/M_MAIN/PRG_04_Treuils_Benne.st` | L12 | `WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest;` | `WinchM1FinalInterlockRequest` |
+| `CODE/I_TRANSLATION/FB_Translation.st` | L85 | `BrakeReleaseRequest       : BOOL;` | `BrakeReleaseRequest` |
+| `CODE/H_TREUILS_BENNE/FB_Safety_Winch.st` | L248 | `MecaB_NoOperatorCmd : BOOL;` | `MecaB_NoOperatorCmd` |
 
 ---
 
@@ -396,14 +396,14 @@ La convention d'exemption stipule :
 
 | Fichier relatif | Ligne | Extrait de code concerné | Nom détecté | Correction préconisée (futur refactor) |
 |---|---|---|---|---|
-| `CODE/SUPERVISION/_TYPES/ST_BucketHMIState.st` | L8 | `ActiveOffset_M : REAL;` | `ActiveOffset_M` | `SetOffset_M` ou champ mesure |
-| `CODE/SUPERVISION/_TYPES/ST_BucketHMIState.st` | L9 | `M2StartStop : BOOL;` | `M2StartStop` | `BtnM2StartStop` ou `TglM2StartStop` |
-| `CODE/SUPERVISION/_TYPES/ST_BucketHMIState.st` | L10 | `M2Direction : INT;` | `M2Direction` | `SelM2Direction` |
-| `CODE/SUPERVISION/_TYPES/ST_BucketHMIState.st` | L11 | `M2ForceSlowSpeed : BOOL;` | `M2ForceSlowSpeed` | `TglM2ForceSlowSpeed` |
-| `CODE/SUPERVISION/_TYPES/ST_BucketHMIState.st` | L17 | `RemainingTravel_M : REAL;` | `RemainingTravel_M` | Champ mesure / diagnostic |
-| `CODE/SUPERVISION/_TYPES/ST_EncoderHMI.st` | L12 | `PresetTriggerCmd : WORD;` | `PresetTriggerCmd` | `SetPresetTrigger` / `BtnPresetTrigger` |
-| `CODE/SUPERVISION/_TYPES/ST_WinchSymmetryHMI.st` | L9 | `DeltaStopDistance_M : REAL;` | `DeltaStopDistance_M` | `SetDeltaStopDistance_M` / `Cfg...` |
-| `CODE/SUPERVISION/_TYPES/ST_WinchSymmetryHMI.st` | L11 | `MaxSyncDeviation_M : REAL;` | `MaxSyncDeviation_M` | `CfgMaxSyncDeviation_M` |
+| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L8 | `ActiveOffset_M : REAL;` | `ActiveOffset_M` | `SetOffset_M` ou champ mesure |
+| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L9 | `M2StartStop : BOOL;` | `M2StartStop` | `BtnM2StartStop` ou `TglM2StartStop` |
+| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L10 | `M2Direction : INT;` | `M2Direction` | `SelM2Direction` |
+| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L11 | `M2ForceSlowSpeed : BOOL;` | `M2ForceSlowSpeed` | `TglM2ForceSlowSpeed` |
+| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L17 | `RemainingTravel_M : REAL;` | `RemainingTravel_M` | Champ mesure / diagnostic |
+| `CODE/J_SUPERVISION/_TYPES/ST_EncoderHMI.st` | L12 | `PresetTriggerCmd : WORD;` | `PresetTriggerCmd` | `SetPresetTrigger` / `BtnPresetTrigger` |
+| `CODE/J_SUPERVISION/_TYPES/ST_WinchSymmetryHMI.st` | L9 | `DeltaStopDistance_M : REAL;` | `DeltaStopDistance_M` | `SetDeltaStopDistance_M` / `Cfg...` |
+| `CODE/J_SUPERVISION/_TYPES/ST_WinchSymmetryHMI.st` | L11 | `MaxSyncDeviation_M : REAL;` | `MaxSyncDeviation_M` | `CfgMaxSyncDeviation_M` |
 
 ---
 
@@ -430,12 +430,12 @@ Au-delà des règles initialement recensées (NC-010 à NC-070), 6 nouveaux méc
 
 | ID Règle | Intention & Paragraphe source | Faisabilité mécanique | Exemple concret dans `CODE/*.st` |
 |---|---|---|---|
-| **`NC-080`** | **Repère matériel (M1/M2/M3) juste après le préfixe dans une GVL plate**<br> *Ref : `NAMING_CONVENTION.md §Repère juste après le préfixe`* | 🟢 **Élevée** (Regex sur fichiers `GVL_*.st`) | Incohérence dans `CODE/MAIN/GVL_Global.st` :<br>`TranslationBrakeCmd : BOOL;` *(manque M3)* vs `M1BrakeCmd : BOOL;` *(M1 en préfixe principal)* vs `M2BrakeCmd : BOOL;` |
+| **`NC-080`** | **Repère matériel (M1/M2/M3) juste après le préfixe dans une GVL plate**<br> *Ref : `NAMING_CONVENTION.md §Repère juste après le préfixe`* | 🟢 **Élevée** (Regex sur fichiers `GVL_*.st`) | Incohérence dans `CODE/M_MAIN/GVL_Global.st` :<br>`TranslationBrakeCmd : BOOL;` *(manque M3)* vs `M1BrakeCmd : BOOL;` *(M1 en préfixe principal)* vs `M2BrakeCmd : BOOL;` |
 | **`NC-090`** | **Une notion = un seul nom dans tout le projet (Anti-synonymes parallèles)**<br> *Ref : `NAMING_CONVENTION.md §1` & `CODE_QUALITY_STANDARDS.md §1`* | 🟡 **Moyenne** (Dictionnaire de paires interdites) | Coexistence parallèle de `Pos` (158 occurrences) vs `Position` (132 occurrences), et `Speed` vs `Velocity` across `CODE/`. |
-| **`NC-100`** | **Chaîne à 4 maillons : Paramètre → Mesure → Reached → Active**<br> *Ref : `NAMING_CONVENTION.md §Paramètre -> Mesure -> État atteint -> État actif`* | 🟢 **Élevée** (Pattern matching sur décl. booléennes) | Alignement dans `CODE/CYCLE/FB_Cycle.st` :<br>`LimitLegalDepthM` (Param) → `Position_M` (Mesure) → `LimitLegalReached` (Reached) → `ForbidDescentActive` (Active). |
+| **`NC-100`** | **Chaîne à 4 maillons : Paramètre → Mesure → Reached → Active**<br> *Ref : `NAMING_CONVENTION.md §Paramètre -> Mesure -> État atteint -> État actif`* | 🟢 **Élevée** (Pattern matching sur décl. booléennes) | Alignement dans `CODE/G_CYCLE/FB_Cycle.st` :<br>`LimitLegalDepthM` (Param) → `Position_M` (Mesure) → `LimitLegalReached` (Reached) → `ForbidDescentActive` (Active). |
 | **`NC-110`** | **Format hiérarchique DUT : `ST_<Domaine>_[<SousDomaine>_]<Rôle>`**<br> *Ref : `NAMING_CONVENTION.md §Structures de données (DUT)`* | 🟢 **Élevée** (Regex sur `TYPE ST_*`) | Non-conformités de structuration DUT dans `CODE/TREUILS/` :<br>`ST_BucketConfig` *(devrait être `ST_Winch_Bucket_Config`)*,<br>`ST_SpeedStepTable` *(devrait être `ST_Winch_SpeedStepTable`)*. |
-| **`NC-120`** | **Construction 2 niveaux : Pas de répétition de l'instance/axe dans le champ**<br> *Ref : `NAMING_CONVENTION.md §Construction d'un nom : instance -> champ`* | 🟢 **Élevée** (Parsing struct & nom de champ) | Répétition d'axe dans `CODE/SUPERVISION/_TYPES/ST_BucketHMIState.st` :<br>Le champ `M2PositionCorrected` répète l'axe `M2` à l'intérieur de la structure du benne M2. |
-| **`NC-130`** | **Initialisation explicite à `:= TRUE` des booléens de sécurité capteur**<br> *Ref : `NAMING_CONVENTION.md §Polarité des booléens I/O`* | 🟢 **Élevée** (Regex sur décl. `VAR_INPUT` / `BOOL`) | Omission d'initialisation fail-safe `:= TRUE` dans `CODE/AU/FB_Safety_EmergencyManagement.st` (L17) :<br>`PowerContactorEngaged : BOOL;` *(doit être `:= TRUE` pour éviter un défaut immédiat au boot)*. |
+| **`NC-120`** | **Construction 2 niveaux : Pas de répétition de l'instance/axe dans le champ**<br> *Ref : `NAMING_CONVENTION.md §Construction d'un nom : instance -> champ`* | 🟢 **Élevée** (Parsing struct & nom de champ) | Répétition d'axe dans `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` :<br>Le champ `M2PositionCorrected` répète l'axe `M2` à l'intérieur de la structure du benne M2. |
+| **`NC-130`** | **Initialisation explicite à `:= TRUE` des booléens de sécurité capteur**<br> *Ref : `NAMING_CONVENTION.md §Polarité des booléens I/O`* | 🟢 **Élevée** (Regex sur décl. `VAR_INPUT` / `BOOL`) | Omission d'initialisation fail-safe `:= TRUE` dans `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` (L17) :<br>`PowerContactorEngaged : BOOL;` *(doit être `:= TRUE` pour éviter un défaut immédiat au boot)*. |
 
 ---
 

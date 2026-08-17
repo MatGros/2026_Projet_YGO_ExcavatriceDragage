@@ -2,8 +2,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-CHECKLIST = ROOT / "CODE" / "SUPERVISION" / "_TYPES" / "ST_SafetyChecklist.st"
-VIEW = ROOT / "CODE" / "DEPANNAGE" / "FB_TroubleshootingView.st"
+CHECKLIST = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "ST_SafetyChecklist.st"
+VIEW = ROOT / "CODE" / "K_DEPANNAGE" / "FB_TroubleshootingView.st"
 
 
 def test_checklist_has_public_arming_observables() -> None:

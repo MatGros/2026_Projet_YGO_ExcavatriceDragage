@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §4.
 > Rôle de **ce** document : entrées brutes joystick simulées (bus CAN hors ligne) — et
 > **catalogue unique** des `TC-P13-050...`.
-> Source code : `CODE/SIMULATION/FB_Sim_Joystick.st` · instance `FB_SimBench.instSimJoystick`.
+> Source code : `CODE/L_SIMULATION/FB_Sim_Joystick.st` · instance `FB_SimBench.instSimJoystick`.
 
 ## 🧭 Sommaire
 
@@ -66,4 +66,4 @@ cyclique, condition nécessaire pour que le forçage tienne dans la durée.
 |---|---|
 | AF13 (chapô) | Frontière simulation, granularité `SimOperatorActive` |
 | AF08 / FB_Joystick | Consommateur réel — homme-mort, `DeadmanArmed` |
-| Code | `CODE/SIMULATION/FB_Sim_Joystick.st`, `CODE/JOYSTICK/FB_Joystick.st` |
+| Code | `CODE/L_SIMULATION/FB_Sim_Joystick.st`, `CODE/D_JOYSTICK/FB_Joystick.st` |

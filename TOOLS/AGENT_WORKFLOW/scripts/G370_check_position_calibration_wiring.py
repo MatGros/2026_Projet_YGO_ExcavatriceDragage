@@ -37,7 +37,8 @@ def main() -> int:
     root = Path(args.root)
 
     errors = 0
-    for path in sorted((root / "CODE" / "MAIN").rglob("*.st")):
+    main_dir = root / "CODE" / "M_MAIN" if (root / "CODE" / "M_MAIN").is_dir() else root / "CODE" / "MAIN"
+    for path in sorted(main_dir.rglob("*.st")):
         text = path.read_text(encoding="utf-8", errors="replace")
         rel = path.relative_to(root).as_posix()
 

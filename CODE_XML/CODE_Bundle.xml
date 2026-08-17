@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.220675" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.220675">
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-17T05:53:47.220675">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -9400,6 +9400,95 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
           </data>
         </addData>
       </pou>
+      <pou name="FB_AntiFlickerText" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="NewText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte candidat à afficher</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceInstant">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = afficher immédiatement (défaut critique), sans maintien</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Text">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte stabilisé exposé à l'IHM</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="TonHold">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4.3
+   🎯 Responsabilité : maintient un texte warning/état un temps minimum
+      avant de laisser le contenu changer, et laisse passer en direct
+      (sans maintien) les messages critiques (défauts AU/puissance).
+   🛡️ Sécurité : l'action de sécurité reste instantanée — ce FB ne
+      retarde jamais un texte, il ne fait que stabiliser l'affichage.
+      Il n'a aucun effet sur la machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Lissage anti-clignotement"}
+// Défaut critique : affichage immédiat, le TON est remis à zéro (aucune latence).
+IF ForceInstant THEN
+    Text := NewText;
+    TonHold(IN := FALSE);
+ELSE
+    // Warning / état : le texte ne change qu'après maintien min (HoldTime).
+    // Un signal qui oscille plus vite que HoldTime → texte stable.
+    TonHold(IN := (NewText &lt;&gt; Text), PT := HoldTime);
+    IF TonHold.Q THEN
+        Text := NewText;
+    END_IF;
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c4ab4ebb-976e-5154-b2e7-972371a90d1b</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_AxisScale" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -16144,6 +16233,9 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interlock métier : mouvement demandé mais permit absent</xhtml>
+              </documentation>
             </variable>
             <variable name="AnyBypassActive">
               <type>
@@ -16154,6 +16246,9 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut/interlock critique : affiché immédiatement (sans maintien)</xhtml>
+              </documentation>
             </variable>
             <variable name="SpecialConditionCandidate">
               <type>
@@ -16165,15 +16260,21 @@ END_IF;
                 <string length="120" />
               </type>
             </variable>
-            <variable name="TonSpecialCondition">
+            <variable name="AntiFlickSpecial">
               <type>
-                <derived name="TON" />
+                <derived name="FB_AntiFlickerText" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 §3 Condition spéciale (warning → maintenu)</xhtml>
+              </documentation>
             </variable>
-            <variable name="TonOperatorAction">
+            <variable name="AntiFlickOperator">
               <type>
-                <derived name="TON" />
+                <derived name="FB_AntiFlickerText" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 §4 Action opérateur (critique → direct, warning → maintenu)</xhtml>
+              </documentation>
             </variable>
             <variable name="CST_BannerHoldTime">
               <type>
@@ -16195,6 +16296,7 @@ END_IF;
    🎯 Responsabilité : assemble les 4 textes du bandeau et expose
       la cause observable du blocage courant, sans piloter la machine.
    🛡️ Sécurité : priorité AU/puissance, SafeStop, puis interlocks métier.
+      L'anti-clignotement est délégué à FB_AntiFlickerText (AF-07 §4.3).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -16210,8 +16312,10 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
+{region "§1 Contexte global"}
 // ═══════════════════════════════════════════════════════════════
 // 1. CONTEXTE GLOBAL — aucun numéro d'étape ici
+// Format (AF-07 §4.1) : [RÉEL/SIMU] [MODE] [COUPLAGE]
 // ═══════════════════════════════════════════════════════════════
 IF SimulationModeActive THEN
     PrefixContext := '[SIMULATION] ';
@@ -16240,9 +16344,12 @@ ELSE
     CouplingStr := ' [AUCUN AXE]';
 END_IF;
 Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
+{endregion}
 
+{region "§2 Progression"}
 // ═══════════════════════════════════════════════════════════════
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
+// Format (AF-07 §4.1) : Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;
 // ═══════════════════════════════════════════════════════════════
 IF HomingActive THEN
     IF HomingStepM1 &gt; 0 THEN
@@ -16285,9 +16392,13 @@ ELSIF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
 ELSE
     Banner.SequenceProgressText := 'Machine: ARRÊTÉE';
 END_IF;
+{endregion}
 
+{region "§3 Condition spéciale"}
 // ═══════════════════════════════════════════════════════════════
 // 3. CONDITION SPÉCIALE — un seul indicateur bypass/simulation
+// Format (AF-07 §4.1) : ATTENTION: &lt;Dérogation / Bridage / Alerte&gt;
+// 🧊 Warning → maintenu min (anti-clignotement), jamais critique.
 // ═══════════════════════════════════════════════════════════════
 AnyBypassActive := SimulationModeActive
                 OR BypassGlobalActive
@@ -16304,14 +16415,18 @@ ELSIF LegalLimitReached THEN
 ELSE
     SpecialConditionCandidate := '';
 END_IF;
-// 🧊 Anti-clignotement (AF-07 §4.3) : maintien min avant changement
-TonSpecialCondition(IN := (SpecialConditionCandidate &lt;&gt; Banner.SpecialConditionText), PT := CST_BannerHoldTime);
-IF TonSpecialCondition.Q THEN
-    Banner.SpecialConditionText := SpecialConditionCandidate;
-END_IF;
 
+AntiFlickSpecial(NewText := SpecialConditionCandidate, ForceInstant := FALSE, HoldTime := CST_BannerHoldTime);
+Banner.SpecialConditionText := AntiFlickSpecial.Text;
+{endregion}
+
+{region "§4 Action opérateur"}
 // ═══════════════════════════════════════════════════════════════
 // 4. ACTION — cause fixe, sécurité d'abord, sans rotation
+// Format (AF-07 §4.1) : [ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;
+// 🧊 Défauts (AU/puissance/SafeStop) + interlock DirectionBlocked
+//    → affichés immédiatement (ForceInstant=TRUE) ; les autres états
+//    → maintenus min (anti-clignotement). Décision revue 2026-08-17.
 // ═══════════════════════════════════════════════════════════════
 IF CurrentMode = E_Mode.SEMI_AUTO THEN
     CurrentDirection := CycleRequestDirection;
@@ -16356,17 +16471,14 @@ ELSE
     OperatorActionCandidate := '[JOYSTICK] Déplacement en cours';
 END_IF;
 
-// 🧊 Anti-clignotement (AF-07 §4.3) : défauts (AU/SafeStop) en direct, warnings/états maintenus
-CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny OR SafeStopActive);
-IF CriticalActionActive THEN
-    Banner.OperatorActionText := OperatorActionCandidate;
-    TonOperatorAction(IN := FALSE);
-ELSE
-    TonOperatorAction(IN := (OperatorActionCandidate &lt;&gt; Banner.OperatorActionText), PT := CST_BannerHoldTime);
-    IF TonOperatorAction.Q THEN
-        Banner.OperatorActionText := OperatorActionCandidate;
-    END_IF;
-END_IF;
+// Interlock = mouvement demandé mais permit absent : c'est une cause
+// sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
+CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged
+                     OR PowerCutOffActiveAny OR SafeStopActive OR DirectionBlocked);
+
+AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
+Banner.OperatorActionText := AntiFlickOperator.Text;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -35734,7 +35846,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
     </data>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="CYCLE">
+        <Folder Name="G_CYCLE">
           <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
           <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
           <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
@@ -35742,18 +35854,18 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_DiveSearch" ObjectId="0e6b7a8e-54c0-5c72-8612-9c2a76db57f8" />
           <Object Name="FB_ExtractionSequence" ObjectId="db0a276d-2eae-5fdc-b5fd-93390d06b89e" />
         </Folder>
-        <Folder Name="DIAG">
+        <Folder Name="C_DIAG_RESEAUX">
           <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
           <Object Name="FB_Diag_CanOpen" ObjectId="335793a2-469c-5bc1-8663-6c12c4d0dfde" />
           <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
           <Object Name="FB_Diag_IhmHeartbeat" ObjectId="7e9589ba-412d-5501-80d5-184905e87d23" />
           <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
         </Folder>
-        <Folder Name="MODES">
+        <Folder Name="F_MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
           <Object Name="FB_Modes" ObjectId="472bf31b-6364-520b-84dc-569fca7609c9" />
         </Folder>
-        <Folder Name="COMMUN">
+        <Folder Name="A_COMMUN">
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
           <Object Name="FB_Acquisition_Preflight" ObjectId="78a087ce-501c-55a1-a50d-014fd4495703" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
@@ -35769,7 +35881,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
         </Folder>
-        <Folder Name="TRANSLATION">
+        <Folder Name="I_TRANSLATION">
           <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
           <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
@@ -35779,7 +35891,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="GVL_Translation_M3_Stub" ObjectId="3a0fdbba-89c2-56ba-b2ac-52cf47b5119c" />
           <Object Name="ST_TranslationCmdDemand" ObjectId="0b5f8faa-764b-51e3-b87f-be2bae8212ac" />
         </Folder>
-        <Folder Name="TREUILS">
+        <Folder Name="H_TREUILS_BENNE">
           <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
           <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
           <Object Name="FB_DriftGuard" ObjectId="e215f19f-4c29-5289-9559-f2cf7fa9d55e" />
@@ -35803,24 +35915,8 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
           </Folder>
         </Folder>
-        <Folder Name="JOYSTICK">
-          <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
-          <Object Name="FB_Filter_PT1" ObjectId="564cb076-094f-527b-93bc-caad3ea68d7f" />
-          <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
-          <Object Name="ST_Joystick_AxisCmd" ObjectId="cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068" />
-        </Folder>
-        <Folder Name="CODEURS">
-          <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
-          <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
-          <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
-          <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
-          <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
-          <Object Name="FB_Encoder_SpeedMonitor" ObjectId="c1cd7624-9491-50e0-9332-6845d97ac927" />
-          <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
-          <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
-          <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
-        </Folder>
-        <Folder Name="SUPERVISION">
+        <Folder Name="J_SUPERVISION">
+          <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
           <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
           <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
           <Folder Name="_TYPES">
@@ -35902,7 +35998,24 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
             <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
           </Folder>
         </Folder>
-        <Folder Name="AU">
+        <Folder Name="D_JOYSTICK">
+          <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
+          <Object Name="FB_Filter_PT1" ObjectId="564cb076-094f-527b-93bc-caad3ea68d7f" />
+          <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
+          <Object Name="ST_Joystick_AxisCmd" ObjectId="cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068" />
+        </Folder>
+        <Folder Name="E_CODEURS">
+          <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
+          <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
+          <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
+          <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
+          <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
+          <Object Name="FB_Encoder_SpeedMonitor" ObjectId="c1cd7624-9491-50e0-9332-6845d97ac927" />
+          <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
+          <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
+          <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
+        </Folder>
+        <Folder Name="B_AU_SECURITE">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
           <Object Name="FB_Safety_EmergencyManagementLogic" ObjectId="caf20e65-2056-55b9-b3cc-b6cc1b3bfe7b" />
           <Object Name="FB_Safety_EmergencyManagementOutput" ObjectId="d3f89721-8269-5526-aac8-48009a2f16a2" />
@@ -35910,7 +36023,7 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="ST_Safety_Emergency_InternalCmd" ObjectId="231a5be8-1708-5e9a-a840-cc0ec056946d" />
           <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
         </Folder>
-        <Folder Name="SIMULATION">
+        <Folder Name="L_SIMULATION">
           <Object Name="FB_SimBench" ObjectId="74b0c5a1-6e4c-5cee-9193-c64ed7a28cd6" />
           <Object Name="FB_Sim_Encoder" ObjectId="526914c5-468f-5758-8161-f70e0fd85cca" />
           <Object Name="FB_Sim_Joystick" ObjectId="a481952f-eb98-506a-b160-fd074635a746" />
@@ -35918,11 +36031,11 @@ Maintenance. PV n'est JAMAIS une cible sélectionnable (point de ralentissement 
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
         </Folder>
-        <Folder Name="DEPANNAGE">
+        <Folder Name="K_DEPANNAGE">
           <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
           <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
         </Folder>
-        <Folder Name="MAIN">
+        <Folder Name="M_MAIN">
           <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
           <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
           <Object Name="PRG_02_Acquisition" ObjectId="212fd0f8-509e-536e-99de-b75543d86add" />

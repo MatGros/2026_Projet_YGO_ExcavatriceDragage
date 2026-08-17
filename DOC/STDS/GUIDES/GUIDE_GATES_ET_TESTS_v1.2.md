@@ -71,9 +71,9 @@ complet. Seuls les gates applicables à un bloc isolé s'exécutent :
 | <small><code>210</code>-<code>420</code></small> | ❌ globaux (bundle/dépôt) → signalés `[--]` non applicables, s'exécuteront au palier C |
 
 ```
-python run_all_gates.py --files CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st
-python run_all_gates.py --palier A --files CODE/MAIN/PRG_02_Acquisition.st
-python run_all_gates.py --files CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st CODE/TREUILS/FB_WinchOutputInterlock_LD.st   # multi-fichiers
+python run_all_gates.py --files CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st
+python run_all_gates.py --palier A --files CODE/M_MAIN/PRG_02_Acquisition.st
+python run_all_gates.py --files CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st   # multi-fichiers
 ```
 
 Les gates globaux sont listés comme **non applicables** (sans bloquer) : le mode fichier

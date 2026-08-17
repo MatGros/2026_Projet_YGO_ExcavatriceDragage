@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-11_Fonction_Translation_v2.2.md`](../AF_Partie-11_Fonction_Translation_v2.2.md) §5.
 > Rôle de **ce** document : barrière finale M3 (watchdog frein, gate double condition,
 > anti-redémarrage, mot AC600) — et **catalogue unique** des `TC-P11-006` à `TC-P11-009`.
-> Source code : `CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st` · instance `Outputs.instTranslationOutputInterlock_LD`.
+> Source code : `CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st` · instance `Outputs.instTranslationOutputInterlock_LD`.
 
 ## 🧭 Sommaire
 
@@ -110,4 +110,4 @@ Aucun écart — comportement conforme, structure parallèle à `FB_WinchOutputI
 | AF11 (chapô) | Rôle machine, intégration programme |
 | AF11 / FB_Translation | Producteur de la demande (`ST_TranslationFinalInterlockRequest`) |
 | AF03 | Profil barrière finale |
-| Code | `CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st` |
+| Code | `CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st` |

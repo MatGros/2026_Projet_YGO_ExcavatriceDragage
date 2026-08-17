@@ -1,0 +1,95 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T122_PHASE3_REFONTE_BUS
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T122_PHASE3_REFONTE_BUS
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Appliquer la convention UserRequest / LogicRequest / FinalOutput sur les
+    variables de commande restantes du flux joystick → actionneurs, pour une
+    cohérence de nommage sur tout le projet (après les phases 1-2 déjà faites).
+    Renommage LEXICAL uniquement — aucune logique modifiée.
+    Critères structurels : nom de fichier = nom de POU
+    suffixe de langage = langage bundle (ST, pas de suffixe _CFC/_LD)
+
+  acceptance:
+    - id: AC1
+      statement: "Les variables de commande restantes du flux (joystick → FB_Winch → interlock → sorties) utilisent la convention UserRequest/LogicRequest/FinalOutput, cohérente avec les phases 1-2."
+      verified_by: "Lecture du code — nommage cohérent sur le flux."
+    - id: AC2
+      statement: "Aucun changement de logique — renommage lexical uniquement, valeurs et câblage identiques."
+      verified_by: "G200_check_linkage.py — câblage identique, seuls les noms changent."
+    - id: AC3
+      statement: "Les variables safety (SafeStop, PowerCutOff, AscentPermit, DescendPermit) ne sont pas renommées."
+      verified_by: "grep de ces noms — inchangés."
+    - id: AC4
+      statement: "0 ancienne occurrence des noms renommés (renommage complet)."
+      verified_by: "grep des anciens noms — 0 occurrence."
+    - id: AC5
+      statement: "La liaison passe (G200)."
+      verified_by: "python G200_check_linkage.py --report — PASS."
+    - id: AC6
+      statement: "nom de fichier est identique au nom de POU et suffixe de langage est identique au langage bundle pour les POU de CODE/MAIN modifiés"
+      verified_by: "G200_check_linkage.py --report"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_04_Treuils_Benne.st
+      - CODE/MAIN/PRG_02_Acquisition.st
+      - CODE/MAIN/PRG_03_Modes_Cycle.st
+      - CODE/MAIN/PRG_05_Translation.st
+      - CODE/MAIN/PRG_07_Supervision.st
+      - CODE/TREUILS/FB_Winch.st
+      - CODE/TREUILS/FB_WinchOutputInterlock_LD.st
+      - CODE/TRANSLATION/FB_Translation.st
+      - CODE/DEPANNAGE/FB_TroubleshootingView.st
+      - CODE/SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/SUPERVISION/_TYPES/ST_Chain_Winch_Demandes.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_T122_PHASE3_REFONTE_BUS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE_XML/ (fichiers générés hors scope)
+
+  conservation:
+    must_survive:
+      - "Aucun changement de logique (valeurs, câblage, producteur unique)."
+      - "Les variables safety (SafeStop, PowerCutOff, AscentPermit, DescendPermit) inchangées."
+      - "Les champs des structures (ST_WinchCmd, ST_Joystick_AxisCmd, etc.) inchangés — renommage des variables locales uniquement."
+    dropped_on_purpose:
+      - "Noms de variables de commande non conformes à la convention UserRequest/LogicRequest/FinalOutput."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+
+  models_allowed:
+    - "codex/gpt-5.6-luna"
+    - "codex/gpt-5.6-sol"
+
+  alert_duty: >
+    Toute ambiguïté sur la convention, tout risque de toucher à la logique safety
+    ou un doute de câblage est remonté immédiatement. Ne pas élargir le périmètre.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: IN_PROGRESS
+
+execution:
+  executed_by: "codex/gpt-5.6-luna"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat cree. Delegation T122 Phase 3."
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "DeepSeek (Orchestrateur)"
+  validated_at: ""
+  notes: ""

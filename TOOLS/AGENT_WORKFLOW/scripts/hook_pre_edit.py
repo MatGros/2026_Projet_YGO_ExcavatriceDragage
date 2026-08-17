@@ -37,18 +37,19 @@ ALWAYS_REQUIRED = ["DOC/STDS/CODE_QUALITY_STANDARDS.md", "DOC/STDS/NAMING_CONVEN
 # Dossier reel de CODE/ -> numeros de partie AF a avoir lus.
 # Aucune VERSION ici : elle est resolue au moment du controle.
 SPEC_MAP: dict[str, list[int]] = {
-    "CODE/AU/": [1, 3],
-    "CODE/CODEURS/": [10, 3],
-    "CODE/COMMUN/": [3, 6],
-    "CODE/CYCLE/": [4],
-    "CODE/DIAG/": [2],
-    "CODE/JOYSTICK/": [8],
-    "CODE/MAIN/": [2, 6],
-    "CODE/MODES/": [5],
-    "CODE/SIMULATION/": [13],
-    "CODE/SUPERVISION/": [7],
-    "CODE/TRANSLATION/": [11, 3],
-    "CODE/TREUILS/": [9, 3, 12],
+    "CODE/A_COMMUN/": [3, 6],
+    "CODE/B_AU_SECURITE/": [1, 3],
+    "CODE/C_DIAG_RESEAUX/": [2],
+    "CODE/D_JOYSTICK/": [8],
+    "CODE/E_CODEURS/": [10, 3],
+    "CODE/F_MODES/": [5],
+    "CODE/G_CYCLE/": [4],
+    "CODE/H_TREUILS_BENNE/": [9, 3, 12],
+    "CODE/I_TRANSLATION/": [11, 3],
+    "CODE/J_SUPERVISION/": [7],
+    "CODE/K_DEPANNAGE/": [14],
+    "CODE/L_SIMULATION/": [13],
+    "CODE/M_MAIN/": [2, 6],
 }
 
 

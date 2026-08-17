@@ -1,0 +1,552 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.793550" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.793550">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="INIT" value="1" />
+              <value name="READY" value="2" />
+              <value name="BUSY" value="3" />
+              <value name="DONE" value="4" />
+              <value name="STOPPING" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STOPPING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_WinchLoadEstimateTable">
+        <baseType>
+          <struct>
+            <variable name="IsConfigured">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="LoadPctByStepAndSpeedBand">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <array>
+                      <dimension lower="1" upper="5" />
+                      <baseType>
+                        <REAL />
+                      </baseType>
+                    </array>
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/ST_PLCOPENXML_GENERATOR</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3ce84c87-ca73-5af4-aa58-4b48adcd8dc4</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
+   📊 ST_WinchLoadEstimateTable — Table empirique charge estimée
+   ═══════════════════════════════════════════════════════════════════════════════
+   ⚠️ Valeur informative uniquement : ce tableau ne remplace pas une mesure de
+      charge certifiée et ne participe à aucune fonction de sécurité.
+   🧭 Index 1 : palier contacteurs commandé (1..5)
+   🧭 Index 2 : bande de vitesse câble mesurée (1..5)
+   📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_WinchSpeedConfig">
+        <baseType>
+          <struct>
+            <variable name="MaxMeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesurée de référence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandMaxMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond vitesse mesurée de chaque palier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedBandHysteresisMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hystérésis de classement (m/s)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e42720b7-697f-5cd2-bd03-5cc46c6f51bc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
+   🪜 ST_WinchSpeedConfig — Plages de vitesse linéaire mesurée des 5 paliers
+   ═══════════════════════════════════════════════════════════════════════════════
+   🎯 Configuration de caractérisation, séparée de ST_SpeedStepTable :
+      - ST_SpeedStepTable = contacteurs commandés par palier (% vitesse)
+      - ST_WinchSpeedConfig = vitesse câble réellement mesurée (m/s)
+   ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
+      Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_WinchLoadEstimator" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+            </variable>
+            <variable name="ActiveSpeedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier commandé 0..5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble absolue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedSignedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée : positive = montée, négative = descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedConfig">
+              <type>
+                <derived name="ST_WinchSpeedConfig" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plages vitesse mesurée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadTable">
+              <type>
+                <derived name="ST_WinchLoadEstimateTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Table empirique 5x5</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : entrée/table invalide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+            </variable>
+            <variable name="SpeedBand">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bande vitesse courante 0..5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EstimatedLoadPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Estimation informative 0..100 %</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Configured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si table explicitement validée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ascending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE uniquement pendant une montée mesurée</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+            </variable>
+            <variable name="PreviousSpeedBand">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="HasPreviousBand">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SelectedLoadPct">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
+   📊 FB_WinchLoadEstimator — Estimation empirique de charge treuil
+   ═══════════════════════════════════════════════════════════════════════════════
+   🧩 Brique de diagnostic/information, sans commande moteur et sans SafeStop.
+   🎯 Croise le palier commandé et la bande de vitesse mesurée pour lire une
+      estimation dans ST_WinchLoadEstimateTable.
+   ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
+      reste à 0 % et Configured reste FALSE.
+   ═══════════════════════════════════════════════════════════════════════════════
+   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Ready := FALSE;
+    Busy := FALSE;
+    Done := FALSE;
+    Error := FALSE;
+    ErrorId := 16#0000;
+    State := E_State.DISABLED;
+    SpeedBand := 0;
+    EstimatedLoadPct := 0.0;
+    Configured := FALSE;
+    Ascending := FALSE;
+    HasPreviousBand := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+Busy := FALSE;
+Done := FALSE;
+State := E_State.READY;
+ResetEdge(CLK := Reset);
+Configured := LoadTable.IsConfigured;
+// 📈 WINCH-CORE-01 : l'estimation de charge n'a de sens qu'en montée.
+// La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
+// mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
+Ascending := (MeasuredSpeedSignedMps &gt; 0.0);
+
+// 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
+IF (MeasuredSpeedMps &lt; 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps &lt;= 0.0) THEN
+    ErrorId := ErrorId OR 16#0001;
+    SpeedBand := 0;
+ELSIF NOT HasPreviousBand THEN
+    IF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[1] THEN
+        PreviousSpeedBand := 1;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[2] THEN
+        PreviousSpeedBand := 2;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[3] THEN
+        PreviousSpeedBand := 3;
+    ELSIF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[4] THEN
+        PreviousSpeedBand := 4;
+    ELSE
+        PreviousSpeedBand := 5;
+    END_IF;
+    HasPreviousBand := TRUE;
+    SpeedBand := PreviousSpeedBand;
+ELSE
+    // 🔒 Valider l'état mémorisé avant toute indexation dynamique.
+    IF PreviousSpeedBand &lt; 1 OR PreviousSpeedBand &gt; 5 THEN
+        PreviousSpeedBand := 1;
+        ErrorId := ErrorId OR 16#0001;
+    END_IF;
+
+    // CODESYS ne garantit pas le court-circuit des expressions AND :
+    // chaque borne est donc testée dans une branche séparée avant accès.
+    IF PreviousSpeedBand &lt; 5 THEN
+        IF MeasuredSpeedMps &gt; (SpeedConfig.SpeedBandMaxMps[PreviousSpeedBand]
+                               + SpeedConfig.SpeedBandHysteresisMps) THEN
+            PreviousSpeedBand := PreviousSpeedBand + 1;
+        END_IF;
+    END_IF;
+    IF PreviousSpeedBand &gt; 1 THEN
+        IF MeasuredSpeedMps &lt; (SpeedConfig.SpeedBandMaxMps[PreviousSpeedBand - 1]
+                               - SpeedConfig.SpeedBandHysteresisMps) THEN
+            PreviousSpeedBand := PreviousSpeedBand - 1;
+        END_IF;
+    END_IF;
+    SpeedBand := PreviousSpeedBand;
+END_IF;
+
+// 📊 3. LECTURE TABLE — bornes séparées avant l'accès au tableau 5x5.
+EstimatedLoadPct := 0.0;
+IF Configured THEN
+    IF Ascending THEN
+        IF ActiveSpeedStep &gt;= 1 THEN
+            IF ActiveSpeedStep &lt;= 5 THEN
+                IF SpeedBand &gt;= 1 THEN
+                    IF SpeedBand &lt;= 5 THEN
+                        SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
+                        IF (SelectedLoadPct &lt; 0.0) OR (SelectedLoadPct &gt; 100.0) THEN
+                            ErrorId := ErrorId OR 16#0001;
+                        ELSE
+                            EstimatedLoadPct := SelectedLoadPct;
+                        END_IF;
+                    END_IF;
+                END_IF;
+            END_IF;
+        END_IF;
+    END_IF;
+END_IF;
+
+// 📤 4. SORTIES D'ÉTAT ET ACQUITTEMENT.
+IF ResetEdge.Q AND (ErrorId &lt;&gt; 16#0000) AND (MeasuredSpeedMps &gt;= 0.0) THEN
+    ErrorId := 16#0000;
+END_IF;
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1ca57a3d-7abe-5417-80b9-b0b83cdad590</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="H_TREUILS_BENNE">
+          <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
+          <Object Name="ST_WinchLoadEstimateTable" ObjectId="3ce84c87-ca73-5af4-aa58-4b48adcd8dc4" />
+          <Object Name="ST_WinchSpeedConfig" ObjectId="e42720b7-697f-5cd2-bd03-5cc46c6f51bc" />
+        </Folder>
+        <Folder Name="F_MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

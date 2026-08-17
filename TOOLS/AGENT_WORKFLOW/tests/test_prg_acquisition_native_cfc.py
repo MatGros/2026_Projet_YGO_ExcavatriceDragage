@@ -3,8 +3,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-ST_PATH = ROOT / "CODE" / "MAIN" / "PRG_02_Acquisition.st"
-LEGACY_XML = ROOT / "CODE" / "MAIN" / "PRG_02_Acquisition_CFC.xml"
+ST_PATH = ROOT / "CODE" / "M_MAIN" / "PRG_02_Acquisition.st"
+LEGACY_XML = ROOT / "CODE" / "M_MAIN" / "PRG_02_Acquisition_CFC.xml"
 
 def test_acquisition_is_pure_st_and_legacy_xml_is_absent():
     assert ST_PATH.is_file()

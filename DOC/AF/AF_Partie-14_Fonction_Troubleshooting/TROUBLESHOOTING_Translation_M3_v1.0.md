@@ -4,7 +4,7 @@
 > (variateur AC600 EtherCAT). Complète la table générique `AF_Partie-14_Fonction_Troubleshooting_v1.1.md`
 > §5 (`TranslationPontM3`) avec le détail spécifique M3 : chaque cause de blocage, dans l'ordre où
 > la rencontrer, avec la variable exacte à observer en Watch CODESYS.
-> 📄 Sources : `CODE/TRANSLATION/*.st`, `CODE/MAIN/PRG_02_Acquisition.st`, `PRG_05_Translation.st`,
+> 📄 Sources : `CODE/TRANSLATION/*.st`, `CODE/M_MAIN/PRG_02_Acquisition.st`, `PRG_05_Translation.st`,
 > `PRG_06_Outputs_LD.st`. Spec métier : `DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md`.
 > ⚠️ **Lecture seule stricte** — ce document n'est pas une procédure d'action machine, c'est une
 > aide à l'observation. Toute action reste sous la responsabilité de l'opérateur/automaticien.

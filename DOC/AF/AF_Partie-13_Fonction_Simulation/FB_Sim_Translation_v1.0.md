@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §4.
 > Rôle de **ce** document : modèle simulé des 5 capteurs de position M3 par progression continue —
 > et **catalogue unique** des `TC-P13-040...`.
-> Source code : `CODE/SIMULATION/FB_Sim_Translation.st` · instance `FB_SimBench.instSimTranslation`.
+> Source code : `CODE/L_SIMULATION/FB_Sim_Translation.st` · instance `FB_SimBench.instSimTranslation`.
 
 ## 🧭 Sommaire
 
@@ -69,4 +69,4 @@ Protection division : sous `CST_MinFullTravelTimeS` (0.1s), le modèle n'a plus 
 |---|---|
 | AF13 (chapô) | Frontière simulation, stimuli `SimM3SensorsWordOverrideActive` |
 | AF11 / FB_Translation_PositionDecoder | Consommateur réel des 5 capteurs, table des 6 mots valides |
-| Code | `CODE/SIMULATION/FB_Sim_Translation.st` |
+| Code | `CODE/L_SIMULATION/FB_Sim_Translation.st` |

@@ -66,7 +66,7 @@ def test_pre_edit_bloque_si_specs_non_lues(tmp_path: Path) -> None:
     result = call(PRE_EDIT, {
         "tool_name": "Write",
         "transcript_path": transcript_with_reads(tmp_path, "DOC/STDS/NAMING_CONVENTION.md"),
-        "tool_input": {"file_path": str(ROOT / "CODE/TREUILS/FB_Winch.st")},
+        "tool_input": {"file_path": str(ROOT / "CODE/H_TREUILS_BENNE/FB_Winch.st")},
     })
     assert result.returncode == 2, result.stdout + result.stderr
     assert "CODE_QUALITY_STANDARDS" in result.stderr
@@ -79,7 +79,7 @@ def test_pre_edit_autorise_si_tout_lu(tmp_path: Path) -> None:
     result = call(PRE_EDIT, {
         "tool_name": "Write",
         "transcript_path": transcript_with_reads(tmp_path, *specs),
-        "tool_input": {"file_path": str(ROOT / "CODE/TREUILS/FB_Winch.st")},
+        "tool_input": {"file_path": str(ROOT / "CODE/H_TREUILS_BENNE/FB_Winch.st")},
     })
     assert result.returncode == 0, result.stderr
 
@@ -89,7 +89,7 @@ def test_pre_edit_ne_bloque_pas_sur_panne_outillage(tmp_path: Path) -> None:
     result = call(PRE_EDIT, {
         "tool_name": "Write",
         "transcript_path": str(tmp_path / "absent.jsonl"),
-        "tool_input": {"file_path": str(ROOT / "CODE/TREUILS/FB_Winch.st")},
+        "tool_input": {"file_path": str(ROOT / "CODE/H_TREUILS_BENNE/FB_Winch.st")},
     })
     assert result.returncode == 0
 
@@ -104,7 +104,7 @@ def test_pre_edit_exige_la_version_active_de_la_spec(tmp_path: Path) -> None:
             "DOC/STDS/NAMING_CONVENTION.md",
             "ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.13.md",
         ),
-        "tool_input": {"file_path": str(ROOT / "CODE/TREUILS/FB_Winch.st")},
+        "tool_input": {"file_path": str(ROOT / "CODE/H_TREUILS_BENNE/FB_Winch.st")},
     })
     assert result.returncode == 2
     assert "AF_Partie-09" in result.stderr

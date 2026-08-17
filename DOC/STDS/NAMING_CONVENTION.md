@@ -438,6 +438,29 @@ M1/M2/M3) remonte juste après le préfixe.
 
 ---
 
+## Constantes (VAR CONSTANT / VAR_GLOBAL CONSTANT)
+
+Toute constante déclarée reçoit le **préfixe `CST_`** (nommage explicite, repérable au tri
+alphabétique et en Watch), suivi d'un nom PascalCase décrivant le rôle :
+
+```
+CST_<NomPascalCase> : <type> := <valeur>;   // dans VAR CONSTANT du FB
+CST_<NomPascalCase> : <type> := <valeur>;   // dans VAR_GLOBAL CONSTANT d'une GVL
+```
+
+✅ `CST_BannerHoldTime : TIME := T#500ms`, `CST_FaultDisplayDebounce`, `CST_MaxDescentTime`
+❌ `BannerHoldTime`, `HOLD_TIME`, `HoldTime := T#500ms` (variable modifiable — c'est une
+constante d'affichage, elle ne doit jamais être modifiable à chaud)
+
+- Une valeur figée par conception métier/sécurité se déclare en **`VAR CONSTANT`** (ou
+  `VAR_GLOBAL CONSTANT` pour les constantes partagées entre POU) — jamais en variable modifiable.
+- Une valeur qui DOIT être calibrée/tunable (ex. seuils terrain) reste une **variable** (souvent
+  persistante), PAS une constante `CST_`.
+- Sauf dérogation documentée, le préfixe `CST_` est **obligatoire** pour toute constante —
+  il n'existe pas de constante sans préfixe.
+
+---
+
 ## Construction d'un nom : instance → champ (2 niveaux, jamais mélangés)
 
 🔧 REX 2026-07-15 : formalisé après plusieurs allers-retours sur le Translation M3 — un nom se

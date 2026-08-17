@@ -29,15 +29,15 @@ SAFETY_DIRECTION_IF = re.compile(r"IF\s+Direction\s*[=<>!]")
 # Clé = chemin relatif SANS prefixe CODE/
 # Toute NOUVELLE occurrence non listée ici = ERROR
 KNOWN_VAR_OUTPUT_VIOLATIONS = {
-    "DIAG/FB_Diag_CanOpen.st": {
+    "C_DIAG_RESEAUX/FB_Diag_CanOpen.st": {
         "DeviceJoystick.State", "DeviceJoystick.Error", "DeviceJoystick.ErrorId"
     },
-    "DIAG/FB_Diag_Ethercat.st": {
+    "C_DIAG_RESEAUX/FB_Diag_Ethercat.st": {
         "DeviceVariateur.State", "DeviceEncoderM1.State", "DeviceEncoderM2.State",
         "DeviceVariateur.Error", "DeviceEncoderM1.Error", "DeviceEncoderM2.Error",
         "DeviceVariateur.ErrorId", "DeviceEncoderM1.ErrorId", "DeviceEncoderM2.ErrorId"
     },
-    "MAIN/PRG_07_Supervision.st": {
+    "M_MAIN/PRG_07_Supervision.st": {
         "GVL_IHM.State", "GVL_IHM.Error", "GVL_IHM.ErrorId"
     },
 }
@@ -52,26 +52,26 @@ class SimulationAllowance:
 
 
 # Decision humaine 2026-08 : GVL_Simulation est interdit hors implementation
-# CODE/SIMULATION et ces frontieres (7 POU cibles). Chaque exception est nommee,
+# CODE/L_SIMULATION et ces frontieres (7 POU cibles). Chaque exception est nommee,
 # justifiee et temporaire ; ne jamais ajouter un chemin pour faire taire un gate.
 # 2026-08-05 : noms migres des CFC legacy (PRG_ACQUISITION_CFC, PRG_SUPERVISION_CFC,
 SIMULATION_ALLOWED_PATHS: dict[str, SimulationAllowance] = {
-    "CODE/MAIN/PRG_02_Acquisition.st": SimulationAllowance(
+    "CODE/M_MAIN/PRG_02_Acquisition.st": SimulationAllowance(
         executable_usage="Produit HwReal/HwSim/HwIn et aiguille reel/simule.",
         decision="Decision humaine 2026-08 : frontiere acquisition validee.",
         removal_condition="Retirer si la frontiere reel/simule change de POU.",
     ),
-    "CODE/MAIN/PRG_05_Translation.st": SimulationAllowance(
+    "CODE/M_MAIN/PRG_05_Translation.st": SimulationAllowance(
         executable_usage="Aiguille la consigne de vitesse en mode simulation.",
         decision="Decision humaine 2026-08 : frontiere translation validee.",
         removal_condition="Retirer si la frontiere reel/simule change de POU.",
     ),
-    "CODE/MAIN/PRG_07_Supervision.st": SimulationAllowance(
+    "CODE/M_MAIN/PRG_07_Supervision.st": SimulationAllowance(
         executable_usage="Expose les etats de simulation et commande le banc.",
         decision="Decision humaine 2026-08 : frontiere supervision validee.",
         removal_condition="Retirer si la frontiere reel/simule change de POU.",
     ),
-    "CODE/DEPANNAGE/FB_TroubleshootingView.st": SimulationAllowance(
+    "CODE/K_DEPANNAGE/FB_TroubleshootingView.st": SimulationAllowance(
         executable_usage="Affiche le diagnostic des etats simules.",
         decision="Decision humaine 2026-08 : frontiere troubleshooting validee.",
         removal_condition="Retirer si la frontiere reel/simule change de POU.",
@@ -94,14 +94,18 @@ def line_number(text: str, position: int) -> int:
 
 def simulation_reference_allowed(path: Path) -> bool:
     normalized = path.as_posix()
-    return normalized.startswith("CODE/SIMULATION/") or normalized in SIMULATION_ALLOWED_PATHS
+    if not normalized.startswith("CODE/"):
+        normalized = f"CODE/{normalized}"
+    return normalized.startswith("CODE/L_SIMULATION/") or normalized in SIMULATION_ALLOWED_PATHS
 
 
 def requires_doc_reference(path: Path) -> bool:
     normalized = path.as_posix()
+    if not normalized.startswith("CODE/"):
+        normalized = f"CODE/{normalized}"
     if path.name.startswith(("FB_", "PRG_", "GVL_")):
         return True
-    return any(f"/{folder}/" in normalized for folder in ("AU", "TRANSLATION", "TREUILS"))
+    return any(f"/{folder}/" in normalized for folder in ("B_AU_SECURITE", "I_TRANSLATION", "H_TREUILS_BENNE"))
 
 
 def main() -> int:

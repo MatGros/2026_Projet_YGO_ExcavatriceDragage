@@ -2,7 +2,7 @@
 
 > Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §3.  
 > Rôle de **ce** document : gestion du référencement (homing nominal et unitaire), mémorisation RETAIN et qualification du doute.  
-> Source code : `CODE/CODEURS/FB_Encoder_Homing.st` · instances cibles `instHomingM1/M2` dans `PRG_04_Treuils_Benne_CFC`.  
+> Source code : `CODE/E_CODEURS/FB_Encoder_Homing.st` · instances cibles `instHomingM1/M2` dans `PRG_04_Treuils_Benne_CFC`.  
 
 ## 🧭 Sommaire
 
@@ -55,7 +55,7 @@ transmet au télégramme EtherCAT, puis renvoie `PresetAck` ou `PresetNak`. Apr�
 
 ---
 
-## 2. Interface (vérifiée `CODE/CODEURS/FB_Encoder_Homing.st`)
+## 2. Interface (vérifiée `CODE/E_CODEURS/FB_Encoder_Homing.st`)
 
 | Port entrée | Type | Rôle |
 |---|---|---|

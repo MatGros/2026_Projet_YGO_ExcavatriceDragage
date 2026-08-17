@@ -44,11 +44,11 @@ L'implémentation suit `DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md` et
 
 | Lot | Contenu | Fichier |
 |---|---|---|
-| **L1** | Réécriture `FB_Cycle` conforme §11bis R1-R9 + enum `E_CycleStep` | `CODE/CYCLE/FB_Cycle.st`, `CODE/CYCLE/E_CycleStep.st` |
-| **L2** | 2 instances `FB_Cycle` dans `PRG_03_Modes_Cycle` | `CODE/MAIN/PRG_03_Modes_Cycle.st` |
-| **L3** | Pont SEMI_AUTO treuils/benne (M1/M2, benne, Kobold) | `CODE/MAIN/PRG_04_Treuils_Benne.st` |
-| **L4** | Pont SEMI_AUTO translation M3 | `CODE/MAIN/PRG_05_Translation.st` |
-| **L5** | GVL_IHM + banner + compteur + troubleshooting | `CODE/SUPERVISION/_TYPES/ST_CycleState.st`, `CODE/MAIN/PRG_07_Supervision.st`, `CODE/GVL_PERSISTENT.st` |
+| **L1** | Réécriture `FB_Cycle` conforme §11bis R1-R9 + enum `E_CycleStep` | `CODE/G_CYCLE/FB_Cycle.st`, `CODE/G_CYCLE/E_CycleStep.st` |
+| **L2** | 2 instances `FB_Cycle` dans `PRG_03_Modes_Cycle` | `CODE/M_MAIN/PRG_03_Modes_Cycle.st` |
+| **L3** | Pont SEMI_AUTO treuils/benne (M1/M2, benne, Kobold) | `CODE/M_MAIN/PRG_04_Treuils_Benne.st` |
+| **L4** | Pont SEMI_AUTO translation M3 | `CODE/M_MAIN/PRG_05_Translation.st` |
+| **L5** | GVL_IHM + banner + compteur + troubleshooting | `CODE/J_SUPERVISION/_TYPES/ST_CycleState.st`, `CODE/M_MAIN/PRG_07_Supervision.st`, `CODE/GVL_PERSISTENT.st` |
 
 ---
 
@@ -56,13 +56,13 @@ L'implémentation suit `DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md` et
 
 | Fichier | Nature | Modification |
 |---|---|---|
-| `CODE/CYCLE/E_CycleStep.st` | Modifié | Enum X0→X13 + STABILIZING (X12 supprimé) |
-| `CODE/CYCLE/FB_Cycle.st` | Réécrit | CASE enum unique (R1), labels `Xn - texte` (R2), graphe linéaire (R3), `X13_DONE_SYNC` finale (R4), TON scaffold (R5), porte R8, `CycleStepAtError` (R9), tempo max d'étape, homme-mort 3s. **v1.1** : `DeadmanArmed` requis au démarrage (X0→X1) |
-| `CODE/MAIN/PRG_03_Modes_Cycle.st` | Modifié | 2 instances `instCycleMaintenance`/`instCycleSemiAuto` câblées. **v1.1** : SpeedMismatch 1.5 m/s / 500 ms, `Benne_IsRoughlyClosed` câblé |
-| `CODE/MAIN/PRG_04_Treuils_Benne.st` | Modifié | Pont SEMI_AUTO : M1/M2 consomment `instCycleSemiAuto.WinchM1Cmd/WinchM2Cmd` ; benne `CmdBucketCloseArbitrated`/`CmdOpen_IHM` ; Kobold `KoboldContactorCmdArbitrated`. **v1.1** : sortie `Benne_IsRoughlyClosed` (tolérance 2 m) |
-| `CODE/MAIN/PRG_05_Translation.st` | Modifié | Pont SEMI_AUTO : `SelTarget`/`M3_StartStop_Active` consomment `instCycleSemiAuto.TranslationCmd` |
-| `CODE/SUPERVISION/_TYPES/ST_CycleState.st` | Modifié | + `CycleStepAtError`, `SampleCount` |
-| `CODE/MAIN/PRG_07_Supervision.st` | Modifié | Publication `GVL_IHM.Cycle.State.*` (débloque T115) |
+| `CODE/G_CYCLE/E_CycleStep.st` | Modifié | Enum X0→X13 + STABILIZING (X12 supprimé) |
+| `CODE/G_CYCLE/FB_Cycle.st` | Réécrit | CASE enum unique (R1), labels `Xn - texte` (R2), graphe linéaire (R3), `X13_DONE_SYNC` finale (R4), TON scaffold (R5), porte R8, `CycleStepAtError` (R9), tempo max d'étape, homme-mort 3s. **v1.1** : `DeadmanArmed` requis au démarrage (X0→X1) |
+| `CODE/M_MAIN/PRG_03_Modes_Cycle.st` | Modifié | 2 instances `instCycleMaintenance`/`instCycleSemiAuto` câblées. **v1.1** : SpeedMismatch 1.5 m/s / 500 ms, `Benne_IsRoughlyClosed` câblé |
+| `CODE/M_MAIN/PRG_04_Treuils_Benne.st` | Modifié | Pont SEMI_AUTO : M1/M2 consomment `instCycleSemiAuto.WinchM1Cmd/WinchM2Cmd` ; benne `CmdBucketCloseArbitrated`/`CmdOpen_IHM` ; Kobold `KoboldContactorCmdArbitrated`. **v1.1** : sortie `Benne_IsRoughlyClosed` (tolérance 2 m) |
+| `CODE/M_MAIN/PRG_05_Translation.st` | Modifié | Pont SEMI_AUTO : `SelTarget`/`M3_StartStop_Active` consomment `instCycleSemiAuto.TranslationCmd` |
+| `CODE/J_SUPERVISION/_TYPES/ST_CycleState.st` | Modifié | + `CycleStepAtError`, `SampleCount` |
+| `CODE/M_MAIN/PRG_07_Supervision.st` | Modifié | Publication `GVL_IHM.Cycle.State.*` (débloque T115) |
 | `CODE/GVL_PERSISTENT.st` | Modifié | + `_CycleSampleCount` (RETAIN) |
 
 ---

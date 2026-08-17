@@ -2,7 +2,7 @@
 
 > Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §4.  
 > Rôle de **ce** document : bornage de la position dans l'enveloppe de sécurité et détection d'incohérence/dépassement.  
-> Source code : `CODE/CODEURS/FB_Encoder_Safety.st` · instances `instEncoderSafetyM1/M2` dans `Acquisition (CFC)`.  
+> Source code : `CODE/E_CODEURS/FB_Encoder_Safety.st` · instances `instEncoderSafetyM1/M2` dans `Acquisition (CFC)`.  
 
 ## 🧭 Sommaire
 
@@ -28,7 +28,7 @@ Brique de **surveillance de cohérence de mesure** : vérifie que la position me
 
 ---
 
-## 2. Interface (vérifiée `CODE/CODEURS/FB_Encoder_Safety.st`)
+## 2. Interface (vérifiée `CODE/E_CODEURS/FB_Encoder_Safety.st`)
 
 | Port entrée | Type | Rôle |
 |---|---|---|

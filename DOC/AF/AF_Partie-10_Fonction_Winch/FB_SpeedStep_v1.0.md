@@ -2,7 +2,7 @@
 
 > **Rôle** : Décodeur de consigne de vitesse analogique (0..100 %) vers les 4 contacteurs de palier discrets d'un treuil.  
 > **Catégorie** : Brique technique de commande mouvement (composée à l'intérieur de `FB_Winch`).  
-> **Code Source** : `CODE/TREUILS/FB_SpeedStep.st`  
+> **Code Source** : `CODE/H_TREUILS_BENNE/FB_SpeedStep.st`  
 
 ---
 

@@ -2,7 +2,7 @@
 
 > Rôle : acquisition et conditionnement du geste opérateur (Hall CANopen → consignes d'axe).
 > **Pas** un FB de mouvement : pas de `SafeStop` / pas de pilotage Q.
-> Source code : `CODE/JOYSTICK/FB_Joystick.st` · instance `Acquisition (CFC).instJoystick`.
+> Source code : `CODE/D_JOYSTICK/FB_Joystick.st` · instance `Acquisition (CFC).instJoystick`.
 > v1.3 archivée : `ARCHIVES/Doc/AF_Partie-08_Fonction_Joystick_v1.3.md`.
 
 ## 🧭 Sommaire
@@ -329,4 +329,4 @@ identifiée, mais **à valider explicitement avant code**.
 | AF07 | `ST_JoystickHMI` |
 | AF10 / AF11 | Consommateurs AxisCmd + DeadmanArmed (Treuils Benne incluse · Translation) ; exception Extraction |
 | AF13 | `FB_Sim_Joystick` amont |
-| Code | `CODE/JOYSTICK/FB_Joystick.st`, `FB_AxisScale.st`, `FB_Filter_PT1.st`, `ST_Joystick_AxisCmd.st` |
+| Code | `CODE/D_JOYSTICK/FB_Joystick.st`, `FB_AxisScale.st`, `FB_Filter_PT1.st`, `ST_Joystick_AxisCmd.st` |

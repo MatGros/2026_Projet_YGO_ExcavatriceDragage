@@ -25,6 +25,9 @@ if str(_TOOL_ROOT) not in sys.path:
 
 _REPO_ROOT = _TOOL_ROOT.parent.parent  # project root (CODE/ lives here)
 CODE_DIR = _REPO_ROOT / "CODE"
+MAIN_DIR = CODE_DIR / "M_MAIN" if (CODE_DIR / "M_MAIN").is_dir() else CODE_DIR / "MAIN"
+AU_DIR = CODE_DIR / "B_AU_SECURITE" if (CODE_DIR / "B_AU_SECURITE").is_dir() else CODE_DIR / "AU"
+CYCLE_DIR = CODE_DIR / "G_CYCLE" if (CODE_DIR / "G_CYCLE").is_dir() else CODE_DIR / "CYCLE"
 
 from scripts.st_to_ld import build_ld_pou_xml, build_ld_project_xml
 from scripts.st_to_pou import build_st_pou_xml, build_st_project_xml
@@ -61,7 +64,7 @@ def _has_xmlns_empty(element: ET.Element, tag: str) -> bool:
 
 
 def test_st_to_ld_produces_valid_pou_with_ld_body():
-    st_file = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
+    st_file = MAIN_DIR / "PRG_AU_Outputs_LD.st"
     if not st_file.exists():
         pytest.skip("PRG_AU_Outputs_LD.st not available")
     diag = DiagnosticCollector()
@@ -86,7 +89,7 @@ def test_st_to_ld_produces_valid_pou_with_ld_body():
 
 
 def test_st_to_ld_rejects_non_ld_program():
-    st_file = CODE_DIR / "AU" / "FB_Safety_EmergencyManagement.st"
+    st_file = AU_DIR / "FB_Safety_EmergencyManagement.st"
     if not st_file.exists():
         pytest.skip("FB_Safety_EmergencyManagement.st not available")
     diag = DiagnosticCollector()
@@ -105,7 +108,7 @@ def test_st_to_ld_missing_file_exits_1(tmp_path):
 
 
 def test_st_to_pou_produces_valid_pou_with_st_body():
-    st_file = CODE_DIR / "AU" / "FB_Safety_EmergencyManagement.st"
+    st_file = AU_DIR / "FB_Safety_EmergencyManagement.st"
     if not st_file.exists():
         pytest.skip("FB_Safety_EmergencyManagement.st not available")
     diag = DiagnosticCollector()
@@ -124,7 +127,7 @@ def test_st_to_pou_produces_valid_pou_with_st_body():
 
 
 def test_st_to_pou_rejects_ld_program():
-    st_file = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
+    st_file = MAIN_DIR / "PRG_AU_Outputs_LD.st"
     if not st_file.exists():
         pytest.skip("PRG_AU_Outputs_LD.st not available")
     diag = DiagnosticCollector()
@@ -143,7 +146,7 @@ def test_st_to_pou_missing_file_exits_1(tmp_path):
 
 
 def test_cfc_extract_produces_valid_pou_with_aligned_objectid():
-    xml_file = CODE_DIR / "MAIN" / "PRG_AU_Acquisition_CFC.xml"
+    xml_file = MAIN_DIR / "PRG_AU_Acquisition_CFC.xml"
     if not xml_file.exists():
         pytest.skip("PRG_AU_Acquisition_CFC.xml not available")
     data = extract_cfc_pou(xml_file)
@@ -176,7 +179,7 @@ def test_cfc_extract_missing_file_exits_1(tmp_path):
 
 
 def test_st_to_dut_produces_valid_datatype_struct():
-    st_file = CODE_DIR / "AU" / "ST_Safety_Emergency_HmiState.st"
+    st_file = AU_DIR / "ST_Safety_Emergency_HmiState.st"
     if not st_file.exists():
         pytest.skip("ST_Safety_Emergency_HmiState.st not available")
     diag = DiagnosticCollector()
@@ -190,7 +193,7 @@ def test_st_to_dut_produces_valid_datatype_struct():
 
 
 def test_st_to_dut_produces_valid_datatype_enum():
-    st_file = CODE_DIR / "CYCLE" / "E_CycleStep.st"
+    st_file = CYCLE_DIR / "E_CycleStep.st"
     if not st_file.exists():
         pytest.skip("E_CycleStep.st not available")
     diag = DiagnosticCollector()
@@ -204,7 +207,7 @@ def test_st_to_dut_produces_valid_datatype_enum():
 
 
 def test_st_to_dut_rejects_fb():
-    st_file = CODE_DIR / "AU" / "FB_Safety_EmergencyManagement.st"
+    st_file = AU_DIR / "FB_Safety_EmergencyManagement.st"
     if not st_file.exists():
         pytest.skip("FB_Safety_EmergencyManagement.st not available")
     diag = DiagnosticCollector()
@@ -223,7 +226,7 @@ def test_st_to_dut_missing_file_exits_1(tmp_path):
 
 
 def test_build_bundle_produces_valid_project_with_project_structure():
-    au_dir = CODE_DIR / "AU"
+    au_dir = AU_DIR
     if not au_dir.exists():
         pytest.skip("CODE/AU/ not available")
     diag = DiagnosticCollector()
@@ -267,8 +270,8 @@ def test_build_bundle_produces_valid_project_with_project_structure():
 
 
 def test_build_bundle_from_multiple_inputs():
-    au_dir = CODE_DIR / "AU"
-    ld_file = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
+    au_dir = AU_DIR
+    ld_file = MAIN_DIR / "PRG_AU_Outputs_LD.st"
     if not au_dir.exists() or not ld_file.exists():
         pytest.skip("required inputs not available")
     diag = DiagnosticCollector()
@@ -339,8 +342,8 @@ def _assert_valid_project_bundle(data: bytes, expected_pou_count: int) -> ET.Ele
 
 def test_st_to_ld_multi_file_produces_valid_project():
     """st_to_ld.py with 2 files → <project> with 2 <pou> in <LD>."""
-    f1 = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
-    f2 = CODE_DIR / "MAIN" / "PRG_10_Outputs_LD.st"
+    f1 = MAIN_DIR / "PRG_AU_Outputs_LD.st"
+    f2 = MAIN_DIR / "PRG_10_Outputs_LD.st"
     if not f1.exists() or not f2.exists():
         pytest.skip("LD test files not available")
     diag = DiagnosticCollector()
@@ -354,8 +357,8 @@ def test_st_to_ld_multi_file_produces_valid_project():
 
 def test_st_to_pou_multi_file_produces_valid_project():
     """st_to_pou.py with 2 files → <project> with 2 <pou> in <ST>."""
-    f1 = CODE_DIR / "AU" / "FB_Safety_EmergencyManagement.st"
-    f2 = CODE_DIR / "AU" / "FB_Safety_EmergencyManagementLogic.st"
+    f1 = AU_DIR / "FB_Safety_EmergencyManagement.st"
+    f2 = AU_DIR / "FB_Safety_EmergencyManagementLogic.st"
     if not f1.exists() or not f2.exists():
         pytest.skip("POU ST test files not available")
     diag = DiagnosticCollector()
@@ -368,8 +371,8 @@ def test_st_to_pou_multi_file_produces_valid_project():
 
 def test_cfc_extract_multi_file_produces_valid_project():
     """cfc_extract.py with 2 files → <project> with 2 CFC <pou>."""
-    f1 = CODE_DIR / "MAIN" / "PRG_AU_Acquisition_CFC.xml"
-    f2 = CODE_DIR / "MAIN" / "PRG_GLOBAL_CFC.xml"
+    f1 = MAIN_DIR / "PRG_AU_Acquisition_CFC.xml"
+    f2 = MAIN_DIR / "PRG_GLOBAL_CFC.xml"
     if not f1.exists() or not f2.exists():
         pytest.skip("CFC test files not available")
     diag = DiagnosticCollector()
@@ -382,8 +385,8 @@ def test_cfc_extract_multi_file_produces_valid_project():
 
 def test_st_to_dut_multi_file_produces_valid_project():
     """st_to_dut.py with 2 files → <project> with 2 <dataType>."""
-    f1 = CODE_DIR / "AU" / "ST_Safety_Emergency_State.st"
-    f2 = CODE_DIR / "AU" / "ST_Safety_Emergency_Diag.st"
+    f1 = AU_DIR / "ST_Safety_Emergency_State.st"
+    f2 = AU_DIR / "ST_Safety_Emergency_Diag.st"
     if not f1.exists() or not f2.exists():
         pytest.skip("DUT test files not available")
     diag = DiagnosticCollector()
@@ -400,8 +403,8 @@ def test_st_to_ld_multi_file_main_exits_0(tmp_path):
     """CLI main() with 2 LD files exits 0 and writes a <project> file."""
     from scripts.st_to_ld import main
 
-    f1 = CODE_DIR / "MAIN" / "PRG_AU_Outputs_LD.st"
-    f2 = CODE_DIR / "MAIN" / "PRG_10_Outputs_LD.st"
+    f1 = MAIN_DIR / "PRG_AU_Outputs_LD.st"
+    f2 = MAIN_DIR / "PRG_10_Outputs_LD.st"
     if not f1.exists() or not f2.exists():
         pytest.skip("LD test files not available")
     out = tmp_path / "bundle.xml"

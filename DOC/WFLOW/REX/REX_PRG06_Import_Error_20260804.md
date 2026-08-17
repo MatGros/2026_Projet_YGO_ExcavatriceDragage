@@ -148,7 +148,7 @@ contact pointé sur la broche du bloc producteur.
 | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | coils→blocs, outputs dans bloc (causes 2-3) |
 | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | Le convertisseur universel ST→LD traite désormais directement l'ensemble des POU `_LD`. |
 | `TOOLS/AGENT_WORKFLOW/scripts/G390_check_bundle_freshness.py` | vérifie le bundle frais |
-| `CODE/MAIN/PRG_06_Outputs_LD.st` | outputs directs du FB (au lieu de chemins nested) |
+| `CODE/M_MAIN/PRG_06_Outputs_LD.st` | outputs directs du FB (au lieu de chemins nested) |
 
 ---
 
