@@ -31,7 +31,7 @@ DOC_FILE_PATTERNS = (
     re.compile(r"^NAMING_CONVENTION\.md$"),
     re.compile(r"^REGISTRE_.+_v\d+\.\d+\.md$"),
     re.compile(r"^.+_Journal_Modifications\.md$"),
-    re.compile(r"^(CODE_QUALITY_STANDARDS|PI_SOUND_NOTIFICATION|README|REX_.+)\.md$"),
+    re.compile(r"^(CODE_QUALITY_STANDARDS|README|REX_.+)\.md$"),
 )
 
 
