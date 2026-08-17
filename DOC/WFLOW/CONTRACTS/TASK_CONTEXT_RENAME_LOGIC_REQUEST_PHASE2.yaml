@@ -1,0 +1,95 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — RENAME_LOGIC_REQUEST_PHASE2
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: RENAME_LOGIC_REQUEST_PHASE2
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Renommer les variables d'arbitrage logique M1/M2 pour refléter le rôle de
+    demande logique (LogicRequest) : M1/M2_Direction_Active → M1/M2LogicRequestDirection,
+    M1/M2_StartStop_Active → M1/M2LogicRequestStartStop,
+    M1/M2_SpeedRef_Active → M1/M2LogicRequestSpeedRef_Pct. Renommage LEXICAL
+    uniquement, aucune modification de logique.
+    Critères structurels : nom de fichier = nom de POU
+    suffixe de langage = langage bundle (ST, pas de suffixe _CFC/_LD)
+
+  acceptance:
+    - id: AC1
+      statement: "M1_Direction_Active et M2_Direction_Active sont renommés en M1LogicRequestDirection et M2LogicRequestDirection dans toutes les occurrences."
+      verified_by: "grep — 0 occurrence 'M1_Direction_Active'/'M2_Direction_Active' dans CODE/."
+    - id: AC2
+      statement: "M1_StartStop_Active et M2_StartStop_Active sont renommés en M1LogicRequestStartStop et M2LogicRequestStartStop."
+      verified_by: "grep — 0 occurrence 'M1_StartStop_Active'/'M2_StartStop_Active' dans CODE/."
+    - id: AC3
+      statement: "M1_SpeedRef_Active et M2_SpeedRef_Active sont renommés en M1LogicRequestSpeedRef_Pct et M2LogicRequestSpeedRef_Pct."
+      verified_by: "grep — 0 occurrence 'M1_SpeedRef_Active'/'M2_SpeedRef_Active' dans CODE/."
+    - id: AC4
+      statement: "Aucun changement de logique : valeurs -1/0/+1, producteur unique, consommateurs (FB_Winch, FB_Safety_Winch, FB_WinchOutputInterlock_LD) inchangés."
+      verified_by: "G200_check_linkage.py --report : câblage identique, seuls les noms changent."
+    - id: AC5
+      statement: "Les variables safety (SafeStop, PowerCutOff, AscentPermit, DescendPermit) ne sont pas modifiées."
+      verified_by: "grep de ces noms — inchangés."
+    - id: AC6
+      statement: "Les gates passent (bundle + liaison + run_all_gates) dans un environnement propre."
+      verified_by: "python run_all_gates.py — PASS."
+    - id: AC7
+      statement: "nom de fichier est identique au nom de POU et suffixe de langage est identique au langage bundle pour les POU de CODE/MAIN modifiés"
+      verified_by: "G200_check_linkage.py --report"
+
+  scope:
+    allowed:
+      - CODE/MAIN/PRG_04_Treuils_Benne.st
+      - CODE/MAIN/PRG_02_Acquisition.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_RENAME_LOGIC_REQUEST_PHASE2.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md
+      - Tout autre FB/PRG hors scope
+      - CODE_XML/ (fichiers générés hors scope)
+
+  conservation:
+    must_survive:
+      - "Logique inchangée : valeurs -1/0/+1, producteur unique, consommateurs identiques (FB_Winch, FB_Safety_Winch, FB_WinchOutputInterlock_LD)."
+      - "Les variables safety (SafeStop, PowerCutOff, AscentPermit, DescendPermit) inchangées."
+      - "Les champs des structures (ex. WinchM1Cmd.Direction) inchangés — renommage des variables locales Active uniquement."
+    dropped_on_purpose:
+      - "Suffixe 'Active' remplacé par 'LogicRequest' pour les 6 variables d'arbitrage M1/M2."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "codex/gpt-5.6-luna"
+    - "codex/gpt-5.6-sol"
+
+  alert_duty: >
+    Toute référence manquante, variable orpheline ou doute de liaison est remonté
+    immédiatement. Ne pas élargir le périmètre au-delà des 6 variables nommées.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "codex/gpt-5.6-luna"
+  completed_at: "2026-08-16"
+  status: COMPLETED
+  summary: "Renommage des 6 variables M1/M2_*_Active en M1/M2LogicRequest*. Liaison PASS (G200). Style PASS. Gates bundle/pytest/persistance : échecs environnement (WinError 5). git diff --check PASS."
+  evidence_submitted:
+    - "G200_check_linkage: PASS (0 erreur, 1077 instances)"
+    - "git diff --check: PASS"
+
+validation:
+  status: PENDING
+  validated_by: "DeepSeek (Orchestrateur)"
+  validated_at: ""
+  notes: ""

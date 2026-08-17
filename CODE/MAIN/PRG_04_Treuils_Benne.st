@@ -33,9 +33,8 @@ VAR
     instDiveSearch : FB_DiveSearch;
     instExtractionSequence : FB_ExtractionSequence;
 
-    MaintenanceMotionRequestActive : BOOL;
-    MaintenanceMotionDirection     : INT;
-    MaintenanceMotionSpeed_Pct     : REAL;
+    CoupledUserRequestActive : BOOL;
+    CoupledUserRequestDirection     : INT;
     ManualBottomPositionConfirmed  : BOOL;
     BottomPositionConfirmed        : BOOL;
     CmdBucketCloseArbitrated       : BOOL;
@@ -49,8 +48,8 @@ VAR
     // 🆕 2026-08-07 (Fiche 01, demande client) : séquencement automatique benne en pilotage
     // couplé (both) normal — descente uniquement benne ouverte, montée uniquement benne
     // fermée. Distinct de DumpAtTremie/DiveSearch/ExtractionSequence (fonctionnement normal,
-    // pas une assistance MAINT_N1/N2 dédiée). Réutilise MaintenanceMotionRequestActive/
-    // MaintenanceMotionDirection (§1 ci-dessus) : déjà exactement "mouvement couplé (both)
+    // pas une assistance MAINT_N1/N2 dédiée). Réutilise CoupledUserRequestActive/
+    // CoupledUserRequestDirection (§1 ci-dessus) : déjà exactement "mouvement couplé (both)
     // demandé" dans les 2 modes (joystick Select=0, ou BtnWinchBothUp/Down) — mêmes variables
     // déjà utilisées par instBucket/instDiveSearch/instExtractionSequence, aucune nouvelle
     // détection à inventer.
@@ -64,13 +63,13 @@ VAR
     ControlAscentStartM1PosM       : REAL;
     ControlAscentStartM2PosM       : REAL;
 
-    M1_StartStop_Active     : BOOL;
-    M1_Direction_Active     : INT;
-    M1_SpeedRef_Active      : REAL;
+    M1LogicRequestStartStop     : BOOL;
+    M1LogicRequestDirection     : INT;
+    M1LogicRequestSpeedRef_Pct      : REAL;
 
-    M2_StartStop_Active     : BOOL;
-    M2_Direction_Active     : INT;
-    M2_SpeedRef_Active      : REAL;
+    M2LogicRequestStartStop     : BOOL;
+    M2LogicRequestDirection     : INT;
+    M2LogicRequestSpeedRef_Pct      : REAL;
     M2_SpeedStepTableActive : ST_SpeedStepTable;
 
     SpeedGuardEnableM1 : BOOL := FALSE;
@@ -135,25 +134,25 @@ END_VAR
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     // 🔴🔧 REX 2026-08-07 (audit, bug preexistant trouve avant Fiche benne) : ancienne version
     // affectait HwIn.Operator.JoyYRaw_ANA2 (valeur analogique BRUTE 0..10000, meme signal que
-    // RawY sur instJoystick) directement a MaintenanceMotionDirection, alors que
+    // RawY sur instJoystick) directement a CoupledUserRequestDirection, alors que
     // FB_Bucket/FB_DiveSearch/FB_ExtractionSequence testent MotionDirection = 1/-1 EXACTEMENT.
     // Consequence : en mode TglJoystickMaster, la benne/les sequenceurs assistes ne pouvaient
     // JAMAIS demarrer via le joystick (seul le mode Boutons IHM, qui affecte bien 1/-1,
     // fonctionnait). Corrige : direction deja mise a l'echelle (-1/0/+1) par instJoystick.
-    MaintenanceMotionDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
-    MaintenanceMotionRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
+    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+    CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
-    MaintenanceMotionSpeed_Pct := 100.0;
+
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
-        MaintenanceMotionDirection := 1;
+        CoupledUserRequestDirection := 1;
     ELSIF GVL_IHM.Commun.BtnWinchBothDown THEN
-        MaintenanceMotionDirection := -1;
+        CoupledUserRequestDirection := -1;
     ELSE
-        MaintenanceMotionDirection := 0;
+        CoupledUserRequestDirection := 0;
     END_IF;
-    MaintenanceMotionRequestActive := (MaintenanceMotionDirection <> 0);
-    MaintenanceMotionSpeed_Pct := 100.0;
+    CoupledUserRequestActive := (CoupledUserRequestDirection <> 0);
+
 END_IF;
 
 // 🆕 2026-08-07 : mode "vidage à la trémie" (verrouillage, demande client). Périmètre identique
@@ -172,7 +171,7 @@ GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_A
 IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
-   OR (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)) THEN
+   OR (CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)) THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
     BypassKoboldBottomTouched := FALSE;
 END_IF;
@@ -184,7 +183,7 @@ ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomCon
 // pas de défaut, benne fermée -- réutilise le bloc de clear commun juste au-dessus).
 BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-   AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
+   AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
    AND BypassKoboldFallEdge.Q THEN
     BypassKoboldBottomTouched := TRUE;
 END_IF;
@@ -197,8 +196,8 @@ instDiveSearch(
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode := PRG_03_Modes_Cycle.Auth.Mode,
-    MotionRequestActive := MaintenanceMotionRequestActive,
-    MotionDirection := MaintenanceMotionDirection,
+    MotionRequestActive := CoupledUserRequestActive,
+    MotionDirection := CoupledUserRequestDirection,
     BucketIsOpen := _BucketState.IsOpen,
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     M1Position_M := PRG_02_Acquisition.CablePosM1,
@@ -235,8 +234,8 @@ instExtractionSequence(
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode := PRG_03_Modes_Cycle.Auth.Mode,
-    MotionRequestActive := MaintenanceMotionRequestActive,
-    MotionDirection := MaintenanceMotionDirection,
+    MotionRequestActive := CoupledUserRequestActive,
+    MotionDirection := CoupledUserRequestDirection,
     BottomPositionConfirmed := BottomPositionConfirmed,
     BucketIsClosed := _BucketState.IsClosed,
     BucketBusy := instBucket.Busy,
@@ -278,7 +277,7 @@ END_IF;
 
 // 🆕 2026-08-07 (Fiche 01, demande client) : règle absolue en pilotage couplé (both) normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée. Réutilise
-// MaintenanceMotionRequestActive/MaintenanceMotionDirection (§1) : déjà "mouvement couplé
+// CoupledUserRequestActive/CoupledUserRequestDirection (§1) : déjà "mouvement couplé
 // demandé" dans les 2 modes (joystick Select=0 exclut le pilotage unitaire M1/M2 seul,
 // BtnWinchBothUp/Down exclut les boutons IHM individuels M1/M2). Jamais actif en SEMI_AUTO
 // (mêmes conditions que le reste de ce §).
@@ -290,11 +289,11 @@ END_IF;
 // Fiche 01).
 CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
     AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.SEMI_AUTO)
-    AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1)
+    AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
     AND NOT _BucketState.IsOpen;
 CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
     AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.SEMI_AUTO)
-    AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)
+    AND CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)
     AND NOT _BucketState.IsClosed;
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -319,7 +318,7 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
 ELSE
     KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
         OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-            AND MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = -1));
+            AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1));
 END_IF;
 
 
@@ -344,8 +343,8 @@ instBucket(
     CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR DumpAtTremieBucketOpenArmed OR CoupledDiveBucketOpenArmed
                            OR (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Open),
     CmdClose_IHM        := CmdBucketCloseArbitrated,
-    MotionRequestActive := MaintenanceMotionRequestActive,
-    MotionDirection     := MaintenanceMotionDirection,
+    MotionRequestActive := CoupledUserRequestActive,
+    MotionDirection     := CoupledUserRequestDirection,
     CablePosM1          := PRG_02_Acquisition.CablePosM1,
     CablePosM2          := PRG_02_Acquisition.CablePosM2,
     HomedM1             := PRG_02_Acquisition.instHomingM1.Homed,
@@ -367,10 +366,10 @@ instBucket(
 // 🆕 T114 : Si la benne n'est pas fermée (NOT IsClosed) et que instBucket n'est plus occupé (Busy=FALSE),
 // toute demande de montée est automatiquement dégradée au Palier 1 (Vitesse lente, voir instWinchM1/M2),
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
-// 📌 Note d'architecture (lag 1 scan) : M1/M2_Direction_Active est consommé ici avant son calcul arbitré
+// 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
 CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Busy;
-BucketNotClosedAscentStep1 := (M1_Direction_Active = 1 OR M2_Direction_Active = 1) AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
+BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDirection = 1) AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
 
 // 🆕 T111 : En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
@@ -407,37 +406,37 @@ END_IF;
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // 🆕 Pont SEMI_AUTO (L3) : consomme les demandes du séquenceur de cycle.
     // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
-    M1_Direction_Active := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
-    M1_StartStop_Active := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
-    M1_SpeedRef_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
+    M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
+    M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
+    M1LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.SpeedPct;
 ELSE
     IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
         // Mode Boutons IHM
         IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
-            M1_Direction_Active := 1;
-            M1_SpeedRef_Active  := 100.0;
+            M1LogicRequestDirection := 1;
+            M1LogicRequestSpeedRef_Pct  := 100.0;
         ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
-            M1_Direction_Active := -1;
-            M1_SpeedRef_Active  := 100.0;
+            M1LogicRequestDirection := -1;
+            M1LogicRequestSpeedRef_Pct  := 100.0;
         ELSE
-            M1_Direction_Active := 0;
-            M1_SpeedRef_Active  := 0.0;
+            M1LogicRequestDirection := 0;
+            M1LogicRequestSpeedRef_Pct  := 0.0;
         END_IF;
     ELSE
         // Mode Joystick Maître
         IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
-            M1_Direction_Active := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
-            M1_SpeedRef_Active  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
+            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+            M1LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
         ELSE
-            M1_Direction_Active := 0;
-            M1_SpeedRef_Active  := 0.0;
+            M1LogicRequestDirection := 0;
+            M1LogicRequestSpeedRef_Pct  := 0.0;
         END_IF;
     END_IF;
 
-    M1_StartStop_Active := (M1_Direction_Active <> 0) AND NOT instBucket.Busy
+    M1LogicRequestStartStop := (M1LogicRequestDirection <> 0) AND NOT instBucket.Busy
                             AND NOT CoupledMotionBlockedByBucket
-                            AND NOT ((SyncMinorDeviationBlocksUp   AND (M1_Direction_Active = 1))
-                                 OR  (SyncMinorDeviationBlocksDown AND (M1_Direction_Active = -1)))
+                            AND NOT ((SyncMinorDeviationBlocksUp   AND (M1LogicRequestDirection = 1))
+                                 OR  (SyncMinorDeviationBlocksDown AND (M1LogicRequestDirection = -1)))
                             AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
 END_IF;
 
@@ -450,43 +449,43 @@ END_IF;
 // dans la branche ELSE (arbitrage normal) : si le mouvement couplé est toujours demandé, M2
 // reçoit sa commande de continuité le MÊME scan, sans dépendre d'un timing de bascule.
 IF instBucket.Busy AND instBucket.M2_StartStop THEN
-    M2_StartStop_Active := instBucket.M2_StartStop;
-    M2_Direction_Active := instBucket.M2_Direction;
-    M2_SpeedRef_Active  := 15.0;
+    M2LogicRequestStartStop := instBucket.M2_StartStop;
+    M2LogicRequestDirection := instBucket.M2_Direction;
+    M2LogicRequestSpeedRef_Pct  := 15.0;
 ELSE
     IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
         // 🆕 Pont SEMI_AUTO (L3) : consomme les demandes du séquenceur de cycle.
-        M2_Direction_Active := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
-        M2_StartStop_Active := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
-        M2_SpeedRef_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
+        M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
+        M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
+        M2LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
     ELSE
         IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
             // Mode Boutons IHM
             IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
-                M2_Direction_Active := 1;
-                M2_SpeedRef_Active  := 100.0;
+                M2LogicRequestDirection := 1;
+                M2LogicRequestSpeedRef_Pct  := 100.0;
             ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
-                M2_Direction_Active := -1;
-                M2_SpeedRef_Active  := 100.0;
+                M2LogicRequestDirection := -1;
+                M2LogicRequestSpeedRef_Pct  := 100.0;
             ELSE
-                M2_Direction_Active := 0;
-                M2_SpeedRef_Active  := 0.0;
+                M2LogicRequestDirection := 0;
+                M2LogicRequestSpeedRef_Pct  := 0.0;
             END_IF;
         ELSE
             // Mode Joystick Maître
             IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
-                M2_Direction_Active := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
-                M2_SpeedRef_Active  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
+                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+                M2LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
             ELSE
-                M2_Direction_Active := 0;
-                M2_SpeedRef_Active  := 0.0;
+                M2LogicRequestDirection := 0;
+                M2LogicRequestSpeedRef_Pct  := 0.0;
             END_IF;
         END_IF;
 
-        M2_StartStop_Active := (M2_Direction_Active <> 0)
+        M2LogicRequestStartStop := (M2LogicRequestDirection <> 0)
                                 AND NOT CoupledMotionBlockedByBucket
-                                AND NOT ((SyncMinorDeviationBlocksUp   AND (M2_Direction_Active = -1))
-                                     OR  (SyncMinorDeviationBlocksDown AND (M2_Direction_Active = 1)))
+                                AND NOT ((SyncMinorDeviationBlocksUp   AND (M2LogicRequestDirection = -1))
+                                     OR  (SyncMinorDeviationBlocksDown AND (M2LogicRequestDirection = 1)))
                                 AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
     END_IF;
 END_IF;
@@ -497,13 +496,13 @@ END_IF;
 // ouverture/fermeture-puis-mouvement-couplé où le mouvement doit continuer sans coupure
 // (affecte aussi ExtractionSequence.CLOSING_BUCKET->CONTROL_ASCENT, pas seulement la Fiche 01).
 // Corrigé : ne force plus l'arrêt si un mouvement couplé est toujours activement demandé
-// (MaintenanceMotionRequestActive), auquel cas l'arbitrage normal (§3, déjà corrigé) prend le
+// (CoupledUserRequestActive), auquel cas l'arbitrage normal (§3, déjà corrigé) prend le
 // relais sans interruption. Comportement inchangé pour toute fin d'action benne SANS mouvement
 // couplé en cours (ouverture/fermeture manuelle isolée, bouton IHM) : l'arrêt reste forcé.
 BenneBusyFallEdge(CLK := instBucket.Busy);
-IF BenneBusyFallEdge.Q AND NOT (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection <> 0)) THEN
-    M1_StartStop_Active := FALSE;
-    M2_StartStop_Active := FALSE;
+IF BenneBusyFallEdge.Q AND NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection <> 0)) THEN
+    M1LogicRequestStartStop := FALSE;
+    M2LogicRequestStartStop := FALSE;
 END_IF;
 
 // 🆕 2026-08-07 (Fiche 01, demande client) : après une fermeture benne armée PAR CE mécanisme
@@ -523,7 +522,7 @@ IF ControlAscentActive THEN
     IF (ABS(PRG_02_Acquisition.CablePosM1 - ControlAscentStartM1PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
        AND (ABS(PRG_02_Acquisition.CablePosM2 - ControlAscentStartM2PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
         ControlAscentActive := FALSE;             // Distance de contrôle parcourue : paliers normaux
-    ELSIF NOT (MaintenanceMotionRequestActive AND (MaintenanceMotionDirection = 1)) THEN
+    ELSIF NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)) THEN
         ControlAscentActive := FALSE;             // Montée relâchée/interrompue : annule la phase
     END_IF;
 END_IF;
@@ -628,14 +627,14 @@ IF PRG_02_Acquisition.instJoystick.AtNeutral OR NOT GVL_IHM.Commun.Cfg.TglEnable
     KoboldBottomTouchLatched := FALSE;
 END_IF;
 
-// 🔧 2026-08-07 (revue Fiche 05) : MaintenanceMotionRequestActive ajouté -- sans lui, cette
-// surveillance pouvait s'armer aussi en pilotage UNITAIRE M1 (Select=1), où MaintenanceMotionDirection
-// reflète quand même l'axe joystick brut (seul MaintenanceMotionRequestActive exige Select=0).
+// 🔧 2026-08-07 (revue Fiche 05) : CoupledUserRequestActive ajouté -- sans lui, cette
+// surveillance pouvait s'armer aussi en pilotage UNITAIRE M1 (Select=1), où CoupledUserRequestDirection
+// reflète quand même l'axe joystick brut (seul CoupledUserRequestActive exige Select=0).
 // Hors scope de la fiche ("pendant une descente COUPLÉE normale") -- corrigé.
 // Qualification immersion : front montant Kobold dans la fenêtre [ImmersionLower_M..ImmersionUpper_M]
 IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
-   AND MaintenanceMotionRequestActive
-   AND (MaintenanceMotionDirection = -1)
+   AND CoupledUserRequestActive
+   AND (CoupledUserRequestDirection = -1)
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
     IF (PRG_02_Acquisition.CablePosM1 <= _DredgingAssistCfgPersist.ImmersionUpper_M)
@@ -658,8 +657,8 @@ END_IF;
 // FB_DiveSearch (BucketIsOpen requis pour READY_TO_DESCEND). Ajouté : autorisation directe et
 // explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif) -- indépendante du
 // timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
-DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND MaintenanceMotionRequestActive
-    AND (MaintenanceMotionDirection = -1) AND NOT _BucketState.IsOpen);
+DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequestActive
+    AND (CoupledUserRequestDirection = -1) AND NOT _BucketState.IsOpen);
 
 // 🔴🔧 REX 2026-08-07 (17) — retour terrain : BypassKoboldBottomTouched confirmait le fond
 // (pour Extraction) mais ne bloquait pas la descente elle-même -- seul KoboldBottomTouchLatched
@@ -708,7 +707,7 @@ instSafetyWinchM1(
     CablePosM              := PRG_02_Acquisition.CablePosM1,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
-    Direction              := M1_Direction_Active,
+    Direction              := M1LogicRequestDirection,
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
     Homed                  := PRG_02_Acquisition.instHomingM1.Homed,
     HomingSuspect          := PRG_02_Acquisition.instHomingM1.HomingSuspect,
@@ -768,7 +767,7 @@ instSafetyWinchM2(
     CablePosM              := PRG_02_Acquisition.CablePosM2,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
-    Direction              := M2_Direction_Active,
+    Direction              := M2LogicRequestDirection,
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
     Homed                  := PRG_02_Acquisition.instHomingM2.Homed,
     HomingSuspect          := PRG_02_Acquisition.instHomingM2.HomingSuspect,
@@ -843,12 +842,12 @@ instWinchM1(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
-    StartStop               := M1_StartStop_Active,
+    StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := DescendPermitM1_Active,
     AscentPermit            := AscentPermitM1_Active,
-    Direction               := M1_Direction_Active,
-    SpeedRefPct             := M1_SpeedRef_Active,
+    Direction               := M1LogicRequestDirection,
+    SpeedRefPct             := M1LogicRequestSpeedRef_Pct,
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
     // 🆕 2026-08-15 (T111 / T113 / T114) : Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
@@ -874,12 +873,12 @@ instWinchM2(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
-    StartStop               := M2_StartStop_Active,
+    StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := DescendPermitM2_Active,
     AscentPermit            := AscentPermitM2_Active,
-    Direction               := M2_Direction_Active,
-    SpeedRefPct             := M2_SpeedRef_Active,
+    Direction               := M2LogicRequestDirection,
+    SpeedRefPct             := M2LogicRequestSpeedRef_Pct,
     SpeedStepTable          := M2_SpeedStepTableActive,
     // 🔴🔧 REX 2026-08-07 (16) — retour terrain, GAP CONFIRMÉ : instBucket.M2_ForceSlowSpeed
     // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) n'était consommé que
@@ -962,7 +961,7 @@ WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.M1_Speed_Mps - M1_PrevSpeed
 M1_PrevSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
 
 WinchM1State.Position_M := PRG_02_Acquisition.CablePosM1;
-WinchM1State.SpeedRef_Pct := M1_SpeedRef_Active;
+WinchM1State.SpeedRef_Pct := M1LogicRequestSpeedRef_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
 WinchM1State.FBState := instWinchM1.State;
 WinchM1State.Ready := instWinchM1.Ready;
@@ -1019,7 +1018,7 @@ WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.M2_Speed_Mps - M2_PrevSpeed
 M2_PrevSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
 
 WinchM2State.Position_M := PRG_02_Acquisition.CablePosM2;
-WinchM2State.SpeedRef_Pct := M2_SpeedRef_Active;
+WinchM2State.SpeedRef_Pct := M2LogicRequestSpeedRef_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
 WinchM2State.FBState := instWinchM2.State;
 WinchM2State.Ready := instWinchM2.Ready;

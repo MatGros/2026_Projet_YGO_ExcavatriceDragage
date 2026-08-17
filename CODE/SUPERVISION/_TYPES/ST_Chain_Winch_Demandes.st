@@ -9,5 +9,7 @@ STRUCT
     Idx207_BypassOperatorComm    : BOOL; // 0 = Comm Normale OK | 1 = Bypass Réseau Actif ⚠️
     Idx208_ArbitratedSpeed_Pct   : REAL; // [%] Consigne finale retenue après arbitrage
     Idx209_ArbitratedDirection   : INT;  // +1 = Montée | 0 = Neutre | -1 = Descente
+    Idx210_CoupledUserRequestDirection : INT; // +1 = Montée | 0 = Neutre | -1 = Descente
+    Idx211_CoupledUserRequestActive    : BOOL; // 1 = demande utilisateur couplée active
 END_STRUCT
 END_TYPE

@@ -1,0 +1,94 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — COMPLETE_TROUBLESHOOTING_FLUX
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: COMPLETE_TROUBLESHOOTING_FLUX
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Compléter la vue Troubleshooting (GVL_Troubleshooting) pour montrer le flux
+    chronologique complet : intention utilisateur (UserRequest) → arbitrage →
+    commande → sortie. Câbler l'intention couplée (CoupledUserRequestDirection/
+    Active), corriger l'asymétrie M1/M2 (M2 arbitré non câblé), et traiter les
+    champs TBD où un producteur existe. Diagnostic lecture seule — aucune logique
+    machine modifiée.
+
+  acceptance:
+    - id: AC1
+      statement: "Les champs d'intention (CoupledUserRequestDirection INT, CoupledUserRequestActive BOOL) sont ajoutés à ST_Chain_Winch_Demandes et câblés dans FB_TroubleshootingView."
+      verified_by: "Lecture ST_Chain_Winch_Demandes.st (nouveaux champs) + FB_TroubleshootingView.st (câblage)."
+    - id: AC2
+      statement: "M2 arbitré (M2LogicRequestSpeedRef_Pct/Direction) est câblé dans Demandes_200.Idx208/209 (actuellement TBD/non câblé)."
+      verified_by: "Lecture FB_TroubleshootingView.st — Idx208/209 M2 alimentés, plus TBD."
+    - id: AC3
+      statement: "Idx201/Idx202 (joystick brut/scalé) sont câblés si un producteur existe (ex. HwIn.Operator.JoyYRaw_ANA2, instJoystick.SpeedYPct)."
+      verified_by: "Lecture FB_TroubleshootingView.st — champs alimentés ou documentés si pas de producteur."
+    - id: AC4
+      statement: "Les autres champs TBD où un producteur public existe sont câblés (CycleAutoCmd_Pct, EncoderRawPos, CycleCmd_Open, CycleTargetPosition, etc.)."
+      verified_by: "Grep 'TBD' dans FB_TroubleshootingView.st — réduit aux cas sans producteur."
+    - id: AC5
+      statement: "Aucun changement de logique machine — diagnostic lecture seule (publication GVL_Troubleshooting uniquement)."
+      verified_by: "G200_check_linkage.py — aucune instance métier modifiée."
+    - id: AC6
+      statement: "La liaison passe (G200)."
+      verified_by: "python G200_check_linkage.py --report — PASS."
+    - id: AC7
+      statement: "nom de fichier est identique au nom de POU et suffixe de langage est identique au langage bundle pour les POU de CODE/MAIN modifiés (PRG_07_Supervision)"
+      verified_by: "G200_check_linkage.py --report"
+
+  scope:
+    allowed:
+      - CODE/DEPANNAGE/FB_TroubleshootingView.st
+      - CODE/SUPERVISION/_TYPES/ST_Chain_Winch_Demandes.st
+      - CODE/SUPERVISION/_TYPES/ST_ChainWinch.st
+      - CODE/SUPERVISION/_TYPES/ST_Chain_Winch_Outputs.st
+      - CODE/DEPANNAGE/GVL_Troubleshooting.st
+      - CODE/MAIN/PRG_07_Supervision.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_COMPLETE_TROUBLESHOOTING_FLUX.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE/MAIN/PRG_04_Treuils_Benne.st
+      - CODE/MAIN/PRG_02_Acquisition.st
+      - CODE_XML/ (fichiers générés hors scope)
+
+  conservation:
+    must_survive:
+      - "Aucun changement de logique machine (PRG_04, FB_Winch, FB_Safety_Winch)."
+      - "Les champs déjà câblés (M1 Idx208/209, safety, etc.) inchangés."
+    dropped_on_purpose:
+      - "Aucun — ajout/câblage de diagnostic uniquement."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+
+  models_allowed:
+    - "codex/gpt-5.6-luna"
+    - "codex/gpt-5.6-sol"
+
+  alert_duty: >
+    Tout producteur absent, ambiguïté de champ ou risque de toucher à la logique
+    machine est remonté immédiatement. Ne pas élargir le périmètre.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: IN_PROGRESS
+
+execution:
+  executed_by: "codex/gpt-5.6-luna"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat cree. Delegation T123."
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "DeepSeek (Orchestrateur)"
+  validated_at: ""
+  notes: ""
