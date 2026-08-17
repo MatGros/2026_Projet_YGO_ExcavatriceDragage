@@ -1,0 +1,78 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — NAMING_FLUX_DONNEES : nommage du flux joystick → actionneurs
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: NAMING_FLUX_DONNEES
+  criticality: C2            # Analyse/architecture — AUCUNE modification de code
+  strategy: patch
+
+  objective: >
+    Challenger et proposer un nommage clair du flux de données joystick →
+    actionneurs, en distinguant l'intention utilisateur (UserRequest) de la
+    demande logique (LogicRequest), et en corrigeant le nom trompeur
+    MaintenanceMotionDirection (utilisé en couplé MAINT_N1/N2 ET semi-auto).
+    Livrable = recommandation d'architecture/nommage, PAS de modification de code.
+
+  acceptance:
+    - id: AC1
+      statement: "Cartographier le flux complet joystick → actionneurs (joystick, arbitrage, treuil, interlock, sorties) avec les variables existantes."
+      verified_by: "Lecture CODE/ (PRG_02, PRG_04, FB_Winch, FB_WinchOutputInterlock_LD, PRG_06) — tableau du flux."
+    - id: AC2
+      statement: "Proposer un nommage distinguant intention utilisateur (UserRequest) vs demande logique (LogicRequest), cohérent sur tout le flux."
+      verified_by: "Recommandation écrite avec exemples de renommage par variable."
+    - id: AC3
+      statement: "Challenger le renommage de MaintenanceMotionDirection (proposition : CoupledMotionDirection) — valider ou rejeter avec justification."
+      verified_by: "Analyse critique : usage réel (MAINT_N1/N2 + semi-auto), blast radius, risque."
+    - id: AC4
+      statement: "Estimer l'effort et le risque du renommage (blast radius, variables safety, gates)."
+      verified_by: "Estimation écrite : fichiers touchés, risque, effort."
+    - id: AC5
+      statement: "Aucun fichier CODE/ modifié — livrable = analyse/recommandation uniquement."
+      verified_by: "git status : aucun changement de code."
+
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_NAMING_FLUX_DONNEES.yaml
+    forbidden:
+      - CODE/ (aucune modification)
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Aucun code modifié — analyse seule."
+    dropped_on_purpose:
+      - "Aucun."
+
+  evidence_required:
+    - check_linkage          # inchangé (aucune modif code) — à confirmer
+    - run_all_gates          # inchangé
+
+  models_allowed:
+    - "codex/gpt-5.6-luna"
+    - "codex/gpt-5.6-sol"
+
+  alert_duty: >
+    Tout risque de sécurité, incohérence de spec ou blast radius important est
+    remonté immédiatement. Signaler n'est pas élargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: IN_PROGRESS
+
+execution:
+  executed_by: "codex/gpt-5.6-luna"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat cree. Delegation a codex/gpt-5.6-luna."
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "DeepSeek (Orchestrateur)"
+  validated_at: ""
+  notes: ""

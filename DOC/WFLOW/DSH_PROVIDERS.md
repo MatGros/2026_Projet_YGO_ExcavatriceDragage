@@ -19,15 +19,32 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 
 ---
 
-## 🧠 Modèles disponibles
-
-| ID (à utiliser) | Display name (affichage GUI) |
-|---|---|
-| `codex/gpt-5.6-luna` | codex/GPT 5.6 Luna |
-| `codex/gpt-5.6-sol` | codex/GPT 5.6 Sol |
-| *(à compléter après `réfetch` dans la GUI)* | |
+## 🧠 Modèles disponibles (catalogue `omniroute`)
 
 > L'**ID** est ce qu'on passe à l'override `model`. Le **display name** ne sert qu'à l'affichage.
+> ⚠️ Catalogue à **`réfetch`** dans la GUI si un ID ci-dessous 404 — l'ID exact prime toujours.
+
+### ⚡ Rapides — raisonnement rapide, recherche, modif de code
+
+| ID (à utiliser) | Statut (test 2026-08-16) |
+|---|---|
+| `codex/gpt-5.6-luna` | ✅ répond |
+| `kc/stepfun/step-3.7-flash:free` | ✅ répond (gratuit — raisonnement rapide) |
+| `ollamacloud/glm-5.2` | ✅ répond · ⭐ **recommandé** (qualité validée utilisateur) |
+| `nvidia/nvidia/nemotron-3-super-120b-a12b` | ✅ répond |
+
+### 🛠️ Profonds — raisonnement agentique, codage profond, refactoring
+
+| ID (à utiliser) | Statut (test 2026-08-16) |
+|---|---|
+| `claude/claude-sonnet-5` | ✅ répond (préfixe `claude/`) |
+| `codex/gpt-5.6-terra` | ✅ répond |
+| `codex/gpt-5.6-sol` | ✅ répond |
+
+> ✅ **Seuls les modèles ci-dessus sont confirmés utilisables** via le harness.
+> ⚠️ D'autres modèles existent côté gateway mais ne sont **pas** dans le catalogue harness
+> `omniroute` → `LlmError('UNKNOWN_MODEL')` → **non utilisables** tant qu'ils ne sont pas ajoutés
+> dans la GUI DSH (settings provider). Ne pas les intégrer tels quels.
 
 ---
 

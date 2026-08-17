@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T15:07:47.294879" />
-  <contentHeader name="v0.6.02_RefactorGateAndTest.project" modificationDateTime="2026-08-15T15:07:47.294879">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T00:35:41.826769" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T00:35:41.826769">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.02_RefactorGateAndTest</property>
+          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -1482,7 +1482,7 @@ instSimBench(
     M1_SpeedContactor_2      := GVL_Global.M1SpeedContactor2,
     M1_SpeedContactor_3      := GVL_Global.M1SpeedContactor3,
     M1_SpeedContactor_4      := GVL_Global.M1SpeedContactor4,
-    M1_SpeedRefPct           := PRG_04_Treuils_Benne.M1_SpeedRef_Active,
+    M1_SpeedRefPct           := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
     M1_PresetTriggerCmd      := instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderAbsM1.PresetValueOut,
     M1_BrakeCmd              := GVL_Global.M1BrakeCmd,
@@ -1492,7 +1492,7 @@ instSimBench(
     M2_SpeedContactor_2      := GVL_Global.M2SpeedContactor2,
     M2_SpeedContactor_3      := GVL_Global.M2SpeedContactor3,
     M2_SpeedContactor_4      := GVL_Global.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_04_Treuils_Benne.M2_SpeedRef_Active,
+    M2_SpeedRefPct           := PRG_04_Treuils_Benne.M2LogicRequestSpeedRef_Pct,
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
     M2_BrakeCmd              := GVL_Global.M2BrakeCmd,
