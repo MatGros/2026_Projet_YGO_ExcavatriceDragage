@@ -86,6 +86,11 @@ Détail complet (préfixes, suffixes d'unité, polarité booléenne, constructio
   image process), jamais comme boîte à variables communes.
 - **Une déclaration = un rôle documenté** : unité, plage et polarité en commentaire de fin de ligne
   quand elles ne sont pas évidentes dans le nom.
+- **Littéraux STRING en ASCII strict** : un littéral STRING (`'...'`) ne contient **aucun caractère
+  multi-octet** (emoji, tiret cadratin `—`, trait de cadre `═`). CODESYS n'interprète pas les STRING
+  en UTF-8 par défaut → un caractère multi-octet casse la compilation (C0555 + erreurs en cascade,
+  REX 2026-08-17 `FB_Hmi_BannerFormatter`). Les accents latins (é, è, à) sont tolérés ; les emojis
+  restent autorisés dans les **commentaires**. Contrôle : `G405_check_st_string_ascii.py`.
 - **`VAR_IN_OUT` est réservé** au partage intentionnel et documenté d'un objet. Il ne sert jamais
   à contourner une interface ni à autoriser un second écrivain.
 - **`PERSISTENT`/`RETAIN`** : uniquement pour un réglage qui doit survivre à un redémarrage.

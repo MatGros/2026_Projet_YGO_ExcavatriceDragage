@@ -68,6 +68,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "380", "G380 — Persistance config",                       [sys.executable, f"{S}/G380_check_config_persistence.py", "."]),
     ("C", "390", "G390 — Fraicheur bundle",                         [sys.executable, f"{S}/G390_check_bundle_freshness.py", "."]),
     ("C", "400", "G400 — Syntaxe ST du bundle (no terminator)",     [sys.executable, f"{S}/G400_check_bundle_st_syntax.py", "."]),
+    ("C", "405", "G405 — Littéraux STRING ASCII (REX 2026-08-17)",   [sys.executable, f"{S}/G405_check_st_string_ascii.py", "."]),
     ("C", "410", "G410 — Invariants LD (tous les POU `_LD`, REX 2026-08-04/13)", [sys.executable, f"{S}/G410_check_ld_invariants.py", "."]),
     ("C", "420", "G420 — PyTest (gates + convertisseur)",           [str(_py313()), "-m", "pytest",
                                                                      "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
