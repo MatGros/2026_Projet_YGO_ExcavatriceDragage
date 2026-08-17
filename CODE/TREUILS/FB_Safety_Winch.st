@@ -33,7 +33,7 @@
         principe que `M1_M2_TopPositionSensor`, câblé IDENTIQUEMENT sur
         les 2 instances) : mou de câble détecté (descente non arrêtée à
         temps) → bit3 ErrorId (visible IHM, reset front requis dès que la
-        cause disparaît) → sortie **`ForbidDescent`** DÉDIÉE, DISTINCTE de
+        cause disparaît) → sortie **`DescendPermit`** DÉDIÉE, DISTINCTE de
         `SafeStop` — bloque UNIQUEMENT la descente (`FB_Winch.RelayRev`),
         la remontée (`RelayFwd`) reste libre pour permettre à l'opérateur
         d'aller vérifier le câblage. Nouveau pattern (pas un simple
@@ -92,7 +92,7 @@
       modèle à 3 couches en fonctionnement NORMAL (hors référencement) à l'approche du capteur
       haut : (1) ~arrêt rampé normal à `HomingTargetMx_M - WinchTopStopMarginM` (voir
        `PRG_TREUILS_CFC.st`, gardé par `HomingApproachEnable` désormais — REX 2026-07-08 (2)) ;
-      (2) coupure immédiate `ForbidAscent` si le capteur physique est réellement atteint (bit5,
+      (2) coupure immédiate `AscentPermit` si le capteur physique est réellement atteint (bit5,
       déjà existant) ; (3) **Méca D** : si malgré la coupure (2), les contacteurs ET le frein ne
       confirment pas être retombés/serrés dans `PostRampTimeout` → `SafeStop` ET `PowerCutOff` —
       même motif exact que Méca B (`TonMecaD`, même vérification), juste une condition d'armement
@@ -113,13 +113,13 @@
         `PostRampTimeout` → `SafeStop` ET `PowerCutOff` (dernier recours, même logique que Méca
         B/D : la rampe seule n'a visiblement pas suffi à arrêter réellement le treuil).
    🔴🔧 REX 2026-08-07 — BypassGlobal DÉSACTIVAIT LES FINS DE COURSE PHYSIQUES (demande client,
-      audit confirmé à 100% par lecture directe du fichier) : `ForbidAscent`/`ForbidDescent`
+      audit confirmé à 100% par lecture directe du fichier) : `AscentPermit`/`DescendPermit`
       étaient calculés puis ANDés avec `NOT BypassGlobal` en toute fin de logique — même le check
       brut indépendant du capteur haut (déjà conçu pour "rester actif" selon son propre commentaire
       REX 2026-07-08) se retrouvait masqué. Concrètement : `Bypass.Global` sur M1/M2 empêchait
       l'arrêt réel sur fin de course haute/basse au joystick, aucun crash mécanique visible tant
       que l'opérateur ne relâchait pas. Corrigé : `BypassGlobal` retiré des deux formules finales
-      (`ForbidAscent`/`ForbidDescent`) — seuls `BypassTopLimitSwitch`/`BypassCableLimitSwitch`
+      (`AscentPermit`/`DescendPermit`) — seuls `BypassTopLimitSwitch`/`BypassCableLimitSwitch`
       (individuels, conscients) peuvent désormais lever CES deux protections précises. Le reste du
       domaine (Méca A-E, thermique, phase, comm, sync, codeur) reste masqué par `BypassGlobal`
       exactement comme avant — changement strictement limité aux 2 fins de course physiques.
@@ -134,7 +134,7 @@
       `GVL_IHM.Commun.LimitLegalReached` n'était consommé QUE par `FB_Cycle` (séquenceur
       semi-automatique) — la descente manuelle au joystick M1/M2 pouvait dépasser la profondeur
       légale sans AUCUN blocage réel. Ajouté : `LimitLegalReached`/`BypassLimitLegal` en entrée,
-      nouveau terme OR direct sur `ForbidDescent` (pas de nouveau bit `ErrorId` : les 16 bits du
+      nouveau terme OR direct sur `DescendPermit` (pas de nouveau bit `ErrorId` : les 16 bits du
       WORD sont déjà tous utilisés). Bypassable par `BypassProcess` (groupé) ou `BypassLimitLegal`
       (individuel, `ST_BypassWinch.LimitLegal`, MAINT_N2) — jamais par `BypassGlobal` seul.
    ═══════════════════════════════════════════════════════════════ *)
@@ -200,7 +200,7 @@ VAR_INPUT
     // 🌐 Bypass Global : si TRUE, force ErrorId=0 et saute toutes les vérifications
     BypassGlobal              : BOOL := FALSE;
     BypassSafety          : BOOL := FALSE;   // 🛡️ Bypass groupé PowerCutOff (bits 2,7,8,9,10,11,13)
-    BypassProcess         : BOOL := FALSE;   // ⚙️ Bypass groupé SafeStop/Forbid seul (bits 0,1,3,4,5,6,12,14,15) + limite légale (hors bit, ErrorId plein)
+    BypassProcess         : BOOL := FALSE;   // ⚙️ Bypass groupé SafeStop/Permit seul (bits 0,1,3,4,5,6,12,14,15) + limite légale (hors bit, ErrorId plein)
     BypassTopLimitSwitch  : BOOL := FALSE;   // 🚧 Bypass individuel fin de course haute PHYSIQUE (capteur, bit5)
     BypassTopLimitSoftware: BOOL := FALSE;   // 🆕 2026-08-07 : Bypass individuel fin de course haute LOGICIEL (position calculée, hors bit)
     BypassCableLimitSwitch: BOOL := FALSE;   // 🚧 Bypass individuel limite basse câble (bit6)
@@ -340,7 +340,7 @@ END_IF;
 // position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
 // (TopPositionSensor=FALSE), qu'on n'est pas en phase de référencement (homing), ET qu'on
 // commande un mouvement vers le haut (Direction > 0), alors on lève le défaut.
-// 🔧 REX 2026-08-07 (demande client, suite fix ForbidAscent/ForbidDescent) : SORTI du bloc
+// 🔧 REX 2026-08-07 (demande client, suite fix AscentPermit/DescendPermit) : SORTI du bloc
 // "IF NOT BypassGlobal" ci-dessous — même doctrine que le blocage réel (§4) : BypassGlobal M1/M2
 // ne doit masquer NI le mouvement NI l'alarme IHM de ces 2 fins de course physiques. Seuls
 // BypassProcess (groupé, conscient) ou BypassTopLimitSwitch (individuel) peuvent encore éteindre
@@ -409,7 +409,7 @@ END_IF;
 
 // 🔍 3quater. MOU DE CÂBLE (physiquement sur tambour M2, câblé sur les 2 instances Safety)
 // Mode NORMAL (SyncEnable=TRUE) → SafeStop M1+M2 (bit3 inclus dans SafeStop)
-// Mode RÉCUPÉRATION (SyncEnable=FALSE) → ForbidDescent uniquement (descente interdite pour ne pas dérouler, montée OK pour retendre/fermer)
+// Mode RÉCUPÉRATION (SyncEnable=FALSE) → DescendPermit uniquement (descente interdite pour ne pas dérouler, montée OK pour retendre/fermer)
 IF NOT BypassProcess AND SlackCableDetected THEN
     ErrorId := ErrorId OR 16#0008;
 ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
@@ -487,10 +487,10 @@ END_IF;
 
 // 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT (REX 2026-07-08 (3),
 // demande utilisateur) — bit11
-// Complète le bit5 (ForbidAscent immédiat) : arme la MÊME condition (capteur haut atteint, hors
+// Complète le bit5 (AscentPermit immédiat) : arme la MÊME condition (capteur haut atteint, hors
 // homing) mais avec un délai de confirmation, comme Méca B. Si les contacteurs ET le frein ne
 // confirment pas être retombés/serrés dans PostRampTimeout après l'arrivée au capteur → défaut
-// → SafeStop ET PowerCutOff (la coupure ForbidAscent seule n'a visiblement pas suffi à arrêter
+// → SafeStop ET PowerCutOff (la coupure AscentPermit seule n'a visiblement pas suffi à arrêter
 // réellement le treuil : roue libre ou contacteur/frein défaillant).
 TonMecaD(
     IN := NOT (BypassSafety OR BypassMecaD) AND ((((NOT TopPositionSensor AND NOT InReferencingMode) 
@@ -579,7 +579,7 @@ ELSE
 END_IF;
 
 // ⬇️ DescendPermit : TRUE = descente autorisée (pas de limite basse, pas de mou câble en mode récup, contacteur engagé)
-// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (Permit = NOT Forbid).
+// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 DescendPermit := NOT (
     (((ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
@@ -588,7 +588,7 @@ DescendPermit := NOT (
 );
 
 // ⬆️ AscentPermit : TRUE = montée autorisée (pas de fin course haut, pas de dépassement position)
-// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (Permit = NOT Forbid).
+// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 AscentPermit := NOT (
     (((ErrorId AND 16#0020) <> 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
@@ -605,7 +605,7 @@ AscentPermit := NOT (
 // mécanique dans ce cas, coupure puissance immédiate nécessaire. Même raisonnement appliqué au
 // thermique moteur par cohérence/défense en profondeur (demande explicite).
 // 🆕 REX 2026-07-08 (3) : bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B :
-// contacteurs/frein déjà censés être coupés (ForbidAscent immédiat sur capteur), une confirmation
+// contacteurs/frein déjà censés être coupés (AscentPermit immédiat sur capteur), une confirmation
 // manquante après délai signifie que la coupure locale n'a pas suffi.
 // 🆕 REX 2026-07-08 (4) : bit13 (Méca E escalade) ajouté — PAS bit12 seul (détection immédiate =
 // SafeStop uniquement ; PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).

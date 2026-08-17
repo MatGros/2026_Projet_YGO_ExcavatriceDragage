@@ -1,14 +1,14 @@
 # AGENT_WORKFLOW — Orchestration, Gates & Policies
 
-Package Python + Pi Coding Agent pour automatiser et fiabiliser le workflow CODESYS.
+Package Python pour automatiser et fiabiliser le workflow CODESYS.
 
 ```text
 TOOLS/AGENT_WORKFLOW/
 ├── src/agent_workflow/          # Code importable (scripts, gates, utils)
 ├── scripts/                     # Points d'entrée CLI (installés via pyproject.toml)
-├── skills/                      # Skills Pi Coding (codesys-change, codesys-review, ...)
+├── skills/                      # Skills (codesys-change, codesys-review, ...)
 ├── prompts/                     # Prompts standardisés (requirement-intake, release-check, ...)
-├── schemas/                     # JSON Schemas (herdr_review, requirement_intake)
+├── schemas/                     # JSON Schemas (requirement_intake)
 ├── docs/                        # Policies (SAFETY, WORKFLOW, TOKEN, DOC_WRITING, CODE_WRITING, ...)
 └── templates/                   # Gabarits (FB, PRG, GVL, spec, validation, ...)
 ```
@@ -99,7 +99,7 @@ check-codesys-compile --log build.log --strict
 
 ---
 
-## Skills Pi Coding Agent (dans `skills/`)
+## Skills (dans `skills/`)
 
 | Skill | Rôle |
 |---|---|
@@ -109,7 +109,9 @@ check-codesys-compile --log build.log --strict
 | `release-check` | Checklist fin de tâche avant intégration manuelle |
 | `requirement-intake` | Qualification `NEW_INFORMATION` avant tout code |
 
-Chargement auto dans Pi via `package.json` → `pi.skills`.
+📌 Ces skills ne sont pas découvertes automatiquement par Claude Code (seul `.claude/skills/`
+l'est) — ce sont des procédures de référence, pointées par `AGENTS.md`/`WORKFLOW.md`, pas
+chargées par un mécanisme de package.
 
 ---
 
@@ -122,7 +124,6 @@ Chargement auto dans Pi via `package.json` → `pi.skills`.
 | `TOKEN_POLICY.md` | Gestion budget tokens, context window, compression |
 | `DOC_WRITING_POLICY.md` | Style docs projet (concision, emoji, versioning) |
 | `CODE_WRITING_POLICY.md` | Style ST (headers, naming, contrats FB, sécurité) |
-| `INTEGRATIONS.md` | Pi Subagents (défaut), Herdr secours, Ponytail, config, modes |
 | `RELEASE_PROCESS.md` | Checklist fin de tâche |
 | `STRUCTURE_AND_CLEANUP.md` | Arborescence, archivage, nettoyage |
 
@@ -149,7 +150,6 @@ Chargement auto dans Pi via `package.json` → `pi.skills`.
 
 | Schema | Validation |
 |---|---|
-| `herdr_review.schema.json` | Rapports Herdr : `humanValidationRequired: true`, `validationStatus: advisory-only \| human-validated` |
 | `requirement_intake.schema.json` | Entrée `NEW_INFORMATION` : id, source, TBD, décision humaine obligatoire |
 
 ---
@@ -161,14 +161,6 @@ python -m pytest TOOLS/AGENT_WORKFLOW/scripts/ -v
 ```
 
 Tests : structure, style, bundle, pre-edit gate, compile check.
-
----
-
-## Intégration Pi Coding Agent
-
-1. Installer le package : `pip install -e TOOLS/AGENT_WORKFLOW`
-2. Dans Pi : `pi package add TOOLS/AGENT_WORKFLOW` (ou via `package.json` déjà présent)
-3. Skills auto-disponibles : `codesys-change`, `codesys-review`, `herdr-review`, `doc-sync`, `release-check`, `requirement-intake`
 
 ---
 

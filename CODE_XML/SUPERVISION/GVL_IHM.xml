@@ -209,7 +209,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ForbidDescentM1/M2_Raw)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1706,7 +1706,7 @@ TglEnableDumpAtTremie (bit IHM brut)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ForbidDescent M1/M2 forcé par ce mode (hors P1/Maintenance)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">DescendPermit M1/M2 forcé par ce mode (hors P1/Maintenance)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassDiveActive">

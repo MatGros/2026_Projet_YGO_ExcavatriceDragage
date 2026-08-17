@@ -183,7 +183,7 @@ Seule **l'affectation POU** change.
 > (qui réintroduirait la violation grave Homing→Modes). Le gel de sortie (`CablePosMSafe`) reste le
 > comportement naturel de la chaîne (option 3 validée).
 
-📌 Lot de migration : **M1** de `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
+📌 Lot de migration : **M1** (C4, rebuild) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 
 ---
 
@@ -246,8 +246,7 @@ Questions ouvertes à instruire, avec preuve de code à l'appui :
    touche-t-il une commande, un interlock ou une autorisation de mouvement ?
 
 ⛔ **Tant que ce point n'est pas tranché par l'utilisateur, le lot M1 ne peut pas déplacer
-`instHomingM1/M2`.** Référence pilotage : `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`
-§4, lot M1, point dur n°2.
+`instHomingM1/M2`.** Migration 7 POU soldée ; historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 
 ---
 

@@ -147,7 +147,7 @@ creait les cycles Safety <-> Treuils et Safety <-> Translation. Correspondance d
 | `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` | Devient aussi l'agrégateur `PowerCutOff` (Ladder). |
 | `PRG_SUPERVISION_CFC` + `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision` | Observation et diagnostic, lecture seule stricte (ST pur). |
 
-📌 Dossier de decision : `DOC/WFLOW/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
+📌 Décision d'architecture (7 POU par procédé) reportée dans `AF_Partie-02` §2/§4 ; historique de migration archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 **Aucun renommage ni fusion ne demarre sans lot dedie** : chaque etape exige remappage complet des
 consommateurs, producteur unique et preuve de liaison.
 

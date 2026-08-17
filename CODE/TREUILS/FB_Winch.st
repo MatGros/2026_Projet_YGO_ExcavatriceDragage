@@ -34,9 +34,9 @@
       codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
       uniquement pour l'instant — voir CODE/TREUILS/FB_Safety_Winch.st).
    🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
-      entrée `ForbidDescent` (sortie dédiée FB_Safety_Winch, DISTINCTE de
+      entrée `DescendPermit` (sortie dédiée FB_Safety_Winch, DISTINCTE de
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
-      `RelayFwd` (montée) toujours piloté normalement, mais `ForbidDescent`
+      `RelayFwd` (montée) toujours piloté normalement, mais `DescendPermit`
       déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
       en train de remonter — voir DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §4ter pour le contexte
       d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
@@ -48,12 +48,12 @@
       montée, les 5 paliers normaux restent inchangés (`MaxStepNumber := 5`).
       Ne change PAS la logique de décodage (voir FB_SpeedStep.st), juste le
       plafond fourni selon le sens.
-   🔧 CORRECTIF (2026-07-03vicies, demande utilisateur, AUDIT D72) : `ForbidDescent`
+   🔧 CORRECTIF (2026-07-03vicies, demande utilisateur, AUDIT D72) : `DescendPermit`
       (mou de câble) intègre désormais une VRAIE décélération rapide (comme `SafeStop`)
       via `EffectiveSafeStop`, au lieu d'un simple masquage brut de `RelayRev`. INHIBÉ
       quand `CommandedDirection = 1` (montée/enroulement en cours) : l'opérateur peut
       librement remonter pour reprendre le mou, sans déclencher de décélération. Le
-      masquage `RelayRev := FALSE` sur `ForbidDescent` reste EN PLUS, inconditionnel
+      masquage `RelayRev := FALSE` sur `DescendPermit` reste EN PLUS, inconditionnel
       (filet de sécurité direct, indépendant de la rampe).
    🔴🔧 REX 2026-07-07 : NOUVELLE DONNÉE TERRAIN — `ContactorFeedbackFwd`/`ContactorFeedbackRev`
       (retour individuel par sens) SUPPRIMÉS côté matériel, remplacés par UN SEUL retour par
@@ -155,7 +155,7 @@ VAR
     BusinessStepDelay    : TON;   // 🪜 Tempo métier nominale entre hausses de palier
     AllContactorsCommandedOff : BOOL; // 🔧 REX 2026-07-07
     RampTargetPct       : REAL;
-    EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (ForbidDescent hors montée)
+    EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (DescendPermit hors montée)
     ActiveMaxStep       : INT;    // 🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse
     FirstScanDone       : BOOL;
 END_VAR

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T05:39:25.076270" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-15T05:39:25.076270">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T02:50:38.737958" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T02:50:38.737958">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -584,7 +584,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX audit 2026-08-14 : le homing s'exécutait sans AUCUNE condition (Mode, treuil
 sélectionné, capteur haut, bornage cible déclarés en interface mais jamais lus). Gate
 différencié par chemin, validé avec l'utilisateur : le nominal capture AU FRONT du
-capteur haut (répétable à vitesse d'accostage constante — ForbidAscent de FB_Safety_Winch
+capteur haut (répétable à vitesse d'accostage constante — AscentPermit de FB_Safety_Winch
 coupe déjà la montée indépendamment, pas d'attente d'arrêt confirmé) ; l'unitaire exige
 le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt à l'appel
 (PRG_02_Acquisition.st, M2BucketRefRequested) — rien à ajouter ici pour ce chemin.
@@ -717,7 +717,7 @@ IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
     ErrorId := ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
 END_IF;
 
-// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — ForbidAscent
+// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
 // (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
 // attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
 // Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif

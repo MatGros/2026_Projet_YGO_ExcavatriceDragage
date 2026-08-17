@@ -78,7 +78,7 @@ VAR
     // 🆕 REX audit 2026-08-14 : le homing s'exécutait sans AUCUNE condition (Mode, treuil
     // sélectionné, capteur haut, bornage cible déclarés en interface mais jamais lus). Gate
     // différencié par chemin, validé avec l'utilisateur : le nominal capture AU FRONT du
-    // capteur haut (répétable à vitesse d'accostage constante — ForbidAscent de FB_Safety_Winch
+    // capteur haut (répétable à vitesse d'accostage constante — AscentPermit de FB_Safety_Winch
     // coupe déjà la montée indépendamment, pas d'attente d'arrêt confirmé) ; l'unitaire exige
     // le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt à l'appel
     // (PRG_02_Acquisition.st, M2BucketRefRequested) — rien à ajouter ici pour ce chemin.
@@ -160,7 +160,7 @@ IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
     ErrorId := ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
 END_IF;
 
-// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — ForbidAscent
+// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
 // (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
 // attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
 // Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif

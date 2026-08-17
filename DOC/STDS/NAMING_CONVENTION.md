@@ -78,7 +78,7 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 > 🗺️ **Cette table ne decide rien : elle recopie la cible de `AF_Partie-02` §2 et §4**, seule
 > source de l'architecture. Elle sert uniquement a fixer l'orthographe des noms.
 > Le decoupage est fait **par ensemble mecanique**, pas par couche transverse : chaque procede
-> porte sa safety dans sa propre page. Decision : `DOC/WFLOW/AUDITS/Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`.
+> porte sa safety dans sa propre page. Décision reportée dans `AF_Partie-02` §2/§4 ; historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 
 | Rang | Nom cible | Langage / source |
 |---|---|---|
@@ -111,11 +111,11 @@ Aucun n'est un nom cible : ils sont absorbes par la page du procede correspondan
 | `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` |
 | `PRG_SUPERVISION_CFC`, `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision` |
 
-⛔ **Aucun renommage, fusion ou conversion CFC natif ne demarre sans lot dedie** : chaque etape
+⛔ **Aucun renommage, fusion ou conversion ne demarre sans lot dedie** : chaque etape
 exige le remappage complet des consommateurs avant suppression de l'ancien producteur, un
-producteur unique a tout instant, et une preuve de liaison. Ordonnancement des lots M0→M8, avec
-M7 (renumerotation) verrouille tant qu'un cycle inter-programme subsiste :
-`DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`.
+producteur unique a tout instant, et une preuve de liaison. La renumérotation 7 POU
+(`PRG_02`→`PRG_07`) est **soldée** ; la conversion CFC natif est **abandonnée** (code en ST +
+PLCopenXML). Historique : `ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`.
 
 ### Instances FB
 - Préfixe **`inst`** + rôle PascalCase : `instJoystick`, `instSafetyWinchM1`.

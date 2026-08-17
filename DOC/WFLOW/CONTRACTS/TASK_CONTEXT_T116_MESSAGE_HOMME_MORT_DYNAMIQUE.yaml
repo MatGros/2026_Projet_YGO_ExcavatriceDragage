@@ -1,0 +1,86 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T116_MESSAGE_HOMME_MORT_DYNAMIQUE
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T116_MESSAGE_HOMME_MORT_DYNAMIQUE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Rendre le message homme-mort de l'IHM dynamique selon l'état réel, au lieu du
+    texte figé « Actionner l'axe avec homme-mort maintenu ». Trois états :
+    non armé / armé-neutre / déplacement. Refonte limitée au message
+    OperatorActionText du bandeau — aucune logique machine modifiée.
+    Critères structurels : nom de fichier = nom de POU
+    suffixe de langage = langage bundle (ST, pas de suffixe _CFC/_LD)
+
+  acceptance:
+    - id: AC1
+      statement: "Le message homme-mort est dynamique selon l'état : ① non armé → « Appuyer sur l'homme-mort au neutre pour armer » · ② armé + neutre → « Armé — actionner l'axe » · ③ déplacement → « Déplacement en cours »."
+      verified_by: "Lecture du code FB_Hmi_BannerFormatter.st — logique à 3 états sur DeadmanArmed + AtNeutral."
+    - id: AC2
+      statement: "Le message ne montre plus le texte figé « Actionner l'axe avec homme-mort maintenu » en MAINT_N1/N2."
+      verified_by: "Lecture du code — ce littéral supprimé/remplacé."
+    - id: AC3
+      statement: "Aucune logique machine modifiée (mouvement, interlocks, safety) — refonte texte IHM uniquement."
+      verified_by: "G200_check_linkage.py — aucune instance métier modifiée."
+    - id: AC4
+      statement: "Les états sont dérivés des signaux existants (DeadmanArmed, JoystickAtNeutral) — pas de nouveau signal nécessaire."
+      verified_by: "Lecture du code — entrées existantes utilisées."
+    - id: AC5
+      statement: "La liaison passe (G200)."
+      verified_by: "python G200_check_linkage.py --report — PASS."
+    - id: AC6
+      statement: "nom de fichier est identique au nom de POU et suffixe de langage est identique au langage bundle pour les POU de CODE/MAIN modifiés"
+      verified_by: "G200_check_linkage.py --report"
+
+  scope:
+    allowed:
+      - CODE/SUPERVISION/FB_Hmi_BannerFormatter.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_T116_MESSAGE_HOMME_MORT_DYNAMIQUE.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - Tout autre FB/PRG hors scope
+
+  conservation:
+    must_survive:
+      - "Aucun changement de logique machine."
+      - "Les autres messages du bandeau (GlobalContextText, SequenceProgressText, SpecialConditionText) inchangés."
+    dropped_on_purpose:
+      - "Texte figé « Actionner l'axe avec homme-mort maintenu » remplacé par 3 états dynamiques."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+
+  models_allowed:
+    - "codex/gpt-5.6-luna"
+    - "codex/gpt-5.6-sol"
+
+  alert_duty: >
+    Tout doute sur la sémantique homme-mort (maintien continu vs armement initial)
+    est remonté immédiatement. Ne pas élargir le périmètre.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "codex/gpt-5.6-luna"
+  completed_at: "2026-08-17"
+  status: COMPLETED
+  summary: "Message homme-mort dynamique (3 états) implémenté dans FB_Hmi_BannerFormatter. Liaison PASS. Bundle PASS."
+  evidence_submitted:
+    - "G200_check_linkage: PASS (65 OK, 0 KO)"
+    - "bundle: 169/169 objets"
+
+validation:
+  status: PENDING
+  validated_by: "DeepSeek (Orchestrateur)"
+  validated_at: ""
+  notes: ""

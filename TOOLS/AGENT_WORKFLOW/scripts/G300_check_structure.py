@@ -13,7 +13,6 @@ WORKFLOW_DIRS = {
     "templates",
     "skills",
     "prompts",
-    "extensions",
     "scripts",
     "schemas",
     "config",

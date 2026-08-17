@@ -35,14 +35,19 @@ TOOLS/AGENT_WORKFLOW/
 ├─ templates/
 ├─ skills/
 ├─ prompts/
-├─ extensions/
 ├─ scripts/
 ├─ schemas/
 ├─ config/
+├─ tasks/
 └─ reports/
 ```
 
-`reports/` contient uniquement les sorties temporaires du workflow.
+`reports/` contient uniquement les sorties temporaires du workflow — **dossier optionnel, non créé
+tant qu'un script n'y écrit rien** ; ne pas le créer vide « au cas où ».
+
+📌 `extensions/` retiré le 2026-08-17 : c'était le dossier des extensions Pi Coding Agent
+(`.pi/agent/extensions/*.ts`, ex. `sound-notifier.ts`), workflow abandonné. Aucune extension
+`.ts` n'a de rôle dans ce projet — ne pas recréer ce dossier.
 
 ### Outil existant
 
@@ -71,9 +76,8 @@ ses modules dans `AGENT_WORKFLOW/`.
 - Documentation : `UPPER_SNAKE_CASE.md`.
 - Skills : dossier kebab-case + `SKILL.md`.
 - Prompts : nom court kebab-case `.md`.
-- Scripts : `snake_case.py`.
+- Scripts : gates numérotés `GNNN_check_nom.py`, autres `snake_case.py`.
 - Schémas : nom métier `.schema.json`.
-- Extensions : nom métier kebab-case `.ts`.
 
 ## 3. Suppression et nettoyage
 

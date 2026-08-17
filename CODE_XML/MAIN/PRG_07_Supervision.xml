@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T01:49:23.171932" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T01:49:23.171932">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T02:47:22.160247" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T02:47:22.160247">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1240,7 +1240,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ForbidDescentM1/M2_Raw)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2363,7 +2363,7 @@ TglEnableDumpAtTremie (bit IHM brut)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ForbidDescent M1/M2 forcé par ce mode (hors P1/Maintenance)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">DescendPermit M1/M2 forcé par ce mode (hors P1/Maintenance)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassDiveActive">
@@ -6097,11 +6097,20 @@ instHmiBannerFormatter(
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    SafeStopActiveAny     := GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop OR GVL_IHM.TranslationM3.Safety.SafeStop,
-    PowerCutOffActiveAny  := PRG_06_Outputs_LD.PowerCutOffActive,
-    DeadmanArmed          := PRG_02_Acquisition.JoystickDeadmanArmed,
-    JoystickAtNeutral     := PRG_02_Acquisition.instJoystick.AtNeutral,
-    CycleAutoBusy         := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO)
+    PowerCutOffActiveAny        := PRG_06_Outputs_LD.PowerCutOffActive,
+    SafeStopActive              := GVL_IHM.M1TreuilRetenue.Safety.SafeStop AND GVL_IHM.M2TreuilBenne.Safety.SafeStop,
+    DescendPermit               := GVL_IHM.M1TreuilRetenue.Safety.DescendPermit AND GVL_IHM.M2TreuilBenne.Safety.DescendPermit,
+    AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
+    BucketIsOpen                := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
+    DiveActive                  := GVL_IHM.DredgingAssist.State.DiveBusy,
+    TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent AND GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
+    CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
+    M1LogicRequestDirection     := PRG_04_Treuils_Benne.M1LogicRequestDirection,
+    M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
+    CycleRequestDirection       := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction,
+    DeadmanArmed                := PRG_02_Acquisition.JoystickDeadmanArmed,
+    JoystickAtNeutral           := PRG_02_Acquisition.instJoystick.AtNeutral,
+    CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy
 );
 GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 
@@ -7661,7 +7670,7 @@ END_IF;
                 <derived name="E_CycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Cycle &amp; Sous-cycles</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Cycle &amp; sous-cycles</xhtml>
               </documentation>
             </variable>
             <variable name="DiveState">
@@ -7694,7 +7703,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Dérogations &amp; Particularités</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Dérogations &amp; particularités</xhtml>
               </documentation>
             </variable>
             <variable name="BypassWinchM1Active">
@@ -7732,7 +7741,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Sécurité &amp; Consignes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Sécurité, causes et intention de direction</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -7740,14 +7749,71 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
-            <variable name="SafeStopActiveAny">
+            <variable name="PowerCutOffActiveAny">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="PowerCutOffActiveAny">
+            <variable name="SafeStopActive">
               <type>
                 <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND, bandeau conservateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DiveActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TopLimitReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoupledUserRequestDirection">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M1LogicRequestDirection">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="M2LogicRequestDirection">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="CycleRequestDirection">
+              <type>
+                <INT />
               </type>
             </variable>
             <variable name="DeadmanArmed">
@@ -7789,14 +7855,30 @@ END_IF;
                 <string length="30" />
               </type>
             </variable>
+            <variable name="CurrentDirection">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="DirectionBlocked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AnyBypassActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧠 FB_Hmi_BannerFormatter — Formateur du bandeau d'information IHM
    ───────────────────────────────────────────────────────────────
    📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
-   🎯 Responsabilité : assemble et arbitre les 4 champs de texte
-      normalisés du bandeau supérieur à partir des états typés des procédés.
+   🎯 Responsabilité : assemble les 4 textes du bandeau et expose
+      la cause observable du blocage courant, sans piloter la machine.
+   🛡️ Sécurité : priorité AU/puissance, SafeStop, puis interlocks métier.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -7805,15 +7887,15 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 IF NOT Enable THEN
-    Banner.GlobalContextText    := '';
-    Banner.SequenceProgressText := '';
-    Banner.SpecialConditionText := '';
-    Banner.OperatorActionText   := '';
+    Banner.GlobalContextText     := '';
+    Banner.SequenceProgressText  := '';
+    Banner.SpecialConditionText  := '';
+    Banner.OperatorActionText    := '';
     RETURN;
 END_IF;
 
 // ═══════════════════════════════════════════════════════════════
-// 1. GLOBAL CONTEXT TEXT [RÉEL/SIMU] [MODE] [COUPLAGE]
+// 1. CONTEXTE GLOBAL — aucun numéro d'étape ici
 // ═══════════════════════════════════════════════════════════════
 IF SimulationModeActive THEN
     PrefixContext := '[SIMULATION] ';
@@ -7822,14 +7904,10 @@ ELSE
 END_IF;
 
 CASE CurrentMode OF
-    E_Mode.DISABLE:
-        ModeStr := '[DÉSACTIVÉ]';
-    E_Mode.MAINT_N1:
-        ModeStr := '[MAINT_N1]';
-    E_Mode.MAINT_N2:
-        ModeStr := '[MAINT_N2]';
-    E_Mode.SEMI_AUTO:
-        ModeStr := '[SEMI-AUTO]';
+    E_Mode.DISABLE:  ModeStr := '[DÉSACTIVÉ]';
+    E_Mode.MAINT_N1: ModeStr := '[MAINT_N1]';
+    E_Mode.MAINT_N2: ModeStr := '[MAINT_N2]';
+    E_Mode.SEMI_AUTO: ModeStr := '[SEMI-AUTO]';
 ELSE
     ModeStr := '[MODE INCONNU]';
 END_CASE;
@@ -7839,115 +7917,122 @@ IF CurrentMode = E_Mode.SEMI_AUTO THEN
 ELSIF BothAxesCoupled THEN
     CouplingStr := ' [M1+M2 COUPLÉS]';
 ELSIF WinchSelected = 1 THEN
-    CouplingStr := ' [M1 RETENUE SEUL]';
+    CouplingStr := ' [M1 SEUL]';
 ELSIF WinchSelected = 2 THEN
-    CouplingStr := ' [M2 BENNE SEULE]';
+    CouplingStr := ' [M2 SEUL]';
 ELSE
     CouplingStr := ' [AUCUN AXE]';
 END_IF;
-
 Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 
 // ═══════════════════════════════════════════════════════════════
-// 2. SEQUENCE PROGRESS TEXT (Micro / Progression)
+// 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
 // ═══════════════════════════════════════════════════════════════
 IF HomingActive THEN
     IF HomingStepM1 &gt; 0 THEN
-        Banner.SequenceProgressText := 'Homing: RECHERCHE INDEX M1 EN COURS';
+        Banner.SequenceProgressText := 'Homing: INDEX HAUT M1';
     ELSIF HomingStepM2 &gt; 0 THEN
-        Banner.SequenceProgressText := 'Homing: RECHERCHE INDEX M2 EN COURS';
+        Banner.SequenceProgressText := 'Homing: INDEX HAUT M2';
     ELSE
-        Banner.SequenceProgressText := 'Homing: ATTENTE DECLENCHEMENT CAPTEUR HAUT';
+        Banner.SequenceProgressText := 'Homing: ATTENTE CAPTEUR HAUT';
     END_IF;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     CASE CycleStep OF
-        E_CycleStep.X0_PREPARATION:
-            Banner.SequenceProgressText := 'Cycle: PREPARATION (ATTENTE START)';
-        E_CycleStep.X1_HOMING:
-            Banner.SequenceProgressText := 'Cycle: REFERENCEMENT CODEURS';
-        E_CycleStep.X2_WORK_POS_SELECT:
-            Banner.SequenceProgressText := 'Cycle: SELECTION POSITION TRAVAIL';
-        E_CycleStep.X3_OPEN_BUCKET:
-            Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
+        E_CycleStep.X0_PREPARATION: Banner.SequenceProgressText := 'Cycle: PRÉPARATION';
+        E_CycleStep.X1_HOMING: Banner.SequenceProgressText := 'Cycle: RÉFÉRENCEMENT';
+        E_CycleStep.X2_WORK_POS_SELECT: Banner.SequenceProgressText := 'Cycle: POSITION TRAVAIL';
+        E_CycleStep.X3_OPEN_BUCKET: Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
         E_CycleStep.X4_DESCEND_OPEN:
             IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
-                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 02_RECHERCHE_IMMERSION';
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; IMMERSION';
             ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
-                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 03_PLONGEE_RECHERCHE_FOND';
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; RECHERCHE FOND';
             ELSIF DiveState = E_DiveSearchState.BOTTOM_CONFIRMED THEN
-                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; Kobold: 04_FOND_TOUCHE_CONFIRME';
+                Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; FOND CONFIRMÉ';
             ELSE
-                Banner.SequenceProgressText := 'Cycle: 01_DESCENTE_BENNE_OUVERTE';
+                Banner.SequenceProgressText := 'Cycle: DESCENTE BENNE OUVERTE';
             END_IF;
-        E_CycleStep.X5_BOTTOM_CONFIRMED:
-            Banner.SequenceProgressText := 'Cycle: 02_ATTENTE_FOND_TOUCHE';
-        E_CycleStep.X6_CLOSE_BUCKET:
-            Banner.SequenceProgressText := 'Cycle: 03_FERMETURE_BENNE_AU_FOND';
-        E_CycleStep.X7_CTRL_ASCENT:
-            Banner.SequenceProgressText := 'Cycle: 04_ARRACHAGE_ET_REMONTEE_LENTE_PALIER_1';
-        E_CycleStep.X8_ASCENT_LOADED:
-            Banner.SequenceProgressText := 'Cycle: 05_REMONTEE_NOMINALE_CHARGE';
-        E_CycleStep.X9_DRAIN_PAUSE:
-            Banner.SequenceProgressText := 'Cycle: 06_EGOUTTAGE_TEMPORISE';
-        E_CycleStep.X10_TRANSLATE_DUMP:
-            Banner.SequenceProgressText := 'Cycle: 07_DEPLACEMENT_TRANSLATION_VERS_TREMIE';
-        E_CycleStep.X11_OPEN_DUMP:
-            Banner.SequenceProgressText := 'Cycle: 08_DESCENTE_ET_OUVERTURE_BENNE_TREMIE';
-        E_CycleStep.X13_DONE_SYNC:
-            Banner.SequenceProgressText := 'Cycle: 10_CYCLE_TERMINE_PRET';
-        E_CycleStep.STABILIZING:
-            Banner.SequenceProgressText := 'Cycle: EN ATTENTE / STABILISATION';
+        E_CycleStep.X5_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
+        E_CycleStep.X6_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
+        E_CycleStep.X7_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: ARRACHAGE / MONTÉE LENTE';
+        E_CycleStep.X8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
+        E_CycleStep.X9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
+        E_CycleStep.X10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
+        E_CycleStep.X11_OPEN_DUMP: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+        E_CycleStep.X13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
+        E_CycleStep.STABILIZING: Banner.SequenceProgressText := 'Cycle: STABILISATION';
     ELSE
-        Banner.SequenceProgressText := 'Cycle: ETAPE EN COURS';
+        Banner.SequenceProgressText := 'Cycle: ÉTAPE EN COURS';
     END_CASE;
-ELSE
-    IF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
-        Banner.SequenceProgressText := 'Manuel: PILOTAGE DIRECT JOYSTICK / PUPITRE';
-    ELSE
-        Banner.SequenceProgressText := 'Machine: ARRETEE / NEUTRALISEE';
-    END_IF;
-END_IF;
-
-// ═══════════════════════════════════════════════════════════════
-// 3. SPECIAL CONDITION TEXT (Dérogations &amp; Avertissements)
-// ═══════════════════════════════════════════════════════════════
-IF BypassGlobalActive THEN
-    Banner.SpecialConditionText := '[DEROGATION] : Bypass global securite actif';
-ELSIF BypassWinchM1Active OR BypassWinchM2Active THEN
-    Banner.SpecialConditionText := '[DEROGATION] : Bypass treuil actif (surveillance inhibee)';
-ELSIF BypassTranslation THEN
-    Banner.SpecialConditionText := '[DEROGATION] : Bypass translation actif';
-ELSIF SyncDegradedActive THEN
-    Banner.SpecialConditionText := '[BRIDAGE] : Vitesse limitee Palier 1 (Ecart synchro M1/M2)';
-ELSIF LegalLimitReached THEN
-    Banner.SpecialConditionText := '[LIMITE] : Profondeur legale de dragage atteinte';
-ELSE
-    Banner.SpecialConditionText := 'Nominal : Aucune derogation active';
-END_IF;
-
-// ═══════════════════════════════════════════════════════════════
-// 4. OPERATOR ACTION TEXT (Consigne d'action requise)
-// ═══════════════════════════════════════════════════════════════
-IF NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
-    Banner.OperatorActionText := '[PUPITRE] Réarmer la chaîne AU physique et enclencher la puissance';
-ELSIF SafeStopActiveAny THEN
-    Banner.OperatorActionText := '[PUPITRE] Acquitter le défaut (Reset) et ramener le joystick au neutre';
-ELSIF CurrentMode = E_Mode.DISABLE THEN
-    Banner.OperatorActionText := '[IHM] Sélectionner un mode de marche actif (MAINT_N1, MAINT_N2 ou AUTO)';
-ELSIF NOT DeadmanArmed THEN
-    Banner.OperatorActionText := '[JOYSTICK] Maintenir la gâchette homme-mort au neutre pour armer';
-ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    IF CycleStep = E_CycleStep.X0_PREPARATION THEN
-        Banner.OperatorActionText := '[IHM] Appuyer sur Start Cycle pour lancer la séquence';
-    ELSIF CycleStep = E_CycleStep.STABILIZING THEN
-        Banner.OperatorActionText := '[JOYSTICK] Réarmer homme-mort puis réengager déflexion pour reprise';
-    ELSE
-        Banner.OperatorActionText := '[JOYSTICK] Maintenir déflexion active pour déroulement du cycle';
-    END_IF;
 ELSIF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
-    Banner.OperatorActionText := '[JOYSTICK] Actionner l axe souhaité avec homme-mort maintenu';
+    Banner.SequenceProgressText := 'Manuel: PILOTAGE DIRECT';
 ELSE
-    Banner.OperatorActionText := '[AUCUNE ACTION ATTENDUE]';
+    Banner.SequenceProgressText := 'Machine: ARRÊTÉE';
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 3. CONDITION SPÉCIALE — un seul indicateur bypass/simulation
+// ═══════════════════════════════════════════════════════════════
+AnyBypassActive := SimulationModeActive
+                OR BypassGlobalActive
+                OR BypassWinchM1Active
+                OR BypassWinchM2Active
+                OR BypassTranslation
+                OR BypassSyncActive;
+IF AnyBypassActive THEN
+    Banner.SpecialConditionText := '⚠️ Bypass actif';
+ELSIF SyncDegradedActive THEN
+    Banner.SpecialConditionText := '⚠️ Synchro bridée';
+ELSIF LegalLimitReached THEN
+    Banner.SpecialConditionText := '⚠️ Limite légale';
+ELSE
+    Banner.SpecialConditionText := '';
+END_IF;
+
+// ═══════════════════════════════════════════════════════════════
+// 4. ACTION — cause fixe, sécurité d'abord, sans rotation
+// ═══════════════════════════════════════════════════════════════
+IF CurrentMode = E_Mode.SEMI_AUTO THEN
+    CurrentDirection := CycleRequestDirection;
+ELSIF BothAxesCoupled THEN
+    CurrentDirection := CoupledUserRequestDirection;
+ELSIF WinchSelected = 1 THEN
+    CurrentDirection := M1LogicRequestDirection;
+ELSIF WinchSelected = 2 THEN
+    CurrentDirection := M2LogicRequestDirection;
+ELSE
+    CurrentDirection := 0;
+END_IF;
+
+DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
+                OR (CurrentDirection &gt; 0 AND NOT AscentPermit);
+
+IF NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
+    Banner.OperatorActionText := '[PUPITRE] Réarmer AU et puissance';
+ELSIF SafeStopActive THEN
+    Banner.OperatorActionText := '[PUPITRE] Acquitter SafeStop';
+ELSIF DirectionBlocked THEN
+    IF CurrentDirection &lt; 0 THEN
+        Banner.OperatorActionText := '[TREUIL] Descente interdite';
+    ELSE
+        Banner.OperatorActionText := '[TREUIL] Montée interdite';
+    END_IF;
+ELSIF DiveActive AND CurrentDirection &lt; 0 THEN
+    Banner.OperatorActionText := '[TREUIL] Attendre fin du Dive';
+ELSIF NOT BucketIsOpen AND CurrentDirection &lt; 0 THEN
+    Banner.OperatorActionText := '[BENNE] Ouvrir la benne';
+ELSIF TopLimitReached AND CurrentDirection &gt; 0 THEN
+    Banner.OperatorActionText := '[TREUIL] Limite haute';
+ELSIF NOT DeadmanArmed THEN
+    Banner.OperatorActionText := '[JOYSTICK] Appuyer homme-mort au neutre';
+ELSIF CurrentMode = E_Mode.DISABLE THEN
+    Banner.OperatorActionText := '[IHM] Sélectionner un mode';
+ELSIF CurrentMode = E_Mode.SEMI_AUTO AND CycleStep = E_CycleStep.X0_PREPARATION THEN
+    Banner.OperatorActionText := '[IHM] Démarrer le cycle';
+ELSIF JoystickAtNeutral THEN
+    Banner.OperatorActionText := '[JOYSTICK] Armé — actionner l''axe';
+ELSE
+    Banner.OperatorActionText := '[JOYSTICK] Déplacement en cours';
 END_IF;
 </xhtml>
           </ST>
@@ -8261,7 +8346,7 @@ GVL_Troubleshooting.ContexteMachineGlobal.Idx302_PowerContactorEngaged := HwIn.M
 GVL_Troubleshooting.ContexteMachineGlobal.Idx303_SafeStopActiveAny := WinchM1.Safety.SafeStop OR WinchM2.Safety.SafeStop OR Translation.Safety.SafeStop;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx304_PowerCutOffActiveAny := WinchM1.Safety.PowerCutOff OR WinchM2.Safety.PowerCutOff OR Translation.Safety.PowerCutOff;
 GVL_Troubleshooting.ContexteMachineGlobal.Idx401_HmiHeartbeatOk    := Commun.HeartbeatIhmOk;
-GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy     := CycleAutoBusy
+GVL_Troubleshooting.ContexteMachineGlobal.Idx402_CycleAutoBusy     := CycleAutoBusy;
 
 {endregion}
 
@@ -8277,7 +8362,7 @@ GVL_Troubleshooting.LevageSynchroniseM1M2.Idx303_M1_AscentPermit := WinchM1.Safe
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx304_M2_AscentPermit := WinchM2.Safety.AscentPermit;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx501_M1_CmdRelayFwd_DQ := WinchM1.State.RelayFwd;
 GVL_Troubleshooting.LevageSynchroniseM1M2.Idx502_M2_CmdRelayFwd_DQ := WinchM2.State.RelayFwd;
-// Idx201_JoyYRaw_Pct / Idx203_ArbitratedSpeed_Pct / Idx303-304_ForbidAscent / Idx401_SyncMotionAllowed /
+// Idx201_JoyYRaw_Pct / Idx203_ArbitratedSpeed_Pct / Idx303-304_AscentPermit / Idx401_SyncMotionAllowed /
 // Idx402-403_SetpointSpeed : non câblés — fiche §5.2 "(reste) champs à revoir un par un", laissés à
 // leur valeur d'initialisation, pas de calcul inventé (fiche §7).
 
@@ -8293,10 +8378,10 @@ GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx104_BrakeApplied := NOT HwIn.
 GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M1_ThermalOk_DI;
 
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedRef
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedRef;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM1.Cmd.BtnUp;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM1.Cmd.BtnDown;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM1SpeedRef_Pct
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM1SpeedRef_Pct;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx208_ArbitratedSpeed_Pct := M1LogicRequestSpeedRef_Pct;
@@ -8309,10 +8394,10 @@ GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx302_SafeStopActive := WinchM1
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx303_PowerCutOffActive := WinchM1.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_ForbidAscentEffective := NOT WinchM1.Safety.AscentPermit;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_AscentPermitEffective := WinchM1.Safety.AscentPermit;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx309_ForbidDescentEffective := NOT WinchM1.Safety.DescendPermit;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx309_DescendPermitEffective := WinchM1.Safety.DescendPermit;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx310_MecaFaultMask := WinchM1.Safety.ErrorId;
 
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx401_MotionAllowed := WinchM1.State.Ready;
@@ -8344,10 +8429,10 @@ GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx104_BrakeApplied := NOT HwIn.
 GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winch.M2_ThermalOk_DI;
 
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedRef
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.SpeedRef;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM2.Cmd.BtnUp;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM2.Cmd.BtnDown;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM2SpeedRef_Pct
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM2SpeedRef_Pct;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx206_ModeActive := Auth.Mode;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm := WinchM2.Bypass.OperatorComm;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx208_ArbitratedSpeed_Pct := M2LogicRequestSpeedRef_Pct;
@@ -8360,10 +8445,10 @@ GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx302_SafeStopActive := WinchM2
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := WinchM2.Safety.PowerCutOff;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_ForbidAscentEffective := NOT WinchM2.Safety.AscentPermit;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_AscentPermitEffective := WinchM2.Safety.AscentPermit;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := HwIn.Winch.M2_TensionedCable_DI;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx309_ForbidDescentEffective := NOT WinchM2.Safety.DescendPermit;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx309_DescendPermitEffective := WinchM2.Safety.DescendPermit;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx310_MecaFaultMask := WinchM2.Safety.ErrorId;
 
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx401_MotionAllowed := WinchM2.State.Ready;

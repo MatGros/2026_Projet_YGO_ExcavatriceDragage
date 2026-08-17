@@ -23,7 +23,7 @@ STRUCT
     DumpAtTremieAssistActive   : BOOL; (* Armé ET Mode MAINT_N1/N2 (mode réellement actif) *)
     DumpAtTremieAtTremie       : BOOL; (* M3_AtTremieStable *)
     DumpAtTremieBucketOpenArmed: BOOL; (* CmdOpen_IHM déclenché par ce mode *)
-    DumpAtTremieDescentLocked  : BOOL; (* ForbidDescent M1/M2 forcé par ce mode (hors P1/Maintenance) *)
+    DumpAtTremieDescentLocked  : BOOL; (* DescendPermit M1/M2 forcé par ce mode (hors P1/Maintenance) *)
     // 🆕 2026-08-07 (9) : diagnostic bypass séquence DiveSearch
     BypassDiveActive           : BOOL; (* TglBypassDiveSearchSequence armé (descente couplée en cours) *)
     BypassKoboldBottomTouched  : BOOL; (* Fond confirmé par le bypass (front montant Kobold en descente) *)

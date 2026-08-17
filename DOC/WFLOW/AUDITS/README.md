@@ -19,11 +19,10 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 | Dossier / fichier | Périmètre | Statut |
 |---|---|---|
 | `IHM_VARIABLES_MIGRATION.md` | Correspondance ancien → nouveau chemin des variables IHM | **Vivant** — à tenir à jour à chaque lot, sert au reparamétrage IHM/SCADA physique |
-| `Architecture/RU_C4_ARCHITECTURE_PROCEDES.md` | Découpage **par ensemble mécanique** : 7 POU, chaque procédé porte sa safety | **ACTÉE** — reportée dans `AF_Partie-02` §2/§4, qui reste la source unique de la cible |
-| `Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` | Ordonnancement des lots M0→M8, criticités, grille d'évaluation | **Vivant** — pilotage de la migration (T102) |
 
-> 🚫 Les deux fichiers ci-dessus sont les **seuls** documents d'architecture actifs. Tout autre
-> dossier C4 propose une cible abandonnée (safety séparée, 13 POU) : il est archivé, ne pas le suivre.
+> 🚫 La décision d'architecture (7 POU **par ensemble mécanique**, chaque procédé porte sa safety)
+> est **reportée dans `AF_Partie-02` §2/§4**, qui reste la source unique de la cible. Les docs de
+> migration M0→M8 sont **archivés** (`Architecture_Migration7POU/`), la migration étant soldée.
 
 ## 🎯 À quoi sert chaque document — pour reprendre le travail
 
@@ -41,7 +40,7 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 |---|---|
 | `../REGISTRE_Suivi_MiseEnService_v1.0.md` | **Consigner chaque séance d'essai** (mesures, constats, décisions). C'est là que doivent aller les relevés de T89, T90, T92, T95 — pas dans une conversation |
 | `../CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation_v1.0.md` | Mode d'emploi du banc : activation par domaine, tests, retour en réel |
-| `../AF_Partie-13_Fonction_Simulation_v2.0.md` · `../AF_Partie-14_Fonction_Troubleshooting_v1.0.md` | Architecture de la simulation · troubleshooting (`PRG_TROUBLESHOOTING_CFC` actuel, absorbé par `PRG_07_Supervision_CFC` en cible) |
+| `../AF_Partie-13_Fonction_Simulation_v2.0.md` · `../AF_Partie-14_Fonction_Troubleshooting_v1.0.md` | Architecture de la simulation · troubleshooting (absorbé par `PRG_07_Supervision`) |
 
 ---
 
@@ -71,6 +70,7 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 | `AF_Partie-14_PLC_Tests_Validation_v1.2.md` | Spec du framework de tests supprimé | `v0.5.1` |
 | `TEST_FRAMEWORK_AUDIT_v1.0.md` | Audit du framework de tests supprimé | `v0.5.1` |
 | `Architecture/` — 10 fichiers C4 : `PLAN_Reconstruction_C4`, `CONTRAT_C4_CANONIQUE`, `TABLE_POU_ACTIFS_VS_LEGACY`, `RU_C4_FINAL`, `SPEC_C4_2_Contrats_Publics_Minimaux`, `PLAN_Migration_C4_2_Contrats`, `BLOCAGE_C4_2_Reset_Encoder`, `PROPOSITION_C4_INTENTIONS_AMONT`, `TRACE_C4_SAFETY_MOUVEMENTS`, `PLAN_Migration_MainTask_CFC` | Analyse C4 fondée sur une **safety séparée des mouvements** (13 POU) | 2026-08 — **périmés** : la décision par procédés (`Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`) les remplace. 🚫 Ne jamais reconstruire cette cible. Conservés pour la traçabilité des cycles prouvés |
+| `Architecture_Migration7POU/` — 7 fichiers : `AUDIT_M0_GEL_ETAT_INITIAL`, `PLAN_EXECUTION_MIGRATION_7POU`, `REGISTRE_ARBITRAGES_MIGRATION`, `TEST_IMPORT_PRG_ACQUISITION_CFC_XML`, `EVALUATION_ARCHIVAGE_CODE_LEGACY`, `DIAGRAMME_ARCHITECTURE_CFC_TARGET`, `RU_C4_ARCHITECTURE_PROCEDES` | Migration vers l'architecture 7 POU (M0→M8) | 2026-08-16 — **soldée** : renumérotation M7 faite (`PRG_02`→`PRG_07`), conversion CFC natif **M8 abandonnée** (code en ST + PLCopenXML). Cible reportée dans `AF_Partie-02` §2/§4 |
 
 ---
 

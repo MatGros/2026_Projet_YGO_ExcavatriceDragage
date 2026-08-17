@@ -121,7 +121,7 @@ PLC ne remplace jamais cette chaine.
   pas ici et pas dans un POU safety global — qui n'existe pas dans la cible.
 - Aucune sortie physique : elles restent produites uniquement par `PRG_06_Outputs_LD`.
 
-📌 Lot de migration : **M1** de `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
+📌 Lot de migration : **M1** (C4, rebuild) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 Le référencement (`FB_Encoder_Homing`) n'appartient pas à cette frontière de mesure : il rejoint
 `PRG_04_Treuils_Benne_CFC`, où les autorisations de maintenance et la visibilité opérateur sont
 disponibles. Il consomme les faits publiés par l'acquisition (`RawPos`, `EncoderAvailable`, retours

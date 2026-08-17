@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T13:27:21.134945" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-15T13:27:21.134945">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T03:04:03.791297" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T03:04:03.791297">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1042,12 +1042,12 @@ Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
 Winch.COD1_Alarms              := 0;
 Winch.COD1_Warnings            := 0;
-Winch.COD1_DeviceState         := 4; // DEVICE_STATE RUNNING = 4 (bus OK)
+Winch.COD1_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING (bus OK)
 
 Winch.COD2_PosValue            := instSimEncoderM2.RawPosOut;
 Winch.COD2_Alarms              := 0;
 Winch.COD2_Warnings            := 0;
-Winch.COD2_DeviceState         := 4; // DEVICE_STATE RUNNING = 4
+Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
 
 
 {endregion}
@@ -1105,7 +1105,7 @@ END_IF;
 
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
-Translation.AC600_DeviceState    := 4; // DEVICE_STATE RUNNING = 4
+Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNING
 
 
 {endregion}
@@ -1152,7 +1152,7 @@ END_IF;
 Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount &gt; 0);
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
-Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
+Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 
 
 {endregion}

@@ -1,6 +1,11 @@
 # PROJECT_WORKSPACE — Environnement de travail du projet
 
-Configuration et mode d’emploi de l’environnement de développement du projet : **Pi**, **AGY Antigravity**, **Claude Code**, **OpenCode** (avec agents Orchestrateur, Codeur & Vérificateur intégrés), gates, **Herdr** et visualisation du workflow.
+Configuration et mode d’emploi de l’environnement de développement du projet : **AGY Antigravity**,
+**Claude Code**, **Codex**, **OpenCode** (avec agents Orchestrateur, Codeur & Vérificateur intégrés),
+gates et visualisation du workflow.
+
+> 📌 **Pi** et **Herdr** retirés le 2026-08-17 (workflow abandonné, voir `AGENTS.md` — délégation
+> désormais antigravity/Codex/agents Claude Code natifs).
 
 L’extension VS Code **Terminals Manager** est le mécanisme recommandé pour ouvrir manuellement des terminaux configurés dans ce projet.
 
@@ -10,20 +15,20 @@ Extension : `fabiospampinato.vscode-terminals`
 
 ## 🎯 Rôle
 
-Cet environnement ouvre, dans le terminal intégré VS Code, neuf onglets indépendants :
+Cet environnement ouvre, dans le terminal intégré VS Code, dix onglets indépendants :
 
 | Onglet | Commande | Rôle |
 |---|---|---|
-| **🥧 Pi** | `pi` | Agent de coding Pi dans le projet |
 | **🚀 AGY Antigravity** | `agy` | Agent Antigravity CLI dans le projet |
 | **🧠 Claude Code** | `claude` | Agent Claude Code CLI dans le projet |
 | **🦙 Claude Code (Ollama)** | `ollama launch claude --model gemma4:e4b` | Agent Claude Code local via Ollama (`gemma4:e4b`) |
 | **🔓 OpenCode** | `opencode --agent orchestrateur` | Interface OpenCode unique avec agents Orchestrateur, Codeur (`@codeur`) et Vérificateur (`@verificateur`) |
 | **🦙 OpenCode (Ollama)** | `ollama launch opencode --model gemma4:e4b` | Agent OpenCode local via Ollama (`gemma4:e4b`) |
 | **✅ Gates** | `python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys` | Contrôles Python du workflow |
-| **🤠 Herdr** | `herdr start-agent claude` | Agent Herdr/Claude optionnel |
 | **📊 Workflow Graph** | `python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header` | Génération de tous les diagrammes Mermaid |
 | **🌐 OmniRoute Server** | `omniroute` | Serveur OmniRoute |
+| **🤖 Codex (OpenAI)** | `codex` | Agent Codex CLI dans le projet |
+| **🦙 DSH (Ollama)** | `ollama launch dsh` | Agent DSH local via Ollama |
 
 Chaque terminal utilise la racine du projet comme répertoire courant :
 `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage`.
@@ -36,7 +41,7 @@ Chaque terminal utilise la racine du projet comme répertoire courant :
 4. Rechercher **Terminals Manager** — auteur **Fabio Spampinato**.
 5. Installer l’extension `fabiospampinato.vscode-terminals`.
 6. Si vous voulez que des terminaux s’ouvrent automatiquement au démarrage du workspace, installer également **Terminal Keeper** — auteur **Nguyen Ngoc Long**.
-7. Vérifier que Python, Pi, AGY (`agy`), Claude (`claude`) et Herdr sont disponibles dans le `PATH` si ces onglets sont utilisés.
+7. Vérifier que Python, AGY (`agy`), Claude (`claude`) et Codex (`codex`) sont disponibles dans le `PATH` si ces onglets sont utilisés.
 
 La configuration active lue par VS Code est versionnée à la racine dans :
 
@@ -50,11 +55,16 @@ Et une copie source est également présente dans le dossier de l'outil :
 TOOLS/PROJECT_WORKSPACE/terminals.json
 ```
 
+⚠️ **Les deux fichiers ne sont liés par aucun mécanisme** (pas de build, pas de symlink) — un
+copier-coller manuel. Elles ont déjà divergé une fois (onglets `Codex`/`DSH` ajoutés à `.vscode/`
+sans être reportés dans la copie source, corrigé le 2026-08-17). **Toute modification d'un des
+deux fichiers doit être reportée à l'identique dans l'autre dans le même geste.**
+
 ## ▶️ Utilisation
 
 L’ouverture de VS Code ne lance rien automatiquement (`autorun: false`).
 
-Pour lancer les sept onglets :
+Pour lancer les dix onglets :
 
 1. `Ctrl+Shift+P`
 2. Exécuter **Terminals: Run**
@@ -99,10 +109,9 @@ Tester dans un terminal VS Code :
 
 ```powershell
 python --version
-pi --version
 agy --version
 claude --version
-herdr --help
+codex --version
 ```
 
 Installer ou ajouter au `PATH` le programme manquant.

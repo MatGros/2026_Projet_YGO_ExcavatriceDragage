@@ -1,9 +1,13 @@
 # Routage des modèles
 
-> 🔧 **Révisé 2026-07-29.** La version précédente annonçait `omni/cc/claude-sonnet-5` comme
-> modèle de revue privilégié. Les 53 tâches réellement exécutées disaient autre chose
-> (`omni/cx/gpt-5.6-terra` en tête, 18×). Une règle de routage écrite mais jamais vérifiée
-> ne route rien — d'où le garde-fou `check_model_routing.py`, qui relit ce qui a *réellement* tourné.
+> 🔧 **Révisé 2026-08-17.** Pi Subagents/Herdr abandonnés. Le gate `G220_check_model_routing.py`
+> lisait `.pi-subagents/artifacts/*_meta.json` (modèle réellement exécuté) — ce dossier n'existe
+> plus, et ni antigravity ni Codex ne déposent d'équivalent structuré dans le dépôt. Le gate est
+> archivé (`ARCHIVES/Tools/AGENT_WORKFLOW/scripts/README.md`) plutôt que laissé à faire semblant
+> de vérifier (même décision que l'abandon de `PLC_TESTS` le 2026-07-26, `docs/TASK_CONTEXT.md`).
+> Ce document garde les principes de choix de modèle (toujours valides) et documente franchement
+> que le respect de ces principes n'est **plus vérifié automatiquement** — seulement par la
+> validation humaine et la double revue A/B (`SAFETY_POLICY.md`).
 
 ## 🧭 Deux notions à ne pas confondre
 
@@ -29,9 +33,8 @@ Un `reviewer` juge : la famille rapide lui est **interdite**, l'effort réduit e
 
 `antigravity/gemini-3.5-flash-medium` · `antigravity/gemini-3.5-flash-high`
 
-Aujourd'hui le `scout` tourne sur `nemotron-550b:low` ou `claude-sonnet-5:low` : on paie un très
-gros modèle bridé pour faire du repérage. Un modèle rapide n'est pas un compromis sur ce poste,
-c'est **le bon outil**.
+Pour un `scout` (repérage, cartographie), un modèle rapide n'est pas un compromis, c'est **le bon
+outil** — inutile de payer un gros modèle bridé pour du repérage.
 
 | Usage | Modèle |
 |---|---|
@@ -45,47 +48,47 @@ L'interdiction safety n'est pas un jugement sur le modèle : c'est la règle exi
 
 ## 🔀 Multi-modèle — pas la règle par défaut
 
+Voie exécutée par l'**orchestrateur** (agent Claude Code) qui délègue selon le besoin, via les
+agents natifs disponibles : **antigravity**, **Codex**, ou un **fork Claude Code**.
+
 | Voie | Analyse | Revue | Double A/B |
 |---|---|---|---|
-| C0–C1 Fast | Pi seul | — | — |
-| C2 Standard | modèle fort | avis ciblé optionnel | — |
-| C3 Standard | modèle fort | 1 Pi Subagent read-only si le risque le justifie | — |
-| C4 Safety | modèle fort **High Effort** | 2 Pi Subagents A/B read-only parallèles | ✅ **obligatoire** |
-| C4 + divergence | Pi + humain | l'humain tranche ; Herdr sur demande explicite | — |
+| C0–C1 Fast | orchestrateur seul | — | — |
+| C2 Standard | modèle fort | avis ciblé optionnel (1 agent natif read-only) | — |
+| C3 Standard | modèle fort | 1 agent natif read-only si le risque le justifie | — |
+| C4 Safety | modèle fort **High Effort** | 2 agents natifs A/B read-only parallèles | ✅ **obligatoire** |
+| C4 + divergence | orchestrateur + humain | l'humain tranche | — |
 
 ## 🔴 Double revue parallèle A/B (C4 uniquement)
 
 **Déclencheur** : TEST_DESIGN, ST généré, toute revue safety C4.
 
-1. Agent A reçoit le contexte complet (contrat de tâche + code), en read-only.
-2. Agent B reçoit **exactement le même contexte**, sans voir le résultat de A.
-3. Pi attend, lit, compare :
+1. Agent A (ex. antigravity) reçoit le contexte complet (contrat de tâche + code), en read-only.
+2. Agent B (ex. Codex, ou un fork Claude Code) reçoit **exactement le même contexte**, sans voir
+   le résultat de A.
+3. L'orchestrateur attend, lit, compare :
    - consensus → synthèse présentée à l'humain ;
    - divergence (≥1 point contradictoire) → 🚨 alerte + positions A/B côte à côte.
 
 **Règles** : pas de fusion automatique · aucun agent ne commit ni ne valide la safety ·
 Ponytail et famille rapide interdits sur toute analyse safety/normative/redondance.
 
-## ✅ Vérification — le routage est contrôlé, plus seulement déclaré
+## ⚠️ Vérification — non automatique, tracée dans le contrat de tâche
 
-Chaque `.pi-subagents/artifacts/*_meta.json` enregistre le modèle **réellement exécuté**.
-La preuve est donc déjà dans le dépôt ; il suffit de la lire.
+Sans artefact structuré équivalent à celui de Pi Subagents, le respect de ces règles **n'est plus
+contrôlé par un gate**. La garantie repose sur :
 
-```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/G220_check_model_routing.py            # gate (bloquant)
-python TOOLS/AGENT_WORKFLOW/scripts/G220_check_model_routing.py --inventory # qui a fait quoi
-```
+- `models_allowed` déclaré dans le `TASK_CONTEXT` de la tâche (`templates/task_contract.yaml`) ;
+- `human_validation_required` — l'automaticien vérifie que la voie suivie (simple/double revue)
+  correspond à la criticité annoncée, avant tout chargement CODESYS ;
+- le devoir d'alerte de l'orchestrateur si un agent délégué s'écarte de ces règles.
 
-| Contrôle | Détecte |
-|---|---|
-| `M1` | famille rapide sur un rôle de jugement — **erreur** (mention renforcée si sujet safety) |
-| `M2` | effort réduit sur un rôle de jugement — avertissement |
-| `M4` | fournisseur hors catalogue — routage non maîtrisé |
-
-📌 Les modèles autorisés d'une tâche se déclarent dans son **contrat de tâche**
-(`models_allowed`), pas dans un réglage séparé — voir `templates/task_contract.yaml`.
+Si un futur outil de délégation dépose un artefact structuré (modèle/rôle réellement exécuté),
+`ARCHIVES/Tools/AGENT_WORKFLOW/scripts/G220_check_model_routing.py` est réutilisable comme base :
+seule sa source de données (`.pi-subagents/`) est morte, sa logique de détection reste valide.
 
 ## 🔌 Fournisseurs
 
-Catalogue connu : `omni/` · `nvidia/` · `antigravity/` · `gh/` · `openrouter/` · `ollama/`.
+Catalogue connu : `antigravity/` · `openai/` (Codex) · `nvidia/` · `omni/` · `gh/` ·
+`openrouter/` · `ollama/`.
 Les clés ne sont **jamais** stockées dans le dépôt.

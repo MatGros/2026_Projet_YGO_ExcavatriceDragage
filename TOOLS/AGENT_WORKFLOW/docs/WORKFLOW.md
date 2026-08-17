@@ -5,8 +5,8 @@
 ```text
 Entrée (CODE_CHANGE ou NEW_INFORMATION)
 → 📚 Prise de connaissance (AF + état d'ensemble du programme) — AVANT de planifier
-→ 🏷️ Qualification criticité C0-C4 (Pi propose → humain valide)
-→ 🔀 Stratégie patch / rebuild (Pi propose → humain valide)
+→ 🏷️ Qualification criticité C0-C4 (orchestrateur propose → humain valide)
+→ 🔀 Stratégie patch / rebuild (orchestrateur propose → humain valide)
 → voie adaptée (Fast / Standard / Safety)
 → 📝 CONTRAT DE TÂCHE : objectifs testables (obligatoire dès C2)
 → artefacts obligatoires selon voie
@@ -87,7 +87,7 @@ remplacent le boilerplate de l'*acceptance contract*) et aux agents externes.
 ```text
 hook PreToolUse (bloque si specs non lues) → Plan → **validation humaine** → Code → Gates → ✅
 ```
-- Pas de multi-modèle, pas de REGISTRE, pas de revue Herdr.
+- Pas de multi-modèle, pas de REGISTRE, pas de revue complémentaire.
 - Gate 5 (compilation CODESYS) optionnel.
 
 ### 🔵 Standard Lane — C2-C3
@@ -96,9 +96,9 @@ hook PreToolUse (bloque si specs non lues) → Plan → **validation humaine** �
 ```text
 hook PreToolUse (bloque si specs non lues)
 → CONTRAT DE TÂCHE (obligatoire)
-→ REGISTRE_ACTIONS (proposé par Pi)
-→ TASK_CONTEXT.yaml (proposé par Pi)
-→ 0 ou 1 avis Pi Subagent ciblé (read-only)
+→ REGISTRE_ACTIONS (proposé par l'orchestrateur)
+→ TASK_CONTEXT.yaml (proposé par l'orchestrateur)
+→ 0 ou 1 avis d'agent natif ciblé (antigravity/Codex/fork Claude Code, read-only)
 → Plan → **validation humaine obligatoire** → Code → Gates → hook Stop
 → revue complémentaire seulement si anomalie ou demande humaine
 → ✅ Rapport
@@ -116,7 +116,7 @@ hook PreToolUse (bloque si specs non lues)
 → TASK_CONTEXT.yaml (obligatoire)
 → TEST_DESIGN.md (obligatoire)
 → ⚠️ ALERTE RISQUES explicite
-→ 🔴 DOUBLE AVIS Pi Subagents PARALLÈLES A/B (read-only, même contexte, sans se voir)
+→ 🔴 DOUBLE AVIS AGENTS NATIFS PARALLÈLES A/B (ex. antigravity + Codex, read-only, même contexte, sans se voir)
 → synthèse : consensus ✅ / divergence 🚨
 → **validation humaine obligatoire : artefacts + plan + décision safety**
 → Code ST (High Effort, un seul exécutant)
@@ -135,7 +135,7 @@ hook PreToolUse (bloque si specs non lues)
 
 ## 🏷️ Qualification criticité
 
-Pi qualifie et propose, l'humain valide en 1 mot.
+L'orchestrateur qualifie et propose, l'humain valide en 1 mot.
 
 | Niveau | Exemple | Artefacts |
 |---|---|---|
@@ -147,7 +147,7 @@ Pi qualifie et propose, l'humain valide en 1 mot.
 
 ## Règles générales
 
-- 📌 **Tout sous-agent (Pi worker/reviewer, Claude, Codex, antigravity) reçoit
+- 📌 **Tout sous-agent (fork Claude Code, Codex, antigravity) reçoit
   `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de sa tâche.** Un sous-agent
   démarre froid : sans ce préambule il ne connaît ni les règles, ni les cas d'arrêt, ni la
   vérification de liaison — c'est ce qui a laissé passer le bug `PRG_10_Outputs_LD`.
@@ -161,11 +161,9 @@ Pi qualifie et propose, l'humain valide en 1 mot.
 - Aucun commit automatique — validation humaine obligatoire.
 - Toute modification safety exige une validation humaine.
 - Ponytail est interdit dès qu'un sujet safety, norme ou redondance est détecté.
-- Les avis passent par Pi Subagents et restent read-only. Ils sont toujours attendus, lus et
-  synthétisés avant le plan ; aucun avis n'est lancé en arrière-plan.
-- Herdr est un secours explicite uniquement. S'il est utilisé, suivre le cycle bloquant
-  `start → handshake → wait → read → mission → wait → read → contrôle` décrit dans
-  `INTEGRATIONS.md`.
+- Les avis passent par des agents natifs (antigravity, Codex, forks Claude Code) et restent
+  read-only. Ils sont toujours attendus, lus et synthétisés avant le plan ; aucun avis n'est
+  lancé en arrière-plan sans être relu.
 
 ## 🕵️ Diagnostic / Recherche de blocage
 
