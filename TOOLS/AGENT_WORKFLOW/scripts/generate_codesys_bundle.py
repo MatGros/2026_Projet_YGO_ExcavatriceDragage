@@ -51,19 +51,30 @@ def main() -> int:
     # renomme/supprime reste orphelin en silence dans CODE_XML/ (ni generation ni gate
     # ne le detectait -- 4 fichiers morts trouves : FB_DigitalInputFilter, GVL_IHM_AU,
     # ST_Safety_Emergency_HmiCmd/HmiState). CODE_XML/ doit etre un miroir strict de
-    # CODE/, jamais un historique. Purge APRES la lecture du nom de projet ci-dessus :
-    # existing_project_name() a besoin de l'ancien bundle si --project-name est omis.
-    shutil.rmtree(out_dir, ignore_errors=True)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    # CODE/, jamais un historique.
+    #
+    # Generation ATOMIQUE dans un dossier temporaire, bascule seulement si les deux
+    # passes reussissent (revue 2026-08-17, code-review) : un rmtree(out_dir) direct
+    # laissait CODE_XML/ vide/absent si le generateur plantait apres la purge --
+    # G200_check_linkage.py traite un bundle absent comme "0 incoherence" (liste
+    # vide), donc le gate BLOQUANT de liaison passerait au vert a tort. `ignore_errors`
+    # est banni : un fichier verrouille (IDE CODESYS ouvert, antivirus) doit faire
+    # echouer bruyamment, jamais laisser un reliquat en silence.
+    tmp_dir = out_dir.parent / (out_dir.name + ".tmp")
+    if tmp_dir.exists():
+        shutil.rmtree(tmp_dir)
+    tmp_dir.mkdir(parents=True)
+
     command = [
         sys.executable, "-m", "generator.cli",
         "--code-dir", str(code_dir),
-        "--out-dir", str(out_dir),
+        "--out-dir", str(tmp_dir),
         "--bundle", "CODE_Bundle",
         "--project-name", project_name,
     ]
     result = subprocess.run(command, cwd=generator_dir)
     if result.returncode:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
         return result.returncode
 
     # Miroir un-fichier-par-objet dans CODE_XML/ : `--bundle` et le mode par objet sont
@@ -73,12 +84,20 @@ def main() -> int:
     per_object = [
         sys.executable, "-m", "generator.cli",
         "--code-dir", str(code_dir),
-        "--out-dir", str(out_dir),
+        "--out-dir", str(tmp_dir),
         "--project-name", project_name,
     ]
     result_objects = subprocess.run(per_object, cwd=generator_dir)
     if result_objects.returncode:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
         return result_objects.returncode
+
+    # Bascule : out_dir n'est jamais laisse vide/absent. Si la suppression de
+    # l'ancien contenu echoue (fichier verrouille), l'exception remonte -- pas de
+    # `ignore_errors` ici, sinon un reliquat pourrait survivre en silence a la bascule.
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    tmp_dir.rename(out_dir)
 
     return subprocess.run([sys.executable, str(freshness), str(root)]).returncode
 
