@@ -37,7 +37,7 @@
 - 🎯 **Périmètre** : Treuils M1/M2 — commande frein vs contacteurs de sens
 - 🚦 **Statut** : 🟢 **Implémenté (déjà dans le repo, daté 08/06)**
 - 🔍 **Constat / Décision** : Simplification : le frein est commandé **directement** par la commande des **contacteurs de sens** (`BrakeCmd := RelayFwd OR RelayRev`). Aucun écart frein/mouvement possible.
-- 🛠️ **Preuve code** : `CODE/TREUILS/FB_WinchOutputInterlock_LD.st:244` (`BrakeCmd := RelayFwd OR RelayRev`), `FB_WinchOutputInterlock_LD.st:13-15`, `FB_Winch.st:9` (+ câblage `PRG_06_Outputs_LD`).
+- 🛠️ **Preuve code** : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st:244` (`BrakeCmd := RelayFwd OR RelayRev`), `FB_WinchOutputInterlock_LD.st:13-15`, `FB_Winch.st:9` (+ câblage `PRG_06_Outputs_LD`).
 - 📌 **Action** : À tester au chargement `v0.5.9_IOTest` (séquence frein+sens).
 
 ---
@@ -47,7 +47,7 @@
 - 🎯 **Périmètre** : Benne M2 / translation M3 — mode vidage à la trémie, pilotage joystick
 - 🚦 **Statut** : 🟢 **Implémenté (déjà dans le repo, daté 08/07)**
 - 🔍 **Constat** : Ajout d'un **mode « au-dessus de la trémie »** où le **joystick commande l'ouverture** (de la benne).
-- 🛠️ **Preuve code** : `CODE/MAIN/PRG_04_Treuils_Benne.st:221-234` (`DumpAtTremieAssistActive` + `M3_AtTremieStable` → `DumpAtTremieBucketOpenArmed` → `CmdOpen_IHM`). Le mouvement réel reste gouverné par la demande joystick (`MotionRequestActive`/`MotionDirection`).
+- 🛠️ **Preuve code** : `CODE/M_MAIN/PRG_04_Treuils_Benne.st:221-234` (`DumpAtTremieAssistActive` + `M3_AtTremieStable` → `DumpAtTremieBucketOpenArmed` → `CmdOpen_IHM`). Le mouvement réel reste gouverné par la demande joystick (`MotionRequestActive`/`MotionDirection`).
 - 📌 **À valider** : comportement armement ouverture sur site au chargement `v0.5.9_IOTest`.
 
 ---
@@ -57,7 +57,7 @@
 - 🎯 **Périmètre** : Benne M2 — armement automatique ouverture/fermeture sur mouvement couplé joystick
 - 🚦 **Statut** : 🟢 **Implémenté** — Fiche 01 désactivée par défaut, pilotage repose sur DiveSearch/ExtractionSequence
 - 🔍 **Constat** : essais terrain → benne coincée en boucle (`M2_LimitShift` figé empêchait d'atteindre la cible fermeture), verrouillait M1/M2 en permanence (`instBucket.Busy`). Décision client : revenir au pilotage par modes le temps de fiabiliser.
-- 🛠️ **Solution** : `GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing` (défaut `FALSE`) — `CoupledDiveBucketOpenArmed`/`CoupledAscentBucketCloseArmed` figés `FALSE` tant que non réarmé. `M2_LimitShift` rendu dynamique (suit la position réelle de M1, plus une limite théorique figée). Preuve : `CODE/MAIN/PRG_04_Treuils_Benne.st` (§1, `M2_LimitShift`).
+- 🛠️ **Solution** : `GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing` (défaut `FALSE`) — `CoupledDiveBucketOpenArmed`/`CoupledAscentBucketCloseArmed` figés `FALSE` tant que non réarmé. `M2_LimitShift` rendu dynamique (suit la position réelle de M1, plus une limite théorique figée). Preuve : `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (§1, `M2_LimitShift`).
 - 📌 **Action** : ne réactiver le toggle qu'après validation terrain complète de la séquence.
 
 ### MES-023 — 🔴 Contacteur mesure Kobold jamais physiquement commandé
@@ -65,7 +65,7 @@
 - 🎯 **Périmètre** : Capteur Kobold — activation contacteur mesure (`M1_M2_KoboldMeasureEnable_DQ`)
 - 🚦 **Statut** : 🟢 **Corrigé**
 - 🔍 **Constat** : `KoboldContactorCmd` (`PRG_06_Outputs_LD`) déclaré mais **jamais assigné** — chaîne `instDiveSearch.KoboldMeasureEnable → KoboldContactorCmdArbitrated` s'arrêtait net, aucune erreur de compilation/gate pour le signaler. Même classe de bug que le fix frein M3 du 2026-08-05.
-- 🛠️ **Solution** : `KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;` + coil directe sur `M1_M2_KoboldMeasureEnable_DQ` (même pattern validé M1/M2/M3). Preuve : `CODE/MAIN/PRG_06_Outputs_LD.st` | Générateur PLCopenXML ST→LD | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | 🟢 Généralisé (Ladder standard) | `DIRECT_HW_COILS`.
+- 🛠️ **Solution** : `KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;` + coil directe sur `M1_M2_KoboldMeasureEnable_DQ` (même pattern validé M1/M2/M3). Preuve : `CODE/M_MAIN/PRG_06_Outputs_LD.st` | Générateur PLCopenXML ST→LD | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | 🟢 Généralisé (Ladder standard) | `DIRECT_HW_COILS`.
 - 📌 **Action** : confirmer import CODESYS propre (risque connu, REX 2026-08-04, validé sur M1/M2/M3).
 
 ### MES-024 — 🔴 Permis de mouvement `DescendPermit`/`AscentPermit` calculés mais jamais consommés
@@ -73,7 +73,7 @@
 - 🎯 **Périmètre** : Modes DiveSearch (descente) / ExtractionSequence (montée)
 - 🚦 **Statut** : 🟢 **Corrigé**
 - 🔍 **Constat** : `instDiveSearch.DescendPermit` et `instExtractionSequence.AscentPermit` calculés par leur FB respectif mais jamais lus dans `PRG_04`/`PRG_06` — rien n'empêchait réellement de descendre benne fermée (Dive) ou de monter sans fond confirmé (Extraction).
-- 🛠️ **Solution** : `ForbidDescentDiveBucketClosed` / `ForbidAscentExtractionBottomNotConfirmed`, blocage direct indépendant du timing interne des FB. Preuve : `CODE/MAIN/PRG_04_Treuils_Benne.st` (§5).
+- 🛠️ **Solution** : `ForbidDescentDiveBucketClosed` / `ForbidAscentExtractionBottomNotConfirmed`, blocage direct indépendant du timing interne des FB. Preuve : `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (§5).
 - 📌 **Action** : aucune, correctif autonome.
 
 ### MES-025 — 🟠 Palier vitesse M2 non plafonné pendant mouvement benne (contacteurs de vitesse)
@@ -81,7 +81,7 @@
 - 🎯 **Périmètre** : M2 — vitesse pendant ouverture/fermeture benne pilotée par `FB_Bucket`
 - 🚦 **Statut** : 🟢 **Corrigé**
 - 🔍 **Constat** : `instBucket.M2_ForceSlowSpeed` ("Bloque les contacteurs de vitesse de M2") ne substituait que la table de vitesse, ne plafonnait pas réellement `MaxStepAscent`/`CfgMaxStepDescente` — un contacteur de vitesse a été observé enclenché brièvement pendant `CLOSING_BUCKET` avant correctif.
-- 🛠️ **Solution** : `CfgMaxStepDescente`/`MaxStepAscent` (instWinchM2) suivent désormais `instBucket.M2_ForceSlowSpeed`. Preuve : `CODE/MAIN/PRG_04_Treuils_Benne.st` (§6, `instWinchM2`).
+- 🛠️ **Solution** : `CfgMaxStepDescente`/`MaxStepAscent` (instWinchM2) suivent désormais `instBucket.M2_ForceSlowSpeed`. Preuve : `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (§6, `instWinchM2`).
 - 📌 **Action** : ⚪ reproduction non confirmée après correctif — à surveiller sur prochains essais fermeture benne.
 
 ### MES-026 — 🟡 Bypass séquence DiveSearch (réglages seuils pas encore calibrés)
@@ -89,7 +89,7 @@
 - 🎯 **Périmètre** : DiveSearch — confirmation fond hors préconditions strictes
 - 🚦 **Statut** : 🟡 **À surveiller** — fonctionnel, réglages définitifs (`DiveStartMin_M`/`ImmersionUpper_M`/`ImmersionLower_M`) pas encore calibrés
 - 🔍 **Constat** : préconditions `WAIT_PRECONDITIONS` (benne ouverte, fenêtre immersion) bloquaient toute progression tant que les seuils n'étaient pas réglés — besoin d'un chemin de test simplifié pendant la mise en service.
-- 🛠️ **Solution** : `GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence` (défaut `FALSE`) — front montant Kobold pendant descente couplée confirme directement le fond ET bloque la descente (même doctrine que Fiche 05), sans passer par les préconditions. `FB_DiveSearch` continue de gérer le contacteur Kobold en parallèle (jamais désactivé). Preuve : `CODE/CYCLE/FB_DiveSearch.st` (`BypassPreconditions`), `CODE/MAIN/PRG_04_Treuils_Benne.st` (§1).
+- 🛠️ **Solution** : `GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence` (défaut `FALSE`) — front montant Kobold pendant descente couplée confirme directement le fond ET bloque la descente (même doctrine que Fiche 05), sans passer par les préconditions. `FB_DiveSearch` continue de gérer le contacteur Kobold en parallèle (jamais désactivé). Preuve : `CODE/G_CYCLE/FB_DiveSearch.st` (`BypassPreconditions`), `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (§1).
 - 📌 **Action** : régler `DiveStartMin_M`/`ImmersionUpper_M`/`ImmersionLower_M` définitivement, puis repasser le toggle à `FALSE`.
 - 🟡 **Suivi terrain (même jour, après essais)** : le bypass fonctionne (fond confirmé), mais `DredgingAssist.State.DiveErrorId = 2` (bit1, "séquence Kobold invalide") se déclenche quand même côté `FB_DiveSearch` — normal : ce FB continue de tourner en parallèle avec SA propre logique stricte (fenêtre immersion `ImmersionUpper_M`/`ImmersionLower_M`, pas encore calibrée, voir ci-dessus), indépendante du bypass. Obligation de faire un Reset manuel (`FaultMachineReset_IHM`) pour clear le défaut à chaque fois. Cause racine identique à l'action ouverte ci-dessus (seuils pas calibrés) — pas un bug distinct, mais gênant en pratique tant que non réglé.
 
@@ -98,7 +98,7 @@
 - 🎯 **Périmètre** : M2 — pilotage unitaire joystick (`SelJoystickWinch=2`)
 - 🚦 **Statut** : 🟢 **Implémenté** — défaut `TRUE` (demande client)
 - 🔍 **Constat** : besoin d'un jog libre M2 borné dans les limites benne (0 → `OffsetCloseM`, config) à vitesse bridée, sans passer par `instBucket` (pas de mémorisation `CloseReq`/`OpenReq`).
-- 🛠️ **Solution** : `GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits` (défaut `TRUE`) — actif uniquement en pilotage unitaire M2, borne `ForbidDescentM2`/`ForbidAscentM2` sur `CablePosM1 + OffsetOpenM/OffsetCloseM`, plafonne palier 1. Preuve : `CODE/SUPERVISION/_TYPES/ST_BucketCmd.st`, `CODE/MAIN/PRG_04_Treuils_Benne.st` (§5-6).
+- 🛠️ **Solution** : `GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits` (défaut `TRUE`) — actif uniquement en pilotage unitaire M2, borne `ForbidDescentM2`/`ForbidAscentM2` sur `CablePosM1 + OffsetOpenM/OffsetCloseM`, plafonne palier 1. Preuve : `CODE/J_SUPERVISION/_TYPES/ST_BucketCmd.st`, `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (§5-6).
 - 📌 **Action** : valider bornes réelles sur site (0 → 15m config actuelle).
 
 ### MES-028 — 🟠 Palier ralentissement fin de course haut trop bas si benne chargée

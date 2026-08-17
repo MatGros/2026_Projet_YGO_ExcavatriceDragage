@@ -55,7 +55,7 @@ CRITICALITY_REQUIRING_CONTRACT = {"C2", "C3", "C4"}
 # Un contrat touchant un PROGRAM doit rendre les deux controles structurels
 # explicites AVANT ecriture. Ce gate ne parse jamais le code : il valide que
 # l'orchestrateur a formule les preuves attendues dans le contrat.
-STRUCTURAL_SCOPE_PREFIX = "CODE/MAIN/"
+STRUCTURAL_SCOPE_PREFIXES = ("CODE/M_MAIN/", "CODE/MAIN/")
 # Une cooccurrence de mots est insuffisante : l'operateur relationnel doit
 # relier LOCALement les deux termes. Les motifs interdisent notamment de faire
 # passer « fichier est identique dans la revue ; POU documente » : un point, un
@@ -154,9 +154,9 @@ def has_placeholder(value: str) -> bool:
 
 
 def touches_program_main(allowed: list[str]) -> bool:
-    """Retourne True si scope.allowed autorise une ecriture dans CODE/MAIN."""
+    """Retourne True si scope.allowed autorise une ecriture dans CODE/MAIN ou CODE/M_MAIN."""
     normalized = [entry.replace("\\", "/").lstrip("./").upper() for entry in allowed]
-    return any(entry.startswith(STRUCTURAL_SCOPE_PREFIX) for entry in normalized)
+    return any(entry.startswith(STRUCTURAL_SCOPE_PREFIXES) for entry in normalized)
 
 
 def has_file_pou_criterion(statements: list[str]) -> bool:

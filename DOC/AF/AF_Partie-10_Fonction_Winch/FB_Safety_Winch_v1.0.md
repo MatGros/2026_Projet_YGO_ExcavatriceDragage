@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §3.
 > Rôle de **ce** document : interface, 7 mécanismes A-G, masques, écarts — et **catalogue unique**
 > des `TC-P10-001` à `TC-P10-010` (ne pas les recopier dans le chapô AF10).
-> Source code : `CODE/TREUILS/FB_Safety_Winch.st` · instances `Safety (CFC).instSafetyWinchM1/M2`.
+> Source code : `CODE/H_TREUILS_BENNE/FB_Safety_Winch.st` · instances `Safety (CFC).instSafetyWinchM1/M2`.
 
 ## 🧭 Sommaire
 
@@ -135,4 +135,4 @@ AscentPermit  = NOT (bit5 OR (capteur haut physique atteint) OR (limite haute at
 | AF03 | Profil FB safety domaine |
 | AF09 | Encodeurs — position/vitesse/Homed consommés |
 | AF10 / [FB_Bucket](FB_Bucket_v1.0.md) | Benne — Méca C couche 2 |
-| Code | `CODE/TREUILS/FB_Safety_Winch.st` |
+| Code | `CODE/H_TREUILS_BENNE/FB_Safety_Winch.st` |

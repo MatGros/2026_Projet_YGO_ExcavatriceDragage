@@ -4,7 +4,7 @@
 > Rôle de **ce** document : mouvement M3 (rampe, arbitrage, mot AC600, ralentissement PV,
 > arrêt sur capteur, frein) — et **catalogue unique** des `TC-P11-003` à `TC-P11-005`, `TC-P11-013`.
 > Compose `FB_Brake` (réutilisé depuis COMMUN) + `FB_Ramp` (continu %/s — contrairement aux treuils à paliers discrets).
-> Source code : `CODE/TRANSLATION/FB_Translation.st` · instance `Translation.instTranslationM3`.
+> Source code : `CODE/I_TRANSLATION/FB_Translation.st` · instance `Translation.instTranslationM3`.
 
 ## 🧭 Sommaire
 
@@ -222,4 +222,4 @@ reprend sa dernière position connue au redémarrage via `GVL_PERSISTENT._Transl
 | AF11 / FB_TranslationOutputInterlock_LD | Consommateur de la demande produite ici |
 | AF11 / FB_Translation_PositionDecoder | Fournit butées extrêmes |
 | AF03 | Contrat FB mouvement |
-| Code | `CODE/TRANSLATION/FB_Translation.st` |
+| Code | `CODE/I_TRANSLATION/FB_Translation.st` |

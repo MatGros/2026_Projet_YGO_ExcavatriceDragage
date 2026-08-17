@@ -127,7 +127,7 @@ TRACE_INVERSE(S):
 
 ## 8bis. 🗺️ CARTE DE LECTURE — `GVL_Troubleshooting`
 
-> Toutes les structures du GVL réel (`CODE/DEPANNAGE/GVL_Troubleshooting.st`). Lire dans ces structures, jamais dans des internes de FB.
+> Toutes les structures du GVL réel (`CODE/K_DEPANNAGE/GVL_Troubleshooting.st`). Lire dans ces structures, jamais dans des internes de FB.
 
 | Structure | Contenu |
 |---|---|

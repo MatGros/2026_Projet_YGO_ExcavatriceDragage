@@ -84,22 +84,22 @@ leur demande `PowerCutOff` agrégée.
 ### 🧱 Fiches Composants & Cartouches ST (`CODE/AU/`)
 
 #### 🛡️ `FB_Safety_EmergencyManagement` *(Composite Façade)*
-- **Fichier Source** : [`FB_Safety_EmergencyManagement.st`](../../../../CODE/AU/FB_Safety_EmergencyManagement.st)
+- **Fichier Source** : [`FB_Safety_EmergencyManagement.st`](../../../../CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Façade publique, instance unique ; câblage interne Logic/Output & exposition des bus d'état`
 - **Responsabilité** : Point d'entrée unique de la boucle d'arrêt d'urgence, encapsule les sous-instances privées `Logic` et `Output`.
 
 #### 🧠 `FB_Safety_EmergencyManagementLogic` *(Décision & Machine d'État)*
-- **Fichier Source** : [`FB_Safety_EmergencyManagementLogic.st`](../../../../CODE/AU/FB_Safety_EmergencyManagementLogic.st)
+- **Fichier Source** : [`FB_Safety_EmergencyManagementLogic.st`](../../../../CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Machine d'état, fronts Reset/Arm, calcul ErrorId & consignes logiques`
 - **Responsabilité** : Gère les étapes d'auto-test, les fronts `Reset`/`ArmRequest`, et produit le bus interne `ST_Safety_Emergency_InternalCmd`.
 
 #### 🔒 `FB_Safety_EmergencyManagementOutput` *(Pilote Physique Fail-Safe)*
-- **Fichier Source** : [`FB_Safety_EmergencyManagementOutput.st`](../../../../CODE/AU/FB_Safety_EmergencyManagementOutput.st)
+- **Fichier Source** : [`FB_Safety_EmergencyManagementOutput.st`](../../../../CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Enable gate + copie consignes logiques vers sorties physiques`
 - **Responsabilité** : Barrière physique finale pour les signaux `MaintainA_RQ` et `MaintainB_RQ` (polarité maintien, `TRUE` = voie saine).
 
 #### 🧩 `ST_Safety_Emergency_InternalCmd` *(DUT Bus Interne)*
-- **Fichier Source** : [`ST_Safety_Emergency_InternalCmd.st`](../../../../CODE/AU/ST_Safety_Emergency_InternalCmd.st)
+- **Fichier Source** : [`ST_Safety_Emergency_InternalCmd.st`](../../../../CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st)
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Transporte les ordres logiques entre le bloc de décision et le bloc de sortie`
 - **Responsabilité** : Structure d'échange interne à 3 champs `BOOL` reliant `Logic` et `Output`.
 
@@ -489,18 +489,18 @@ Les résultats d'exécution restent hors AF (scripts / checklists / registres).
 
 Fichiers code de référence :
 
-- `CODE/AU/FB_Safety_EmergencyManagement.st`
-- `CODE/AU/FB_Safety_EmergencyManagementLogic.st`
-- `CODE/AU/FB_Safety_EmergencyManagementOutput.st`
-- `CODE/AU/ST_Safety_Emergency_InternalCmd.st` (interne Logic→Output)
-- `CODE/AU/ST_Safety_Emergency_State.st` (bus état public)
-- `CODE/AU/ST_Safety_Emergency_Diag.st` (bus diagnostic)
+- `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st`
+- `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st`
+- `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st`
+- `CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st` (interne Logic→Output)
+- `CODE/B_AU_SECURITE/ST_Safety_Emergency_State.st` (bus état public)
+- `CODE/B_AU_SECURITE/ST_Safety_Emergency_Diag.st` (bus diagnostic)
 - `ARCHIVES/Code/SUPERVISION/ST_Safety_Emergency_HmiCmd.st` (bus commande IHM, test archivé T99)
 - `ARCHIVES/Code/SUPERVISION/ST_Safety_Emergency_HmiState.st` (bus état IHM, test archivé T99)
 - `ARCHIVES/Code/SUPERVISION/GVL_IHM_AU.st` (interface IHM archivée T99)
-- `CODE/MAIN/PRG_02_Acquisition.st` (ST pur)
-- `CODE/MAIN/PRG_06_Outputs_LD.st` (sorties)
+- `CODE/M_MAIN/PRG_02_Acquisition.st` (ST pur)
+- `CODE/M_MAIN/PRG_06_Outputs_LD.st` (sorties)
 - `ARCHIVES/Code/TESTS/PRG_AU_TestBench.st` (banc de test manuel, archivé 2026-08-01 — voir `DOC/WFLOW/PLAN_TASK.md`)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)
 - Cible de migration : `PRG_02_Acquisition.st` (ST pur, dans `CODE/MAIN`)
-- `CODE/SIMULATION/FB_Sim_Safety.st`
+- `CODE/L_SIMULATION/FB_Sim_Safety.st`

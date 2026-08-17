@@ -24,7 +24,7 @@ Cette session a traité et clôturé les axes majeurs de consolidation industrie
 
 ### 1.1 Bandeau IHM 4 Champs & Câblage Réel
 * **Spécification** : Mise à jour de [`AF_Partie-07_Interface_IHM_v2.0.md`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md) §4.
-* **Création du DUT & FB** : [`ST_HmiBanner.st`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/_TYPES/ST_HmiBanner.st) et [`FB_Hmi_BannerFormatter.st`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/SUPERVISION/FB_Hmi_BannerFormatter.st).
+* **Création du DUT & FB** : [`ST_HmiBanner.st`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/J_SUPERVISION/_TYPES/ST_HmiBanner.st) et [`FB_Hmi_BannerFormatter.st`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st).
 * **Câblage Réel (`PRG_07_Supervision.st`)** :
   * `HomingActive := (NOT WinchM1State.Encoder.Homed) OR (NOT WinchM2State.Encoder.Homed)` (Couvre M1 et M2).
   * `HomingStepM1 := SEL(PRG_02_Acquisition.instHomingM1.Busy, 0, 1)` (Affichage direct de la phase de recherche).

@@ -19,6 +19,7 @@ WORKFLOW_DIRS = {
     "reports",
     "tests",
     "tasks",
+    "hooks",
 }
 
 DOC_FILE_PATTERNS = (

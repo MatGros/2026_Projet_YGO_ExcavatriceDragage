@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §4.
 > Rôle de **ce** document : synchro niveau 1 (warning), couplage croisé — et **catalogue unique**
 > des `TC-P10-014`, `015`, `016`.
-> Source code : `CODE/TREUILS/FB_WinchSync.st` · instance unique dans `PRG_04_Treuils_Benne.st` (ST). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : aucune page CFC native cible.
+> Source code : `CODE/H_TREUILS_BENNE/FB_WinchSync.st` · instance unique dans `PRG_04_Treuils_Benne.st` (ST). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : aucune page CFC native cible.
 
 ## 🧭 Sommaire
 
@@ -89,4 +89,4 @@ Aucun écart majeur identifié — comportement conforme à la doc legacy sur ce
 | AF10 (chapô) | Rôle machine, intégration programme |
 | AF10 / FB_Safety_Winch | Méca E — défense en profondeur niveau 2 |
 | AF05 | Modes — `SyncEnable` |
-| Code | `CODE/TREUILS/FB_WinchSync.st`, `CODE/MAIN/PRG_04_Treuils_Benne.st` (ST) |
+| Code | `CODE/H_TREUILS_BENNE/FB_WinchSync.st`, `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (ST) |

@@ -2,7 +2,7 @@
 
 > Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §4.
 > Rôle de **ce** document : modèle simulé de la chaîne AU/contacteur — et **catalogue unique** des `TC-P13-020...`.
-> Source code : `CODE/SIMULATION/FB_Sim_Safety.st` · instance `FB_SimBench.instSimSafety`.
+> Source code : `CODE/L_SIMULATION/FB_Sim_Safety.st` · instance `FB_SimBench.instSimSafety`.
 > ⚠️ Ce FB ne simule **que** les entrées de `FB_Safety_EmergencyManagement` (Partie 01, propriétaire
 > de la vraie logique AU). Il ne redécide rien, il rejoue la chaîne sortie.
 
@@ -118,4 +118,4 @@ et `.ArmingFailed`.
 | AF01 / FB_Safety_EmergencyManagement | Consommateur réel de `SimChainOk`/`SimContactorOk` (via `HwIn.Machine`), propriétaire des latches `Cause`/`Ack` |
 | AF13 / FB_SimBench | Câblage des entrées (`PowerCutOff_A/B`, `BtnEmergencyStop`, décalage 1 scan) |
 | `CODE_QUALITY_STANDARDS.md §9` | Pattern Cause/Ack, Reset inconditionnel |
-| Code | `CODE/SIMULATION/FB_Sim_Safety.st`, `CODE/AU/FB_Safety_EmergencyManagementLogic.st` |
+| Code | `CODE/L_SIMULATION/FB_Sim_Safety.st`, `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st` |

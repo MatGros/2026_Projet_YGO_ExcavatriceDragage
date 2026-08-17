@@ -23,9 +23,9 @@ import re
 import sys
 from pathlib import Path
 
-TYPES_DIR = Path("CODE/SUPERVISION/_TYPES")
+TYPES_DIR = Path("CODE/J_SUPERVISION/_TYPES")
 PERSISTENT_FILE = Path("CODE/GVL_PERSISTENT.st")
-SUPERVISION_FILE = Path("CODE/MAIN/PRG_07_Supervision.st")
+SUPERVISION_FILE = Path("CODE/M_MAIN/PRG_07_Supervision.st")
 
 TYPE_DECL_RE = re.compile(r"TYPE\s+(ST_\w+)\s*:", re.IGNORECASE)
 STRUCT_BODY_RE = re.compile(r"STRUCT(.*?)END_STRUCT", re.DOTALL | re.IGNORECASE)

@@ -1144,7 +1144,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
         <Folder Name="">
           <Object Name="GVL_PERSISTENT" ObjectId="b404450e-105f-5aa6-8c01-cbf582c5f3ce" />
         </Folder>
-        <Folder Name="SUPERVISION">
+        <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
             <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
@@ -1155,7 +1155,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
             <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
           </Folder>
         </Folder>
-        <Folder Name="TREUILS">
+        <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
             <Object Name="ST_BucketState" ObjectId="a8523258-d2bb-591c-8a54-f00784419808" />
             <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
@@ -1166,7 +1166,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
           <Object Name="ST_Winch_SymmetryCfg" ObjectId="cafdebf4-b7e5-5000-bdd0-033e76a6b7c7" />
           <Object Name="ST_Winch_SymmetryData" ObjectId="f7635572-022c-5fdd-93e8-106b5d2eea3e" />
         </Folder>
-        <Folder Name="CODEURS">
+        <Folder Name="E_CODEURS">
           <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
         </Folder>
       </ProjectStructure>

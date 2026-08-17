@@ -52,9 +52,11 @@ def test_cli_mirrors_code_folder_structure(tmp_path):
     out_dir = tmp_path / "generated"
     main(["--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)])
 
-    assert (out_dir / "TREUILS" / "FB_Winch.xml").is_file()
+    treuil_dir = "H_TREUILS_BENNE" if (CODE_DIR / "H_TREUILS_BENNE").is_dir() else "TREUILS"
+    cycle_dir = "G_CYCLE" if (CODE_DIR / "G_CYCLE").is_dir() else "CYCLE"
+    assert (out_dir / treuil_dir / "FB_Winch.xml").is_file()
     assert (out_dir / "GVL_PERSISTENT.xml").is_file()
-    assert (out_dir / "CYCLE" / "E_CycleStep.xml").is_file()
+    assert (out_dir / cycle_dir / "E_CycleStep.xml").is_file()
 
 
 def test_cli_single_object_with_deps_embeds_dependency_closure(tmp_path):
@@ -65,7 +67,8 @@ def test_cli_single_object_with_deps_embeds_dependency_closure(tmp_path):
     generated_files = list(out_dir.rglob("*.xml"))
     assert len(generated_files) == 1  # one file, dependencies embedded inside it, not as separate files
 
-    root = _parse_unprefixed((out_dir / "TREUILS" / "FB_Winch.xml").read_text(encoding="utf-8-sig"))
+    treuil_dir = "H_TREUILS_BENNE" if (CODE_DIR / "H_TREUILS_BENNE").is_dir() else "TREUILS"
+    root = _parse_unprefixed((out_dir / treuil_dir / "FB_Winch.xml").read_text(encoding="utf-8-sig"))
     data_type_names = {dt.get("name") for dt in root.findall(".//dataType")}
     pou_names = {p.get("name") for p in root.findall(".//pou")}
     assert "ST_SpeedStepTable" in data_type_names
@@ -76,7 +79,8 @@ def test_cli_no_deps_flag_excludes_dependencies(tmp_path):
     out_dir = tmp_path / "generated"
     main(["FB_Winch", "--no-deps", "--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)])
 
-    root = _parse_unprefixed((out_dir / "TREUILS" / "FB_Winch.xml").read_text(encoding="utf-8-sig"))
+    treuil_dir = "H_TREUILS_BENNE" if (CODE_DIR / "H_TREUILS_BENNE").is_dir() else "TREUILS"
+    root = _parse_unprefixed((out_dir / treuil_dir / "FB_Winch.xml").read_text(encoding="utf-8-sig"))
     assert root.findall(".//dataType") == []
     pous = root.findall(".//pou")
     assert [p.get("name") for p in pous] == ["FB_Winch"]
@@ -103,22 +107,24 @@ def test_cli_timestamp_override_is_used_verbatim(tmp_path):
             "2020-01-01T00:00:00.000000",
         ]
     )
-    root = _parse_unprefixed((out_dir / "CYCLE" / "E_CycleStep.xml").read_text(encoding="utf-8-sig"))
+    cycle_dir = "G_CYCLE" if (CODE_DIR / "G_CYCLE").is_dir() else "CYCLE"
+    root = _parse_unprefixed((out_dir / cycle_dir / "E_CycleStep.xml").read_text(encoding="utf-8-sig"))
     assert root.find("fileHeader").get("creationDateTime") == "2020-01-01T00:00:00.000000"
     assert root.find("contentHeader").get("modificationDateTime") == "2020-01-01T00:00:00.000000"
 
 
 def test_cli_folder_selector_generates_only_matching_domain(tmp_path, capsys):
     out_dir = tmp_path / "generated"
+    folder_name = "H_TREUILS_BENNE" if (CODE_DIR / "H_TREUILS_BENNE").is_dir() else "TREUILS"
     exit_code = main(
-        ["--folder", "TREUILS", "--bundle", "CODE_TREUILS_Test", "--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)]
+        ["--folder", folder_name, "--bundle", "CODE_TREUILS_Test", "--code-dir", str(CODE_DIR), "--out-dir", str(out_dir)]
     )
     captured = capsys.readouterr()
     assert exit_code == 0, captured.err
 
     diag = DiagnosticCollector()
     objects = discover_objects(CODE_DIR, diag)
-    expected_names = {obj.name for obj in objects if obj.folder.upper() == "TREUILS"}
+    expected_names = {obj.name for obj in objects if obj.folder.upper() == folder_name.upper()}
     assert len(expected_names) > 0
 
     root = _parse_unprefixed((out_dir / "CODE_TREUILS_Test.xml").read_text(encoding="utf-8-sig"))
@@ -131,11 +137,12 @@ def test_cli_folder_selector_generates_only_matching_domain(tmp_path, capsys):
 
 def test_cli_folder_selector_combines_with_explicit_object_names(tmp_path):
     out_dir = tmp_path / "generated"
+    folder_name = "H_TREUILS_BENNE" if (CODE_DIR / "H_TREUILS_BENNE").is_dir() else "TREUILS"
     exit_code = main(
         [
             "E_CycleStep",
             "--folder",
-            "TREUILS",
+            folder_name,
             "--bundle",
             "CODE_Combo_Test",
             "--code-dir",
@@ -165,8 +172,10 @@ def test_cli_list_folders_prints_domains_and_exits_zero(capsys):
     exit_code = main(["--list-folders", "--code-dir", str(CODE_DIR)])
     captured = capsys.readouterr()
     assert exit_code == 0
-    assert "TREUILS" in captured.out
-    assert "AU" in captured.out
+    treuil_name = "H_TREUILS_BENNE" if (CODE_DIR / "H_TREUILS_BENNE").is_dir() else "TREUILS"
+    au_name = "B_AU_SECURITE" if (CODE_DIR / "B_AU_SECURITE").is_dir() else "AU"
+    assert treuil_name in captured.out
+    assert au_name in captured.out
 
 
 def test_cli_project_name_flag_is_used_in_content_header(tmp_path):
@@ -174,5 +183,6 @@ def test_cli_project_name_flag_is_used_in_content_header(tmp_path):
     main(
         ["E_CycleStep", "--code-dir", str(CODE_DIR), "--out-dir", str(out_dir), "--project-name", "MyProject"]
     )
-    root = _parse_unprefixed((out_dir / "CYCLE" / "E_CycleStep.xml").read_text(encoding="utf-8-sig"))
+    cycle_dir = "G_CYCLE" if (CODE_DIR / "G_CYCLE").is_dir() else "CYCLE"
+    root = _parse_unprefixed((out_dir / cycle_dir / "E_CycleStep.xml").read_text(encoding="utf-8-sig"))
     assert root.find("contentHeader").get("name") == "MyProject.project"

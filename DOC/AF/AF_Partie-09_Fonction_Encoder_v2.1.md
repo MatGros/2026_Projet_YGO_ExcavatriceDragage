@@ -267,7 +267,7 @@ Questions ouvertes à instruire, avec preuve de code à l'appui :
 3. **Une fois référencé**, `CablePosM` redevient fiable : presser `ConfirmOpenPosition`
    (`FB_Bucket`) pour amorcer le suivi automatique `BucketState.IsOpen` — action **distincte** de
    l'étape 1 (vérification visuelle pré-homing) et **postérieure** à elle, voir
-   `CODE/TREUILS/BENNE/FB_Bucket.st` en-tête REX 2026-07-08.
+   `CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st` en-tête REX 2026-07-08.
 
 **Unitaire (MAINT_N2)** : sélectionner treuil → manœuvrer → arrêt confirmé → `CfgHomingTargetM` → `BtnHome`.
 

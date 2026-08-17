@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §4.
 > Rôle de **ce** document : modèle simulé d'un codeur absolu de treuil — et **catalogue unique**
 > des `TC-P13-030...`.
-> Source code : `CODE/SIMULATION/FB_Sim_Encoder.st` · instances `FB_SimBench.instSimEncoderM1/M2`.
+> Source code : `CODE/L_SIMULATION/FB_Sim_Encoder.st` · instances `FB_SimBench.instSimEncoderM1/M2`.
 
 ## 🧭 Sommaire
 
@@ -71,4 +71,4 @@ coupure.
 |---|---|
 | AF13 (chapô) | Frontière simulation §2 (aiguillage `WinchInputSourceSimulated`) |
 | AF09/AF10 | `FB_Encoder_Abs`, `FB_Encoder_Homing` (consommateurs réels de `RawPosOut`) |
-| Code | `CODE/SIMULATION/FB_Sim_Encoder.st`, `CODE/GVL_PERSISTENT.st` |
+| Code | `CODE/L_SIMULATION/FB_Sim_Encoder.st`, `CODE/GVL_PERSISTENT.st` |

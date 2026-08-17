@@ -51,7 +51,8 @@ def local_name(tag: str) -> str:
 
 def st_program_sources(code: Path) -> list[ProgramSource]:
     sources: list[ProgramSource] = []
-    for path in sorted((code / "MAIN").glob("*.st")):
+    main_dir = code / "M_MAIN" if (code / "M_MAIN").is_dir() else code / "MAIN"
+    for path in sorted(main_dir.glob("*.st")):
         text = path.read_text(encoding="utf-8", errors="replace")
         match = PROGRAM_HEADER.search(text)
         if match:
@@ -62,7 +63,8 @@ def st_program_sources(code: Path) -> list[ProgramSource]:
 def xml_program_sources(code: Path) -> list[ProgramSource]:
     """Trouve les PROGRAM CFC natifs, une fois les .st convertis en .xml."""
     sources: list[ProgramSource] = []
-    for path in sorted((code / "MAIN").glob("*.xml")):
+    main_dir = code / "M_MAIN" if (code / "M_MAIN").is_dir() else code / "MAIN"
+    for path in sorted(main_dir.glob("*.xml")):
         if path.name in BUNDLE_NAMES:
             continue
         try:
@@ -96,7 +98,7 @@ def bundle_languages(bundle: Path) -> dict[str, set[str]]:
 
 def check(root: Path) -> list[str]:
     code = root / "CODE"
-    main = code / "MAIN"
+    main = code / "M_MAIN" if (code / "M_MAIN").is_dir() else code / "MAIN"
     if not main.is_dir():
         return [f"[S0] repertoire introuvable : {main}"]
 

@@ -326,4 +326,4 @@ L'asservissement synchro est découpé en 3 zones d'action calibrées sur site :
 | AF06 | E/S physiques treuils |
 | AF09 | Codeurs — Homed, position, vitesse |
 | PLAN_TASK | Lot 4 (T87/T91/T93/T94/T95/T96) — décision non prise, étude terrain requise |
-| Code | `CODE/TREUILS/*.st`, `CODE/MAIN/PRG_04_Treuils_Benne.st` (ST actuel) ; cible `PRG_04_Treuils_Benne.xml` absente |
+| Code | `CODE/TREUILS/*.st`, `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (ST actuel) ; cible `PRG_04_Treuils_Benne.xml` absente |

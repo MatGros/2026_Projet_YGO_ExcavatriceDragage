@@ -160,7 +160,17 @@ l'opérateur. Stratégie **hybride** :
   changement → s'affiche après 500 ms max (acceptable pour un warning, jamais pour un défaut).
 - **Défauts** : passent en direct (pas de maintien) — un défaut AU/puissance doit être visible
   immédiatement, sans latence.
-- **Seuil** : 500 ms par défaut, à calibrer sur site (REX terrain).
+- **Interlock `DirectionBlocked`** (décision revue 2026-08-17) : un mouvement **demandé** mais
+  **bloqué** (permit absent) est traité comme un **défaut critique** → affiché **immédiatement**
+  (pas de maintien). Justification : c'est une cause de **blocage de mouvement sécurité**, pas un
+  simple état transitoire ; l'opérateur qui pousse un axe interdit doit comprendre tout de suite
+  pourquoi la machine ne bouge pas. Le `DirectionBlocked` alimente donc `CriticalActionActive`
+  au même titre que AU/puissance/SafeStop.
+- **Implémentation** : le lissage est délégué au FB utilitaire **`FB_AntiFlickerText`** (un par
+  champ anti-clignoté), qui prend `NewText` + `ForceInstant` (TRUE = direct) + `HoldTime`.
+  `FB_Hmi_BannerFormatter` en instancie deux : `AntiFlickSpecial` (jamais critique) et
+  `AntiFlickOperator` (`ForceInstant := CriticalActionActive`).
+- **Seuil** : 500 ms par défaut (`CST_BannerHoldTime`), à calibrer sur site (REX terrain).
 
 ---
 
@@ -190,4 +200,4 @@ Type exact, programme eventuel et ordonnancement : **TBD**.
 - Partie 02 : frontieres IHM et troubleshooting.
 - Partie 03 : contrats publics.
 - Parties metier 04 a 14 : contenu semantique publie dans `State`/`Cmd`/`Cfg`.
-- Code : `CODE/SUPERVISION/GVL_IHM.st` et `CODE/SUPERVISION/_TYPES/`.
+- Code : `CODE/J_SUPERVISION/GVL_IHM.st` et `CODE/SUPERVISION/_TYPES/`.

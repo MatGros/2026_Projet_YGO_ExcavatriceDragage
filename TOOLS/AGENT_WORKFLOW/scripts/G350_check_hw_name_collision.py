@@ -34,7 +34,7 @@ import sys
 from pathlib import Path
 
 # Seul POU dont le rôle architectural est de porter les noms Device bruts (AF_Partie-06 §1/§4).
-ACQUISITION_FRONTIER = "MAIN/PRG_02_Acquisition.st"
+ACQUISITION_FRONTIER = "M_MAIN/PRG_02_Acquisition.st"
 
 # Trappe de sortie pour une collision detectee mais pas encore verifiee terrain :
 # WARN (pas ERROR, non bloquant) le temps de confirmer sur machine reelle. Vide
@@ -114,7 +114,8 @@ def main() -> int:
 
     errors = 0
     warnings = 0
-    for path in sorted((root / "CODE" / "MAIN").glob("PRG_*.st")):
+    main_dir = root / "CODE" / "M_MAIN" if (root / "CODE" / "M_MAIN").is_dir() else root / "CODE" / "MAIN"
+    for path in sorted(main_dir.glob("PRG_*.st")):
         rel = path.relative_to(root / "CODE").as_posix()
         if rel == ACQUISITION_FRONTIER:
             continue

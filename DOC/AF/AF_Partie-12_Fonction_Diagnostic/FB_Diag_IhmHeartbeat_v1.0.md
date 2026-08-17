@@ -2,7 +2,7 @@
 
 > Surveillance bidirectionnelle IHM↔PLC (toggle heartbeat).
 > Profil AF03 : brique métier non-mouvement.
-> Source : `CODE/DIAG/FB_Diag_IhmHeartbeat.st` · instance : `PRG_01_Diagnostics.instIhmHeartbeat` (ST actuel) ; cible `PRG_02_Acquisition_CFC.instIhmHeartbeat`.
+> Source : `CODE/C_DIAG_RESEAUX/FB_Diag_IhmHeartbeat.st` · instance : `PRG_01_Diagnostics.instIhmHeartbeat` (ST actuel) ; cible `PRG_02_Acquisition_CFC.instIhmHeartbeat`.
 
 ## 🎯 Rôle
 

@@ -34,10 +34,20 @@
 | 2A | Interlocks finaux frein / puissance | Lot 3A | `FB_WinchOutputInterlock_LD` + `FB_TranslationOutputInterlock_LD` ; `SafeStop` reste la rampe rapide métier, tests PLC préparés ; qualification CODESYS/simulation à faire | ⏳ | PI-01 | ⏳ Validation CODESYS/terrain requise |
 | 7 | Translation M3 — sécurité, sortie moteur, homme-mort | T104 + T105 + T106 + T107 | Audit 2026-08-05 (session M3), 4 lots implémentés dans l'ordre LOT0 → M4 → LOT3 → LOT2, `check_linkage.py`/`check_ld_invariants.py`/bundle PASS à chaque lot | ⏳ | HUM | 🟢 Prêt à tester (mise en service) |
 | 6 | Améliorations secondaires | T75 + T76 + T77 + T79 + T88 | T78 attend la décision T93 (T84/T85/T86 déjà implémentés au lot 1, T87 reporté au lot 4) | ⏸️ | — | — |
-| 8 | Audit doc — lot C4 AU Troubleshooting | Vérifier clôture du lot (§06) | REGISTRE + TEST_DESIGN C4 AU | 🔍 | DSH-01 | — |
+| 8 | Audit doc — lot C4 AU Troubleshooting | Vérifier clôture du lot (§06) | REGISTRE + TEST_DESIGN C4 AU | ⏳ | DSH-01 | ✅ Vérification clôture faite 2026-08-18 : code implémenté (`Step4_ContactorReleased` + préconditions AF01 en lecture seule, 2026-08-14), cohérent avec TEST_DESIGN. ⏳ Essais Watch C4-001→005 non exécutés — validation CODESYS/terrain en suspens |
 | 9 | Audit outillage `TOOLS/AGENT_WORKFLOW` | Purge Herdr/Pi, réécriture C0-C4 vers agents natifs, archivage `G220`, nettoyage `PROJECT_WORKSPACE` | Herdr/Pi abandonné (confirmé 2026-08-17) ; C0-C4 rebranché sur antigravity/Codex/forks Claude Code | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
 | 10 | Audit `CODE_XML` — reliquats & génération | 4 XML orphelins supprimés, génération rendue atomique (`generate_codesys_bundle.py`) | Bug trouvé en revue : purge non-atomique pouvait faire passer `G200` faussement au vert si le générateur échouait — corrigé et testé (2 scénarios d'échec simulés) | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
 | 11 | Audit documentation `DOC/TESTS`, `DOC/WFLOW` | Fusion registre MES (30 entrées, collision `MES-022/023` corrigée), archivage `Architecture/` (migration 7 POU terminée), liens morts corrigés | `ARCHIVES/Doc/` découvert gitignoré (comme `.claude/`/`.vscode/`) — forcé au tracking | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
+| 12 | Refactoring Indexation Dossiers `CODE/` (`A_` à `M_`) | T122-A à T122-D (Phases 1 à 4 terminées) | Aligner explorateur CODESYS sur l'ordre d'exécution MainTask (indexation par lettres `A_COMMUN` .. `M_MAIN`) ; plan détaillé dans `AUDIT_Plan_Refactor_Dossiers_Indexes_v1.0.md` | ✅ | AGY-01 | ✅ Validé (revue experte PASS & 100% Gates verts) |
+
+### 🗂️ Chantier Refactoring Indexation Dossiers CODE (T122-A à T122-D)
+
+| Sous-tâche | Phase | Description & Périmètre | Contrat d'exécution | Statut | Lock Agent | Validation |
+|---|---|---|---|:---:|:---:|---|
+| **T122-A** | Phase 1 | Renommage physique `git mv` des 13 répertoires `CODE/` (`A_COMMUN` à `M_MAIN`) | `TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE1_RENOMMAGE.yaml` | ✅ | AGY-01 | ✅ Validé par l'orchestrateur |
+| **T122-B** | Phase 2 | Patch des 8 scripts Python `TOOLS/` & baseline `naming_baseline.json` | `TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE2_PATCH_OUTILLAGE.yaml` | ✅ | AGY-02 | ✅ Validé par l'orchestrateur (PyTest 381 PASS, Baseline OK) |
+| **T122-C** | Phase 3 | Patch cartouches documentaires `DOC/AF/` & Rebuild bundle `CODE_Bundle.xml` | `TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE3_DOCS_ET_BUNDLE.yaml` | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G340 PASS, Bundle 170 objets) |
+| **T122-D** | Phase 4 | Exécution & Validation des Portails Mécaniques (`run_all_gates.py` A, B, C) | `TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE4_VALIDATION_GATES.yaml` | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200 PASS, G300 PASS, G310 PASS) |
 
 ### Règles de conduite
 
@@ -293,6 +303,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T121 | Audit & élimination des constantes magiques (`<> 8` → symboles DUT/enums) | Projet / Convention / Sécurité | ✅ | DSH-02 | `CODE/` (grep), `NAMING_CONVENTION.md` |
 | T122 | Renommage flux joystick → actionneurs (CoupledUserRequest / LogicRequest) | Projet / Convention / Sécurité | ✅ | DSH-02 | `PRG_04_Treuils_Benne.st` (Phases 1-2 faites, phase 3 différée) |
 | T123 | Compléter la vue Troubleshooting (flux chronologique, 18 TBD) | Projet / Diagnostic | ✅ | DSH-02 | `FB_TroubleshootingView.st`, `ST_ChainWinch.st`, `GVL_Troubleshooting.st` |
+| T124 | `FB_Hmi_BannerFormatter` — suivi revue expert anti-clignotement | Projet / IHM / Convention | ⏳ | DSH-01 | **Implémenté 2026-08-18** : (1) `DirectionBlocked` tranché en `CriticalActionActive` (interlock = affichage immédiat) ; (2) doublon anti-flicker refactoré → `FB_AntiFlickerText` (DRY, 2 instances) ; (3) préfixe `CST_` documenté dans `NAMING_CONVENTION`. + régions `{region §N}` + renvois formats AF dans le FB. AF-07 §4.3 mis à jour. Gates G405 (ASCII) + G200 (liaison) **PASS** ; bundle régénéré. ⏳ Validation CODESYS (banc) à faire |
 
 ---
 
@@ -326,7 +337,16 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | **T113** | Synchronisation M1/M2 étagée (nominal <0.3m, dégradation Palier 1 0.3-0.8m, SafeStop >1.2m) | ✅ Implémenté dans `FB_WinchSync` (2026-08-15). |
 | **T114** | Autorisation remontée Palier 1 si Benne obstruée / décalage codeur | ✅ Implémenté dans `PRG_04_Treuils_Benne` (2026-08-15). |
 
+### 🧰 3.2 Outillage livré (hors `Txx` — repère de traçabilité)
 
+> ⚠️ Les livrables d'outillage/gouvernance ne sont **pas** des tâches de lot `Txx` (pas de colonne
+> `Lock Agent`) : ils sont tracés ici comme **repère**, dans `TOOLS/AGENT_WORKFLOW/` et `AGENTS.md`.
+
+| # | Livrable | Emplacement | État |
+|---|---|---|---|
+| **O1** | Gate `G405` — littéraux STRING ASCII (REX 2026-08-17) | `TOOLS/AGENT_WORKFLOW/scripts/G405_check_st_string_ascii.py` + palier C de `run_all_gates.py` | ✅ **PASS** (créé, intégré) |
+| **O2** | Hook `pre-push` non bloquant (diff-stat, alertes suppressions/chemins protégés, rappel « premier réflexe = demander l'humain ») | `TOOLS/AGENT_WORKFLOW/scripts/pre_push_guard.py` + `TOOLS/AGENT_WORKFLOW/hooks/pre-push` | ✅ Livré (script testé, hook `sh`) |
+| **O3** | Règle « Premier réflexe avant commit/push » + activation `core.hooksPath` | `AGENTS.md` | ✅ Acté |
 
 ✅ **Session 2026-07-09 (agent de scan doc)** : table complétée (T12-T27) — voir §5 pour le détail des renvois ajoutés dans chaque `AF_PartieN`.
 

@@ -3,8 +3,8 @@
 > 🎯 Brique unique de mise en forme du dépannage. Lecture seule stricte, aucune écriture de
 > commande, configuration ou interlock. Profil `👁️ Programme CFC` au sens `AF_Partie-03 §2`
 > allégé : ici un FB (pas une page), instancié une seule fois dans `PRG_07_Supervision`.
-> 📄 Source : `CODE/DEPANNAGE/FB_TroubleshootingView.st`
-> 📄 GVL alimentée : `CODE/DEPANNAGE/GVL_Troubleshooting.st`
+> 📄 Source : `CODE/K_DEPANNAGE/FB_TroubleshootingView.st`
+> 📄 GVL alimentée : `CODE/K_DEPANNAGE/GVL_Troubleshooting.st`
 > 🔗 Producteur unique de `GVL_Troubleshooting.*` — appelé uniquement dans `PRG_07_Supervision`.
 > 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2.
 

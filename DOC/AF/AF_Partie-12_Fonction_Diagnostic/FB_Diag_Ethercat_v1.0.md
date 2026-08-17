@@ -2,7 +2,7 @@
 
 > Diagnostic bus EtherCAT (3 esclaves : variateur M3 + codeurs M1/M2).
 > Profil AF03 : brique métier non-mouvement.
-> Source : `CODE/DIAG/FB_Diag_Ethercat.st` · instance : `PRG_01_Diagnostics.instDiagEthercat` (ST actuel) ; cible `PRG_02_Acquisition_CFC.instDiagEthercat`.
+> Source : `CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st` · instance : `PRG_01_Diagnostics.instDiagEthercat` (ST actuel) ; cible `PRG_02_Acquisition_CFC.instDiagEthercat`.
 
 ## 🎯 Rôle
 

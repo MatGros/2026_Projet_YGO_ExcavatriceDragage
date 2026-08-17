@@ -2,7 +2,7 @@
 
 > **Projet** : Excavatrice de dragage — CODESYS 3.5
 > **Statut** : référence active · décision documentaire préalable au retrait de `PRG_01/FB_Input`
-> **Sources** : `CODE/SIMULATION/*.st`, `CODE/MAIN/PRG_02_Acquisition.st` (ST propriétaire),
+> **Sources** : `CODE/SIMULATION/*.st`, `CODE/M_MAIN/PRG_02_Acquisition.st` (ST propriétaire),
 > `AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md`,
 > `CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation_v1.0.md`.
 > 🆕 v2.3 (2026-08-14) : composition éclatée en fiches par FB dédiées (§2, pattern Partie 11/01) —

@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.3.md`](../AF_Partie-13_Fonction_Simulation_v2.3.md) §2/§4.
 > Rôle de **ce** document : enveloppe unique de simulation banc — composition, câblage des
 > décalages 1-scan, table des sous-modèles — et **catalogue unique** des `TC-P13-010...`.
-> Source code : `CODE/SIMULATION/FB_SimBench.st` · instance `PRG_02_Acquisition.instSimBench`.
+> Source code : `CODE/L_SIMULATION/FB_SimBench.st` · instance `PRG_02_Acquisition.instSimBench`.
 
 ## 🧭 Sommaire
 
@@ -128,4 +128,4 @@ donc aucune régression de mouvement possible en changeant sa valeur à l'arrêt
 | AF13 / FB_Sim_Safety | Piège latch AU §4 — lecture obligatoire avant tout diagnostic de blocage armement |
 | AF11 / FB_Safety_Translation | Consommateur réel de `DriveStatusWord`, propriétaire Méca A/B |
 | AF02 §4 | Ordre `MainTask`, base du décalage 1 scan |
-| Code | `CODE/SIMULATION/FB_SimBench.st`, `CODE/MAIN/PRG_02_Acquisition.st:228-277` |
+| Code | `CODE/L_SIMULATION/FB_SimBench.st`, `CODE/M_MAIN/PRG_02_Acquisition.st:228-277` |

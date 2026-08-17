@@ -56,10 +56,10 @@ run-all-gates --skip-codesys
 run-all-gates --codesys-log build.log --strict
 
 # Vérification style sur un fichier
-check-code-style CODE/TREUILS/FB_Winch.st
+check-code-style CODE/H_TREUILS_BENNE/FB_Winch.st
 
 # Pre-edit gate : spécifications lues ?
-pre-edit-gate --check CODE/TRANSLATION/FB_Translation.st
+pre-edit-gate --check CODE/I_TRANSLATION/FB_Translation.st
 pre-edit-gate --mark-read DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
 
 # Validation compilation CODESYS

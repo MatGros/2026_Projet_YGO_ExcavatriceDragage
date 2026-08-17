@@ -347,4 +347,4 @@ Pas de paramètre d'activation — toujours actif, coût CPU négligeable (même
 - [`NAMING_CONVENTION.md`](../NAMING_CONVENTION.md) — nommage des instances (`inst<Rôle>`), suffixes `_DI`/`_DQ`.
 - `AF_Partie-02_Architecture_Programme_v3.1.md §5` — `PRG_07_Supervision` lecture seule stricte.
 - `AF_Partie-14_Fonction_Troubleshooting_v1.1.md` — invariant troubleshooting lecture seule.
-- Exemples de code déjà conformes (R1-R4, R8) : `CODE/CYCLE/FB_Cycle.st`, `CODE/CYCLE/FB_DiveSearch.st`, `CODE/CYCLE/FB_ExtractionSequence.st`.
+- Exemples de code déjà conformes (R1-R4, R8) : `CODE/G_CYCLE/FB_Cycle.st`, `CODE/G_CYCLE/FB_DiveSearch.st`, `CODE/G_CYCLE/FB_ExtractionSequence.st`.

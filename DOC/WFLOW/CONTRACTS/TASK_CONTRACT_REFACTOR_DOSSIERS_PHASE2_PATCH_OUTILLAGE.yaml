@@ -1,0 +1,96 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: REFACTOR_DOSSIERS_PHASE2_PATCH_OUTILLAGE
+  criticality: C2
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Adapter l'ensemble de l'outillage de contrôle, des gates de qualité, des hooks
+    et des suites de tests unitaires/intégration à la nouvelle arborescence indexée
+    de CODE/ (dossiers A_COMMUN à M_MAIN).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "G110 check_naming_style passe avec 0 nouveau signalement sur CODE/."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G110_check_naming_style.py CODE"
+    - id: AC2
+      statement: "G310 check_code_structure valide l'arborescence indexee avec 0 erreur."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py"
+    - id: AC3
+      statement: "La suite de tests unitaires et integration ST_PLCOPENXML_GENERATOR est verte."
+      verified_by: "python -m pytest TOOLS/ST_PLCOPENXML_GENERATOR/tests -q"
+    - id: AC4
+      statement: "Le contrat de tache est valide par check_task_contract.py."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE2_PATCH_OUTILLAGE.yaml"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - TOOLS/AGENT_WORKFLOW/config/
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - TOOLS/ST_PLCOPENXML_GENERATOR/
+      - TOOLS/OUTILS_ST2PY/
+      - DOC/WFLOW/
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - DOC/AF/
+      - PRJ_CODESYS/
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Compatibilite de generation PLCopenXML des POU et GVL"
+      - "Controles de securite et invariants des gates G100-G420"
+      - "Baseline de nommage complete"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_task_contract
+    - G110_naming
+    - G310_structure
+    - pytest_st_generator
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/ag/gemini-3.7"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Extension de scope validee par l'orchestrateur pour inclure ST_PLCOPENXML_GENERATOR,
+    OUTILS_ST2PY et G200.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "AGY-02 (Antigravity gemini-3.7)"
+  completed_at: "2026-08-18T01:32:00+02:00"
+  status: COMPLETED
+  summary: >
+    Tous les scripts d'outillage (Gates G100/G200/G310/G320/G350/G370/G380, hooks, check_task_contract),
+    la baseline de nommage (naming_baseline.json 241 entrees) et l'ensemble des tests pytest de
+    ST_PLCOPENXML_GENERATOR et AGENT_WORKFLOW ont ete adaptes a la nouvelle structure CODE/ indexee.
+  evidence_submitted:
+    - "check_task_contract: PASS"
+    - "G110_check_naming_style: PASS (0 nouveau)"
+    - "G310_check_code_structure: PASS (0 erreur)"
+    - "pytest ST_PLCOPENXML_GENERATOR: PASS (381 passed, 8 skipped)"
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: APPROVED
+  validated_by: "Antigravity (Orchestrateur)"
+  validated_at: "2026-08-17T12:20:00+02:00"
+  notes: "Phase 2 validée avec succès (outillage, baseline et tests 100% verts)."

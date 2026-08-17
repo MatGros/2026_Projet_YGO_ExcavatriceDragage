@@ -3,7 +3,7 @@
 > Rôle machine (vague) : [`AF_Partie-10_Fonction_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch_v2.0.md) §6.
 > Rôle de **ce** document : barrière finale, watchdog frein, machine d'état, anti-redémarrage —
 > et **catalogue unique** des `TC-P10-012`, `013`, `020`.
-> Source code : `CODE/TREUILS/FB_WinchOutputInterlock_LD.st` · instances dans `Outputs (Ladder)`.
+> Source code : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st` · instances dans `Outputs (Ladder)`.
 
 ## 🧭 Sommaire
 
@@ -116,4 +116,4 @@ réarmer `RestartInhibit`.
 | AF10 (chapô) | Rôle machine, intégration programme |
 | AF10 / FB_Winch | Producteur de la demande (`ST_WinchFinalInterlockRequest`) |
 | AF03 | Profil barrière finale |
-| Code | `CODE/TREUILS/FB_WinchOutputInterlock_LD.st` |
+| Code | `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st` |

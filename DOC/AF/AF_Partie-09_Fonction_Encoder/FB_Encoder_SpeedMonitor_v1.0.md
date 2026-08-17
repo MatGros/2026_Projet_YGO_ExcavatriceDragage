@@ -2,7 +2,7 @@
 
 > Rôle machine : [`AF_Partie-09_Fonction_Encoder_v2.1.md`](../AF_Partie-09_Fonction_Encoder_v2.1.md) §5.  
 > Rôle de **ce** document : diagnostic et détection de variations brusques/incohérentes de vitesse.  
-> Source code : `CODE/CODEURS/FB_Encoder_SpeedMonitor.st` · instances `instSpeedMonitorM1/M2` dans `Safety (CFC)`.  
+> Source code : `CODE/E_CODEURS/FB_Encoder_SpeedMonitor.st` · instances `instSpeedMonitorM1/M2` dans `Safety (CFC)`.  
 
 ## 🧭 Sommaire
 
@@ -26,7 +26,7 @@ Brique de **diagnostic passif et de surveillance cinématique** : surveille l'ac
 
 ---
 
-## 2. Interface (vérifiée `CODE/CODEURS/FB_Encoder_SpeedMonitor.st`)
+## 2. Interface (vérifiée `CODE/E_CODEURS/FB_Encoder_SpeedMonitor.st`)
 
 | Port entrée | Type | Rôle |
 |---|---|---|

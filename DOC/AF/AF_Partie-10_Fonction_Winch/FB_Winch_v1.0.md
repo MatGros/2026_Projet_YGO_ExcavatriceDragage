@@ -4,7 +4,7 @@
 > Rôle de **ce** document : directeur mouvement treuil (rampe, palier, sens, frein) — et
 > **catalogue unique** des `TC-P10-011`, `017`, `018`, `019`.
 > Compose `FB_SpeedStep` (§5), `FB_Brake` (§6), `FB_Ramp` (résumés ici, pas de fiche séparée).
-> Source code : `CODE/TREUILS/FB_Winch.st` · instances `instWinchM1/M2` dans `Treuils (CFC)`.
+> Source code : `CODE/H_TREUILS_BENNE/FB_Winch.st` · instances `instWinchM1/M2` dans `Treuils (CFC)`.
 
 ## 🧭 Sommaire
 
@@ -148,4 +148,4 @@ leur **égalité** qui signale un contacteur/bobine collé (pas leur différence
 | AF10 / FB_WinchOutputInterlock_LD | Consommateur de la demande produite ici |
 | AF09 | Encodeurs — `Homed`, `CablePosM`, vitesse |
 | AF10 / [FB_Bucket](FB_Bucket_v1.0.md) | Benne — sous-fonction M2 de ce FB |
-| Code | `CODE/TREUILS/FB_Winch.st`, `FB_SpeedStep.st`, `CODE/COMMUN/FB_Brake.st` |
+| Code | `CODE/H_TREUILS_BENNE/FB_Winch.st`, `FB_SpeedStep.st`, `CODE/A_COMMUN/FB_Brake.st` |

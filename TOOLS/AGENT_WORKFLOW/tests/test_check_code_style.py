@@ -16,10 +16,10 @@ SPEC.loader.exec_module(check_code_style)
 
 def test_simulation_allowlist_limitee_aux_trois_frontieres_justifiees() -> None:
     expected_paths = {
-        "CODE/MAIN/PRG_02_Acquisition.st",
-        "CODE/MAIN/PRG_05_Translation.st",
-        "CODE/MAIN/PRG_07_Supervision.st",
-        "CODE/DEPANNAGE/FB_TroubleshootingView.st",
+        "CODE/M_MAIN/PRG_02_Acquisition.st",
+        "CODE/M_MAIN/PRG_05_Translation.st",
+        "CODE/M_MAIN/PRG_07_Supervision.st",
+        "CODE/K_DEPANNAGE/FB_TroubleshootingView.st",
     }
 
     assert set(check_code_style.SIMULATION_ALLOWED_PATHS) == expected_paths
@@ -31,5 +31,5 @@ def test_simulation_allowlist_limitee_aux_trois_frontieres_justifiees() -> None:
         assert check_code_style.simulation_reference_allowed(Path(path))
 
     assert not check_code_style.simulation_reference_allowed(
-        Path("CODE/MAIN/PRG_SAFETY_CFC.st")
+        Path("CODE/M_MAIN/PRG_SAFETY_CFC.st")
     )

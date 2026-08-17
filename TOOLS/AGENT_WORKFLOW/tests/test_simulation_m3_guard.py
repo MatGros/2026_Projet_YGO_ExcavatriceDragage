@@ -7,8 +7,8 @@ créait un mot incohérent et un faux SafeStop.
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-SIM_BENCH = ROOT / "CODE" / "SIMULATION" / "FB_SimBench.st"
-SIM_TRANSLATION = ROOT / "CODE" / "SIMULATION" / "FB_Sim_Translation.st"
+SIM_BENCH = ROOT / "CODE" / "L_SIMULATION" / "FB_SimBench.st"
+SIM_TRANSLATION = ROOT / "CODE" / "L_SIMULATION" / "FB_Sim_Translation.st"
 
 
 def test_m3_sensor_override_uses_decoder_bit_order() -> None:
