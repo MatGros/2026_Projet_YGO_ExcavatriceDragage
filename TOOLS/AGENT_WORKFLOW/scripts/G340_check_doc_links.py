@@ -31,8 +31,6 @@ EXCLUDED_PARTS = {"ARCHIVES", "node_modules", ".venv", "venv", ".git", ".pi-suba
 HISTORICAL_LOGS = {
     "DOC/VERSION_HISTORY.md",
     "DOC/AUDIT_Coherence_Documentaire_v1.0.md",
-    "DOC/WFLOW/AUDITS/Architecture/AUDIT_M0_GEL_ETAT_INITIAL.md",
-    "DOC/WFLOW/AUDITS/Architecture/REGISTRE_ARBITRAGES_MIGRATION.md",
     "DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Encoder_Extraction_Code_v1.0.md",
     # PLAN_TASK est un journal d'evenements passes (REX 2026-08-12, lot
     # RENAME_GATES_G_PREFIX) : il cite les scripts sous leur ancien nom a la date
