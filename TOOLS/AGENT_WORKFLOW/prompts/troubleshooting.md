@@ -2,7 +2,7 @@
 
 > Prompt réutilisable pour diagnostiquer un blocage/bug dans le programme CODESYS.
 > L'agent NE PEUT PAS exécuter le PLC : il lit des variables de diagnostic et raisonne par arbre de décision.
-> Fiche de session : `DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_<Sujet>_<AAAA-MM-JJ>.md` (depuis `TEMPLATE_Troubleshooting.md`).
+> Fiche de session : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_<Sujet>_<AAAA-MM-JJ>.md` (depuis `TEMPLATE_Troubleshooting.md`).
 
 ## 0. 📥 ACQUISITION DES VALEURS (canal)
 

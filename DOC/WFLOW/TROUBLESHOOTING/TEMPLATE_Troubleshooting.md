@@ -1,5 +1,6 @@
 # 🕵️ Session de Troubleshooting — Recherche de Blocage et de Panne — <Sujet>
 
+> 📌 **Emplacement obligatoire** : Créer la fiche sous `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_<SujetCourt>_AAAAMMJJ.md`.
 > 📅 Date : <AAAA-MM-JJ> · 🧊 Situation : [SIMULATION BANC] / [SITE] · 📄 Statut : [OUVERTE] / [EN COURS] / [RÉSOLUE]
 
 ## 1. 🧊 Contexte figé (horodaté)
