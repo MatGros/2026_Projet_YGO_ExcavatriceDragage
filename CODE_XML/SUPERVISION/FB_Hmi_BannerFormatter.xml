@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T04:26:18.539366" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T04:26:18.539366">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T07:25:16.678262" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T07:25:16.678262">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -507,7 +507,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND, bandeau conservateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)</xhtml>
               </documentation>
             </variable>
             <variable name="DescendPermit">
@@ -541,7 +541,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par OR — toute limite haute affichée</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledUserRequestDirection">
@@ -819,7 +819,7 @@ ELSIF CurrentMode = E_Mode.DISABLE THEN
 ELSIF CurrentMode = E_Mode.SEMI_AUTO AND CycleStep = E_CycleStep.X0_PREPARATION THEN
     OperatorActionCandidate := '[IHM] Démarrer le cycle';
 ELSIF JoystickAtNeutral THEN
-    OperatorActionCandidate := '[JOYSTICK] Armé - actionner l''axe';
+    OperatorActionCandidate := '[JOYSTICK] Armé - actionner axe';
 ELSE
     OperatorActionCandidate := '[JOYSTICK] Déplacement en cours';
 END_IF;

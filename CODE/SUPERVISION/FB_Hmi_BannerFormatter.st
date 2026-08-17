@@ -35,12 +35,12 @@ VAR_INPUT
     EmergencyChainClosed : BOOL;
     PowerContactorEngaged: BOOL;
     PowerCutOffActiveAny : BOOL;
-    SafeStopActive       : BOOL; // Agrégat M1/M2 par AND, bandeau conservateur
+    SafeStopActive       : BOOL; // Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)
     DescendPermit        : BOOL; // Agrégat M1/M2 par AND
     AscentPermit         : BOOL; // Agrégat M1/M2 par AND
     BucketIsOpen         : BOOL;
     DiveActive           : BOOL;
-    TopLimitReached      : BOOL; // Agrégat M1/M2 par AND
+    TopLimitReached      : BOOL; // Agrégat M1/M2 par OR — toute limite haute affichée
     CoupledUserRequestDirection : INT;
     M1LogicRequestDirection     : INT;
     M2LogicRequestDirection     : INT;
@@ -218,7 +218,7 @@ ELSIF CurrentMode = E_Mode.DISABLE THEN
 ELSIF CurrentMode = E_Mode.SEMI_AUTO AND CycleStep = E_CycleStep.X0_PREPARATION THEN
     OperatorActionCandidate := '[IHM] Démarrer le cycle';
 ELSIF JoystickAtNeutral THEN
-    OperatorActionCandidate := '[JOYSTICK] Armé - actionner l''axe';
+    OperatorActionCandidate := '[JOYSTICK] Armé - actionner axe';
 ELSE
     OperatorActionCandidate := '[JOYSTICK] Déplacement en cours';
 END_IF;

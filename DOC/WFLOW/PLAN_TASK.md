@@ -35,6 +35,9 @@
 | 7 | Translation M3 — sécurité, sortie moteur, homme-mort | T104 + T105 + T106 + T107 | Audit 2026-08-05 (session M3), 4 lots implémentés dans l'ordre LOT0 → M4 → LOT3 → LOT2, `check_linkage.py`/`check_ld_invariants.py`/bundle PASS à chaque lot | ⏳ | HUM | 🟢 Prêt à tester (mise en service) |
 | 6 | Améliorations secondaires | T75 + T76 + T77 + T79 + T88 | T78 attend la décision T93 (T84/T85/T86 déjà implémentés au lot 1, T87 reporté au lot 4) | ⏸️ | — | — |
 | 8 | Audit doc — lot C4 AU Troubleshooting | Vérifier clôture du lot (§06) | REGISTRE + TEST_DESIGN C4 AU | 🔍 | DSH-01 | — |
+| 9 | Audit outillage `TOOLS/AGENT_WORKFLOW` | Purge Herdr/Pi, réécriture C0-C4 vers agents natifs, archivage `G220`, nettoyage `PROJECT_WORKSPACE` | Herdr/Pi abandonné (confirmé 2026-08-17) ; C0-C4 rebranché sur antigravity/Codex/forks Claude Code | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
+| 10 | Audit `CODE_XML` — reliquats & génération | 4 XML orphelins supprimés, génération rendue atomique (`generate_codesys_bundle.py`) | Bug trouvé en revue : purge non-atomique pouvait faire passer `G200` faussement au vert si le générateur échouait — corrigé et testé (2 scénarios d'échec simulés) | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
+| 11 | Audit documentation `DOC/TESTS`, `DOC/WFLOW` | Fusion registre MES (30 entrées, collision `MES-022/023` corrigée), archivage `Architecture/` (migration 7 POU terminée), liens morts corrigés | `ARCHIVES/Doc/` découvert gitignoré (comme `.claude/`/`.vscode/`) — forcé au tracking | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
 
 ### Règles de conduite
 
@@ -242,7 +245,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T39 | Interfaces Homing nominale et unitaire : essais opérateur CODESYS | Projet / Terrain | ⏳ | HUM | AF_Partie-10 |
 | T43 | Comparaison vitesse M1/M2 remontée : régler seuils/tempo (inactif à 0) | Projet / Client | ⏸️ | — | AF_Partie-04 §3quater, `FB_Cycle` |
 | T47 | Garde-fou palier vitesse treuils : documenter métier, calibrer et activer | Projet / Sécurité / Terrain | ⏳ | HUM | `FB_SpeedStep`, `GVL_PERSISTENT._WinchSpeedConfig` |
-| T48 | Matrice validation pannes treuils V1–V7 en simulation/terrain | Projet / Terrain | ⏳ | HUM | `REGISTRE_Suivi_MiseEnService_v1.0.md` |
+| T48 | Matrice validation pannes treuils V1–V7 en simulation/terrain | Projet / Terrain | ⏳ | HUM | `REGISTRE_Suivi_MiseEnService.md` |
 | T52 | Valider chaîne `PowerCutOff` physique et temps coupure réel | Électricité + Projet | ⏳ | HUM | `PRG_06_Outputs_LD.st` |
 | T54 | Intégrer latence boucle automate (~10 ms) au calcul temps d'arrêt | Projet | ⬜ | — | AUDIT Winch §3.2 |
 | T55 | Stratégie synchronisme unique (info / mineur / majeur / critique) | Projet | ⬜ | — | `FB_WinchSync` |
@@ -371,7 +374,7 @@ séquence de freinage. À instruire ensemble, sur machine.
 `Network.Bypass.IhmHeartbeat := FALSE` (**T83**) · `SpeedGuardEnable` activé · valeurs persistantes
 relevées et archivées.
 
-📝 **Chaque phase donne lieu à une entrée `MES-xxx`** dans `REGISTRE_Suivi_MiseEnService_v1.0.md`.
+📝 **Chaque phase donne lieu à une entrée `MES-xxx`** dans `REGISTRE_Suivi_MiseEnService.md`.
 
 ---
 
@@ -399,7 +402,7 @@ relevées et archivées.
 ### 🧾 Journal des séances MES / REX
 
 Les constats, mesures et décisions issus du banc ou du terrain sont consignés dans
-`REGISTRE_Suivi_MiseEnService_v1.0.md`. Toute action différée issue d'une séance doit
+`REGISTRE_Suivi_MiseEnService.md`. Toute action différée issue d'une séance doit
 être créée ou mise à jour ici au §3 avec un identifiant `Txx` : ce plan reste l'unique source des
 reliquats à implémenter.
 

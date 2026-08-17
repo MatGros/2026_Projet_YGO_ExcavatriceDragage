@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-15T10:38:34.846022" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-15T10:38:34.846022">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.220675" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.220675">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16039,7 +16039,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND, bandeau conservateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)</xhtml>
               </documentation>
             </variable>
             <variable name="DescendPermit">
@@ -16073,7 +16073,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par OR — toute limite haute affichée</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledUserRequestDirection">
@@ -16351,7 +16351,7 @@ ELSIF CurrentMode = E_Mode.DISABLE THEN
 ELSIF CurrentMode = E_Mode.SEMI_AUTO AND CycleStep = E_CycleStep.X0_PREPARATION THEN
     OperatorActionCandidate := '[IHM] Démarrer le cycle';
 ELSIF JoystickAtNeutral THEN
-    OperatorActionCandidate := '[JOYSTICK] Armé - actionner l''axe';
+    OperatorActionCandidate := '[JOYSTICK] Armé - actionner axe';
 ELSE
     OperatorActionCandidate := '[JOYSTICK] Déplacement en cours';
 END_IF;
@@ -24710,7 +24710,7 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx111_BucketIsIntermediate := Winch
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx112_DeltaPosition_M := WinchM2.Bucket.State.DeltaPosition_M;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx201_HmiCmd_BtnOpen := WinchM2.Bucket.Cmd.BtnOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx202_HmiCmd_BtnClose := WinchM2.Bucket.Cmd.BtnClose;
-GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := CycleBucketOpen
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx203_CycleCmd_Open := CycleBucketOpen;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx204_CoupledDiveOpenArmed := WinchM2.Bucket.State.CoupledDiveOpenArmed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx205_CoupledAscentCloseArmed := WinchM2.Bucket.State.CoupledAscentCloseArmed;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx206_CloseReqActive := WinchM2.Bucket.State.CloseActive;
@@ -34821,12 +34821,12 @@ instHmiBannerFormatter(
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffActiveAny        := PRG_06_Outputs_LD.PowerCutOffActive,
-    SafeStopActive              := GVL_IHM.M1TreuilRetenue.Safety.SafeStop AND GVL_IHM.M2TreuilBenne.Safety.SafeStop,
+    SafeStopActive              := GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop,
     DescendPermit               := GVL_IHM.M1TreuilRetenue.Safety.DescendPermit AND GVL_IHM.M2TreuilBenne.Safety.DescendPermit,
     AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
     BucketIsOpen                := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
     DiveActive                  := GVL_IHM.DredgingAssist.State.DiveBusy,
-    TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent AND GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
+    TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent OR GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
     M1LogicRequestDirection     := PRG_04_Treuils_Benne.M1LogicRequestDirection,
     M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
