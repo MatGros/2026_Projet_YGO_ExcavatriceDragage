@@ -1,6 +1,8 @@
 # 🔬 REX — [Titre de l'incident / Sujet]
 
-**Date** : YYYY-MM-DD  
+> 📌 **Convention de nommage obligatoire** : `REX_<SujetCourt>_AAAAMMJJ.md` (ex. `REX_PRG06_Import_Error_20260804.md`).
+
+**Date** : AAAA-MM-JJ  
 **Auteur / Réf** : [Nom / Agent ID / Réf tâche Txx]  
 **Statut** : 🔴 Ouvert / 🟠 En cours d'analyse / ✅ Résolu & Guarded  
 **Criticité** : C0 (Doc) / C1 (Diag) / C2 (Métier) / C3 (Safety standard) / C4 (Safety critique)  
