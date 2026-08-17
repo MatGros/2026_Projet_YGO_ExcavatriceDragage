@@ -20,7 +20,9 @@
 > - `✅` : **Clôturé & Validé** (validé formellement par l'humain et archivé)
 >
 > **Légende des Identifiants Agents (`Lock Agent`)** :
-> `CC-01`/`CC-02` (Claude Code) · `AGY-01`/`AGY-02` (Antigravity/Gemini) · `CDX-01` (Codex/OpenAI) · `PI-01` (Pi/OmniRoute) · `HUM` (Humain/Terrain) · `—` (Libre).
+> `CC-01`/`CC-02` (Claude Code) · `AGY-01`/`AGY-02` (Antigravity/Gemini) · `CDX-01` (Codex/OpenAI) · `PI-01` (Pi/OmniRoute) · `DSH-01`/`DSH-02` (DeepSeek Harness) · `HUM` (Humain/Terrain) · `—` (Libre).
+>
+> 📌 **Notice** : chaque identifiant est **unique** — un agent ne reprend jamais un identifiant déjà pris. À chaque nouvel agent, on **incrémente** le numéro (ex. `DSH-01` → `DSH-02` → `DSH-03`). Vérifier les identifiants déjà utilisés avant de s'inscrire.
 
 | Ordre | Lot fonctionnel | Tâches | Dépendances / décision | Statut | Lock Agent | Validation utilisateur |
 |---:|---|---|---|:---:|:---:|---|
@@ -32,6 +34,7 @@
 | 2A | Interlocks finaux frein / puissance | Lot 3A | `FB_WinchOutputInterlock_LD` + `FB_TranslationOutputInterlock_LD` ; `SafeStop` reste la rampe rapide métier, tests PLC préparés ; qualification CODESYS/simulation à faire | ⏳ | PI-01 | ⏳ Validation CODESYS/terrain requise |
 | 7 | Translation M3 — sécurité, sortie moteur, homme-mort | T104 + T105 + T106 + T107 | Audit 2026-08-05 (session M3), 4 lots implémentés dans l'ordre LOT0 → M4 → LOT3 → LOT2, `check_linkage.py`/`check_ld_invariants.py`/bundle PASS à chaque lot | ⏳ | HUM | 🟢 Prêt à tester (mise en service) |
 | 6 | Améliorations secondaires | T75 + T76 + T77 + T79 + T88 | T78 attend la décision T93 (T84/T85/T86 déjà implémentés au lot 1, T87 reporté au lot 4) | ⏸️ | — | — |
+| 8 | Audit doc — lot C4 AU Troubleshooting | Vérifier clôture du lot (§06) | REGISTRE + TEST_DESIGN C4 AU | 🔍 | DSH-01 | — |
 
 ### Règles de conduite
 
@@ -279,14 +282,14 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T109 | Formaliser convention polarité positive (`*Permit` / `Allowed`) pour arbitrages | Projet / Convention | ⬜ | — | `NAMING_CONVENTION.md` |
 | T110 | Clarifier sémantique `DriveStatusWord.0` AC600 ("Power Ready" vs "Mouvement" Méca B) | Projet / Sécurité | ⬜ | — | `FB_Safety_Translation.st` |
 | T115 | Bandeau IHM champ 2 « Cycle » : `CycleStep` non alimenté → affiche `INIT` | Projet / IHM | ⏸️ | — | `PRG_07_Supervision.st`, lié au lot Cycle Auto |
-| T116 | IHM : message homme-mort/neutre dynamique selon l'état réel (3 états) | Projet / IHM | ⬜ | — | `PRG_07_Supervision.st`, `FB_Hmi_BannerFormatter.st`, `FB_Joystick.st` |
-| T117 | Renommage/élimination des variables `Forbid*` (`ForbidDescent`/`ForbidAscent`) | Projet / Convention | ⬜ | — | `NAMING_CONVENTION.md`, `T109` |
-| T118 | Refonte des textes IHM du bandeau (`FB_Hmi_BannerFormatter`) : cause + action | Projet / IHM | ⬜ | — | `FB_Hmi_BannerFormatter.st`, `PRG_07_Supervision.st`, Option A |
-| T119 | Analyse comportement Dive / référencement benne dans le cycle semi-auto | Projet / Sécurité / IHM | ⏸️ | — | Reliquat session 2026-08-16, lié à T118 |
-| T120 | Autoriser SEMI_AUTO même si prérequis non prêts (attente explicite cycle) | Projet / Sécurité / IHM | ⬜ | — | `FB_Modes.st`, `PRG_03_Modes_Cycle.st`, `FB_Cycle.st` |
-| T121 | Audit & élimination des constantes magiques (`<> 8` → symboles DUT/enums) | Projet / Convention / Sécurité | ⬜ | — | `CODE/` (grep), `NAMING_CONVENTION.md` |
-| T122 | Renommage flux joystick → actionneurs (CoupledUserRequest / LogicRequest) | Projet / Convention / Sécurité | ⏳ | CDX-01 | `PRG_04_Treuils_Benne.st` (Phases 1-2 faites, phase 3 différée) |
-| T123 | Compléter la vue Troubleshooting (flux chronologique, 18 TBD) | Projet / Diagnostic | ⏳ | CDX-01 | `FB_TroubleshootingView.st`, `ST_ChainWinch.st`, `GVL_Troubleshooting.st` |
+| T116 | IHM : message homme-mort/neutre dynamique selon l'état réel (3 états) | Projet / IHM | ✅ | DSH-02 | `PRG_07_Supervision.st`, `FB_Hmi_BannerFormatter.st`, `FB_Joystick.st` |
+| T117 | Renommage/élimination des variables `Forbid*` (`ForbidDescent`/`ForbidAscent`) | Projet / Convention | ✅ | DSH-02 | `NAMING_CONVENTION.md`, `T109` |
+| T118 | Refonte des textes IHM du bandeau (`FB_Hmi_BannerFormatter`) : cause + action | Projet / IHM | ✅ | DSH-02 | `FB_Hmi_BannerFormatter.st`, `PRG_07_Supervision.st`, Option A |
+| T119 | Analyse comportement Dive / référencement benne dans le cycle semi-auto | Projet / Sécurité / IHM | ✅ | DSH-02 | Reliquat session 2026-08-16, lié à T118 |
+| T120 | Autoriser SEMI_AUTO même si prérequis non prêts (attente explicite cycle) | Projet / Sécurité / IHM | ⏸️ | DSH-02 | `FB_Modes.st`, `PRG_03_Modes_Cycle.st`, `FB_Cycle.st` — agent échoue (C4), différé |
+| T121 | Audit & élimination des constantes magiques (`<> 8` → symboles DUT/enums) | Projet / Convention / Sécurité | ✅ | DSH-02 | `CODE/` (grep), `NAMING_CONVENTION.md` |
+| T122 | Renommage flux joystick → actionneurs (CoupledUserRequest / LogicRequest) | Projet / Convention / Sécurité | ✅ | DSH-02 | `PRG_04_Treuils_Benne.st` (Phases 1-2 faites, phase 3 différée) |
+| T123 | Compléter la vue Troubleshooting (flux chronologique, 18 TBD) | Projet / Diagnostic | ✅ | DSH-02 | `FB_TroubleshootingView.st`, `ST_ChainWinch.st`, `GVL_Troubleshooting.st` |
 
 ---
 
