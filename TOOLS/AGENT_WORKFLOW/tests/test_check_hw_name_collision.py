@@ -19,7 +19,10 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_csv_reel_contient_les_noms_connus_du_bug_frein_m3() -> None:
-    csv_path = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv"
+    # 20260806 = CSV en vigueur au moment du REX (archive 2026-08-17, cf.
+    # ARCHIVES/Tools/AGENT_WORKFLOW/config/) ; les 3 noms restent presents dans le
+    # CSV vivant courant, ce test suit donc l'actif plutot qu'un snapshot fige.
+    csv_path = REPO_ROOT / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260814.csv"
     names = check_hw_name_collision.load_hw_names(csv_path)
     assert "M3_BrakeRelease_RQ" in names
     assert "M1_RelayFwd_Up_DQ" in names

@@ -37,7 +37,7 @@
 
 Bloc safety **métier** du domaine treuil (Partie3 §2 : profil FB safety domaine). Surveille des
 faits qualifiés (position, vitesse, contacteurs, frein, com) et produit les interlocks du domaine
-(`SafeStop`, `ForbidDescent`, `ForbidAscent`, `PowerCutOff`). Ne devient pas propriétaire des
+(`SafeStop`, `DescendPermit`, `AscentPermit`, `PowerCutOff`). Ne devient pas propriétaire des
 mesures surveillées (codeurs, contacteurs restent produits ailleurs).
 
 2 instances : `instSafetyWinchM1`, `instSafetyWinchM2` — une par treuil, indépendantes.
@@ -110,7 +110,7 @@ AscentPermit  = NOT (bit5 OR (capteur haut physique atteint) OR (limite haute at
 |---|---|
 | `BypassGlobal` | Force `ErrorId=0`, ignore tout |
 | `BypassSafety` | Groupe PowerCutOff (bits 2,7,8,9,10,11,13) |
-| `BypassProcess` | Groupe SafeStop/Forbid (bits 0,1,3,4,5,6,12,14,15) |
+| `BypassProcess` | Groupe SafeStop/Permit (bits 0,1,3,4,5,6,12,14,15) |
 | `BypassMecaA..E`, `BypassTopLimitSwitch`, `BypassCableLimitSwitch`, `BypassOperatorComm`, `BypassPhaseRotation`, `BypassBrakeThermal` | Individuels par méca/cause |
 
 🚫 **Règle projet (NAMING_CONVENTION)** : ne jamais forcer manuellement une sortie de commande

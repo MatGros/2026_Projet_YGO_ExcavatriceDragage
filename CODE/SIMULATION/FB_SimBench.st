@@ -214,12 +214,12 @@ Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
 Winch.COD1_Alarms              := 0;
 Winch.COD1_Warnings            := 0;
-Winch.COD1_DeviceState         := 4; // DEVICE_STATE RUNNING = 4 (bus OK)
+Winch.COD1_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING (bus OK)
 
 Winch.COD2_PosValue            := instSimEncoderM2.RawPosOut;
 Winch.COD2_Alarms              := 0;
 Winch.COD2_Warnings            := 0;
-Winch.COD2_DeviceState         := 4; // DEVICE_STATE RUNNING = 4
+Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
 
 
 {endregion}
@@ -277,7 +277,7 @@ END_IF;
 
 Translation.M3_StatusWord        := M3_StatusWordSim;
 Translation.M3_ActualFrequencyHz := M3_ActualFreqHz;
-Translation.AC600_DeviceState    := 4; // DEVICE_STATE RUNNING = 4
+Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNING
 
 
 {endregion}
@@ -324,7 +324,7 @@ END_IF;
 Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount > 0);
 
 Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
-Operator.JOY1_DeviceState := 4; // DEVICE_STATE RUNNING = 4
+Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 
 
 {endregion}

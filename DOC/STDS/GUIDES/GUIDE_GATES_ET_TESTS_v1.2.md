@@ -97,13 +97,16 @@ prévient explicitement qu'ils seront rejoués sur le bundle complet au palier C
 | <nobr><code>100</code></nobr> | <small><code>G100_check_code_style.py</code></small> | Style (`VAR_OUTPUT`, simulation) |
 | <nobr><code>110</code></nobr> | <small><code>G110_check_naming_style.py</code></small> | Nommage IEC 61131-3 (`NC-010`→`NC-070`, informatif, baseline) |
 
-### Palier B — `200`-`220`
+### Palier B — `200`-`210`
 
 | <nobr>ID Gate</nobr> | <nobr>Script</nobr> | Vérifie |
 |---|---|---|
 | <nobr><code>200</code></nobr> | <small><code>G200_check_linkage.py</code></small> | Liaison — **seule preuve de câblage réel**, `§3` |
 | <nobr><code>210</code></nobr> | <small><code>G210_check_cfc_wiring.py</code></small> | Câblage CFC natif |
-| <nobr><code>220</code></nobr> | <small><code>G220_check_model_routing.py</code></small> | Routage modèle (Pi Subagents) |
+
+📌 `G220_check_model_routing.py` (routage modèle Pi Subagents) archivé 2026-08-17 avec l'abandon
+de Pi/Herdr — voir `ARCHIVES/Tools/AGENT_WORKFLOW/scripts/README.md`. La garantie "modèle fort en
+C4" repose désormais sur `human_validation_required` + double revue A/B (`SAFETY_POLICY.md`).
 
 ### Palier C — `300`-`420`
 

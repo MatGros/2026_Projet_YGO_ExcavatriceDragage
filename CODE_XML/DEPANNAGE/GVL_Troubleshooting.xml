@@ -223,7 +223,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Fond détecté, descente bloquée (ForbidDescentM1/M2_Raw)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 1 = Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx306_ErrorIdRaw">
@@ -2482,12 +2482,12 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteur Actif | 1 = Capteur Haut Shunté IHM ⚠️</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx306_ForbidAscentEffective">
+            <variable name="Idx306_AscentPermitEffective">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Montée Autorisée | 1 = MONTÉE BLOQUÉE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE 🔴</xhtml>
               </documentation>
             </variable>
             <variable name="Idx307_SlackCablePhysical_DI">
@@ -2506,12 +2506,12 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteur Actif | 1 = Mou de Câble Shunté IHM ⚠️</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx309_ForbidDescentEffective">
+            <variable name="Idx309_DescendPermitEffective">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Descente Autorisée | 1 = DESCENTE BLOQUÉE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE 🔴</xhtml>
               </documentation>
             </variable>
             <variable name="Idx310_MecaFaultMask">

@@ -25,15 +25,13 @@ PLC_LIVE_READER/
 │                           input des scripts codesys_console)
 └── RESULTS/                 CSV produits (sortie)
     ├── snapshot/            un instant T, sur declenchement manuel
-    ├── acquisition/         serie periodique (plusieurs instants dans un seul CSV)
-    └── ARCHIVES/            sessions de troubleshooting cloturees, un sous-dossier
-                              <Sujet>_<AAAA-MM-JJ>/ par fiche (voir skill troubleshooting §Etape 8)
+    └── acquisition/         serie periodique (plusieurs instants dans un seul CSV)
 ```
 
 ⚠️ Les CSV de `RESULTS/snapshot/` et `RESULTS/acquisition/` sont **trackés en Git** (historisation) —
 sans tri, ils s'accumulent indéfiniment. À la clôture d'une fiche de troubleshooting, la skill
 `troubleshooting` (étape 8) déplace les CSV produits pendant la session vers
-`RESULTS/ARCHIVES/<Sujet>_<date>/`.
+`ARCHIVES/Tools/PLC_LIVE_READER/RESULTS/<Sujet>_<date>/` (miroir racine, voir `ARCHIVES/Tools/`).
 
 ## ⚠️ Deux modes distincts — diagnostiqué le 2026-08-16 sur ce projet
 

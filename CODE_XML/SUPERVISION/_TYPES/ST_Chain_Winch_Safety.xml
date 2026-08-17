@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-27T13:56:34.389295" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-27T13:56:34.389295">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T02:50:18.761427" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T02:50:18.761427">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -66,12 +66,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteur Actif | 1 = Capteur Haut Shunté IHM ⚠️</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx306_ForbidAscentEffective">
+            <variable name="Idx306_AscentPermitEffective">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Montée Autorisée | 1 = MONTÉE BLOQUÉE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE 🔴</xhtml>
               </documentation>
             </variable>
             <variable name="Idx307_SlackCablePhysical_DI">
@@ -90,12 +90,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Capteur Actif | 1 = Mou de Câble Shunté IHM ⚠️</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx309_ForbidDescentEffective">
+            <variable name="Idx309_DescendPermitEffective">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Descente Autorisée | 1 = DESCENTE BLOQUÉE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE 🔴</xhtml>
               </documentation>
             </variable>
             <variable name="Idx310_MecaFaultMask">

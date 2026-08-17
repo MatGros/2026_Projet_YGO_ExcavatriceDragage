@@ -1,0 +1,76 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T119_ANALYSE_DIVE_BENNE_CYCLE
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T119_ANALYSE_DIVE_BENNE_CYCLE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Analyser le comportement Dive / référencement benne dans le cycle semi-auto
+    (MAINT_N1) : clarifier l'interlock descente benne fermée (DescendPermitDiveBucketOpen)
+    et le retour IHM à l'étape « descendre » du cycle. Livrable = analyse/recommandation,
+    AUCUNE modification de code.
+
+  acceptance:
+    - id: AC1
+      statement: "Cartographier l'interlock descente benne fermée (DescendPermitDiveBucketOpen) dans le cycle semi-auto : quand bloque-t-il, pourquoi, et quel est l'impact sur l'étape « descendre »."
+      verified_by: "Lecture PRG_04_Treuils_Benne.st, FB_DiveSearch.st, FB_Cycle.st — tableau de l'interlock."
+    - id: AC2
+      statement: "Identifier le conflit : référencer la benne FERMÉE vs l'exigence Dive (benne OUVERTE pour descendre)."
+      verified_by: "Analyse critique — recommandation sur la stratégie de référencement benne."
+    - id: AC3
+      statement: "Proposer le retour IHM à l'étape « descendre » du cycle (message/action) quand la descente est bloquée par la benne fermée."
+      verified_by: "Recommandation écrite — lié à T118."
+    - id: AC4
+      statement: "Estimer l'effort/risque des options (couper Dive pendant référencement, autoriser descente benne fermée, etc.)."
+      verified_by: "Estimation écrite."
+    - id: AC5
+      statement: "Aucun fichier CODE/ modifié — livrable = analyse/recommandation uniquement."
+      verified_by: "git status — aucun changement de code."
+
+  scope:
+    allowed:
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_T119_ANALYSE_DIVE_BENNE_CYCLE.yaml
+    forbidden:
+      - CODE/ (aucune modification)
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Aucun code modifié — analyse seule."
+    dropped_on_purpose:
+      - "Aucun."
+
+  evidence_required:
+    - check_linkage          # inchangé (aucune modif code)
+
+  models_allowed:
+    - "codex/gpt-5.6-luna"
+    - "codex/gpt-5.6-sol"
+
+  alert_duty: >
+    Tout risque de sécurité ou incohérence de spec est remonté immédiatement.
+    Signaler n'est pas élargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "codex/gpt-5.6-luna"
+  completed_at: "2026-08-17"
+  status: COMPLETED
+  summary: "Analyse Dive/benne cycle terminée. Blocage cohérent avec la sécurité (benne fermée n'autorise pas descente Dive). Stratégie : référencer fermée, exiger ouverture réelle, confirmer IsOpen, puis armer Dive. IHM : 'Benne non ouverte — ouvrir et confirmer'. Ambiguïté levée : petits cycles (Dive/Extraction/Bucket) partagés entre MAINT et SEMI_AUTO (cohérence entre modes)."
+  evidence_submitted:
+    - "Analyse AC1-AC5 complète"
+
+validation:
+  status: PENDING
+  validated_by: "DeepSeek (Orchestrateur)"
+  validated_at: ""
+  notes: ""

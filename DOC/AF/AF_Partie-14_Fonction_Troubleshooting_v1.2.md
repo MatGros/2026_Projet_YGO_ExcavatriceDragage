@@ -33,7 +33,7 @@ Le contenu fonctionnel des 5 fonctions machine ci-dessus, ses seuils et ses obse
 (`FB_Acquisition_Preflight`, `FB_Winch_Symmetry`) ne sont pas modifies par le changement de POU.
 Fiches : `AF_Partie-06` (Preflight) et `AF_Partie-10` (Symmetry).
 
-📌 Lot de migration : **M6** de `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C2, patch).
+📌 Lot de migration : **M6** (C2, patch) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 
 ---
 

@@ -1,7 +1,7 @@
 # Préambule obligatoire — tout sous-agent qui touche au code
 
-> 📌 **À coller en tête de CHAQUE tâche déléguée** (Pi Subagents worker/reviewer, agent Claude,
-> Codex, antigravity). Sans lui, le sous-agent démarre sans les règles du projet et redécouvre
+> 📌 **À coller en tête de CHAQUE tâche déléguée** (fork Claude Code worker/reviewer, Codex,
+> antigravity). Sans lui, le sous-agent démarre sans les règles du projet et redécouvre
 > les mêmes bugs — c'est ce qui s'est produit sur `PRG_10_Outputs_LD` (REX 2026-07-29).
 > Le préambule est court **exprès** : il pointe, il ne recopie pas.
 

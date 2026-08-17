@@ -595,7 +595,7 @@ END_IF;
 
 // 🆕 2026-08-07 (demande client) : la limite légale (profondeur min. autorisée) doit elle aussi
 // bénéficier du ralentissement progressif avant arrêt (comme la limite câble physique), pas juste
-// un arrêt sec (ForbidDescent, ajouté au lot précédent). Comme les 2 limites bornent la même
+// un arrêt sec (DescendPermit, ajouté au lot précédent). Comme les 2 limites bornent la même
 // direction (descente), on alimente FB_Winch.BottomLimitM avec la PLUS RESTRICTIVE des deux
 // (MAX de 2 valeurs négatives = celle la moins profonde = atteinte en premier) : le ralentissement
 // (FB_Winch §"RALENTISSEMENT AUTOMATIQUE SUR BORDURES") s'enclenche alors sur la bonne limite,

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.674168" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T14:02:33.674168">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T02:50:38.805427" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T02:50:38.805427">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -209,7 +209,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ForbidDescentM1/M2_Raw)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)</xhtml>
               </documentation>
             </variable>
           </struct>

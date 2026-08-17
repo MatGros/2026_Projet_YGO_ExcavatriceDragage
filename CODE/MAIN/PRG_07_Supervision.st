@@ -389,11 +389,20 @@ instHmiBannerFormatter(
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    SafeStopActiveAny     := GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop OR GVL_IHM.TranslationM3.Safety.SafeStop,
-    PowerCutOffActiveAny  := PRG_06_Outputs_LD.PowerCutOffActive,
-    DeadmanArmed          := PRG_02_Acquisition.JoystickDeadmanArmed,
-    JoystickAtNeutral     := PRG_02_Acquisition.instJoystick.AtNeutral,
-    CycleAutoBusy         := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO)
+    PowerCutOffActiveAny        := PRG_06_Outputs_LD.PowerCutOffActive,
+    SafeStopActive              := GVL_IHM.M1TreuilRetenue.Safety.SafeStop AND GVL_IHM.M2TreuilBenne.Safety.SafeStop,
+    DescendPermit               := GVL_IHM.M1TreuilRetenue.Safety.DescendPermit AND GVL_IHM.M2TreuilBenne.Safety.DescendPermit,
+    AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
+    BucketIsOpen                := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
+    DiveActive                  := GVL_IHM.DredgingAssist.State.DiveBusy,
+    TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent AND GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
+    CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
+    M1LogicRequestDirection     := PRG_04_Treuils_Benne.M1LogicRequestDirection,
+    M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
+    CycleRequestDirection       := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction,
+    DeadmanArmed                := PRG_02_Acquisition.JoystickDeadmanArmed,
+    JoystickAtNeutral           := PRG_02_Acquisition.instJoystick.AtNeutral,
+    CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy
 );
 GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 

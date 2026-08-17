@@ -1,0 +1,95 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T117_RENOMMAGE_FORBID
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T117_RENOMMAGE_FORBID
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Éliminer le vocabulaire « Forbid » (logique inverse) au profit de la polarité
+    positive (Permit). Renommer les champs de diagnostic ForbidAscentEffective/
+    ForbidDescentEffective en polarité positive, et nettoyer les commentaires.
+    La logique est DÉJÀ en polarité positive (Permit = NOT Forbid, REX T112) —
+    renommage lexical uniquement, aucune logique modifiée.
+
+  acceptance:
+    - id: AC1
+      statement: "Les champs Idx306_ForbidAscentEffective et Idx309_ForbidDescentEffective de ST_Chain_Winch_Safety sont renommés en polarité positive (ex. Idx306_AscentPermitEffective, Idx309_DescendPermitEffective)."
+      verified_by: "grep 'Forbid' dans CODE/ — 0 occurrence dans les noms de champs."
+    - id: AC2
+      statement: "Les assignations dans FB_TroubleshootingView sont mises à jour (NOT AscentPermit → champ positif, etc.)."
+      verified_by: "Lecture FB_TroubleshootingView.st — cohérent avec les nouveaux champs."
+    - id: AC3
+      statement: "Les commentaires contenant 'Forbid' sont nettoyés (remplacés par la polarité positive)."
+      verified_by: "grep 'Forbid' dans CODE/ — réduit aux références historiques justifiées."
+    - id: AC4
+      statement: "Aucun changement de logique — renommage lexical uniquement."
+      verified_by: "G200_check_linkage.py — aucune instance métier modifiée."
+    - id: AC5
+      statement: "La liaison passe (G200)."
+      verified_by: "python G200_check_linkage.py --report — PASS."
+    - id: AC6
+      statement: "nom de fichier est identique au nom de POU et suffixe de langage est identique au langage bundle pour les POU de CODE/MAIN modifiés (PRG_04_Treuils_Benne)"
+      verified_by: "G200_check_linkage.py --report"
+
+  scope:
+    allowed:
+      - CODE/SUPERVISION/_TYPES/ST_Chain_Winch_Safety.st
+      - CODE/DEPANNAGE/FB_TroubleshootingView.st
+      - CODE/SUPERVISION/_TYPES/ST_ChainBucket.st
+      - CODE/SUPERVISION/_TYPES/ST_CommunHMI.st
+      - CODE/SUPERVISION/_TYPES/ST_DredgingAssistState.st
+      - CODE/MAIN/PRG_04_Treuils_Benne.st
+      - CODE/TREUILS/FB_Safety_Winch.st
+      - CODE/TREUILS/FB_Winch.st
+      - CODE/CODEURS/FB_Encoder_Homing.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.0.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_T117_RENOMMAGE_FORBID.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE_XML/ (fichiers générés hors scope)
+
+  conservation:
+    must_survive:
+      - "Aucun changement de logique (Permit = NOT Forbid conservé)."
+      - "Les variables safety (SafeStop, PowerCutOff, AscentPermit, DescendPermit) inchangées."
+    dropped_on_purpose:
+      - "Vocabulaire 'Forbid' remplacé par la polarité positive (Permit)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+
+  models_allowed:
+    - "codex/gpt-5.6-luna"
+    - "codex/gpt-5.6-sol"
+
+  alert_duty: >
+    Tout risque de toucher à la logique (pas juste au nom) est remonté immédiatement.
+    Ne pas élargir le périmètre.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "codex/gpt-5.6-luna"
+  completed_at: "2026-08-17"
+  status: COMPLETED
+  summary: "Champs ForbidAscentEffective/ForbidDescentEffective renommés en AscentPermitEffective/DescendPermitEffective. Assignations FB_TroubleshootingView mises à jour."
+  evidence_submitted:
+    - "grep ForbidAscentEffective/ForbidDescentEffective : 0 occurrence"
+
+validation:
+  status: PENDING
+  validated_by: "DeepSeek (Orchestrateur)"
+  validated_at: ""
+  notes: ""

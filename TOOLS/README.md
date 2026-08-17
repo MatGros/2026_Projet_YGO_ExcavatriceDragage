@@ -4,21 +4,21 @@ Ce dossier contient **deux outils indépendants** + **documentation/configuratio
 
 ```
 TOOLS/
-├── AGENT_WORKFLOW/       # Orchestration agents, gates, policies, skills Pi
+├── AGENT_WORKFLOW/       # Orchestration agents, gates, policies, skills
 │   ├── scripts/          # Gates Python (structure, style, bundle, compile, pre-edit)
-│   ├── skills/           # Skills Pi Coding Agent (codesys-change, herdr-review, ...)
+│   ├── skills/           # Skills (codesys-change, codesys-review, ...)
 │   ├── docs/             # Policies (SAFETY, WORKFLOW, TOKEN, DOC_WRITING, ...)
-│   ├── schemas/          # JSON schemas (herdr_review, requirement_intake)
+│   ├── schemas/          # JSON schemas (requirement_intake)
 │   ├── templates/        # Templates ST & DOC
 │   ├── prompts/          # Prompts agents
-│   └── config/           # herdr_policy.json
+│   └── config/           # naming_baseline.json, workflow_diagram.json, Device_IO_*.csv
 ├── ST_PLCOPENXML_GENERATOR/  # Convertisseur ST → PLCopenXML (autonome)
     ├── generator/        # Code Python du générateur
     ├── tests/            # Unitaires, intégration, golden files (306 tests)
     ├── SAMPLES_CODESYS/
     ├── test_import_poc/
     └── docs/
-├── PROJECT_WORKSPACE/       # Environnement de travail du projet (Pi, AGY, Claude, Gates, Herdr, Graph)
+├── PROJECT_WORKSPACE/       # Environnement de travail du projet (AGY, Claude, Codex, OpenCode, Gates, Graph)
 │   ├── README.md             # Documentation et guide (terminaux VS Code)
 │   ├── MARKDOWN_WORKSPACE.md # Édition & cochage des fichiers Markdown (Ctrl+K V)
 │   └── terminals.json        # Fichier de configuration modèle
@@ -62,9 +62,9 @@ python -m generator.cli --bundle CODE_Bundle --project-name "MGS_v0.4.18" --time
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --codesys-log build.log --strict
 ```
 
-### Lancer les terminaux VS Code (Pi + Gates + Herdr + Graph)
+### Lancer les terminaux VS Code (AGY + Claude + Codex + OpenCode + Gates + Graph)
 
-L’extension **Terminals Manager** ouvre les quatre onglets dans le terminal intégré :
+L’extension **Terminals Manager** ouvre les dix onglets dans le terminal intégré :
 
 ```text
 Ctrl+Shift+P → Terminals: Run
@@ -86,16 +86,17 @@ python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header
 # Voir dans VS Code (Markdown preview) ou Mermaid Live Editor
 ```
 
-### Skills Pi Coding Agent
+### Skills du workflow
 
 Installation :
 
 ```powershell
 pip install -e TOOLS/AGENT_WORKFLOW
-# ou via Pi : pi package add TOOLS/AGENT_WORKFLOW
 ```
 
-Skills disponibles : `codesys-change`, `codesys-review`, `herdr-review`, `doc-sync`, `release-check`, `requirement-intake`.
+Skills disponibles (`TOOLS/AGENT_WORKFLOW/skills/`, référence — non auto-découvertes par Claude
+Code, seul `.claude/skills/` l'est) : `codesys-change`, `codesys-review`, `doc-sync`,
+`release-check`, `requirement-intake`.
 
 ---
 
@@ -115,13 +116,16 @@ Skills disponibles : `codesys-change`, `codesys-review`, `herdr-review`, `doc-sy
 
 👉 **Toujours lancer `run_all_gates.py` avant de terminer une tâche** — c'est le "test de consentement". Pas de commit sans gates verts **ET validation utilisateur** — les deux sont obligatoires.
 
-### `AGENT_WORKFLOW/skills/` — Extensions Pi Coding Agent
+### `AGENT_WORKFLOW/skills/` — Skills de référence
 
-🤖 Compétences qu'on donne aux agents IA pour naviguer le projet :
+🤖 Compétences qu'on donne aux agents IA pour naviguer le projet (référence, pointées par
+`AGENTS.md`/`WORKFLOW.md` — seul `.claude/skills/` est auto-découvert par Claude Code) :
 
-- **`codesys-workflow`** 📝 : Lire les specs, vérifier nommage, auditer FB avant de coder
+- **`codesys-change`** 📝 : Modifier CODE/ (lecture specs, plan, gates, bundle, validation)
 - **`codesys-review`** 🔍 : Review du code ST (sécurité machine, non-régression, contrats)
-- **`herdr-review`** 👥 : Orchestration multi-agents (délégation, parallélisation)
+- **`doc-sync`** 🔄 : Mise à jour DOC après modification CODE
+- **`release-check`** ✅ : Checklist fin de tâche
+- **`requirement-intake`** 📥 : Qualification `NEW_INFORMATION` avant tout code
 
 ### `AGENT_WORKFLOW/docs/` — Policies & Architecture
 
@@ -141,7 +145,7 @@ Skills disponibles : `codesys-change`, `codesys-review`, `herdr-review`, `doc-sy
 
 ### `PROJECT_WORKSPACE/` — Orchestration IDE
 
-🖥️ Config para VS Code : lance Pi, Gates, Graph, Herdr dans 4 terminaux parallèles (1 raccourci)
+🖥️ Config VS Code : lance AGY, Claude, Codex, OpenCode, Gates, Graph dans 10 terminaux parallèles (1 raccourci)
 - `README.md` → terminaux VS Code (`Ctrl+Shift+P` → **Terminals: Run**)
 - `MARKDOWN_WORKSPACE.md` → édition & cochage des fichiers Markdown (`Ctrl+K V` sans extension checkbox)
 
@@ -168,8 +172,7 @@ PROJET/
 ├── TOOLS/          # Outils (ce dossier)
 │   ├── AGENT_WORKFLOW/
 │   └── ST_PLCOPENXML_GENERATOR/
-├── ARCHIVES/       # Docs & outils obsolètes
-└── .pi/            # Config Pi Coding Agent
+└── ARCHIVES/       # Docs & outils obsolètes
 ```
 
 ---

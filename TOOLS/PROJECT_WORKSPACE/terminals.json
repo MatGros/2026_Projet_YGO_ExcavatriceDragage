@@ -2,15 +2,6 @@
   "autorun": false,
   "terminals": [
     {
-      "name": "🥧 Pi",
-      "cwd": "${workspaceFolder}",
-      "command": "pi",
-      "open": true,
-      "focus": false,
-      "icon": "hubot",
-      "color": "terminal.ansiCyan"
-    },
-    {
       "name": "🚀 AGY Antigravity",
       "cwd": "${workspaceFolder}",
       "command": "agy",
@@ -65,13 +56,13 @@
       "color": "terminal.ansiGreen"
     },
     {
-      "name": "🤠 Herdr",
+      "name": "📊 Workflow Graph",
       "cwd": "${workspaceFolder}",
-      "command": "herdr start-agent claude",
+      "command": "python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header",
       "open": true,
       "focus": false,
-      "icon": "robot",
-      "color": "terminal.ansiYellow"
+      "icon": "graph",
+      "color": "terminal.ansiMagenta"
     },
     {
       "name": "🌐 OmniRoute Server",
@@ -81,6 +72,24 @@
       "focus": false,
       "icon": "server",
       "color": "terminal.ansiBrightGreen"
+    },
+    {
+      "name": "🤖 Codex (OpenAI)",
+      "cwd": "${workspaceFolder}",
+      "command": "codex",
+      "open": true,
+      "focus": false,
+      "icon": "symbol-class",
+      "color": "terminal.ansiBrightRed"
+    },
+    {
+      "name": "🦙 DSH (Ollama)",
+      "cwd": "${workspaceFolder}",
+      "command": "ollama launch dsh",
+      "open": true,
+      "focus": false,
+      "icon": "terminal",
+      "color": "terminal.ansiBrightYellow"
     }
   ]
 }

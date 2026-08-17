@@ -3,7 +3,7 @@
 > Rôle : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, benne, barrière finale.
 > **Détail technique par FB** : voir les 9 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
-> Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_TREUILS_CFC.st` et `PRG_SAFETY_CFC.st` (tous deux ST actuels), `PRG_OUTPUTS_LD.st` (Ladder généré). Cible de migration CFC native : **une seule page** `PRG_04_Treuils_Benne.xml` — elle absorbe la partie M1/M2/benne de `PRG_SAFETY_CFC` (safety câblée en parallèle visible sur la même page). Aucune page safety séparée n'est une cible.
+> Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_04_Treuils_Benne.st` (ST), `PRG_06_Outputs_LD.st` (Ladder généré). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : le code reste en **ST + PLCopenXML**, aucune page CFC native cible.
 > 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 > Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
@@ -200,7 +200,7 @@ la même page, ce qui supprime par construction le cycle prouvé `Safety ↔ Tre
 responsabilité exclusive de la barrière finale `PRG_06_Outputs_LD` (AF02 §2). Aucun POU « safety
 machine globale » n'existe dans la cible.
 
-📌 Lot de migration : **M3** de `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md` (C4, rebuild).
+📌 Lot de migration : **M3** (C4, rebuild) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 
 ---
 

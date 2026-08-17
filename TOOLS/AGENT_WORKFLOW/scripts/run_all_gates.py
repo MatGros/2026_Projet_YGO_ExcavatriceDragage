@@ -13,7 +13,7 @@ en mode fichier — ils s'exécuteront sur le bundle complet (palier C).
 Usage:
     python run_all_gates.py                       # tout (comportement historique)
     python run_all_gates.py --palier A            # bloc isolé : G100, G110
-    python run_all_gates.py --palier B            # liens/dépendances : G200, G210, G220
+    python run_all_gates.py --palier B            # liens/dépendances : G200, G210
     python run_all_gates.py --palier C            # fin de lot : G300..G420
     python run_all_gates.py --palier D            # sur demande : G500 (avec --codesys-log)
     python run_all_gates.py --files CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st
@@ -56,10 +56,9 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "330", "G330 — Securite des types et membres STRUCT",     [sys.executable, f"{S}/G330_check_type_safety.py"]),
     # Palier A — bloc isolé (G100, G110)
     ("A", "100", "G100 — Code style (VAR_OUTPUT, simulation)",      [sys.executable, f"{S}/G100_check_code_style.py", "CODE"]),
-    # Palier B — liens/dépendances (G200..G220)
+    # Palier B — liens/dépendances (G200..G210)
     ("B", "200", "G200 — LIAISON (instances, refs, bundle)",        [sys.executable, f"{S}/G200_check_linkage.py"]),
     ("B", "210", "G210 — Cablage CFC natif",                        [sys.executable, f"{S}/G210_check_cfc_wiring.py"]),
-    ("B", "220", "G220 — Routage modele",                           [sys.executable, f"{S}/G220_check_model_routing.py"]),
     # Palier C — fin de lot (G340..G420)
     ("C", "340", "G340 — Liens documentaires",                      [sys.executable, f"{S}/G340_check_doc_links.py"]),
     ("C", "350", "G350 — Collision noms HW (REX 2026-08-05)",       [sys.executable, f"{S}/G350_check_hw_name_collision.py", "."]),

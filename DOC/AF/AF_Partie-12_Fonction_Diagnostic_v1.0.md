@@ -121,7 +121,7 @@ disparaissent (lot M1) ; le relais par un POU safety intermediaire disparait (lo
 `FB_Safety_*` lisant le fait diagnostic directement depuis l'acquisition.
 
 📌 Lots de migration : **M1** (diagnostics dans l'acquisition) et **M6** (observateurs dans la
-supervision) de `DOC/WFLOW/AUDITS/Architecture/PLAN_EXECUTION_MIGRATION_7POU.md`.
+supervision) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 
 ---
 
