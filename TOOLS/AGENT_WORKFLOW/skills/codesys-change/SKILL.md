@@ -6,7 +6,7 @@ description: Prépare et exécute une modification ciblée CODESYS en respectant
 # Modification CODESYS
 
 1. Lire `TASK_CONTEXT`, `CODE_WRITING_POLICY.md`, `DOC_WRITING_POLICY.md` et les specs actives pertinentes.
-2. Vérifier le scope avec `check_structure.py` et `check_code_style.py`.
+2. Vérifier le scope avec `G300_check_structure.py` et `G100_check_code_style.py`.
 3. Cartographier avant le plan : propriétaire de chaque donnée, producteur unique, interface publique,
    consommateurs et arbitrage des commandes. Refuser tout accès nouveau aux internes d’une instance,
    calcul dupliqué, canal GVL caché ou fusion anarchique de sources par `OR`.
@@ -23,7 +23,7 @@ description: Prépare et exécute une modification ciblée CODESYS en respectant
    un POU XML natif/CFC est concerné et préserver la cohérence des noms, interfaces et références
    avec les sources ST.
 8. **Si au moins un fichier `CODE/**/*.st` a changé : générer obligatoirement `CODE_XML/CODE_Bundle.xml`** via `TOOLS/ST_PLCOPENXML_GENERATOR` avant toute restitution. Ce n'est pas une option et il ne faut jamais proposer un import fichier-par-fichier. Si un POU XML natif/CFC est concerné, le conserver comme source métier et ne jamais éditer le XML final du bundle à la main.
-9. Exécuter obligatoirement `check_bundle_freshness.py <project_root>` après génération ; un bundle absent ou stale bloque la restitution.
+9. Exécuter obligatoirement `G390_check_bundle_freshness.py <project_root>` après génération ; un bundle absent ou stale bloque la restitution.
 10. Pour C3/C4/safety, la validation humaine (Watch/forçage CODESYS avant chargement) est obligatoire, même si CODESYS compile. Si un test PLC automatique a été déclaré (`tests_automated_required: true`), exécuter aussi `check_task_test_contract.py <TASK_CONTEXT> --release` — sans `implemented` + preuve d'exécution, le lot reste **incomplet**.
 11. Si ST2PY est utilisé pour la simulation ou la non-régression, le rapporter comme outil hors-PLC complémentaire ; il ne remplace pas la validation CODESYS ni les essais terrain.
 12. Lancer les autres gates et signaler les limites.
