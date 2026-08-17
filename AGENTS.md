@@ -129,6 +129,18 @@ Workflow multi-agents Pi et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORK
 
 ⚠️ **Aucun commit sans validation humaine explicite** — pour tout agent, sans exception.
 
+🚨 **Premier réflexe avant commit/push** : si un fichier que tu n'as **pas** modifié apparaît dans
+le diff, ou s'il y a une **suppression**, ou un fichier qui ne devrait pas être là → **STOP et
+demande à l'humain**. Ne supprime **jamais** un fichier que tu n'as pas toi-même créé/modifié
+(l'humain ou un autre agent a pu l'éditer). Ce n'est pas ton rôle de déplacer, supprimer ou
+ne-pas-committer des fichiers. Le hook `pre-push` (`TOOLS/AGENT_WORKFLOW/scripts/pre_push_guard.py`)
+le rappelle à chaque push (informatif, non bloquant).
+
+🔧 **Activer le hook partagé** (une fois par clone) :
+```bash
+git config core.hooksPath TOOLS/AGENT_WORKFLOW/hooks
+```
+
 ---
 
 ## 🛠️ Workflow d'édition (détail : [`codesys-workflow`](.claude/skills/codesys-workflow.md))
@@ -145,7 +157,7 @@ d'application → `4bis.` vérification mécanique **bloquante** → `5.` REX ve
 Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document : [DOC/README.md](DOC/README.md).
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
-- [DSH_PROVIDERS](DOC/WFLOW/DSH_PROVIDERS.md) — 🔌 provider `omniroute` + délégation multi-modèles (workflow `provider`/`model`)
+- [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 provider `omniroute` + délégation multi-modèles (workflow `provider`/`model`)
 - [PLAN_TASK](DOC/WFLOW/PLAN_TASK.md) — 🗂️ **pilotage, pas une spec** : état des tâches, reliquats, TBD
 - [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
   `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),

@@ -4,7 +4,6 @@
 > Rôle de **ce** document : synchro niveau 1 (warning), couplage croisé — et **catalogue unique**
 > des `TC-P10-014`, `015`, `016`.
 > Source code : `CODE/TREUILS/FB_WinchSync.st` · instance unique dans `PRG_04_Treuils_Benne.st` (ST). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : aucune page CFC native cible.
-> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Winch_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire
 

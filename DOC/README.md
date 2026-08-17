@@ -63,9 +63,9 @@ Ils restent des **POU du code actuel**, cibles de migration, jamais des cibles d
 | Pilotage / reliquats / TBD | [WFLOW/PLAN_TASK.md](WFLOW/PLAN_TASK.md) |
 | Historique CODE ↔ DOC | [VERSION_HISTORY.md](VERSION_HISTORY.md) |
 | Décisions de conception | [ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md](../ARCHIVES/Doc/AUDIT_Coherence_Documentaire_v1.0.md) (archive) |
-| Mise en service | [TESTS/REGISTRES/REGISTRE_Suivi_MiseEnService.md](TESTS/REGISTRES/REGISTRE_Suivi_MiseEnService.md) |
-| Post-mise en service | [TESTS/REGISTRES/REGISTRE_Suivi_PostMES.md](TESTS/REGISTRES/REGISTRE_Suivi_PostMES.md) |
-| Fiches d'essais | `TESTS/CHECKLISTS/` · Audits ouverts : `WFLOW/AUDITS/` · Schémas : `DIA/` |
+| Mise en service | [WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService.md](WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService.md) |
+| Post-mise en service | [WFLOW/REGISTRES/REGISTRE_Suivi_PostMES.md](WFLOW/REGISTRES/REGISTRE_Suivi_PostMES.md) |
+| Fiches d'essais | `WFLOW/CHECKLISTS/` · Audits : `WFLOW/AUDITS/` · REX : `WFLOW/REX/` · Schémas : `DIA/` |
 | Décision d'architecture actée | `AF_Partie-02` §2/§4 (source unique, voir ci-dessus) — décision historique dans [ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/RU_C4_ARCHITECTURE_PROCEDES.md](../ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/RU_C4_ARCHITECTURE_PROCEDES.md) (archive) |
 | Migration 7 POU (M0→M8) | **Terminée** — `CODE/MAIN/` contient `PRG_02..07` ; plan archivé dans [ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/](../ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/) |
 

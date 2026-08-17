@@ -3,7 +3,6 @@
 > Rôle : acquisition et conditionnement du geste opérateur (Hall CANopen → consignes d'axe).
 > **Pas** un FB de mouvement : pas de `SafeStop` / pas de pilotage Q.
 > Source code : `CODE/JOYSTICK/FB_Joystick.st` · instance `Acquisition (CFC).instJoystick`.
-> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Joystick_Extraction_Code_v1.0.md`.
 > v1.3 archivée : `ARCHIVES/Doc/AF_Partie-08_Fonction_Joystick_v1.3.md`.
 
 ## 🧭 Sommaire
