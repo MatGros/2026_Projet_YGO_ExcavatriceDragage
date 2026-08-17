@@ -152,8 +152,8 @@ END_IF;
 
 | Type | Lien |
 |---|---|
-| Rapport auto-déclaré (maj) | `DOC/TESTS/RAPPORT_AUDIT_SESSION_20260815.md` |
-| Journal d'audit | `DOC/TESTS/AGENDA_AUDIT_SESSION_20260815.md` |
+| Rapport auto-déclaré (maj) | `DOC/WFLOW/AUDITS/RAPPORT_AUDIT_SESSION_20260815.md` |
+| Journal d'audit | `DOC/WFLOW/AUDITS/AGENDA_AUDIT_SESSION_20260815.md` |
 | Spec bandeau | `DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md` §4 |
 | Fiche codeur | `DOC/AF/AF_Partie-09_Fonction_Encoder/FB_Encoder_Safety_v1.0.md` |
 | Pilotage | `DOC/WFLOW/PLAN_TASK.md` |

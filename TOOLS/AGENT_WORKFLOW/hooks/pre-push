@@ -1,0 +1,8 @@
+﻿#!/bin/sh
+# pre-push guard — INFORMATIF et NON BLOQUANT (versionné, partagé entre agents).
+# Affiche un résumé + avertissements (suppressions, fichiers protégés) et rappelle
+# que le premier réflexe d'un agent est de DEMANDER à l'humain, pas de supprimer.
+# Toujours exit 0 : ne bloque jamais le push.
+
+python "TOOLS/AGENT_WORKFLOW/scripts/pre_push_guard.py" "$1" "$2"
+exit 0

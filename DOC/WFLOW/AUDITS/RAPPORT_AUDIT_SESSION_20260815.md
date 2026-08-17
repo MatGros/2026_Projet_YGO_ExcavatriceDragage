@@ -117,6 +117,6 @@ ALL GATES PASSED [OK] (18/18)
 
 | Document | Rôle |
 |---|---|
-| [`DOC/TESTS/AGENDA_AUDIT_SESSION_20260815.md`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/TESTS/AGENDA_AUDIT_SESSION_20260815.md) | Agenda et liste exhaustive des 12 tâches de la session |
-| [`DOC/TESTS/VERIFICATION_AUDIT_SESSION_20260815.md`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/TESTS/VERIFICATION_AUDIT_SESSION_20260815.md) | Audit indépendant contradictoire |
+| [`DOC/WFLOW/AUDITS/AGENDA_AUDIT_SESSION_20260815.md`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS/AGENDA_AUDIT_SESSION_20260815.md) | Agenda et liste exhaustive des 12 tâches de la session |
+| [`DOC/WFLOW/AUDITS/VERIFICATION_AUDIT_SESSION_20260815.md`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS/VERIFICATION_AUDIT_SESSION_20260815.md) | Audit indépendant contradictoire |
 | [`CODE_XML/CODE_Bundle.xml`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE_XML/CODE_Bundle.xml) | Bundle PLCopenXML validé et prêt à l'importation |

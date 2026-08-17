@@ -3,7 +3,6 @@
 > Rôle machine (vague) : [`AF_Partie-01_Analyse_Fonctionnelle_v2.0.md`](AF_Partie-01_Analyse_Fonctionnelle_v2.0.md) §5.
 > Rôle de **ce** document : constitution, interfaces, séquence, intégration, écarts bus —
 > et **catalogue unique** des `TC-P01-*` (ne pas les recopier dans AF01).
-> Extraction code : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md`.
 > ⚠️ Existant vérifié + écarts à normaliser. Pas de modif code sans validation §8.
 
 ## 🧭 Sommaire
@@ -487,7 +486,6 @@ Les résultats d'exécution restent hors AF (scripts / checklists / registres).
 | AF06 | Noms DI/DQ puissance |
 | AF07 | Champs `ST_Modes*` |
 | AF13 | `FB_Sim_Safety` |
-| Extraction | `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Safety_EmergencyManagement_Extraction_Code_v1.0.md` |
 
 Fichiers code de référence :
 

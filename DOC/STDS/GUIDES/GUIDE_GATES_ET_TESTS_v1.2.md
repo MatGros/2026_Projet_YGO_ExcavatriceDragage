@@ -182,4 +182,4 @@ liaison — chantier à faire ensemble, pas en isolation.
 - [`CODE_QUALITY_STANDARDS.md §3`](../CODE_QUALITY_STANDARDS.md) — pourquoi `G200_check_linkage.py` est non négociable.
 - [`GUIDE_SEQUENCEUR_v1.2.md`](GUIDE_SEQUENCEUR_v1.2.md) — norme d'écriture des séquenceurs (sujet différent, même famille de guides).
 - `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md` — criticité C0-C4, voies Fast/Standard/Safety (processus humain↔agent, pas la liste des gates).
-- `DOC/WFLOW/RAPPORT_LINTER_ET_WORKFLOW_CODESYS.md` — rapport d'origine ayant introduit `CODE_XML/`, `test_codesys_compile.py`, `codesys_compilation_diag.py`.
+- `DOC/WFLOW/AUDITS/RAPPORT_LINTER_ET_WORKFLOW_CODESYS.md` — rapport d'origine ayant introduit `CODE_XML/`, `test_codesys_compile.py`, `codesys_compilation_diag.py`.

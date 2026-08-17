@@ -6,7 +6,6 @@
 > **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni programme propre.
 > Source code : `CODE/TREUILS/BENNE/*.st`, `CODE/CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`.
 > Instance unique `instBucket` dans `Treuils (CFC)` — fiche FB du domaine Treuils.
-> Extraction : `DOC/TESTS/CHECKLISTS/EXTRACTIONS/FB_Bucket_Extraction_Code_v1.0.md`.
 
 ## 🧭 Sommaire
 
