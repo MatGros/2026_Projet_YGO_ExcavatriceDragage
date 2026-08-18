@@ -15,6 +15,7 @@ VAR_OUTPUT
     HwSim                    : ST_HardwareImage;  (* Image simulée ; TRUE = état modèle normalisé *)
     HwIn                     : ST_HardwareImage;  (* Image utilisée ; TRUE = état logique métier *)
     WinchInputSourceChanged  : BOOL;              (* TRUE pendant 1 cycle si source Winch change *)
+    SimulationBypassActive   : BOOL;              (* TRUE = bypass simulation treuils actif (SimulationModeActive AND SimWinchActive AND SimulationBypassActive) *)
 
     JoystickDeadmanArmed      : BOOL;   (* TRUE = geste homme-mort joystick armé (FB_Joystick.DeadmanArmed, AF08 §4/§6) *)
     JoystickYNeutral          : BOOL;   (* TRUE = axe Y joystick au neutre — armement Méca B (FB_Safety_Winch) *)
@@ -163,6 +164,7 @@ WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_S
 TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
 MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
+SimulationBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive;
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}

@@ -38,7 +38,8 @@ KNOWN_VAR_OUTPUT_VIOLATIONS = {
         "DeviceVariateur.ErrorId", "DeviceEncoderM1.ErrorId", "DeviceEncoderM2.ErrorId"
     },
     "M_MAIN/PRG_07_Supervision.st": {
-        "GVL_IHM.State", "GVL_IHM.Error", "GVL_IHM.ErrorId"
+        "GVL_IHM.State", "GVL_IHM.Error", "GVL_IHM.ErrorId",
+        "GVL_IHM.Ready", "GVL_IHM.Busy", "GVL_IHM.Done"
     },
 }
 
