@@ -1,109 +1,78 @@
-(* ═══════════════════════════════════════════════════════════════
+(* =======================================================================
    🛡️ FB_WinchOutputInterlock_LD — Barrière finale frein / puissance M1 ou M2
    ───────────────────────────────────────────────────────────────
-   📥 Commandes métier déjà calculées par FB_Winch.
-   📤 Producteur unique des commandes finales vers PRG_06_Outputs_LD.
-   🔒 Le retour (`BrakeFeedback`) confirme le contacteur/bobine de desserrage ;
-      il ne mesure pas mécaniquement le frein.
-   ⏱️ Watchdog fixe 500 ms après demande effective de desserrage.
-   🔧 REX 2026-08-05 : Reset du watchdog frein reconstruit en pattern Cause/Ack
-      (CODE_QUALITY_STANDARDS §9) — plus jamais conditionné par un état externe
-      instantané (audit sécurité M3, même classe que l'incident EmergencyArmingFailed).
-   🆕 REX 2026-08-06 (retrait FB_Brake, demande client) : plus de séquence temporisée
-      frein — le frein n'est plus qu'un consommateur direct de RelayFwd/RelayRev
-      (`BrakeCmd := RelayFwd OR RelayRev`, câblé au grand jour dans PRG_06_Outputs_LD
-      à partir des DQ RelayFwd/RelayRev). Aucun risque d'écart frein/mouvement : le
-      frein SUIT structurellement le contacteur de sens, il ne peut jamais en diverger
-      puisque c'est la MÊME variable qui pilote les deux. `FB_Brake` reste utilisé tel
-      quel pour Translation (M3) — non touché par ce lot.
-   🔧 REX 2026-08-06bis (review croisée Codex) : le watchdog frein a d'abord été armé sur
-      `RequestedRelayFwd OR RequestedRelayRev` (demande BRUTE, disponible tôt dans le scan)
-      — bug réel trouvé : cette demande brute passe à TRUE dès l'appui joystick, alors que
-      `RelayFwd`/`RelayRev` FINAUX (§5) restent à FALSE jusqu'à T#1000ms (retombée +
-      `RestartDelay`, voir §4). Le watchdog (seuil 500ms) se déclenchait donc À TORT sur
-      quasiment CHAQUE redémarrage normal. Corrigé : le watchdog est désormais armé sur
-      `BrakeCmd` (§6, calculé APRÈS §5 — la valeur réellement et définitivement commandée),
-      jamais sur une demande amont non encore autorisée. Conséquence acceptée : le bit0
-      `ErrorId` (et donc `Error`) n'est mis à jour qu'après le calcul de `BrakeCmd`, donc lu
-      par §3/§5 avec un retard d'UN scan (~10ms) sur une nouvelle occurrence de défaut —
-      négligeable face au budget 500ms du watchdog, et strictement nécessaire pour éviter
-      les faux déclenchements.
-   🔴🔧 REX 2026-08-07 — RestartDelay COMPTAIT SANS ATTENDRE LE FREIN PHYSIQUE (audit croisé,
-      demande client) : un lot précédent avait fait démarrer le décompte 1500ms sur `NOT
-      MotorRequest` seul (relâchement joystick, instantané), perdant la dépendance à
-      `BrakeFeedback` (retombée physique bobine/mâchoires, ~200-300ms mécaniques après la
-      commande). Un redémarrage pouvait donc être autorisé alors que le frein n'était pas
-      encore réellement fermé au moment où le décompte a commencé. Corrigé (§4) :
-      `NOT BrakeFeedback` réintégré en ET avec `NOT MotorRequest` — le décompte ne
-      démarre/continue que si les deux conditions (moteur non demandé ET frein physiquement
-      fermé) sont vraies. Comportement "purge pendant la pause" conservé.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Barrière de sécurité finale pour frein et contacteurs M1/M2
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs_LD)
+   🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchOutputInterlock_LD
 VAR_INPUT
-    Enable                       : BOOL;
-    Reset                        : BOOL;
-    PowerContactorEngaged              : BOOL;
-    SafeStop                     : BOOL; // 🔧 REX 2026-08-05 (audit sécurité) : volontairement non lu ci-dessous —
-                                          // SafeStop est une rampe rapide gérée en amont par FB_Winch
-                                          // (Enable maintenu, AGENTS.md "SafeStop = rampe rapide"). Cette barrière
-                                          // ne coupe qu'après la retombée effective de la demande à zéro, sauf
-                                          // gate dur/timeout/défaut final (§5) — couper ici immédiatement sur
-                                          // SafeStop dupliquerait la rampe en un arrêt brutal, contraire au
-                                          // comportement spécifié. Entrée conservée pour interface standard
-                                          // complète (AF_Partie-03 §1bis), pas un oubli.
-    BrakeFeedback                : BOOL; // 🆕 2026-08-06 : retour PHYSIQUE brut du contacteur/bobine frein
-                                          // (PRG_02_Acquisition.HwIn.Winch.Mx_BrakeIsOpen_DI), câblé DIRECTEMENT
-                                          // depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
-                                          // (FB_Brake retiré du treuil, voir bandeau). TRUE = frein ouvert/relâché.
-    FwdRevSpeedFeedbackOff       : BOOL;
-    RequestedRelayFwd            : BOOL;
-    RequestedRelayRev            : BOOL;
-    RequestedContactor1          : BOOL; // Mapping métier FB_Winch / SpeedStepTable
-    RequestedContactor2          : BOOL; // Mapping métier FB_Winch / SpeedStepTable
-    RequestedContactor3          : BOOL; // Mapping métier FB_Winch / SpeedStepTable
-    RequestedContactor4          : BOOL; // Mapping métier FB_Winch / SpeedStepTable
-    RequestedStep                : INT;
+    // === COMMANDES ET ETATS GENERAL ===
+    Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset                           : BOOL;                           // --> [CMD] Acquittement defaut sur front
+    SafeStop                        : BOOL;                           // --> [SAFE] Entree securite pour interface standard
+
+    // === HARDWARE ET FEEDBACKS ===
+    PowerContactorEngaged           : BOOL;                           // --> [SAFE] Chaine AU rearmee et puissance OK
+    BrakeFeedback                   : BOOL;                           // --> [HW] Feedback physique ouverture frein (NC)
+    FwdRevSpeedFeedbackOff          : BOOL;                           // --> [HW] Feedback retombe tous contacteurs sens/vitesse
+
+    // === DEMANDES DE COMMANDE AMONT ===
+    RequestedRelayFwd               : BOOL;                           // --> [CMD] Demande contacteur sens montee
+    RequestedRelayRev               : BOOL;                           // --> [CMD] Demande contacteur sens descente
+    RequestedContactor1             : BOOL;                           // --> [CMD] Demande contacteur vitesse palier 1
+    RequestedContactor2             : BOOL;                           // --> [CMD] Demande contacteur vitesse palier 2
+    RequestedContactor3             : BOOL;                           // --> [CMD] Demande contacteur vitesse palier 3
+    RequestedContactor4             : BOOL;                           // --> [CMD] Demande contacteur vitesse palier 4
+    RequestedStep                   : INT;                            // --> [CMD] Palier de vitesse demande
 END_VAR
 VAR_OUTPUT
-    Ready                        : BOOL;
-    Busy                         : BOOL;
-    Done                         : BOOL;
-    Error                        : BOOL;
-    ErrorId                      : WORD; // bit0 : absence confirmation contacteur desserrage > 500 ms
-    State                        : E_WinchFinalInterlockState;
-    StateAtError                 : E_WinchFinalInterlockState;
-    Reason                       : E_WinchFinalInterlockReason;
-    AuthorizedStep               : INT;
-    RelayFwd                     : BOOL;
-    RelayRev                     : BOOL;
-    Contactor1                   : BOOL;
-    Contactor2                   : BOOL;
-    Contactor3                   : BOOL;
-    Contactor4                   : BOOL;
-    BrakeCmd                     : BOOL; // 🆕 2026-08-06 : dérivé UNIQUEMENT de RelayFwd OR RelayRev (fin §5) —
-                                          // plus de FB_Brake, plus de gate ContactorEngaged/anti-retombée séparée.
-    BrakeTimeoutElapsed          : TIME;
-    RestartInhibit               : BOOL; // TRUE : timeout acquitté mais neutre/nouvelle demande exigés
-    RestartDelayElapsed          : TIME;
-    StepDelayElapsed             : TIME;
+    // === ETATS IEC ET SYNOPTIQUE ===
+    Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
+    Busy                            : BOOL;                           // <-- [STAT] Interlock actif
+    Done                            : BOOL;                           // <-- [STAT] Action terminee
+    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
+    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur (bit0: timeout frein)
+    State                           : E_WinchFinalInterlockState;     // <-- [STAT] Etat courant machine d'etat interlock
+    StateAtError                    : E_WinchFinalInterlockState;     // <-- [DIAG] Etat memorise lors du dernier defaut
+    Reason                          : E_WinchFinalInterlockReason;    // <-- [DIAG] Cause de neutralisation ou blocage
+
+    // === ORDRES ACTIONNEURS VALIDES ===
+    AuthorizedStep                  : INT;                            // <-- [ACT] Palier de vitesse autorise
+    RelayFwd                        : BOOL;                           // <-- [ACT] Ordre contacteur sens montee valide
+    RelayRev                        : BOOL;                           // <-- [ACT] Ordre contacteur sens descente valide
+    Contactor1                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 1 valide
+    Contactor2                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 2 valide
+    Contactor3                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 3 valide
+    Contactor4                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 4 valide
+    BrakeCmd                        : BOOL;                           // <-- [ACT] Ordre ouverture frein valide
+
+    // === DIAGNOSTICS ET TEMPORISATIONS ===
+    BrakeTimeoutElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation watchdog frein
+    RestartInhibit                  : BOOL;                           // <-- [DIAG] Inhibition redemarrage actif
+    RestartDelayElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation anti-court-cycle
+    StepDelayElapsed                : TIME;                           // <-- [DIAG] Ecoule temporisation palier
 END_VAR
 VAR
-    ResetEdge                    : R_TRIG;
-    ErrorEdge                    : R_TRIG;
-    BrakeTimeout                 : TON;
-    StepDelay                    : TON;
-    RestartDelay                 : TON;
-    RestartRequired              : BOOL;
-    ResetRequired                : BOOL; // Timeout : front Reset conscient obligatoire
-    NeutralRequestSeen           : BOOL; // Demande moteur zéro observée après acquittement
-    RequestedStepClamped         : INT;
-    StepDelayTarget              : INT;  // Cible mémorisée : tout changement annule le temps en cours
-    MotorRequest                 : BOOL;
-    // 🔧 REX 2026-08-05 : pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) — voir §6bis ci-dessous
-    BrakeTimeoutCause             : BOOL;
-    BrakeTimeoutAck               : BOOL := TRUE;
-    BrakeTimeoutCauseEdge         : R_TRIG;
+    // === DETECTEURS ET TIMERS INTERNES ===
+    ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
+    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
+    BrakeTimeoutCauseEdge           : R_TRIG;                         // . [LOC] Detecteur front cause timeout frein
+    BrakeTimeout                    : TON;                            // . [LOC] Temporisation watchdog frein
+    StepDelay                       : TON;                            // . [LOC] Temporisation changement de palier
+    RestartDelay                    : TON;                            // . [LOC] Temporisation anti-court-cycle redemarrage
+
+    // === VARIABLES LOCALES CALCULÉES ===
+    RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
+    ResetRequired                   : BOOL;                           // . [LOC] Exigence d'acquittement Reset conscient
+    NeutralRequestSeen              : BOOL;                           // . [LOC] Observation passage consigne au neutre
+    RequestedStepClamped            : INT;                            // . [LOC] Palier demande borne dans [0..5]
+    StepDelayTarget                 : INT;                            // . [LOC] Cible palier memorisee
+    MotorRequest                    : BOOL;                           // . [LOC] Demande mouvement moteur active
+    BrakeTimeoutCause               : BOOL;                           // . [LOC] Cause timeout frein presente
+    BrakeTimeoutAck                 : BOOL := TRUE;                  // . [LOC] Acquittement cause timeout frein
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────

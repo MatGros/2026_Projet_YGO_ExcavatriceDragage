@@ -1,19 +1,13 @@
-(* ═══════════════════════════════════════════════════════════════════════════════
-   🪜 ST_WinchSpeedConfig — Plages de vitesse linéaire mesurée des 5 paliers
-   ═══════════════════════════════════════════════════════════════════════════════
-   🎯 Configuration de caractérisation, séparée de ST_SpeedStepTable :
-      - ST_SpeedStepTable = contacteurs commandés par palier (% vitesse)
-      - ST_WinchSpeedConfig = vitesse câble réellement mesurée (m/s)
-   ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
-      Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-*)
-
+(* =======================================================================
+   ⚙️ ST_WinchSpeedConfig — Configuration des plages de vitesse linéaire
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   ======================================================================= *)
 TYPE ST_WinchSpeedConfig :
 STRUCT
-    MaxMeasuredSpeedMps      : REAL;                    // Vitesse maximale mesurée de référence
-    SpeedBandMaxMps          : ARRAY[1..5] OF REAL;    // Plafond vitesse mesurée de chaque palier
-    SpeedBandHysteresisMps   : REAL;                    // Hystérésis de classement (m/s)
+    MaxMeasuredSpeedMps    : REAL;                                    // Vitesse maximale mesuree de reference (m/s)
+    SpeedBandMaxMps        : ARRAY[1..5] OF REAL;                    // Plafonds vitesse mesuree par palier (m/s)
+    SpeedBandHysteresisMps : REAL;                                    // Hysteresis anti-battement classement vitesse (m/s)
 END_STRUCT
 END_TYPE

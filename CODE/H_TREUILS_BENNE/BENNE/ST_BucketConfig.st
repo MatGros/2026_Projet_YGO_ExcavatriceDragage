@@ -1,19 +1,15 @@
-(* ═══════════════════════════════════════════════════════════════
+(* =======================================================================
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.A
-   ═══════════════════════════════════════════════════════════════ *)
-
+   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   ======================================================================= *)
 TYPE ST_BucketConfig :
 STRUCT
-    OffsetOpenM     : REAL;    (* Écart M1/M2 en mètres benne ouvert *)
-    OffsetCloseM    : REAL;    (* Écart M1/M2 en mètres benne fermé *)
-    CoherenceLimitM : REAL;    (* Seuil de détection d'incohérence au boot *)
-    // 🆕 2026-08-07 (20) — retour terrain, demande client : inertie mécanique du benne (M2 continue
-    // sur sa lancée après coupure StartStop) -- couper la commande EN AVANCE de la cible pour que
-    // l'arrêt réel (après coast-down) tombe proche du vrai offset, au lieu de dépasser. Anticipation
-    // distincte par sens (fermeture/ouverture ont des inerties différentes selon retour terrain).
-    CloseAnticipationM : REAL := 1.0; (* Coupe la commande de fermeture 1m avant OffsetCloseM *)
-    OpenAnticipationM  : REAL := 1.3; (* Coupe la commande d'ouverture 1.3m avant OffsetOpenM *)
+    OffsetOpenM        : REAL;                                        // Ecart M1/M2 en metres benne ouvert (m)
+    OffsetCloseM       : REAL;                                        // Ecart M1/M2 en metres benne ferme (m)
+    CoherenceLimitM    : REAL;                                        // Seuil de detection d'incoherence au boot (m)
+    CloseAnticipationM : REAL := 1.0;                                 // Anticipation coupure commande fermeture (m)
+    OpenAnticipationM  : REAL := 1.3;                                 // Anticipation coupure commande ouverture (m)
 END_STRUCT
 END_TYPE

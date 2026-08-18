@@ -1,34 +1,74 @@
-(* ═══════════════════════════════════════════════════════════════
+(* =======================================================================
    ⚖️ FB_Winch_Symmetry — Mesure passive MES-008 M1/M2
-   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
-   🔒 Observateur pur : aucune écriture de commande, sécurité ou mouvement.
-   ═══════════════════════════════════════════════════════════════ *)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Observateur de symétrie et de synchronisme des treuils M1/M2
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔒 Observateur pur : Aucune ecriture de commande, securite ou mouvement
+   ======================================================================= *)
+
 FUNCTION_BLOCK FB_Winch_Symmetry
 VAR_INPUT
-    Reset : BOOL;
-    M1CommandActive : BOOL;
-    M2CommandActive : BOOL;
-    M1Direction : INT;
-    M2Direction : INT;
-    M1BrakeCmd, M2BrakeCmd, M1BrakeApplied, M2BrakeApplied : BOOL;
-    M1Position_M, M2Position_M, M1Speed_Mps, M2Speed_Mps, SyncDeviation_M : REAL;
-    Config : ST_Winch_SymmetryCfg;
-END_VAR
-VAR_IN_OUT
-    Data : ST_Winch_SymmetryData;
+    // === COMMANDES ET CONSIGNES ===
+    Reset                           : BOOL;                           // --> [CMD] Reinitialisation des mesures sur front
+    M1CommandActive                 : BOOL;                           // --> [CMD] Commande active sur treuil M1
+    M2CommandActive                 : BOOL;                           // --> [CMD] Commande active sur treuil M2
+    M1Direction                     : INT;                            // --> [CMD] Sens commande M1 (-1/0/+1)
+    M2Direction                     : INT;                            // --> [CMD] Sens commande M2 (-1/0/+1)
+
+    // === FEEDBACKS HARWARE ET FREINS ===
+    M1BrakeCmd                      : BOOL;                           // --> [HW] Ordre ouverture frein M1
+    M2BrakeCmd                      : BOOL;                           // --> [HW] Ordre ouverture frein M2
+    M1BrakeApplied                  : BOOL;                           // --> [HW] Etat frein M1 serre
+    M2BrakeApplied                  : BOOL;                           // --> [HW] Etat frein M2 serre
+
+    // === MESURES POSITIONS ET VITESSES ===
+    M1Position_M                    : REAL;                           // --> [HW] Position mesuree M1 (m)
+    M2Position_M                    : REAL;                           // --> [HW] Position mesuree M2 (m)
+    M1Speed_Mps                     : REAL;                           // --> [HW] Vitesse mesuree M1 (m/s)
+    M2Speed_Mps                     : REAL;                           // --> [HW] Vitesse mesuree M2 (m/s)
+    SyncDeviation_M                 : REAL;                           // --> [HW] Ecart instantane synchro (m)
+
+    // === CONFIGURATION ===
+    Config                          : ST_Winch_SymmetryCfg;           // --> [CFG] Configuration des seuils de symetrie
 END_VAR
 VAR_OUTPUT
-    SymmetryOk : BOOL;
-    SymmetryValid : BOOL;
+    // === ETATS IEC ET SYNOPTIQUE ===
+    SymmetryOk                      : BOOL;                           // <-- [STAT] Symetrie globale conforme aux criteres
+    SymmetryValid                   : BOOL;                           // <-- [STAT] Mesure de symetrie valide et calculee
+END_VAR
+VAR_IN_OUT
+    // === STRUCTURES DE DONNÉES PARTAGÉES ===
+    Data                            : ST_Winch_SymmetryData;          // <-> [BUS] Donnees de mesures de symetrie
 END_VAR
 VAR
-    ResetEdge : R_TRIG;
-    CycleTime : FB_CycleTime;
-    CommandTon : TON;
-    Comparable, Qualified, PreviousQualified, Stopping, StartCapturedM1, StartCapturedM2, StopCapturedM1, StopCapturedM2 : BOOL;
-    StartMsM1, StartMsM2, ReleaseMsM1, ReleaseMsM2, ApplyMsM1, ApplyMsM2, StopMsM1, StopMsM2 : UDINT;
-    MotionTimer, StopTimer : TON;
-    StopStartM1_M, StopStartM2_M : REAL;
+    // === SOUS-INSTANCES FB ===
+    ResetEdge                       : R_TRIG;                         // * [INST] Detecteur front reinitialisation
+    CycleTime                       : FB_CycleTime;                   // * [INST] Calcul du temps de cycle
+
+    // === TIMERS INTERNES ===
+    CommandTon                      : TON;                            // . [LOC] Tempo qualification commande stable
+    MotionTimer                     : TON;                            // . [LOC] Chronometre de mouvement
+    StopTimer                       : TON;                            // . [LOC] Chronometre d'arret
+
+    // === VARIABLES LOCALES CALCULÉES ===
+    Comparable                      : BOOL;                           // . [LOC] Conditions de comparaison remplies
+    Qualified                       : BOOL;                           // . [LOC] Phase de mesure qualifiee
+    PreviousQualified               : BOOL;                           // . [LOC] Etat qualifie cycle precedent
+    Stopping                        : BOOL;                           // . [LOC] Phase d'arret en cours
+    StartCapturedM1                 : BOOL;                           // . [LOC] Top depart capture M1
+    StartCapturedM2                 : BOOL;                           // . [LOC] Top depart capture M2
+    StopCapturedM1                  : BOOL;                           // . [LOC] Top arret capture M1
+    StopCapturedM2                  : BOOL;                           // . [LOC] Top arret capture M2
+    StartMsM1                       : UDINT;                          // . [LOC] Horodatage d'ouverture M1 (ms)
+    StartMsM2                       : UDINT;                          // . [LOC] Horodatage d'ouverture M2 (ms)
+    ReleaseMsM1                     : UDINT;                          // . [LOC] Temps de desserrage frein M1 (ms)
+    ReleaseMsM2                     : UDINT;                          // . [LOC] Temps de desserrage frein M2 (ms)
+    ApplyMsM1                       : UDINT;                          // . [LOC] Temps de serrage frein M1 (ms)
+    ApplyMsM2                       : UDINT;                          // . [LOC] Temps de serrage frein M2 (ms)
+    StopMsM1                        : UDINT;                          // . [LOC] Horodatage d'arret M1 (ms)
+    StopMsM2                        : UDINT;                          // . [LOC] Horodatage d'arret M2 (ms)
+    StopStartM1_M                   : REAL;                           // . [LOC] Position debut d'arret M1 (m)
+    StopStartM2_M                   : REAL;                           // . [LOC] Position debut d'arret M2 (m)
 END_VAR
 
 CycleTime(DefaultValueS := 0.010); ResetEdge(CLK := Reset);

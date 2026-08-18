@@ -1,269 +1,121 @@
-(* ═══════════════════════════════════════════════════════════════
-   🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
+(* =======================================================================
+   🛡️ FB_Safety_Winch — Surveillance et sécurité d'un treuil (M1 / M2)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md,
-                   DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §7
-                    (contrat : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2/§3)
-   🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_<Metier> est
-      un FB métier à part entière (pas une brique réduite).
-   📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch
-      DU MÊME TREUIL (instSafetyWinchM1→instWinchM1, idem M2).
-   ⚠️ ÉVOLUTION (lot Codeur, 2026-07-02) : `FB_Safety_Winch` reste UN
-      SEUL type FB — le "split M1/M2" acté en Partie10 §7 s'obtient par
-      DEUX INSTANCES (`instSafetyWinchM1`/`instSafetyWinchM2`), chacune
-      câblée sur l'`EncoderAvailable` de SON treuil (pas deux FB
-      distincts — composition, pas duplication de code).
-      - ✅ Détecte la perte joystick/CAN (sans commande valide, un
-        treuil ne doit pas pouvoir bouger).
-      - ✅ Détecte la perte codeur DE CE TREUIL (`EncoderAvailable`,
-        sortie `FB_Encoder_Abs` — désormais câblée, ErrorId bit1).
-      - 🔴 TBD (non simulé) : perte bus EtherCAT spécifique (au-delà de
-        ce que `EncoderAvailable` reflète déjà, si besoin d'un signal
-        distinct plus tard).
-      - `PowerCutOff` : FALSE pour ce lot (pas encore de
-        ST_ContactorCheck de puissance câblé — FB_Output
-        transverse hors périmètre de ce lot, voir Partie6).
-   🆕 AJOUT (2026-07-02, retour terrain — nouvel export Device.export avec
-      I/O réel `M1_ThermalFeedback`/`M2_ThermalFeedback` et
-      `M1_M2_SlackCableSwitch`, demande utilisateur) — Partie9 §4ter :
-      - ✅ `ThermalFeedback` (par instance, retour thermique CE moteur) :
-        défaut → bit2 ErrorId → `SafeStop` (arrêt total, protection moteur,
-        comme les autres défauts du domaine).
-      - ✅ `SlackCableDetected` (COMMUN aux 2 treuils, même capteur — même
-        principe que `M1_M2_TopPositionSensor`, câblé IDENTIQUEMENT sur
-        les 2 instances) : mou de câble détecté (descente non arrêtée à
-        temps) → bit3 ErrorId (visible IHM, reset front requis dès que la
-        cause disparaît) → sortie **`DescendPermit`** DÉDIÉE, DISTINCTE de
-        `SafeStop` — bloque UNIQUEMENT la descente (`FB_Winch.RelayRev`),
-        la remontée (`RelayFwd`) reste libre pour permettre à l'opérateur
-        d'aller vérifier le câblage. Nouveau pattern (pas un simple
-        `SafeStop`, qui aurait arrêté les 2 sens) — voir Partie9 §4ter
-        pour la justification complète.
-   🔴🔧 REX 2026-07-07 — IMPLÉMENTATION DU CAS B (roue libre) + 2 NOUVEAUX GARDE-FOUS
-      (demande utilisateur, suite à la consolidation du feedback contacteur unique) :
-      - **Bit7 — Méca A "mouvement non commandé général"** : arme une surveillance
-        position/vitesse dès que `FwdRevSpeedFeedbackOff AND BrakeFeedback` (tout
-        confirmé physiquement coupé). Si pendant que c'est armé, la vitesse mesurée
-        codeur dépasse `UncommandedSpeedThresholdMps` (0.02 m/s, théorique — à
-        ajuster sur site) OU la position dérive de plus de `UncommandedDriftToleranceM`
-        (2.0 m) par rapport à la référence prise à l'armement → défaut → `SafeStop`
-        ET `PowerCutOff` (les contacteurs sont déjà confirmés coupés, `SafeStop` seul
-        ne suffit pas — c'est le rôle de `PowerCutOff`).
-      - **Bit8 — Méca B "pilotage actif malgré absence de commande opérateur"** :
-        indépendant de la logique interne FB_Winch (défense en profondeur — reste
-        valable même si l'arbitrage FB_Winch est en défaut). Si (perte CAN joystick,
-        bit0 déjà existant) OU (joystick au neutre, `JoystickYNeutral`) ET que
-        `FwdRevSpeedFeedbackOff` ne repasse PAS à `TRUE` dans `PostRampTimeout` (3s,
-        théorique) → défaut → `SafeStop` ET `PowerCutOff`.
-      - **Bit9 — Méca C "glissement M1 pendant mouvement Benne" (escalade)** :
-        armé UNIQUEMENT si `BenneHoldStillActive=TRUE` (câblé sur `instBucket.Busy`
-        pour l'instance M1 SEULEMENT — toujours `FALSE` côté M2, qui doit bouger
-        pendant le benne). Référence position prise à l'armement ; si dérive
-        `BenneSlipToleranceM` (2.0 m, > à la tolérance 1.0 m déjà surveillée côté
-        `FB_Bucket` lui-même) dépassée → la couche Benne (`SafeStop` M1 seul, 1m)
-        n'a pas suffi → escalade `PowerCutOff` (dernier recours).
-      - **Bit14** : sens codeur opposé au sens commandé, confirmé 500 ms → `SafeStop`.
-      - **Bit15** : absence de vitesse malgré relais de sens commandé, confirmée 3 s → `SafeStop`.
-   🆕 REX 2026-07-08 (demande utilisateur, retour terrain frein) :
-      - `BrakeThermalFeedback` (COMMUN aux 3 freins M1/M2/M3, 1 seul fil, câblé IDENTIQUEMENT
-        sur les 2 instances Winch + l'instance Translation — même principe que `SlackCableDetected`) :
-        défaut/perte → bit10 ErrorId → `SafeStop` **ET `PowerCutOff`**. Justification : le frein
-        est à manque de courant (colle au repos, voir FB_Brake) — la perte de ce retour peut
-        signifier qu'un frein colle INSTANTANÉMENT alors que le moteur est encore sous couple/en
-        mouvement ; une simple rampe de décélération (`SafeStop`) ne protège pas la mécanique
-        dans ce cas précis, il faut couper la puissance immédiatement.
-      - **Escalade PowerCutOff étendue à bit2 (surchauffe moteur, déjà existant)** : même
-        raisonnement — la perte du retour thermique moteur M1/M2 est traitée à l'identique du
-        thermique frein (défense en profondeur, demande explicite utilisateur), donc ajoutée au
-        masque `PowerCutOff` en plus du masque `SafeStop` (déjà présente).
-   🔧 REX 2026-07-08 (audit + demande utilisateur, factorisation/renforcement Méca A/B/C) :
-      - **Méca A et Méca C factorisés** via la nouvelle brique réutilisable `FB_DriftGuard`
-        (`CODE/WINCH/` — seul consommateur réel à ce jour, pas `COMMUN` : voir bandeau du FB) :
-        les deux partageaient ~15 lignes identiques (armement + capture position référence +
-        calcul dérive) — remplacé par 2 instances (`DriftGuardA`/`DriftGuardC`), comportement
-        strictement inchangé. Méca A garde son propre check vitesse en plus (câblé en OR, hors
-        périmètre de la brique). `MecaADriftM`/`MecaCDriftM`/`MecaBElapsedTime` exposés en sortie
-        pour diagnostic/réglage tolérances côté IHM (voir §6 mapping).
-      - **Méca B étendu au frein** : vérifiait uniquement `FwdRevSpeedFeedbackOff` (contacteurs)
-        sous `PostRampTimeout` — `BrakeFeedback` (frein) ajouté à la même condition. Un frein qui
-        ne confirme pas son engagement dans ce délai est tout aussi dangereux qu'un contacteur qui
-        ne retombe pas (risque de mouvement/roue libre non détecté).
-   🆕 REX 2026-07-08 (3) — MÉCA D (bit11), demande utilisateur (retour terrain test banc) :
-      modèle à 3 couches en fonctionnement NORMAL (hors référencement) à l'approche du capteur
-      haut : (1) ~arrêt rampé normal à `HomingTargetMx_M - WinchTopStopMarginM` (voir
-       `PRG_TREUILS_CFC.st`, gardé par `HomingApproachEnable` désormais — REX 2026-07-08 (2)) ;
-      (2) coupure immédiate `AscentPermit` si le capteur physique est réellement atteint (bit5,
-      déjà existant) ; (3) **Méca D** : si malgré la coupure (2), les contacteurs ET le frein ne
-      confirment pas être retombés/serrés dans `PostRampTimeout` → `SafeStop` ET `PowerCutOff` —
-      même motif exact que Méca B (`TonMecaD`, même vérification), juste une condition d'armement
-      différente (capteur haut atteint hors référencement, au lieu de perte commande opérateur).
-   🆕 REX 2026-07-08 (4) — MÉCA E (bits 12/13), écart synchro M1/M2 CRITIQUE, demande utilisateur
-      (analyse redondance synchro) : `FB_WinchSync` (écart mineur, `WinchSyncTolerance_M`) reste
-      le 1er niveau (arrêt rampe normale, `PRG_TREUILS_CFC.st`). Méca E est une couche
-      SUPPLÉMENTAIRE et INDÉPENDANTE dans `FB_Safety_Winch` pour un écart VRAIMENT important
-      (`CriticalSyncToleranceM`, théorique 2.0m) — défense en profondeur si le 1er niveau n'a pas
-      suffi (ex. treuil qui continue malgré l'arrêt demandé). Nouvelles entrées `OtherWinchPosM`
-      (position croisée : M2 côté instance M1, M1 côté instance M2) et `BenneBusy` (suppression
-      pendant un cycle benne — l'écart M1/M2 y est volontaire, PAS un défaut ; 1 cycle de retard
-      accepté, même principe que `BenneHoldStillActive`, négligeable vu l'amplitude en jeu).
-      - **Bit12** : écart critique détecté (`SyncEnable AND NOT BenneBusy AND NOT
-        InReferencingMode AND ABS(CablePosM - OtherWinchPosM) > CriticalSyncToleranceM`) →
-        `SafeStop` immédiat (rampe rapide), PAS de `PowerCutOff` à ce stade.
-      - **Bit13** : escalade — si l'arrêt (bit12) n'est PAS confirmé (contacteurs ET frein) dans
-        `PostRampTimeout` → `SafeStop` ET `PowerCutOff` (dernier recours, même logique que Méca
-        B/D : la rampe seule n'a visiblement pas suffi à arrêter réellement le treuil).
-   🔴🔧 REX 2026-08-07 — BypassGlobal DÉSACTIVAIT LES FINS DE COURSE PHYSIQUES (demande client,
-      audit confirmé à 100% par lecture directe du fichier) : `AscentPermit`/`DescendPermit`
-      étaient calculés puis ANDés avec `NOT BypassGlobal` en toute fin de logique — même le check
-      brut indépendant du capteur haut (déjà conçu pour "rester actif" selon son propre commentaire
-      REX 2026-07-08) se retrouvait masqué. Concrètement : `Bypass.Global` sur M1/M2 empêchait
-      l'arrêt réel sur fin de course haute/basse au joystick, aucun crash mécanique visible tant
-      que l'opérateur ne relâchait pas. Corrigé : `BypassGlobal` retiré des deux formules finales
-      (`AscentPermit`/`DescendPermit`) — seuls `BypassTopLimitSwitch`/`BypassCableLimitSwitch`
-      (individuels, conscients) peuvent désormais lever CES deux protections précises. Le reste du
-      domaine (Méca A-E, thermique, phase, comm, sync, codeur) reste masqué par `BypassGlobal`
-      exactement comme avant — changement strictement limité aux 2 fins de course physiques.
-      🔧 COMPLÉTÉ (même jour, demande client "intègre-le totalement côté IHM/troubleshooting") :
-      les calculs bit5/bit6 (§3sexties/§3septies) sont EUX AUSSI sortis du bloc `IF NOT
-      BypassGlobal` — `ErrorId`/`Error` (donc l'alarme IHM `WinchM1/M2SafetyHMI.Error`) reflètent
-      désormais le vrai état des fins de course même sous `BypassGlobal`, cohérent avec le
-      blocage réel déjà corrigé. Seuls `BypassProcess`/`BypassTopLimitSwitch`/
-      `BypassCableLimitSwitch` (conscients, individuels/groupés) peuvent encore éteindre CETTE
-      alarme précise — plus jamais `BypassGlobal` seul.
-   🔴🔧 REX 2026-08-07 (2) — LIMITE LÉGALE JAMAIS APPLIQUÉE EN MANUEL (demande client) :
-      `GVL_IHM.Commun.LimitLegalReached` n'était consommé QUE par `FB_Cycle` (séquenceur
-      semi-automatique) — la descente manuelle au joystick M1/M2 pouvait dépasser la profondeur
-      légale sans AUCUN blocage réel. Ajouté : `LimitLegalReached`/`BypassLimitLegal` en entrée,
-      nouveau terme OR direct sur `DescendPermit` (pas de nouveau bit `ErrorId` : les 16 bits du
-      WORD sont déjà tous utilisés). Bypassable par `BypassProcess` (groupé) ou `BypassLimitLegal`
-      (individuel, `ST_BypassWinch.LimitLegal`, MAINT_N2) — jamais par `BypassGlobal` seul.
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===
+   🎯 Rôle : Protection machine, surveillance codeurs, dérives et interlocks
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔒 Sécurité : Gestion des autorisations SafeStop, PowerCutOff et permis
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_Winch
 VAR_INPUT
-    Enable              : BOOL;        // Active la surveillance
-    Reset               : BOOL;        // Front acquittement défauts
-    PowerContactorEngaged     : BOOL;        // Chaîne AU réarmée + conditions globales OK (info de contexte)
-    Mode                : E_Mode;      // Mode courant (autorisations)
-    SyncEnable          : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — FALSE (MAINT N1/N2) → désactive synchro ET lève SafeStop mou câble (récupération manuelle)
-    JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
-    JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
-    HeartbeatIhmOk      : BOOL;        // 💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
-    EncoderAvailable    : BOOL;        // Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance
-    EncoderFaultBypass  : BOOL;        // 🔧 Autorisation maintenance sans codeur ; effective uniquement en MAINT_N2
-    ThermalFeedback     : BOOL;        // Retour TOR thermique CE moteur (NC) — source normalisée par PRG_02_Acquisition.HwIn
-    BrakeThermalFeedback: BOOL;        // 🆕 REX 2026-07-08 : retour TOR thermique frein commun — source normalisée par PRG_02_Acquisition.HwIn
-    SlackCableDetected  : BOOL;        // Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si NOT SyncEnable
-    PhaseRotationOk     : BOOL;        // PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI — TRUE = rotation phases correcte
-    TopPositionSensor   : BOOL;        // Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte
-    InReferencingMode   : BOOL;        // TRUE si treuil en cours de homing (référencement)
-    CablePosM           : REAL;        // Position actuelle câble en mètres (scalée)
-    CfgCableLimitDescentM  : REAL;        // Limite basse physique descente en mètres (valeur négative)
-    LimitLegalReached   : BOOL;        // 🆕 2026-08-07 : GVL_IHM.Commun.LimitLegalReached — limite légale de profondeur atteinte
-    Direction           : INT;         // 🆕 REX 2026-07-08 : Consigne active de direction (-1/0/+1)
-    MovementCommanded   : BOOL;        // TRUE si au moins un contacteur de sens est réellement commandé
-    Homed               : BOOL;        // Indique si le treuil est référencé
-    HomingSuspect       : BOOL;        // Indique si le référencement est suspect
-    TopLimitM           : REAL;        // Position limite haute active (cible homing, m)
+    // === COMMANDES ET ETATS GENERAL ===
+    Enable                          : BOOL;                           // --> [CMD] Active la surveillance globale FB
+    Reset                           : BOOL;                           // --> [CMD] Front acquittement defauts
+    Mode                            : E_Mode;                         // --> [CMD] Mode d'exploitation actif
+    SyncEnable                      : BOOL;                           // --> [CMD] Validation synchronisation treuils
+    Direction                       : INT;                            // --> [CMD] Consigne active de direction (-1/0/+1)
+    MovementCommanded               : BOOL;                           // --> [CMD] Au moins un contacteur de sens commande
 
-    // 🔧 REX 2026-07-07 — Méca A/B/C (voir bandeau en-tête)
-    FwdRevSpeedFeedbackOff  : BOOL;         // Retour unique "tous contacteurs sens+vitesse retombés" CE treuil
-    BrakeFeedback           : BOOL;         // Retour frein CE treuil (TRUE = ouvert/desserré — révocation 2026-08-03)
-    JoystickYNeutral        : BOOL;         // TRUE = joystick axe Y au neutre (magnitude ~0), précalculé en amont
-    BenneHoldStillActive  : BOOL;         // TRUE seulement pour l'instance M1 pendant que le benne bouge M2 seul (instBucket.Busy) — toujours FALSE côté M2
-    UncommandedSpeedThresholdMps : REAL := 0.02; // 🔧 Méca A — théorique, à ajuster sur site
-    UncommandedDriftToleranceM   : REAL := 2.0;  // 🔧 Méca A — théorique, à ajuster sur site
-    PostRampTimeout              : TIME := T#3S; // 🔧 Méca B — théorique, à ajuster sur site
-    BenneSlipToleranceM        : REAL := 2.0;  // 🔧 Méca C — escalade safety (> 1.0 m déjà surveillé côté FB_Bucket)
+    // === ETATS SECOURS ET HARDWARE ===
+    PowerContactorEngaged           : BOOL;                           // --> [SAFE] Chaine AU rearmee + puissance OK
+    JoystickOnline                  : BOOL;                           // --> [HW] Statut bus CAN Joystick Online
+    JoystickOperational             : BOOL;                           // --> [HW] Statut bus CAN Joystick Operational
+    HeartbeatIhmOk                  : BOOL;                           // --> [HW] Communication IHM-PLC valide
+    EncoderAvailable                : BOOL;                           // --> [HW] Codeur disponible pour ce treuil
+    ThermalFeedback                 : BOOL;                           // --> [HW] Retour thermique moteur (NC)
+    BrakeThermalFeedback            : BOOL;                           // --> [HW] Retour thermique frein (NC)
+    SlackCableDetected              : BOOL;                           // --> [HW] Delecteur mou de cable (NC)
+    PhaseRotationOk                 : BOOL;                           // --> [HW] Sens de rotation des phases OK
+    TopPositionSensor               : BOOL;                           // --> [HW] Capteur fin de course haut (NC)
+    FwdRevSpeedFeedbackOff          : BOOL;                           // --> [HW] Feedback retombe tous contacteurs
+    BrakeFeedback                   : BOOL;                           // --> [HW] Feedback frein ouvert
+    JoystickYNeutral                : BOOL;                           // --> [HW] Joystick au neutre
+    BenneHoldStillActive            : BOOL;                           // --> [HW] Maintien fixe M1 actif pendant benne
+    BenneBusy                       : BOOL;                           // --> [HW] Cycle benne actif sur l'autre treuil
+    OtherWinchInhibited             : BOOL;                           // --> [HW] Autre treuil inhibe (maintenance)
 
-    // 🆕 REX 2026-07-08 (4) — Méca E (bits 12/13), écart synchro M1/M2 critique
-    ExpectedOtherWinchPosM  : REAL;         // Position ATTENDUE de l'AUTRE treuil, DÉJÀ corrigée de
-                                             // l'offset benne actif par l'appelant (PRG_SAFETY_CFC) —
-                                             // ce FB ne fait qu'un ABS(CablePosM - ExpectedOtherWinchPosM)
-    BenneBusy             : BOOL;         // instBucket.Busy (les 2 instances) — suppression pendant
-                                             // le trajet actif (écart transitoire normal, pas un défaut)
-    CriticalSyncToleranceM  : REAL := 2.5;  // 🔧 Méca E — écart critique SafeStop (Zone 3 dès 2.5m)
-    // 🆕 REX 2026-07-08 (7) : retour terrain — InhibitM1 côté instance M1 (Enable global) ne suffit
-    // pas : si c'est l'AUTRE treuil qui est inhibé (ex. M2 en maintenance), M1 continue de comparer
-    // sa position à ExpectedOtherWinchPosM (calculé depuis la position figée de M2) — écart croît
-    // sans borne pendant que M1 travaille seul normalement → faux Méca E. Croisé (M2 côté instance
-    // M1, M1 côté instance M2), même principe que ExpectedOtherWinchPosM.
-    OtherWinchInhibited     : BOOL;         // Inhibition de l'AUTRE treuil (mise en service N2)
-    MovementSpeedThresholdMps : REAL := 0.02; // Seuil mouvement mesurable pour contrôles sens/absence
-    MeasuredSpeedMps          : REAL; // Mesure absolue produite par PRG_02 chaîne codeur
-    MeasuredSpeedSignedMps    : REAL; // Mesure signée produite par PRG_02 chaîne codeur
-    MeasuredSpeedValid        : BOOL; // TRUE si la fenêtre horodatée codeur est complète et fiable
-    OppositeDirectionTimeout  : TIME := T#500MS; // Confirmation sens réel opposé à la commande
-    NoMovementTimeout         : TIME := T#3S;    // Confirmation absence de mouvement malgré commande
-    // 🌐 Bypass Global : si TRUE, force ErrorId=0 et saute toutes les vérifications
-    BypassGlobal              : BOOL := FALSE;
-    BypassSafety          : BOOL := FALSE;   // 🛡️ Bypass groupé PowerCutOff (bits 2,7,8,9,10,11,13)
-    BypassProcess         : BOOL := FALSE;   // ⚙️ Bypass groupé SafeStop/Permit seul (bits 0,1,3,4,5,6,12,14,15) + limite légale (hors bit, ErrorId plein)
-    BypassTopLimitSwitch  : BOOL := FALSE;   // 🚧 Bypass individuel fin de course haute PHYSIQUE (capteur, bit5)
-    BypassTopLimitSoftware: BOOL := FALSE;   // 🆕 2026-08-07 : Bypass individuel fin de course haute LOGICIEL (position calculée, hors bit)
-    BypassCableLimitSwitch: BOOL := FALSE;   // 🚧 Bypass individuel limite basse câble (bit6)
-    BypassLimitLegal      : BOOL := FALSE;   // 🆕 2026-08-07 : Bypass individuel limite légale de profondeur
-    BypassOperatorComm    : BOOL := FALSE;   // 📡 Bypass perte communication opérateur
-    BypassPhaseRotation   : BOOL := FALSE;   // ⚡ Bypass défaut rotation phases
-    BypassBrakeThermal    : BOOL := FALSE;   // 🌡️ Bypass surchauffe frein
-    BypassMotorThermal    : BOOL := FALSE;   // 🆕 2026-08-07 : 🌡️ Bypass surchauffe moteur (bit2) —
-                                              // manquait alors que BypassBrakeThermal existe déjà pour
-                                              // le même niveau de sévérité (SafeStop+PowerCutOff)
-    BypassMecaA           : BOOL := FALSE;   // 🔄 Bypass Méca A
-    BypassMecaB           : BOOL := FALSE;   // 🛑 Bypass Méca B
-    BypassMecaC           : BOOL := FALSE;   // 🏋️ Bypass Méca C
-    BypassMecaD           : BOOL := FALSE;   // 🚧 Bypass Méca D
-    BypassMecaE           : BOOL := FALSE;   // 🔄 Bypass Méca E
+    // === REGLAGES ET LIMITES SÉCURITÉ ===
+    InReferencingMode               : BOOL;                           // --> [CFG] Treuil en cours de homing
+    CablePosM                       : REAL;                           // --> [CFG] Position actuelle cable (m)
+    CfgCableLimitDescentM           : REAL;                           // --> [CFG] Limite basse physique descente (m)
+    LimitLegalReached               : BOOL;                           // --> [CFG] Limite legale de profondeur atteinte
+    Homed                           : BOOL;                           // --> [CFG] Treuil reference
+    HomingSuspect                   : BOOL;                           // --> [CFG] Referencement suspect
+    TopLimitM                       : REAL;                           // --> [CFG] Position limite haute active (m)
+    UncommandedSpeedThresholdMps    : REAL := 0.02;                   // --> [CFG] Seuil vitesse non commandee Meca A (m/s)
+    UncommandedDriftToleranceM      : REAL := 2.0;                    // --> [CFG] Tolerance derive position Meca A (m)
+    PostRampTimeout                 : TIME := T#3s;                   // --> [CFG] Delai attente retombee contacteurs/frein Meca B
+    BenneSlipToleranceM             : REAL := 2.0;                    // --> [CFG] Tolerance glissement M1 pendant benne (m)
+    ExpectedOtherWinchPosM          : REAL;                           // --> [CFG] Position attendue de l'autre treuil (m)
+    CriticalSyncToleranceM          : REAL := 2.5;                    // --> [CFG] Tolerance ecart critique synchro (m)
+    MovementSpeedThresholdMps       : REAL := 0.02;                   // --> [CFG] Seuil vitesse mesurable (m/s)
+    MeasuredSpeedMps                : REAL;                           // --> [CFG] Mesure absolue vitesse (m/s)
+    MeasuredSpeedSignedMps          : REAL;                           // --> [CFG] Mesure signee vitesse (m/s)
+    MeasuredSpeedValid              : BOOL;                           // --> [CFG] Mesure vitesse valide
+    OppositeDirectionTimeout        : TIME := T#500ms;                // --> [CFG] Delai confirmation sens oppose
+    NoMovementTimeout               : TIME := T#3s;                   // --> [CFG] Delai confirmation absence mouvement
+
+    // === BYPASSES ET SIMULATION ===
+    EncoderFaultBypass              : BOOL;                           // --> [TST] Bypass defaut codeur
+    BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Force ErrorId=0 global
+    BypassSafety                    : BOOL := FALSE;                  // --> [TST] Bypass groupe PowerCutOff
+    BypassProcess                   : BOOL := FALSE;                  // --> [TST] Bypass groupe SafeStop/Permit
+    BypassTopLimitSwitch            : BOOL := FALSE;                  // --> [TST] Bypass individuel fin de course haut capteur
+    BypassTopLimitSoftware          : BOOL := FALSE;                  // --> [TST] Bypass individuel fin de course haut logiciel
+    BypassCableLimitSwitch          : BOOL := FALSE;                  // --> [TST] Bypass individuel limite basse cable
+    BypassLimitLegal                : BOOL := FALSE;                  // --> [TST] Bypass individuel limite legale
+    BypassOperatorComm              : BOOL := FALSE;                  // --> [TST] Bypass perte com operateur
+    BypassPhaseRotation             : BOOL := FALSE;                  // --> [TST] Bypass defaut rotation phases
+    BypassBrakeThermal              : BOOL := FALSE;                  // --> [TST] Bypass surchauffe frein
+    BypassMotorThermal              : BOOL := FALSE;                  // --> [TST] Bypass surchauffe moteur
+    BypassMecaA                     : BOOL := FALSE;                  // --> [TST] Bypass Meca A
+    BypassMecaB                     : BOOL := FALSE;                  // --> [TST] Bypass Meca B
+    BypassMecaC                     : BOOL := FALSE;                  // --> [TST] Bypass Meca C
+    BypassMecaD                     : BOOL := FALSE;                  // --> [TST] Bypass Meca D
+    BypassMecaE                     : BOOL := FALSE;                  // --> [TST] Bypass Meca E
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD;        // bits0..13 : protections existantes ; bit14 : sens réel opposé ; bit15 : absence mouvement malgré commande
-    State               : E_State;
-    StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si NOT SyncEnable)
-    DescendPermit       : BOOL;        // 🟢 Autorise descente — TRUE = OK, FALSE = interdit (bit6 limite basse câble, mou câble mode récup)
-    AscentPermit        : BOOL;        // 🟢 Autorise montée — TRUE = OK, FALSE = interdit (bit5 fin course haut)
-    PowerCutOff         : BOOL;        // 🧨 Coupure puissance amont réelle — bits 2/7/8/9/10/11 (voir bandeau en-tête)
+    // === ETATS IEC ET SYNOPTIQUE ===
+    Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
+    Busy                            : BOOL;                           // <-- [STAT] Traitement securite en cours
+    Done                            : BOOL;                           // <-- [STAT] Action terminee
+    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
+    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur bitmask (0..15)
+    State                           : E_State;                        // <-- [STAT] Etat courant machine d'etat FB
+    StateAtError                    : E_State;                        // <-- [DIAG] Etat memorise lors du dernier defaut
 
-    // 🆕 REX 2026-07-08 : diagnostic/réglage tolérances — miroirs des bricks internes, à consommer
-    // par l'IHM pour la mise en service (voir PRG_SUPERVISION_CFC, GVL_IHM.M1Winch/M2Winch)
-    MecaADriftM         : REAL;        // Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM
-    MecaCDriftM         : REAL;        // Dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM
-    MecaBElapsedTime    : TIME;        // Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout
+    // === SORTIES DE SÉCURITÉ ET AUTORISATIONS ===
+    SafeStop                        : BOOL;                           // <-- [SAFE] Arret rapide 2 sens (Enable maintenu)
+    DescendPermit                   : BOOL;                           // <-- [SAFE] Permis de descente autorise
+    AscentPermit                    : BOOL;                           // <-- [SAFE] Permis de montee autorise
+    PowerCutOff                     : BOOL;                           // <-- [SAFE] Coupure puissance amont
+
+    // === DIAGNOSTICS ET MESURES ===
+    MecaADriftM                     : REAL;                           // <-- [DIAG] Derive mesuree Meca A (m)
+    MecaCDriftM                     : REAL;                           // <-- [DIAG] Derive mesuree Meca C (m)
+    MecaBElapsedTime                : TIME;                           // <-- [DIAG] Ecoule confirmation contacteurs/frein
 END_VAR
 VAR
-    ResetEdge           : R_TRIG;
-    ErrorEdge           : R_TRIG;
-    FirstScanDone       : BOOL;
+    // === SOUS-INSTANCES FB ===
+    DriftGuardA                     : FB_DriftGuard;                  // * [INST] Surveillance derive Meca A
+    DriftGuardC                     : FB_DriftGuard;                  // * [INST] Surveillance derive Meca C
 
-    // 🔧 Méca A (bit7) — la vitesse est désormais reçue de la chaîne codeur (T84/T85)
-    DriftGuardA         : FB_DriftGuard;   // 🔧 REX 2026-07-08 : factorise Méca A (remplace MecaA_Armed/MecaA_RefPosM)
+    // === DETECTEURS ET TIMERS INTERNES ===
+    ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
+    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
+    TonMecaB                        : TON;                            // . [LOC] Tempo confirmation arret Meca B
+    TonMecaD                        : TON;                            // . [LOC] Tempo arret fin de course haut Meca D
+    TonMecaE                        : TON;                            // . [LOC] Tempo confirmation arret synchro Meca E
+    TonOppositeDirection            : TON;                            // . [LOC] Tempo confirmation sens oppose
+    TonNoMovement                   : TON;                            // . [LOC] Tempo confirmation absence mouvement
+    TonStartupWarmup                : TON;                            // . [LOC] Tempo masquage transitoire au boot
 
-    // 🔧 REX 2026-07-07 — Méca B (bit8)
-    MecaB_NoOperatorCmd : BOOL;         // (perte CAN joystick) OU (joystick au neutre)
-    TonMecaB            : TON;
-
-    // 🆕 REX 2026-07-08 (3) — Méca D (bit11) : arrivée capteur haut hors référencement
-    TonMecaD            : TON;
-
-    // 🔧 REX 2026-07-07 — Méca C (bit9, escalade)
-    DriftGuardC         : FB_DriftGuard;   // 🔧 REX 2026-07-08 : factorise Méca C (remplace MecaC_Armed/MecaC_RefPosM)
-
-    // Transition référencement
-    LastInReferencingMode : BOOL;
-
-    // 🆕 REX 2026-07-08 (4) — Méca E (bits 12/13)
-    TonMecaE               : TON;   // Confirmation arrêt après détection écart critique (escalade PowerCutOff)
-    TonOppositeDirection  : TON;
-    TonNoMovement         : TON;
-    OppositeDirectionActive : BOOL;
-    EncoderAvailableEffective : BOOL;   // Codeur valide OU bypass individuel autorisé en MAINT_N2
-    TonStartupWarmup      : TON;        // ⏱️ Inhibition 3s au boot + effacement auto coms
+    // === VARIABLES LOCALES INTERNES ===
+    FirstScanDone                   : BOOL;                           // . [LOC] Premier cycle effectue
+    MecaB_NoOperatorCmd             : BOOL;                           // . [LOC] Absence commande operateur
+    LastInReferencingMode           : BOOL;                           // . [LOC] Memorisation etat homing precedent
+    OppositeDirectionActive         : BOOL;                           // . [LOC] Sens oppose confirme actif
+    EncoderAvailableEffective       : BOOL;                           // . [LOC] Codeur valide ou bypass effectif
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===

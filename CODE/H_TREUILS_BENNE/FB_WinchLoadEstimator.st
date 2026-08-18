@@ -1,46 +1,54 @@
-(* ═══════════════════════════════════════════════════════════════════════════════
+(* =======================================================================
    📊 FB_WinchLoadEstimator — Estimation empirique de charge treuil
-   ═══════════════════════════════════════════════════════════════════════════════
-   🧩 Brique de diagnostic/information, sans commande moteur et sans SafeStop.
-   🎯 Croise le palier commandé et la bande de vitesse mesurée pour lire une
-      estimation dans ST_WinchLoadEstimateTable.
-   ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
-      reste à 0 % et Configured reste FALSE.
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-*)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Estimation informative de la charge par croisement palier/vitesse
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Brique de diagnostic/mesure (1 instance par treuil)
+   🔒 Sécurité : Aucune commande moteur ni action sur SafeStop (information IHM)
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchLoadEstimator
 VAR_INPUT
-    Enable             : BOOL;
-    Reset              : BOOL;
-    PowerContactorEngaged    : BOOL;
-    Mode               : E_Mode;
-    ActiveSpeedStep    : INT;                       // Palier commandé 0..5
-    MeasuredSpeedMps   : REAL;                      // Vitesse câble absolue
-    MeasuredSpeedSignedMps : REAL;                  // Vitesse signée : positive = montée, négative = descente
-    SpeedConfig        : ST_WinchSpeedConfig;       // Plages vitesse mesurée
-    LoadTable          : ST_WinchLoadEstimateTable;// Table empirique 5x5
+    // === COMMANDES ET CONSIGNES ===
+    Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB
+    Reset                           : BOOL;                           // --> [CMD] Acquittement defaut sur front
+    Mode                            : E_Mode;                         // --> [CMD] Mode d'exploitation actif
+    ActiveSpeedStep                 : INT;                            // --> [CMD] Palier commande actif (0..5)
+
+    // === SECOURS ET HARDWARE ===
+    PowerContactorEngaged           : BOOL;                           // --> [SAFE] Chaine AU rearmee et puissance OK
+    MeasuredSpeedMps                : REAL;                           // --> [HW] Vitesse cable absolue (m/s)
+    MeasuredSpeedSignedMps          : REAL;                           // --> [HW] Vitesse signee (+: montee, -: descente) (m/s)
+
+    // === REGLAGES ET TABLES ===
+    SpeedConfig                     : ST_WinchSpeedConfig;            // --> [CFG] Configuration des plages de vitesse
+    LoadTable                       : ST_WinchLoadEstimateTable;      // --> [CFG] Table empirique d'estimation 5x5
 END_VAR
 VAR_OUTPUT
-    Ready              : BOOL;
-    Busy               : BOOL;
-    Done               : BOOL;
-    Error              : BOOL;
-    ErrorId            : WORD;                     // bit0 : entrée/table invalide
-    State              : E_State;
-    StateAtError       : E_State;
-    SpeedBand          : INT;                      // Bande vitesse courante 0..5
-    EstimatedLoadPct   : REAL;                     // Estimation informative 0..100 %
-    Configured         : BOOL;                     // TRUE si table explicitement validée
-    Ascending          : BOOL;                     // TRUE uniquement pendant une montée mesurée
+    // === ETATS IEC ET SYNOPTIQUE ===
+    Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
+    Busy                            : BOOL;                           // <-- [STAT] Traitement en cours
+    Done                            : BOOL;                           // <-- [STAT] Action terminee
+    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
+    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur (bit0: entree/table invalide)
+    State                           : E_State;                        // <-- [STAT] Etat courant machine d'etat FB
+    StateAtError                    : E_State;                        // <-- [DIAG] Etat memorise lors du dernier defaut
+
+    // === DIAGNOSTICS ET ESTIMATIONS ===
+    SpeedBand                       : INT;                            // <-- [DIAG] Bande de vitesse courante (0..5)
+    EstimatedLoadPct                : REAL;                           // <-- [DIAG] Estimation de charge (0..100%)
+    Configured                      : BOOL;                           // <-- [STAT] Table explicitement validee
+    Ascending                       : BOOL;                           // <-- [STAT] Montee effective mesuree en cours
 END_VAR
 VAR
-    ResetEdge          : R_TRIG;
-    ErrorEdge          : R_TRIG;
-    PreviousSpeedBand  : INT;
-    HasPreviousBand    : BOOL;
-    SelectedLoadPct    : REAL;
+    // === DETECTEURS ET TIMERS INTERNES ===
+    ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
+    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
+
+    // === VARIABLES LOCALES CALCULÉES ===
+    PreviousSpeedBand               : INT;                            // . [LOC] Memoire bande de vitesse cycle precedent
+    HasPreviousBand                 : BOOL;                           // . [LOC] Indicateur premiere bande memorisee
+    SelectedLoadPct                 : REAL;                           // . [LOC] Valeur de charge extraite de la table
 END_VAR
 
 // 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.

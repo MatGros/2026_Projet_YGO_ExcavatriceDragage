@@ -1,45 +1,11 @@
-(* ═══════════════════════════════════════════════════════════════
-   🪜 FB_SpeedStep — Décodeur palier → 4 contacteurs (1 par treuil)
+(* =======================================================================
+   🪜 FB_SpeedStep — Décodeur palier vitesse vers contacteurs
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §2, §6
-   📄 Audit P0.2 : AUDIT_Winch_v1.0 (archivé) §2.2
-   📥 SpeedRefPct    : consigne 0..100 % (déjà rampée en amont, ABS)
-   📥 Table          : ST_SpeedStepTable propre AU TREUIL appelant
-                        (M1 et M2 ont chacune la leur — pas de table globale)
-   📥 MaxStepNumber  : plafond palier (1..5), borné et validé ici
-   📤 Contactor1..4  : état de chaque contacteur de vitesse (BOOL individuel,
-                        lu directement dans `Table.P<palier>R<relais>`)
-   📤 StepNumber     : n° palier courant (0 = arrêt, 1..5)
-   📤 ConfigError    : TRUE si table invalide ou MaxStepNumber hors bornes
-   📤 ConfigErrorId  : WORD bitfield (bit0 = config invalide)
-   🧩 Réutilisation lib Util (Partie3 §0) : HYSTERESIS pour la sélection
-      de palier anti-battement — AUCUN seuil "maison" recalculé.
-   ⚠️ CORRECTIF interface HYSTERESIS (2026-07-01) : `Util` 3.5.19.0 expose
-      `HYSTERESIS(IN, HIGH, LOW : INT → OUT : BOOL)` (TRUE si IN < LOW,
-      FALSE si IN > HIGH, maintien entre les deux) — `SpeedRefPct` (REAL)
-      est converti en INT (`REAL_TO_INT`) avant appel.
-   ⚠️ ÉVOLUTION (retour terrain 2026-07-01) : `StepMask` (BYTE packé) est
-      remplacé par 4 sorties BOOL individuelles, lues directement dans la
-      table (`P<palier>R<relais>`) — plus de bit-extraction côté FB_Winch,
-      paramétrage un contacteur à la fois pendant la mise en service.
-   ⚠️ Brique réduite (Partie3 §1bis) : pas d'Enable/Reset/ErrorId/State
-      au sens "FB métier" — c'est un décodeur pur, composé À L'INTÉRIEUR de
-      FB_Winch, qui porte lui la sécurité/le contrat complet.
-      ➕ MAIS on ajoute 2 sorties locales `ConfigError` + `ConfigErrorId`
-      pour signaler une table de config invalide (P0.2 audit).
-   🆕 AJOUT (2026-07-03quinquies, spec descente/couple) : `MaxStepNumber` plafonne
-      le palier atteignable (défaut 5 = comportement inchangé). Sert à `FB_Winch`
-      pour limiter la vitesse en descente (charge entraînante, pas besoin d'aller
-      vite) SANS changer la logique de décodage elle-même — juste un plafond
-      appliqué APRÈS la sélection par hystérésis, avant la lecture de la table.
-   🛡️ CORRECTIF P0.2 (2026-07-21) :
-      - Bornage `MaxStepNumber` ∈ [1..5] dès l'entrée
-      - Validation table : seuils croissants 0..100 %, hystérésis > 0,
-        contacteurs cohérents (au moins 1 par palier 2..MaxStepNumber ; palier 1 tout FALSE autorisé)
-      - Sortie `ConfigError` / `ConfigErrorId` (bit0 = table invalide)
-      - Forçage sorties sûres (contacteurs FALSE, StepNumber=0) si erreur config
-      - Reset sur front (R_TRIG) + cause disparue (conforme Partie 3 §5)
-   ════════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Décodeur interne (compose FB_Winch)
+   🔒 Sécurité : Validation configuration table et anti-battement hysteresis
+   ======================================================================= *)
 
 {attribute 'qualified_only'}
 {attribute 'hide_all_locals'}
@@ -48,38 +14,49 @@
 
 FUNCTION_BLOCK PUBLIC FB_SpeedStep
 VAR_INPUT
-    Enable            : BOOL;               // Piloté par FB_Winch : FALSE = treuil à l'arrêt (palier 0)
-    SpeedRefPct       : REAL;                // Consigne vitesse 0..100 % (déjà rampée par FB_Winch)
-    Table             : ST_SpeedStepTable;   // Table des 5 paliers (contacteurs + seuils), propre à CE treuil
-    HystMargin        : REAL := 2.0;         // Marge anti-battement (%) autour de chaque seuil
-    MaxStepNumber     : INT := 5;            // 🆕 Plafond palier atteignable (1..5) — 5 = pas de restriction
-    MeasuredSpeedBand : INT := 0;            // Bande vitesse réelle validée (0 = inconnue)
-    SpeedGuardEnable  : BOOL := FALSE;       // 🛡️ Garde-fou palier activable après validation terrain
-    SpeedGuardReady   : BOOL := FALSE;       // 🟢 Vitesse stable et conditions de passage validées
+    // === COMMANDES ET CONSIGNES ===
+    Enable                          : BOOL;                           // --> [CMD] Pilotage actif (FALSE = palier 0 / arret)
+    SpeedRefPct                     : REAL;                           // --> [CMD] Consigne vitesse 0..100%
+
+    // === REGLAGES ET CONFIGURATION ===
+    Table                           : ST_SpeedStepTable;              // --> [CFG] Table des 5 paliers propre au treuil
+    HystMargin                      : REAL := 2.0;                    // --> [CFG] Marge anti-battement (%)
+    MaxStepNumber                   : INT := 5;                       // --> [CFG] Plafond palier atteignable (1..5)
+
+    // === MESURES ET GARDE-FOUS ===
+    MeasuredSpeedBand               : INT := 0;                       // --> [HW] Bande vitesse reelle validee
+    SpeedGuardEnable                : BOOL := FALSE;                  // --> [HW] Garde-fou palier activable
+    SpeedGuardReady                 : BOOL := FALSE;                  // --> [HW] Conditions de passage validees
 END_VAR
 VAR_OUTPUT
-    Contactor1        : BOOL;   // Contacteur de vitesse 1 pour le palier courant
-    Contactor2        : BOOL;   // Contacteur de vitesse 2 pour le palier courant
-    Contactor3        : BOOL;   // Contacteur de vitesse 3 pour le palier courant
-    Contactor4        : BOOL;   // Contacteur de vitesse 4 pour le palier courant
-    StepNumber        : INT;    // N° palier courant (0 = arrêt, 1..5)
-    SpeedGuardLimited : BOOL;   // TRUE si le garde-fou a limité le palier demandé
-    ConfigError       : BOOL;   // 🛡️ Miroir de ConfigErrorId <> 0 (config table invalide)
-    ConfigErrorId     : WORD;   // 🛡️ Bitfield config : bit0 = table invalide (seuils, hyst, contacteurs)
+    // === ETATS IEC ET SYNOPTIQUE ===
+    StepNumber                      : INT;                            // <-- [STAT] Numero de palier courant (0..5)
+
+    // === ORDRES ACTIONNEURS (CONTACTEURS) ===
+    Contactor1                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 1
+    Contactor2                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 2
+    Contactor3                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 3
+    Contactor4                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 4
+
+    // === DIAGNOSTICS ET ERREURS ===
+    SpeedGuardLimited               : BOOL;                           // <-- [DIAG] Statut limitation par garde-fou
+    ConfigError                     : BOOL;                           // <-- [DIAG] Synthese erreur configuration
+    ConfigErrorId                   : WORD;                           // <-- [DIAG] Bitfield erreur configuration
 END_VAR
 VAR
-    SpeedRefInt       : INT;          // Consigne convertie en INT (interface HYSTERESIS)
-    Hyst1             : HYSTERESIS;   // 🧱 Lib Util — transition palier 1→2
-    Hyst2             : HYSTERESIS;   // 🧱 Lib Util — transition palier 2→3
-    Hyst3             : HYSTERESIS;   // 🧱 Lib Util — transition palier 3→4
-    Hyst4             : HYSTERESIS;   // 🧱 Lib Util — transition palier 4→5
+    // === SOUS-INSTANCES FB ===
+    Hyst1                           : HYSTERESIS;                     // * [INST] Transition palier 1 vers 2
+    Hyst2                           : HYSTERESIS;                     // * [INST] Transition palier 2 vers 3
+    Hyst3                           : HYSTERESIS;                     // * [INST] Transition palier 3 vers 4
+    Hyst4                           : HYSTERESIS;                     // * [INST] Transition palier 4 vers 5
+    _ConfigErrorTrig                : R_TRIG;                         // * [INST] Front montant erreur configuration
 
-    // 🛡️ Validation config locale (P0.2 audit)
-    _ConfigValid      : BOOL;         // Résultat validation table + MaxStepNumber
-    _ConfigValidPrev  : BOOL;         // Mémoire cycle précédent pour détection front
-    _ConfigErrorTrig  : R_TRIG;       // Front montant erreur config (pour reset)
-    _ConfigErrorIdInt : WORD;         // Accumulateur interne défauts config
-    _MaxStepClamped   : INT;          // MaxStepNumber borné [1..5]
+    // === VARIABLES LOCALES INTERNES ===
+    SpeedRefInt                     : INT;                            // . [LOC] Consigne convertie en INT pour Hysteresis
+    _ConfigValid                    : BOOL;                           // . [LOC] Resultat validation table et MaxStep
+    _ConfigValidPrev                : BOOL;                           // . [LOC] Memoire cycle precedent validation
+    _ConfigErrorIdInt               : WORD;                           // . [LOC] Accumulateur interne defauts config
+    _MaxStepClamped                 : INT;                            // . [LOC] MaxStepNumber borne dans [1..5]
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_SpeedStep) ===
