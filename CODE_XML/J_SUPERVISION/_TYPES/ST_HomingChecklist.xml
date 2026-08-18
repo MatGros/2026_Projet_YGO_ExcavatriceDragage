@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.251611" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.251611">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_HomingChecklist">
+        <baseType>
+          <struct>
+            <variable name="Step1_ModeAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Pré-requis de mode
+TRUE = Mode MAINT_N1 ou MAINT_N2 actif ➔ Commutateur Mode IHM : GVL_IHM.Modes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2_WinchSelected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Treuil sélectionné en MAINT_N2 ➔ Bouton IHM : GVL_IHM.Modes.Cmd.TglJoystickMaster / Selection Treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3_EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Santé Matériel &amp; Bus
+TRUE = Codeur EtherCAT OK &amp; E/S OK ➔ Si simu : GVL_Simulation.SimWinchActive=1 / SimSafetyActive=1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2bis. Entrées physiques directes HwIn (vérité terrain)
+Retours contacteurs retombés issus de HwIn.Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour fin de course frein (1 = ouvert) issu de HwIn.Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun libre (1 = libre) issu de HwIn.Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4_ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. État Physique Machine
+TRUE = Tous les contacteurs retombés (attendre l'arrêt complet)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step5_BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Frein serré (attendre l'arrêt complet)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensorActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Fin de course haut physique (TRUE = au contact)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Benne Ouvert (TRUE = Ouvert) ➔ Pour forcer sans codeur : GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllConditionsMet">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Séquence &amp; Bilan
+TRUE = Prêt pour le homing ! ➔ Déclencher : GVL_IHM.M1TreuilRetenue.Cmd.BtnHome (à 8m) ou BtnHomingAtZero (à 0m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Séquence de calage en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Calage réussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingHomed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Treuil actuellement référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Doute redémarrage ➔ Lever le doute via : GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RejectErrorMask">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">5. Code de rejet exact
+Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>2d6561f4-76da-5ede-affd-bb7892225e3b</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎯 ST_HomingChecklist — Diagnostic chronologique de référencement (Dépannage)
+   ───────────────────────────────────────────────────────────────
+   🎨 Permet de localiser immédiatement l'étape qui bloque le Homing (M1/M2).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Object Name="ST_HomingChecklist" ObjectId="2d6561f4-76da-5ede-affd-bb7892225e3b" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

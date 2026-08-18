@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T23:35:29.769647" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T23:35:29.769647">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_AntiFlickerText" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="NewText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte candidat à afficher</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceInstant">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = afficher immédiatement (défaut critique), sans maintien</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Text">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte stabilisé exposé à l'IHM</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="TonHold">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
+   ───────────────────────────────────────────────────────────────
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4.3
+   🎯 Responsabilité : maintient un texte warning/état un temps minimum
+      avant de laisser le contenu changer, et laisse passer en direct
+      (sans maintien) les messages critiques (défauts AU/puissance).
+   🛡️ Sécurité : l'action de sécurité reste instantanée — ce FB ne
+      retarde jamais un texte, il ne fait que stabiliser l'affichage.
+      Il n'a aucun effet sur la machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Lissage anti-clignotement"}
+// Défaut critique : affichage immédiat, le TON est remis à zéro (aucune latence).
+IF ForceInstant THEN
+    Text := NewText;
+    TonHold(IN := FALSE);
+ELSE
+    // Warning / état : le texte ne change qu'après maintien min (HoldTime).
+    // Un signal qui oscille plus vite que HoldTime → texte stable.
+    TonHold(IN := (NewText &lt;&gt; Text), PT := HoldTime);
+    IF TonHold.Q THEN
+        Text := NewText;
+    END_IF;
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c4ab4ebb-976e-5154-b2e7-972371a90d1b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

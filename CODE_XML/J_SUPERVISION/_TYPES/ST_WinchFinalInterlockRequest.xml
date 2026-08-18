@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.686415" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T14:02:33.686415">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_WinchFinalInterlockRequest">
+        <baseType>
+          <struct>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SafeStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BrakeFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 (retrait FB_Brake) : retour PHYSIQUE brut du</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FwdRevSpeedFeedbackOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">contacteur/bobine frein (TRUE = ouvert/relâché) — remplace
+BrakeReleaseRequest/BrakeCommandOpenConfirmed ; la barrière
+finale calcule elle-même BrakeCmd := RelayFwd OR RelayRev.
+TRUE = relais sens + C1..C4 tous retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedRelayFwd">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RequestedRelayRev">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RequestedContactor1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RequestedContactor2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RequestedContactor3">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RequestedContactor4">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="RequestedStep">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="PowerCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-05 : demande coupure puissance (FB_Safety_Winch), agrégée par PRG_06 (M5, A-04)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1a0be5b9-7748-52ea-86e2-35102e49b3f8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪝 ST_WinchFinalInterlockRequest — Demande brute vers frontière Q M1/M2
+   ───────────────────────────────────────────────────────────────
+   📤 Producteur unique : PRG_TREUILS_CFC (VAR_OUTPUT).
+   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock_LD.
+   🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
+      demandes exactes de FB_Winch / ST_SpeedStepTable.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Object Name="ST_WinchFinalInterlockRequest" ObjectId="1a0be5b9-7748-52ea-86e2-35102e49b3f8" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

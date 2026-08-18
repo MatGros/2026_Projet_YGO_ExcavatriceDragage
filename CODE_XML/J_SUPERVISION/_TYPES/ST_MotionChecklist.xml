@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.254608" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.254608">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_MotionChecklist">
+        <baseType>
+          <struct>
+            <variable name="Step1_PowerEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Puissance &amp; Mode
+TRUE = Contacteur principal sous tension (PowerContactorEngaged_DI) ➔ Armer puissance via Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2_ModeAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Mode MAINT_N1 ou N2 actif (pas DISABLE) ➔ Commutateur Mode IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3_NotBusyOtherTask">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Pas d'autre séquence en cours (Homing, Benne busy, etc.)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1bis. Entrées physiques directes HwIn (vérité terrain)
+Contacteur puissance principal issu de HwIn.Machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour fin de course frein (1 = ouvert) issu de HwIn</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cmd_BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre de commande d'ouverture de frein généré par l'automate</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4_MotionRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Intention &amp; Demande
+TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster doit être à 0 !</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = Montée, -1 = Descente, 0 = Repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedSpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0..100 % consigne demandée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step5_NoSafetyFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Chaîne de Sécurité &amp; Verrous
+TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step6_DirectionAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens autorisé (AscentPermit/DescendPermit)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step7_BrakeReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Commande frein activée &amp; retour frein OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step8_OutputInterlockOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Étage de sortie LD débloqué (pas d'interlock actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllConditionsMet">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Bilan &amp; Exécution Physiques
+🟢 TRUE = TOUTES LES CONDITIONS SONT REMPLIES, LES RELAIS DOIVENT COLLER !</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwdActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Montée physiquement commandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Relais Descente physiquement commandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedContactor1Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur de vitesse Palier 1 commandé</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6d9cfeb3-7f24-5c22-8bb6-161cefc2f0eb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_MotionChecklist — Diagnostic chronologique de commande de mouvement
+   ───────────────────────────────────────────────────────────────
+   🎨 Permet de voir en un coup d'œil pourquoi un ordre de mouvement ne fait pas coller les relais.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Object Name="ST_MotionChecklist" ObjectId="6d9cfeb3-7f24-5c22-8bb6-161cefc2f0eb" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

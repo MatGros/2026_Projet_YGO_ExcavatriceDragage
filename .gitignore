@@ -9,6 +9,8 @@ PRJ/*.bak
 # CODESYS temporary files
 *.~u
 *.~d
+*.tmp
+CODE_XML.tmp/
 
 # Python
 venv/
