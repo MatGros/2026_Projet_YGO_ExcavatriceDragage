@@ -1,37 +1,39 @@
-(* ═══════════════════════════════════════════════════════════════
+(* =======================================================================
    🔒 FB_Safety_EmergencyManagementOutput — Projection Physique Fail-Safe
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Enable gate + copie consignes logiques vers sorties physiques
    🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-*)
+   🔌 Architecture : Projection physique fail-safe
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput
 VAR_INPUT
-    Enable              : BOOL;                // Active le pilote (FALSE = toutes sorties à FALSE)
-    Cmd                 : ST_Safety_Emergency_InternalCmd; // Ordres logiques reçus du bloc logique
-    ChainOk             : BOOL;                // Miroir EmergencyChainClosed (pour bus State)
-    ContactorOk         : BOOL;                // Miroir PowerContactorEngaged (pour bus State)
-    ArmingStep          : INT;                 // Miroir ArmingSeqStep (pour bus State)
-    Armable             : BOOL;                // Calculé par Logic (pour bus State)
-    ArmingBusy          : BOOL;                // Calculé par Logic (pour bus State)
-    Error               : BOOL;                // Miroir Error (pour bus Diag)
-    ErrorId             : WORD;                // Miroir ErrorId (pour bus Diag)
-    RedundancyTestFailed : BOOL;               // Miroir (pour bus Diag)
-    ArmFailed           : BOOL;                // Miroir (pour bus Diag)
-    LockoutActive       : BOOL;                // Miroir (pour bus Diag)
+    // === CONSIGNES & COMMANDES LOGIQUES ===
+    Enable                  : BOOL; // --> [CMD]  Active le pilote (FALSE = toutes sorties a FALSE)
+    Cmd                     : ST_Safety_Emergency_InternalCmd; // --> [CMD] Ordres logiques recus du bloc logique
+
+    // === RETOURS D'ETAT & DIAGNOSTICS (MIROIRS) ===
+    ChainOk                 : BOOL; // --> [HW]   Miroir EmergencyChainClosed (pour bus State)
+    ContactorOk             : BOOL; // --> [HW]   Miroir PowerContactorEngaged (pour bus State)
+    ArmingStep              : INT;  // --> [STAT] Miroir ArmingSeqStep (pour bus State)
+    Armable                 : BOOL; // --> [STAT] Calcule par Logic (pour bus State)
+    ArmingBusy              : BOOL; // --> [STAT] Calcule par Logic (pour bus State)
+    Error                   : BOOL; // --> [DIAG] Miroir Error (pour bus Diag)
+    ErrorId                 : WORD; // --> [DIAG] Miroir ErrorId (pour bus Diag)
+    RedundancyTestFailed    : BOOL; // --> [DIAG] Miroir RedundancyTestFailed (pour bus Diag)
+    ArmFailed               : BOOL; // --> [DIAG] Miroir ArmFailed (pour bus Diag)
+    LockoutActive           : BOOL; // --> [DIAG] Miroir LockoutActive (pour bus Diag)
 END_VAR
 VAR_OUTPUT
-    // ⚡ Sorties physiques terminales
-    MaintainA_RQ        : BOOL; // Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure
-    MaintainB_RQ        : BOOL; // Vers relais maintien canal B — TRUE = voie maintenue, FALSE = coupure
-    ArmPulse_RQ         : BOOL; // Vers contacteur impulsion réarmement — TRUE = pulse actif
+    // === SORTIES PHYSIQUES TERMINALES ===
+    MaintainA_RQ            : BOOL; // <-- [ACT]  Vers relais maintien canal A (TRUE = voie maintenue)
+    MaintainB_RQ            : BOOL; // <-- [ACT]  Vers relais maintien canal B (TRUE = voie maintenue)
+    ArmPulse_RQ             : BOOL; // <-- [ACT]  Vers contacteur impulsion rearmement (TRUE = pulse actif)
 
-    // 🚦 Bus d'état public
-    State               : ST_Safety_Emergency_State;
-    Diag                : ST_Safety_Emergency_Diag;
+    // === BUS D'ETAT & DIAGNOSTIC PUBLICS ===
+    State                   : ST_Safety_Emergency_State; // <-- [STAT] Bus d'etat public
+    Diag                    : ST_Safety_Emergency_Diag;  // <-- [DIAG] Bus diagnostic public
 END_VAR
 
 // === IMPLEMENTATION ===
