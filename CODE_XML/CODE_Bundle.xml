@@ -12296,6 +12296,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant StartCycle</xhtml>
               </documentation>
             </variable>
+            <variable name="DeadmanArmedEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant DeadmanArmed (demarrage joystick)</xhtml>
+              </documentation>
+            </variable>
             <variable name="AbortEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -12499,6 +12507,7 @@ END_IF;
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
+DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
 ErrorEdge(CLK := Error);
 
@@ -12583,9 +12592,10 @@ CASE State OF
         Busy := FALSE; Done := FALSE;
 
         // Transition si système sain et réarmé (front reset ou démarrage).
-        // 🔫 D2 : l'appui homme-mort (DeadmanArmed) est requis pour INITIER le cycle ;
-        // la continuité des mouvements ne dépend que de CycleMotionPermit (manche défléchi).
-        IF StartEdge.Q AND DeadmanArmed THEN
+        // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
+        // (DeadmanArmedEdge) — l'opérateur peut lancer depuis l'IHM ou le joystick.
+        // La continuité des mouvements ne dépend que de CycleMotionPermit (manche défléchi).
+        IF StartEdge.Q OR DeadmanArmedEdge.Q THEN
             State := E_CycleStep.X1_HOMING;
         END_IF;
 
@@ -17684,11 +17694,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
     CASE CycleStep OF
         E_CycleStep.X0_PREPARATION:
-            IF NOT DeadmanArmed THEN
-                OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
-            ELSE
-                OperatorActionCandidate := '[IHM] Démarrer le cycle';
-            END_IF;
+            OperatorActionCandidate := '[IHM/JOYSTICK] Démarrer le cycle (bouton Start ou homme-mort)';
         E_CycleStep.X1_HOMING:
             OperatorActionCandidate := '[IHM] Attendre référencement codeurs';
         E_CycleStep.X2_WORK_POS_SELECT:

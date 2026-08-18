@@ -230,11 +230,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
     CASE CycleStep OF
         E_CycleStep.X0_PREPARATION:
-            IF NOT DeadmanArmed THEN
-                OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
-            ELSE
-                OperatorActionCandidate := '[IHM] Démarrer le cycle';
-            END_IF;
+            OperatorActionCandidate := '[IHM/JOYSTICK] Démarrer le cycle (bouton Start ou homme-mort)';
         E_CycleStep.X1_HOMING:
             OperatorActionCandidate := '[IHM] Attendre référencement codeurs';
         E_CycleStep.X2_WORK_POS_SELECT:

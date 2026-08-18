@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T16:21:27.602631" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T16:21:27.602631">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T16:34:25.609737" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T16:34:25.609737">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -955,11 +955,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
     CASE CycleStep OF
         E_CycleStep.X0_PREPARATION:
-            IF NOT DeadmanArmed THEN
-                OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
-            ELSE
-                OperatorActionCandidate := '[IHM] Démarrer le cycle';
-            END_IF;
+            OperatorActionCandidate := '[IHM/JOYSTICK] Démarrer le cycle (bouton Start ou homme-mort)';
         E_CycleStep.X1_HOMING:
             OperatorActionCandidate := '[IHM] Attendre référencement codeurs';
         E_CycleStep.X2_WORK_POS_SELECT:
