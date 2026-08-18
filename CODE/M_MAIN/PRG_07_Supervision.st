@@ -72,8 +72,6 @@ instDiagIhmHeartbeat(
     TglHeartbeatIhm := SEL(GVL_IHM.Network.Bypass.IhmHeartbeat, GVL_IHM.Commun.TglHeartbeatIhm, GVL_Global.BlinkClock)
 );
 
-StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
-
 FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset

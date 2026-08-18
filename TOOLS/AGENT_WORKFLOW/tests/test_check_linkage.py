@@ -333,7 +333,7 @@ def test_l13_gvl_non_qualifiee_avec_acces_par_champ_nu_non_signalee(tmp_path: Pa
     root = make_project(
         tmp_path,
         {
-            "CODE/MAIN/GVL_BypassRetain.st": """\
+            "CODE/L_SIMULATION/GVL_BypassRetain.st": """\
 VAR_GLOBAL RETAIN
     BypassWinchM1Global : BOOL := FALSE;
 END_VAR
