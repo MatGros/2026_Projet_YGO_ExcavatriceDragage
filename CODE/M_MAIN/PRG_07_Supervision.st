@@ -447,7 +447,25 @@ instTroubleshootingView(
     PowerCutOffActive    := PRG_06_Outputs_LD.PowerCutOffActive,
     ArmingPulseActive    := PRG_06_Outputs_LD.EmergencyArmingPulseActive,
     MaintainAActive      := PRG_06_Outputs_LD.PowerKeepAliveACmd,
-    MaintainBActive      := PRG_06_Outputs_LD.PowerKeepAliveBCmd
+    MaintainBActive      := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
+    CycleReady           := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready,
+    CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Done,
+    CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Error,
+    CycleErrorId         := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId,
+    CycleStep            := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep,
+    CycleStepStr         := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStateStr,
+    CycleStepAtError     := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
+    CycleStartRequest    := GVL_IHM.Cycle.Cmd.BtnStart,
+    CycleAbortRequest    := GVL_IHM.Cycle.Cmd.BtnAbort,
+    CycleTargetDepth_M   := GVL_IHM.Cycle.Cfg.SetDepth_M,
+    CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
+    CycleSpeedMismatchActive := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive,
+    CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
+    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Error,
+    JoystickDeadmanArmed := PRG_02_Acquisition.JoystickDeadmanArmed,
+    JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
+    HomedM1              := PRG_02_Acquisition.instHomingM1.Homed,
+    HomedM2              := PRG_02_Acquisition.instHomingM2.Homed
 );
 
 {endregion}

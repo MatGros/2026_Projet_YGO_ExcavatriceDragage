@@ -14,6 +14,7 @@ VAR_GLOBAL
     BenneOuvertureFermeture: ST_ChainBucket;        // 🪣 4. Ouverture / Fermeture Benne
     TranslationPontM3     : ST_ChainTranslation;   // ↔️ 5. Translation Pont M3 (Variateur AC600)
     AssistanceDragage     : ST_ChainDredgingAssist; // 🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie
+    CycleSemiAuto         : ST_ChainCycleSemiAuto;  // 🔄 6. Séquenceur de Cycle Semi-Automatique (X0 à X13)
     HomingM1              : ST_HomingChecklist;   (* 🎯 Diagnostic chronologique Homing M1 (Treuil Retenue) *)
     HomingM2              : ST_HomingChecklist;   (* 🎯 Diagnostic chronologique Homing M2 (Treuil Benne) *)
     Safety                : ST_SafetyChecklist;   (* 🛡️ Diagnostic chronologique Chaîne de Sécurité & Réarmement AU *)

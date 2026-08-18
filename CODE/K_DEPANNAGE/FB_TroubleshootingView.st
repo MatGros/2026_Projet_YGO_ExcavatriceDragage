@@ -69,6 +69,26 @@ VAR_INPUT
     ArmingPulseActive        : BOOL;   (* --> [SAFE] Impulsion réarmement *)
     MaintainAActive          : BOOL;   (* --> [SAFE] Maintien canal A *)
     MaintainBActive          : BOOL;   (* --> [SAFE] Maintien canal B *)
+
+    (* 🔄 Séquenceur de cycle semi-automatique *)
+    CycleReady               : BOOL;   (* --> [STAT] Séquenceur prêt *)
+    CycleDone                : BOOL;   (* --> [STAT] Séquenceur terminé *)
+    CycleError               : BOOL;   (* --> [STAT] Séquenceur en erreur *)
+    CycleErrorId             : WORD;   (* --> [DIAG] Code erreur séquenceur *)
+    CycleStep                : E_CycleStep; (* --> [STAT] Étape courante *)
+    CycleStepStr             : STRING(40);  (* --> [STAT] Libellé étape *)
+    CycleStepAtError         : E_CycleStep; (* --> [DIAG] Étape au défaut *)
+    CycleStartRequest        : BOOL;   (* --> [CMD] Demande Start *)
+    CycleAbortRequest        : BOOL;   (* --> [CMD] Demande Abort *)
+    CycleTargetDepth_M       : REAL;   (* --> [CFG] Profondeur consigne *)
+    CycleKoboldBottomTouch   : BOOL;   (* --> [HW] Contact fond *)
+    CycleSpeedMismatchActive : BOOL;   (* --> [DIAG] Écart vitesse M1/M2 *)
+    CycleLimitLegalReached   : BOOL;   (* --> [SAFE] Limite légale atteinte *)
+    CycleWinchSyncError      : BOOL;   (* --> [SAFE] Erreur synchro treuils *)
+    JoystickDeadmanArmed     : BOOL;   (* --> [CMD] Homme-mort armé *)
+    JoystickAtNeutral        : BOOL;   (* --> [HW] Joystick au neutre *)
+    HomedM1                  : BOOL;   (* --> [HW] Codeur M1 référencé *)
+    HomedM2                  : BOOL;   (* --> [HW] Codeur M2 référencé *)
 END_VAR
 VAR_OUTPUT
     Ready                    : BOOL; (* <-- [STAT] Diagnostic interne minimal — fiche §3 *)
@@ -555,8 +575,33 @@ GVL_Troubleshooting.MotionM3.SpeedContactor1Active := FALSE; // Non applicable �
 {region "§12 Images entrees reelles et simulees"}
 // === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
 GVL_Troubleshooting.Inputs := HwIn;
-
-
-
-
 {endregion}
+
+{region "§13 Séquenceur de cycle semi-automatique"}
+// === 🔄 12. Diagnostic Chronologique Séquenceur Semi-Auto (CycleSemiAuto) ===
+GVL_Troubleshooting.CycleSemiAuto.Idx101_ModeSemiAutoActive        := (Auth.Mode = E_Mode.SEMI_AUTO);
+GVL_Troubleshooting.CycleSemiAuto.Idx102_PowerAndSafetyOk          := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.CycleSemiAuto.Idx103_HeartbeatIhmOk            := Commun.HeartbeatIhmOk;
+GVL_Troubleshooting.CycleSemiAuto.Idx104_DeadmanArmed              := JoystickDeadmanArmed;
+GVL_Troubleshooting.CycleSemiAuto.Idx105_MancheDeflechi            := NOT JoystickAtNeutral;
+GVL_Troubleshooting.CycleSemiAuto.Idx106_HomedM1M2                 := HomedM1 AND HomedM2;
+GVL_Troubleshooting.CycleSemiAuto.Idx107_StartCycleRequest         := CycleStartRequest;
+GVL_Troubleshooting.CycleSemiAuto.Idx108_AbortCycleRequest         := CycleAbortRequest;
+
+GVL_Troubleshooting.CycleSemiAuto.Idx201_Ready                     := CycleReady;
+GVL_Troubleshooting.CycleSemiAuto.Idx202_Busy                      := CycleAutoBusy;
+GVL_Troubleshooting.CycleSemiAuto.Idx203_Done                      := CycleDone;
+GVL_Troubleshooting.CycleSemiAuto.Idx204_Error                     := CycleError;
+GVL_Troubleshooting.CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
+GVL_Troubleshooting.CycleSemiAuto.Idx206_Step                      := CycleStep;
+GVL_Troubleshooting.CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
+GVL_Troubleshooting.CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;
+
+GVL_Troubleshooting.CycleSemiAuto.Idx301_TargetPosition            := CycleTargetPosition;
+GVL_Troubleshooting.CycleSemiAuto.Idx302_TargetDepth_M             := CycleTargetDepth_M;
+GVL_Troubleshooting.CycleSemiAuto.Idx303_KoboldBottomTouch         := CycleKoboldBottomTouch;
+GVL_Troubleshooting.CycleSemiAuto.Idx304_SpeedMismatchActive       := CycleSpeedMismatchActive;
+GVL_Troubleshooting.CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimitLegalReached;
+GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
+{endregion}
+
