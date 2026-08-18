@@ -1,106 +1,89 @@
-(* ═══════════════════════════════════════════════════════════════
-   🪣 FB_Bucket — Commande d'ouverture/fermeture du benne
+(* =======================================================================
+   🪣 FB_Bucket — Commande d'ouverture et de fermeture du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
-   🔌 Conforme au contrat FB standard (Partie3 §1bis).
-   ⚠️ REX 2026-07-07 : inversion du sens moteur M2 constatée sur site
-      (ré-câblage/relabel %Q0.0 et %Q0.3) → ENROULAGE M2 (Direction=+1)
-      FERME désormais le benne, DEROULAGE M2 (Direction=-1) l'OUVRE
-      (c'était l'inverse avant). Voir DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §REX.
-   ⚠️ REX 2026-07-07 (2) : ajout du garde-fou HomedM1/HomedM2 — CablePosM1/M2
-      ne sont fiables que si les codeurs absolus sont référencés (Partie10).
-      Sans ça, une position aberrante (codeur non homé) pourrait faire
-      mémoriser un IsOpen/IsClosed faux dès l'entrée en BUSY.
-   🔧 REX 2026-07-07 (3) : Méca C couche 1 (bit4) — M1 DOIT rester immobile pendant
-      que M2 bouge seul. Si M1 glisse de plus de M1SlipToleranceM (1.0 m) pendant
-      BUSY → SevereError (coupe M2 via le mécanisme existant) + sortie dédiée
-      M1SlipDetected (à consommer côté PRG_TREUILS_CFC pour forcer SafeStop
-      sur M1 spécifiquement — FB_Bucket ne pilote pas M1). Couche de secours si
-      cette couche ne suffit pas : voir FB_Safety_Winch bit9 (tolérance 2.0 m,
-      escalade PowerCutOff).
-   🆕 REX 2026-07-08 (mise en service, demande utilisateur) :
-      - `ConfirmOpenPosition` : bouton IHM dédié de RÉFÉRENCEMENT du benne en position ouverte
-        (mise en service). Action de CONFIRMATION pure (aucun mouvement) — mémorise
-        BucketState.IsOpen directement, à utiliser juste après le référencement des codeurs
-        M1/M2 (les 2 à la même valeur, benne physiquement ouvert vérifié par l'opérateur —
-        voir DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md "flux nominal, benne ouvert").
-        Remplace le contournement précédent (un BtnOpen qui se terminait par coïncidence car la
-        cible était déjà atteinte) par une action explicite et auditable. Même principe que
-        `BtnConfirmCoherence` dans FB_Encoder_Homing (front, gardée par Mode MAINT_N1/N2).
-   🆕 REX 2026-07-08 (audit sécurité, demande utilisateur) :
-      - `M1_Busy`/`M2_Busy` : la demande d'ouverture/fermeture n'est acceptée (mémorisation
-        `CloseReq`/`OpenReq` + transition vers BUSY) QUE si les deux treuils sont à l'arrêt —
-        tous modes. Avant ce correctif, rien ne le garantissait ; un mouvement manuel sur M1
-        pouvait "traverser" l'armement du benne (trou détecté par audit automatisme/IHM).
-      - Sens inverse borné pendant BUSY : l'opérateur peut désormais pousser le joystick dans
-        le sens opposé au sens principal (recul/annulation partielle), mais UNIQUEMENT jusqu'à
-        la position M2 mémorisée au démarrage de la demande (`M2StartPosM`) — jamais au-delà
-        (pas de réouverture/refermeture complète depuis ce sens inverse).
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Pilotage synchrone et séquencement d'ouverture/fermeture benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : FB standard (Partie3 §1bis)
+   🔒 Sécurité : Surveillance du glissement M1 et interlocks de mouvement
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Bucket
 VAR_INPUT
-    Enable              : BOOL;             // Activation générale
-    Reset               : BOOL;             // Acquittement défauts (front)
-    PowerContactorEngaged     : BOOL;             // Condition d'arrêt d'urgence
-    Mode                : E_Mode;           // Mode de marche machine
-    CmdOpen_IHM         : BOOL;             // Demande d'ouverture depuis l'IHM
-    CmdClose_IHM        : BOOL;             // Demande de fermeture depuis l'IHM
-    MotionRequestActive : BOOL;             // Intention mouvement déjà arbitrée (joystick ou boutons IHM)
-    MotionDirection     : INT;              // Sens arbitré : 1=montée, -1=descente
-    CablePosM1          : REAL;             // Position réelle câble treuil M1 (mètres)
-    CablePosM2          : REAL;             // Position réelle câble treuil M2 (mètres)
-    HomedM1             : BOOL;             // Codeur M1 référencé (instHomingM1.Homed) — REX 2026-07-07
-    HomedM2             : BOOL;             // Codeur M2 référencé (instHomingM2.Homed) — REX 2026-07-07
-    Config              : ST_BucketConfig; // Configuration (RETAIN site)
-    CfgTimeoutDuration  : TIME := T#60s;   // Timeout de mouvement configurable (60s par défaut pour confort d'essai)
-    M1SlipToleranceM    : REAL := 1.0;     // 🔧 REX 2026-07-07 : tolérance glissement M1 pendant Busy (m)
-    M1_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM1.Busy — doit être à l'arrêt pour armer une demande
-    M2_Busy             : BOOL;             // 🆕 REX 2026-07-08 : instWinchM2.Busy — doit être à l'arrêt pour armer une demande
-     ConfirmOpenPosition : BOOL;             // 🆕 REX 2026-07-08 : bouton IHM référencement benne ouvert (front, mise en service — voir bandeau)
-     ConfirmClosePosition : BOOL;            // 🆕 REX 2026-07-08 : bouton IHM référencement benne fermé (front, mise en service)
-     InhibitM1           : BOOL;             // 🆕 REX 2026-07-08 : M1 est inhibé
-     InhibitM2           : BOOL;             // 🆕 REX 2026-07-08 : M2 est inhibé
-     BypassGlobal        : BOOL := FALSE;    // 🌐 TRUE = force ErrorId=0, ignore toutes les erreurs benne
- END_VAR
+    // === COMMANDES ET ETATS GENERAL ===
+    Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB
+    Reset                           : BOOL;                           // --> [CMD] Acquittement defauts sur front
+    Mode                            : E_Mode;                         // --> [CMD] Mode de marche machine
+    CmdOpen_IHM                     : BOOL;                           // --> [CMD] Demande ouverture depuis IHM
+    CmdClose_IHM                    : BOOL;                           // --> [CMD] Demande fermeture depuis IHM
+    MotionRequestActive             : BOOL;                           // --> [CMD] Intention mouvement arbitree
+    MotionDirection                 : INT;                            // --> [CMD] Sens arbitre (1: montee, -1: descente)
+    ConfirmOpenPosition             : BOOL;                           // --> [CMD] Bouton IHM confirmation benne ouvert
+    ConfirmClosePosition            : BOOL;                           // --> [CMD] Bouton IHM confirmation benne ferme
+
+    // === SECOURS ET HARDWARE ===
+    PowerContactorEngaged           : BOOL;                           // --> [SAFE] Condition d'arret d'urgence / puissance
+    CablePosM1                      : REAL;                           // --> [HW] Position reelle cable treuil M1 (m)
+    CablePosM2                      : REAL;                           // --> [HW] Position reelle cable treuil M2 (m)
+    HomedM1                         : BOOL;                           // --> [HW] Codeur M1 reference
+    HomedM2                         : BOOL;                           // --> [HW] Codeur M2 reference
+    M1_Busy                         : BOOL;                           // --> [HW] Treuil M1 en mouvement (Busy)
+    M2_Busy                         : BOOL;                           // --> [HW] Treuil M2 en mouvement (Busy)
+    InhibitM1                       : BOOL;                           // --> [HW] Treuil M1 inhibe
+    InhibitM2                       : BOOL;                           // --> [HW] Treuil M2 inhibe
+
+    // === REGLAGES ET CONFIGURATION ===
+    Config                          : ST_BucketConfig;                // --> [CFG] Configuration parametres benne
+    CfgTimeoutDuration              : TIME := T#60s;                  // --> [CFG] Timeout de mouvement configurable
+    M1SlipToleranceM                : REAL := 1.0;                    // --> [CFG] Tolerance glissement M1 pendant Busy (m)
+
+    // === BYPASSES ET SIMULATION ===
+    BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Force ErrorId=0 global
+END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;             // FB prêt à fonctionner
-    Busy                : BOOL;             // Mouvement en cours
-    Done                : BOOL;             // Mouvement terminé avec succès
-    Error               : BOOL;             // Présence d'un défaut
-    ErrorId             : WORD;             // bit0: "Timeout mouvement benne" - Timeout mouvement, bit1: "Incohérence position benne" - Incohérence boot, bit2: "Limites placement benne dépassées" - Limites dépassées, bit3: "Codeur(s) benne non référencé(s)" - Codeur(s) M1/M2 non référencé(s), bit4: "Glissement M1 détecté" - Glissement M1 pendant Busy
-    M1SlipDetected      : BOOL;             // 🔧 REX 2026-07-07 : à consommer côté PRG_TREUILS_CFC (force SafeStop M1)
-    CloseReq            : BOOL;             // 🆕 REX 2026-07-08 : demande de fermeture mémorisée — image IHM (FALSE = pas de demande active
-                                             // ou objectif atteint/retour position départ ; TRUE = demande armée ou mouvement en cours)
-    OpenReq             : BOOL;             // 🆕 REX 2026-07-08 : demande d'ouverture mémorisée — même principe
-    State               : E_State;          // État opérationnel du FB
-    StateAtError        : E_State;          // État lors de l'apparition de l'erreur
-    ActiveOffsetM       : REAL;             // Décalage cible à injecter dans FB_WinchSync
-    DeltaPosition_M     : REAL;             // 📏 Écart réel signé M2 - M1 (mètres)
-    M2_StartStop        : BOOL;             // Sortie consigne StartStop vers Winch M2
-    M2_Direction        : INT;              // Sortie consigne Direction vers Winch M2
-    M2_ForceSlowSpeed   : BOOL;             // TRUE = Bloque les contacteurs de vitesse de M2
-    RemainingTravelM    : REAL;             // 🔧 REX 2026-07-07 : distance restante avant cible (m, toujours
-                                             // positive, décroît vers 0) — 0.0 hors mouvement (READY/DONE)
+    // === ETATS IEC ET SYNOPTIQUE ===
+    Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
+    Busy                            : BOOL;                           // <-- [STAT] Mouvement benne en cours
+    Done                            : BOOL;                           // <-- [STAT] Mouvement termine avec succes
+    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
+    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur bitmask (bit0..4)
+    State                           : E_State;                        // <-- [STAT] Etat operationnel du FB
+    StateAtError                    : E_State;                        // <-- [DIAG] Etat lors de l'apparition du defaut
+
+    // === DEMANDES ET ORDRES ACTIONNEURS ===
+    CloseReq                        : BOOL;                           // <-- [STAT] Demande de fermeture memorisee
+    OpenReq                         : BOOL;                           // <-- [STAT] Demande d'ouverture memorisee
+    M2_StartStop                    : BOOL;                           // <-- [ACT] Ordre StartStop vers Winch M2
+    M2_Direction                    : INT;                            // <-- [ACT] Ordre Direction vers Winch M2
+    M2_ForceSlowSpeed               : BOOL;                           // <-- [ACT] Forcage vitesse lente sur M2
+
+    // === DIAGNOSTICS ET MESURES ===
+    M1SlipDetected                  : BOOL;                           // <-- [DIAG] Glissement M1 detecte
+    ActiveOffsetM                   : REAL;                           // <-- [DIAG] Decalage cible pour FB_WinchSync
+    DeltaPosition_M                 : REAL;                           // <-- [DIAG] Ecart reel signe M2 - M1 (m)
+    RemainingTravelM                : REAL;                           // <-- [DIAG] Distance restante avant cible (m)
 END_VAR
 VAR_IN_OUT
-    BucketState        : ST_BucketState;  // État physique du benne mémorisé (RETAIN)
+    // === STRUCTURES DE DONNÉES PARTAGÉES ===
+    BucketState                     : ST_BucketState;                 // <-> [BUS] Etat physique memorise du benne
 END_VAR
 VAR
-    FirstCycle          : BOOL := TRUE;     // Drapeau de premier cycle API
-    ResetEdge           : R_TRIG;           // Détecteur de front montant Reset
-    ErrorEdge           : R_TRIG;           // Détecteur de front montant Error
-    TonTimeout          : TON;              // Temporisateur de timeout de mouvement
-    SevereError         : BOOL;             // Erreur grave nécessitant l'arrêt
-    MaxAllowedOffset    : REAL;             // Offset max calculé dynamiquement
-    BusyEdge            : R_TRIG;           // 🔧 REX 2026-07-07 — détecte l'entrée en Busy (arme la réf. M1)
-    M1RefPosM           : REAL;             // 🔧 REX 2026-07-07 — position M1 mémorisée à l'entrée en Busy
-    M2StartPosM         : REAL;             // 🆕 REX 2026-07-08 — position M2 mémorisée à l'entrée en Busy (borne le recul autorisé)
-    WasOpenAtStart      : BOOL;             // 🆕 REX 2026-07-08 — état IsOpen mémorisé à l'entrée en Busy (restauré si recul complet)
-    WasClosedAtStart    : BOOL;             // 🆕 REX 2026-07-08 — état IsClosed mémorisé à l'entrée en Busy (restauré si recul complet)
-    LeftStartSinceArm   : BOOL;             // 🆕 REX 2026-07-08 — a réellement quitté la position de départ (évite un retour instantané au 1er cycle Busy)
-    ConfirmOpenEdge     : R_TRIG;           // 🆕 REX 2026-07-08 — détecteur de front ConfirmOpenPosition
-    ConfirmCloseEdge    : R_TRIG;           // 🆕 REX 2026-07-08 — détecteur de front ConfirmClosePosition
+    // === DETECTEURS ET TIMERS INTERNES ===
+    ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
+    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
+    BusyEdge                        : R_TRIG;                         // . [LOC] Detecteur entree en etat Busy
+    ConfirmOpenEdge                 : R_TRIG;                         // . [LOC] Detecteur front confirmation ouverture
+    ConfirmCloseEdge                : R_TRIG;                         // . [LOC] Detecteur front confirmation fermeture
+    TonTimeout                      : TON;                            // . [LOC] Temporisateur timeout de mouvement
+
+    // === VARIABLES LOCALES CALCULÉES ===
+    FirstCycle                      : BOOL := TRUE;                  // . [LOC] Drapeau de premier cycle API
+    SevereError                     : BOOL;                           // . [LOC] Erreur grave necessitant arret
+    MaxAllowedOffset                : REAL;                           // . [LOC] Offset max calcule dynamiquement
+    M1RefPosM                       : REAL;                           // . [LOC] Position M1 memorisee a l'entree Busy
+    M2StartPosM                     : REAL;                           // . [LOC] Position M2 memorisee a l'entree Busy
+    WasOpenAtStart                  : BOOL;                           // . [LOC] Etat IsOpen memorise a l'entree Busy
+    WasClosedAtStart                : BOOL;                           // . [LOC] Etat IsClosed memorise a l'entree Busy
+    LeftStartSinceArm               : BOOL;                           // . [LOC] Quitte position de depart
 END_VAR
 
 {region "Gate securite"}

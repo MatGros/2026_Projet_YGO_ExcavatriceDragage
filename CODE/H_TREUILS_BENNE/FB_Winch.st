@@ -1,163 +1,104 @@
-(* ═══════════════════════════════════════════════════════════════
-   🪝 FB_Winch — Directeur d'un treuil individuel (M1: moteur de retenue / M2: moteur Benne — instance par treuil)
+(* =======================================================================
+   🪝 FB_Winch — Directeur d'un treuil individuel (M1 / M2)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   🔌 FB DE MOUVEMENT (Partie3 §1bis) : porte StartStop + SafeStop en
-      plus de l'interface standard. Précédence Enable > SafeStop > StartStop.
-   🧩 Compose FB_SpeedStep (décodage palier). 🆕 2026-08-06 (retrait FB_Brake, demande
-      client) : le frein n'est plus géré ici — FB_Winch ne produit plus aucune sortie
-      frein. La commande frein est désormais un couplage DIRECT sur RelayFwd/RelayRev,
-      calculé dans FB_WinchOutputInterlock_LD puis câblé au grand jour dans
-      PRG_06_Outputs_LD (voir bandeaux de ces deux fichiers). FB_Brake reste utilisé
-      tel quel pour Translation (M3), non touché par ce lot.
-   📤 Sorties physiques : RelayFwd/RelayRev (contacteurs de sens),
-      Contactor1..4 (contacteurs de vitesse) — à câbler manuellement sur les
-      canaux Q réels (I/O Mapping CODESYS). Le frein n'est plus une sortie de ce FB.
-   🔒 Interlock changement de sens : jamais Fwd et Rev simultanément.
-      ⚠️ CORRECTIF (retour terrain 2026-07-01) : neutre↔un sens = immédiat ;
-      seule une inversion DIRECTE Fwd↔Rev exige la vitesse confirmée nulle
-      (l'ancienne version exigeait l'arrêt confirmé même pour le tout
-      premier engagement, ce qui bloquait `CommandedDirection` à 0 en
-      permanence — voir §3bis dans le corps ST pour le détail).
-   ⚠️ ÉVOLUTION (retour terrain 2026-07-01) : `Contactor1..4` sont désormais
-      lus directement dans `FB_SpeedStep` (table `P<palier>R<relais>`),
-      plus de masque `BYTE` intermédiaire ni de bit-extraction ici.
-   ⚠️ CORRECTIF (retour terrain 2026-07-02) : une inversion de sens PLUS
-      RAPIDE que le temps de décélération réel pouvait bloquer
-      indéfiniment `CommandedDirection` (le treuil ne s'arrêtait jamais,
-      continuait dans l'ancien sens) — la cible de rampe suivait la
-      magnitude joystick en continu, sans garantie de croiser le seuil
-      d'arrêt. Corrigé : `DirectionChangePending` FORCE désormais la
-      cible à 0.0 dès qu'un changement de sens est en attente, de façon
-      déterministe et indépendante du joystick (voir §3 dans le corps ST).
-   🔴 Ce lot (M1 seul, Maintenance N1, test banc) : pas de dépendance
-      codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
-      uniquement pour l'instant — voir CODE/H_TREUILS_BENNE/FB_Safety_Winch.st).
-   🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
-      entrée `DescendPermit` (sortie dédiée FB_Safety_Winch, DISTINCTE de
-      `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
-      `RelayFwd` (montée) toujours piloté normalement, mais `DescendPermit`
-      déclenche maintenant une vraie décélération rapide dès qu'on n'est PAS
-      en train de remonter — voir DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §4ter pour le contexte
-      d'origine, et l'entrée D72 ci-dessous pour le comportement actuel.
-   🆕 AJOUT (2026-07-03quinquies, retour terrain — limitation couple en descente) :
-      nouveau paramètre `CfgMaxStepDescente` (défaut 2). En descente
-      (`CommandedDirection = -1`), le palier atteignable par `FB_SpeedStep` est
-      plafonné à cette valeur MÊME à consigne joystick 100% — la charge est
-      entraînante en descente (image de couple, pas besoin d'aller vite). En
-      montée, les 5 paliers normaux restent inchangés (`MaxStepNumber := 5`).
-      Ne change PAS la logique de décodage (voir FB_SpeedStep.st), juste le
-      plafond fourni selon le sens.
-   🔧 CORRECTIF (2026-07-03vicies, demande utilisateur, AUDIT D72) : `DescendPermit`
-      (mou de câble) intègre désormais une VRAIE décélération rapide (comme `SafeStop`)
-      via `EffectiveSafeStop`, au lieu d'un simple masquage brut de `RelayRev`. INHIBÉ
-      quand `CommandedDirection = 1` (montée/enroulement en cours) : l'opérateur peut
-      librement remonter pour reprendre le mou, sans déclencher de décélération. Le
-      masquage `RelayRev := FALSE` sur `DescendPermit` reste EN PLUS, inconditionnel
-      (filet de sécurité direct, indépendant de la rampe).
-   🔴🔧 REX 2026-07-07 : NOUVELLE DONNÉE TERRAIN — `ContactorFeedbackFwd`/`ContactorFeedbackRev`
-      (retour individuel par sens) SUPPRIMÉS côté matériel, remplacés par UN SEUL retour par
-      treuil (`FwdRevSpeedFeedbackOff` = "tous contacteurs sens+vitesse retombés"). Conséquences :
-      - `FwdContactorCheck`/`RevContactorCheck` (2 diagnostics séparés) fusionnés en UN seul
-        `ContactorsCheck` (`ST_ContactorCheck`) — on ne sait plus DIRE lequel est resté collé.
-      - Détection **StuckClosed uniquement**, vérifiée **seulement à l'arrêt commandé** (tous
-        relais/contacteurs à FALSE) : si `FwdRevSpeedFeedbackOff` ne repasse pas à `TRUE` dans le
-        délai `ContactorFeedbackTimeout`, défaut "contacteur(s) collé(s)" global (bit1 `ErrorId`).
-      - `StuckOpen` n'a plus de sens (pas de confirmation individuelle par sens quand un
-        mouvement est commandé) — `ContactorsCheck.StuckOpen` reste toujours `FALSE`, gardé
-        uniquement pour la compatibilité de type `ST_ContactorCheck` (partagé avec `BrakeContactorCheck`).
-      - Bit2 `ErrorId` (ex-RevContactorCheck) est désormais **libre/inutilisé**.
-   ═══════════════════════════════════════════════════════════════ *)
+   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop)
+   🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Winch
 VAR_INPUT
-    Enable                  : BOOL;
-    Reset                   : BOOL;
-    PowerContactorEngaged         : BOOL;
-    Mode                    : E_Mode;
-    StartStop               : BOOL;
-    SafeStop                : BOOL;
-    DescendPermit           : BOOL := TRUE;
-    AscentPermit            : BOOL := TRUE;
-    Direction               : INT;
-    SpeedRefPct             : REAL;
-    SpeedStepTable          : ST_SpeedStepTable;
-    CfgMaxStepDescente         : INT := 3;    // 🆕 Plafond palier en descente (CommandedDirection=-1) — couple, pas vitesse — 🔧 REX 2026-07-08 : défaut relevé à 3
-    MaxStepAscent           : INT := 5;    // 🆕 REX 2026-07-15 (9) : Plafond palier en montée (CommandedDirection=1) — 5 = pas de restriction
-                                             // (valeur fixe Auto ET Manuel, voir PRG_TREUILS_CFC).
-    HomingApproachActive    : BOOL;        // 🆕 REX 2026-07-08 : Limite la vitesse au palier 1 en montée (approche capteur haut)
-    FwdRevSpeedFeedbackOff  : BOOL;   // 🔧 REX 2026-07-07 : retour unique "tous contacteurs sens+vitesse
-                                       // retombés" (remplace ContactorFeedbackFwd/Rev)
-    BypassContactorCheck    : BOOL;   // 🧪 TRUE = désactive StuckClosed (axe simulé,
-                                       // voir GVL_Simulation.SensorMxContactorFeedbackIsReal — TOUJOURS FALSE réel)
-    BypassGlobal            : BOOL;   // 🌐 TRUE = force ErrorId=0, ignore toutes les erreurs du FB
-    SpeedStepHystMargin     : REAL := 2.0;
-    // 🆕 2026-08-06 (décision validée, retour terrain) : rampe %/s (CfgRampAccelRate/
-    // DecelNormalRate/DecelFastRate, FB_Ramp) RETIRÉE — remplacée par une temporisation FIXE
-    // par palier, asymétrique montée/descente. Cible documentée
-    // DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §6.2 (montée en charge = plus prudente, descente
-    // sans effort = plus rapide).
-    // 🆕 2026-08-06 (simplification demandée) : interlock changement de sens asymétrique —
-    // descente sans effort (pas de charge résistante, réengagement rapide), montée = charge en
-    // traction (délai plus long). La temporisation par palier se DÉDUIT de cet interlock
-    // (+100ms) plutôt que d'être un réglage séparé — garantit par construction qu'elle reste
-    // toujours au-dessus, jamais besoin de les tenir synchronisés à la main.
-    DirectionInterlockDelayDescent : TIME := T#400ms;  // Réengagement en descente (CommandedDirection=-1)
-    DirectionInterlockDelayAscent  : TIME := T#900ms;  // Réengagement en montée (CommandedDirection=1)
-    ContactorFeedbackTimeout: TIME := T#500ms;
-    Homed                   : BOOL;             // 🆕 État de référencement du treuil
-    HomingSuspect           : BOOL;             // 🆕 REX 2026-07-08 : Incertitude/doute sur le référencement (§3.7)
-    CablePosM               : REAL;             // 🆕 Position actuelle du câble en mètres
-    TopLimitM               : REAL := 8.5;      // 🆕 Position limite haute active (cible homing, m) — ancre le ralentissement
-    BottomLimitM            : REAL := -20.0;    // 🆕 Position limite basse active (m)
-    CfgSlowdownDistanceM       : REAL := 1.0;      // 🆕 Distance d'approche avant limite pour ralentir (m)
-    CfgSlowdownMaxStep         : INT := 1;         // 🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5, défaut 1 = vitesse mini)
-    MeasuredSpeedBand       : INT := 0;         // 🛡️ Bande vitesse réelle validée
-    SpeedGuardEnable        : BOOL := FALSE;   // 🛡️ Activation garde-fou changement de palier
-    SpeedGuardReady         : BOOL := FALSE;   // 🟢 Conditions de stabilité validées
+    // === COMMANDES ET CONSIGNES ===
+    Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+    StartStop                       : BOOL;                           // --> [CMD] Ordre de marche/arret mouvement
+    Direction                       : INT;                            // --> [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
+    SpeedRefPct                     : REAL;                           // --> [CMD] Consigne vitesse % (0.0 a 100.0)
+    Mode                            : E_Mode;                         // --> [CMD] Mode d'exploitation actif
+
+    // === SECOURS ET PERMIS DE SÉCURITÉ ===
+    SafeStop                        : BOOL;                           // --> [SAFE] Arret rapide de securite
+    DescendPermit                   : BOOL := TRUE;                  // --> [SAFE] Permis de descente (mou de cable)
+    AscentPermit                    : BOOL := TRUE;                  // --> [SAFE] Permis de montee (fin de course haut)
+    PowerContactorEngaged           : BOOL;                           // --> [SAFE] Statut contacteur de ligne / puissance
+
+    // === REGLAGES ET CONFIGURATION ===
+    SpeedStepTable                  : ST_SpeedStepTable;              // --> [CFG] Table de seuils des paliers de vitesse
+    CfgMaxStepDescente              : INT := 3;                       // --> [CFG] Plafond palier en descente (1..5)
+    MaxStepAscent                   : INT := 5;                       // --> [CFG] Plafond palier en montee (1..5)
+    HomingApproachActive            : BOOL;                           // --> [CFG] Vitesse limitee au palier 1 (approche homing)
+    SpeedStepHystMargin             : REAL := 2.0;                    // --> [CFG] Marge d'hysteresis palier (%)
+    DirectionInterlockDelayDescent  : TIME := T#400ms;                // --> [CFG] Delai interlock changement de sens descente
+    DirectionInterlockDelayAscent   : TIME := T#900ms;                // --> [CFG] Delai interlock changement de sens montee
+    ContactorFeedbackTimeout        : TIME := T#500ms;                // --> [CFG] Delai d'attente retombee des contacteurs
+    TopLimitM                       : REAL := 8.5;                    // --> [CFG] Position limite haute active (m)
+    BottomLimitM                    : REAL := -20.0;                  // --> [CFG] Position limite basse active (m)
+    CfgSlowdownDistanceM            : REAL := 1.0;                    // --> [CFG] Distance d'approche avant limite pour ralentir (m)
+    CfgSlowdownMaxStep              : INT := 1;                       // --> [CFG] Plafond palier dans zone de ralentissement (1..5)
+
+    // === MESURES ET FEEDBACKS SENSORS ===
+    FwdRevSpeedFeedbackOff          : BOOL;                           // --> [HW] Retour unique contacteurs sens+vitesse retombes
+    Homed                           : BOOL;                           // --> [HW] Statut treuil reference
+    HomingSuspect                   : BOOL;                           // --> [HW] Incertitude / doute sur le referencement
+    CablePosM                       : REAL;                           // --> [HW] Position actuelle du cable (m)
+    MeasuredSpeedBand               : INT := 0;                       // --> [HW] Bande vitesse reelle validee
+    SpeedGuardEnable                : BOOL := FALSE;                  // --> [HW] Activation garde-fou changement de palier
+    SpeedGuardReady                 : BOOL := FALSE;                  // --> [HW] Conditions de stabilite validees
+
+    // === BYPASSES ET SIMULATION ===
+    BypassContactorCheck            : BOOL;                           // --> [TST] Bypass diagnostic contacteurs (simu)
+    BypassGlobal                    : BOOL;                           // --> [TST] Force ErrorId=0, ignore erreurs
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD; // bit0: frein ; bit1: contacteur(s) collé(s) ; bit2: configuration FB_SpeedStep invalide
-    State               : E_State;
-    StateAtError        : E_State;
-    RelayFwd            : BOOL;
-    RelayRev            : BOOL;
-    Contactor1          : BOOL;
-    Contactor2          : BOOL;
-    Contactor3          : BOOL;
-    Contactor4          : BOOL;
-    RequestedStep       : INT;             // Palier brut calculé par FB_SpeedStep avant tempo métier
-    StepNumber          : INT;             // Palier métier temporisé, transmis à l'interlock final
-    BusinessStepDelayElapsed : TIME;       // Écoulé de la tempo métier (EffectiveStepDelay, asymétrique montée/descente)
-    SpeedGuardLimited   : BOOL;
-    ContactorsCheck     : ST_ContactorCheck;  // 🔧 REX 2026-07-07 : fusion Fwd+Rev (StuckOpen toujours FALSE, voir bandeau)
-    InTopSlowdownZone    : BOOL;   // 🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite haute)
-    InBottomSlowdownZone : BOOL;   // 🆕 2026-08-07 : diagnostic — palier plafonné à 1 (approche limite basse)
-    CommandedDirection  : INT;     // 🆕 2026-08-07 : diagnostic — sens interne mémorisé (déclaration déplacée depuis VAR, aucun changement de logique)
-    DirectionChangeDelayElapsed : TIME; // 🆕 2026-08-07 : diagnostic — écoulé de DirectionChangeDelay (miroir, retour terrain délai montée)
-    DirectionChangePending : BOOL; // 🆕 2026-08-07 : diagnostic — déclaration déplacée depuis VAR (GATE 2sexies : doit accompagner CommandedDirection), aucun changement de logique
+    // === ETATS IEC ET SYNOPTIQUE ===
+    Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
+    Busy                            : BOOL;                           // <-- [STAT] Mouvement en cours
+    Done                            : BOOL;                           // <-- [STAT] Action terminee
+    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
+    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur bitmask
+    State                           : E_State;                        // <-- [STAT] Etat courant machine d'etat FB
+    StateAtError                    : E_State;                        // <-- [DIAG] Etat memorise lors du dernier defaut
+
+    // === ORDRES ACTIONNEURS (CONTACTEURS) ===
+    RelayFwd                        : BOOL;                           // <-- [ACT] Ordre contacteur sens montee
+    RelayRev                        : BOOL;                           // <-- [ACT] Ordre contacteur sens descente
+    Contactor1                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 1
+    Contactor2                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 2
+    Contactor3                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 3
+    Contactor4                      : BOOL;                           // <-- [ACT] Ordre contacteur vitesse palier 4
+
+    // === DIAGNOSTICS ET MESURES ===
+    RequestedStep                   : INT;                            // <-- [DIAG] Palier brut calcule par SpeedStep
+    StepNumber                      : INT;                            // <-- [DIAG] Palier metier temporise actif
+    BusinessStepDelayElapsed        : TIME;                           // <-- [DIAG] Ecoule tempo metier palier
+    SpeedGuardLimited               : BOOL;                           // <-- [DIAG] Statut limitation par garde-fou
+    ContactorsCheck                 : ST_ContactorCheck;              // <-- [DIAG] Diagnostic concorde contacteurs
+    InTopSlowdownZone               : BOOL;                           // <-- [DIAG] Zone de ralentissement haut active
+    InBottomSlowdownZone            : BOOL;                           // <-- [DIAG] Zone de ralentissement bas active
+    CommandedDirection              : INT;                            // <-- [DIAG] Sens interne memorise
+    DirectionChangeDelayElapsed     : TIME;                           // <-- [DIAG] Ecoule delai changement de sens
+    DirectionChangePending          : BOOL;                           // <-- [DIAG] Changement de sens en attente
 END_VAR
 VAR
-    SpeedStep           : FB_SpeedStep;
-    CycleTimeCalc       : FB_CycleTime;
-    // 🆕 2026-08-06 : SpeedRamp (FB_Ramp) retiré — RampTargetPct alimente directement
-    // FB_SpeedStep, la progressivité vient de la temporisation par palier (StepDelay ci-dessous).
-    ResetEdge           : R_TRIG;
-    ErrorEdge           : R_TRIG;
-    DirectionChangeDelay: TON;
-    EffectiveDirectionInterlockDelay : TIME; // 🆕 2026-08-06 : DirectionInterlockDelayDescent/Ascent selon le sens ENTRANT (Direction)
-    EffectiveStepDelay  : TIME; // 🆕 2026-08-06 : déduit d'EffectiveDirectionInterlockDelay + T#100ms
-    TonContactorsDropped: TON;   // 🔧 REX 2026-07-07 : remplace TonFwdFeedback/TonRevFeedback
-    BusinessStepDelay    : TON;   // 🪜 Tempo métier nominale entre hausses de palier
-    AllContactorsCommandedOff : BOOL; // 🔧 REX 2026-07-07
-    RampTargetPct       : REAL;
-    EffectiveSafeStop   : BOOL;   // 🆕 2026-07-03vicies — SafeStop réel OU (DescendPermit hors montée)
-    ActiveMaxStep       : INT;    // 🆕 REX 2026-07-08 : Limite dynamique du pas de vitesse
-    FirstScanDone       : BOOL;
+    // === SOUS-INSTANCES FB ===
+    SpeedStep                       : FB_SpeedStep;                   // * [INST] Decodage paliers vitesse
+    CycleTimeCalc                   : FB_CycleTime;                   // * [INST] Calcul temps de cycle
+
+    // === DETECTEURS ET TIMERS INTERNES ===
+    ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
+    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
+    DirectionChangeDelay            : TON;                            // . [LOC] Temporisation changement de sens
+    TonContactorsDropped            : TON;                            // . [LOC] Temporisation retombee contacteurs
+    BusinessStepDelay               : TON;                            // . [LOC] Temporisation hausse de palier
+
+    // === VARIABLES LOCALES CALCULÉES ===
+    EffectiveDirectionInterlockDelay: TIME;                           // . [LOC] Delai interlock effectif selon sens
+    EffectiveStepDelay              : TIME;                           // . [LOC] Delai palier effectif selon sens
+    AllContactorsCommandedOff       : BOOL;                           // . [LOC] Tous contacteurs commandes a FALSE
+    RampTargetPct                   : REAL;                           // . [LOC] Consigne cible envoyee au SpeedStep
+    EffectiveSafeStop               : BOOL;                           // . [LOC] SafeStop effectif incluant permis
+    ActiveMaxStep                   : INT;                            // . [LOC] Plafond palier actif dynamique
+    FirstScanDone                   : BOOL;                           // . [LOC] Indicateur premier cycle passe
 END_VAR
 
 {region "Gate et initialisation"}

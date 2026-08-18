@@ -1,91 +1,77 @@
-(* ═══════════════════════════════════════════════════════════════
-   ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (M1: moteur de retenue, M2: moteur Benne — squelette liaisons — pas de correction)
+(* =======================================================================
+   ⚖️ FB_WinchSync — Surveillance de synchro M1/M2 (sans correction)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §9
-   🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop —
-      1 seule instance (surveille les 2 treuils, pas 1 par treuil comme FB_Safety_Winch).
-   🎯 PÉRIMÈTRE CE LOT (squelette de liaisons, décisions Partie9 §9 déjà actées) :
-      - Calcule `DeltaPosM = |CablePosM1 - CablePosM2|` (fiable seulement si les 2 treuils
-        sont homés — sinon 0.0, pas de comparaison).
-      - `SyncActive` selon `Mode` : MAINT_N1 = imposée (non désactivable, sécurité
-        maintenue) ; MAINT_N2 = activable/désactivable via `SyncEnable` (FB_Modes, 🔧 REX
-        2026-07-08 : ex-`OverrideSync` inversé) ; MANUEL/SEMI_AUTO = active par défaut.
-      - `SyncWarn` = AVERTISSEMENT IHM SEULEMENT (Partie5 §6, comme `SyncWarn`/
-        `ForceImbalance` cités en exemple) — **PAS de SafeStop** : aucune correction de
-        vitesse n'existe aujourd'hui côté FB_Winch (pas d'entrée dédiée), donc rien à
-        piloter automatiquement ce lot. Surveillance visuelle opérateur en attendant.
-   🔴 HORS PÉRIMÈTRE CE LOT : régulation/correction active de l'écart (nécessiterait une
-      entrée de correction sur FB_Winch, pas encore conçue) — squelette de surveillance
-      uniquement, comme demandé (« même s'il n'est pas complet à l'intérieur »).
-
-   🔧 REX 2026-07-08 (5) — incident terrain : écart mineur transitoire (0.24m, mécanique,
-      coast-down différentiel M1/M2 à l'arrêt réel — normal et inévitable) déclenchait bit0
-      et bloquait le mouvement dans les DEUX sens (régression, déblocage possible seulement
-      via Reset+MAINT_N2+SyncEnable=FALSE). Root cause : phénomène mécanique, pas un bug du
-      couplage croisé logiciel (bit1). Deux correctifs :
-      1) `SignedDeltaPosM` (nouvelle sortie, calculé AVANT le ABS() de `DeltaPosM`) : signe
-         positif = M1 "plus haut" que M2, négatif = M2 plus haut. Consommé par PRG_06 pour
-         arbitrer DIRECTIONNELLEMENT le blocage bit0 — seul le sens qui AGGRAVE l'écart reste
-         bloqué, l'autre sens (qui le réduit) reste autorisé. Méca E (FB_Safety_Winch, écart
-         critique 2.0m) et bit1 restent le filet réel si l'écart continue de dériver.
-      2) Filtre temporel `DeviationTimer` (même pattern que `MismatchTimer` bit1) sur bit0,
-         800ms 🔧 théorique à ajuster sur site — absorbe le transitoire mécanique normal
-         d'arrêt (~900ms de temporisations frein cumulées M1+M2).
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_WinchSync) ===
+   🎯 Rôle : Calcul d'écart de position entre M1 et M2 et contrôle de cohérence
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : FB standard de surveillance transverse (1 instance)
+   🔒 Sécurité : Génération d'avertissement et détection de discordances
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchSync
 VAR_INPUT
-    Enable          : BOOL;        // Standard — Partie5 §2 : FB_WinchSync.Enable := SyncEnable (câblage PRG_MAIN)
-    Reset           : BOOL;        // Acquittement défaut (front)
-    PowerContactorEngaged : BOOL;        // Standard
-    Mode            : E_Mode;      // Arbitre SyncActive (voir en-tête)
-    CablePosM1      : REAL;        // Sortie FB_Encoder_Scale M1
-    CablePosM2      : REAL;        // Sortie FB_Encoder_Scale M2
-    HomedM1         : BOOL;        // Sortie FB_Encoder_Homing M1
-    HomedM2         : BOOL;        // Sortie FB_Encoder_Homing M2
-    SyncEnable      : BOOL;        // 🔧 REX 2026-07-08 : ex-OverrideSync inversé — Sortie FB_Modes, TRUE=synchro voulue
-    CfgSyncToleranceM  : REAL := 0.10; // RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn
-    ActiveOffsetM   : REAL := 0.0; // 🪣 Offset cible appliqué (ex: benne fermé/ouvert)
-    
-    // 🆕 Signaux de commande réels des treuils (pour contrôle de cohérence)
-    RelayFwdM1      : BOOL;
-    RelayFwdM2      : BOOL;
-    RelayRevM1      : BOOL;
-    RelayRevM2      : BOOL;
-    Contactor1_M1   : BOOL;
-    Contactor1_M2   : BOOL;
-    Contactor2_M1   : BOOL;
-    Contactor2_M2   : BOOL;
-    Contactor3_M1   : BOOL;
-    Contactor3_M2   : BOOL;
-    Contactor4_M1   : BOOL;
-    Contactor4_M2   : BOOL;
-    // 🌐 Bypass Global : force ErrorId = 0, ignore toute erreur de synchro
-    BypassGlobal    : BOOL := FALSE;
+    // === COMMANDES ET CONSIGNES ===
+    Enable                          : BOOL;                           // --> [CMD] Validation surveillance globale
+    Reset                           : BOOL;                           // --> [CMD] Acquittement defaut sur front
+    Mode                            : E_Mode;                         // --> [CMD] Mode courant pour arbitrage SyncActive
+    SyncEnable                      : BOOL;                           // --> [CMD] Autorisation utilisateur synchro
+
+    // === SECOURS ET HARDWARE ===
+    PowerContactorEngaged           : BOOL;                           // --> [SAFE] Puissance contacteur ligne engagee
+
+    // === MESURES ET ETATS CODEURS ===
+    CablePosM1                      : REAL;                           // --> [HW] Position cable treuil M1 (m)
+    CablePosM2                      : REAL;                           // --> [HW] Position cable treuil M2 (m)
+    HomedM1                         : BOOL;                           // --> [HW] Treuil M1 reference
+    HomedM2                         : BOOL;                           // --> [HW] Treuil M2 reference
+
+    // === REGLAGES ET CONFIGURATION ===
+    CfgSyncToleranceM               : REAL := 0.10;                   // --> [CFG] Ecart max tolere avant alerte (m)
+    ActiveOffsetM                   : REAL := 0.0;                    // --> [CFG] Offset cible applique (ex: benne)
+
+    // === COMMANDES ET FEEDBACKS ACTIONS ===
+    RelayFwdM1                      : BOOL;                           // --> [HW] Feedback/Ordre montee M1
+    RelayFwdM2                      : BOOL;                           // --> [HW] Feedback/Ordre montee M2
+    RelayRevM1                      : BOOL;                           // --> [HW] Feedback/Ordre descente M1
+    RelayRevM2                      : BOOL;                           // --> [HW] Feedback/Ordre descente M2
+    Contactor1_M1                   : BOOL;                           // --> [HW] Contacteur palier 1 M1
+    Contactor1_M2                   : BOOL;                           // --> [HW] Contacteur palier 1 M2
+    Contactor2_M1                   : BOOL;                           // --> [HW] Contacteur palier 2 M1
+    Contactor2_M2                   : BOOL;                           // --> [HW] Contacteur palier 2 M2
+    Contactor3_M1                   : BOOL;                           // --> [HW] Contacteur palier 3 M1
+    Contactor3_M2                   : BOOL;                           // --> [HW] Contacteur palier 3 M2
+    Contactor4_M1                   : BOOL;                           // --> [HW] Contacteur palier 4 M1
+    Contactor4_M2                   : BOOL;                           // --> [HW] Contacteur palier 4 M2
+
+    // === BYPASSES ET SIMULATION ===
+    BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Force ErrorId=0 global
 END_VAR
 VAR_OUTPUT
-    Ready           : BOOL;
-    Busy            : BOOL;
-    Done            : BOOL;
-    Error           : BOOL;
-    ErrorId         : WORD;        // bit0: "Écart synchronisme trop important" - écart hors tolérance (SyncActive uniquement) ; bit1: "Incohérence commande synchro" - incohérence de commande (sens/paliers différents)
-    State           : E_State;
-    StateAtError    : E_State;
-    DeltaPosM       : REAL;        // |CablePosM1 - CablePosM2|, 0.0 si pas les 2 homés
-    SignedDeltaPosM : REAL;        // 🆕 REX 2026-07-08 (5) : signé, > 0 = M1 plus haut que M2 — pour arbitrage directionnel PRG_06
-    SyncActive      : BOOL;        // Surveillance imposée/activable selon Mode (voir en-tête)
-    SyncWarn        : BOOL;        // ⚠️ Avertissement IHM uniquement (Partie5 §6) — PAS de SafeStop
-    SyncDegradedStep1 : BOOL;      // 🐢 2026-08-15 (T113) : Écart modéré actif -> force le Palier 1 sur les 2 treuils
+    // === ETATS IEC ET SYNOPTIQUE ===
+    Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
+    Busy                            : BOOL;                           // <-- [STAT] Traitement en cours
+    Done                            : BOOL;                           // <-- [STAT] Action terminee
+    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
+    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur bitmask (bit0: ecart, bit1: incoherence)
+    State                           : E_State;                        // <-- [STAT] Etat courant machine d'etat FB
+    StateAtError                    : E_State;                        // <-- [DIAG] Etat memorise lors du dernier defaut
+
+    // === MESURES ET DIAGNOSTICS DE SYNCHRO ===
+    DeltaPosM                       : REAL;                           // <-- [DIAG] Ecart absolu position |M1 - M2| (m)
+    SignedDeltaPosM                 : REAL;                           // <-- [DIAG] Ecart signe position (M1 - M2) (m)
+    SyncActive                      : BOOL;                           // <-- [STAT] Statut synchro active selon mode
+    SyncWarn                        : BOOL;                           // <-- [DIAG] Avertissement IHM ecart tolere depasse
+    SyncDegradedStep1               : BOOL;                           // <-- [DIAG] Forcage palier 1 sur ecart modere
 END_VAR
 VAR
-    ResetEdge       : R_TRIG;
-    ErrorEdge       : R_TRIG;
-    MismatchActive  : BOOL;        // 🆕 Indique une discordance active de commande
-    MismatchTimer   : TON;         // 🆕 Filtre temporel pour éviter les faux déclenchements transitoires
-    DeviationActive : BOOL;        // 🆕 REX 2026-07-08 (5) : écart hors tolérance actif (avant filtre)
-    DeviationTimer  : TON;         // 🆕 REX 2026-07-08 (5) : filtre temporel bit0, même pattern que MismatchTimer
+    // === DETECTEURS ET TIMERS INTERNES ===
+    ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
+    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
+    MismatchTimer                   : TON;                            // . [LOC] Tempo filtrage incoherence commande
+    DeviationTimer                  : TON;                            // . [LOC] Tempo filtrage transitoire ecart
+
+    // === VARIABLES LOCALES INTERNES ===
+    MismatchActive                  : BOOL;                           // . [LOC] Discordance commande active
+    DeviationActive                 : BOOL;                           // . [LOC] Ecart position hors tolerance actif
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
