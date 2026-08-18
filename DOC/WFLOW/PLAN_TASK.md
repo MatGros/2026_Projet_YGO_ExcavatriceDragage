@@ -60,7 +60,7 @@
 | **T123-C** | `CODE/C_DIAG_RESEAUX/` (2 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200..G410 PASS, logique métier 100% intacte) |
 | **T123-D** | `CODE/D_JOYSTICK/` (4 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200..G410 PASS, logique métier 100% intacte) |
 | **T123-E** | `CODE/E_CODEURS/` (3 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200..G410 PASS, logique métier 100% intacte) |
-| **T123-F** | `CODE/F_MODES/` (2 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-F** | `CODE/F_MODES/` (2 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200..G410 PASS, logique métier 100% intacte) |
 | **T123-G** | `CODE/G_CYCLE/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
 | **T123-H** | `CODE/H_TREUILS_BENNE/` (11 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
 | **T123-I** | `CODE/I_TRANSLATION/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |

@@ -1,47 +1,53 @@
-(* ═══════════════════════════════════════════════════════════════
-   🎚️ FB_Modes — Arbitrage du mode machine
+(* =======================================================================
+   ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
+   🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur
+   🔌 Interface : Standard composant d'arbitrage applicatif
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🔌 FB STANDARD : pas un FB de mouvement, pas de StartStop/SafeStop.
-   🎯 Rôle : Source unique du mode arbitré + bus d'autorisations.
-      - Arbitrage mode (DISABLE/N1/N2/SEMI_AUTO) + garde-fou codeur.
-      - Calcul bus autorisations (SyncEnable, Inhibit, Sélection, Homing, Maintenance).
-   🔒 Authentification : gérée côté IHM. FB_Modes accepte SelMode tel quel.
-   ⚠️ EncoderFaultPresent consommé avec 1 cycle de retard (FB_Encoder_Safety appelé après).
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION ===
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Modes
 VAR_INPUT
-    Enable              : BOOL;        // Active l'arbitrage
-    Reset               : BOOL;        // Front acquittement défaut (bit0)
-    PowerContactorEngaged : BOOL;      // Chaîne AU OK
-    SelMode             : E_Mode;      // Sélecteur IHM (GVL_IHM.Modes.Cmd.SelMode)
-    SelSyncEnable       : BOOL;        // Case IHM synchro (GVL_IHM.M1M2Sync.Cmd.SelSyncEnable)
-    InhibitM1Request    : BOOL;        // Bouton IHM inhibition M1
-    InhibitM2Request    : BOOL;        // Bouton IHM inhibition M2
-    SelHomingApproachEnable : BOOL;    // Case IHM autorisant dépassement arrêt haut
-    EncoderFaultPresent : BOOL;        // Défaut codeur (agrégat M1/M2, 1 cycle retard)
-    JoystickWinchSelectRequest : INT;  // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (brut IHM)
-    SelMaintenanceZoneAccess : BOOL;   // 🆕 2026-08-06 : bit IHM dédié, autorisation CONSCIENTE zone Maintenance M3 (GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess) — MAINT_N2 seul ne suffit plus
+    // === GESTION FB & AUTORISATIONS ===
+    Enable                  : BOOL;   // --> [CMD] Autorisation generale FB (TRUE = active)
+    Reset                   : BOOL;   // --> [CMD] Front acquittement defauts
+    PowerContactorEngaged   : BOOL;   // --> [SAFE] Chaine AU OK (TRUE = armee)
+
+    // === SELECTIONS IHM & COMMANDES MODES ===
+    SelMode                 : E_Mode; // --> [CMD] Selecteur de mode IHM
+    SelSyncEnable           : BOOL;   // --> [CMD] Selection synchro treuils IHM
+    InhibitM1Request        : BOOL;   // --> [CMD] Demande inhibition treuil M1
+    InhibitM2Request        : BOOL;   // --> [CMD] Demande inhibition treuil M2
+    SelHomingApproachEnable : BOOL;   // --> [CMD] Selection approche homing IHM
+    JoystickWinchSelectRequest : INT; // --> [CMD] Selection treuils joystick (0=Couple, 1=M1, 2=M2)
+    SelMaintenanceZoneAccess: BOOL;   // --> [CMD] Autorisation acces zone maintenance M3
+
+    // === RETOURS CAPTEURS & DIAGNOSTICS ===
+    EncoderFaultPresent     : BOOL;   // --> [HW] Defaut codeur agrege (1 cycle retard)
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD;        // bit0: "Mode Semi-Auto refusé (Défaut Codeur)"
-    State               : E_State;
-    StateAtError        : E_State;
-    Auth                : ST_Modes_Autorisations;  // Bus d'autorisations typé
+    // === ETATS & DIAGNOSTICS IEC ===
+    Ready                   : BOOL;   // <-- [STAT] FB pret a fonctionner
+    Busy                    : BOOL;   // <-- [STAT] FB en traitement
+    Done                    : BOOL;   // <-- [STAT] Traitement termine
+    Error                   : BOOL;   // <-- [DIAG] Defaut present
+    ErrorId                 : WORD;   // <-- [DIAG] Code erreur (bit0=Semi-Auto refuse)
+    State                   : E_State;// <-- [STAT] Etat courant du FB
+    StateAtError            : E_State;// <-- [DIAG] Etat au moment du dernier defaut
+
+    // === BUS D'AUTORISATIONS ARBITREES ===
+    Auth                    : ST_Modes_Autorisations; // <-- [STAT] Bus d'autorisations typees machine
 END_VAR
 VAR
-    ResetEdge           : R_TRIG;
-    ErrorEdge           : R_TRIG;
-    PrevInhibitM1       : BOOL;  // Mémoire état inhibition M1 (exclusion mutuelle)
-    PrevInhibitM2       : BOOL;  // Mémoire état inhibition M2 (exclusion mutuelle)
+    // === SOUS-INSTANCES FB ===
+    ResetEdge               : R_TRIG; // * [INST] Detecteur front montant Reset
+    ErrorEdge               : R_TRIG; // * [INST] Detecteur front montant Error
+
+    // === VARIABLES LOCALES & MEMOIRES ===
+    PrevInhibitM1           : BOOL;   // . [LOC] Memoire etat inhibition M1 (exclusion mutuelle)
+    PrevInhibitM2           : BOOL;   // . [LOC] Memoire etat inhibition M2 (exclusion mutuelle)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -158,9 +164,7 @@ ELSE
 END_IF;
 
 // 5quinquies. CIBLE TRANSLATION MAINTENANCE
-// 🆕 2026-08-06 (retour terrain) : MAINT_N2 seul ne suffit plus — bit IHM dédié
-// (SelMaintenanceZoneAccess) exigé EN PLUS, action consciente distincte du simple
-// changement de mode. PRG_TRANSLATION_CFC consomme ce bit.
+// MAINT_N2 ou MAINT_N1 + bit IHM dédié (SelMaintenanceZoneAccess) exigé EN PLUS
 Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
 
 // GATE — désactivation inhibitions/sync si mode change (sortie N1/N2)
