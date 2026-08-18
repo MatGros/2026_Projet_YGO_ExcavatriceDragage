@@ -1,20 +1,17 @@
-(* ═══════════════════════════════════════════════════════════════
-   🛡️ ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+(* =======================================================================
+   📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
-      Consommé par PRG_SUPERVISION_CFC et GVL_Troubleshooting.
-   🎯 Champs lecture seule — producteur unique = FB composite.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-*)
+   🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
 
 TYPE ST_Safety_Emergency_Diag :
 STRUCT
-    Error                    : BOOL;   // 🔴 Synthèse : (ErrorId <> 0)
-    ErrorId                  : WORD;   // ❌ bit0 = RedundancyTestFailed (auto-test A/B), bit1 = EmergencyArmingFailed (timeout confirm contacteur)
-    RedundancyTestFailed     : BOOL;   // 🔴 Canal A ou B resté collé/shunté détecté à l'auto-test — Reset requis (cause disparue)
-    ArmFailed                : BOOL;   // 🔴 Impulsion envoyée mais contacteur puissance non confirmé sous 2 s — Reset + contacteur engagé requis
-    LockoutActive            : BOOL;   // ⏳ Verrouillage temporel de 5 s entre tentatives de réarmement échouées
+    Error                : BOOL; // Synthese defaut active : (ErrorId <> 0)
+    ErrorId              : WORD; // Bitfield erreurs : bit0=Redundancy, bit1=Arming, bit3=Startup
+    RedundancyTestFailed : BOOL; // Canal A ou B reste colle/shunte detecte a l'auto-test (Reset requis)
+    ArmFailed            : BOOL; // Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)
+    LockoutActive        : BOOL; // Verrouillage temporel de 5s entre tentatives de rearmement echouees
 END_STRUCT
 END_TYPE

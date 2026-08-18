@@ -1,49 +1,54 @@
-(* ═══════════════════════════════════════════════════════════════
+(* =======================================================================
    🛡️ FB_Safety_EmergencyManagement — Composite & Façade Publique
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Façade publique, instance unique ; câblage interne Logic/Output & exposition des bus d'état
-   🧩 Architecture : Câblage interne Logic/Output & exposition des bus d'état
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-*)
+   🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
+   🔌 Architecture : Composition interne Logic/Output
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagement
 VAR_INPUT
-    Enable              : BOOL;        // Active la surveillance
-    Reset               : BOOL;        // Front acquittement défauts
-    ArmRequest          : BOOL;        // Demande de réarmement (BtnEmergencyArming)
-    EmergencyChainClosed      : BOOL;        // Retour physique boucle d'urgence amont contacteur
-    PowerContactorEngaged     : BOOL;        // Confirmation contacteur de puissance principal
-    PowerCutOffRequest  : BOOL;        // Requête de coupure logique issue des métiers
-    BtnEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
+    // === COMMANDES & CONSIGNES ===
+    Enable                  : BOOL; // --> [CMD]  Active la surveillance (TRUE = autorise)
+    Reset                   : BOOL; // --> [CMD]  Front acquittement defauts
+    ArmRequest              : BOOL; // --> [CMD]  Demande de rearmement (BtnEmergencyArming)
+    PowerCutOffRequest      : BOOL; // --> [SAFE] Requete de coupure logique issue des metiers
+    BtnEmergencyCutOff      : BOOL; // --> [CMD]  Commande d'ouverture d'urgence depuis l'IHM
+
+    // === RETOURS MATERIELS (HW) ===
+    EmergencyChainClosed    : BOOL; // --> [HW]   Retour physique boucle d'urgence amont contacteur
+    PowerContactorEngaged   : BOOL; // --> [HW]   Confirmation contacteur de puissance principal
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD;        // bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed, bit3: StartupFail
+    // === ETATS IEC & SYNOPTIQUE ===
+    Ready                   : BOOL; // <-- [STAT] FB pret a fonctionner
+    Busy                    : BOOL; // <-- [STAT] Sequence ou lockout en cours
+    Done                    : BOOL; // <-- [STAT] Contacteur puissance confirme engage
 
-    // ⚡ Sorties physiques (polarité maintien explicite)
-    MaintainA_RQ        : BOOL;        // Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)
-    MaintainB_RQ        : BOOL;        // Sortie de pilotage canal B (TRUE = voie maintenue, FALSE = coupure)
-    ArmPulse_RQ         : BOOL;        // Impulsion réarmement physique (1s)
+    // === DIAGNOSTIQUES & ERREURS ===
+    Error                   : BOOL; // <-- [DIAG] Synthese defaut (TRUE = defaut actif)
+    ErrorId                 : WORD; // <-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)
 
-    // 🚦 Bus d'état public (AF §8.2)
-    State               : ST_Safety_Emergency_State; // ChainOk, ContactorOk, Step, Armable, ArmingBusy
-    Diag                : ST_Safety_Emergency_Diag;  // Error, ErrorId, Redundancy, ArmFailed, Lockout
+    // === SORTIES PHYSIQUES (FAIL-SAFE) ===
+    MaintainA_RQ            : BOOL; // <-- [ACT]  Sortie pilotage canal A (TRUE = voie maintenue)
+    MaintainB_RQ            : BOOL; // <-- [ACT]  Sortie pilotage canal B (TRUE = voie maintenue)
+    ArmPulse_RQ             : BOOL; // <-- [ACT]  Impulsion rearmement physique (1s)
 
-    // 🩺 Diagnostics scalaires (rétrocompatibilité PRG_10/GVL_Global)
-    ArmingSeqStep                : INT;
-    RedundancyTestFailed         : BOOL;
-    EmergencyArmingFailed        : BOOL;
-    EmergencyArmingLockoutActive : BOOL;
+    // === BUS D'ETAT & DIAGNOSTIC ===
+    State                   : ST_Safety_Emergency_State; // <-- [STAT] Bus d'etat public
+    Diag                    : ST_Safety_Emergency_Diag;  // <-- [DIAG] Bus de diagnostic public
+
+    // === DIAGNOSTICS SCALAIRES (RETROCOMPATIBILITE) ===
+    ArmingSeqStep                : INT;  // <-- [DIAG] Etape sequence rearmement (0=IDLE..6=Confirm)
+    RedundancyTestFailed         : BOOL; // <-- [DIAG] Defaut auto-test canal A ou B reste colle
+    EmergencyArmingFailed        : BOOL; // <-- [DIAG] Defaut rearmement contacteur puissance (timeout 2s)
+    EmergencyArmingLockoutActive : BOOL; // <-- [DIAG] Verrouillage temporel 5s entre essais
 END_VAR
 VAR
-    // 🧱 Composition interne des sous-blocs
-    Logic               : FB_Safety_EmergencyManagementLogic;
-    Output              : FB_Safety_EmergencyManagementOutput;
+    // === SOUS-INSTANCES FB ===
+    Logic                   : FB_Safety_EmergencyManagementLogic;  // * [INST] Machinerie d'etat et decision AU
+    Output                  : FB_Safety_EmergencyManagementOutput; // * [INST] Projection fail-safe vers sorties physiques
 END_VAR
 
 // === IMPLEMENTATION ===

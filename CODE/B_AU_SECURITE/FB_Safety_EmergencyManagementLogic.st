@@ -1,75 +1,79 @@
-(* ═══════════════════════════════════════════════════════════════
+(* =======================================================================
    🛡️ FB_Safety_EmergencyManagementLogic — Décision & Séquencement AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Machine d'état, fronts Reset/Arm, calcul ErrorId & consignes logiques
-   🛡️ Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
-            DOC/STDS/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-*)
+   🔒 Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementLogic
 VAR_INPUT
-    Enable              : BOOL;        // Active la surveillance
-    Reset               : BOOL;        // Front acquittement défauts
-    ArmRequest          : BOOL;        // Demande de réarmement (BtnEmergencyArming)
-    EmergencyChainClosed      : BOOL;        // Retour physique boucle d'urgence amont contacteur
-    PowerContactorEngaged     : BOOL;        // Confirmation contacteur de puissance principal
-    PowerCutOffRequest  : BOOL;        // Requête de coupure logique issue des métiers
-    BtnEmergencyCutOff  : BOOL;        // Commande d'ouverture d'urgence depuis l'IHM
+    // === COMMANDES & CONSIGNES ===
+    Enable                  : BOOL; // --> [CMD]  Active la surveillance (TRUE = autorise)
+    Reset                   : BOOL; // --> [CMD]  Front acquittement defauts
+    ArmRequest              : BOOL; // --> [CMD]  Demande de rearmement (BtnEmergencyArming)
+    PowerCutOffRequest      : BOOL; // --> [SAFE] Requete de coupure logique issue des metiers
+    BtnEmergencyCutOff      : BOOL; // --> [CMD]  Commande d'ouverture d'urgence depuis l'IHM
+
+    // === RETOURS MATERIELS (HW) ===
+    EmergencyChainClosed    : BOOL; // --> [HW]   Retour physique boucle d'urgence amont contacteur
+    PowerContactorEngaged   : BOOL; // --> [HW]   Confirmation contacteur de puissance principal
 END_VAR
 VAR_OUTPUT
-    Error               : BOOL;
-    ErrorId             : WORD;        // bit0: RedundancyTestFailed (affiché), bit1: EmergencyArmingFailed (affiché)
-    Cmd                 : ST_Safety_Emergency_InternalCmd; // Structure de commande logique produite
+    // === ERREURS & CONSIGNES LOGIQUES ===
+    Error                   : BOOL; // <-- [DIAG] Synthese defaut actif
+    ErrorId                 : WORD; // <-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)
+    Cmd                     : ST_Safety_Emergency_InternalCmd; // <-- [STAT] Structure de commande logique produite
 
-    ArmingSeqStep       : INT;         // Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm
-    RedundancyTestFailed: BOOL;        // 🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag
-    EmergencyArmingFailed: BOOL;       // 🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag
-    EmergencyArmingLockoutActive : BOOL; // Verrouillage temporel de 5s entre les essais
-
-    // 🆕 Bus State/Diag internes — repris par le composite pour les DUT publics
-    Armable             : BOOL;        // 🟢 Réarmement possible maintenant
-    ArmingBusy          : BOOL;        // ⏳ Séquence ou lockout en cours
-    StartupFail         : BOOL;        // 🔴 Autotest démarche échoué
-END_VAR
-VAR CONSTANT
-    // [CST] Temporisations normatives de securite AU (fixes, non modifiables RETAIN/IHM)
-    CST_TestDuration         : TIME := T#200ms;  // Duree auto-test canal A ou B
-    CST_ArmingPulseDuration  : TIME := T#1s;     // Duree impulsion rearmement contacteur
-    CST_ArmingConfirmTimeout : TIME := T#2s;     // Timeout confirmation engagement contacteur
-    CST_ArmingLockout        : TIME := T#5s;     // Duree verrouillage anti-reessai apres echec
-    CST_FaultDisplayDebounce : TIME := T#200ms;  // 🩹 Anti-clignotement affichage IHM uniquement (§9 STD) — jamais sur l'action
+    // === DIAGNOSTICS & RETOURS D'ETAT ===
+    ArmingSeqStep                : INT;  // <-- [DIAG] Etape sequence (0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm)
+    RedundancyTestFailed         : BOOL; // <-- [DIAG] Defaut auto-test redondance (Cause lissee OR NOT Ack)
+    EmergencyArmingFailed        : BOOL; // <-- [DIAG] Defaut rearmement contacteur (Cause lissee OR NOT Ack)
+    EmergencyArmingLockoutActive : BOOL; // <-- [DIAG] Verrouillage temporel 5s entre essais
+    Armable                      : BOOL; // <-- [STAT] Rearmement possible actuellement
+    ArmingBusy                   : BOOL; // <-- [STAT] Sequence ou lockout en cours
+    StartupFail                  : BOOL; // <-- [DIAG] Autotest demarrage echoue
 END_VAR
 VAR
-    ResetEdge           : R_TRIG;
-    ArmReqEdge          : R_TRIG;
-    EnableRising        : R_TRIG;
-    ForceTestA          : BOOL;
-    ForceTestB          : BOOL;
-    TonTestA            : TON;
-    TonRestoreA         : TON;
-    TonTestB            : TON;
-    TonRestoreB         : TON;
-    TonArmingPulse      : TON;
-    TonArmingConfirm    : TON;
-    TonArmingLockout    : TON;
+    // === DETECTEURS DE FRONT INTERNES ===
+    ResetEdge               : R_TRIG; // . [LOC] Detecteur front montant Reset
+    ArmReqEdge              : R_TRIG; // . [LOC] Detecteur front montant ArmRequest
+    EnableRising            : R_TRIG; // . [LOC] Detecteur front montant Enable
+    RedundancyCauseEdge     : R_TRIG; // . [LOC] Detecteur nouvelle occurrence cause redondance
+    ArmingFailedCauseEdge   : R_TRIG; // . [LOC] Detecteur nouvelle occurrence cause rearmement
 
-    // 🆕 Autotest démarrage
-    StartupCheckDone    : BOOL;        // TRUE = autotest passé, attente réarmement
-    StartupCheckOK      : BOOL;        // Résultat autotest (latche le temps du front)
+    // === DRAPEAUX & FORCAGES LOGIQUES ===
+    ForceTestA              : BOOL; // . [LOC] Forcage coupure canal A pendant test
+    ForceTestB              : BOOL; // . [LOC] Forcage coupure canal B pendant test
+    StartupCheckDone        : BOOL; // . [LOC] Autotest demarrage effectue
+    StartupCheckOK          : BOOL; // . [LOC] Resultat autotest demarrage (latche)
 
-    // 🩹 Pattern Cause/Ack (§3.4bis AF01, §9 STD) — Reset jamais conditionné
-    RedundancyTestFailedCause : BOOL;        // Latch brut : canal collé détecté à l'auto-test
-    RedundancyTestFailedAck   : BOOL := TRUE; // Accusé opérateur — TRUE = pas d'alarme à afficher
-    RedundancyCauseEdge       : R_TRIG;       // Détecte une NOUVELLE occurrence de la cause
-    TonRedundancyDisplay      : TON;          // Debounce affichage IHM uniquement
+    // === CAUSE & ACK DEFAUT REDONDANCE ===
+    RedundancyTestFailedCause : BOOL;         // . [LOC] Cause brute : canal colle detecte a l'auto-test
+    RedundancyTestFailedAck   : BOOL := TRUE; // . [LOC] Accuse operateur (TRUE = pas d'alarme a afficher)
 
-    EmergencyArmingFailedCause : BOOL;        // Latch brut : contacteur non confirmé sous 2s
-    EmergencyArmingFailedAck   : BOOL := TRUE; // Accusé opérateur — TRUE = pas d'alarme à afficher
-    ArmingFailedCauseEdge      : R_TRIG;       // Détecte une NOUVELLE occurrence de la cause
-    TonArmingFailedDisplay     : TON;          // Debounce affichage IHM uniquement
+    // === CAUSE & ACK DEFAUT REARMEMENT ===
+    EmergencyArmingFailedCause : BOOL;         // . [LOC] Cause brute : contacteur non confirme sous 2s
+    EmergencyArmingFailedAck   : BOOL := TRUE; // . [LOC] Accuse operateur (TRUE = pas d'alarme a afficher)
+
+    // === TEMPORISATEURS LOGIQUES ===
+    TonTestA                : TON; // . [LOC] Timer auto-test canal A
+    TonRestoreA             : TON; // . [LOC] Timer restauration canal A
+    TonTestB                : TON; // . [LOC] Timer auto-test canal B
+    TonRestoreB             : TON; // . [LOC] Timer restauration canal B
+    TonArmingPulse          : TON; // . [LOC] Timer impulsion rearmement
+    TonArmingConfirm        : TON; // . [LOC] Timer attente confirmation contacteur
+    TonArmingLockout        : TON; // . [LOC] Timer lockout anti-reessai
+    TonRedundancyDisplay    : TON; // . [LOC] Timer debounce affichage IHM redondance
+    TonArmingFailedDisplay  : TON; // . [LOC] Timer debounce affichage IHM rearmement
+END_VAR
+VAR CONSTANT
+    // === TEMPORISATIONS NORMATIVES DE SECURITE (FIXES) ===
+    CST_TestDuration         : TIME := T#200ms; // Duree auto-test canal A ou B
+    CST_ArmingPulseDuration  : TIME := T#1s;    // Duree impulsion rearmement contacteur
+    CST_ArmingConfirmTimeout : TIME := T#2s;    // Timeout confirmation engagement contacteur
+    CST_ArmingLockout        : TIME := T#5s;    // Duree verrouillage anti-reessai apres echec
+    CST_FaultDisplayDebounce : TIME := T#200ms; // Anti-clignotement affichage IHM uniquement
 END_VAR
 
 // === IMPLEMENTATION ===
