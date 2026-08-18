@@ -1,39 +1,51 @@
-(* ═══════════════════════════════════════════════════════════════
+(* =======================================================================
    🛡️ FB_Encoder_Safety — Bornage physique & surveillance cohérence
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3.6/§3.7
-   🎯 Rôle :
-      - Surveillance bornage absolu [-99.00 ; +99.00] m
-      - Relais de HomingSuspect (ErrorId bit1)
-      - Expose EncoderIncoherent (= Error) et transmet CablePosMSafe
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d'incohérence redémarrage
+   🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
+   🛡️ Sécurité : Verrouillage de la position câble sûre
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_Safety
 VAR_INPUT
-    Enable                : BOOL;        // Active le bloc
-    Reset                 : BOOL;        // Acquittement défaut (front)
-    PowerContactorEngaged : BOOL;        // Ligne puissance enclenchée
-    Mode                  : E_Mode;      // Mode d'exploitation
-    CablePosM             : REAL;        // Position calculée (FB_Encoder_Scale)
-    HomingSuspect         : BOOL;        // Alerte incohérence redémarrage (FB_Encoder_Homing)
-    PositionMinM          : REAL := -99.0; // Bornage physique bas
-    PositionMaxM          : REAL := 99.0;  // Bornage physique haut
-    BypassGlobal          : BOOL := FALSE; // Mise en service : neutralise le défaut de bornage
+    // === COMMANDES & AUTORISATIONS ===
+    Enable                : BOOL;        // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset                 : BOOL;        // --> [CMD] Acquittement defaut (front montant)
+
+    // === CONTEXTE & ETAT PUISSANCE ===
+    PowerContactorEngaged : BOOL;        // --> [HW]  Ligne puissance enclenchee
+    Mode                  : E_Mode;      // --> [CMD] Mode d'exploitation actif
+
+    // === MESURES & ALERTE HOMING ===
+    CablePosM             : REAL;        // --> [HW]  Position calculee (m, sortie FB_Encoder_Scale)
+    HomingSuspect         : BOOL;        // --> [SAFE] Alerte incoherence redemarrage (FB_Encoder_Homing)
+
+    // === REGLAGES & BORNES PHYSIQUES ===
+    PositionMinM          : REAL := -99.0; // --> [CFG] Plafond bornage physique bas (m)
+    PositionMaxM          : REAL := 99.0;  // --> [CFG] Plafond bornage physique haut (m)
+
+    // === TESTS & BYPASS ===
+    BypassGlobal          : BOOL := FALSE; // --> [TST] Neutralisation defaut de bornage pour mise en service
 END_VAR
 VAR_OUTPUT
-    Ready            : BOOL;
-    Busy             : BOOL;
-    Done             : BOOL;
-    Error            : BOOL;
-    ErrorId          : WORD;        // bit0: Position hors bornes [-99..+99]m ; bit1: Incohérence boot (HomingSuspect)
-    State            : E_State;
-    StateAtError     : E_State;
-    CablePosMSafe    : REAL;        // Position câble instantanée (non figée)
-    EncoderIncoherent: BOOL;        // = Error — consommé par FB_Modes et IHM
+    // === ETATS IEC & SYNOPTIQUE ===
+    Ready                 : BOOL;        // <-- [STAT] FB pret a fonctionner
+    Busy                  : BOOL;        // <-- [STAT] FB en cours de traitement
+    Done                  : BOOL;        // <-- [STAT] Traitement termine
+    Error                 : BOOL;        // <-- [STAT] Synthese defaut (ErrorId <> 0)
+    ErrorId               : WORD;        // <-- [DIAG] Code defaut (bit0: Bornes, bit1: Boot suspect)
+    State                 : E_State;     // <-- [STAT] Etat courant du FB
+    StateAtError          : E_State;     // <-- [DIAG] Etat courant lors du dernier defaut
+
+    // === MESURES SURE & SECURITE ===
+    CablePosMSafe         : REAL;        // <-- [DIAG] Position cable instantanee transmise (m)
+    EncoderIncoherent     : BOOL;        // <-- [SAFE] Incoherence ou hors bornes (TRUE = defaut)
 END_VAR
 VAR
-    ResetEdge             : R_TRIG;
-    ErrorEdge             : R_TRIG;
+    // === DETECTEURS DE FRONT ===
+    ResetEdge             : R_TRIG;      // . [LOC] Detecteur front montant Reset
+    ErrorEdge             : R_TRIG;      // . [LOC] Detecteur front montant Error
 END_VAR
 
 // 🛑 1. GATE

@@ -1,26 +1,31 @@
-(* ═══════════════════════════════════════════════════════════════
-   📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
+(* =======================================================================
+   ⚙️ FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §2/§3.1
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 Formule : CablePosM = (RawPos - HomingRefRaw) × (CableM_PerRev / PointsPerRev)
-   🧮 Arithmétique signée sûre : conversion en DINT avant la soustraction.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
+   🔒 Polarité : CablePosM signée (+ enroulé, - sous l'eau)
+   🔌 Architecture : Convertisseur de mesure unitaire par treuil
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_Scale
 VAR_INPUT
-    RawPos          : UDINT;       // Position brute (sortie FB_Encoder_Abs, déjà gelée sur doute)
-    HomingRefRaw    : UDINT;       // Référence brute figée au dernier homing (ST_Encoder_Calib)
-    CableM_PerRev   : REAL := 2.0; // Câble déroulé par tour (périmètre tambour confirmé 2026-07-02, réglable site)
-    PointsPerRev    : UDINT := 8192; // Résolution codeur confirmée (Partie10 §3.3)
+    // === DONNEES ENTREE & REFERENCES BRUTES ===
+    RawPos          : UDINT;       // --> [HW]  Position brute codeur (sortie FB_Encoder_Abs, gelee sur doute)
+    HomingRefRaw    : UDINT;       // --> [CFG] Reference brute figee au dernier homing (ST_Encoder_Calib)
+
+    // === PARAMETRES & RATIOS DE CONVERSION ===
+    CableM_PerRev   : REAL := 2.0; // --> [CFG] Developpement cable par tour tambour (m/tour)
+    PointsPerRev    : UDINT := 8192;// --> [CFG] Resolution codeur (pts/tour)
 END_VAR
 VAR_OUTPUT
-    CablePosM       : REAL;        // Position câble en mètres, signée (+ enroulé, − sous l'eau)
+    // === MESURE CONVERTIE ===
+    CablePosM       : REAL;        // <-- [DIAG] Position cable en metres (+ enroule, - sous l'eau)
 END_VAR
 VAR
-    RawDiff         : DINT;        // Écart signé RawPos - HomingRefRaw (§3.1)
+    // === CALCULS INTERNES ===
+    RawDiff         : DINT;        // . [LOC] Ecart signe RawPos - HomingRefRaw
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Scale) ===

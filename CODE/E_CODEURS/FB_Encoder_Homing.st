@@ -1,94 +1,99 @@
-(* ═══════════════════════════════════════════════════════════════
-   🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
+(* =======================================================================
+   ⚙️ FB_Encoder_Homing — Référencement codeur nominal ou unitaire
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §1/§5/§7bis
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 Rôle : Gestion du flux de homing nominal (capteur haut + cible paramétrable)
-      ou unitaire (MAINT_N2, treuil sélectionné).
-   🧮 Calcul du point de calage :
-      - PresetValue = centre de la plage multi-tour (marge anti-débordement)
-      - HomingRefRaw = PresetValue - round(CfgTopSensorPosM × PointsPerRev / CableM_PerRev)
-   🧊 Expose ST_Encoder_Calib en VAR_IN_OUT (RETAIN).
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Séquence de référencement nominal (capteur haut) ou unitaire (MAINT_N2)
+   🔒 Polarité : Homed=TRUE dès qu'un référencement valide est enregistré
+   🔌 Architecture : Expose ST_Encoder_Calib en VAR_IN_OUT
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_Homing
 VAR_INPUT
-    Enable               : BOOL;        // Standard
-    Reset                : BOOL;        // Acquittement défaut (front) — bits 0/2/3/4/5 (voir §ErrorId)
-    PowerContactorEngaged      : BOOL;        // Standard
-    Mode                 : E_Mode;      // MAINT_N1 requis pour le flux nominal
-    Home                 : BOOL;        // Demande de référencement (front, bouton IHM UNIQUE)
-    UnitaryMode          : BOOL;        // TRUE = flux unitaire à cible libre (MAINT_N2 uniquement)
-    WinchSelected        : BOOL;        // TRUE = cette instance est le treuil sélectionné
-    CfgHomingTargetM        : REAL;        // Cible libre unitaire, limitée à [-99.0 ; +99.0] m
-    // 🆕 2026-08-07 (19) — retour terrain, demande client : BtnConfirmOpenPos/ClosePos (benne)
-    // doivent aussi référencer le codeur M2 (comme BtnHome), pas seulement mémoriser un état
-    // logique -- cible DYNAMIQUE (position réelle de M1, calculée côté appelant), pas une valeur
-    // de config fixe comme CfgHomingTargetM. Si TRUE au front Home, DynamicHomingTargetM prime
-    // sur UnitaryMode/CfgTopSensorPosM.
-    UseDynamicTarget        : BOOL := FALSE;
-    DynamicHomingTargetM    : REAL := 0.0;
-    BtnConfirmCoherence     : BOOL;        // Front — lève le doute §3.7 (bit9), sans réhoming complet
-    TopPositionSensor    : BOOL;        // 🔧 2026-07-02 : capteur position haute UNIQUE, COMMUN aux 2 treuils
-                                         // (les 2 câbles hissent ensemble le même ensemble mécanique) — câblé
-                                         // IDENTIQUEMENT sur les instances M1 ET M2 (PAS un capteur par treuil),
-                                         // voir PRG_MAIN.st
-    CfgTopSensorPosM   : REAL := 8.5;   // Cible homing nominal (RETAIN site, voir Partie10 §7bis)
-    FwdRevSpeedFeedbackOff : BOOL;      // Retour unique "tous contacteurs sens+vitesse retombés" CE TREUIL — arrêt confirmé
-    BrakeFeedback        : BOOL;        // Retour contacteur frein CE TREUIL (TRUE = ouvert/desserré — révocation 2026-08-03)
-    RawPos               : UDINT;       // Sortie FB_Encoder_Abs (déjà gelée sur doute)
-    EncoderAvailable     : BOOL;        // Sortie FB_Encoder_Abs
-    PresetAck            : BOOL;        // Pulse — sortie FB_Encoder_Abs (écriture confirmée)
-    PresetNak            : BOOL;        // Pulse — sortie FB_Encoder_Abs (écriture refusée/timeout)
-    PointsPerRev         : UDINT := 8192;   // Confirmé fiche technique (Partie10 §3.3)
-    MultiTurnRevsMax     : UDINT := 4096;   // Confirmé fiche technique (Partie10 §3.3)
-    CableM_PerRev        : REAL := 2.0;     // Confirmé terrain 2026-07-02 (Partie10 §2)
-    BypassGlobal         : BOOL := FALSE;   // 🌐 Ignore arrêt confirmé et capteur haut (mise en service)
+    // === COMMANDES & AUTORISATIONS ===
+    Enable                 : BOOL;        // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset                  : BOOL;        // --> [CMD] Acquittement defaut (front montant)
+    Home                   : BOOL;        // --> [CMD] Demande de referencement (front)
+    BtnConfirmCoherence    : BOOL;        // --> [CMD] Levee de doute d'incoherence au boot (front)
+
+    // === CONTEXTE & MODES ===
+    PowerContactorEngaged  : BOOL;        // --> [HW]  Ligne puissance enclenchee
+    Mode                   : E_Mode;      // --> [CMD] Mode d'exploitation actif (MAINT_N1/N2 requis)
+    UnitaryMode            : BOOL;        // --> [CMD] Mode unitaire a cible libre (MAINT_N2)
+    WinchSelected          : BOOL;        // --> [CMD] Instance est le treuil selectionne
+
+    // === CIBLES & CONFIGURATION HOMING ===
+    CfgHomingTargetM       : REAL;        // --> [CFG] Cible libre homing unitaire (m)
+    UseDynamicTarget       : BOOL := FALSE; // --> [CFG] Activation cible dynamique
+    DynamicHomingTargetM   : REAL := 0.0; // --> [CFG] Cible dynamique de referencement (m)
+    CfgTopSensorPosM       : REAL := 8.5; // --> [CFG] Cible homing nominal capteur haut (m)
+
+    // === RETOURS HW & CAPTEURS ===
+    TopPositionSensor      : BOOL;        // --> [HW]  Capteur physique position haute unique
+    FwdRevSpeedFeedbackOff : BOOL;        // --> [HW]  Contacteurs sens et vitesse retombes
+    BrakeFeedback          : BOOL;        // --> [HW]  Contacteur frein ouvert/desserre
+
+    // === MESURES & RETOURS FB CODEUR ABSOLU ===
+    RawPos                 : UDINT;       // --> [HW]  Position brute codeur (sortie FB_Encoder_Abs)
+    EncoderAvailable       : BOOL;        // --> [HW]  Codeur absolu disponible et valide
+    PresetAck              : BOOL;        // --> [HW]  Pulse confirmation ecriture preset reussie
+    PresetNak              : BOOL;        // --> [HW]  Pulse echec / timeout ecriture preset
+
+    // === CARACTERISTIQUES MECANIQUES & BUS ===
+    PointsPerRev           : UDINT := 8192; // --> [CFG] Resolution codeur (pts/tour)
+    MultiTurnRevsMax       : UDINT := 4096; // --> [CFG] Capacite multitour max codeur (tours)
+    CableM_PerRev          : REAL := 2.0;   // --> [CFG] Perimetre tambour / developpement cable (m/tour)
+
+    // === TESTS & BYPASS ===
+    BypassGlobal           : BOOL := FALSE; // --> [TST] Neutralisation securites pour mise en service
 END_VAR
 VAR_OUTPUT
-    Ready                : BOOL;
-    Busy                 : BOOL;
-    Done                 : BOOL;        // Pulse 1 cycle — référencement réussi (miroir PresetAck)
-    Error                : BOOL;
-    ErrorId              : WORD;        // Voir table de bits en en-tête de fichier / doc §5
-    State                : E_State;
-    StateAtError         : E_State;
-    PresetRequest        : BOOL;        // Pulse → FB_Encoder_Abs.PresetRequest
-    PresetValue          : UDINT;       // → FB_Encoder_Abs.PresetValue (= HomingRefTargetNominal)
-    Homed                : BOOL;        // RETAIN interne, miroir Calib.Homed
-    HomingSuspect        : BOOL;        // RETAIN interne, miroir Calib.HomingSuspect
-    HomingRefRaw         : UDINT;       // RETAIN interne, miroir Calib.HomingRefRaw → FB_Encoder_Scale
+    // === ETATS IEC & SYNOPTIQUE ===
+    Ready                  : BOOL;        // <-- [STAT] FB pret a fonctionner
+    Busy                   : BOOL;        // <-- [STAT] Sequence SDO preset en cours
+    Done                   : BOOL;        // <-- [STAT] Referencement effectue avec succes
+    Error                  : BOOL;        // <-- [STAT] Synthese defaut (ErrorId <> 0)
+    ErrorId                : WORD;        // <-- [DIAG] Masque de bits de defaut
+    State                  : E_State;     // <-- [STAT] Etat courant du FB
+    StateAtError           : E_State;     // <-- [DIAG] Etat courant lors du dernier defaut
+
+    // === COMMANDES VERS FB_ENCODER_ABS ===
+    PresetRequest          : BOOL;        // <-- [ACT]  Pulse demande d'ecriture preset SDO
+    PresetValue            : UDINT;       // <-- [ACT]  Valeur de cible brute pour preset SDO
+
+    // === RESULTATS & MEMOIRE CALIBRATION ===
+    Homed                  : BOOL;        // <-- [STAT] Codeur pagine et referencie
+    HomingSuspect          : BOOL;        // <-- [DIAG] Incoherence redemarrage a lever
+    HomingRefRaw           : UDINT;       // <-- [DIAG] Offset de reference brut calcule
 END_VAR
 VAR_IN_OUT
-    Calib                : ST_Encoder_Calib;   // Référence vers l'état persistant global (survit aux téléchargements)
+    // === STRUCTURE DE CALIBRATION PERSISTANTE ===
+    Calib                  : ST_Encoder_Calib; // <-> [BUS] Structure de calibration RETAIN
 END_VAR
 VAR
-    ResetEdge            : R_TRIG;
-    ErrorEdge            : R_TRIG;
-    HomeEdge             : R_TRIG;
-    ConfirmCoherenceEdge : R_TRIG;
-    InitDone             : BOOL;        // Contrôle cohérence §3.7 fait une fois par session Enable
-    ArretConfirme        : BOOL;
-    PresetValueCalc      : UDINT;       // = HomingRefTargetNominal (constant tant que PointsPerRev/MultiTurnRevsMax fixes)
-    TargetPoints         : DINT;        // Écart signé CfgTopSensorPosM → points, figé pendant la séquence
-    TargetPositionM      : REAL;        // Cible retenue : nominale ou unitaire
-    RawDiffRestart       : DINT;        // Écart |RawPos - LastKnownRawPos| au redémarrage (§3.7)
-    // 🆕 REX audit 2026-08-14 : le homing s'exécutait sans AUCUNE condition (Mode, treuil
-    // sélectionné, capteur haut, bornage cible déclarés en interface mais jamais lus). Gate
-    // différencié par chemin, validé avec l'utilisateur : le nominal capture AU FRONT du
-    // capteur haut (répétable à vitesse d'accostage constante — AscentPermit de FB_Safety_Winch
-    // coupe déjà la montée indépendamment, pas d'attente d'arrêt confirmé) ; l'unitaire exige
-    // le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt à l'appel
-    // (PRG_02_Acquisition.st, M2BucketRefRequested) — rien à ajouter ici pour ce chemin.
-    TopSensorEdge         : R_TRIG;      // Front montant TopPositionSensor — déclenche le nominal
-    DynamicTargetEdge     : R_TRIG;      // Front montant UseDynamicTarget — déclenche le homing dynamique
-    HomingModeOk          : BOOL;        // Mode MAINT_N1/N2 requis, tous chemins
-    NominalHomingTrigger  : BOOL;
-    UnitaryHomingTrigger  : BOOL;
-    DynamicHomingTrigger  : BOOL;
-    HomingTrigger         : BOOL;
+    // === DETECTEURS DE FRONT ===
+    ResetEdge              : R_TRIG;      // . [LOC] Detecteur front montant Reset
+    ErrorEdge              : R_TRIG;      // . [LOC] Detecteur front montant Error
+    HomeEdge               : R_TRIG;      // . [LOC] Detecteur front montant Home
+    ConfirmCoherenceEdge   : R_TRIG;      // . [LOC] Detecteur front montant BtnConfirmCoherence
+    TopSensorEdge          : R_TRIG;      // . [LOC] Detecteur front montant TopPositionSensor
+    DynamicTargetEdge      : R_TRIG;      // . [LOC] Detecteur front montant UseDynamicTarget
+
+    // === ETATS & DRAPEAUX INTERNES ===
+    InitDone               : BOOL;        // . [LOC] Controle incoherence boot effectue
+    ArretConfirme          : BOOL;        // . [LOC] Condition d'arret moteur confirmee
+    HomingModeOk           : BOOL;        // . [LOC] Mode de fonctionnement valide pour homing
+    NominalHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing nominal
+    UnitaryHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing unitaire
+    DynamicHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing dynamique
+    HomingTrigger          : BOOL;        // . [LOC] Synthese declenchement homing
+
+    // === VARIABLES DE CALCUL ===
+    PresetValueCalc        : UDINT;       // . [LOC] Valeur cible de preset (centre plage)
+    TargetPoints           : DINT;        // . [LOC] Ecart cible converti en points
+    TargetPositionM        : REAL;        // . [LOC] Cible retenue en metres
+    RawDiffRestart         : DINT;        // . [LOC] Ecart brut de position au redemarrage
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===

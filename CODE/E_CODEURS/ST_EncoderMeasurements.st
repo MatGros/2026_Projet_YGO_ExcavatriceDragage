@@ -1,15 +1,15 @@
-(* ═══════════════════════════════════════════════════════════════
-   📏 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
+(* =======================================================================
+   📊 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
    ───────────────────────────────────────────────────────────────
-   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2ter
-   🎨 Un sous-DUT par treuil (M1, M2) de la chaîne de mesure pure.
-   🔗 Producteur unique : PRG_02_Acquisition_CFC (rang 02, chaîne codeur M1/M2).
-      Lecteurs : PRG_04_Treuils_Benne_CFC, PRG_03_Modes_Cycle_CFC, Supervision/IHM.
-   🛡️ Sans simulation : M1 reflète COD1, M2 reflète COD2 — jamais croisés.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Structure frontière regroupant les sous-DUTs de mesure des treuils M1 et M2
+   🔌 Interface : Producteur unique PRG_02_Acquisition
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   ======================================================================= *)
+
 TYPE ST_EncoderMeasurements :
 STRUCT
-    M1 : ST_EncoderMeasurement; (* Chaîne de mesure treuil M1 (COD1) *)
-    M2 : ST_EncoderMeasurement; (* Chaîne de mesure treuil M2 (COD2) *)
+    // === CHAINES DE MESURE PAR TREUIL ===
+    M1 : ST_EncoderMeasurement; // Chaine de mesure treuil M1 (COD1)
+    M2 : ST_EncoderMeasurement; // Chaine de mesure treuil M2 (COD2)
 END_STRUCT
 END_TYPE

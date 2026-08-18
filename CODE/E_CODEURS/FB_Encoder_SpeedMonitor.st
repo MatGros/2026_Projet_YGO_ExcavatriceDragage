@@ -1,48 +1,57 @@
-(* ═══════════════════════════════════════════════════════════════════════════════
-   🔍 FB_Encoder_SpeedMonitor — Détection de variation brusque de vitesse câble
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Brique standard de diagnostic — aucun pilotage moteur, aucun SafeStop.
-   🎯 Compare deux mesures successives de vitesse linéaire câble en m/s.
-   🧩 Le seuil et la durée de confirmation sont fournis par l'appelant :
-      aucun réglage métier n'est figé dans cette brique.
-   🛡️ Une variation confirmée pose ErrorId bit0. Le défaut reste mémorisé
-      jusqu'à disparition de la cause et acquittement par front Reset.
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
-*)
+(* =======================================================================
+   📊 FB_Encoder_SpeedMonitor — Détection variation brusque vitesse câble
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Surveillance et détection de variation brusque de vitesse câble
+   🔒 Polarité : SpeedVariationConfirmed=TRUE si variation > seuil pendant timeout
+   📊 Diagnostic : Brique de surveillance diagnostic sans actionneur direct
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_SpeedMonitor
 VAR_INPUT
-    Enable                     : BOOL;        // Autorise la surveillance
-    Reset                      : BOOL;        // Acquittement par front
-    PowerContactorEngaged            : BOOL;        // Contexte sécurité global valide
-    Mode                       : E_Mode;      // Contexte de fonctionnement
-    SpeedMps                   : REAL;        // Vitesse linéaire absolue mesurée (m/s)
-    SpeedVariationThresholdMps : REAL;        // Variation minimale à surveiller (m/s)
-    SpeedVariationTimeout      : TIME;        // Durée minimale de confirmation
-    SpeedStabilityTimeout      : TIME;        // Durée sans variation avant vitesse stable
+    // === COMMANDES & AUTORISATIONS ===
+    Enable                     : BOOL;        // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset                      : BOOL;        // --> [CMD] Acquittement defaut (front montant)
+
+    // === CONTEXTE & ETAT PUISSANCE ===
+    PowerContactorEngaged      : BOOL;        // --> [HW]  Ligne puissance enclenchee
+    Mode                       : E_Mode;      // --> [CMD] Mode d'exploitation actif
+
+    // === MESURES & CONSIGNES SURVEILLANCE ===
+    SpeedMps                   : REAL;        // --> [HW]  Vitesse lineaire absolue mesuree (m/s)
+    SpeedVariationThresholdMps : REAL;        // --> [CFG] Seuil de variation minimale a surveiller (m/s)
+    SpeedVariationTimeout      : TIME;        // --> [CFG] Duree minimale de confirmation variation
+    SpeedStabilityTimeout      : TIME;        // --> [CFG] Duree sans variation avant vitesse stable
 END_VAR
 VAR_OUTPUT
-    Ready                  : BOOL;
-    Busy                   : BOOL;
-    Done                   : BOOL;
-    Error                  : BOOL;
-    ErrorId                : WORD;        // bit0 : variation vitesse confirmée
-    State                  : E_State;
-    StateAtError           : E_State;
-    SpeedDeltaMps          : REAL;        // Écart absolu entre deux mesures (m/s)
-    SpeedVariationDetected : BOOL;        // Seuil dépassé sur le cycle courant
-    SpeedVariationConfirmed: BOOL;        // Seuil dépassé pendant la durée requise
-    SpeedStable            : BOOL;        // Vitesse stable pendant SpeedStabilityTimeout
+    // === ETATS IEC & SYNOPTIQUE ===
+    Ready                  : BOOL;        // <-- [STAT] FB pret a fonctionner
+    Busy                   : BOOL;        // <-- [STAT] FB en cours de traitement
+    Done                   : BOOL;        // <-- [STAT] Traitement termine
+    Error                  : BOOL;        // <-- [STAT] Synthese defaut (ErrorId <> 0)
+    ErrorId                : WORD;        // <-- [DIAG] Code defaut (bit0: variation vitesse confirmee)
+    State                  : E_State;     // <-- [STAT] Etat courant du FB
+    StateAtError           : E_State;     // <-- [DIAG] Etat courant lors du dernier defaut
+
+    // === RESULTATS & MESURES DIAGNOSTIC ===
+    SpeedDeltaMps          : REAL;        // <-- [DIAG] Ecart absolu entre deux mesures (m/s)
+    SpeedVariationDetected : BOOL;        // <-- [DIAG] Seuil depasse sur le cycle courant
+    SpeedVariationConfirmed: BOOL;        // <-- [DIAG] Seuil depasse pendant la duree requise
+    SpeedStable            : BOOL;        // <-- [STAT] Vitesse stable pendant SpeedStabilityTimeout
 END_VAR
 VAR
-    ResetEdge          : R_TRIG;
-    ErrorEdge          : R_TRIG;
-    VariationTimer     : TON;
-    StabilityTimer     : TON;
-    PreviousSpeedMps   : REAL;
-    HasPreviousSpeed   : BOOL;
-    VariationActive    : BOOL;
+    // === DETECTEURS DE FRONT ===
+    ResetEdge              : R_TRIG;      // . [LOC] Detecteur front montant Reset
+    ErrorEdge              : R_TRIG;      // . [LOC] Detecteur front montant Error
+
+    // === TEMPORISATEURS INTERNES ===
+    VariationTimer         : TON;         // . [LOC] Temporisateur de confirmation de variation
+    StabilityTimer         : TON;         // . [LOC] Temporisateur de confirmation de stabilite
+
+    // === VARIABLES ET MEMOIRES INTERNES ===
+    PreviousSpeedMps       : REAL;        // . [LOC] Vitesse mesuree au cycle precedent (m/s)
+    HasPreviousSpeed       : BOOL;        // . [LOC] Premiere mesure enregistree
+    VariationActive        : BOOL;        // . [LOC] Condition de depassement de seuil active
 END_VAR
 
 // 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.

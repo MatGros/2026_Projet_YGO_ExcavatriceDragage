@@ -1,58 +1,73 @@
-(* ═══════════════════════════════════════════════════════════════
-   🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus EtherCAT)
+(* =======================================================================
+   🔌 FB_Encoder_Abs — Acquisition codeur absolu (accès bus EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3/§6
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 Accès bus EtherCAT, statut esclave, extraction positions brutes
-      et séquence de Preset SDO (PresetTriggerCmd := 2).
-   🧊 Principe « geler sur doute » (§6) : RawPos/AngleRaw/TurnCount
-      conservent leur dernière valeur valide si EncoderAvailable = FALSE.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
+   🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
+   🔌 Architecture : Module d'acquisition codeur absolu
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_Abs
 VAR_INPUT
-    Enable              : BOOL;        // Standard
-    Reset               : BOOL;        // Acquittement défaut (front)
-    PowerContactorEngaged     : BOOL;        // Standard
-    Mode                : E_Mode;      // Standard (contexte, pas encore exploité ce lot)
-    RawPosIn            : UDINT;       // Brut EtherCAT (ex. COD1_PosValue, %ID)
-    AlarmsIn            : UINT;        // Brut EtherCAT (ex. COD1_Alarms)
-    WarningsIn          : UINT;        // Brut EtherCAT (ex. COD1_Warnings) — informatif seulement
-    SlaveOperational    : BOOL;        // FB_Diag_Ethercat — esclave EtherCAT opérationnel
-    PointsPerRev        : UDINT := 8192;  // Résolution codeur confirmée (Partie10 §3.3)
-    PresetRequest       : BOOL;        // Front — piloté par FB_Encoder_Homing via PRG_02_Encoders
-    PresetValue         : UDINT;       // Cible brute — piloté par FB_Encoder_Homing (stub 0 ce lot)
-    PresetTimeout       : TIME := T#2s;
-    PresetTolerancePts  : UDINT := 10; // Tolérance relecture post-preset
+    // === COMMANDES & AUTORISATIONS ===
+    Enable              : BOOL;        // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset               : BOOL;        // --> [CMD] Acquittement defaut (front montant)
+    PresetRequest       : BOOL;        // --> [CMD] Demande de preset (front montant)
+
+    // === CONTEXTE & ETAT PUISSANCE ===
+    PowerContactorEngaged     : BOOL;  // --> [HW]  Ligne puissance enclenchee
+    Mode                : E_Mode;      // --> [CMD] Mode d'exploitation actif
+
+    // === BUS ETHERCAT & CAPTEUR HW ===
+    RawPosIn            : UDINT;       // --> [HW]  Position brute EtherCAT
+    AlarmsIn            : UINT;        // --> [HW]  Codes alarmes bruts EtherCAT
+    WarningsIn          : UINT;        // --> [HW]  Codes avertissements bruts EtherCAT
+    SlaveOperational    : BOOL;        // --> [HW]  Statut esclave EtherCAT operationnel
+
+    // === PARAMETRES & REGLAGES ===
+    PointsPerRev        : UDINT := 8192; // --> [CFG] Resolution codeur (pts/tour)
+    PresetValue         : UDINT;       // --> [CFG] Valeur cible de preset
+    PresetTimeout       : TIME := T#2s;// --> [CFG] Temporisation max attente preset
+    PresetTolerancePts  : UDINT := 10; // --> [CFG] Tolerance relecture post-preset (pts)
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD;        // bit0: "Défaut communication codeur" - alarme/bus codeur ; bit1: "Erreur référencement (timeout)" - preset refusé/timeout
-    State               : E_State;
-    StateAtError        : E_State;
-    RawPos              : UDINT;       // Position brute — GELÉE si EncoderAvailable=FALSE
-    EncoderAvailable    : BOOL;
-    AngleRaw            : UINT;        // Informatif maintenance : RawPos MOD PointsPerRev
-    TurnCount           : UDINT;       // Informatif maintenance : RawPos / PointsPerRev
-    PresetAck           : BOOL;        // Pulse 1 cycle — écriture confirmée
-    PresetNak           : BOOL;        // Pulse 1 cycle — écriture refusée/timeout
-    PresetTriggerCmd    : WORD;        // → à câbler sur COD_PresettTrigCmd (RxPDO)
-    CodeSeqTriggerCmd   : WORD;        // → à câbler sur COD_CodeSeqTrigCmd (RxPDO)
-    PresetValueOut      : UDINT;       // → à câbler sur COD_PresetValue (RxPDO)
+    // === ETATS IEC & SYNOPTIQUE ===
+    Ready               : BOOL;        // <-- [STAT] FB pret a fonctionner
+    Busy                : BOOL;        // <-- [STAT] Sequence de preset en cours
+    Done                : BOOL;        // <-- [STAT] Preset effectue avec succes
+    Error               : BOOL;        // <-- [STAT] Synthese defaut (ErrorId <> 0)
+    ErrorId             : WORD;        // <-- [DIAG] Code defaut (bit0: Com, bit1: Preset Timeout)
+    State               : E_State;     // <-- [STAT] Etat courant du FB
+    StateAtError        : E_State;     // <-- [DIAG] Etat courant lors du dernier defaut
+
+    // === MESURES & DONNEES CODEUR ===
+    RawPos              : UDINT;       // <-- [DIAG] Position brute gelee si non disponible
+    EncoderAvailable    : BOOL;        // <-- [STAT] Codeur operationnel et disponible
+    AngleRaw            : UINT;        // <-- [DIAG] Angle brut sur un tour (MOD PointsPerRev)
+    TurnCount           : UDINT;       // <-- [DIAG] Nombre de tours bruts (RawPos / PointsPerRev)
+
+    // === COMMANDES & ECHANGE BUS ETHERCAT ===
+    PresetAck           : BOOL;        // <-- [STAT] Pulse confirmation preset reussi
+    PresetNak           : BOOL;        // <-- [STAT] Pulse refus / timeout preset
+    PresetTriggerCmd    : WORD;        // <-- [ACT]  Ordre declenchement preset vers PDO Rx
+    CodeSeqTriggerCmd   : WORD;        // <-- [ACT]  Ordre sequence code vers PDO Rx
+    PresetValueOut      : UDINT;       // <-- [ACT]  Valeur de preset transmise au PDO Rx
 END_VAR
 VAR
-    ResetEdge           : R_TRIG;
-    ErrorEdge           : R_TRIG;
-    PresetReqEdge       : R_TRIG;
-    PresetTimer         : TON;
-    PresetSeqStep       : INT;         // 0=IDLE, 1=pulse CodeSeq, 2=pulse Trig, 3=attente confirmation
-    RawDiff             : DINT;
-    PresetTimerVisual   : TON;         // Timer pour laisser le temps de voir l'impulsion (1.5s)
+    // === DETECTEURS DE FRONT ===
+    ResetEdge           : R_TRIG;      // . [LOC] Detecteur front montant Reset
+    ErrorEdge           : R_TRIG;      // . [LOC] Detecteur front montant Error
+    PresetReqEdge       : R_TRIG;      // . [LOC] Detecteur front montant PresetRequest
+
+    // === TEMPORISATEURS INTERNES ===
+    PresetTimer         : TON;         // . [LOC] Temporisateur timeout sequence preset
+    PresetTimerVisual   : TON;         // . [LOC] Temporisateur maintien visuel impulsion (500ms)
+
+    // === VARIABLES INTERNES DE CALCUL & ETAT ===
+    PresetSeqStep       : INT;         // . [LOC] Etape sequence preset (0:IDLE, 1:PULSE/WAIT)
+    RawDiff             : DINT;        // . [LOC] Ecart signe entre RawPos et PresetValueOut
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
