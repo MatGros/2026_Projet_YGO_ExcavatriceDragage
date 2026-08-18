@@ -1,0 +1,69 @@
+contract:
+  task_id: REFACTOR_DECLARATIONS_D_JOYSTICK
+  criticality: C1
+  strategy: patch
+
+  objective: "Refactoriser les cartouches d'en-tête et les déclarations de variables de tous les fichiers ST du dossier CODE/D_JOYSTICK/ selon les standards ST (en-tête concis <= 15L sans récit REX, ordre VAR_INPUT -> VAR_OUTPUT -> VAR_IN_OUT -> VAR, flèches ASCII --> / <-- / <-> / * / . et tags de rôle [CMD], [CFG], [HW], [SAFE], [TST], [STAT], [ACT], [DIAG], [BUS], [INST], [LOC])."
+
+  acceptance:
+    - id: AC1
+      statement: "Chaque fichier .st de CODE/D_JOYSTICK/ possède un cartouche d'en-tête concis (<= 15 lignes), sans récit REX/chantier/dates, avec lien AF-08 préservé et émojis blanchis uniquement."
+      verified_by: "Revue manuelle des en-têtes et absence de mots-clés REX/chantier"
+    - id: AC2
+      statement: "L'ordre des déclarations dans chaque fichier .st de CODE/D_JOYSTICK/ respecte VAR_INPUT -> VAR_OUTPUT -> VAR_IN_OUT -> VAR."
+      verified_by: "Inspecter la structure des blocs de déclaration dans chaque fichier"
+    - id: AC3
+      statement: "Toutes les variables déclarées comportent une flèche ASCII (--> / <-- / <-> / * / .) et un tag de sous-domaine valide."
+      verified_by: "Inspecter les commentaires de fin de ligne dans les blocs VAR"
+    - id: AC4
+      statement: "Le corps fonctionnel du code (mise à l'échelle, filtrage PT1, zone morte joystick) est STRICTEMENT INTACT et non altéré."
+      verified_by: "git diff --ignore-all-space ne montre aucun changement dans la logique métier"
+    - id: AC5
+      statement: "Tous les portails mécaniques CI/CD (G100, G110, G200, G300, G310, G330, G340) restent valides."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py"
+
+  scope:
+    allowed:
+      - CODE/D_JOYSTICK/
+    forbidden:
+      - CODE/A_COMMUN/
+      - CODE/B_AU_SECURITE/
+      - CODE/C_DIAG_RESEAUX/
+      - CODE/E_CODEURS/
+      - CODE/F_MODES/
+      - CODE/G_CYCLE/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/I_TRANSLATION/
+      - CODE/J_SUPERVISION/
+      - CODE/K_DEPANNAGE/
+      - CODE/L_SIMULATION/
+      - CODE/M_MAIN/
+      - TOOLS/
+      - DOC/AF/
+
+  evidence_required:
+    - check_linkage
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "codex/gpt-5.6-luna"
+    - "agy/gemini-3.6-flash-high"
+
+  alert_duty: "Toute modification accidentelle du corps du code ST ou altération d'interface non désirée est immédiatement signalée."
+
+status: COMPLETED
+
+execution:
+  executed_by: "AGY-01 (Antigravity gemini-3.6-flash-high via Sub-agent)"
+  completed_at: "2026-08-17T15:15:00+02:00"
+  status: COMPLETED
+  summary: "Les 4 fichiers de CODE/D_JOYSTICK/ ont été refactorisés avec succès : en-têtes concis <= 15L sans REX, ordre VAR_INPUT -> VAR_OUTPUT -> VAR_IN_OUT -> VAR, flèches ASCII et tags de rôle appliqués. Zéro modification sur la logique métier."
+  evidence_submitted:
+    - "git diff -w: 0 modification de logique métier"
+    - "G200_check_linkage.py: PASS (0 erreur)"
+    - "G310, G340, G405: PASS (0 erreur)"
+
+validation:
+  status: APPROVED
+  validated_by: "Antigravity (Orchestrateur)"

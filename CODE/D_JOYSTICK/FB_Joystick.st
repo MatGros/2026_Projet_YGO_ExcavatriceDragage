@@ -1,89 +1,94 @@
-(* ═══════════════════════════════════════════════════════════════
-   🕹️ FB_Joystick — Acquisition & traitement Hall (Homme-mort ISO 13850)
+(* =======================================================================
+   🕹️ FB_Joystick — Acquisition & conditionnement du geste opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
-      Pipeline par axe : FB_AxisScale → FB_Filter_PT1 → Homme-Mort → ST_Joystick_AxisCmd.
-      Les rampes d'accélération/décélération sont gérées exclusivement par les
-      FB de mouvement aval (FB_Winch, FB_Translation), hors de ce bloc.
-    🔒 Bouton homme-mort :
-       - Armement au neutre strict (ScaleX/Y.OutPct = 0.0).
-       - Consentement au démarrage : mouvement libre SANS surveillance du bouton
-         (défaut, DeadmanReconfEnable := FALSE). Optionnel : reconfirmation périodique
-         en mouvement (délai DeadmanRearmTimeout) si DeadmanReconfEnable := TRUE.
-       - Désarmement sur maintien au neutre (durée NeutralHoldTime) + gate/mode/fin benne.
-   📤 Produit AxisCmdX, AxisCmdY, et signaux de diagnostic/miroir.
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Joystick) ===
+             Pipeline par axe : FB_AxisScale -> FB_Filter_PT1 -> Homme-Mort -> ST_Joystick_AxisCmd.
+   🔒 Sécurité : Armement homme-mort par maintien au neutre.
+                 Désarmement sur neutre prolongé, changement mode ou fin benne.
+   📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   ======================================================================= *)
 
 FUNCTION_BLOCK FB_Joystick
 VAR_INPUT
-    Enable          : BOOL;       // Active la logique
-    Reset           : BOOL;       // Acquittement défaut
-    PowerContactorEngaged : BOOL;       // Conditions globales OK (chaîne AU réarmée)
-    Mode            : E_Mode;     // Changement de mode désarme le homme-mort
-    BenneBusy       : BOOL;       // Fin de cycle benne (front descendant) désarme le homme-mort
-    PreserveArmingAfterBucket : BOOL; // TRUE uniquement pendant fermeture ExtractionSequence : enchaînement palier 1 autorisé
-    BusCanOpenOP    : ST_Diag_Device;       // État présence nœud CAN
-    JoystickOP      : ST_Diag_Device;       // Mode esclave CANopen actif
-    RawX            : INT;        // Valeur brute axe X
-    RawY            : INT;        // Valeur brute axe Y
-    RawButton       : BOOL;       // État brut bouton
-    BtnCalibrate    : BOOL;       // Demande de recalage neutre
-    InvertX         : BOOL := FALSE;
-    InvertY         : BOOL := FALSE;
-    DeadbandRaw     : INT := 300;      // Zone morte en points ADC bruts (0..10000)
-    FilterTime      : TIME := TIME#0ms;// Filtrage premier ordre axe
-    NeutralHoldTime : TIME := T#100MS; // Maintien continu au neutre avant désarmement
-    DeadmanArmHoldTime  : TIME := T#100MS; // Appui continu bouton requis pour armer
-    DeadmanArmGraceTime : TIME := T#3S;    // Délai de grâce post-armement avant application du désarmement neutre
+    // === PERMIS SÉCURITÉ & ETATS SYSTEME ===
+    Enable                    : BOOL;       // --> [CMD]  Active la logique du bloc (TRUE=Autorise)
+    Reset                     : BOOL;       // --> [CMD]  Acquittement defaut
+    PowerContactorEngaged     : BOOL;       // --> [SAFE] Conditions globales OK (chaine AU rearmee)
+    Mode                      : E_Mode;     // --> [SAFE] Changement de mode desarme l'homme-mort
+    BenneBusy                 : BOOL;       // --> [SAFE] Fin de cycle benne (front descendant) desarme l'homme-mort
+    PreserveArmingAfterBucket : BOOL;       // --> [SAFE] Maintien armement pendant fermeture ExtractionSequence
+
+    // === ACQUISITION MATERIELLE & DIAGNOSTIC ===
+    BusCanOpenOP              : ST_Diag_Device; // --> [HW]   Etat presence noeud CAN
+    JoystickOP                : ST_Diag_Device; // --> [HW]   Mode esclave CANopen actif
+    RawX                      : INT;        // --> [HW]   Valeur brute axe X (0..10000)
+    RawY                      : INT;        // --> [HW]   Valeur brute axe Y (0..10000)
+    RawButton                 : BOOL;       // --> [HW]   Etat brut bouton homme-mort
+
+    // === COMMANDES OPÉRATEUR & CALIBRATION ===
+    BtnCalibrate              : BOOL;       // --> [CMD]  Demande de recalage neutre
+
+    // === REGLAGES & CONFIGURATION ===
+    InvertX                   : BOOL := FALSE;   // --> [CFG]  Inversion sens de l'axe X
+    InvertY                   : BOOL := FALSE;   // --> [CFG]  Inversion sens de l'axe Y
+    DeadbandRaw               : INT := 300;      // --> [CFG]  Zone morte en points ADC bruts (0..10000)
+    FilterTime                : TIME := T#0MS;   // --> [CFG]  Filtrage premier ordre axe
+    NeutralHoldTime           : TIME := T#100MS; // --> [CFG]  Maintien continu au neutre avant desarmement
+    DeadmanArmHoldTime        : TIME := T#100MS; // --> [CFG]  Appui continu bouton requis pour armer
+    DeadmanArmGraceTime       : TIME := T#3S;    // --> [CFG]  Delai de grace post-armement avant desarmement neutre
 END_VAR
 VAR_OUTPUT
-    Ready           : BOOL;       // Prêt à commuter
-    Busy            : BOOL;       // Traitement en cours
-    Done            : BOOL;       // Données valides dispo
-    Error           : BOOL;       // Présence anomalie
-    ErrorId         : WORD;       // bit0: "Échec calibration Joystick" - Valeurs RawX/Y hors plage lors du recalage
-    AxisCmdX        : ST_Joystick_AxisCmd; // Sortie normalisée X
-    AxisCmdY        : ST_Joystick_AxisCmd; // Sortie normalisée Y
-    Button          : BOOL;       // Bouton filtré
-    NeutralXAct     : INT;        // Point neutre X actuel pour IHM/Test
-    NeutralYAct     : INT;        // Point neutre Y actuel pour IHM/Test
-    // 🆕 Miroirs directs (maintenance) — mêmes valeurs que AxisCmdX/Y.SpeedRef/.Direction,
-    // exposés à plat pour lecture immédiate en vue instance CODESYS (pas de dépliage struct).
-    SpeedXPct       : REAL;       // Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef
-    DirectionX      : INT;        // Sens axe X (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdX.Direction
-    SpeedYPct       : REAL;       // Consigne vitesse axe Y en % SIGNÉE (-100..+100), miroir AxisCmdY.SpeedRef
-    DirectionY      : INT;        // Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdY.Direction
-    DeadmanArmed    : BOOL;       // 🆕 Geste armé (bouton appuyé au neutre) — IHM/diagnostic
-    AtNeutral       : BOOL;       // 🆕 2026-08-07 : TRUE si les 2 axes sont en zone morte (position centrale) — IHM/diagnostic
+    // === ETATS IEC & SYNOPTIQUE ===
+    Ready                     : BOOL;       // <-- [STAT] FB pret a fonctionner
+    Busy                      : BOOL;       // <-- [STAT] Traitement en cours
+    Done                      : BOOL;       // <-- [STAT] Donnees valides disponibles
+    Button                    : BOOL;       // <-- [STAT] Bouton homme-mort filtre
+
+    // === DIAGNOSTIC & ANOMALIES ===
+    Error                     : BOOL;       // <-- [DIAG] Presence anomalie
+    ErrorId                   : WORD;       // <-- [DIAG] Bit0: Echec calibration Joystick (RawX/Y hors plage)
+
+    // === CONSIGNES AXES NORMALISEES ===
+    AxisCmdX                  : ST_Joystick_AxisCmd; // <-- [ACT]  Sortie normalisee axe X
+    AxisCmdY                  : ST_Joystick_AxisCmd; // <-- [ACT]  Sortie normalisee axe Y
+
+    // === MESURES & MIROIRS MAINTENANCE ===
+    NeutralXAct               : INT;        // <-- [STAT] Point neutre X actuel pour IHM/Test
+    NeutralYAct               : INT;        // <-- [STAT] Point neutre Y actuel pour IHM/Test
+    SpeedXPct                 : REAL;       // <-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef
+    DirectionX                : INT;        // <-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdX.Direction
+    SpeedYPct                 : REAL;       // <-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef
+    DirectionY                : INT;        // <-- [STAT] Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdY.Direction
+    DeadmanArmed              : BOOL;       // <-- [STAT] Geste arme (bouton appuye au neutre) - IHM/diagnostic
+    AtNeutral                 : BOOL;       // <-- [STAT] TRUE si les 2 axes sont en zone morte (position centrale)
 END_VAR
 VAR_IN_OUT
-    NeutralXMem     : INT; // Point neutre X persistant global
-    NeutralYMem     : INT; // Point neutre Y persistant global
+    // === RETENTION & CALIBRATION PERSISTANTE ===
+    NeutralXMem               : INT;        // <-> [BUS]  Point neutre X persistant global
+    NeutralYMem               : INT;        // <-> [BUS]  Point neutre Y persistant global
 END_VAR
 VAR
-    CycleTimeCalc   : FB_CycleTime;
-    ScaleX          : FB_AxisScale;
-    ScaleY          : FB_AxisScale;
-    FilterX         : FB_Filter_PT1;
-    FilterY         : FB_Filter_PT1;
-    CmdXVal         : REAL;
-    CmdYVal         : REAL;
-    LastCalibrate   : BOOL;
-    ResetEdge       : R_TRIG;
-    DeadmanEdge     : R_TRIG;
-    NeutralHoldTimer: TON;
-    DeadmanArmTimer : TON;
-    DeadmanArmPending : BOOL;
-    DeadmanArmGraceTimer : TON;
-    LastMode        : E_Mode;
-    BenneBusyFallEdge : F_TRIG;
-END_VAR
+    // === SOUS-INSTANCES FB & TIMERS ===
+    CycleTimeCalc             : FB_CycleTime;        // * [INST] Calcul du temps de cycle reel
+    ScaleX                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe X
+    ScaleY                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe Y
+    FilterX                   : FB_Filter_PT1;       // * [INST] Filtre passe-bas PT1 axe X
+    FilterY                   : FB_Filter_PT1;       // * [INST] Filtre passe-bas PT1 axe Y
+    ResetEdge                 : R_TRIG;              // * [INST] Detecteur front montant Reset
+    DeadmanEdge               : R_TRIG;              // * [INST] Detecteur front montant Bouton homme-mort
+    NeutralHoldTimer          : TON;                 // * [INST] Temporisation maintien au neutre
+    DeadmanArmTimer           : TON;                 // * [INST] Temporisation maintien bouton armement
+    DeadmanArmGraceTimer      : TON;                 // * [INST] Temporisation delai de grace post-armement
+    BenneBusyFallEdge         : F_TRIG;              // * [INST] Detecteur front descendant Fin de cycle benne
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
+    // === VARIABLES LOCALES INTERNES ===
+    CmdXVal                   : REAL;                // . [LOC]  Consigne axe X calculee apres filtrage/homme-mort
+    CmdYVal                   : REAL;                // . [LOC]  Consigne axe Y calculee apres filtrage/homme-mort
+    LastCalibrate             : BOOL;                // . [LOC]  Memorisation etat precedent bouton calibration
+    DeadmanArmPending         : BOOL;                // . [LOC]  Armement en cours d'attente de la tempo maintien
+    LastMode                  : E_Mode;              // . [LOC]  Memorisation mode scan precedent pour detection changement
+END_VAR
 
 {region "§1 Gate securite"}
 // 🛑 1. GATE (Sécurités et coupures prioritaires)

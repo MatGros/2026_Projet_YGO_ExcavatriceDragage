@@ -1,30 +1,26 @@
-(* ═══════════════════════════════════════════════════════════════
-   🔁 FB_Filter_PT1 — Filtre passe-bas premier ordre (PT1 numérique)
+(* =======================================================================
+   ⚙️ FB_Filter_PT1 — Filtre passe-bas premier ordre (PT1 numérique)
    ───────────────────────────────────────────────────────────────
-   📄 Extrait depuis le projet CODESYS (Device.export, JOYSTICK/)
-   🎯 Filtre exponentiel discret : y[k] = α·x[k] + (1-α)·y[k-1]
-      où α = CycleTimeS / (T + CycleTimeS), T = TimeConst en secondes.
-   ⚠️ Si TimeConst = 0 ou CycleTimeS = 0, sortie = entrée (pass-through).
-   ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-*)
+   🎯 Rôle : Filtre exponentiel discret y[k] = a*x[k] + (1-a)*y[k-1]
+             avec a = CycleTimeS / (T + CycleTimeS). Pass-through si T=0 ou Cycle=0.
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   ======================================================================= *)
 
 FUNCTION_BLOCK FB_Filter_PT1
 VAR_INPUT
-    /// Consigne brute entrée
-    ValueIn    : REAL;
-    /// Constante de temps du filtre
-    TimeConst  : TIME;
-    /// Temps de cycle réel en secondes
-    CycleTimeS : REAL;
+    // === CONSIGNES DE PILOTAGE & CONFIGURATION ===
+    ValueIn    : REAL;  // --> [CMD] Consigne d'axe brute a filtrer
+    TimeConst  : TIME;  // --> [CFG] Constante de temps du filtre (ex: T#200ms)
+    CycleTimeS : REAL;  // --> [CFG] Temps de cycle reel de la tache en secondes (ex: 0.02)
 END_VAR
 VAR_OUTPUT
-    /// Consigne filtrée sortie
-    ValueOut : REAL;
+    // === SORTIES LISSÉES ===
+    ValueOut   : REAL;  // <-- [STAT] Consigne d'axe lissee par filtre PT1
 END_VAR
 VAR
-    T     : REAL;
-    Alpha : REAL;
+    // === VARIABLES LOCALES INTERNES ===
+    T          : REAL;  // . [LOC]  Constante de temps convertie en secondes
+    Alpha      : REAL;  // . [LOC]  Facteur d'attenuation du filtre exponentiel
 END_VAR
 
 T := TIME_TO_REAL(TimeConst) / 1000.0; // ms → s
