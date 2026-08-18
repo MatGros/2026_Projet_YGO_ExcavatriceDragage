@@ -138,13 +138,23 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     M3_PositioningActive  := TRUE;
     SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
     M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
-    M3_SpeedRef_Active   := 100.0;
 
-    // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
-    IF SelTarget = 1 THEN
-        M3_Direction_Active := 1;
+    // 🔒 Gating direction/vitesse sur Start (REX 2026-08-18) : sans Start (cycle à X0),
+    // M3_Direction_Active/M3_SpeedRef_Active restaient non-nuls (SelTarget≠1 → -1, vitesse 100),
+    // ce qui faisait « bouger » M3 en simulation (FB_Sim_Translation ignore Start) et déclenchait
+    // l'escalade fin de course (bit6) → PowerCutOff → éjection SEMI_AUTO. Direction/vitesse
+    // uniquement si le cycle commande réellement le mouvement.
+    IF M3_StartStop_Active THEN
+        M3_SpeedRef_Active := 100.0;
+        // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
+        IF SelTarget = 1 THEN
+            M3_Direction_Active := 1;
+        ELSE
+            M3_Direction_Active := -1;
+        END_IF;
     ELSE
-        M3_Direction_Active := -1;
+        M3_SpeedRef_Active := 0.0;
+        M3_Direction_Active := 0;
     END_IF;
 ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
    OR (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2) THEN
