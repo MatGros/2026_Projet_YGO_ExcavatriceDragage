@@ -1,17 +1,22 @@
-(* ═══════════════════════════════════════════════════════════════
-   🧲 ST_Encoder_Calib — Calibration & référence codeur (1 par treuil, RETAIN)
+(* =======================================================================
+   💾 ST_Encoder_Calib — Calibration & référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
+   💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
-   ═══════════════════════════════════════════════════════════════ *)
+   ======================================================================= *)
 
 TYPE ST_Encoder_Calib :
 STRUCT
-    HomingRefRaw                  : UDINT;   // Valeur brute figée au dernier homing réussi
-    LastKnownRawPos                : UDINT;   // Dernier point brut valide connu (§3.7, continu)
-    RestartCoherenceTolerancePts    : UDINT := 1000;  // Tolérance redémarrage (~12% PointsPerRev 8192)
-    Homed                          : BOOL;    // TRUE dès qu'un référencement a réussi
-    HomingSuspect                  : BOOL;    // TRUE si incohérence détectée au redémarrage (§3.7)
+    // === DONNEES DE REFERENCE BRUTE (RETAIN) ===
+    HomingRefRaw                 : UDINT;         // Valeur brute figee au dernier homing reussi
+    LastKnownRawPos               : UDINT;         // Dernier point brut valide connu (continu)
+
+    // === CONFIGURATION & REGLAGES TOLERANCE ===
+    RestartCoherenceTolerancePts   : UDINT := 1000; // Tolerance redemarrage (pts, ~12% de 8192)
+
+    // === ETATS DE CALIBRATION & SECURITE ===
+    Homed                         : BOOL;          // TRUE des qu'un referencement a reussi
+    HomingSuspect                 : BOOL;          // TRUE si incoherence detectee au redemarrage
 END_STRUCT
 END_TYPE

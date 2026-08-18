@@ -1,37 +1,48 @@
-(* ═══════════════════════════════════════════════════════════════
-   📐 FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
+(* =======================================================================
+   ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3.8
-   🛡️ Sécurité : mesure propriétaire de la chaîne codeur ; aucune réaction machine
-   🧩 Dépendances : position sûre fournie par FB_Encoder_Safety
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
+   🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ======================================================================= *)
+
 FUNCTION_BLOCK PUBLIC FB_Encoder_SpeedMeasure
 VAR_INPUT
-    Enable        : BOOL; // Autorise l'acquisition
-    Reset         : BOOL; // Purge immédiate de l'historique
-    Position_M    : REAL; // Position câble sûre en mètres
-    PositionValid : BOOL; // TRUE si la chaîne codeur garantit la position
+    // === COMMANDES & AUTORISATIONS ===
+    Enable              : BOOL;        // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset               : BOOL;        // --> [CMD] Purge immediate de l'historique (front montant)
+
+    // === MESURE SURES EN ENTREE ===
+    Position_M          : REAL;        // --> [HW]  Position cable sure en metres (FB_Encoder_Safety)
+    PositionValid       : BOOL;        // --> [SAFE] Validite de la chaine codeur
 END_VAR
 VAR_OUTPUT
-    Speed_Mps       : REAL; // Vitesse absolue sur la fenêtre horodatée
-    SignedSpeed_Mps : REAL; // Vitesse signée : positive montée, négative descente
-    Valid           : BOOL; // TRUE après 6 positions couvrant au moins 50 ms
-END_VAR
-VAR CONSTANT
-    WindowTime   : TIME := T#50MS;
-    SamplePeriod : TIME := T#10MS;
-    SampleCount  : INT := 6;
+    // === VITESSE CALCULÉE & VALIDITE ===
+    Speed_Mps           : REAL;        // <-- [DIAG] Vitesse absolue sur la fenetre glissante (m/s)
+    SignedSpeed_Mps     : REAL;        // <-- [DIAG] Vitesse signee (+ montee, - descente) (m/s)
+    Valid               : BOOL;        // <-- [STAT] Vitesse valide (6 ech. sur 50 ms)
 END_VAR
 VAR
-    Positions_M : ARRAY[0..5] OF REAL;
-    Timestamps  : ARRAY[0..5] OF TIME;
-    CurrentTimestamp : TIME;
-    LastTimestamp    : TIME;
-    ElapsedSinceSample : TIME;
-    WindowElapsed      : TIME;
-    CollectedSamples   : INT;
-    Index              : INT;
-    TimestampInitialized : BOOL;
+    // === HISTORIQUE & ECHANTILLONS ===
+    Positions_M         : ARRAY[0..5] OF REAL; // . [LOC] Tableau des 6 positions enregistrees
+    Timestamps          : ARRAY[0..5] OF TIME; // . [LOC] Horodatage associe aux 6 positions
+
+    // === HORODATAGE & TEMPORISATION ===
+    CurrentTimestamp    : TIME;        // . [LOC] Horodatage courant du cycle
+    LastTimestamp       : TIME;        // . [LOC] Horodatage de l'echantillon precedent
+    ElapsedSinceSample  : TIME;        // . [LOC] Temps ecoule depuis le dernier echantillon
+    WindowElapsed       : TIME;        // . [LOC] Temps total ecoule sur la fenetre de mesure
+
+    // === COMPTEURS & ETATS INTERNES ===
+    CollectedSamples    : INT;         // . [LOC] Nombre d'echantillons collectes dans la fenetre
+    Index               : INT;         // . [LOC] Index de boucle de decalage
+    TimestampInitialized: BOOL;        // . [LOC] Indicateur d'initialisation du premier horodatage
+END_VAR
+VAR CONSTANT
+    // === PARAMETRES DE LA FENETRE GLISSANTE ===
+    WindowTime          : TIME := T#50MS; // Fenetre glissante de mesure
+    SamplePeriod        : TIME := T#10MS; // Periode minimale entre deux echantillons
+    SampleCount         : INT := 6;       // Nombre total d'echantillons requis
 END_VAR
 
 // ⏱️ Horodatage natif : le calcul utilise le temps réellement écoulé, jamais un cycle supposé.
