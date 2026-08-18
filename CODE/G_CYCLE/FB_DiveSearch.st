@@ -1,55 +1,63 @@
-(* ═══════════════════════════════════════════════════════════════
-   🌊 FB_DiveSearch — Assistance plongée et recherche du fond Kobold
+(* =======================================================================
+   ⚙️ FB_DiveSearch — Assistance plongée et recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
-   🛡️ Sécurité : T81/T82. Jamais de descente assistée sans séquence 0→1→0 valide.
-   🧩 Responsabilité : qualifie le Kobold et autorise uniquement la descente cohérente.
-   🔌 Interface : intention de descente + mesures → autorisation + fond validé.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Qualification du capteur Kobold et autorisation de descente
+   🛡️ Sécurité : Verrouillage si séquence d'immersion 0->1->0 invalide
+   🔌 Interface : Intention de descente et mesures vers permis de descente
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
 FUNCTION_BLOCK FB_DiveSearch
 VAR_INPUT
-    Enable                 : BOOL;
-    Reset                  : BOOL;
-    PowerContactorEngaged        : BOOL;
-    Mode                   : E_Mode;
-    MotionRequestActive    : BOOL; (* Intention déjà arbitrée en amont *)
-    MotionDirection        : INT;  (* -1 = descente *)
-    BucketIsOpen           : BOOL;
-    KoboldImmersed         : BOOL; (* FALSE hors eau/fond ; TRUE immergé *)
-    M1Position_M           : REAL;
-    M2Position_M           : REAL;
-    PositionsValid         : BOOL;
-    DiveStartMin_M         : REAL;
-    ImmersionUpper_M       : REAL;
-    ImmersionLower_M       : REAL;
-    // 🆕 2026-08-07 (14) — retour terrain, demande explicite : réglages DiveStartMin_M/
-    // ImmersionUpper_M/ImmersionLower_M pas encore calibrés sur site, bloquaient WAIT_PRECONDITIONS
-    // (bit2 config) sans aucun moyen de progresser dans la séquence pendant les essais. Si TRUE,
-    // saute entièrement ErrorCausePresent (bit2) ET le test WAIT_PRECONDITIONS -- transition directe
-    // vers READY_TO_DESCEND. Défaut FALSE : comportement standard inchangé.
-    BypassPreconditions    : BOOL := FALSE;
+    // === COMMANDES & AUTORISATIONS ===
+    Enable                  : BOOL;         // --> [CMD] Activation generale du FB (TRUE=Autorise)
+    Reset                   : BOOL;         // --> [CMD] Acquittement defaut (front)
+    PowerContactorEngaged   : BOOL;         // --> [SAFE] Chaine de securite OK
+    Mode                    : E_Mode;       // --> [CMD] Mode de fonctionnement arbitre
+    MotionRequestActive     : BOOL;         // --> [CMD] Intention de mouvement active
+    MotionDirection         : INT;          // --> [CMD] Sens de mouvement (-1 = descente)
+
+    // === CAPTEURS & ETATS BENNE ===
+    BucketIsOpen            : BOOL;         // --> [HW] Benne ouverte confirmee
+    KoboldImmersed          : BOOL;         // --> [HW] Capteur Kobold immerge (FALSE=hors eau, TRUE=immerge)
+    M1Position_M            : REAL;         // --> [HW] Position codeur treuil M1 (m)
+    M2Position_M            : REAL;         // --> [HW] Position codeur treuil M2 (m)
+    PositionsValid          : BOOL;         // --> [HW] Validite des mesures de position
+
+    // === CONFIGURATION & SEUILS ===
+    DiveStartMin_M          : REAL;         // --> [CFG] Seuil position min pour debut plongee (m)
+    ImmersionUpper_M        : REAL;         // --> [CFG] Borne haute fenetre d'immersion (m)
+    ImmersionLower_M        : REAL;         // --> [CFG] Borne basse fenetre d'immersion (m)
+    BypassPreconditions     : BOOL := FALSE;// --> [TST] Bypass preconditions et seuils (mode test)
 END_VAR
 VAR_OUTPUT
-    Ready                  : BOOL;
-    Busy                   : BOOL;
-    Done                   : BOOL;
-    Error                  : BOOL;
-    ErrorId                : WORD; (* bit0: préconditions, bit1: séquence Kobold invalide, bit2: configuration seuils invalide *)
-    State                  : E_State;
-    StateAtError           : E_State;
-    DiveState              : E_DiveSearchState;
-    DescendPermit          : BOOL; (* Autorise uniquement la demande de descente active *)
-    KoboldMeasureEnable    : BOOL;
-    BottomTouchConfirmed   : BOOL;
-    OperatorActionId       : WORD;
-    OperatorAction         : STRING(120);
+    // === ETATS IEC & DEFECTUOSITES ===
+    Ready                   : BOOL;         // <-- [STAT] FB pret a fonctionner
+    Busy                    : BOOL;         // <-- [STAT] Recherche de fond en cours
+    Done                    : BOOL;         // <-- [STAT] Fond detecte et confirme
+    Error                   : BOOL;         // <-- [STAT] Defaut sequence plongee
+    ErrorId                 : WORD;         // <-- [DIAG] Code erreur bitmask (bit0:precond, bit1:seq, bit2:cfg)
+    State                   : E_State;      // <-- [STAT] Etat IEC standard
+    StateAtError            : E_State;      // <-- [DIAG] Etat IEC au moment du defaut
+    DiveState               : E_DiveSearchState; // <-- [STAT] Phase interne de recherche fond
+
+    // === PERMIS & AUTORISATIONS ===
+    DescendPermit           : BOOL;         // <-- [ACT] Autorisation de descente assistee
+    KoboldMeasureEnable     : BOOL;         // <-- [ACT] Activation mesure/acquisition Kobold
+    BottomTouchConfirmed    : BOOL;         // <-- [STAT] Contact fond valide et confirme
+
+    // === DIAGNOSTIC IHM ===
+    OperatorActionId        : WORD;         // <-- [DIAG] ID action operateur requise
+    OperatorAction          : STRING(120);  // <-- [DIAG] Message explicatif operateur
 END_VAR
 VAR
-    ResetEdge              : R_TRIG;
-    KoboldRiseEdge         : R_TRIG;
-    KoboldFallEdge         : F_TRIG;
-    ImmersionConfirmed     : BOOL;
-    ErrorCausePresent      : BOOL;
+    // === DETECTEURS DE FRONTS ===
+    ResetEdge               : R_TRIG;       // . [LOC] Detecteur front montant Reset
+    KoboldRiseEdge          : R_TRIG;       // . [LOC] Detecteur front entrant eau (0->1)
+    KoboldFallEdge          : F_TRIG;       // . [LOC] Detecteur front sortie eau / fond (1->0)
+
+    // === VARIABLES LOCALES INTERNES ===
+    ImmersionConfirmed      : BOOL;         // . [LOC] Immersion dans la fenetre d'eau validee
+    ErrorCausePresent       : BOOL;         // . [LOC] Presence d'une cause de defaut parametrage
 END_VAR
 
 {region "§1 Gate desactivation"}
