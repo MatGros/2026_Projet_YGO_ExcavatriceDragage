@@ -1,11 +1,10 @@
-(* ═══════════════════════════════════════════════════════════════
-   🚦 E_State — Phase opérationnelle d'un FB métier (valeurs EXCLUSIVES)
+(* =======================================================================
+   ⚙️ E_State — Phase opérationnelle d'un FB métier (valeurs EXCLUSIVES)
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
-   ⚠️ Un seul état à la fois. Error / SafeStop / perte Enable sont
-      ORTHOGONAUX à la phase (voir ErrorId, ne polluent pas State).
-   🧩 Fondation manquante requise par le contrat FB (Partie3 §1).
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Énumération des phases opérationnelles d'un FB métier
+   ⚙️ Machine d'état : Un seul état actif à la fois (orthogonal à Error)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   ======================================================================= *)
 
 TYPE E_State :
 ENUM

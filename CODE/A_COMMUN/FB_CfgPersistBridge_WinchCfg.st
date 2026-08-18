@@ -1,16 +1,19 @@
-(* ═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_WinchCfg — Pont persistance générique pour ST_WinchCfg
+(* =======================================================================
+   💾 FB_CfgPersistBridge_WinchCfg — Pont persistance pour ST_WinchCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Deux instances indépendantes : M1TreuilRetenue.Cfg et M2TreuilBenne.Cfg.
-   Restaure Persist → Hmi au boot si nécessaire, puis sauvegarde Hmi → Persist.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT <-> GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   ======================================================================= *)
 FUNCTION_BLOCK FB_CfgPersistBridge_WinchCfg
-VAR_IN_OUT
-    Hmi     : ST_WinchCfg; (* 🖥️ Struct exposé à l'IHM *)
-    Persist : ST_WinchCfg; (* 💾 Mémoire PERSISTENT *)
-END_VAR
 VAR_OUTPUT
-    JustRestored : BOOL; (* 🔔 TRUE pendant le scan de restauration *)
+    // === ETATS RESTAURATION ===
+    JustRestored            : BOOL;               // <-- [STAT] Vrai sur le cycle de restauration initiale
+END_VAR
+VAR_IN_OUT
+    // === BUS CONFIGURATION ET PERSISTANCE ===
+    Hmi                     : ST_WinchCfg;        // <-> [BUS] Structure de configuration IHM
+    Persist                 : ST_WinchCfg;        // <-> [BUS] Structure de configuration persistante
 END_VAR
 
 JustRestored := FALSE;

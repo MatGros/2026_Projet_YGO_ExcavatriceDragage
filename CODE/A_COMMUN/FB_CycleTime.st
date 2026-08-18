@@ -1,21 +1,25 @@
-(* ═══════════════════════════════════════════════════════════════
-   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+(* =======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
-      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   ======================================================================= *)
 FUNCTION_BLOCK FB_CycleTime
 VAR_INPUT
-    DefaultValueS : REAL := 0.004; (* Valeur de secours par défaut (ex. 4ms) *)
+    // === REGLAGES DE SECOURS ===
+    DefaultValueS           : REAL := 0.004;      // --> [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)
 END_VAR
 VAR_OUTPUT
-    CycleTimeS    : REAL;          (* Temps écoulé réel calculé (secondes) *)
+    // === MESURE ET DIAGNOSTIC ===
+    CycleTimeS              : REAL;               // <-- [DIAG] Temps ecoule reel calcule (secondes)
 END_VAR
 VAR
-    TimeCurrent   : TIME;          (* Temps système actuel *)
-    TimeLast      : TIME;          (* Empreinte de temps du cycle précédent *)
-    DeltaTimeMs   : UDINT;         (* Écart brut calculé (ms) *)
-    InitDone      : BOOL;          (* Drapeau d'initialisation du premier cycle *)
+    // === HORLOGE ET MEMOIRE TEMPORELLE ===
+    TimeCurrent             : TIME;               // . [LOC] Temps systeme actuel
+    TimeLast                : TIME;               // . [LOC] Empreinte de temps du cycle precedent
+    DeltaTimeMs             : UDINT;              // . [LOC] Ecart brut calcule (ms)
+    InitDone                : BOOL;               // . [LOC] Drapeau d'initialisation du premier cycle
 END_VAR
 
 // 1. ACQUISITION DU TEMPS SYSTÈME

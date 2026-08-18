@@ -1,28 +1,55 @@
-(* ═══════════════════════════════════════════════════════════════
-   🩺 FB_Acquisition_Preflight — Verdict passif machine arrêtée
-   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
-   🔒 Observateur pur : aucun SafeStop, PowerCutOff ou ordre machine.
-   ═══════════════════════════════════════════════════════════════ *)
+(* =======================================================================
+   📊 FB_Acquisition_Preflight — Verdict passif machine arrêtée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Verdict passif de qualification E/S machine arrêtée (16 contrôles)
+   🔒 Polarité : Observateur pur (aucun SafeStop, PowerCutOff ou ordre machine)
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §6
+   ======================================================================= *)
 FUNCTION_BLOCK FB_Acquisition_Preflight
 VAR_INPUT
-    Execute : BOOL;
-    MachineIsStill : BOOL;
-    M1BrakeApplied, M2BrakeApplied, M3BrakeApplied : BOOL;
-    M1ContactorsReleased, M2ContactorsReleased, M1ThermalOk, M2ThermalOk : BOOL;
-    BrakeThermalOk, PhaseRotationOk, SlackCableTensioned, M3SensorWordIncoherent : BOOL;
-    EmergencyChainClosed, PowerContactorEngaged, EncoderM1Operational, EncoderM2Operational : BOOL;
-    HomedM1, HomedM2, M1PositionInBounds, M2PositionInBounds : BOOL;
+    // === COMMANDES & ETATS MACHINE ===
+    Execute                 : BOOL; // --> [CMD] Lancement du verdict (front montant)
+    MachineIsStill          : BOOL; // --> [HW]  Machine a l'arret complet (vitesse nulle)
+
+    // === ETATS FREINS & CONTACTEURS ===
+    M1BrakeApplied          : BOOL; // --> [HW]  Frein M1 serre
+    M2BrakeApplied          : BOOL; // --> [HW]  Frein M2 serre
+    M3BrakeApplied          : BOOL; // --> [HW]  Frein M3 serre
+    M1ContactorsReleased    : BOOL; // --> [HW]  Contacteurs M1 retombes
+    M2ContactorsReleased    : BOOL; // --> [HW]  Contacteurs M2 retombes
+
+    // === PROTECTION THERMIQUE & RESEAU ===
+    M1ThermalOk             : BOOL; // --> [HW]  Thermique moteur M1 OK
+    M2ThermalOk             : BOOL; // --> [HW]  Thermique moteur M2 OK
+    BrakeThermalOk          : BOOL; // --> [HW]  Thermique freins OK
+    PhaseRotationOk         : BOOL; // --> [HW]  Ordre des phases reseau OK
+
+    // === CAPTEURS & CHAINE DE SECURITE ===
+    SlackCableTensioned     : BOOL; // --> [HW]  Cable M2 tendu (anti-mou)
+    M3SensorWordIncoherent  : BOOL; // --> [HW]  Incoherence mot capteurs M3
+    EmergencyChainClosed    : BOOL; // --> [SAFE] Chaine d'arret d'urgence fermee
+    PowerContactorEngaged   : BOOL; // --> [HW]  Contacteur de puissance enclenche
+
+    // === CODEURS & HOMING ===
+    EncoderM1Operational    : BOOL; // --> [HW]  Codeur M1 operationnel
+    EncoderM2Operational    : BOOL; // --> [HW]  Codeur M2 operationnel
+    HomedM1                 : BOOL; // --> [HW]  Homing M1 effectue
+    HomedM2                 : BOOL; // --> [HW]  Homing M2 effectue
+    M1PositionInBounds      : BOOL; // --> [HW]  Position M1 dans les bornes
+    M2PositionInBounds      : BOOL; // --> [HW]  Position M2 dans les bornes
 END_VAR
 VAR_OUTPUT
-    PreflightOk : BOOL;
-    PreflightDone : BOOL;
-    PreflightBusy : BOOL;
-    PreflightErrorId : WORD;
+    // === ETATS ET DIAGNOSTIC ===
+    PreflightOk             : BOOL; // <-- [STAT] Verdict preflight OK (aucun defaut)
+    PreflightDone           : BOOL; // <-- [STAT] Verdict preflight termine
+    PreflightBusy           : BOOL; // <-- [STAT] Diagnostic preflight en cours
+    PreflightErrorId        : WORD; // <-- [DIAG] Masque de defauts preflight (16 bits)
 END_VAR
 VAR
-    ExecuteEdge : R_TRIG;
-    BootPending : BOOL := TRUE;
-    RequestPending : BOOL;
+    // === TRIGGERS & ETATS INTERNES ===
+    ExecuteEdge             : R_TRIG;       // . [LOC] Trigger front montant Execute
+    BootPending             : BOOL := TRUE; // . [LOC] Demande preflight initiale au demarrage
+    RequestPending          : BOOL;         // . [LOC] Demande de verdict en attente
 END_VAR
 
 ExecuteEdge(CLK := Execute);

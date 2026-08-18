@@ -55,7 +55,7 @@
 | Sous-tâche | Périmètre | Contenu du Refactor | Statut | Lock Agent | Validation |
 |---|---|---|:---:|:---:|---|
 | **T123-STD** | Documentation Standards | Mise à jour `CODE_QUALITY_STANDARDS.md` & `NAMING_CONVENTION.md` | ✅ | AGY-01 | ✅ Normes rédigées & validées |
-| **T123-A** | `CODE/A_COMMUN/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-A** | `CODE/A_COMMUN/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200..G410 PASS, logique métier 100% intacte) |
 | **T123-B** | `CODE/B_AU_SECURITE/` (9 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
 | **T123-C** | `CODE/C_DIAG_RESEAUX/` (2 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
 | **T123-D** | `CODE/D_JOYSTICK/` (4 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
