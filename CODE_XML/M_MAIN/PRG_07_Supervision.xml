@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T16:21:45.995959" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T16:21:45.995959">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T16:43:12.530183" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T16:43:12.530183">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6134,6 +6134,7 @@ instHmiBannerFormatter(
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     CycleStep             := GVL_IHM.Cycle.State.CycleStep,
     CycleStateStr         := GVL_IHM.Cycle.State.CycleStateStr,
+    CycleErrorId          := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId,
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
     HomingActive          := (NOT PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed),
@@ -8037,6 +8038,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Libellé détaillé de l'étape cycle (FB_Cycle.CycleStateStr)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut cycle (FB_Cycle.ErrorId) — notifié à STABILIZING</xhtml>
+              </documentation>
+            </variable>
             <variable name="DiveState">
               <type>
                 <derived name="E_DiveSearchState" />
@@ -8488,12 +8497,13 @@ END_IF;
 
 {region "§3 Condition spéciale"}
 // ═══════════════════════════════════════════════════════════════
-// 3. CONDITION SPÉCIALE — un seul indicateur bypass/simulation
+// 3. CONDITION SPÉCIALE — un seul indicateur bypass/dérogation
 // Format (AF-07 §4.1) : ATTENTION: &lt;Dérogation / Bridage / Alerte&gt;
 // 🧊 Warning → maintenu min (anti-clignotement), jamais critique.
+// ⚠️ La simulation n'est PAS un bypass : elle n'apparaît que dans le
+//    contexte global (champ 1), jamais ici.
 // ═══════════════════════════════════════════════════════════════
-AnyBypassActive := SimulationModeActive
-                OR BypassGlobalActive
+AnyBypassActive := BypassGlobalActive
                 OR BypassWinchM1Active
                 OR BypassWinchM2Active
                 OR BypassTranslation
@@ -8576,7 +8586,20 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_CycleStep.X13_DONE_SYNC:
             OperatorActionCandidate := '[IHM] Cycle terminé';
         E_CycleStep.STABILIZING:
-            OperatorActionCandidate := '[IHM] Cycle en attente / stabilisation';
+            // Notifier le défaut cycle (ErrorId) — acquittement requis.
+            IF (CycleErrorId AND 16#0002) &lt;&gt; 0 THEN
+                OperatorActionCandidate := '[PUPITRE] Défaut synchronisme treuils - acquitter';
+            ELSIF (CycleErrorId AND 16#0004) &lt;&gt; 0 THEN
+                OperatorActionCandidate := '[IHM] Sélectionner position travail - acquitter';
+            ELSIF (CycleErrorId AND 16#0010) &lt;&gt; 0 THEN
+                OperatorActionCandidate := '[PUPITRE] Écart vitesse M1/M2 - acquitter';
+            ELSIF (CycleErrorId AND 16#0020) &lt;&gt; 0 THEN
+                OperatorActionCandidate := '[PUPITRE] Perte communication IHM - acquitter';
+            ELSIF (CycleErrorId AND 16#0040) &lt;&gt; 0 THEN
+                OperatorActionCandidate := '[PUPITRE] Tempo max d''étape dépassée - acquitter';
+            ELSE
+                OperatorActionCandidate := '[PUPITRE] Défaut cycle - acquitter';
+            END_IF;
         ELSE
             OperatorActionCandidate := '[IHM] Cycle en cours...';
     END_CASE;

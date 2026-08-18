@@ -18,6 +18,7 @@ VAR_INPUT
     // 🔄 Cycle & sous-cycles
     CycleStep            : E_CycleStep;   // --> [HW] Étape cycle
     CycleStateStr        : STRING(80);   // --> [HW] Libellé détaillé de l'étape cycle (FB_Cycle.CycleStateStr)
+    CycleErrorId         : WORD;   // --> [DIAG] Code défaut cycle (FB_Cycle.ErrorId) — notifié à STABILIZING
     DiveState            : E_DiveSearchState;   // --> [HW] État plongée
     ExtractionState      : E_ExtractionSequenceState;   // --> [HW] État extraction
     HomingActive         : BOOL;   // --> [HW] Référencement en cours
@@ -168,12 +169,13 @@ END_IF;
 
 {region "§3 Condition spéciale"}
 // ═══════════════════════════════════════════════════════════════
-// 3. CONDITION SPÉCIALE — un seul indicateur bypass/simulation
+// 3. CONDITION SPÉCIALE — un seul indicateur bypass/dérogation
 // Format (AF-07 §4.1) : ATTENTION: <Dérogation / Bridage / Alerte>
 // 🧊 Warning → maintenu min (anti-clignotement), jamais critique.
+// ⚠️ La simulation n'est PAS un bypass : elle n'apparaît que dans le
+//    contexte global (champ 1), jamais ici.
 // ═══════════════════════════════════════════════════════════════
-AnyBypassActive := SimulationModeActive
-                OR BypassGlobalActive
+AnyBypassActive := BypassGlobalActive
                 OR BypassWinchM1Active
                 OR BypassWinchM2Active
                 OR BypassTranslation
@@ -256,7 +258,20 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_CycleStep.X13_DONE_SYNC:
             OperatorActionCandidate := '[IHM] Cycle terminé';
         E_CycleStep.STABILIZING:
-            OperatorActionCandidate := '[IHM] Cycle en attente / stabilisation';
+            // Notifier le défaut cycle (ErrorId) — acquittement requis.
+            IF (CycleErrorId AND 16#0002) <> 0 THEN
+                OperatorActionCandidate := '[PUPITRE] Défaut synchronisme treuils - acquitter';
+            ELSIF (CycleErrorId AND 16#0004) <> 0 THEN
+                OperatorActionCandidate := '[IHM] Sélectionner position travail - acquitter';
+            ELSIF (CycleErrorId AND 16#0010) <> 0 THEN
+                OperatorActionCandidate := '[PUPITRE] Écart vitesse M1/M2 - acquitter';
+            ELSIF (CycleErrorId AND 16#0020) <> 0 THEN
+                OperatorActionCandidate := '[PUPITRE] Perte communication IHM - acquitter';
+            ELSIF (CycleErrorId AND 16#0040) <> 0 THEN
+                OperatorActionCandidate := '[PUPITRE] Tempo max d''étape dépassée - acquitter';
+            ELSE
+                OperatorActionCandidate := '[PUPITRE] Défaut cycle - acquitter';
+            END_IF;
         ELSE
             OperatorActionCandidate := '[IHM] Cycle en cours...';
     END_CASE;
