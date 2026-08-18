@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:59:38.616047" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:59:38.616047">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:49:22.960284" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:49:22.960284">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -885,6 +885,14 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE pendant 1 cycle si source Winch change</xhtml>
               </documentation>
             </variable>
+            <variable name="SimulationBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass simulation treuils actif (SimulationModeActive AND SimWinchActive AND SimulationBypassActive)</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickDeadmanArmed">
               <type>
                 <BOOL />
@@ -1389,6 +1397,7 @@ WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_S
 TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
 MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
+SimulationBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive;
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}

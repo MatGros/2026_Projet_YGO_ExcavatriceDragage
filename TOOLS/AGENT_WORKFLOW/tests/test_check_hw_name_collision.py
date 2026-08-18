@@ -46,7 +46,7 @@ END_VAR
 
 def test_declaration_dans_prg_non_acquisition_est_une_erreur(tmp_path, monkeypatch) -> None:
     root = tmp_path
-    main_dir = root / "CODE" / "MAIN"
+    main_dir = root / "CODE" / "M_MAIN"
     main_dir.mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config").mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv").write_text(
@@ -64,7 +64,7 @@ def test_declaration_dans_prg_non_acquisition_est_une_erreur(tmp_path, monkeypat
 
 def test_frontiere_acquisition_est_exemptee(tmp_path, monkeypatch) -> None:
     root = tmp_path
-    main_dir = root / "CODE" / "MAIN"
+    main_dir = root / "CODE" / "M_MAIN"
     main_dir.mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config").mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv").write_text(
@@ -86,7 +86,7 @@ def test_pending_field_verification_est_warn_pas_error(tmp_path, monkeypatch) ->
     fonctionne toujours si un futur cas non-verifie terrain doit y transiter."""
     monkeypatch.setattr(check_hw_name_collision, "PENDING_FIELD_VERIFICATION", {"TestPendingVar_RQ"})
     root = tmp_path
-    main_dir = root / "CODE" / "MAIN"
+    main_dir = root / "CODE" / "M_MAIN"
     main_dir.mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config").mkdir(parents=True)
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv").write_text(

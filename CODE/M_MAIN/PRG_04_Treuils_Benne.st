@@ -730,12 +730,12 @@ instSafetyWinchM1(
     // bypass individuel pour le pilotage a l'unite.
     // 🔒 SÉCURITÉ : GVL_Simulation.SimulationBypassActive n'agit QUE si SimulationModeActive=TRUE (strictement inopérant sur machine réelle).
     BypassTopLimitSwitch   := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch
-                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
+                              OR PRG_02_Acquisition.SimulationBypassActive,
     BypassTopLimitSoftware := GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware
-                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
+                              OR PRG_02_Acquisition.SimulationBypassActive,
     BypassCableLimitSwitch := GVL_IHM.M1TreuilRetenue.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
     BypassLimitLegal       := GVL_IHM.M1TreuilRetenue.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal
-                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
+                              OR PRG_02_Acquisition.SimulationBypassActive,
     BypassOperatorComm     := GVL_IHM.M1TreuilRetenue.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M1TreuilRetenue.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M1TreuilRetenue.Bypass.BrakeThermal,
@@ -788,12 +788,12 @@ instSafetyWinchM2(
     // OR avec le bypass commun (Commun.Bypass) -- voir M1 ci-dessus
     // 🔒 SÉCURITÉ : GVL_Simulation.SimulationBypassActive n'agit QUE si SimulationModeActive=TRUE (strictement inopérant sur machine réelle).
     BypassTopLimitSwitch   := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch OR GVL_IHM.Commun.Bypass.TopLimitSwitch
-                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
+                              OR PRG_02_Acquisition.SimulationBypassActive,
     BypassTopLimitSoftware := GVL_IHM.M2TreuilBenne.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware
-                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
+                              OR PRG_02_Acquisition.SimulationBypassActive,
     BypassCableLimitSwitch := GVL_IHM.M2TreuilBenne.Bypass.CableLimitSwitch OR GVL_IHM.Commun.Bypass.CableLimitSwitch,
     BypassLimitLegal       := GVL_IHM.M2TreuilBenne.Bypass.LimitLegal OR GVL_IHM.Commun.Bypass.LimitLegal
-                              OR (GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive),
+                              OR PRG_02_Acquisition.SimulationBypassActive,
     BypassOperatorComm     := GVL_IHM.M2TreuilBenne.Bypass.OperatorComm,
     BypassPhaseRotation    := GVL_IHM.M2TreuilBenne.Bypass.PhaseRotation,
     BypassBrakeThermal     := GVL_IHM.M2TreuilBenne.Bypass.BrakeThermal,
