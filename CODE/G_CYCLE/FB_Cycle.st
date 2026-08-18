@@ -273,11 +273,9 @@ CASE State OF
 
         // Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).
         // P2(2) n'est PAS une destination — capteur de passage en petite vitesse (PV).
-        IF (SelTarget <> 1) AND (SelTarget <> 3) AND (SelTarget <> 4) THEN
-            Error := TRUE;
-            ErrorId := ErrorId OR 16#0004;
-            State := E_CycleStep.STABILIZING;
-        ELSE
+        // Si aucune cible valide n'est sélectionnée, on ATTEND à X2 (pas de défaut) :
+        // l'opérateur choisit la position de travail via l'IHM (SelTarget).
+        IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
             SelectedWorkTarget := SelTarget;
             TranslationCmd.Target := SelTarget;
             TranslationCmd.Start := CycleMotionPermit;

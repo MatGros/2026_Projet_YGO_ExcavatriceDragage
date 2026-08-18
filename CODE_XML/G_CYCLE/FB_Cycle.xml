@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T16:34:00.557844" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T16:34:00.557844">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T17:03:04.335051" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T17:03:04.335051">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1119,11 +1119,9 @@ CASE State OF
 
         // Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).
         // P2(2) n'est PAS une destination — capteur de passage en petite vitesse (PV).
-        IF (SelTarget &lt;&gt; 1) AND (SelTarget &lt;&gt; 3) AND (SelTarget &lt;&gt; 4) THEN
-            Error := TRUE;
-            ErrorId := ErrorId OR 16#0004;
-            State := E_CycleStep.STABILIZING;
-        ELSE
+        // Si aucune cible valide n'est sélectionnée, on ATTEND à X2 (pas de défaut) :
+        // l'opérateur choisit la position de travail via l'IHM (SelTarget).
+        IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
             SelectedWorkTarget := SelTarget;
             TranslationCmd.Target := SelTarget;
             TranslationCmd.Start := CycleMotionPermit;
