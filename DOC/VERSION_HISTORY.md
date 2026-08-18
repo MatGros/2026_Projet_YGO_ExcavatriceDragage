@@ -4,6 +4,12 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `v0.6.8_Refactor_Indexation_Dossiers_Flux_Chronologique` — 2026-08-18 — refactoring architecture dossiers `CODE/` (flux logique chronologique)
+- **Refonte de l'arborescence `CODE/`** : indexation préfixée de `A_COMMUN` à `M_MAIN` pour refléter la logique et la chronologie du flux d'exécution automate :
+  - `A_COMMUN` · `B_AU_SECURITE` · `C_DIAG_RESEAUX` · `D_JOYSTICK` · `E_CODEURS` · `F_MODES` · `G_CYCLE` · `H_TREUILS_BENNE` · `I_TRANSLATION` · `J_SUPERVISION` · `K_DEPANNAGE` · `L_SIMULATION` · `M_MAIN`
+- **Outillage & Gates** : adaptation complète des 18 gates de validation (G100 à G420), hooks bloquants, tests pytest et régénération synchronisée de `CODE_XML/` et `naming_baseline.json`.
+- **Alignement documentaire** : mise à jour des contrats de composants, des fiches AF et des chemins relatifs d'architecture.
+
 ### `v0.6.00_Bascule_Chantier` — 2026-08-07 — transition de version pour la suite des essais
 - **Clôture journée MES** sur `v0.5.25_DepartSoirEssai` (retours terrain : voir `TREUILS_JOYSTICK_SESSION_TERRAIN` ci-dessous)
 - **Passage en `v0.6.00`** pour la suite du chantier et les **prochains essais** (nouvelle architecture)
