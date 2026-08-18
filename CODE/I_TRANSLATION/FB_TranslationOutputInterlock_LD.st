@@ -64,7 +64,6 @@ VAR CONSTANT
     DriveFreqWordMaxHz            : REAL := 600.0;   // Borne haute anti-debordement WORD (Hz)
 END_VAR
 
-{region "§1 Front reset et gate"}
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
 // Le front est échantillonné même pendant Enable/AU faux. Un Reset maintenu
 // durant une gate ne peut donc jamais devenir un faux acquittement au retour.
@@ -89,9 +88,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2);
-{endregion}
 
-{region "§2 Watchdog frein"}
 // ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
 // Pendant RestartInhibit, BrakeCmd reste coupé : l'ordre amont n'est donc plus
 // effectif et le watchdog ne doit pas créer une nouvelle faute en boucle.
@@ -131,9 +128,7 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
-{endregion}
 
-{region "§3 Réarmement anti-redémarrage"}
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
 // Le mot 7 est un reset AC600, pas un neutre opérateur : il reste autorisé avec
 // fréquence nulle mais ne solde pas RestartInhibit. Seul le mot 0, vu APRÈS
@@ -146,9 +141,7 @@ IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
         NeutralRequestSeen := FALSE;
     END_IF;
 END_IF;
-{endregion}
 
-{region "§4 Décision finale"}
 // ── 4. Décision finale : zéro couple utile sans confirmation frein ──────
 DriveControlWord := 0;
 DriveFreqRefHz := 0.0;
@@ -185,11 +178,8 @@ ELSIF MovementRequested THEN
         State := E_State.INIT;
     END_IF;
 END_IF;
-{endregion}
 
-{region "§5 Mise a lechelle"}
 // ── 5. Mise à l'échelle finale REAL Hz -> WORD registre PDO 0x3100 ──────
 // Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
 // DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).
 DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) * DriveFreqWordScale);
-{endregion}

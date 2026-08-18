@@ -75,14 +75,11 @@ VAR
     BrakeTimeoutAck                 : BOOL := TRUE;                  // . [LOC] Acquittement cause timeout frein
 END_VAR
 
-{region "§1 Front reset avant gate"}
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
 // Le front est échantillonné même pendant Enable/AU faux : un Reset maintenu
 // pendant une gate ne devient jamais un faux acquittement au retour.
 ResetEdge(CLK := Reset);
-{endregion}
 
-{region "§2 Gate"}
 // ── 2. GATE : neutralisation sûre ───────────────────────────────────────
 // ErrorId, RestartInhibit et ResetRequired ne sont jamais effacés par une perte
 // Enable/AU : celle-ci coupe uniquement les sorties. Le retour exige toujours un
@@ -107,9 +104,7 @@ RequestedStepClamped := LIMIT(0, RequestedStep, 5);
 // La demande métier reste donc autorisée ici pendant la décélération ; l'interlock
 // ne coupe qu'après sa retombée effective à zéro, sauf gate dur ou défaut final.
 MotorRequest := (RequestedStepClamped > 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
-{endregion}
 
-{region "§2bis Arbitrage error"}
 // ── 2bis. Arbitrage Error/ErrorId AVANT §3/§5 ────────────────────────────
 // ErrorId bit0 (défaut frein) est mis à jour en FIN de scan (§6bis, après BrakeCmd) —
 // la valeur lue ici est donc celle de la fin du scan PRÉCÉDENT (retard d'un scan sur une
@@ -119,9 +114,7 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
-{endregion}
 
-{region "§3 Réarmement anti-redémarrage"}
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
 // Après timeout : cause disparue + front Reset, puis demande moteur à zéro,
 // puis nouvelle demande distincte. La retombée + T#1000ms sera ensuite refaite.
@@ -136,9 +129,7 @@ IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
         Reason := E_WinchFinalInterlockReason.NONE;
     END_IF;
 END_IF;
-{endregion}
 
-{region "§4 Mémorisation arrêt et anti-redémarrage chaud"}
 // ── 4. Mémorisation de l'arrêt : temporisation d'anti-redémarrage chaud ──────────
 // La temporisation RestartDelay (1500ms) s'arme à l'arrêt du mouvement (NOT MotorRequest) et
 // s'écoule pendant la pause à l'arrêt (au lieu de repartir de zéro à chaque nouvel appui) —
@@ -154,9 +145,7 @@ RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;
 END_IF;
-{endregion}
 
-{region "§5 Autorisation moteur"}
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -214,9 +203,7 @@ ELSE
         State := E_WinchFinalInterlockState.READY;
     END_IF;
 END_IF;
-{endregion}
 
-{region "§6 Commande frein"}
 // ── 6. Commande frein — couplage direct ────────────────────────────────
 // BrakeCmd suit STRUCTURELLEMENT RelayFwd/RelayRev, calculé APRÈS leur
 // finalisation ci-dessus (§5) : il hérite donc automatiquement de toutes leurs
@@ -228,9 +215,7 @@ END_IF;
 // pour piloter physiquement la bobine — ce BrakeCmd ici sert de miroir/diagnostic
 // (State, IHM) mais n'est plus câblé sur la sortie physique (voir PRG_06 §2).
 BrakeCmd := RelayFwd OR RelayRev;
-{endregion}
 
-{region "§6bis Watchdog frein"}
 // ── 6bis. Watchdog frein : uniquement sur la commande RÉELLEMENT FINALE ────
 // Watchdog armé sur BrakeCmd (fin §5/§6), JAMAIS sur RequestedRelayFwd/Rev (demande amont pas
 // encore autorisée par le state-machine §5 — RestartRequired peut la retenir jusqu'à T#1000ms,
@@ -261,4 +246,3 @@ IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
 ELSE
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
-{endregion}
