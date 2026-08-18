@@ -1,16 +1,19 @@
-(* ═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_CommunCfg — Pont persistance générique pour ST_CommunCfg
+(* =======================================================================
+   💾 FB_CfgPersistBridge_CommunCfg — Pont persistance pour ST_CommunCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
-   seul le type ST_CommunCfg change.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT <-> GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   ======================================================================= *)
 FUNCTION_BLOCK FB_CfgPersistBridge_CommunCfg
-VAR_IN_OUT
-    Hmi     : ST_CommunCfg; (* 🖥️ ex. GVL_IHM.Commun.Cfg *)
-    Persist : ST_CommunCfg; (* 💾 ex. GVL_PERSISTENT._CommunCfgPersist *)
-END_VAR
 VAR_OUTPUT
-    JustRestored : BOOL;
+    // === ETATS RESTAURATION ===
+    JustRestored            : BOOL;               // <-- [STAT] Vrai sur le cycle de restauration initiale
+END_VAR
+VAR_IN_OUT
+    // === BUS CONFIGURATION ET PERSISTANCE ===
+    Hmi                     : ST_CommunCfg;       // <-> [BUS] Structure de configuration IHM
+    Persist                 : ST_CommunCfg;       // <-> [BUS] Structure de configuration persistante
 END_VAR
 
 JustRestored := FALSE;

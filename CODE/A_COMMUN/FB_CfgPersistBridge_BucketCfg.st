@@ -1,17 +1,19 @@
-(* ═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_BucketCfg — Pont persistance générique pour ST_BucketCfg
+(* =======================================================================
+   💾 FB_CfgPersistBridge_BucketCfg — Pont persistance pour ST_BucketCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
-   seul le type ST_BucketCfg change. La copie struct-à-struct gère aussi le sous-struct imbriqué
-   Config : ST_BucketConfig automatiquement (pas de traitement spécial nécessaire).
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT <-> GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   ======================================================================= *)
 FUNCTION_BLOCK FB_CfgPersistBridge_BucketCfg
-VAR_IN_OUT
-    Hmi     : ST_BucketCfg; (* 🖥️ ex. GVL_IHM.M2TreuilBenne.Bucket.Cfg *)
-    Persist : ST_BucketCfg; (* 💾 ex. GVL_PERSISTENT._BucketCfgPersist *)
-END_VAR
 VAR_OUTPUT
-    JustRestored : BOOL;
+    // === ETATS RESTAURATION ===
+    JustRestored            : BOOL;               // <-- [STAT] Vrai sur le cycle de restauration initiale
+END_VAR
+VAR_IN_OUT
+    // === BUS CONFIGURATION ET PERSISTANCE ===
+    Hmi                     : ST_BucketCfg;       // <-> [BUS] Structure de configuration IHM
+    Persist                 : ST_BucketCfg;       // <-> [BUS] Structure de configuration persistante
 END_VAR
 
 JustRestored := FALSE;

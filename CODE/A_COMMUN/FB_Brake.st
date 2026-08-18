@@ -1,66 +1,54 @@
-(* ═══════════════════════════════════════════════════════════════
-   🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
+(* =======================================================================
+   🛡️ FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
+   🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
+   🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
-                   (règles issues de DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §4)
-   🛠️ Frein à manque de courant : colle au repos (sécurité positive).
-   📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier > 0)
-   📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
-   ⏱️ Séquence démarrage : attend fermeture contacteur + magnétisation
-      moteur AVANT de relâcher (sinon charge retombe → à-coup).
-   ⏱️ Séquence arrêt     : attend décélération/ouverture contacteur AVANT
-      de coller (sinon usure/casse mécanique en plein mouvement).
-   🔍 Double vérification retour contacteur bobine (ST_ContactorCheck) :
-      incohérence commande/retour au-delà de FeedbackTimeout → ErrorId.
-   🆕 REX 2026-08-03 (révocation 2026-07-26) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
-      (DI = 1 ⟺ frein ouvert). Plus d'inversion à la frontière : ce FB reçoit maintenant un
-      signal dans le MÊME sens que `BrakeCmd` en marche saine (TRUE = relâché = ouvert) → le test d'incohérence est `<>`, pas `=`.
-      ⚠️ Ce retour n'est PAS une mesure du frein : il détecte un contacteur/bobine défaillant, mais
-      pas un frein usé ou qui patine. Le patinage reste couvert par Méca A (dérive codeur,
-      FB_Safety_Winch bit7) — pas par ce bloc.
-   ═══════════════════════════════════════════════════════════════ *)
-
-// === DECLARATION (à coller dans la partie déclaration du POU FB_Brake) ===
-
+   ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Brake
 VAR_INPUT
-    Enable              : BOOL;                     // Contexte général (comme tout FB) — FALSE = frein collé (sûr)
-    Reset               : BOOL;                     // Acquittement défaut (front)
-    MovementRequested   : BOOL;                      // TRUE = FB_Winch demande un mouvement (sens+palier actifs)
-    ContactorFeedback   : BOOL;                      // Retour frein (`PRG_02_Acquisition.HwIn`) : TRUE = frein OUVERT (desserré)
-                                                       // 🆕 REX 2026-08-03 : même sens que BrakeCmd (TRUE = relâché)
-                                                       // → en marche normale les deux sont ÉGAUX ; c'est leur
-                                                       //   DIFFÉRENCE qui trahit un contacteur collé (voir §4).
-    DelayContactClose   : TIME := T#100ms;            // Temps de fermeture contacteur de puissance
-    DelayMagnetise      : TIME := T#300ms;            // Délai magnétisation moteur avant ouverture frein
-    DelayMotorDecel     : TIME := T#500ms;            // Délai décélération/ouverture contacteur avant collage frein
-    FeedbackTimeout     : TIME := T#1s;               // Délai max cohérence commande/retour frein
-    BypassContactorCheck: BOOL;                       // 🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,
-                                                       // voir GVL_Simulation.SensorMxContactorFeedbackIsReal, passé
-                                                       // par l'appelant FB_Winch/FB_Translation — TOUJOURS FALSE réel)
+    // === COMMANDES ET CONSIGNES ===
+    Enable                  : BOOL;               // --> [CMD]  Autorisation generale (FALSE = frein colle)
+    Reset                   : BOOL;               // --> [CMD]  Acquittement defaut (front)
+    MovementRequested       : BOOL;               // --> [CMD]  Demande de mouvement (sens+palier actifs)
+
+    // === RETOURS MATERIELS & SIMULATION ===
+    ContactorFeedback       : BOOL;               // --> [HW]   Retour contacteur frein (TRUE = relache/ouvert)
+    BypassContactorCheck    : BOOL;               // --> [TST]  Bypass controle contacteur (simu)
+
+    // === TEMPORISATIONS ET REGLAGES ===
+    DelayContactClose       : TIME := T#100ms;    // --> [CFG]  Temps de fermeture contacteur de puissance
+    DelayMagnetise          : TIME := T#300ms;    // --> [CFG]  Delai magnetisation moteur avant ouverture frein
+    DelayMotorDecel         : TIME := T#500ms;    // --> [CFG]  Delai deceleration avant collage frein
+    FeedbackTimeout         : TIME := T#1s;       // --> [CFG]  Delai max coherence commande/retour frein
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD;          // bit0: "Défaut engagement frein" - incohérence commande/retour frein (collage ou non-relâche)
-    State               : E_State;
-    StateAtError        : E_State;
-    BrakeCmd            : BOOL;          // Commande sortie bobine frein : TRUE = relâché
-    BrakeCommandOpenConfirmed : BOOL;    // TRUE = frein ouvert = commande ouverture confirmée (même sens que ContactorFeedback)
-    ContactorCheck      : ST_ContactorCheck;  // Diag détaillé (IHM / FB_Safety_Winch)
+    // === ETATS IEC & DERIVATION ===
+    Ready                   : BOOL;               // <-- [STAT] FB pret a fonctionner
+    Busy                    : BOOL;               // <-- [STAT] Sequence temporisee en cours
+    Done                    : BOOL;               // <-- [STAT] Frein ouvert/relache confirme
+    Error                   : BOOL;               // <-- [STAT] Defaut actif sur le frein
+    ErrorId                 : WORD;               // <-- [DIAG] Masque de defauts (bit0: incoherence retour)
+    State                   : E_State;            // <-- [STAT] Etat operationnel courant
+    StateAtError            : E_State;            // <-- [STAT] Etat memorise lors du defaut
+
+    // === COMMANDES ET CONFIRMATIONS ===
+    BrakeCmd                : BOOL;               // <-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)
+    BrakeCommandOpenConfirmed : BOOL;            // <-- [STAT] Confirmation ouverture frein pour verrous
+    ContactorCheck          : ST_ContactorCheck;  // <-- [DIAG] Diagnostic detaille retour contacteur
 END_VAR
 VAR
-    ResetEdge           : R_TRIG;
-    ErrorEdge           : R_TRIG;
-    BypassEdge          : R_TRIG;        // 🔑 REX 2026-07-24 : Front montant activation bypass pour réarmement immédiat
-    TonMagnetise        : TON;           // Temporisation avant relâche
-    TonDecel            : TON;           // Temporisation avant collage
-    TonFeedback         : TON;           // Timeout cohérence commande/retour
-END_VAR
+    // === TRIGGERS ET DETECTION FRONTS ===
+    ResetEdge               : R_TRIG;             // . [LOC]  Detecteur front acquittement
+    ErrorEdge               : R_TRIG;             // . [LOC]  Detecteur front apparition defaut
+    BypassEdge              : R_TRIG;             // . [LOC]  Detecteur front activation bypass
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Brake) ===
+    // === TEMPORISATEURS INTERNES ===
+    TonMagnetise            : TON;                // . [LOC]  Temporisation avant relachement frein
+    TonDecel                : TON;                // . [LOC]  Temporisation avant collage frein
+    TonFeedback             : TON;                // . [LOC]  Timeout de coherence commande/retour
+END_VAR
 
 // 🛑 1. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
 IF NOT Enable THEN
