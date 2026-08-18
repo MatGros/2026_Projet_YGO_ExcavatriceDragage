@@ -39,6 +39,7 @@
 | 10 | Audit `CODE_XML` — reliquats & génération | 4 XML orphelins supprimés, génération rendue atomique (`generate_codesys_bundle.py`) | Bug trouvé en revue : purge non-atomique pouvait faire passer `G200` faussement au vert si le générateur échouait — corrigé et testé (2 scénarios d'échec simulés) | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
 | 11 | Audit documentation `DOC/TESTS`, `DOC/WFLOW` | Fusion registre MES (30 entrées, collision `MES-022/023` corrigée), archivage `Architecture/` (migration 7 POU terminée), liens morts corrigés | `ARCHIVES/Doc/` découvert gitignoré (comme `.claude/`/`.vscode/`) — forcé au tracking | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
 | 12 | Refactoring Indexation Dossiers `CODE/` (`A_` à `M_`) | T122-A à T122-D (Phases 1 à 4 terminées) | Aligner explorateur CODESYS sur l'ordre d'exécution MainTask (indexation par lettres `A_COMMUN` .. `M_MAIN`) ; plan détaillé dans `AUDIT_Plan_Refactor_Dossiers_Indexes_v1.0.md` | ✅ | AGY-01 | ✅ Validé (revue experte PASS & 100% Gates verts) |
+| 13 | Standardisation Déclarations ST & En-têtes concis | T123-STD à T123-M | Aligner le rangement des variables (`VAR_INPUT`→`VAR_OUTPUT`→`VAR_IN_OUT`→`VAR`), ajouter les flèches ASCII (`-->`/`<--`/`<->`/`*`/`.`) & tags (`[CMD]`, `[STAT]`, `[INST]`, `[LOC]`), purger les récits REX des en-têtes de code et lier aux AFs. | 🔒 | AGY-01 | 🔒 En cours (Standards à jour, lot par lot par dossier) |
 
 ### 🗂️ Chantier Refactoring Indexation Dossiers CODE (T122-A à T122-D)
 
@@ -48,6 +49,26 @@
 | **T122-B** | Phase 2 | Patch des 8 scripts Python `TOOLS/` & baseline `naming_baseline.json` | `TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE2_PATCH_OUTILLAGE.yaml` | ✅ | AGY-02 | ✅ Validé par l'orchestrateur (PyTest 381 PASS, Baseline OK) |
 | **T122-C** | Phase 3 | Patch cartouches documentaires `DOC/AF/` & Rebuild bundle `CODE_Bundle.xml` | `TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE3_DOCS_ET_BUNDLE.yaml` | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G340 PASS, Bundle 170 objets) |
 | **T122-D** | Phase 4 | Exécution & Validation des Portails Mécaniques (`run_all_gates.py` A, B, C) | `TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE4_VALIDATION_GATES.yaml` | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200 PASS, G300 PASS, G310 PASS) |
+
+### 🏷️ Chantier Standardisation Déclarations & Cartouches (T123-STD à T123-M)
+
+| Sous-tâche | Périmètre | Contenu du Refactor | Statut | Lock Agent | Validation |
+|---|---|---|:---:|:---:|---|
+| **T123-STD** | Documentation Standards | Mise à jour `CODE_QUALITY_STANDARDS.md` & `NAMING_CONVENTION.md` | ✅ | AGY-01 | ✅ Normes rédigées & validées |
+| **T123-A** | `CODE/A_COMMUN/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-B** | `CODE/B_AU_SECURITE/` (9 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-C** | `CODE/C_DIAG_RESEAUX/` (2 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-D** | `CODE/D_JOYSTICK/` (4 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-E** | `CODE/E_CODEURS/` (3 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-F** | `CODE/F_MODES/` (2 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-G** | `CODE/G_CYCLE/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-H** | `CODE/H_TREUILS_BENNE/` (11 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-I** | `CODE/I_TRANSLATION/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-J** | `CODE/J_SUPERVISION/` (1 fichier) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-K** | `CODE/K_DEPANNAGE/` (1 fichier) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-L** | `CODE/L_SIMULATION/` (8 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-M** | `CODE/M_MAIN/` (10 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-VAL** | Validation & Bundle | `run_all_gates.py` + Régénération `CODE_Bundle_v2.xml` | ⬜ | — | — |
 
 ### Règles de conduite
 

@@ -45,23 +45,32 @@
    - **Flèches Vectorielles & Contrats Explicites** : Éléments vectoriels `<svg>` colorés selon le domaine métier et étiquette explicite du signal transmis.
    - *(Référentiel d'édition complet : [`DOC/STDS/GUIDES/GUIDE_EDITION_AF_v1.0.md`](GUIDES/GUIDE_EDITION_AF_v1.0.md))*.
 6. **Cartouche d'Entête des Fichiers Code ST (`CODE/*.st`) & Cohérence AF Stricte** :
-   - **Structure Multi-Lignes à Émojis Sémantiques** : Tout fichier ST commence par un cartouche structuré avec l'émoji du domaine dans la ligne de titre, et des émojis sémantiques distincts par type d'information :
+   - **Concisions & Longueur Maximale (≤ 15 lignes)** : Le cartouche d'entête doit être **ultra-concis, direct et fonctionnel**. Il comporte au maximum 15 lignes de commentaires.
+   - **Purge Absolue du Journal de Chantier / REX** : **Zéro historique REX, dates de correctifs terrain ou compte-rendus d'incidents** dans le cartouche d'entête du code ST (ex: ❌ *« REX 2026-07-01 bug corrigé... »*, ❌ *« ÉVOLUTION D72 suite retour terrain... »*). Tout l'historique vit exclusivement dans `DOC/VERSION_HISTORY.md`, `DOC/AF/` et Git.
+   - **Structure Multi-Lignes & Liste Blanchie d'Emojis** : Tout fichier ST commence par un cartouche structuré utilisant **exclusivement** les émojis de la liste blanchie universelle (visibilité garantie sans carrés vides dans l'éditeur CODESYS 3.5) :
      ```pascal
-     (* ═══════════════════════════════════════════════════════════════
+     (* =======================================================================
         🛡️ FB_Safety_Translation — Anti-télescopage & Verrouillage M3
         ───────────────────────────────────────────────────────────────
         🎯 Rôle : Anti-télescopage Benne/Translation et verrous de sécurité M3
         🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
-        🧩 Architecture : Composition interne Logic/Output
-        📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
-     *)
+        🔌 Architecture : Composition interne Logic/Output
+        📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+        ======================================================================= *)
      ```
-   - **Guide des Émojis Sémantiques de Ligne** :
-     - `🎯 Rôle :` = Rôle principal du composant (recopié à l'identique depuis la spec AF).
-     - `🔒 Polarité / Sécurité :` = Invariant de sécurité ou polarité physique.
-     - `🧩 Architecture / Composition :` = Structure interne ou sous-instances.
-     - `📤 Sorties / Bus :` = Bus de données ou signaux produits.
-     - `📄 Docs :` = Références aux spécifications AF actives dans `DOC/AF/`.
+   - **Guide des Émojis Blanchis Autorisés (Unicode BMP)** :
+     - `🎯` = Rôle principal du composant (recopié de l'AF).
+     - `📄` = Référence exacte à la spec métier active dans `DOC/AF/`.
+     - `🛡️` = Bloc ou fonction de Sécurité Machine.
+     - `🔒` = Polarité, invariant de sécurité ou verrouillage / interlock.
+     - `🔌` = Interface matérielle ou bus de données DUT.
+     - `📥` = Section Entrées / Acquisition.
+     - `📤` = Section Sorties / Ordres Actionneurs.
+     - `⚙️` = Machine d'état / Calcul interne.
+     - `📊` = Diagnostic / Mesures.
+     - `💾` = Donnée Persistante (`GVL_PERSISTENT`).
+     - `🧪` = Mode Test / Simulation.
+     *(Tout autre émoji exotique qui s'afficherait sous forme de carré vide `` selon la police Windows CODESYS est proscrit).*
    - **Source Unique de Vérité (Zéro Dérive)** : Le titre et le rôle décrits dans le cartouche d'entête `.st` doivent être **recopiés à l'identique** depuis l'AF spécifiée (`DOC/AF/`). Le script d'audit valide automatiquement cette cohérence.
 
 1. Le nom dit **le rôle**, jamais le type (`bFlag` ❌, `iCounter` ❌ — le type se lit en déclaration).
@@ -74,6 +83,51 @@ Détail complet (préfixes, suffixes d'unité, polarité booléenne, constructio
 ---
 
 ## 2. Déclaration — ce qu'un automaticien vérifie sans y penser
+
+- **Ordre immuable des blocs de déclaration** :
+  1. `VAR_INPUT` (Entrées)
+  2. `VAR_OUTPUT` (Sorties)
+  3. `VAR_IN_OUT` (Bus et structures partagées)
+  4. `VAR` (Sous-instances FB puis variables locales internes)
+  5. `VAR_STAT` / `VAR CONSTANT` (Si applicables)
+
+- **Flèches ASCII de flux et Tags de rôle en visualisation CODESYS** :
+  Pour maximiser la lisibilité en mode Watch / Visualisation CODESYS 3.5 et identifier immédiatement le flux de données :
+  - **Entrées (`VAR_INPUT`)** : Flèche `-->` suivie du tag `[CMD]` (commande), `[CFG]` (réglage), `[HW]` (matériel/capteur), `[SAFE]` (sécurité/permis), ou `[TST]` (bypasses/tests).
+  - **Sorties (`VAR_OUTPUT`)** : Flèche `<--` suivie du tag `[STAT]` (état/synoptique), `[ACT]` (ordre actionneur), ou `[DIAG]` (diagnostic/mesure).
+  - **In/Out (`VAR_IN_OUT`)** : Flèche bidirectionnelle `<->` suivie du tag `[BUS]`.
+  - **Instances FB (`VAR`)** : Étoile `*` suivie du tag `[INST]`.
+  - **Variables Locales (`VAR`)** : Point `.` suivi du tag `[LOC]` (⚠️ **Ne JAMAIS utiliser `[INT]`** pour éviter la confusion avec le type de donnée `INT` / Integer IEC 61131-3 !).
+
+- **Sous-groupage par Bannières ASCII** :
+  À l'intérieur de chaque bloc (`VAR_INPUT`, `VAR_OUTPUT`, `VAR`), les variables sont regroupées par sous-domaines fonctionnels précédés d'une bannière ASCII `// === TITRE ===`.
+
+- **Exemple de déclaration cible conforme** :
+  ```pascal
+  VAR_INPUT
+      // === COMMANDES & CONSIGNES ===
+      Enable                  : BOOL;   // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+      Direction               : INT;    // --> [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
+
+      // === REGLAGES & CONFIGURATION ===
+      CfgMaxStepDescente      : INT := 3; // --> [CFG] Plafond palier en descente
+  END_VAR
+  VAR_OUTPUT
+      // === ETATS IEC & SYNOPTIQUE ===
+      Ready                   : BOOL;   // <-- [STAT] FB pret a fonctionner
+
+      // === ORDRES ACTIONNEURS (SORTIES TOR) ===
+      RelayFwd                : BOOL;   // <-- [ACT]  Ordre contacteur sens montee
+  END_VAR
+  VAR
+      // === SOUS-INSTANCES FB ===
+      SpeedStep               : FB_SpeedStep; // * [INST] Decodage paliers vitesse
+
+      // === DETECTEURS & TIMERS INTERNES ===
+      ResetEdge               : R_TRIG;       // . [LOC]  Detecteur front montant Reset
+      DirectionDelay          : TON;          // . [LOC]  Temporisation d'inversion
+  END_VAR
+  ```
 
 - **Toute variable est initialisée explicitement** quand sa valeur par défaut n'est pas la valeur
   sûre. Cas vécu : un `BOOL` capteur de sécurité non initialisé démarre à `FALSE` = « défaut »
