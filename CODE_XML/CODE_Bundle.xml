@@ -17739,7 +17739,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             ELSIF (CycleErrorId AND 16#0020) &lt;&gt; 0 THEN
                 OperatorActionCandidate := '[PUPITRE] Perte communication IHM - acquitter';
             ELSIF (CycleErrorId AND 16#0040) &lt;&gt; 0 THEN
-                OperatorActionCandidate := '[PUPITRE] Tempo max d''étape dépassée - acquitter';
+                OperatorActionCandidate := '[PUPITRE] Tempo max étape dépassée - acquitter';
             ELSE
                 OperatorActionCandidate := '[PUPITRE] Défaut cycle - acquitter';
             END_IF;
