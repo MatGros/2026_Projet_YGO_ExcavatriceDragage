@@ -374,6 +374,7 @@ instHmiBannerFormatter(
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     CycleStep             := GVL_IHM.Cycle.State.CycleStep,
     CycleStateStr         := GVL_IHM.Cycle.State.CycleStateStr,
+    CycleErrorId          := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId,
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
     HomingActive          := (NOT PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed),
