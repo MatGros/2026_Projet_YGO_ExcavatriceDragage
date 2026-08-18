@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:37:02.311359" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:37:02.311359">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:35:51.810777" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:35:51.810777">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -401,6 +401,14 @@ Seuils de changement de palier (0..100%)</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
 --&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
               </documentation>
             </variable>
             <variable name="StartStop">

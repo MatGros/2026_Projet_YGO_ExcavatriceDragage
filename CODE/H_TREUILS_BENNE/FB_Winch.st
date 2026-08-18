@@ -11,6 +11,7 @@ FUNCTION_BLOCK PUBLIC FB_Winch
 VAR_INPUT
     // === COMMANDES ET CONSIGNES ===
     Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset                           : BOOL;                           // --> [CMD] Acquittement defaut (front)
     StartStop                       : BOOL;                           // --> [CMD] Ordre de marche/arret mouvement
     Direction                       : INT;                            // --> [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
     SpeedRefPct                     : REAL;                           // --> [CMD] Consigne vitesse % (0.0 a 100.0)
