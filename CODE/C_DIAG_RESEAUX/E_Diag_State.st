@@ -1,6 +1,9 @@
-(* ═══════════════════════════════════════════════════════════════
-   🚦 E_Diag_State — Phases du cycle de diagnostic bus
-   ═══════════════════════════════════════════════════════════════ *)
+(* =======================================================================
+   📊 E_Diag_State — Enumération des états du cycle de diagnostic réseau
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Phases d'état de surveillance diagnostic d'un bus ou équipement
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   ======================================================================= *)
 TYPE E_Diag_State :
 (
     DISABLED   := 0,  (* Désactivé (surveillance non active) *)
