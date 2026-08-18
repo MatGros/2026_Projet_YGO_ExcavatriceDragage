@@ -1,20 +1,17 @@
-(* ═══════════════════════════════════════════════════════════════
+(* =======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de consigne d'axe 4 champs produite par FB_Joystick.
+   📤 Champs : Enable, StartStop, SpeedRef, Direction.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 4 champs exactement :
-      - Enable    : Autorisation globale du pipeline
-      - StartStop : RAMPE (TRUE = accélération, FALSE = décélération normale)
-      - SpeedRef  : Consigne vitesse signée (-100.0 .. +100.0 %)
-      - Direction : Sens d'axe (-1 = Rev, 0 = Neutre, +1 = Fwd)
-   ═══════════════════════════════════════════════════════════════ *)
+   ======================================================================= *)
 
 TYPE ST_Joystick_AxisCmd :
 STRUCT
-    Enable      : BOOL;   // Autorisation FB (FALSE = neutralisation, sorties coupées)
-    StartStop   : BOOL;   // TRUE = rampe accélération, FALSE = rampe décélération normale
-    SpeedRef    : REAL;   // Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)
-    Direction   : INT;    // -1 = Rev, 0 = Neutre, +1 = Fwd
+    // === CONSIGNES DE PILOTAGE AXE ===
+    Enable      : BOOL;   // --> [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
+    StartStop   : BOOL;   // --> [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration)
+    SpeedRef    : REAL;   // --> [CMD] Consigne vitesse signee (-100.0..+100.0 %, signe coherent avec Direction)
+    Direction   : INT;    // --> [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)
 END_STRUCT
 END_TYPE
