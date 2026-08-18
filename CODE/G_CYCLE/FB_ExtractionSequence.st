@@ -1,51 +1,66 @@
-(* ═══════════════════════════════════════════════════════════════
-   ⛏️ FB_ExtractionSequence — Fermeture benne et remontée assistée
+(* =======================================================================
+   ⚙️ FB_ExtractionSequence — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
-   🛡️ Sécurité : aucune remontée assistée sans fond confirmé ; palier 1 au contrôle.
-   🧩 Responsabilité : séquence métier, jamais commande directe de contacteur.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Séquence d'extraction (fermeture benne, remontée de contrôle, remontée nominale)
+   🛡️ Sécurité : Aucune remontée assistée sans fond confirmé, contrôle palier 1
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
 FUNCTION_BLOCK FB_ExtractionSequence
 VAR_INPUT
-    Enable                     : BOOL;
-    Reset                      : BOOL;
-    PowerContactorEngaged            : BOOL;
-    Mode                       : E_Mode;
-    MotionRequestActive        : BOOL;
-    MotionDirection            : INT; (* +1 = montée *)
-    BottomPositionConfirmed    : BOOL;
-    BucketIsClosed             : BOOL;
-    BucketBusy                 : BOOL;
-    BucketError                : BOOL;
-    WinchSyncError             : BOOL;
-    M1Position_M               : REAL;
-    M2Position_M               : REAL;
-    M1MeasuredSpeedValid       : BOOL;
-    M2MeasuredSpeedValid       : BOOL;
-    PositionsValid             : BOOL;
-    ControlAscentDistance_M    : REAL;
+    // === COMMANDES & AUTORISATIONS ===
+    Enable                      : BOOL;     // --> [CMD] Activation generale du FB (TRUE=Autorise)
+    Reset                       : BOOL;     // --> [CMD] Acquittement defaut (front)
+    PowerContactorEngaged       : BOOL;     // --> [SAFE] Chaine de securite OK
+    Mode                        : E_Mode;   // --> [CMD] Mode de fonctionnement arbitre
+    MotionRequestActive         : BOOL;     // --> [CMD] Intention de mouvement active
+    MotionDirection             : INT;      // --> [CMD] Sens de mouvement (+1 = montee)
+    BottomPositionConfirmed     : BOOL;     // --> [SAFE] Attestation fond confirme (Kobold ou op)
+
+    // === CAPTEURS & ETATS MATERIELS ===
+    BucketIsClosed              : BOOL;     // --> [HW] Benne fermee confirmee
+    BucketBusy                  : BOOL;     // --> [HW] Mouvement benne en cours
+    BucketError                 : BOOL;     // --> [SAFE] Defaut sur sous-systeme benne
+    WinchSyncError              : BOOL;     // --> [SAFE] Defaut de desynchronisme treuils M1/M2
+    M1Position_M                : REAL;     // --> [HW] Position codeur treuil M1 (m)
+    M2Position_M                : REAL;     // --> [HW] Position codeur treuil M2 (m)
+    M1MeasuredSpeedValid        : BOOL;     // --> [HW] Validite mesure vitesse M1
+    M2MeasuredSpeedValid        : BOOL;     // --> [HW] Validite mesure vitesse M2
+    PositionsValid              : BOOL;     // --> [HW] Validite des mesures de position
+
+    // === CONFIGURATION & REGLAGES ===
+    ControlAscentDistance_M     : REAL;     // --> [CFG] Distance palier 1 de controle remontee (m)
 END_VAR
 VAR_OUTPUT
-    Ready                      : BOOL;
-    Busy                       : BOOL;
-    Done                       : BOOL;
-    Error                      : BOOL;
-    ErrorId                    : WORD; (* bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: configuration *)
-    State                      : E_State;
-    StateAtError               : E_State;
-    ExtractionState            : E_ExtractionSequenceState;
-    BucketCloseRequest         : BOOL;
-    AscentPermit               : BOOL;
-    ForceMinSpeedStep          : BOOL;
-    BottomConfirmationConsumed : BOOL;
-    OperatorActionId           : WORD;
-    OperatorAction             : STRING(120);
+    // === ETATS IEC & DEFECTUOSITES ===
+    Ready                       : BOOL;     // <-- [STAT] FB pret a fonctionner
+    Busy                        : BOOL;     // <-- [STAT] Extraction en cours
+    Done                        : BOOL;     // <-- [STAT] Remontee nominale atteinte
+    Error                       : BOOL;     // <-- [STAT] Defaut sequence extraction
+    ErrorId                     : WORD;     // <-- [DIAG] Code erreur bitmask (bit0:fond, bit1:ferme, bit2:ctrl, bit3:cfg)
+    State                       : E_State;  // <-- [STAT] Etat IEC standard
+    StateAtError                : E_State;  // <-- [DIAG] Etat IEC au moment du defaut
+    ExtractionState             : E_ExtractionSequenceState; // <-- [STAT] Phase interne extraction
+
+    // === ORDRES & AUTORISATIONS ===
+    BucketCloseRequest          : BOOL;     // <-- [ACT] Demande de fermeture benne
+    AscentPermit                : BOOL;     // <-- [ACT] Autorisation de remontee assistee
+    ForceMinSpeedStep           : BOOL;     // <-- [ACT] Forcage vitesse minimale (palier de controle)
+    BottomConfirmationConsumed  : BOOL;     // <-- [STAT] Signal confirmation fond consomme
+
+    // === DIAGNOSTIC IHM ===
+    OperatorActionId            : WORD;     // <-- [DIAG] ID action operateur requise
+    OperatorAction              : STRING(120); // <-- [DIAG] Message explicatif operateur
 END_VAR
 VAR
-    ResetEdge                  : R_TRIG;
-    ControlStartM1Position_M   : REAL;
-    ControlStartM2Position_M   : REAL;
-    ErrorCausePresent          : BOOL;
+    // === DETECTEURS DE FRONTS ===
+    ResetEdge                   : R_TRIG;   // . [LOC] Detecteur front montant Reset
+
+    // === MEMORISATIONS & POSITIONS INTERNES ===
+    ControlStartM1Position_M    : REAL;     // . [LOC] Position M1 au debut du palier de controle (m)
+    ControlStartM2Position_M    : REAL;     // . [LOC] Position M2 au debut du palier de controle (m)
+
+    // === VARIABLES LOCALES INTERNES ===
+    ErrorCausePresent           : BOOL;     // . [LOC] Presence d'une cause de defaut parametrage
 END_VAR
 
 {region "§1 Gate desactivation"}

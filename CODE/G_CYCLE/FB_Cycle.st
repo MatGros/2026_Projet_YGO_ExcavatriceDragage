@@ -1,119 +1,120 @@
-(* ═══════════════════════════════════════════════════════════════
-   🔄 FB_Cycle — Séquenceur du Cycle Automatique (Grafcet de dragage)
+(* =======================================================================
+   ⚙️ FB_Cycle — Séquenceur du cycle automatique (Grafcet de dragage)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
-   🔌 Conforme au contrat FB standard (Partie3 §1bis) + §11bis R1-R9.
-   🧩 Deux instances : instCycleMaintenance (MAINT_N1/N2) et
-      instCycleSemiAuto (SEMI_AUTO) — gating sorties par mode.
-   🕹️ Homme-mort (D2) : appui = autorisation 3 s ; mouvement continue
-      sans appui ; arrêt au centre du manche (CycleMotionPermit).
-   ⏱️ Tempo max d'étape : lancée SEULEMENT si pilotage joystick actif.
-   🧊 CycleStepAtError : étape spécifique mémorisée avant STABILIZING (R9).
-   🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE — rebouclage sur X0.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Automate de cycle automatique de dragage (X0 à X13 + STABILIZING)
+   🔒 Sécurité : Gating par mode et homme-mort, repli STABILIZING sur défaut
+   🔌 Interface : Demandes de mouvements (treuils, translation, benne)
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Cycle
 VAR_INPUT
-    Enable                  : BOOL;         // Activation générale du séquenceur
-    Reset                   : BOOL;         // Acquittement défaut (front)
-    PowerContactorEngaged   : BOOL;         // Chaîne de sécurité OK
-    Mode                    : E_Mode;       // Mode arbitré (SEMI_AUTO pour l'instance cycle)
-    CycleMotionPermit       : BOOL;         // 🕹️ Manche défléchi (non centré) — D2
-    DeadmanArmed            : BOOL;         // 🔫 Appui homme-mort (fenêtre 3 s)
-    HeartbeatIhmOk          : BOOL;         // 💓 IHM↔PLC valide
+    // === COMMANDES & AUTORISATIONS ===
+    Enable                  : BOOL;         // --> [CMD] Activation generale du sequenceur
+    Reset                   : BOOL;         // --> [CMD] Acquittement defaut (front)
+    PowerContactorEngaged   : BOOL;         // --> [SAFE] Chaine de securite OK
+    Mode                    : E_Mode;       // --> [CMD] Mode arbitre (SEMI_AUTO pour instance cycle)
+    CycleMotionPermit       : BOOL;         // --> [CMD] Manche deflecte (non centre)
+    DeadmanArmed            : BOOL;         // --> [CMD] Appui homme-mort (fenetre 3 s)
+    HeartbeatIhmOk          : BOOL;         // --> [SAFE] IHM<->PLC valide
 
-    // Commandes opérateur
-    StartCycle              : BOOL;         // Demande lancement / reprise (IHM)
-    AbortCycle              : BOOL;         // Demande abandon (IHM) — pas de Pause (D3)
+    // === COMMANDES OPERATEUR ===
+    StartCycle              : BOOL;         // --> [CMD] Demande lancement / reprise (IHM)
+    AbortCycle              : BOOL;         // --> [CMD] Demande abandon (IHM)
 
-    // Cibles et paramètres (réutilise config maintenance — Q4)
-    SelTarget               : INT;          // 🎯 Cible sélectionnée (GVL_IHM.TranslationM3.Cmd.SelTarget) : 1=Trémie, 2=P2, 3=P1, 4=Maintenance
-    SetDepthM               : REAL;         // Profondeur de consigne (négative)
-    SetOffsetM              : REAL;         // Écart de fermeture benne cible
+    // === CIBLES ET CONFIGURATION ===
+    SelTarget               : INT;          // --> [CFG] Cible selectionnee (1=Tremie, 2=P2, 3=P1, 4=Maintenance)
+    SetDepthM               : REAL;         // --> [CFG] Profondeur de consigne (negative)
+    SetOffsetM              : REAL;         // --> [CFG] Ecart de fermeture benne cible
 
-    // Feedbacks physique & matériel
-    KoboldContactFond       : BOOL;         // Retour dédié Kobold : TRUE = contact fond
-    LimitLegalReached       : BOOL;         // Limite légale atteinte (descente interdite)
-    LimitLegalDepthM        : REAL;         // Profondeur légale minimale autorisée
-    WinchSyncError          : BOOL;         // Désynchronisme bloquant M1/M2
-    WinchSyncDeltaM         : REAL;         // Écart codeurs M1/M2 pour diagnostic
-    M1_CablePosM            : REAL;         // Position câble treuil M1 (recalée)
-    M2_CablePosM            : REAL;         // Position câble treuil M2 (recalée)
-    M1_MeasuredSpeedMps     : REAL;         // Vitesse linéaire mesurée M1 (m/s)
-    M2_MeasuredSpeedMps     : REAL;         // Vitesse linéaire mesurée M2 (m/s)
-    SpeedMismatchThresholdMps : REAL;       // Seuil écart vitesse ; 0 = contrôle désactivé
-    SpeedMismatchTimeout    : TIME;         // Durée de confirmation ; 0 = contrôle désactivé
-    CableLimitM1AscentM     : REAL;         // Limite haute d'exploitation M1
+    // === FEEDBACKS CAPTEURS & MATERIEL ===
+    KoboldContactFond       : BOOL;         // --> [HW] Retour dedie Kobold : TRUE = contact fond
+    LimitLegalReached       : BOOL;         // --> [SAFE] Limite legale atteinte (descente interdite)
+    LimitLegalDepthM        : REAL;         // --> [CFG] Profondeur legale minimale autorisee
+    WinchSyncError          : BOOL;         // --> [SAFE] Desynchronisme bloquant M1/M2
+    WinchSyncDeltaM         : REAL;         // --> [HW] Ecart codeurs M1/M2 pour diagnostic
+    M1_CablePosM            : REAL;         // --> [HW] Position cable treuil M1 (recalee)
+    M2_CablePosM            : REAL;         // --> [HW] Position cable treuil M2 (recalee)
+    M1_MeasuredSpeedMps     : REAL;         // --> [HW] Vitesse lineaire mesuree M1 (m/s)
+    M2_MeasuredSpeedMps     : REAL;         // --> [HW] Vitesse lineaire mesuree M2 (m/s)
+    SpeedMismatchThresholdMps : REAL;       // --> [CFG] Seuil ecart vitesse ; 0 = controle desactive
+    SpeedMismatchTimeout    : TIME;         // --> [CFG] Duree de confirmation ; 0 = controle desactive
+    CableLimitM1AscentM     : REAL;         // --> [CFG] Limite haute d'exploitation M1
 
-    // Feedbacks Translation M3
-    Translation_At_P1           : BOOL;     // Capteur position P1 (arrêt travail)
-    Translation_At_Tremie       : BOOL;     // Capteur fin de course trémie
-    Translation_At_Maintenance : BOOL;     // Capteur fin de course maintenance
-    Translation_Busy            : BOOL;     // Mouvement translation en cours
-    Translation_Done            : BOOL;     // Cible translation atteinte
+    // === FEEDBACKS TRANSLATION M3 ===
+    Translation_At_P1           : BOOL;     // --> [HW] Capteur position P1 (arret travail)
+    Translation_At_Tremie       : BOOL;     // --> [HW] Capteur fin de course tremie
+    Translation_At_Maintenance : BOOL;     // --> [HW] Capteur fin de course maintenance
+    Translation_Busy            : BOOL;     // --> [HW] Mouvement translation en cours
+    Translation_Done            : BOOL;     // --> [HW] Cible translation atteinte
 
-    // Feedbacks Benne
-    Benne_Busy              : BOOL;         // Mouvement mâchoires benne en cours
-    Benne_Done              : BOOL;         // Mouvement ouverture/fermeture terminé
-    Benne_IsOpen            : BOOL;         // Benne mécaniquement ouvert mémorisé
-    Benne_IsClosed          : BOOL;         // Benne mécaniquement fermé mémorisé
-    Benne_IsRoughlyClosed   : BOOL;         // 🆕 Benne « à peu près fermée » (tolérance matière)
+    // === FEEDBACKS BENNE ===
+    Benne_Busy              : BOOL;         // --> [HW] Mouvement machoires benne en cours
+    Benne_Done              : BOOL;         // --> [HW] Mouvement ouverture/fermeture termine
+    Benne_IsOpen            : BOOL;         // --> [HW] Benne mecaniquement ouverte memorisee
+    Benne_IsClosed          : BOOL;         // --> [HW] Benne mecaniquement fermee memorisee
+    Benne_IsRoughlyClosed   : BOOL;         // --> [HW] Benne a peu pres fermee (tolerance matiere)
 
-    // 🆕 Référencement (X1_HOMING)
-    HomedM1                 : BOOL;         // Codeur M1 référencé
-    HomedM2                 : BOOL;         // Codeur M2 référencé
-    TopPositionSensor       : BOOL;         // Capteur position haute (référencement)
-    HomingRequest           : BOOL;         // Demande de référencement (front)
+    // === REFERENCEMENT CODEURS ===
+    HomedM1                 : BOOL;         // --> [HW] Codeur M1 reference
+    HomedM2                 : BOOL;         // --> [HW] Codeur M2 reference
+    TopPositionSensor       : BOOL;         // --> [HW] Capteur position haute (referencement)
+    HomingRequest           : BOOL;         // --> [CMD] Demande de referencement (front)
 END_VAR
 VAR_OUTPUT
-    Ready                   : BOOL;         // Séquenceur disponible
-    Busy                    : BOOL;         // Cycle automatique actif
-    Done                    : BOOL;         // Cycle automatique complété
-    Error                   : BOOL;         // Défaut cycle
-    ErrorId                 : WORD;         // bit0: timeout/limite, bit1: désynchronisme, bit2: cible invalide, bit3: stabilisation impossible, bit4: écart vitesse, bit5: perte heartbeat, bit6: tempo max étape
-    SpeedMismatchMps        : REAL;         // Écart absolu vitesse M1/M2 (m/s)
-    SpeedMismatchActive     : BOOL;         // Seuil vitesse dépassé sur le cycle courant
-    SpeedMismatchConfirmed  : BOOL;         // Écart vitesse confirmé pendant SpeedMismatchTimeout
+    // === ETATS IEC & DEFECTUOSITES ===
+    Ready                   : BOOL;         // <-- [STAT] Sequenceur disponible
+    Busy                    : BOOL;         // <-- [STAT] Cycle automatique actif
+    Done                    : BOOL;         // <-- [STAT] Cycle automatique complete
+    Error                   : BOOL;         // <-- [STAT] Defaut cycle
+    ErrorId                 : WORD;         // <-- [DIAG] Code erreur bitmask
+    SpeedMismatchMps        : REAL;         // <-- [DIAG] Ecart absolu vitesse M1/M2 (m/s)
+    SpeedMismatchActive     : BOOL;         // <-- [DIAG] Seuil vitesse depasse sur cycle courant
+    SpeedMismatchConfirmed  : BOOL;         // <-- [DIAG] Ecart vitesse confirme pendant timeout
 
-    // Commandes structurées (demandes de mouvement)
-    WinchM1Cmd              : ST_WinchCmdDemand;        // Demande treuil M1
-    WinchM2Cmd              : ST_WinchCmdDemand;        // Demande treuil M2
-    TranslationCmd          : ST_TranslationCmdDemand;  // Demande translation M3
-    BucketCmd               : ST_BucketCmdDemand;       // Demande benne
+    // === ORDRES ACTIONNEURS (COMMANDES STRUCTUREES) ===
+    WinchM1Cmd              : ST_WinchCmdDemand;        // <-- [ACT] Demande treuil M1
+    WinchM2Cmd              : ST_WinchCmdDemand;        // <-- [ACT] Demande treuil M2
+    TranslationCmd          : ST_TranslationCmdDemand;  // <-- [ACT] Demande translation M3
+    BucketCmd               : ST_BucketCmdDemand;       // <-- [ACT] Demande benne
 
-    // Métadonnées d'affichage IHM
-    CycleStep               : E_CycleStep;  // Étape active du Grafcet
-    CycleStateStr           : STRING(80);   // Libellé en clair de l'étape (Xn - texte)
-    CycleStepAtError        : E_CycleStep;  // 🧊 Étape spécifique au moment du défaut (R9)
+    // === METADONNEES & SYNOPTIQUE ===
+    CycleStep               : E_CycleStep;  // <-- [STAT] Etape active du Grafcet
+    CycleStateStr           : STRING(80);   // <-- [STAT] Libelle en clair de l'etape
+    CycleStepAtError        : E_CycleStep;  // <-- [DIAG] Etape specifique au moment du defaut
 END_VAR
 VAR_IN_OUT
-    SampleCount             : INT;          // 🆕 Compteur de prélèvements (RETAIN, Q3bis) — référence vers _CycleSampleCount
+    // === STRUCTURES PARTAGEES & COMPTEURS ===
+    SampleCount             : INT;          // <-> [BUS] Compteur de prelevements (RETAIN)
 END_VAR
 VAR
-    ResetEdge               : R_TRIG;
-    StartEdge               : R_TRIG;
-    AbortEdge               : R_TRIG;
-    ErrorEdge               : R_TRIG;       // 🧊 Capture CycleStepAtError avant bascule (R9)
+    // === DETECTEURS DE FRONTS ===
+    ResetEdge               : R_TRIG;       // . [LOC] Detecteur front montant Reset
+    StartEdge               : R_TRIG;       // . [LOC] Detecteur front montant StartCycle
+    AbortEdge               : R_TRIG;       // . [LOC] Detecteur front montant AbortCycle
+    ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
 
-    // Séquencement
-    State                   : E_CycleStep := E_CycleStep.X0_PREPARATION;
-    SavedState              : E_CycleStep := E_CycleStep.X0_PREPARATION;
+    // === ETATS INTERNES ===
+    State                   : E_CycleStep := E_CycleStep.X0_PREPARATION; // . [LOC] Etape courante machine d'etat
+    SavedState              : E_CycleStep := E_CycleStep.X0_PREPARATION; // . [LOC] Etape memorisee
 
-    // Mémorisations et Timers
-    TouchPositionM          : REAL;         // Position M1 mémorisée lors du contact fond
-    RaiseTargetM            : REAL;         // Profondeur de remontée mémorisée
-    DrainingTimer           : TON;          // Temporisateur de vidage (égouttage)
-    StabilizationTimer      : TON;          // Temporisation maximale de remontée lente
-    SpeedMismatchTimer      : TON;          // Confirmation temporelle écart de vitesse
-    StepMaxTimer            : TON;          // 🆕 Tempo max d'étape (R5) — lancée si pilotage
-    SelectedWorkTarget      : INT;          // Cible de travail mémorisée (1=Trémie, 3=P1, 4=Maintenance)
+    // === MEMORISATIONS & REGISTRES INTERNES ===
+    TouchPositionM          : REAL;         // . [LOC] Position M1 memorisee lors du contact fond
+    RaiseTargetM            : REAL;         // . [LOC] Profondeur de remontee memorisee
+    SelectedWorkTarget      : INT;          // . [LOC] Cible de travail memorisee
 
-    // Paramètres internes
-    CtrlAscentDistM         : REAL := 2.0;      // Distance de remontée lente de contrôle
-    CtrlAscentToleranceM    : REAL := 0.25;     // Écart maximal admis entre les deux codeurs
-    CtrlAscentTimeout       : TIME := T#30s;    // Temps max pour atteindre la zone de stabilisation
-    DrainingTime            : TIME := T#5s;     // Temps d'égouttage par défaut
-    StepMaxTimeout          : TIME := T#60s;   // 🆕 Tempo max d'étape (à valider, Q4)
+    // === TEMPORISATEURS INTERNES ===
+    DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage)
+    StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
+    SpeedMismatchTimer      : TON;          // . [LOC] Confirmation temporelle ecart de vitesse
+    StepMaxTimer            : TON;          // . [LOC] Tempo max d'etape
+
+    // === CONSTANTES & CONFIGURATIONS INTERNES ===
+    CtrlAscentDistM         : REAL := 2.0;      // . [LOC] Distance de remontee lente de controle
+    CtrlAscentToleranceM    : REAL := 0.25;     // . [LOC] Ecart maximal admis entre codeurs
+    CtrlAscentTimeout       : TIME := T#30s;    // . [LOC] Temps max pour zone de stabilisation
+    DrainingTime            : TIME := T#5s;     // . [LOC] Temps d'egouttage par defaut
+    StepMaxTimeout          : TIME := T#60s;    // . [LOC] Tempo max d'etape
 END_VAR
 
 // === IMPLEMENTATION ===

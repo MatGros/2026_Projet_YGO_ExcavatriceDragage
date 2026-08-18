@@ -1,7 +1,10 @@
-(* ═══════════════════════════════════════════════════════════════
-   ⛏️ E_ExtractionSequenceState — Phases extraction assistée
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
-   ═══════════════════════════════════════════════════════════════ *)
+(* =======================================================================
+   ⚙️ E_ExtractionSequenceState — Phases d'extraction assistée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des phases de la séquence d'extraction assistée
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
+
 TYPE E_ExtractionSequenceState :
 (
     WAIT_BOTTOM_CONFIRMATION := 0, (* Attente fond Kobold ou attestation opérateur *)
