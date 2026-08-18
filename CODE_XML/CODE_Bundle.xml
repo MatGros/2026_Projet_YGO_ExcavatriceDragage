@@ -2051,6 +2051,205 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_ChainCycleSemiAuto">
+        <baseType>
+          <struct>
+            <variable name="Idx101_ModeSemiAutoActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 1. Conditions d'engagement et autorisations
+1 = Mode arbitré SEMI_AUTO actif | 0 = Autre mode</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx102_PowerAndSafetyOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Chaîne de sécurité OK (PowerContactorEngaged)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx103_HeartbeatIhmOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Liaison IHM&lt;-&gt;PLC valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx104_DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton homme-mort armé (fenêtre 3s active)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx105_MancheDeflechi">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Permis mouvement armé (manche hors zone neutre)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx106_HomedM1M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Codeurs treuils M1 et M2 référencés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx107_StartCycleRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Demande Start reçue (IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx108_AbortCycleRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Demande Abort reçue (IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx201_Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 2. État du Séquenceur
+1 = Séquenceur prêt à démarrer</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx202_Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Cycle en cours d'exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx203_Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Cycle terminé avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx204_Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut ou anomalie bloquante sur le cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx205_ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur interne FB_Cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx206_Step">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape courante (X0 à X13 + STABILIZING)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx207_StepStr">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Libellé explicite de l'étape</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx208_StepAtError">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape mémorisée lors du dernier défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx301_TargetPosition">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 3. Consignes &amp; Feedbacks Opérationnels
+Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_TargetDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profondeur de consigne (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_KoboldBottomTouch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Détection contact fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_SpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Alerte écart de vitesse M1/M2 active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_LimitLegalReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Limite légale atteinte (descente bloquée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_WinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Erreur de synchronisme M1/M2</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fe0796b0-cbd2-54bf-ac31-2ae52afe32d2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔄 ST_ChainCycleSemiAuto — Diagnostic chronologique Séquenceur Semi-Auto
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Vue dépannage / Watch CODESYS pour le cycle semi-automatique
+   📄 Doc métier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
+   🔒 Sécurité : 100% lecture seule / diagnostic d'observation
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_ChainDredgingAssist">
         <baseType>
           <struct>
@@ -26125,6 +26324,151 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Maintien canal B</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Séquenceur de cycle semi-automatique
+--&gt; [STAT] Séquenceur prêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Séquenceur terminé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Séquenceur en erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code erreur séquenceur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStep">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Étape courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStepStr">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Libellé étape</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStepAtError">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Étape au défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStartRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande Start</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleAbortRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande Abort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTargetDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Profondeur consigne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleKoboldBottomTouch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contact fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleSpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Écart vitesse M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleLimitLegalReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite légale atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleWinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Erreur synchro treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickDeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Homme-mort armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickAtNeutral">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Joystick au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M1 référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M2 référencé</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -26643,11 +26987,36 @@ GVL_Troubleshooting.MotionM3.SpeedContactor1Active := FALSE; // Non applicable �
 {region "§12 Images entrees reelles et simulees"}
 // === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
 GVL_Troubleshooting.Inputs := HwIn;
-
-
-
-
 {endregion}
+
+{region "§13 Séquenceur de cycle semi-automatique"}
+// === 🔄 12. Diagnostic Chronologique Séquenceur Semi-Auto (CycleSemiAuto) ===
+GVL_Troubleshooting.CycleSemiAuto.Idx101_ModeSemiAutoActive        := (Auth.Mode = E_Mode.SEMI_AUTO);
+GVL_Troubleshooting.CycleSemiAuto.Idx102_PowerAndSafetyOk          := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.CycleSemiAuto.Idx103_HeartbeatIhmOk            := Commun.HeartbeatIhmOk;
+GVL_Troubleshooting.CycleSemiAuto.Idx104_DeadmanArmed              := JoystickDeadmanArmed;
+GVL_Troubleshooting.CycleSemiAuto.Idx105_MancheDeflechi            := NOT JoystickAtNeutral;
+GVL_Troubleshooting.CycleSemiAuto.Idx106_HomedM1M2                 := HomedM1 AND HomedM2;
+GVL_Troubleshooting.CycleSemiAuto.Idx107_StartCycleRequest         := CycleStartRequest;
+GVL_Troubleshooting.CycleSemiAuto.Idx108_AbortCycleRequest         := CycleAbortRequest;
+
+GVL_Troubleshooting.CycleSemiAuto.Idx201_Ready                     := CycleReady;
+GVL_Troubleshooting.CycleSemiAuto.Idx202_Busy                      := CycleAutoBusy;
+GVL_Troubleshooting.CycleSemiAuto.Idx203_Done                      := CycleDone;
+GVL_Troubleshooting.CycleSemiAuto.Idx204_Error                     := CycleError;
+GVL_Troubleshooting.CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
+GVL_Troubleshooting.CycleSemiAuto.Idx206_Step                      := CycleStep;
+GVL_Troubleshooting.CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
+GVL_Troubleshooting.CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;
+
+GVL_Troubleshooting.CycleSemiAuto.Idx301_TargetPosition            := CycleTargetPosition;
+GVL_Troubleshooting.CycleSemiAuto.Idx302_TargetDepth_M             := CycleTargetDepth_M;
+GVL_Troubleshooting.CycleSemiAuto.Idx303_KoboldBottomTouch         := CycleKoboldBottomTouch;
+GVL_Troubleshooting.CycleSemiAuto.Idx304_SpeedMismatchActive       := CycleSpeedMismatchActive;
+GVL_Troubleshooting.CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimitLegalReached;
+GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
+{endregion}
+
 </xhtml>
           </ST>
         </body>
@@ -32318,13 +32687,23 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     M3_PositioningActive  := TRUE;
     SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
     M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
-    M3_SpeedRef_Active   := 100.0;
 
-    // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
-    IF SelTarget = 1 THEN
-        M3_Direction_Active := 1;
+    // 🔒 Gating direction/vitesse sur Start (REX 2026-08-18) : sans Start (cycle à X0),
+    // M3_Direction_Active/M3_SpeedRef_Active restaient non-nuls (SelTarget≠1 → -1, vitesse 100),
+    // ce qui faisait « bouger » M3 en simulation (FB_Sim_Translation ignore Start) et déclenchait
+    // l'escalade fin de course (bit6) → PowerCutOff → éjection SEMI_AUTO. Direction/vitesse
+    // uniquement si le cycle commande réellement le mouvement.
+    IF M3_StartStop_Active THEN
+        M3_SpeedRef_Active := 100.0;
+        // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
+        IF SelTarget = 1 THEN
+            M3_Direction_Active := 1;
+        ELSE
+            M3_Direction_Active := -1;
+        END_IF;
     ELSE
-        M3_Direction_Active := -1;
+        M3_SpeedRef_Active := 0.0;
+        M3_Direction_Active := 0;
     END_IF;
 ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
    OR (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2) THEN
@@ -36876,7 +37255,25 @@ instTroubleshootingView(
     PowerCutOffActive    := PRG_06_Outputs_LD.PowerCutOffActive,
     ArmingPulseActive    := PRG_06_Outputs_LD.EmergencyArmingPulseActive,
     MaintainAActive      := PRG_06_Outputs_LD.PowerKeepAliveACmd,
-    MaintainBActive      := PRG_06_Outputs_LD.PowerKeepAliveBCmd
+    MaintainBActive      := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
+    CycleReady           := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready,
+    CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Done,
+    CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Error,
+    CycleErrorId         := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId,
+    CycleStep            := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep,
+    CycleStepStr         := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStateStr,
+    CycleStepAtError     := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
+    CycleStartRequest    := GVL_IHM.Cycle.Cmd.BtnStart,
+    CycleAbortRequest    := GVL_IHM.Cycle.Cmd.BtnAbort,
+    CycleTargetDepth_M   := GVL_IHM.Cycle.Cfg.SetDepth_M,
+    CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
+    CycleSpeedMismatchActive := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive,
+    CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
+    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Error,
+    JoystickDeadmanArmed := PRG_02_Acquisition.JoystickDeadmanArmed,
+    JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
+    HomedM1              := PRG_02_Acquisition.instHomingM1.Homed,
+    HomedM2              := PRG_02_Acquisition.instHomingM2.Homed
 );
 
 {endregion}
@@ -37611,6 +38008,14 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie</xhtml>
           </documentation>
         </variable>
+        <variable name="CycleSemiAuto">
+          <type>
+            <derived name="ST_ChainCycleSemiAuto" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 6. Séquenceur de Cycle Semi-Automatique (X0 à X13)</xhtml>
+          </documentation>
+        </variable>
         <variable name="HomingM1">
           <type>
             <derived name="ST_HomingChecklist" />
@@ -37783,6 +38188,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
             <Object Name="ST_ChainBucket" ObjectId="7699fad2-6e4d-5ba2-8474-a7ccec9b870d" />
             <Object Name="ST_ChainContextGlobal" ObjectId="601b64cb-498b-5fca-a2a0-11b24726fea1" />
+            <Object Name="ST_ChainCycleSemiAuto" ObjectId="fe0796b0-cbd2-54bf-ac31-2ae52afe32d2" />
             <Object Name="ST_ChainDredgingAssist" ObjectId="26bb9fd2-df98-54a5-a16a-738f3d1532cd" />
             <Object Name="ST_ChainTranslation" ObjectId="7dbc6f0d-3311-5752-8222-088008af3b8a" />
             <Object Name="ST_ChainWinch" ObjectId="cfbad681-bc46-5033-b562-e37133b1f706" />

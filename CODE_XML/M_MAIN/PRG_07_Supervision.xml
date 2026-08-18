@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:03:27.924564" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:03:27.924564">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T15:59:02.161116" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T15:59:02.161116">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6207,7 +6207,25 @@ instTroubleshootingView(
     PowerCutOffActive    := PRG_06_Outputs_LD.PowerCutOffActive,
     ArmingPulseActive    := PRG_06_Outputs_LD.EmergencyArmingPulseActive,
     MaintainAActive      := PRG_06_Outputs_LD.PowerKeepAliveACmd,
-    MaintainBActive      := PRG_06_Outputs_LD.PowerKeepAliveBCmd
+    MaintainBActive      := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
+    CycleReady           := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready,
+    CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Done,
+    CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Error,
+    CycleErrorId         := PRG_03_Modes_Cycle.instCycleSemiAuto.ErrorId,
+    CycleStep            := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep,
+    CycleStepStr         := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStateStr,
+    CycleStepAtError     := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
+    CycleStartRequest    := GVL_IHM.Cycle.Cmd.BtnStart,
+    CycleAbortRequest    := GVL_IHM.Cycle.Cmd.BtnAbort,
+    CycleTargetDepth_M   := GVL_IHM.Cycle.Cfg.SetDepth_M,
+    CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
+    CycleSpeedMismatchActive := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive,
+    CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
+    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Error,
+    JoystickDeadmanArmed := PRG_02_Acquisition.JoystickDeadmanArmed,
+    JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
+    HomedM1              := PRG_02_Acquisition.instHomingM1.Homed,
+    HomedM2              := PRG_02_Acquisition.instHomingM2.Homed
 );
 
 {endregion}
@@ -8861,6 +8879,151 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Maintien canal B</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Séquenceur de cycle semi-automatique
+--&gt; [STAT] Séquenceur prêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Séquenceur terminé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Séquenceur en erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code erreur séquenceur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStep">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Étape courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStepStr">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Libellé étape</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStepAtError">
+              <type>
+                <derived name="E_CycleStep" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Étape au défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleStartRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande Start</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleAbortRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande Abort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTargetDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Profondeur consigne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleKoboldBottomTouch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contact fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleSpeedMismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Écart vitesse M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleLimitLegalReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite légale atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleWinchSyncError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Erreur synchro treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickDeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Homme-mort armé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickAtNeutral">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Joystick au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M1 référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M2 référencé</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -9379,11 +9542,36 @@ GVL_Troubleshooting.MotionM3.SpeedContactor1Active := FALSE; // Non applicable �
 {region "§12 Images entrees reelles et simulees"}
 // === 📥 11. Image Complète des Entrées Réelles / Simulées (Inputs) ===
 GVL_Troubleshooting.Inputs := HwIn;
-
-
-
-
 {endregion}
+
+{region "§13 Séquenceur de cycle semi-automatique"}
+// === 🔄 12. Diagnostic Chronologique Séquenceur Semi-Auto (CycleSemiAuto) ===
+GVL_Troubleshooting.CycleSemiAuto.Idx101_ModeSemiAutoActive        := (Auth.Mode = E_Mode.SEMI_AUTO);
+GVL_Troubleshooting.CycleSemiAuto.Idx102_PowerAndSafetyOk          := HwIn.Machine.PowerContactorEngaged_DI;
+GVL_Troubleshooting.CycleSemiAuto.Idx103_HeartbeatIhmOk            := Commun.HeartbeatIhmOk;
+GVL_Troubleshooting.CycleSemiAuto.Idx104_DeadmanArmed              := JoystickDeadmanArmed;
+GVL_Troubleshooting.CycleSemiAuto.Idx105_MancheDeflechi            := NOT JoystickAtNeutral;
+GVL_Troubleshooting.CycleSemiAuto.Idx106_HomedM1M2                 := HomedM1 AND HomedM2;
+GVL_Troubleshooting.CycleSemiAuto.Idx107_StartCycleRequest         := CycleStartRequest;
+GVL_Troubleshooting.CycleSemiAuto.Idx108_AbortCycleRequest         := CycleAbortRequest;
+
+GVL_Troubleshooting.CycleSemiAuto.Idx201_Ready                     := CycleReady;
+GVL_Troubleshooting.CycleSemiAuto.Idx202_Busy                      := CycleAutoBusy;
+GVL_Troubleshooting.CycleSemiAuto.Idx203_Done                      := CycleDone;
+GVL_Troubleshooting.CycleSemiAuto.Idx204_Error                     := CycleError;
+GVL_Troubleshooting.CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
+GVL_Troubleshooting.CycleSemiAuto.Idx206_Step                      := CycleStep;
+GVL_Troubleshooting.CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
+GVL_Troubleshooting.CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;
+
+GVL_Troubleshooting.CycleSemiAuto.Idx301_TargetPosition            := CycleTargetPosition;
+GVL_Troubleshooting.CycleSemiAuto.Idx302_TargetDepth_M             := CycleTargetDepth_M;
+GVL_Troubleshooting.CycleSemiAuto.Idx303_KoboldBottomTouch         := CycleKoboldBottomTouch;
+GVL_Troubleshooting.CycleSemiAuto.Idx304_SpeedMismatchActive       := CycleSpeedMismatchActive;
+GVL_Troubleshooting.CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimitLegalReached;
+GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
+{endregion}
+
 </xhtml>
           </ST>
         </body>
