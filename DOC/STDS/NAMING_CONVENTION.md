@@ -39,6 +39,26 @@
 | `inst` | Instance d'un FB (variable) | `instJoystick`, `instWinchM1`, `instModes` |
 | `PRG_` | Programme (POU principal) | `PRG_ACQUISITION_CFC`, `PRG_OUTPUTS_LD` |
 
+### Tags de Rôle & Flèches de Flux en Déclaration ST (Fenêtre Watch CODESYS)
+
+Dans la partie déclaration des fichiers `.st`, chaque variable est documentée en fin de ligne par sa flèche ASCII de flux et son tag de sous-domaine (*voir `CODE_QUALITY_STANDARDS.md §2`*) :
+
+| Tag | Sens Flux | Usage | Exemple |
+|---|---|---|---|
+| `[CMD]` | `-->` (Entrée) | Commande / Consigne opérateur ou POU amont | `Direction : INT; // --> [CMD] Sens (-1,0,1)` |
+| `[CFG]` | `-->` (Entrée) | Paramètre de configuration / Seuil / Tempo | `CfgMaxStep : INT; // --> [CFG] Plafond palier` |
+| `[HW]` | `-->` (Entrée) | Retour matériel / Capteur physique TOR-ANA | `Homed : BOOL; // --> [HW] Etat reference` |
+| `[SAFE]`| `-->` (Entrée) | Permis de sécurité / Câblage verrous | `DescendPermit : BOOL; // --> [SAFE] Permis descente` |
+| `[TST]` | `-->` (Entrée) | Forçage simulation / Bypass de test | `BypassGlobal : BOOL; // --> [TST] Bypass defauts` |
+| `[STAT]`| `<--` (Sortie) | État IEC / Synoptique public | `Ready : BOOL; // <-- [STAT] FB pret` |
+| `[ACT]` | `<--` (Sortie) | Ordre vers actionneur physique (Contacteur/Relais) | `RelayFwd : BOOL; // <-- [ACT] Contacteur montee` |
+| `[DIAG]`| `<--` (Sortie) | Code défaut / Mesure d'exploitation / Miroir | `ErrorId : WORD; // <-- [DIAG] Code defaut` |
+| `[BUS]` | `<->` (InOut) | Structure ou bus bidirectionnel | `HmiBus : ST_HMI; // <-> [BUS] Bus IHM` |
+| `[INST]`| `*` (Interne) | Sous-instance de Function Block | `SpeedStep : FB_SpeedStep; // * [INST] Decodage` |
+| `[LOC]` | `.` (Interne) | Variable locale interne (Timer, Trigger, Calcul) | `ResetEdge : R_TRIG; // . [LOC] Front Reset` |
+
+*(⚠️ **Ne jamais utiliser `[INT]`** comme tag pour éviter toute confusion avec le type IEC `INT`).*
+
 ### Structures de données (DUT) — Convention hiérarchique
 
 ```text
