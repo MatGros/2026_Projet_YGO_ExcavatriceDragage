@@ -12,13 +12,11 @@ en mode fichier — ils s'exécuteront sur le bundle complet (palier C).
 
 Usage:
     python run_all_gates.py                       # tout (comportement historique)
-    python run_all_gates.py --palier A            # bloc isolé : G100, G110
+    python run_all_gates.py --palier A            # bloc isolé : G100, G110 (rapide < 1s)
     python run_all_gates.py --palier B            # liens/dépendances : G200, G210
     python run_all_gates.py --palier C            # fin de lot : G300..G420
     python run_all_gates.py --palier D            # sur demande : G500 (avec --codesys-log)
-    python run_all_gates.py --files CODE/TRANSLATION/FB_TranslationOutputInterlock_LD.st
-    python run_all_gates.py --palier A --files CODE/MAIN/PRG_02_Acquisition.st
-    python run_all_gates.py --palier B --codesys-log build.log   # B + compilation
+    python run_all_gates.py --files CODE/08_TRANSLATION/FB_Translation.st
 """
 
 from __future__ import annotations
@@ -26,6 +24,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 
@@ -35,15 +34,12 @@ def run(cmd: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
 
 
 # ── Paliers (GUIDE_GATES_ET_TESTS_v1.2.md §2) — tranche d'ID par palier ──────────
-# Chaque gate = (palier, id, titre, commande). L'ordre de PLANS est l'ordre
-# historique d'exécution du mode "tout" ; --palier filtre sur le palier.
 S = "TOOLS/AGENT_WORKFLOW/scripts"
 
 
 def _py313() -> str:
     py313 = Path("C:/Python313/python.exe")
     if not py313.exists():
-        print("WARNING: Python 3.13 introuvable, interpreteur courant utilise", file=sys.stderr)
         return sys.executable
     return str(py313)
 
@@ -78,16 +74,11 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
 ]
 
 PALIERS = {"A", "B", "C", "D"}
-
-# Gates applicables à un fichier unique (FB/fonction/POU isolé). Les autres gates
-# (structure, bundle, liens doc, persistance...) sont globaux : ils ne s'exécutent
-# pas en mode --files et sont signalés comme non applicables, sans bloquer.
 FILE_SCOPED_GATES = {"100", "110", "200"}
 
 
 def select_plan(palier: str | None) -> list[tuple[str, str, str, list[str]]]:
     if palier is None:
-        # Mode "tout" : tous les paliers, ordre historique (exclut G500 sans log)
         return [g for g in PLANS if g[0] != "D"]
     palier = palier.upper()
     if palier not in PALIERS:
@@ -96,25 +87,18 @@ def select_plan(palier: str | None) -> list[tuple[str, str, str, list[str]]]:
 
 
 def main() -> int:
+    start_total_time = time.perf_counter()
     parser = argparse.ArgumentParser(description="Run project gates, par palier (A/B/C/D) ou tout")
-    parser.add_argument("--palier", choices=sorted(PALIERS), help="Palier a executer (menu par intention, GUIDE_GATES_ET_TESTS_v1.2.md §2)")
+    parser.add_argument("--palier", choices=sorted(PALIERS), help="Palier à exécuter (menu par intention, GUIDE_GATES_ET_TESTS_v1.2.md §2)")
     parser.add_argument("--codesys-log", type=Path, help="Log de compilation CODESYS (palier D)")
     parser.add_argument("--files", nargs="+", type=Path, help="Cibler un/des fichier(s) .st : seuls les gates applicables à un bloc isolé s'exécutent (G100, G110, G200)")
     parser.add_argument("--skip-codesys", action="store_true", help="Ne pas lancer G500 même si --codesys-log fourni")
     parser.add_argument("--strict", action="store_true", help="Fail on any warning")
-    parser.add_argument(
-        "--fail-fast",
-        action="store_true",
-        help="S'arreter au premier gate rouge (defaut : tout executer puis resumer)",
-    )
+    parser.add_argument("--fail-fast", action="store_true", help="S'arrêter au premier gate rouge")
     args = parser.parse_args()
 
-    root = Path(__file__).resolve().parents[3]
-    project_root = root
+    project_root = Path(__file__).resolve().parents[3]
 
-    # --files : cibler un/des fichier(s) isolé(s). On vérifie l'existence, puis on ne
-    # retient QUE les gates applicables à un bloc isolé (FILE_SCOPED_GATES). Les gates
-    # globaux sont signalés comme non applicables en mode fichier, sans bloquer.
     file_mode = bool(args.files)
     skipped_global: list[tuple[str, str]] = []
     if file_mode:
@@ -124,12 +108,7 @@ def main() -> int:
                 return 2
         base_plan = select_plan(args.palier)
         plan = [g for g in base_plan if g[1] in FILE_SCOPED_GATES]
-        skipped_global = [
-            (g[1], g[2]) for g in base_plan if g[1] not in FILE_SCOPED_GATES
-        ]
-        # G100/G110 : remplacer le scope positionnel ("CODE") par le/les fichier(s) —
-        # sinon argparse reçoit 2 arguments positionnels et refuse.
-        # G200 : construire --files (déjà multi-fichier).
+        skipped_global = [(g[1], g[2]) for g in base_plan if g[1] not in FILE_SCOPED_GATES]
         rebuilt: list[tuple[str, str, str, list[str]]] = []
         for pal, gid, title, cmd in plan:
             if gid in ("100", "110"):
@@ -140,51 +119,44 @@ def main() -> int:
                         rebuilt.append((pal, gid, f"{title} ({f.name})", [sys.executable, f"{S}/{Path(cmd[1]).name}", str(f)]))
             elif gid == "200":
                 rebuilt.append((pal, gid, title, [sys.executable, f"{S}/G200_check_linkage.py", "--files"] + [str(f) for f in args.files]))
-        # REX 2026-08-13 (PRG_02_Acquisition_LD scratch) : un fichier `_LD.st` isolé doit
-        # aussi PROUVER sa convertibilité en XML Ladder valide (index out of range à
-        # l'import CODESYS sinon). On convertit dans un XML temporaire puis on valide
-        # les invariants LD (G410) dessus — le "XML bien formé" ne prouve jamais l'import.
         for f in args.files:
             if f.name.endswith("_LD.st"):
-                rebuilt.append(("A", "410x", f"LD convertible + invariants ({f.name})",
-                                [sys.executable, f"{S}/check_ld_file.py", str(f)]))
+                rebuilt.append(("A", "410x", f"LD convertible + invariants ({f.name})", [sys.executable, f"{S}/check_ld_file.py", str(f)]))
         plan = rebuilt
     else:
         plan = select_plan(args.palier)
 
-    # REX 2026-07-29 : le runner s'arretait au premier echec. Un seul gate rouge
-    # preexistant masquait donc l'etat de TOUS les suivants. On execute tout, on resume a la fin.
-    results: list[tuple[str, bool]] = []
+    results: list[tuple[str, bool, float]] = []
 
     def gate(title: str, cmd: list[str]) -> bool:
         print("\n" + "=" * 60)
         print(title.encode("ascii", "replace").decode("ascii"))
         print("=" * 60)
+        t0 = time.perf_counter()
         code, out, err = run(cmd, project_root)
+        duration = time.perf_counter() - t0
         if out.strip():
             print(out.strip().encode("ascii", "replace").decode("ascii"))
         if err.strip():
             print(err.strip().encode("ascii", "replace").decode("ascii"), file=sys.stderr)
-        results.append((title, code == 0))
+        print(f"[TEMPS] Durée gate : {duration:.2f}s")
+        results.append((title, code == 0, duration))
         return code == 0
 
     for gid, title in skipped_global:
         print("\n" + "=" * 60)
         print(title)
         print("=" * 60)
-        print(f"[--] Gate {gid} global : non applicable en mode --files (bloc isolé). "
-              f"S'exécutera sur le bundle complet (palier C).")
-        results.append((f"{title} [non applicable : gate global, bundle requis]", True))
+        print(f"[--] Gate {gid} global : non applicable en mode --files (bloc isolé). S'exécutera sur le bundle complet (palier C).")
+        results.append((f"{title} [non applicable : gate global, bundle requis]", True, 0.0))
 
-    # G500 (palier D) réclame un log CODESYS : sans --codesys-log, message informatif
-    # (validation sur demande) au lieu d'un échec d'usage.
     d_plan = [g for g in plan if g[1] == "500"]
     if d_plan and not args.codesys_log and not args.skip_codesys:
         print("\n" + "=" * 60)
         print("G500 — Compilation CODESYS (log)")
         print("=" * 60)
         print("Palier D = validation sur demande : fournir --codesys-log <build.log> pour exécuter G500.")
-        results.append(("G500 — Compilation CODESYS (log) [sauté : aucun log fourni]", True))
+        results.append(("G500 — Compilation CODESYS (log) [sauté : aucun log fourni]", True, 0.0))
         plan = [g for g in plan if g[1] != "500"]
 
     for _, _id, title, cmd in plan:
@@ -192,7 +164,6 @@ def main() -> int:
         if not ok and args.fail_fast:
             break
 
-    # G500 (palier D) : exécuté seulement si un log CODESYS est fourni, sauf --skip-codesys
     if not args.skip_codesys and args.codesys_log and not d_plan:
         gate("G500 — GATE 6: Compilation CODESYS", [
             sys.executable, f"{S}/G500_check_codesys_compile.py",
@@ -200,18 +171,25 @@ def main() -> int:
             "--max-warnings", "0" if args.strict else "10",
         ])
 
+    total_duration = time.perf_counter() - start_total_time
+
     print("\n" + "=" * 60)
     if file_mode:
         label = "FICHIER(S) " + " ".join(str(f) for f in args.files)
     else:
         label = f"PALIER {args.palier.upper()}" if args.palier else "TOUT"
-    print(f"RESUME — {label}")
+    print(f"RESUME — {label} (Temps total : {total_duration:.2f}s)")
     print("=" * 60)
-    failed = [title for title, ok in results if not ok]
-    for title, ok in results:
-        print(f"  {'PASS' if ok else 'FAIL'}  {title}")
+    failed = [title for title, ok, _dur in results if not ok]
+    for title, ok, dur in results:
+        status_str = "PASS" if ok else "FAIL"
+        print(f"  {status_str:4s}  [{dur:6.2f}s]  {title}")
+    
+    print("-" * 60)
+    print(f"TEMPS TOTAL DE L'EXECUTION : {total_duration:.2f} secondes")
+    
     if failed:
-        print(f"\n{len(failed)} gate(s) en echec sur {len(results)} :")
+        print(f"\n[FAIL] {len(failed)} gate(s) en echec sur {len(results)} :")
         for title in failed:
             print(f"  - {title}")
         return 1
@@ -220,4 +198,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())
