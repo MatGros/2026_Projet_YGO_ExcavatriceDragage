@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-12T21:43:48.381961" />
+  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-12T21:43:48.381961">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_Global">
+        <variable name="BlinkClock">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Horloge clignotement système (IHM/diag), rythme réglable GVL_PERSISTENT</xhtml>
+          </documentation>
+        </variable>
+        <variable name="M1RelayFwd">
+          <type>
+            <BOOL />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">── [COMMANDES FINALES ET INTERLOCKS RECOPIÉS DE PRG_10_Outputs_LD] ──────────────────────────
+Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERVISION_CFC et PRG_TROUBLESHOOTING_CFC</xhtml>
+          </documentation>
+        </variable>
+        <variable name="M1RelayRev">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M1SpeedContactor1">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M1SpeedContactor2">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M1SpeedContactor3">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M1SpeedContactor4">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M1BrakeCmd">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M2RelayFwd">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M2RelayRev">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M2SpeedContactor1">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M2SpeedContactor2">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M2SpeedContactor3">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M2SpeedContactor4">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="M2BrakeCmd">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="TranslationBrakeCmd">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="EmergencyArmingPulseActive">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="EmergencyArmingLockoutActive">
+          <type>
+            <BOOL />
+          </type>
+        </variable>
+        <variable name="ArmingSeqStep">
+          <type>
+            <INT />
+          </type>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>51cb1508-137d-505a-a2f0-d30091cada6c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🌐 GVL_Global — Variables globales d'utilité générale
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les signaux et horloges système partagés qui
+      ne sont pas spécifiques à la logique de simulation ni raccordés
+      à des calibrations persistantes.
+   🔧 REX 2026-07-16 : BlinkClock1Hz renommé BlinkClock — alimenté via Util.BLINK
+      (asymétrique, durées réglables GVL_PERSISTENT._BlinkTimeOn/_BlinkTimeOff,
+      câblage dans PRG_SUPERVISION_CFC §0). Le nom "1Hz" n'a plus de sens dès que
+      le rythme n'est pas symétrique 500ms/500ms.
+   💡 Besoin d'un AUTRE rythme pour un voyant particulier (pas celui-ci) ?
+      Instancier son propre `BLINK` (lib Util) localement plutôt que de détourner
+      ce bit partagé — voir Partie3 §0 (réutilisation obligatoire des libs).
+   ═══════════════════════════════════════════════════════════════
+    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="M_MAIN">
+          <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
