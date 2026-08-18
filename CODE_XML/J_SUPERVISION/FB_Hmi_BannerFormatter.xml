@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T16:56:04.528102" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T16:56:04.528102">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T16:57:55.288968" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T16:57:55.288968">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1022,7 +1022,8 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_CycleStep.X11_OPEN_DUMP: StepAtErrorStr := 'X11 (vidage benne)';
                 E_CycleStep.X13_DONE_SYNC: StepAtErrorStr := 'X13 (cycle terminé)';
                 E_CycleStep.STABILIZING: StepAtErrorStr := 'X14 (stabilisation)';
-                ELSE: StepAtErrorStr := '?';
+                ELSE
+                    StepAtErrorStr := '?';
             END_CASE;
             // Message compact : ID défaut (ErrorId) + étape d'origine + acquitter.
             // Le détail de la cause est consultable dans le dépannage (GVL_Troubleshooting).
