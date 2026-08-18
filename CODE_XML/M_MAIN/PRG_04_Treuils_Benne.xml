@@ -6420,6 +6420,14 @@ Done := FALSE;
 --&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
               </documentation>
             </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
+              </documentation>
+            </variable>
             <variable name="StartStop">
               <type>
                 <BOOL />
