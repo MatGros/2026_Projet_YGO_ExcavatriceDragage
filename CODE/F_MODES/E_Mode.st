@@ -1,11 +1,9 @@
-(* ═══════════════════════════════════════════════════════════════
-   🎚️ E_Mode — Modes de marche de la machine
+(* =======================================================================
+   ⚙️ E_Mode — Modes de marche de la machine
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md §1
-   ⚙️ Alignement terrain (2026-07-03) :
-      - 0 = DISABLE (sécurité/veille)
-      - MAINT_N1 / MAINT_N2 = Pilotage MANUEL à 2 niveaux
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Énumération des modes d'exploitation et maintenance
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+   ======================================================================= *)
 TYPE E_Mode :
 ENUM
     DISABLE     := 0,   (* Mode Désactivé / Veille de sécurité (sorties bloquées) *)
