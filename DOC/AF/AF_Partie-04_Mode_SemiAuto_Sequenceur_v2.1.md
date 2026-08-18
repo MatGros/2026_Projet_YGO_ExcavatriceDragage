@@ -133,7 +133,7 @@ END_TYPE
 ```mermaid
 stateDiagram-v2
     [*] --> X0_PREPARATION
-    X0_PREPARATION --> X1_HOMING: préconditions OK + Start
+    X0_PREPARATION --> X1_HOMING: préconditions OK + Start (bouton IHM OU homme-mort joystick)
     X1_HOMING --> X2_WORK_POS_SELECT: référencement fait
     X2_WORK_POS_SELECT --> X3_OPEN_BUCKET: translation validée (Trémie/P1/Maintenance)
     X3_OPEN_BUCKET --> X4_DESCEND_OPEN: benne ouverte
@@ -154,7 +154,7 @@ stateDiagram-v2
 
 | Étape | Comportement |
 |---|---|
-| **X0_PREPARATION** | Début de graphe : à la trémie, treuils hauts. Vérif cohérence + Start. |
+| **X0_PREPARATION** | Début de graphe : à la trémie, treuils hauts. Vérif cohérence + Start (bouton IHM `BtnStart` **OU** armement homme-mort joystick). |
 | **X1_HOMING** | Vitesses lentes pour chercher capteur top + référencement. Si déjà homé → passe vite. |
 | **X2_WORK_POS_SELECT** | Cible `SelTarget ∈ {1=Trémie, 3=P1, 4=Maintenance}`. P2(2) rejeté (capteur PV). Translation validée. |
 | **X3_OPEN_BUCKET** | Ouverture benne ; si déjà ouverte → passe vite. |

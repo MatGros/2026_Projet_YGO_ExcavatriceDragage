@@ -91,6 +91,7 @@ VAR
     // === DETECTEURS DE FRONTS ===
     ResetEdge               : R_TRIG;       // . [LOC] Detecteur front montant Reset
     StartEdge               : R_TRIG;       // . [LOC] Detecteur front montant StartCycle
+    DeadmanArmedEdge        : R_TRIG;       // . [LOC] Detecteur front montant DeadmanArmed (demarrage joystick)
     AbortEdge               : R_TRIG;       // . [LOC] Detecteur front montant AbortCycle
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
 
@@ -151,6 +152,7 @@ END_IF;
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
+DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
 ErrorEdge(CLK := Error);
 
@@ -235,9 +237,10 @@ CASE State OF
         Busy := FALSE; Done := FALSE;
 
         // Transition si système sain et réarmé (front reset ou démarrage).
-        // 🔫 D2 : l'appui homme-mort (DeadmanArmed) est requis pour INITIER le cycle ;
-        // la continuité des mouvements ne dépend que de CycleMotionPermit (manche défléchi).
-        IF StartEdge.Q AND DeadmanArmed THEN
+        // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
+        // (DeadmanArmedEdge) — l'opérateur peut lancer depuis l'IHM ou le joystick.
+        // La continuité des mouvements ne dépend que de CycleMotionPermit (manche défléchi).
+        IF StartEdge.Q OR DeadmanArmedEdge.Q THEN
             State := E_CycleStep.X1_HOMING;
         END_IF;
 
