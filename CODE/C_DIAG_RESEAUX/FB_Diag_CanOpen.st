@@ -1,45 +1,52 @@
-(* ═══════════════════════════════════════════════════════════════
-   📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
+(* =======================================================================
+   📊 FB_Diag_CanOpen — Diagnostic bus CANopen & Esclave Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
-   🎯 Rôle : Décide Online/Operational et publie ST_Diag_Device.
-      Distinction explicite dans State :
-      - INIT       : pas encore online (ni réel, ni bypass)
-      - SIMULATED  : bypass actif (simulation ou bypass réseau IHM)
-      - READY      : bus réellement online
-      - ERROR      : défaut détecté
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Surveillance bus CANopen master et esclave Joystick (Online/Op)
+   🔌 Architecture : Publication ST_Diag_Device & E_Diag_State
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Diag_CanOpen
 VAR_INPUT
-    Enable          : BOOL;        (* Active la surveillance CAN *)
-    Reset           : BOOL;        (* Front d'acquittement des défauts *)
-    CANbusStateRaw          : INT;          (* Valeur brute CANbus.GetBusState() (2 = ACTIVE) *)
-    DeviceJoystickStateRaw  : DEVICE_STATE; (* Valeur brute JOY1.GetDeviceState() *)
-    SimBypassActive         : BOOL;         (* TRUE = simulation active pour ce device *)
-    NetworkBypassActive     : BOOL;         (* TRUE = bypass réseau global IHM *)
+    // === COMMANDES & CONTROLE ===
+    Enable                      : BOOL;         // --> [CMD] Active la surveillance CAN
+    Reset                       : BOOL;         // --> [CMD] Front d'acquittement des defauts
+
+    // === ETATS BRUTS MATERIEL ===
+    CANbusStateRaw              : INT;          // --> [HW]  Valeur brute CANbus.GetBusState() (2 = ACTIVE)
+    DeviceJoystickStateRaw      : DEVICE_STATE; // --> [HW]  Valeur brute JOY1.GetDeviceState()
+
+    // === BYPASS & SIMULATION ===
+    SimBypassActive             : BOOL;         // --> [TST] TRUE = simulation active pour ce device
+    NetworkBypassActive         : BOOL;         // --> [TST] TRUE = bypass reseau global IHM
 END_VAR
 VAR_OUTPUT
-    Ready           : BOOL;        (* Logique de surveillance active *)
-    Busy            : BOOL;        (* Non utilisé (conformité interface) *)
-    Done            : BOOL;        (* Non utilisé *)
-    Error           : BOOL;        (* Présence anomalie de communication *)
-    ErrorId         : WORD;        (* Code défaut global résumé *)
-    State           : E_Diag_State; (* Phase courante (INIT/SIMULATED/READY/ERROR) *)
-    StateAtError    : E_Diag_State; (* Phase figée à l'apparition de l'erreur *)
-    DeviceCanOpenMaster : ST_Diag_Device;  (* Diagnostics bus CANopen *)
-    DeviceJoystick  : ST_Diag_Device;  (* Diagnostics esclave Joystick *)
-    (* Miroirs bruts lisibles directement sur l'instance *)
-    CANbusStateRawOut         : INT;
-    DeviceJoystickStateRawOut : DEVICE_STATE;
+    // === ETATS IEC & CONFORMITE ===
+    Ready                       : BOOL;         // <-- [STAT] Logique de surveillance active
+    Busy                        : BOOL;         // <-- [STAT] Non utilise (conformite interface)
+    Done                        : BOOL;         // <-- [STAT] Non utilise
+    State                       : E_Diag_State; // <-- [STAT] Phase courante (INIT/SIMULATED/READY/ERROR)
+
+    // === DIAGNOSTICS & ALARMES ===
+    Error                       : BOOL;         // <-- [DIAG] Presence anomalie de communication
+    ErrorId                     : WORD;         // <-- [DIAG] Code defaut global resume
+    StateAtError                : E_Diag_State; // <-- [DIAG] Phase figee a l'apparition de l'erreur
+    DeviceCanOpenMaster         : ST_Diag_Device; // <-- [DIAG] Diagnostics bus CANopen
+    DeviceJoystick              : ST_Diag_Device; // <-- [DIAG] Diagnostics esclave Joystick
+
+    // === MIROIRS BRUTS MATERIEL ===
+    CANbusStateRawOut           : INT;          // <-- [DIAG] Miroir brut status CANbus
+    DeviceJoystickStateRawOut   : DEVICE_STATE; // <-- [DIAG] Miroir brut status Joystick
 END_VAR
 VAR
-    ResetEdge       : R_TRIG;      (* Détecteur front de reset *)
-    CANbusOnlineReal         : BOOL; (* Bus réellement actif, hors tout bypass *)
-    DeviceJoystickOnlineReal : BOOL; (* Joystick réellement RUNNING, hors tout bypass *)
-    BypassActive             : BOOL; (* Simulation OU bypass réseau IHM *)
-    CANbusOnlineEff          : BOOL; (* Online effectif (réel OU bypass) *)
-    DeviceJoystickOnlineEff  : BOOL; (* Operational effectif (réel OU bypass) *)
+    // === SOUS-INSTANCES FB ===
+    ResetEdge                   : R_TRIG;       // * [INST] Detecteur front de reset
+
+    // === CALCULS ET ETATS INTERNES ===
+    CANbusOnlineReal            : BOOL;         // . [LOC]  Bus reellement actif, hors tout bypass
+    DeviceJoystickOnlineReal    : BOOL;         // . [LOC]  Joystick reellement RUNNING, hors tout bypass
+    BypassActive                : BOOL;         // . [LOC]  Simulation OU bypass reseau IHM
+    CANbusOnlineEff             : BOOL;         // . [LOC]  Online effectif (reel OU bypass)
+    DeviceJoystickOnlineEff     : BOOL;         // . [LOC]  Operational effectif (reel OU bypass)
 END_VAR
 
 // 🛑 1. GATE : Désactivation logique si Enable = FALSE
@@ -83,7 +90,6 @@ END_IF;
 // Bit 0 : Perte de communication CAN
 IF NOT CANbusOnlineEff THEN
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId OR 16#0001;  (* Perte liaison CAN joystick *)
-    DeviceJoystick.Online := FALSE;
 ELSE
     DeviceJoystick.Online := TRUE;
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFE; (* Effacement auto si la liaison revient *)

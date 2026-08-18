@@ -1,32 +1,34 @@
-(* ═══════════════════════════════════════════════════════════════
-   💓 FB_Diag_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
+(* =======================================================================
+   📊 FB_Diag_IhmHeartbeat — Surveillance bidirectionnelle Heartbeat IHM/PLC
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md (mise à jour Heartbeat requise)
-   🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
-      et expose un diagnostic. Ne produit ni SafeStop ni PowerCutOff.
-   🛡️ Les FB_Safety_Winch / FB_Safety_Translation restent propriétaires
-      de leurs réactions métier.
-   ═══════════════════════════════════════════════════════════════ *)
-
+   🎯 Rôle : Surveillance toggle IHM, generation toggle PLC et diagnostic timeout
+   🛡️ Protection : FB de diagnostic autonome (sans action directe sur AU)
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Diag_IhmHeartbeat
 VAR_INPUT
-    Enable              : BOOL;              // Active la surveillance ; FALSE = IHM non valide
-    TglHeartbeatIhm  : BOOL;              // Toggle IHM, inversion attendue toutes les 500 ms
-    IhmTimeout          : TIME := T#2s;     // Absence maximale de front IHM
-    PlcTogglePeriod     : TIME := T#500ms;  // Période du clignotant PLC
+    // === COMMANDES & REGLAGES ===
+    Enable                      : BOOL;         // --> [CMD] Active la surveillance (FALSE = IHM invalide)
+    TglHeartbeatIhm             : BOOL;         // --> [HW]  Toggle IHM, inversion attendue toutes les 500 ms
+    IhmTimeout                  : TIME := T#2s; // --> [CFG] Absence maximale de front IHM
+    PlcTogglePeriod             : TIME := T#500ms; // --> [CFG] Periode du clignotant PLC
 END_VAR
 VAR_OUTPUT
-    HeartbeatIhmOk      : BOOL;              // TRUE après front IHM post-boot et avant timeout
-    HeartbeatIhmTimeout : BOOL;              // TRUE = aucun front IHM depuis IhmTimeout
-    TglHeartbeatPlc  : BOOL;              // Clignotant PLC à superviser côté IHM
-    TimeSinceIhmEdge    : TIME;              // Diagnostic : temps depuis le dernier front IHM
+    // === ETATS & DIAGNOSTICS IHM ===
+    HeartbeatIhmOk              : BOOL;         // <-- [STAT] TRUE apres front IHM post-boot et avant timeout
+    HeartbeatIhmTimeout         : BOOL;         // <-- [DIAG] TRUE = aucun front IHM depuis IhmTimeout
+    TglHeartbeatPlc             : BOOL;         // <-- [STAT] Clignotant PLC a superviser cote IHM
+    TimeSinceIhmEdge            : TIME;         // <-- [DIAG] Temps ecoule depuis le dernier front IHM
 END_VAR
 VAR
-    LastIhmToggle       : BOOL;
-    IhmEdgeSeen         : BOOL;              // Interdit de valider une valeur RETAIN au boot
-    IhmEdgeDetected     : BOOL;
-    IhmTimeoutTon       : TON;
-    PlcToggleTon        : TON;
+    // === SOUS-INSTANCES FB ===
+    IhmTimeoutTon               : TON;          // * [INST] Timer de surveillance timeout IHM
+    PlcToggleTon                : TON;          // * [INST] Timer clignotant heartbeat PLC
+
+    // === CALCULS ET ETATS INTERNES ===
+    LastIhmToggle               : BOOL;         // . [LOC]  Memoire du dernier etat toggle IHM
+    IhmEdgeSeen                 : BOOL;         // . [LOC]  Verrou front vu (interdit RETAIN au boot)
+    IhmEdgeDetected             : BOOL;         // . [LOC]  Front de changement toggle IHM detecte
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -58,7 +60,7 @@ TimeSinceIhmEdge := IhmTimeoutTon.ET;
 HeartbeatIhmTimeout := IhmTimeoutTon.Q;
 HeartbeatIhmOk := NOT HeartbeatIhmTimeout;
 
-// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
+// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Signal Safety autonome.
 PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);
 IF PlcToggleTon.Q THEN
     TglHeartbeatPlc := NOT TglHeartbeatPlc;

@@ -1,58 +1,66 @@
-(* ═══════════════════════════════════════════════════════════════
-   📡 FB_Diag_Ethercat — Diagnostic bus EtherCAT (3 esclaves)
+(* =======================================================================
+   📊 FB_Diag_Ethercat — Diagnostic bus EtherCAT & Esclaves (M3, COD1, COD2)
    ───────────────────────────────────────────────────────────────
-   📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
-   🎯 Rôle : Décide Online/Operational pour variateur M3 + codeurs M1/M2.
-      Publie ST_Diag_Device par device + state global.
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Surveillance bus EtherCAT master, variateur M3 et codeurs M1/M2
+   🔌 Architecture : Publication ST_Diag_Device par esclave & E_Diag_State
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   ======================================================================= *)
 FUNCTION_BLOCK PUBLIC FB_Diag_Ethercat
 VAR_INPUT
-    Enable              : BOOL;        (* Active la surveillance EtherCAT *)
-    Reset               : BOOL;        (* Front d'acquittement des défauts *)
+    // === COMMANDES & CONTROLE ===
+    Enable                      : BOOL;         // --> [CMD] Active la surveillance EtherCAT
+    Reset                       : BOOL;         // --> [CMD] Front d'acquittement des defauts
 
-    (* Variateur M3 (AC600_ECAT_Drive) *)
-    DeviceVariateurStateRaw     : DEVICE_STATE; (* Valeur brute AC600_ECAT_Drive.GetDeviceState() *)
-    DeviceVariateurSimBypass    : BOOL;         (* TRUE = simulation active *)
+    // === ETATS BRUTS MATERIEL & BYPASS VARIATEUR M3 ===
+    DeviceVariateurStateRaw     : DEVICE_STATE; // --> [HW]  Valeur brute AC600_ECAT_Drive.GetDeviceState()
+    DeviceVariateurSimBypass    : BOOL;         // --> [TST] TRUE = simulation active variateur M3
 
-    (* Encodeur M1 (COD1_CODEUR) *)
-    DeviceEncoderM1StateRaw     : DEVICE_STATE; (* Valeur brute COD1_CODEUR.GetDeviceState() *)
-    DeviceEncoderM1SimBypass    : BOOL;         (* TRUE = simulation active *)
+    // === ETATS BRUTS MATERIEL & BYPASS ENCODEUR M1 ===
+    DeviceEncoderM1StateRaw     : DEVICE_STATE; // --> [HW]  Valeur brute COD1_CODEUR.GetDeviceState()
+    DeviceEncoderM1SimBypass    : BOOL;         // --> [TST] TRUE = simulation active encodeur M1
 
-    (* Encodeur M2 (COD2_CODEUR) *)
-    DeviceEncoderM2StateRaw     : DEVICE_STATE; (* Valeur brute COD2_CODEUR.GetDeviceState() *)
-    DeviceEncoderM2SimBypass    : BOOL;         (* TRUE = simulation active *)
+    // === ETATS BRUTS MATERIEL & BYPASS ENCODEUR M2 ===
+    DeviceEncoderM2StateRaw     : DEVICE_STATE; // --> [HW]  Valeur brute COD2_CODEUR.GetDeviceState()
+    DeviceEncoderM2SimBypass    : BOOL;         // --> [TST] TRUE = simulation active encodeur M2
 
-    NetworkBypassActive         : BOOL;         (* TRUE = bypass réseau global IHM *)
+    // === BYPASS RESEAU IHM ===
+    NetworkBypassActive         : BOOL;         // --> [TST] TRUE = bypass reseau global IHM
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;        (* Logique de surveillance active *)
-    Busy                : BOOL;        (* Non utilisé (conformité) *)
-    Done                : BOOL;        (* Non utilisé *)
-    Error               : BOOL;        (* Résumé anomalie de communication bus *)
-    ErrorId             : WORD;        (* Code défaut global résumé *)
-    State               : E_Diag_State; (* Phase courante du diagnostic global — voir en-tête *)
-    StateAtError        : E_Diag_State; (* Phase figée à l'apparition de l'erreur *)
-    DeviceEthercatMaster : ST_Diag_Device; (* Diagnostics bus EtherCAT *)
-    DeviceVariateur     : ST_Diag_Device;  (* Diagnostics esclave AC600 *)
-    DeviceEncoderM1     : ST_Diag_Device;  (* Diagnostics esclave COD1 *)
-    DeviceEncoderM2     : ST_Diag_Device;  (* Diagnostics esclave COD2 *)
-    (* Miroirs bruts lisibles directement sur l'instance *)
-    DeviceVariateurStateRawOut : DEVICE_STATE;
-    DeviceEncoderM1StateRawOut : DEVICE_STATE;
-    DeviceEncoderM2StateRawOut : DEVICE_STATE;
+    // === ETATS IEC & CONFORMITE ===
+    Ready                       : BOOL;         // <-- [STAT] Logique de surveillance active
+    Busy                        : BOOL;         // <-- [STAT] Non utilise (conformite interface)
+    Done                        : BOOL;         // <-- [STAT] Non utilise
+    State                       : E_Diag_State; // <-- [STAT] Phase courante du diagnostic global
+
+    // === DIAGNOSTICS & ALARMES ===
+    Error                       : BOOL;         // <-- [DIAG] Resume anomalie de communication bus
+    ErrorId                     : WORD;         // <-- [DIAG] Code defaut global resume
+    StateAtError                : E_Diag_State; // <-- [DIAG] Phase figee a l'apparition de l'erreur
+    DeviceEthercatMaster        : ST_Diag_Device; // <-- [DIAG] Diagnostics bus EtherCAT
+    DeviceVariateur             : ST_Diag_Device; // <-- [DIAG] Diagnostics esclave AC600
+    DeviceEncoderM1             : ST_Diag_Device; // <-- [DIAG] Diagnostics esclave COD1
+    DeviceEncoderM2             : ST_Diag_Device; // <-- [DIAG] Diagnostics esclave COD2
+
+    // === MIROIRS BRUTS MATERIEL ===
+    DeviceVariateurStateRawOut  : DEVICE_STATE; // <-- [DIAG] Miroir brut status variateur M3
+    DeviceEncoderM1StateRawOut  : DEVICE_STATE; // <-- [DIAG] Miroir brut status encodeur M1
+    DeviceEncoderM2StateRawOut  : DEVICE_STATE; // <-- [DIAG] Miroir brut status encodeur M2
 END_VAR
 VAR
-    ResetEdge           : R_TRIG;      (* Détecteur front de reset *)
-    VariateurOnlineReal  : BOOL; (* GetDeviceState() = RUNNING, hors tout bypass *)
-    EncoderM1OnlineReal  : BOOL;
-    EncoderM2OnlineReal  : BOOL;
-    VariateurBypass      : BOOL; (* Simulation OU bypass réseau IHM, pour ce device *)
-    EncoderM1Bypass      : BOOL;
-    EncoderM2Bypass      : BOOL;
-    VariateurOnlineEff   : BOOL; (* Online effectif (réel OU bypass) *)
-    EncoderM1OnlineEff   : BOOL;
-    EncoderM2OnlineEff   : BOOL;
+    // === SOUS-INSTANCES FB ===
+    ResetEdge                   : R_TRIG;       // * [INST] Detecteur front de reset
+
+    // === CALCULS ET ETATS INTERNES ===
+    VariateurOnlineReal         : BOOL;         // . [LOC]  GetDeviceState() = RUNNING, hors tout bypass
+    EncoderM1OnlineReal         : BOOL;         // . [LOC]  GetDeviceState() = RUNNING, hors tout bypass
+    EncoderM2OnlineReal         : BOOL;         // . [LOC]  GetDeviceState() = RUNNING, hors tout bypass
+    VariateurBypass             : BOOL;         // . [LOC]  Simulation OU bypass reseau IHM variateur
+    EncoderM1Bypass             : BOOL;         // . [LOC]  Simulation OU bypass reseau IHM encodeur M1
+    EncoderM2Bypass             : BOOL;         // . [LOC]  Simulation OU bypass reseau IHM encodeur M2
+    VariateurOnlineEff          : BOOL;         // . [LOC]  Online effectif (reel OU bypass)
+    EncoderM1OnlineEff          : BOOL;         // . [LOC]  Online effectif (reel OU bypass)
+    EncoderM2OnlineEff          : BOOL;         // . [LOC]  Online effectif (reel OU bypass)
 END_VAR
 
 {region "§1 Gate de desactivation"}
