@@ -17,6 +17,7 @@ VAR_INPUT
 
     // 🔄 Cycle & sous-cycles
     CycleStep            : E_CycleStep;   // --> [HW] Étape cycle
+    CycleStateStr        : STRING(80);   // --> [HW] Libellé détaillé de l'étape cycle (FB_Cycle.CycleStateStr)
     DiveState            : E_DiveSearchState;   // --> [HW] État plongée
     ExtractionState      : E_ExtractionSequenceState;   // --> [HW] État extraction
     HomingActive         : BOOL;   // --> [HW] Référencement en cours
@@ -126,33 +127,38 @@ IF HomingActive THEN
         Banner.SequenceProgressText := 'Homing: ATTENTE CAPTEUR HAUT';
     END_IF;
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    CASE CycleStep OF
-        E_CycleStep.X0_PREPARATION: Banner.SequenceProgressText := 'Cycle: PRÉPARATION';
-        E_CycleStep.X1_HOMING: Banner.SequenceProgressText := 'Cycle: RÉFÉRENCEMENT';
-        E_CycleStep.X2_WORK_POS_SELECT: Banner.SequenceProgressText := 'Cycle: POSITION TRAVAIL';
-        E_CycleStep.X3_OPEN_BUCKET: Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
-        E_CycleStep.X4_DESCEND_OPEN:
-            IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
-                Banner.SequenceProgressText := 'Cycle: DESCENTE > IMMERSION';
-            ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
-                Banner.SequenceProgressText := 'Cycle: DESCENTE > RECHERCHE FOND';
-            ELSIF DiveState = E_DiveSearchState.BOTTOM_CONFIRMED THEN
-                Banner.SequenceProgressText := 'Cycle: DESCENTE > FOND CONFIRMÉ';
-            ELSE
-                Banner.SequenceProgressText := 'Cycle: DESCENTE BENNE OUVERTE';
-            END_IF;
-        E_CycleStep.X5_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
-        E_CycleStep.X6_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
-        E_CycleStep.X7_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: ARRACHAGE / MONTÉE LENTE';
-        E_CycleStep.X8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
-        E_CycleStep.X9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
-        E_CycleStep.X10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
-        E_CycleStep.X11_OPEN_DUMP: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-        E_CycleStep.X13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
-        E_CycleStep.STABILIZING: Banner.SequenceProgressText := 'Cycle: STABILISATION';
+    // Détail de l'étape (FB_Cycle.CycleStateStr) prioritaire ; label court en fallback.
+    IF CycleStateStr <> '' THEN
+        Banner.SequenceProgressText := CONCAT('Cycle: ', CycleStateStr);
     ELSE
-        Banner.SequenceProgressText := 'Cycle: ÉTAPE EN COURS';
-    END_CASE;
+        CASE CycleStep OF
+            E_CycleStep.X0_PREPARATION: Banner.SequenceProgressText := 'Cycle: PRÉPARATION';
+            E_CycleStep.X1_HOMING: Banner.SequenceProgressText := 'Cycle: RÉFÉRENCEMENT';
+            E_CycleStep.X2_WORK_POS_SELECT: Banner.SequenceProgressText := 'Cycle: POSITION TRAVAIL';
+            E_CycleStep.X3_OPEN_BUCKET: Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
+            E_CycleStep.X4_DESCEND_OPEN:
+                IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
+                    Banner.SequenceProgressText := 'Cycle: DESCENTE > IMMERSION';
+                ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
+                    Banner.SequenceProgressText := 'Cycle: DESCENTE > RECHERCHE FOND';
+                ELSIF DiveState = E_DiveSearchState.BOTTOM_CONFIRMED THEN
+                    Banner.SequenceProgressText := 'Cycle: DESCENTE > FOND CONFIRMÉ';
+                ELSE
+                    Banner.SequenceProgressText := 'Cycle: DESCENTE BENNE OUVERTE';
+                END_IF;
+            E_CycleStep.X5_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
+            E_CycleStep.X6_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
+            E_CycleStep.X7_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: ARRACHAGE / MONTÉE LENTE';
+            E_CycleStep.X8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
+            E_CycleStep.X9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
+            E_CycleStep.X10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
+            E_CycleStep.X11_OPEN_DUMP: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_CycleStep.X13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
+            E_CycleStep.STABILIZING: Banner.SequenceProgressText := 'Cycle: STABILISATION';
+        ELSE
+            Banner.SequenceProgressText := 'Cycle: ÉTAPE EN COURS';
+        END_CASE;
+    END_IF;
 ELSIF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
     Banner.SequenceProgressText := 'Manuel: PILOTAGE DIRECT';
 ELSE
@@ -219,6 +225,45 @@ ELSIF DirectionBlocked THEN
     ELSE
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;
+ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
+    // Guidance par étape du cycle (AF-07 §4.1) — ne masque jamais un défaut
+    // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
+    CASE CycleStep OF
+        E_CycleStep.X0_PREPARATION:
+            IF NOT DeadmanArmed THEN
+                OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
+            ELSE
+                OperatorActionCandidate := '[IHM] Démarrer le cycle';
+            END_IF;
+        E_CycleStep.X1_HOMING:
+            OperatorActionCandidate := '[IHM] Attendre référencement codeurs';
+        E_CycleStep.X2_WORK_POS_SELECT:
+            OperatorActionCandidate := '[IHM] Sélectionner position travail';
+        E_CycleStep.X3_OPEN_BUCKET:
+            OperatorActionCandidate := '[IHM] Ouverture benne en cours';
+        E_CycleStep.X4_DESCEND_OPEN:
+            OperatorActionCandidate := '[JOYSTICK] Descendre benne ouverte > Attendre contact fond';
+        E_CycleStep.X5_BOTTOM_CONFIRMED:
+            OperatorActionCandidate := '[IHM] Fond confirmé - remontée';
+        E_CycleStep.X6_CLOSE_BUCKET:
+            OperatorActionCandidate := '[IHM] Fermeture benne en cours';
+        E_CycleStep.X7_CTRL_ASCENT:
+            OperatorActionCandidate := '[JOYSTICK] Remontée lente de contrôle';
+        E_CycleStep.X8_ASCENT_LOADED:
+            OperatorActionCandidate := '[IHM] Remontée en charge';
+        E_CycleStep.X9_DRAIN_PAUSE:
+            OperatorActionCandidate := '[IHM] Attendre égouttage';
+        E_CycleStep.X10_TRANSLATE_DUMP:
+            OperatorActionCandidate := '[JOYSTICK] Déplacer vers trémie';
+        E_CycleStep.X11_OPEN_DUMP:
+            OperatorActionCandidate := '[IHM] Vidage benne';
+        E_CycleStep.X13_DONE_SYNC:
+            OperatorActionCandidate := '[IHM] Cycle terminé';
+        E_CycleStep.STABILIZING:
+            OperatorActionCandidate := '[IHM] Cycle en attente / stabilisation';
+        ELSE
+            OperatorActionCandidate := '[IHM] Cycle en cours...';
+    END_CASE;
 ELSIF DiveActive AND CurrentDirection < 0 THEN
     OperatorActionCandidate := '[TREUIL] Attendre fin du Dive';
 ELSIF NOT BucketIsOpen AND CurrentDirection < 0 THEN
@@ -229,8 +274,6 @@ ELSIF NOT DeadmanArmed THEN
     OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF CurrentMode = E_Mode.DISABLE THEN
     OperatorActionCandidate := '[IHM] Sélectionner un mode';
-ELSIF CurrentMode = E_Mode.SEMI_AUTO AND CycleStep = E_CycleStep.X0_PREPARATION THEN
-    OperatorActionCandidate := '[IHM] Démarrer le cycle';
 ELSIF JoystickAtNeutral THEN
     OperatorActionCandidate := '[JOYSTICK] Armé - actionner axe';
 ELSE
