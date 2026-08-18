@@ -81,26 +81,26 @@ Les deux briques consomment une **intention deja arbitree**. Elles ne lisent pas
 
 ## 🔄 3. Cycle semi-auto (grafcet)
 
-### 3.1 Deux instances (D1)
+### 3.1 Instance unique du séquenceur
 
-`FB_Cycle` est un FB séquence **générique**, instancié **deux fois** dans `PRG_03_Modes_Cycle` :
+`FB_Cycle` est un FB séquence **générique**, instancié en **une seule instance** dans `PRG_03_Modes_Cycle` :
 
 ```text
 PRG_03_Modes_Cycle
  ├─ FB_Modes
- ├─ instCycleMaintenance : FB_Cycle   ← utilisé en MAINT_N1/N2
- └─ instCycleSemiAuto    : FB_Cycle   ← utilisé en SEMI_AUTO
+ └─ instCycleSemiAuto : FB_Cycle   ← actif en SEMI_AUTO
 ```
 
-- Chaque instance **conserve son état** tant qu'elle est instanciée.
-- **Ne PAS désactiver l'instance** au changement de mode (sinon R8 → retour X0). Le **gating de
-  mode se fait sur les SORTIES** (pont PRG_04/05) : on ne transmet les demandes de l'instance
-  semi-auto **que si** `Auth.Mode = SEMI_AUTO`.
-- **Retour transparent** : en revenant en SEMI_AUTO, l'instance semi-auto reprend son `State`.
-- **Vérification de reprise** : à la ré-entrée, valider que l'état mémorisé est encore valide
-  (préconditions d'étape). Si non reprenable → retour `X0_PREPARATION`.
-- **Non-régression MAINT** : les deux instances sont indépendantes ; le pont de sortie est
-  strictement gated par mode. Aucune écriture croisée.
+- **Rôle en `SEMI_AUTO`** : Pilote le cycle complet de dragage (X0 à X13).
+- **Rôle en `MAINTENANCE` (N1/N2)** : Le cycle global n'est pas exécuté. Les opérations de maintenance
+  utilisent des **petits cycles unitaires autonomes** (`FB_DiveSearch`, `FB_ExtractionSequence`,
+  `FB_Encoder_Homing`) ou le pilotage direct par joystick.
+- **Mémorisation d'étape** : L'instance `instCycleSemiAuto` **conserve son état** lors d'un passage
+  temporaire en manuel ou maintenance.
+- **Retour transparent** : En revenant en `SEMI_AUTO`, l'instance reprend son étape après vérification
+  des préconditions de sécurité (si non reprenable → retour `X0_PREPARATION`).
+- **Gating de sécurité** : Les commandes vers les actionneurs sont strictement conditionnées par
+  `Auth.Mode = SEMI_AUTO`. Aucune écriture croisée.
 
 ### 3.2 Enum `E_CycleStep`
 
