@@ -50,6 +50,7 @@ VAR
     TonFeedback             : TON;                // . [LOC]  Timeout de coherence commande/retour
 END_VAR
 
+{region "§1 Gate"}
 // 🛑 1. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
 IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
@@ -61,11 +62,15 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
+{endregion}
 
+{region "§2 Reset et fronts"}
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
 BypassEdge(CLK := BypassContactorCheck);
+{endregion}
 
+{region "§3 Séquence temporisée"}
 // 🛠️ 3. SÉQUENCE TEMPORISÉE (démarrage vs arrêt)
 IF MovementRequested THEN
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
@@ -78,7 +83,7 @@ IF MovementRequested THEN
         State := E_State.BUSY;
     END_IF;
 ELSE
-    // 🆕 REX 2026-07-08 : Sécurité positive - fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
+    // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
@@ -87,15 +92,16 @@ END_IF;
 
 Busy := (State = E_State.BUSY);
 Done := (State = E_State.DONE);
+{endregion}
 
+{region "§4 Double vérification contacteur"}
 // 🔍 4. DOUBLE VÉRIFICATION RETOUR CONTACTEUR (ST_ContactorCheck)
 ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
-// 🆕 REX 2026-08-03 (révocation 2026-07-26) : `ContactorFeedback` est maintenant dans le MÊME sens
-// que `BrakeCmd` (TRUE = relâché = frein ouvert). En marche saine les deux sont ÉGAUX → c'est leur
-// DIFFÉRENCE qui signale l'incohérence (contacteur collé).
-// ⚠️ Le test repasse en `<>` (retour à la logique d'origine pré-2026-07-26).
+// ContactorFeedback est dans le MÊME sens que BrakeCmd (TRUE = relâché = frein ouvert).
+// En marche saine les deux sont ÉGAUX → c'est leur DIFFÉRENCE qui signale l'incohérence
+// (contacteur collé). Le test compare donc `<>`.
 TonFeedback(IN := (BrakeCmd <> ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
@@ -116,21 +122,29 @@ ELSE
     END_IF;
 END_IF;
 
+{endregion}
+
+{region "§5 Arbitrage error"}
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
 
+{region "§6 Sortie sûre"}
 // 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
 IF Error THEN
     BrakeCmd := FALSE;
 END_IF;
+{endregion}
 
+{region "§7 Confirmation ouverture"}
 // 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback, ou image de BrakeCmd si BypassContactorCheck=TRUE)
 IF BypassContactorCheck THEN
     BrakeCommandOpenConfirmed := BrakeCmd;
 ELSE
     BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
 END_IF;
+{endregion}

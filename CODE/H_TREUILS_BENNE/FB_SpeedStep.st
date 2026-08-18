@@ -61,6 +61,7 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_SpeedStep) ===
 
+{region "§0 Validation configuration"}
 // ─────────────────────────────────────────────────────────────────────────
 // 🛡️ 0. VALIDATION CONFIGURATION (P0.2) — exécutée CHAQUE cycle pour détecter
 //    toute corruption IHM/PERSISTENT, même siEnable=FALSE (sorties sûres forcée)
@@ -76,7 +77,7 @@ ELSE
 END_IF;
 
 // 🔍 Validation table ST_SpeedStepTable
-// Critères (Partie 9 §2 + audit P0.2) :
+// Critères (Partie 9 §2) :
 // 1. Seuils croissants stricts : StepThreshold_Pct[1] < [2] < [3] < [4] < [5]
 // 2. Seuils dans [0..100] %
 // 3. HystMargin > 0
@@ -160,7 +161,9 @@ END_IF;
 // Sorties erreur config (miroir standard Partie 3)
 ConfigErrorId := _ConfigErrorIdInt;
 ConfigError   := (ConfigErrorId <> 16#0000);
+{endregion}
 
+{region "§1 Gate"}
 // ─────────────────────────────────────────────────────────────────────────
 // 🛑 1. GATE — Enable FALSE OU config invalide = palier 0, sorties sûres
 // ─────────────────────────────────────────────────────────────────────────
@@ -170,7 +173,9 @@ IF (NOT Enable) OR (NOT _ConfigValid) THEN
     SpeedGuardLimited := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Sélection palier"}
 // ─────────────────────────────────────────────────────────────────────────
 // 🪜 2. SÉLECTION DU PALIER (HYSTERESIS lib Util : IN/HIGH/LOW → OUT)
 //    OUT = TRUE tant que IN < LOW (régime "bas") ; OUT bascule à FALSE une fois
@@ -191,14 +196,16 @@ IF NOT Hyst3.OUT THEN StepNumber := 4; END_IF;
 IF NOT Hyst4.OUT THEN StepNumber := 5; END_IF;
 
 // ─────────────────────────────────────────────────────────────────────────
-// 🆕 2bis. PLAFOND (2026-07-03quinquies) — appliqué APRÈS la sélection hystérésis,
+// 2bis. PLAFOND — appliqué APRÈS la sélection hystérésis,
 // AVANT la lecture table : le 0..100% de la consigne peut réclamer le palier 5,
 // mais ne dépassera jamais _MaxStepClamped (ex. limitation couple en descente)
 // ─────────────────────────────────────────────────────────────────────────
 IF StepNumber > _MaxStepClamped THEN
     StepNumber := _MaxStepClamped;
 END_IF;
+{endregion}
 
+{region "§2ter Garde-fou vitesse"}
 // ─────────────────────────────────────────────────────────────────────────
 // 🛡️ 2ter. GARDE-FOU VITESSE RÉELLE — limite uniquement la consigne de palier.
 // Si la vitesse n'est pas validée stable, seul le palier 1 reste autorisé.
@@ -215,7 +222,9 @@ IF SpeedGuardEnable THEN
         SpeedGuardLimited := TRUE;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§3 Contacteurs"}
 // ─────────────────────────────────────────────────────────────────────────
 // 📤 3. CONTACTEURS — lus dans la table (donnée, jamais codé en dur)
 //    CASE couvre explicitement 0..5 : StepNumber=0 → tous FALSE (sécurité)
@@ -233,6 +242,7 @@ ELSE
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     StepNumber := 0;
 END_CASE;
+{endregion}
 
 (* ═══════════════════════════════════════════════════════════════
    📝 NOTE D'APPLICATION MANUELLE CODESYS 3.5

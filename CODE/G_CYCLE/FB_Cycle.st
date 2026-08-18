@@ -119,7 +119,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
-{region "Gate securite"}
+{region "§1 Gate securite"}
 // 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE (R8)
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     WinchM1Cmd.StartStop   := FALSE;
@@ -147,7 +147,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 {endregion}
 
-{region "Preparation surveillance et commandes cycle"}
+{region "§2 Preparation surveillance et commandes cycle"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
@@ -172,7 +172,7 @@ SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
-// 🆕 Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
+// Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
 StepMaxTimer(IN := CycleMotionPermit AND (State <> E_CycleStep.X0_PREPARATION)
                   AND (State <> E_CycleStep.X13_DONE_SYNC)
                   AND (State <> E_CycleStep.STABILIZING),
@@ -208,7 +208,7 @@ IF SpeedMismatchConfirmed AND State <> E_CycleStep.STABILIZING THEN
     State := E_CycleStep.STABILIZING;
 END_IF;
 
-// 🆕 Tempo max d'étape dépassée (blocage probable) → défaut
+// Tempo max d'étape dépassée (blocage probable) → défaut
 IF StepMaxTimer.Q AND State <> E_CycleStep.STABILIZING THEN
     Error := TRUE;
     ErrorId := ErrorId OR 16#0040;
@@ -221,7 +221,7 @@ IF AbortEdge.Q THEN
 END_IF;
 {endregion}
 
-{region "Machine etat cycle automatique"}
+{region "§3 Machine etat cycle automatique"}
 // 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d'état) — CASE sur enum unique (R1)
 CASE State OF
 
@@ -246,7 +246,7 @@ CASE State OF
         CycleStateStr := 'X1 - Référencement codeurs (vitesses lentes)';
         Busy := TRUE;
 
-        // 🆕 Vitesses lentes pour chercher capteur top + référencement
+        // Vitesses lentes pour chercher capteur top + référencement
         IF NOT HomedM1 OR NOT HomedM2 THEN
             WinchM1Cmd.StartStop := CycleMotionPermit;
             WinchM1Cmd.Direction := 1;   // montée lente vers capteur top
@@ -268,7 +268,7 @@ CASE State OF
         CycleStateStr := 'X2 - Sélection position travail';
         Busy := TRUE;
 
-        // 🆕 Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).
+        // Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).
         // P2(2) n'est PAS une destination — capteur de passage en petite vitesse (PV).
         IF (SelTarget <> 1) AND (SelTarget <> 3) AND (SelTarget <> 4) THEN
             Error := TRUE;
@@ -293,7 +293,7 @@ CASE State OF
         CycleStateStr := 'X3 - Ouverture benne';
         Busy := TRUE;
 
-        // 🆕 Ouverture benne ; si déjà ouverte → passe vite
+        // Ouverture benne ; si déjà ouverte → passe vite
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
@@ -363,7 +363,7 @@ CASE State OF
         WinchM1Cmd.StartStop := FALSE;
         BucketCmd.Close := TRUE;
 
-        // 🆕 Tolérance : si benne « à peu près fermée » (matière/objet), on remonte et on contrôle
+        // Tolérance : si benne « à peu près fermée » (matière/objet), on remonte et on contrôle
         IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.Close := FALSE;
             State := E_CycleStep.X7_CTRL_ASCENT;
@@ -421,7 +421,7 @@ CASE State OF
         WinchM2Cmd.StartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
-        // 🆕 Temps écoulé affiché IHM (CycleStateStr + champ dédié)
+        // Temps écoulé affiché IHM (CycleStateStr + champ dédié)
         IF CycleMotionPermit AND DrainingTimer.Q THEN
             DrainingTimer(IN := FALSE);
             State := E_CycleStep.X10_TRANSLATE_DUMP;
@@ -434,7 +434,7 @@ CASE State OF
         TranslationCmd.Target := 1; // Trémie
         TranslationCmd.Start := CycleMotionPermit;
 
-        // 🆕 Avertissement IHM : grille abaissée/libre, crible libre pour réceptionner la charge
+        // Avertissement IHM : grille abaissée/libre, crible libre pour réceptionner la charge
         // (porté par CycleStateStr + OperatorAction côté supervision)
 
         // Transition si translation arrivé à la trémie
@@ -447,7 +447,7 @@ CASE State OF
         CycleStep := E_CycleStep.X11_OPEN_DUMP;
         CycleStateStr := 'X11 - Vidange / ouverture du godet (montée possible, descente ouvre)';
 
-        // 🆕 Montée possible (treuils vers le haut) ; descente fait ouvrir la benne.
+        // Montée possible (treuils vers le haut) ; descente fait ouvrir la benne.
         // Montée : on laisse l'opérateur remonter les 2 treuils en synchro si besoin.
         WinchM1Cmd.StartStop := CycleMotionPermit AND (WinchM1Cmd.Direction = 1);
         WinchM1Cmd.Direction := 1;
@@ -459,7 +459,7 @@ CASE State OF
         // Descente → ouverture benne (vidage)
         BucketCmd.Open := CycleMotionPermit AND (WinchM1Cmd.Direction = -1);
 
-        // 🆕 Contrôle convoyeurs par MESSAGE utilisateur (pas encore câblé) :
+        // Contrôle convoyeurs par MESSAGE utilisateur (pas encore câblé) :
         // CycleStateStr + OperatorAction côté supervision demandent de vérifier
         // que les convoyeurs sont en route avant/au lâcher.
         IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
@@ -476,10 +476,10 @@ CASE State OF
         Done := TRUE;
         Busy := FALSE;
 
-        // 🆕 Compteur de prélèvements (RETAIN, Q3bis) — compte inconditionnellement
+        // Compteur de prélèvements (RETAIN, Q3bis) — compte inconditionnellement
         SampleCount := SampleCount + 1;
 
-        // 🆕 Rebouclage sur X0_PREPARATION (trémie, treuils hauts) — pas de retour P1
+        // Rebouclage sur X0_PREPARATION (trémie, treuils hauts) — pas de retour P1
         IF StartEdge.Q THEN
             Done := FALSE;
             State := E_CycleStep.X0_PREPARATION;
@@ -497,7 +497,7 @@ CASE State OF
 END_CASE;
 {endregion}
 
-{region "Repli homme mort"}
+{region "§4 Repli homme mort"}
 // 🛑 Relâchement du manche (retour au centre) : aucune demande d'actionneur ne reste active.
 // L'étape est mémorisée et reprend au prochain appui valide (D2).
 IF Busy AND NOT CycleMotionPermit THEN

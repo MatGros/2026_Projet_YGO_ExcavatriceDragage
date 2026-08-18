@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
+   ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
    ───────────────────────────────────────────────────────────────
    🎨 Regroupe les bypass "dégradé assumé" propres à un axe (codeur,
       contacteurs) — chaque treuil a son propre matériel, donc son
@@ -17,13 +17,13 @@ STRUCT
     ContactorFeedback : BOOL; (* 🔌 Bypass feedbacks contacteurs de puissance et frein *)
     PhaseRotation     : BOOL; (* ⚡ Bypass défaut rotation de phases (commun machine) *)
     BrakeThermal      : BOOL; (* 🌡️ Bypass surchauffe thermique frein (commun machine) *)
-    MotorThermal      : BOOL; (* 🆕 2026-08-07 : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI) *)
+    MotorThermal      : BOOL; (* : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI) *)
 
     (* 🚧 2. Limites physiques et Positionnement *)
     TopLimitSwitch    : BOOL; (* 🚧 Bypass fin de course physique haute (capteur, bit5) *)
-    TopLimitSoftware  : BOOL; (* 🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée CablePosM >= TopLimitM, symétrique CableLimitSwitch) *)
+    TopLimitSoftware  : BOOL; (* : Bypass fin de course logiciel haut (position calculée CablePosM >= TopLimitM, symétrique CableLimitSwitch) *)
     CableLimitSwitch  : BOOL; (* 🚧 Bypass limite basse physique (longueur de câble max) *)
-    LimitLegal        : BOOL; (* 🆕 2026-08-07 : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached) *)
+    LimitLegal        : BOOL; (* : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached) *)
 
     (* ⚙️ 3. Sécurité Mécanique (Méca A-E) *)
     MecaA             : BOOL; (* 🔄 Bypass Méca A : mouvement non commandé à l'arrêt *)
@@ -36,7 +36,7 @@ STRUCT
     Safety            : BOOL; (* 🛡️ Bypass groupé : tous les bits qui provoquent un PowerCutOff *)
     Process           : BOOL; (* ⚙️ Bypass groupé : tous les bits qui provoquent un SafeStop *)
     Global            : BOOL; (* 🌐 Bypass Global : ignore toutes les sécurités de cet axe *)
-    // 🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+    // FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
     // (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
     Initialized       : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT

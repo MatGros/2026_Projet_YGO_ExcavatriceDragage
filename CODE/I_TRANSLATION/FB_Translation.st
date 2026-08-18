@@ -1,119 +1,110 @@
 (* ═══════════════════════════════════════════════════════════════
-   ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
+   ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable > SafeStop > StartStop.
-   📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
+   Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
    🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
-   ⚠️ CORRECTIF (retour terrain 2026-08-05) : une inversion de sens PLUS RAPIDE que le
-      temps de décélération réel bloquait indéfiniment `CommandedDirection` (la translation
-      ne s'arrêtait jamais, continuait dans l'ancien sens) — la cible de rampe suivait la
-      magnitude joystick en continu, sans garantie de croiser le seuil d'arrêt qui
-      autorise l'interlock changement de sens (§5). Même bug déjà corrigé sur `FB_Winch`
-      (REX 2026-07-02), jamais porté ici. Corrigé : `DirectionChangePending` FORCE
-      désormais la cible à 0.0 dès qu'un changement de sens est en attente, de façon
-      déterministe et indépendante du joystick (voir §4 dans le corps ST).
+   🎯 Invariant : toute inversion de sens force la cible de rampe à 0.0 tant que le
+      changement de sens est en attente, pour garantir le croisement du seuil d'arrêt
+      qui autorise l'interlock de changement de sens (§5).
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Translation
 VAR_INPUT
-    Enable                      : BOOL;        // Active le FB. FALSE = neutralisation totale (sorties coupées)
-    Reset                       : BOOL;        // Acquittement défaut (front)
-    PowerContactorEngaged             : BOOL;        // Chaîne AU réarmée + conditions globales OK
-    Mode                        : E_Mode;      // Mode courant
-    StartStop                   : BOOL;        // TRUE = rampe accélération, FALSE = rampe décélération NORMALE
-    SafeStop                    : BOOL;        // Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    Direction                   : INT;         // -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)
-    SpeedRefPct                 : REAL;        // Magnitude de la consigne (de 0 à 100%)
-    PositionSensorTarget        : BOOL;        // Capteur position cible courante
-    // 🆕 2026-08-06 : 3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
+    Enable                      : BOOL;        // --> [CMD] Active le FB. FALSE = neutralisation totale (sorties coupées)
+    Reset                       : BOOL;        // --> [CMD] Acquittement défaut (front)
+    PowerContactorEngaged             : BOOL;        // --> [SAFE] Chaîne AU réarmée + conditions globales OK
+    Mode                        : E_Mode;      // --> [CMD] Mode courant
+    StartStop                   : BOOL;        // --> [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE
+    SafeStop                    : BOOL;        // --> [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
+    Direction                   : INT;         // --> [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)
+    SpeedRefPct                 : REAL;        // --> [CMD] Magnitude de la consigne (de 0 à 100%)
+    PositionSensorTarget        : BOOL;        // --> [HW] Capteur position cible courante
+    // 3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
     // (même principe que PV→Trémie, généralisé — voir §4bis dans le corps ST)
-    SlowdownSensorTremie         : BOOL;        // Capteur PV — ralentissement avant Trémie (Direction=1)
-    SlowdownSensorMaintenance    : BOOL;        // Capteur P1 — ralentissement avant Maintenance (Direction=-1)
-    SlowdownSensorP1             : BOOL;        // Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)
-    LimitSwitchFwd              : BOOL;        // Fin de course extrême avant
-    LimitSwitchRev              : BOOL;        // Fin de course extrême arrière
+    SlowdownSensorTremie         : BOOL;        // --> [HW] Capteur PV — ralentissement avant Trémie (Direction=1)
+    SlowdownSensorMaintenance    : BOOL;        // --> [HW] Capteur P1 — ralentissement avant Maintenance (Direction=-1)
+    SlowdownSensorP1             : BOOL;        // --> [HW] Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)
+    LimitSwitchFwd              : BOOL;        // --> [HW] Fin de course extrême avant
+    LimitSwitchRev              : BOOL;        // --> [HW] Fin de course extrême arrière
 
     // 🔌 Spécifique ETHERCAT (image process EtherCAT, rafraîchie par EtherCatTask 4ms)
-    DriveStatusWord              : WORD;       // Mot d'état AC600 lu depuis l'image d'entrée EtherCAT
-    DriveActualFreqHz            : REAL;       // Fréquence réelle mesurée (Hz)
+    DriveStatusWord              : WORD;       // --> [HW] Mot d'état AC600 lu depuis l'image d'entrée EtherCAT
+    DriveActualFreqHz            : REAL;       // --> [HW] Fréquence réelle mesurée (Hz)
 
-    BypassContactorCheck         : BOOL;       // 🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)
-    BypassLimitSwitch            : BOOL;       // 🚧 TRUE = ignore les fins de course extrêmes
-    BrakeFeedback                : BOOL;       // Retour physique direct : TRUE = frein OUVERT (desserré)
-    // 🆕 2026-08-06 (retour terrain, REX câblage) : compense le câblage moteur (U/V inversés) —
-    // UNIQUEMENT sur le mot de commande variateur en sortie (§5bis). Direction/CommandedDirection
-    // reste partout ailleurs le sens SÉMANTIQUE réel (+1 = physiquement vers Trémie), pour rester
-    // apparié aux vrais capteurs (LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.
-    // ⚠️ AVANT ce correctif, l'inversion était appliquée en amont (PRG_05, sur M3_Direction_Active
-    // lui-même) : avec le câblage réel de la machine, ça désaccordait TOUTE la logique sécurité/
-    // ralentissement appariée aux capteurs physiques (seule la coupure dure indépendante du sens,
-    // §0bis PRG_05, arrêtait encore la machine — le verrou d'arrivée logiciel ne s'armait jamais).
+    BypassContactorCheck         : BOOL;       // --> [TST] TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)
+    BypassLimitSwitch            : BOOL;       // --> [TST] TRUE = ignore les fins de course extrêmes
+    BrakeFeedback                : BOOL;       // --> [HW] Retour physique direct : TRUE = frein OUVERT (desserré)
+    // Compense le câblage moteur (U/V inversés) — UNIQUEMENT sur le mot de commande variateur
+    // en sortie (§5bis). Direction/CommandedDirection reste partout ailleurs le sens SÉMANTIQUE
+    // réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
+    // (LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.
     InvertDriveDirection          : BOOL;
 
     // Réglages rampe (RETAIN)
-    CfgRampAccelRate                : REAL := 20.0;    // %/s — accélération
-    CfgRampDecelNormalRate          : REAL := 40.0;    // %/s — décélération normale
-    CfgRampDecelFastRate            : REAL := 100.0;   // %/s — décélération RAPIDE
-    DirectionInterlockDelay      : TIME := T#200ms; // Délai avant d'autoriser un changement de sens à l'arrêt
+    CfgRampAccelRate                : REAL := 20.0;    // --> [CFG] %/s — accélération
+    CfgRampDecelNormalRate          : REAL := 40.0;    // --> [CFG] %/s — décélération normale
+    CfgRampDecelFastRate            : REAL := 100.0;   // --> [CFG] %/s — décélération RAPIDE
+    DirectionInterlockDelay      : TIME := T#200ms; // --> [CFG] Délai avant d'autoriser un changement de sens à l'arrêt
 
     // Réglages ETHERCAT uniquement (RETAIN)
-    ApproachSpeedTremieHz        : REAL := 10.0;    // Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)
-    ApproachSpeedMaintenanceHz   : REAL := 10.0;    // Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)
-    ApproachSpeedP1Hz            : REAL := 10.0;    // Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)
-    DriveFreqScaleMaxHz          : REAL := 60.0;    // Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)
+    ApproachSpeedTremieHz        : REAL := 10.0;    // --> [CFG] Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)
+    ApproachSpeedMaintenanceHz   : REAL := 10.0;    // --> [CFG] Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)
+    ApproachSpeedP1Hz            : REAL := 10.0;    // --> [CFG] Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)
+    DriveFreqScaleMaxHz          : REAL := 60.0;    // --> [CFG] Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)
 
     // Réglages communs
-    CaptorDebounce                : TIME := T#100ms; // Filtrage capteur de position cible
-    BrakeDelayContactClose        : TIME := T#100ms; // Voir FB_Brake
-    BrakeDelayMagnetise           : TIME := T#300ms; // Voir FB_Brake
-    BrakeDelayMotorDecel          : TIME := T#500ms; // Voir FB_Brake
-    BrakeFeedbackTimeout          : TIME := T#300ms; // Strictement sous watchdog final 500 ms
+    CaptorDebounce                : TIME := T#100ms; // --> [CFG] Filtrage capteur de position cible
+    BrakeDelayContactClose        : TIME := T#100ms; // --> [CFG] Voir FB_Brake
+    BrakeDelayMagnetise           : TIME := T#300ms; // --> [CFG] Voir FB_Brake
+    BrakeDelayMotorDecel          : TIME := T#500ms; // --> [CFG] Voir FB_Brake
+    BrakeFeedbackTimeout          : TIME := T#300ms; // --> [CFG] Strictement sous watchdog final 500 ms
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD;        // bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint
-    State               : E_State;
-    StateAtError        : E_State;
-    TargetReached        : BOOL;       // Capteur position cible
-    RequestedDriveControlWord : WORD; // Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD
-    RequestedDriveFreqHz      : REAL; // Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD
-    BrakeReleaseRequest       : BOOL; // Demande métier desserrage, issue de FB_Brake
-    BrakeCommandOpenConfirmed : BOOL; // TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)
-    BrakeContactorCheck  : ST_ContactorCheck; // Diag contacteur frein
+    Ready               : BOOL;   // <-- [STAT] FB prêt
+    Busy                : BOOL;   // <-- [STAT] FB occupé
+    Done                : BOOL;   // <-- [STAT] Action terminée
+    Error               : BOOL;   // <-- [STAT] Synthèse défaut
+    ErrorId             : WORD;        // <-- [DIAG] bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint
+    State               : E_State;   // <-- [STAT] Etat courant
+    StateAtError        : E_State;   // <-- [DIAG] Etat mémorisé au dernier défaut
+    TargetReached        : BOOL;       // <-- [STAT] Capteur position cible
+    RequestedDriveControlWord : WORD; // <-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD
+    RequestedDriveFreqHz      : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD
+    BrakeReleaseRequest       : BOOL; // <-- [ACT] Demande métier desserrage, issue de FB_Brake
+    BrakeCommandOpenConfirmed : BOOL; // <-- [STAT] TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)
+    BrakeContactorCheck  : ST_ContactorCheck; // <-- [DIAG] Diag contacteur frein
 END_VAR
 VAR
-    Brake                : FB_Brake;       // Séquence frein
-    CycleTimeCalc        : FB_CycleTime;
-    SpeedRamp             : FB_Ramp;       // Rampe de vitesse logicielle (PLC)
-    ResetEdge            : R_TRIG;
-    ErrorEdge            : R_TRIG;
-    DirectionChangeDelay : TON;            // Interlock changement de sens
-    CommandedDirection   : INT;            // Sens réellement appliqué
-    DirectionChangePending : BOOL;         // 🆕 2026-08-05 : force la rampe à 0 pendant une inversion de sens en attente
-    PhysicalDriveDirection : INT;          // 🆕 2026-08-06 : CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur
-    RampTargetPct        : REAL;
-    CaptorDebounceTon     : TON;
-    ArrivalEdge            : R_TRIG;
-    DirectionAtArrival     : INT;
-    ArrivalLock             : BOOL;        // Arrêt exact sur capteur cible
-    MovementRequested      : BOOL;         // Pilote FB_Brake
-    FirstScanDone          : BOOL;
-    // 🆕 2026-08-06 (revue sécurité) : garde-fou watchdog — DriveActualFreqHz est un passthrough
-    // EtherCAT SANS contrôle de fraîcheur (PRG_02_Acquisition, TimeConst=0ms). Si la comm variateur
-    // se fige (perte EtherCAT) sur une dernière valeur ≥1.0 Hz, plus rien ne referme le frein tant
-    // que ce garde-fou n'existe pas — même si SafeStop a déjà ramené la rampe théorique à 0. Force
-    // le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise DriveActualFreqHz.
+    Brake                : FB_Brake;       // * [INST] Séquence frein
+    CycleTimeCalc        : FB_CycleTime;   // * [INST] Mesure temps de cycle
+    SpeedRamp             : FB_Ramp;       // * [INST] Rampe de vitesse logicielle (PLC)
+    ResetEdge            : R_TRIG;   // . [LOC] Front Reset
+    ErrorEdge            : R_TRIG;   // . [LOC] Front Erreur
+    DirectionChangeDelay : TON;            // . [LOC] Interlock changement de sens
+    CommandedDirection   : INT;            // . [LOC] Sens réellement appliqué
+    DirectionChangePending : BOOL;         // . [LOC] Force la rampe à 0 pendant une inversion de sens en attente
+    PhysicalDriveDirection : INT;          // . [LOC] CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur
+    RampTargetPct        : REAL;   // . [LOC] Cible rampe en %
+    CaptorDebounceTon     : TON;    // . [LOC] Debounce capteur cible
+    ArrivalEdge            : R_TRIG;   // . [LOC] Front arrivée sur capteur
+    DirectionAtArrival     : INT;    // . [LOC] Sens d'arrivée mémorisé
+    ArrivalLock             : BOOL;        // . [LOC] Arrêt exact sur capteur cible
+    MovementRequested      : BOOL;         // . [LOC] Pilote FB_Brake
+    FirstScanDone          : BOOL;   // . [LOC] Initialisation premier scan
+    // Garde-fou watchdog : DriveActualFreqHz est un passthrough EtherCAT sans contrôle de fraîcheur.
+    // Si la communication variateur se fige sur une dernière valeur ≥1.0 Hz, plus rien ne referme
+    // le frein tant que ce garde-fou n'existe pas — même si SafeStop a déjà ramené la rampe théorique
+    // à 0. Force le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise
+    // DriveActualFreqHz.
     TonBrakeRealFreqTimeout : TON;
 END_VAR
 
 // === IMPLEMENTATION ===
 
-{region "Gate et initialisation"}
+{region "§1 Gate et initialisation"}
 // 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
@@ -145,7 +136,7 @@ END_IF;
 
 {endregion}
 
-{region "Acquisition commandes et position cible"}
+{region "§2 Acquisition commandes et position cible"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms
 
@@ -158,13 +149,12 @@ TargetReached := CaptorDebounceTon.Q;
 
 {endregion}
 
-{region "Consigne vitesse ralentissement verrou arrivee"}
+{region "§4 Consigne vitesse ralentissement verrou arrivee"}
 // ⚙️ 4. CORE — arbitrage rampe : Enable > SafeStop > StartStop
-// 🆕 2026-08-05 : DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de
-// sens est en attente — sans ça, la cible suit la magnitude joystick en continu et ne
-// croise jamais le seuil d'arrêt (0.1%) qui autorise l'interlock §5 à basculer
-// CommandedDirection. Une inversion plus rapide que la décélération réelle bloquait donc
-// indéfiniment le mouvement dans l'ancien sens (même bug que FB_Winch, REX 2026-07-02).
+// DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de sens est en attente —
+// sans cela, la cible suit la magnitude joystick en continu et ne croise jamais le seuil
+// d'arrêt (0.1%) qui autorise l'interlock §5 à basculer CommandedDirection. Une inversion
+// plus rapide que la décélération réelle bloquerait indéfiniment le mouvement dans l'ancien sens.
 DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirection <> 0);
 
 RampTargetPct := 0.0;
@@ -182,11 +172,9 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     END_IF;
 END_IF;
 
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur, remplace le timer)
-// 🔧 REX 2026-07-18 : ApproachTime (timer générique, toute direction confondue) remplacé par un
-// capteur dédié qui ne déclenche le ralentissement QU'à l'approche de sa cible, jamais l'inverse.
-// 🆕 2026-08-06 : généralisé à 3 paires capteur/cible indépendantes — chaque capteur "un cran
-// avant" la cible finale déclenche SA propre vitesse réduite, dans SON sens de marche uniquement :
+// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur)
+// Chaque capteur "un cran avant" la cible finale déclenche SA propre vitesse réduite, dans SON
+// sens de marche uniquement — le ralentissement ne se déclenche qu'à l'approche de sa cible :
 //   PV       + Direction=1  → approche Trémie
 //   P1       + Direction=-1 → approche Maintenance
 //   P2       + Direction=-1 → approche P1 (arrêt propre pour travail)
@@ -201,14 +189,11 @@ IF (Direction = -1) AND SlowdownSensorP1 THEN
 END_IF;
 
 // 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1, Maintenance, Fdc extrêmes)
-// 🆕 2026-08-06 (retour terrain + revue) : élargi à P1 (arrêt travail), pas seulement les 2
-// extrémités. Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de
-// course dur (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même
-// brève arme le même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ.
-// 🔧 REX 2026-08-06 (revue) : LimitSwitchFwd/Rev ne passaient PAS par ce verrou — un Fdc qui
-// s'ouvre quelques ms pendant le freinage laissait le §5bis relâcher SA coupure directe sans que
-// rien ne prenne le relais, la rampe (encore haute en interne) revenait en sortie -> ré-accélération.
-// Désormais toute activation, même un instant, arme DirectionAtArrival comme un TargetReached.
+// Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de course dur
+// (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même brève arme le
+// même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ. Toute activation,
+// même un instant, arme DirectionAtArrival comme un TargetReached — un Fdc qui s'ouvre quelques ms
+// pendant le freinage ne doit pas laisser la rampe (encore haute en interne) revenir en sortie.
 ArrivalEdge(CLK := TargetReached
                  OR (LimitSwitchFwd AND (CommandedDirection = 1))
                  OR (LimitSwitchRev AND (CommandedDirection = -1)));
@@ -216,12 +201,12 @@ IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
 
-// 🔧 REX 2026-08-06 (revue) : un retour au neutre, même SOUTENU (>100ms), ne doit JAMAIS lever
-// le verrou — seul un vrai changement de sens (dégagement volontaire, sans ambiguïté) le fait.
-// Sinon : neutre 100ms+ puis réappui dans le MÊME sens (le capteur/Fdc étant resté au niveau
-// haut en continu, TargetReached ne montre plus de front) contournait le verrou et M3 repartait
-// vers la butée. Conforme à la demande d'origine : "on doit repartir dans l'AUTRE sens", jamais
-// juste relâcher-réappuyer pareil. Instantané, jamais retardé (le dégagement doit rester rapide).
+// Un retour au neutre, même SOUTENU (>100ms), ne doit JAMAIS lever le verrou — seul un vrai
+// changement de sens (dégagement volontaire, sans ambiguïté) le fait. Sinon, un neutre 100ms+
+// puis un réappui dans le MÊME sens (le capteur/Fdc restant au niveau haut en continu,
+// TargetReached ne montre plus de front) contournerait le verrou et M3 repartirait vers la butée.
+// On doit repartir dans l'AUTRE sens, jamais juste relâcher-réappuyer pareil. Instantané, jamais
+// retardé (le dégagement doit rester rapide).
 IF (Direction = DirectionAtArrival * (-1)) OR ResetEdge.Q OR (NOT TargetReached AND NOT LimitSwitchFwd AND NOT LimitSwitchRev) THEN
     DirectionAtArrival := 0;
 END_IF;
@@ -239,7 +224,7 @@ SpeedRamp(Target := RampTargetPct,
 
 {endregion}
 
-{region "Interlock changement sens"}
+{region "§5 Interlock changement sens"}
 // 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (vitesse confirmée nulle)
 IF Direction <> CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction <> 0 THEN
@@ -260,16 +245,16 @@ END_IF;
 
 {endregion}
 
-{region "Commande variateur et protections fin course"}
+{region "§5bis Commande variateur et protections fin course"}
 // 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
 // OU que la fréquence réelle mesurée du variateur M3 est >= 1.0 Hz.
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
-// 🆕 2026-08-06 (revue sécurité) : borné par un garde-fou 2s — DriveActualFreqHz n'a aucun
-// contrôle de fraîcheur EtherCAT ; si la comm se fige sur une valeur ≥1.0 Hz (perte réseau en
-// mouvement), rien d'autre en aval ne referme le frein (FB_TranslationOutputInterlock_LD ignore
-// volontairement SafeStop par conception). Le garde-fou force la fermeture du frein 2s après la
-// fin de la rampe THÉORIQUE, quoi que dise la mesure réelle — combine attente réelle (évite un
-// serrage sur arbre encore tournant) et certitude de fermeture (n'attend jamais indéfiniment).
+// Borné par un garde-fou 2s — DriveActualFreqHz n'a aucun contrôle de fraîcheur EtherCAT ; si la
+// communication se fige sur une valeur ≥1.0 Hz (perte réseau en mouvement), rien d'autre en aval
+// ne referme le frein (FB_TranslationOutputInterlock_LD ignore volontairement SafeStop par
+// conception). Le garde-fou force la fermeture du frein 2s après la fin de la rampe THÉORIQUE, quoi
+// que dise la mesure réelle — combine attente réelle (évite un serrage sur arbre encore tournant)
+// et certitude de fermeture (n'attend jamais indéfiniment).
 TonBrakeRealFreqTimeout(IN := NOT ((CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1)), PT := T#2s);
 MovementRequested := ((CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.1))
                      OR (ABS(DriveActualFreqHz) >= 1.0 AND NOT TonBrakeRealFreqTimeout.Q);
@@ -277,7 +262,7 @@ MovementRequested := ((CommandedDirection <> 0) AND (ABS(SpeedRamp.Current) > 0.
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
 RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
 
-// 🆕 2026-08-06 : compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
+// Compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
 // CommandedDirection (sécurité/capteurs juste au-dessus, §4/§4bis/§4ter) reste le sens réel.
 PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, CommandedDirection * (-1));
 
@@ -309,7 +294,7 @@ END_IF;
 
 {endregion}
 
-{region "Commande frein"}
+{region "§6 Commande frein"}
 // 🛑 6. FREIN (composé, réutilisé tel quel)
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       ContactorFeedback := BrakeFeedback,
@@ -327,7 +312,7 @@ BrakeContactorCheck := Brake.ContactorCheck;
 
 {endregion}
 
-{region "Diagnostic etat et repli defaut"}
+{region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;

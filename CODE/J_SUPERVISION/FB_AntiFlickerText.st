@@ -11,15 +11,15 @@
    ═══════════════════════════════════════════════════════════════ *)
 FUNCTION_BLOCK PUBLIC FB_AntiFlickerText
 VAR_INPUT
-    NewText      : STRING(120);  (* Texte candidat à afficher *)
-    ForceInstant : BOOL;         (* TRUE = afficher immédiatement (défaut critique), sans maintien *)
-    HoldTime     : TIME := T#500ms; (* 🧊 Durée de maintien min avant changement (AF-07 §4.3) *)
+    NewText      : STRING(120);  (* --> [CMD] Texte candidat à afficher *)
+    ForceInstant : BOOL;         (* --> [CMD] TRUE = afficher immédiatement (défaut critique), sans maintien *)
+    HoldTime     : TIME := T#500ms; (* --> [CFG] Durée de maintien min avant changement (AF-07 §4.3) *)
 END_VAR
 VAR_OUTPUT
-    Text         : STRING(120);  (* Texte stabilisé exposé à l'IHM *)
+    Text         : STRING(120);  (* <-- [STAT] Texte stabilisé exposé à l'IHM *)
 END_VAR
 VAR
-    TonHold      : TON;
+    TonHold      : TON;   (* . [LOC] Temporisation de maintien *)
 END_VAR
 
 {region "§1 Lissage anti-clignotement"}

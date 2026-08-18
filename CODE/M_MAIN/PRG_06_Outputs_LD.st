@@ -4,7 +4,7 @@
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
    ⚙️ Exécuté par la tâche PLC en position 6 (après PRG_05_Translation).
    📄 Converti automatiquement en Ladder Diagram (<LD>) dans CODESYS.
-   🛡️ LOT_STRUCTURE_INTERLOCKS_LD (2026-08) : barrières finales M1/M2/M3
+   🛡️ Barrières finales M1/M2/M3
       rendues visibles — FB_WinchOutputInterlock_LD (×2) et
       FB_TranslationOutputInterlock_LD (×1) câblés en amont des coils,
       contacts nommés sur variables qualifiées (visibilité maintenance :
@@ -20,14 +20,13 @@
       ne portent donc que SafeStop (partiel) — voir PLAN_TASK lot "5
       Reliquats safety" (T72-T74). Ce lot ne câble que ce qui existe déjà
       en amont ; ne pas déduire que la safety métier complète est active.
-   🗑️ FB_Output retiré (2026-08) : inverseur pur (State := Command XOR
-      InvertLogic) jamais utilisé avec InvertLogic <> FALSE (REX
-      2026-08-04, feedback déjà retiré). Coils câblées directement sur
+   🗑️ FB_Output retiré : inverseur pur (State := Command XOR
+      InvertLogic) jamais utilisé avec InvertLogic <> FALSE. Coils câblées directement sur
       les sorties des interlocks finaux — élimine 15 blocs sans valeur
       ajoutée et simplifie la lecture maintenance.
-   🆕 LOT2 (2026-08-05) : sortie moteur AC600 M3 raccordée. DriveControlWord
+   Sortie moteur AC600 M3 raccordée. DriveControlWord
       (mot commande 0x3101) et DriveFreqRefWord (consigne fréquence WORD,
-      registre 0x3100, échelle ×100 confirmée terrain — WORD 5000 = 50,00 Hz)
+      registre 0x3100, échelle ×100 — WORD 5000 = 50,00 Hz)
       capturés en variables locales M3_DriveControlWord / M3_DriveFreqRefWord.
       Mapping E/S CODESYS (Device.export) manuel restant — voir §2 ci-dessous.
    ═══════════════════════════════════════════════════════════════ *)
@@ -35,7 +34,7 @@
 PROGRAM PRG_06_Outputs_LD
 
 VAR_OUTPUT
-    (* 🐛 FIX 2026-08-05 (confirmé câblé réel par l'utilisateur) : PowerKeepAlive_A_RQ/
+    (* PowerKeepAlive_A_RQ/
        PowerKeepAlive_B_RQ/EmergencyArming_RQ retirés d'ici — même collision de portée
        que M1/M2/M3 (voir §2). Cibles renommées : PowerKeepAliveACmd/BCmd/
        EmergencyArmingCmd, déclarées en VAR locale ci-dessous. *)
@@ -49,7 +48,7 @@ VAR_OUTPUT
     PowerCutOffActive            : BOOL; (* TRUE = demande de coupure finale active *)
 
     SafetyStructureNotValidated  : BOOL := FALSE; (* 🔓 Garde-fou désactivé : les autorisations M1/M2/M3 sont liées dynamiquement à leurs sécurités *)
-    // 🔧 FIX 2026-08-14 (audit sécurité) : Enable ne coupe plus que sur PowerCutOff (barrière
+    // Enable ne coupe plus que sur PowerCutOff (barrière
     // finale, AF02 §2, AF06 §5 "SafeStop laisse la décélération métier se terminer"). SafeStop/
     // Error retirés du calcul — SafeStop est une rampe rapide gérée en amont par FB_Winch/
     // FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ; Error mirait tout ErrorId y
@@ -59,7 +58,7 @@ VAR_OUTPUT
     M1InterlockEnable            : BOOL; (* Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1FinalInterlockRequest.PowerCutOff *)
     M2InterlockEnable            : BOOL; (* Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2FinalInterlockRequest.PowerCutOff *)
     M3InterlockEnable            : BOOL; (* Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationFinalInterlockRequest.PowerCutOff *)
-    // 🆕 Réseau informatif séparé (demande utilisateur) : visibilité maintenance de ce qui
+    // Réseau informatif séparé : visibilité maintenance de ce qui
     // bloque (PowerCutOff / SafeStop / Global), SANS influencer Enable — juste de l'information en Watch/Ladder.
     M1PowerCutOffSafetyInfo      : BOOL;
     M1SafeStopSafetyInfo         : BOOL;
@@ -73,7 +72,7 @@ VAR_OUTPUT
     M3SafeStopSafetyInfo         : BOOL;
     M3BlockedBySafetyInfo        : BOOL;
 
-    (* 🐛 FIX 2026-08-05 : les noms Device bruts ( *_DQ / *_RQ ), ex. M1_RelayFwd_Up_DQ,
+    (* Les noms Device bruts ( *_DQ / *_RQ ), ex. M1_RelayFwd_Up_DQ,
        M3_BrakeRelease_RQ) NE SONT PLUS déclarés ici — les déclarer créait une collision
        de portée avec la variable GLOBALE homonyme créée par le mapping E/S CODESYS
        (Device.export), qui masquait silencieusement le pilotage matériel réel (voir §2
@@ -173,7 +172,7 @@ M1SpeedContactor1 := instWinchOutputInterlockM1.Contactor1;
 M1SpeedContactor2 := instWinchOutputInterlockM1.Contactor2;
 M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
 M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
-// 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT sur les DQ
+// Recalcul INDEPENDANT sur les DQ
 // finaux (pas une simple recopie de instWinchOutputInterlockM1.BrakeCmd) -- visible ici
 // sans ouvrir FB_WinchOutputInterlock_LD, meme doctrine que le reste de ce POU.
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
@@ -236,20 +235,19 @@ M2SpeedContactor1 := instWinchOutputInterlockM2.Contactor1;
 M2SpeedContactor2 := instWinchOutputInterlockM2.Contactor2;
 M2SpeedContactor3 := instWinchOutputInterlockM2.Contactor3;
 M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
-// 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT, voir M1 ci-dessus.
+// Recalcul INDEPENDANT, voir M1 ci-dessus.
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
-// 🔴🔧 REX 2026-08-07 (12) — retour terrain, GAP CONFIRMÉ : KoboldContactorCmd était déclaré
-// (VAR ci-dessus) mais jamais écrit -- la chaîne instDiveSearch.KoboldMeasureEnable ->
-// PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated s'arrêtait net ici, sans erreur de
-// compilation ni de gate pour le signaler (même classe de bug que le fix M3 frein du
-// 2026-08-05). Mapping E/S CODESYS à (re)faire côté utilisateur (voir §2 plus bas) :
+// KoboldContactorCmd était déclaré (VAR ci-dessus) mais jamais écrit -- la chaîne
+// instDiveSearch.KoboldMeasureEnable -> PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated
+// s'arrêtait net ici, sans erreur de compilation ni de gate pour le signaler. Mapping E/S
+// CODESYS à (re)faire côté utilisateur (voir §2 plus bas) :
 // M1_M2_KoboldMeasureEnable_DQ <- PRG_06_Outputs_LD.KoboldContactorCmd.
 KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
-// 🛡️ 2026-08-06 (demande maintenance) : déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
-// 🔧 FIX 2026-08-14 : ne coupe plus que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête
+// 🛡️ Déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
+// Ne coupe plus que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête
 // de fichier (SafeStop/Error écrasaient la rampe rapide gérée en amont par FB_Translation).
 M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
                       AND NOT PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
@@ -343,13 +341,13 @@ GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
 
-// 🆕 REX 2026-08-05 (audit sécurité, trouvé après LOT2) : PowerCutOffReq était figé à FALSE en dur —
+// PowerCutOffReq était figé à FALSE en dur —
 // instSafetyTranslationM3.PowerCutOff (5 mécanismes/8 : thermique frein, Méca A/B, butées, incohérence
 // capteurs) était donc calculé mais totalement inerte, sans aucune coupure amont réelle possible
 // (seul le frein mécanique réagissait via SafeStop). Agrégation OU strict par procédé (M5, A-04) —
 // M1/M2 (FB_Safety_Winch, pas encore instanciée) rejoindront ce OU dès leur safety câblée, aucune
 // demande vraie ne doit jamais être masquée par l'absence d'une autre source.
-// 🆕 2026-08-05 : M1/M2 (FB_Safety_Winch) + M3 câblés — OU strict (M5, A-04).
+// M1/M2 (FB_Safety_Winch) + M3 câblés — OU strict (M5, A-04).
 // ⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD est
 // intégralement généré par l'oracle Python (gen_prg06_oracle.py), jamais par la conversion
 // .st->LD générique (qui plante sur une variable réassignée en OU chaîné — bug pré-existant du

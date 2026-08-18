@@ -13,7 +13,7 @@ STRUCT
     Reset                        : BOOL;
     PowerContactorEngaged              : BOOL;
     SafeStop                     : BOOL;
-    BrakeFeedback                 : BOOL; // 🆕 2026-08-06 (retrait FB_Brake) : retour PHYSIQUE brut du
+    BrakeFeedback                 : BOOL; // (retrait FB_Brake) : retour PHYSIQUE brut du
                                           // contacteur/bobine frein (TRUE = ouvert/relâché) — remplace
                                           // BrakeReleaseRequest/BrakeCommandOpenConfirmed ; la barrière
                                           // finale calcule elle-même BrakeCmd := RelayFwd OR RelayRev.
@@ -25,6 +25,6 @@ STRUCT
     RequestedContactor3          : BOOL;
     RequestedContactor4          : BOOL;
     RequestedStep                : INT;
-    PowerCutOff                  : BOOL; // 🆕 2026-08-05 : demande coupure puissance (FB_Safety_Winch), agrégée par PRG_06 (M5, A-04)
+    PowerCutOff                  : BOOL; // : demande coupure puissance (FB_Safety_Winch), agrégée par PRG_06 (M5, A-04)
 END_STRUCT
 END_TYPE

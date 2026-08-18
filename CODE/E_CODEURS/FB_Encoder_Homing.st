@@ -101,7 +101,7 @@ END_VAR
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-// 🆕 2026-08-06 : PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
+// PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
 IF NOT Enable THEN
     PresetRequest := FALSE;
     PresetValue := 0;
@@ -152,7 +152,7 @@ PresetRequest := FALSE;
 TopSensorEdge(CLK := TopPositionSensor);
 DynamicTargetEdge(CLK := UseDynamicTarget);
 
-// 🆕 Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
+// Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
 ErrorId := ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
@@ -191,7 +191,7 @@ IF HomingTrigger THEN
         TargetPositionM := CfgTopSensorPosM;
     END_IF;
 
-    // 🆕 Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
+    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
     // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
     // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
     IF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
@@ -251,7 +251,7 @@ IF EncoderAvailable AND (State <> E_State.BUSY) THEN
 END_IF;
 
 Busy := (State = E_State.BUSY);
-Homed := Calib.Homed AND NOT Calib.HomingSuspect; // 🆕 REX 2026-07-08 : Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
+Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
 

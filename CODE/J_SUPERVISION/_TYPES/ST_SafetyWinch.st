@@ -13,7 +13,7 @@ STRUCT
     SlackCable        : BOOL;    (* ⚠️ Mou de câble physiquement détecté *)
     ThermalFault      : BOOL;    (* 🔥 Surchauffe thermique moteur *)
     EncoderFault      : BOOL;    (* 🔌 Perte de liaison ou incohérence codeur *)
-    BypassActive      : BOOL;    (* 🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2 *)
+    BypassActive      : BOOL;    (* Bypass codeur effectivement accepté, uniquement MAINT_N2 *)
     CableLimitDescent : BOOL;    (* ⚠️ Longueur max de câble atteinte (limite basse physique) *)
     CableLimitAscent  : BOOL;    (* ⚠️ Limite haute d'exploitation normale atteinte *)
     MecaADrift_M      : REAL;    (* 📐 Dérive mesurée Méca A (m) *)

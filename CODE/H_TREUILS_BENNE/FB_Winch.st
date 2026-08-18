@@ -101,7 +101,7 @@ VAR
     FirstScanDone                   : BOOL;                           // . [LOC] Indicateur premier cycle passe
 END_VAR
 
-{region "Gate et initialisation"}
+{region "§1 Gate et initialisation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -135,7 +135,7 @@ END_IF;
 
 {endregion}
 
-{region "Preparation commande et limites vitesse"}
+{region "§2 Preparation commande et limites vitesse"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);
 
@@ -143,7 +143,7 @@ ResetEdge(CLK := Reset);
 
 DirectionChangePending := (Direction <> CommandedDirection) AND (CommandedDirection <> 0);
 
-// 🆕 Mou de câble / limite basse (DescendPermit=FALSE) et Fin de course haut (AscentPermit=FALSE)
+// Mou de câble / limite basse (DescendPermit=FALSE) et Fin de course haut (AscentPermit=FALSE)
 // intégrés à une VRAIE décélération rapide (comme SafeStop) :
 // - NOT DescendPermit est INHIBÉ si CommandedDirection = 1 (montée libre pour reprendre le mou)
 // - NOT AscentPermit est INHIBÉ si CommandedDirection = -1 (descente libre pour dégager le câble)
@@ -156,10 +156,9 @@ IF NOT EffectiveSafeStop AND StartStop AND NOT DirectionChangePending THEN
     RampTargetPct := ABS(SpeedRefPct);
 END_IF;
 
-// 🆕 RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect) — permet d'approcher
+// RALENTISSEMENT AUTOMATIQUE SUR BORDURES (si référencé et non suspect) — permet d'approcher
 // les fins de course / limites en vitesse lente de façon progressive.
-// 🔧 2026-08-07 (demande client) : ancien plafond RampTargetPct en % (CfgSlowSpeedPct) remplacé
-// par un plafond palier direct (ActiveMaxStep := 1, ci-dessous, même mécanisme que
+// Plafond palier direct (ActiveMaxStep := 1, ci-dessous, même mécanisme que
 // CfgMaxStepDescente/MaxStepAscent) — un treuil ne connaît que 5 paliers de contacteurs, pas une
 // vitesse continue ; palier 1 = tous contacteurs de vitesse relâchés = vitesse minimale, sans
 // dépendre d'un % qui doit rester sous le 1er seuil de la table pour produire le même effet.
@@ -170,7 +169,7 @@ InBottomSlowdownZone := Homed AND NOT HomingSuspect
                          AND ((CommandedDirection = -1) OR (Direction = -1))
                          AND (CablePosM <= (BottomLimitM + CfgSlowdownDistanceM));
 
-// 🆕 2026-08-06 : délai asymétrique selon le sens ENTRANT (Direction) — descente sans effort
+// Délai asymétrique selon le sens ENTRANT (Direction) — descente sans effort
 // (câble mou/gravité favorable) réengage plus vite que montée (charge en traction). La tempo
 // palier se DÉDUIT de cet interlock (+100ms) : jamais besoin de resynchroniser deux réglages.
 IF Direction = -1 THEN
@@ -181,10 +180,9 @@ END_IF;
 EffectiveStepDelay := EffectiveDirectionInterlockDelay + T#100ms;
 
 IF Direction <> CommandedDirection THEN
-    // 🆕 2026-08-07 (retour terrain) : démarrage depuis le neutre/arrêt (CommandedDirection = 0)
-    // prise en compte IMMÉDIATE (0ms), pas de tempo interlock.
-    // L'interlock DirectionChangeDelay (400ms descente / 900ms montée) ne s'applique QU'EN CAS
-    // d'inversion active de sens en mouvement (ex: de -1 vers +1 direct).
+    // Démarrage depuis le neutre/arrêt (CommandedDirection = 0) pris en compte IMMÉDIATE (0ms),
+    // pas de tempo interlock. L'interlock DirectionChangeDelay (400ms descente / 900ms montée) ne
+    // s'applique QU'EN CAS d'inversion active de sens en mouvement (ex: de -1 vers +1 direct).
     IF CommandedDirection = 0 THEN
         CommandedDirection := Direction;
         DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
@@ -200,12 +198,12 @@ IF Direction <> CommandedDirection THEN
 ELSE
     DirectionChangeDelay(IN := FALSE, PT := EffectiveDirectionInterlockDelay);
 END_IF;
-DirectionChangeDelayElapsed := DirectionChangeDelay.ET; // 🆕 2026-08-07 : diagnostic, miroir pur
+DirectionChangeDelayElapsed := DirectionChangeDelay.ET; // Diagnostic, miroir pur
 
-// 🆕 Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
-// Palier 1 en approche homing, MaxStepAscent en montée normale — 🔧 REX 2026-07-15 (9))
+// Plafond dynamique de palier (CfgMaxStepDescente en descente, Palier 1 si non référencé ou douteux,
+// Palier 1 en approche homing, MaxStepAscent en montée normale)
 IF NOT Homed OR HomingSuspect THEN
-    // 🆕 Bypass.Global = TRUE → pas de limitation, on applique la règle normale
+    // Bypass.Global = TRUE → pas de limitation, on applique la règle normale
     IF BypassGlobal THEN
         ActiveMaxStep := SEL(CommandedDirection = -1, MaxStepAscent, CfgMaxStepDescente);
     ELSE
@@ -221,17 +219,17 @@ ELSE
     ActiveMaxStep := 5;
 END_IF;
 
-// 🆕 2026-08-07 : ralentissement sur bordure (voir plus haut) — remplace l'ancien plafond en %
-// par un plafond palier direct (CfgSlowdownMaxStep, défaut 1 = vitesse mini, réglable IHM),
-// appliqué APRÈS le calcul normal ci-dessus via MIN (ne peut qu'abaisser, jamais relever le
-// plafond déjà décidé par ailleurs — ex. CfgMaxStepDescente déjà plus restrictif).
+// Ralentissement sur bordure (voir plus haut) — plafond palier direct (CfgSlowdownMaxStep,
+// défaut 1 = vitesse mini, réglable IHM), appliqué APRÈS le calcul normal ci-dessus via MIN
+// (ne peut qu'abaisser, jamais relever le plafond déjà décidé par ailleurs — ex.
+// CfgMaxStepDescente déjà plus restrictif).
 IF InTopSlowdownZone OR InBottomSlowdownZone THEN
     ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
 END_IF;
 
 {endregion}
 
-{region "Selection et temporisation paliers"}
+{region "§3 Selection et temporisation paliers"}
 SpeedStep(Enable := (RampTargetPct > 0.1), SpeedRefPct := RampTargetPct,
           Table := SpeedStepTable, HystMargin := SpeedStepHystMargin,
           MaxStepNumber := ActiveMaxStep,
@@ -264,7 +262,7 @@ SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
 
 {endregion}
 
-{region "Commandes contacteurs et sens"}
+{region "§4 Commandes contacteurs et sens"}
 // Les sorties métier suivent le palier temporisé. FB_Winch/SpeedStepTable reste
 // propriétaire unique des combinaisons, y compris les mappings M2 Benne dynamiques.
 // FB_WinchOutputInterlock_LD ne fait qu'autoriser ou masquer ces quatre demandes.
@@ -288,22 +286,22 @@ ELSE
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_CASE;
 
-// 🆕 2026-08-06 (retour terrain) : coupure INSTANTANÉE de tous les contacteurs de vitesse dès
-// que l'opérateur relâche le joystick (Direction=0) — ne pas attendre la fin de la rampe de
-// décélération. Avant ce correctif, StepNumber suivait la rampe (décélération progressive),
-// gardant les contacteurs de vitesse engagés plusieurs secondes après l'ordre d'arrêt.
+// Coupure INSTANTANÉE de tous les contacteurs de vitesse dès que l'opérateur relâche le
+// joystick (Direction=0) — ne pas attendre la fin de la rampe de décélération. Sinon,
+// StepNumber suivrait la rampe (décélération progressive), gardant les contacteurs de vitesse
+// engagés plusieurs secondes après l'ordre d'arrêt.
 IF Direction = 0 THEN
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
 END_IF;
 
 // Le sens et la pré-magnétisation suivent la demande brute ; le palier métier
 // temporisé reste seul transmis à l'interlock final pour autoriser la puissance.
-// 🆕 2026-08-06 (retour terrain) : ET Direction=1/-1 (demande OPÉRATEUR brute, pas
-// CommandedDirection qui reste au dernier sens jusqu'à la retombée de la rampe) — coupure
-// instantanée du contacteur de sens dès le relâchement du joystick, même sécurité que ci-dessus.
-// 🆕 2026-08-06 (retrait FB_Brake, demande client) : plus de terme BrakeSafetyOk — le frein
-// n'est plus une condition d'engagement des relais de sens, c'est l'inverse (voir
-// FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
+// ET Direction=1/-1 (demande OPÉRATEUR brute, pas CommandedDirection qui reste au dernier sens
+// jusqu'à la retombée de la rampe) — coupure instantanée du contacteur de sens dès le
+// relâchement du joystick, même sécurité que ci-dessus.
+// Plus de terme BrakeSafetyOk — le frein n'est plus une condition d'engagement des relais de
+// sens, c'est l'inverse (voir FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev,
+// calculé APRÈS ces relais).
 RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep > 0);
 RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep > 0);
 
@@ -315,8 +313,8 @@ IF NOT AscentPermit THEN
     RelayFwd := FALSE;
 END_IF;
 
-// 🔧 REX 2026-07-07 : vérification UNIQUEMENT à l'arrêt commandé (plus de détail par sens —
-// voir bandeau en-tête). AllContactorsCommandedOff = tout ce que FB_Winch commande est à FALSE.
+// Vérification UNIQUEMENT à l'arrêt commandé (plus de détail par sens — voir bandeau en-tête).
+// AllContactorsCommandedOff = tout ce que FB_Winch commande est à FALSE.
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
 
@@ -332,20 +330,20 @@ ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de con
 
 {endregion}
 
-{region "Diagnostic contacteurs et configuration"}
+{region "§5 Diagnostic contacteurs et configuration"}
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d'erreur
 IF BypassGlobal THEN
     ErrorId := 16#0000;
 END_IF;
 
 IF NOT BypassGlobal THEN
-// 🆕 2026-08-06 (retrait FB_Brake) : bit0 ErrorId libre — le frein n'est plus surveillé
-// ici, sa cohérence commande/retour vit désormais dans FB_WinchOutputInterlock_LD (BrakeFeedback).
+// bit0 ErrorId libre — le frein n'est plus surveillé ici, sa cohérence commande/retour vit
+// désormais dans FB_WinchOutputInterlock_LD (BrakeFeedback).
 
 // 🧪 Simulation (GVL_Simulation.SensorMxContactorFeedbackIsReal, passé par l'appelant via
 // BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed
 // se déclenche à tort et bloque RelayFwd/RelayRev (voir Error plus bas).
-// 🔧 REX 2026-07-07 : bit2 (ex-RevContactorCheck) libre/inutilisé, fusionné dans bit1.
+// bit2 (ex-RevContactorCheck) libre/inutilisé, fusionné dans bit1.
 IF NOT BypassContactorCheck THEN
     IF ContactorsCheck.StuckClosed THEN
         ErrorId := ErrorId OR 16#0002;
@@ -369,7 +367,7 @@ END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
 
-{region "Etats et repli defaut"}
+{region "§6 Etats et repli defaut"}
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN

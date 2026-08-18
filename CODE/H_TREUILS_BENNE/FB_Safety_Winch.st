@@ -120,7 +120,7 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
@@ -133,8 +133,8 @@ IF NOT Enable THEN
     State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
-    // 🔧 REX 2026-07-08 : force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement
-    // identique à l'ancien MecaA_Armed/MecaC_Armed := FALSE.
+    // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement identique à l'ancien
+    // MecaA_Armed/MecaC_Armed := FALSE.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
     TonMecaB(IN := FALSE);
@@ -151,18 +151,18 @@ State := E_State.READY;
 
 {endregion}
 
-{region "Initialisation et bypass global"}
+{region "§2 Initialisation et bypass global"}
 // Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
 IF LastInReferencingMode AND NOT InReferencingMode THEN
-    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
+    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
 END_IF;
 LastInReferencingMode := InReferencingMode;
 
 // Si le contacteur de puissance est ouvert (PowerContactorEngaged = FALSE), on force les sorties de sécurité
 // mais on ne fait pas de RETURN pour permettre le diagnostic et l'acquittement (Reset) des défauts.
 IF NOT PowerContactorEngaged THEN
-    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
-    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
+    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
+    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
 END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
@@ -186,19 +186,19 @@ END_IF;
 
 {endregion}
 
-{region "Protections immediates position"}
+{region "§3 Protections immediates position"}
 // 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
 // ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
 // position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
 // (TopPositionSensor=FALSE), qu'on n'est pas en phase de référencement (homing), ET qu'on
 // commande un mouvement vers le haut (Direction > 0), alors on lève le défaut.
-// 🔧 REX 2026-08-07 (demande client, suite fix AscentPermit/DescendPermit) : SORTI du bloc
-// "IF NOT BypassGlobal" ci-dessous — même doctrine que le blocage réel (§4) : BypassGlobal M1/M2
-// ne doit masquer NI le mouvement NI l'alarme IHM de ces 2 fins de course physiques. Seuls
-// BypassProcess (groupé, conscient) ou BypassTopLimitSwitch (individuel) peuvent encore éteindre
-// CETTE alarme — exactement comme tous les autres bypass individuels du fichier (une alarme ne
-// s'éteint QUE si on a explicitement demandé à ignorer CETTE protection précise, jamais via le
-// bypass global qui vise le reste du domaine : Méca A-E, thermique, phase, comm, sync, codeur).
+// SORTI du bloc "IF NOT BypassGlobal" ci-dessous — même doctrine que le blocage réel (§4) :
+// BypassGlobal M1/M2 ne doit masquer NI le mouvement NI l'alarme IHM de ces 2 fins de course
+// physiques. Seuls BypassProcess (groupé, conscient) ou BypassTopLimitSwitch (individuel)
+// peuvent encore éteindre CETTE alarme — exactement comme tous les autres bypass individuels du
+// fichier (une alarme ne s'éteint QUE si on a explicitement demandé à ignorer CETTE protection
+// précise, jamais via le bypass global qui vise le reste du domaine : Méca A-E, thermique, phase,
+// comm, sync, codeur).
 IF NOT (BypassProcess OR BypassTopLimitSwitch) AND NOT TopPositionSensor AND NOT InReferencingMode AND (Direction > 0) THEN
     ErrorId := ErrorId OR 16#0020;
 ELSIF ResetEdge.Q THEN
@@ -208,7 +208,7 @@ END_IF;
 // 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
 // Sécurité active hors référencement. Si la position de câble descend sous la limite basse
 // physique (CablePosM <= CfgCableLimitDescentM), alors on interdit uniquement la descente.
-// 🔧 REX 2026-08-07 : SORTI du bloc "IF NOT BypassGlobal" — même doctrine que bit5 ci-dessus.
+// SORTI du bloc "IF NOT BypassGlobal" — même doctrine que bit5 ci-dessus.
 IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
     ErrorId := ErrorId OR 16#0040;
 ELSIF ResetEdge.Q THEN
@@ -217,7 +217,7 @@ END_IF;
 
 {endregion}
 
-{region "Diagnostics et protections treuil"}
+{region "§4 Diagnostics et protections treuil"}
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
 IF NOT BypassGlobal THEN
 
@@ -237,7 +237,7 @@ IF NOT BypassGlobal THEN
         ErrorId := ErrorId AND 16#FFFE;
     END_IF;
 
-// 🔍 3bis. PERTE CODEUR DE CE TREUIL (câblé — lot Codeur 2026-07-02)
+// 🔍 3bis. PERTE CODEUR DE CE TREUIL
 // 🔧 WINCH-CORE-01 : le fonctionnement sans codeur reste interdit par défaut.
 // Le bypass est individuel, maintenu consciemment depuis l'IHM et strictement limité à MAINT_N2.
 // Il ne masque aucun autre défaut du treuil et n'agit jamais sur l'autre instance.
@@ -250,8 +250,8 @@ ELSE
     ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
 END_IF;
 
-// 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total
-// 🆕 2026-08-07 : ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
+// 🔍 3ter. SURCHAUFFE MOTEUR — bit2, participe au SafeStop total
+// ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
 // bypass dédié plutôt que de dépendre uniquement du bypass groupé BypassSafety.
 IF NOT (BypassSafety OR BypassMotorThermal) AND ThermalFeedback THEN
     ErrorId := ErrorId OR 16#0004;
@@ -268,7 +268,7 @@ ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
-// 🔍 3quinquies. ROTATION DE PHASE (câblé — I/O réel, commun M1/M2, 2026-07-03octodecies) —
+// 🔍 3quinquies. ROTATION DE PHASE —
 // bit4, participe au SafeStop total (sens moteur potentiellement inversé, danger 2 sens).
 IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN
     ErrorId := ErrorId OR 16#0010;
@@ -276,16 +276,16 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFEF;
 END_IF;
 
-// 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL (REX 2026-07-07) — bit7
+// 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL — bit7
 // Armé quand tout est physiquement confirmé coupé (contacteurs + frein). Si dérive ou vitesse
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
-// 🔧 T84/T85 : la chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
+// La chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
 DriftGuardA(
     Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode,
     PositionM  := CablePosM,
     ToleranceM := UncommandedDriftToleranceM
 );
-MecaADriftM := DriftGuardA.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
+MecaADriftM := DriftGuardA.DriftM;   // Diagnostic IHM
 
 IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps))) THEN
     ErrorId := ErrorId OR 16#0080;
@@ -293,33 +293,33 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FF7F;
 END_IF;
 
-// 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR (REX 2026-07-07) — bit8
+// 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR — bit8
 // Indépendant de FB_Winch (défense en profondeur). Perte CAN (bit0) OU joystick au neutre ;
 // si les contacteurs OU LE FREIN ne confirment pas être retombés/serrés dans PostRampTimeout, défaut.
-// 🔧 REX 2026-07-08 (demande utilisateur) : BrakeFeedback ajouté — un frein qui ne confirme pas
-// son engagement dans ce délai est tout aussi dangereux qu'un contacteur qui ne retombe pas
-// (risque de mouvement/roue libre non détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
+// BrakeFeedback ajouté — un frein qui ne confirme pas son engagement dans ce délai est tout
+// aussi dangereux qu'un contacteur qui ne retombe pas (risque de mouvement/roue libre non
+// détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
 MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
                        OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
 TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
-MecaBElapsedTime := TonMecaB.ET;   // 🆕 REX 2026-07-08 : diagnostic IHM
+MecaBElapsedTime := TonMecaB.ET;   // Diagnostic IHM
 IF TonMecaB.Q THEN
     ErrorId := ErrorId OR 16#0100;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FEFF;
 END_IF;
 
-// 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT BENNE, ESCALADE (REX 2026-07-07) — bit9
+// 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT BENNE, ESCALADE — bit9
 // Armé UNIQUEMENT pour l'instance M1 (BenneHoldStillActive câblé sur instBucket.Busy côté M1
 // seulement, toujours FALSE côté M2). Tolérance plus large que celle de FB_Bucket (1.0 m) —
 // n'intervient que si la couche Benne (SafeStop M1 seul) n'a pas suffi.
-// 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé.
+// Dérive factorisée via FB_DriftGuard — comportement inchangé.
 DriftGuardC(
     Arm        := NOT (BypassSafety OR BypassMecaC) AND BenneHoldStillActive,
     PositionM  := CablePosM,
     ToleranceM := BenneSlipToleranceM
 );
-MecaCDriftM := DriftGuardC.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
+MecaCDriftM := DriftGuardC.DriftM;   // Diagnostic IHM
 
 IF DriftGuardC.Violation THEN
     ErrorId := ErrorId OR 16#0200;
@@ -327,7 +327,7 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FDFF;
 END_IF;
 
-// 🔍 3undecies. THERMIQUE FREIN COMMUN M1/M2/M3 (REX 2026-07-08, demande utilisateur) — bit10
+// 🔍 3undecies. THERMIQUE FREIN COMMUN M1/M2/M3 — bit10
 // Signal commun (1 seul fil, câblé identiquement sur les 3 instances Safety) : sa perte peut
 // signifier qu'un frein colle instantanément (frein à manque de courant) → SafeStop ET
 // PowerCutOff (voir bandeau en-tête).
@@ -337,8 +337,7 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FBFF;
 END_IF;
 
-// 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT (REX 2026-07-08 (3),
-// demande utilisateur) — bit11
+// 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT — bit11
 // Complète le bit5 (AscentPermit immédiat) : arme la MÊME condition (capteur haut atteint, hors
 // homing) mais avec un délai de confirmation, comme Méca B. Si les contacteurs ET le frein ne
 // confirment pas être retombés/serrés dans PostRampTimeout après l'arrivée au capteur → défaut
@@ -347,7 +346,7 @@ END_IF;
 TonMecaD(
     IN := NOT (BypassSafety OR BypassMecaD) AND ((((NOT TopPositionSensor AND NOT InReferencingMode) 
             OR (Homed AND NOT HomingSuspect AND (CablePosM >= (TopLimitM + 0.10))))
-           AND (Direction >= 0)) // 🆕 Neutralise la butée haute en descente (Direction = -1)
+           AND (Direction >= 0)) // Neutralise la butée haute en descente (Direction = -1)
           AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)), 
     PT := PostRampTimeout
 );
@@ -357,13 +356,13 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#F7FF;
 END_IF;
 
-// 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE (REX 2026-07-08 (4)) — bits 12/13
+// 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE — bits 12/13
 // Couche INDÉPENDANTE de FB_WinchSync (écart mineur, 1er niveau) — défense en profondeur pour un
 // écart VRAIMENT important. ExpectedOtherWinchPosM est DÉJÀ corrigé de l'offset benne actif par
 // l'appelant : comparaison directe valable que le benne soit ouvert, fermé, ou absent du calcul.
 // Suppression pendant BenneBusy (trajet actif = écart transitoire normal, pas un défaut),
-// InReferencingMode (position pas fiable pendant homing) et OtherWinchInhibited (🆕 REX
-// 2026-07-08 (7) : l'autre treuil en maintenance a une position figée, non comparable).
+// InReferencingMode (position pas fiable pendant homing) et OtherWinchInhibited (l'autre treuil
+// en maintenance a une position figée, non comparable).
 // Bit12 : détection → SafeStop immédiat. Bit13 : escalade si pas confirmé arrêté → PowerCutOff.
 IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
    AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
@@ -411,7 +410,7 @@ END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
 
-{region "Arbitrage sorties securite"}
+{region "§5 Arbitrage sorties securite"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -420,8 +419,7 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
-// (Méca A/B/C) + 10 (thermique frein commun) + 11 (Méca D) + 12/13 (🆕 REX 2026-07-08 (4) :
-// Méca E, écart synchro critique) ou si contacteur coupé
+// (Méca A/B/C) + 10 (thermique frein commun) + 11 (Méca D) + 12/13 (Méca E, écart synchro critique) ou si contacteur coupé
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
@@ -431,7 +429,7 @@ ELSE
 END_IF;
 
 // ⬇️ DescendPermit : TRUE = descente autorisée (pas de limite basse, pas de mou câble en mode récup, contacteur engagé)
-// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (TRUE = mouvement autorisé).
+// Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 DescendPermit := NOT (
     (((ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
@@ -440,7 +438,7 @@ DescendPermit := NOT (
 );
 
 // ⬆️ AscentPermit : TRUE = montée autorisée (pas de fin course haut, pas de dépassement position)
-// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (TRUE = mouvement autorisé).
+// Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 AscentPermit := NOT (
     (((ErrorId AND 16#0020) <> 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
@@ -448,19 +446,19 @@ AscentPermit := NOT (
     OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM)) AND NOT BypassTopLimitSoftware)
 );
 
-// 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
+// PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
 // SafeStop seul ne sert à rien dans ces 3 cas précis.
-// 🆕 REX 2026-07-08 (demande utilisateur) : bit2 (surchauffe/perte thermique MOTEUR) et bit10
-// (surchauffe/perte thermique FREIN commun) ajoutés — un frein à manque de courant peut coller
-// instantanément sur perte de son retour thermique : une rampe SafeStop seule ne protège pas la
-// mécanique dans ce cas, coupure puissance immédiate nécessaire. Même raisonnement appliqué au
-// thermique moteur par cohérence/défense en profondeur (demande explicite).
-// 🆕 REX 2026-07-08 (3) : bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B :
-// contacteurs/frein déjà censés être coupés (AscentPermit immédiat sur capteur), une confirmation
-// manquante après délai signifie que la coupure locale n'a pas suffi.
-// 🆕 REX 2026-07-08 (4) : bit13 (Méca E escalade) ajouté — PAS bit12 seul (détection immédiate =
-// SafeStop uniquement ; PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
+// bit2 (surchauffe/perte thermique MOTEUR) et bit10 (surchauffe/perte thermique FREIN commun)
+// ajoutés — un frein à manque de courant peut coller instantanément sur perte de son retour
+// thermique : une rampe SafeStop seule ne protège pas la mécanique dans ce cas, coupure puissance
+// immédiate nécessaire. Même raisonnement appliqué au thermique moteur par cohérence/défense en
+// profondeur.
+// bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B : contacteurs/frein déjà
+// censés être coupés (AscentPermit immédiat sur capteur), une confirmation manquante après délai
+// signifie que la coupure locale n'a pas suffi.
+// bit13 (Méca E escalade) ajouté — PAS bit12 seul (détection immédiate = SafeStop uniquement ;
+// PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
 PowerCutOff := (ErrorId AND 16#2F84) <> 16#0000;
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)

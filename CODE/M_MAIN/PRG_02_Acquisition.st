@@ -17,7 +17,7 @@ VAR_OUTPUT
     WinchInputSourceChanged  : BOOL;              (* TRUE pendant 1 cycle si source Winch change *)
 
     JoystickDeadmanArmed      : BOOL;   (* TRUE = geste homme-mort joystick armé (FB_Joystick.DeadmanArmed, AF08 §4/§6) *)
-    JoystickYNeutral          : BOOL;   (* 🆕 2026-08-05 : TRUE = axe Y joystick au neutre — armement Méca B (FB_Safety_Winch) *)
+    JoystickYNeutral          : BOOL;   (* TRUE = axe Y joystick au neutre — armement Méca B (FB_Safety_Winch) *)
     JoystickDirectionX        : INT;    (* -1 = Gauche/Rev, 0 = Neutre, +1 = Droite/Fwd *)
     JoystickSpeedPctX         : REAL;   (* Magnitude déviation axe X en % (0..100) *)
     JoystickXNeutral          : BOOL;   (* TRUE = axe X joystick au neutre *)
@@ -28,7 +28,7 @@ VAR_OUTPUT
     TranslationPosP1          : BOOL;   (* TRUE = translation en position P1 — CUMULATIF *)
     TranslationPosMaintenance : BOOL;   (* TRUE = translation en position Maintenance — CUMULATIF *)
 
-    (* 🆕 2026-08-06 : mot EXACT — détection d'arrivée/cible et coupure dure UNIQUEMENT,
+    (* Mot EXACT — détection d'arrivée/cible et coupure dure UNIQUEMENT,
        jamais le ralentissement (zone trop étroite). Voir FB_Translation_PositionDecoder.st *)
     TranslationAtTremie      : BOOL;
     TranslationAtPV          : BOOL;
@@ -52,12 +52,12 @@ VAR_OUTPUT
     InputModuleFault           : BOOL;   (* TRUE = au moins un des 3 modules DI hors service *)
     (* 🧲 Positions câbles calculées en mètres (mises à l'échelle après homing, bornées et
        gelées sur doute par FB_Encoder_Safety — CablePosM1/M2 ne sont PLUS la sortie brute
-       FB_Encoder_Scale depuis le 2026-08-05, voir §4bis) *)
+       FB_Encoder_Scale, voir §4bis) *)
     CablePosM1                 : REAL;   (* Position câble M1 en mètres *)
     CablePosM2                 : REAL;   (* Position câble M2 en mètres *)
-    M1_EncoderIncoherent       : BOOL;   (* 🆕 2026-08-05 : TRUE = position hors plage ±99m OU homing suspect (FB_Encoder_Safety) *)
+    M1_EncoderIncoherent       : BOOL;   (* TRUE = position hors plage ±99m OU homing suspect (FB_Encoder_Safety) *)
     M2_EncoderIncoherent       : BOOL;
-    (* 🆕 2026-08-05 : vitesse câble mesurée (FB_Encoder_SpeedMeasure), prérequis FB_Safety_Winch Méca A/F/G *)
+    (* Vitesse câble mesurée (FB_Encoder_SpeedMeasure), prérequis FB_Safety_Winch Méca A/F/G *)
     M1_Speed_Mps               : REAL;   (* Vitesse absolue M1, m/s *)
     M1_SignedSpeed_Mps         : REAL;   (* Vitesse signée M1 (+ montée / - descente), m/s *)
     M1_SpeedValid              : BOOL;   (* TRUE après 6 échantillons couvrant ≥50ms, position saine *)
@@ -79,19 +79,19 @@ VAR
     instEncoderAbsM1         : FB_Encoder_Abs;
     instEncoderScaleM1       : FB_Encoder_Scale;
     instHomingM1             : FB_Encoder_Homing;
-    instEncoderSafetyM1      : FB_Encoder_Safety;       // 🆕 2026-08-05
-    instEncoderSpeedMeasureM1: FB_Encoder_SpeedMeasure;  // 🆕 2026-08-05
+    instEncoderSafetyM1      : FB_Encoder_Safety;
+    instEncoderSpeedMeasureM1: FB_Encoder_SpeedMeasure;
     instEncoderAbsM2         : FB_Encoder_Abs;
     instEncoderScaleM2       : FB_Encoder_Scale;
     instHomingM2             : FB_Encoder_Homing;
-    // 🆕 2026-08-07 (19) : BtnConfirmOpenPos/ClosePos (benne) référencent aussi le codeur M2,
+    // BtnConfirmOpenPos/ClosePos (benne) référencent aussi le codeur M2,
     // comme BtnHome -- voir bandeau instHomingM2 plus bas.
     M2BucketRefOpenEdge      : R_TRIG;
     M2BucketRefCloseEdge     : R_TRIG;
     M2BucketRefRequested     : BOOL;
     M2BucketRefTargetM       : REAL;
-    instEncoderSafetyM2      : FB_Encoder_Safety;       // 🆕 2026-08-05
-    instEncoderSpeedMeasureM2: FB_Encoder_SpeedMeasure;  // 🆕 2026-08-05
+    instEncoderSafetyM2      : FB_Encoder_Safety;
+    instEncoderSpeedMeasureM2: FB_Encoder_SpeedMeasure;
     instPosDecoderM3         : FB_Translation_PositionDecoder;
 
     (* ── Sélection de source par domaine ── *)
@@ -129,7 +129,7 @@ IF SimulationModeRise.Q THEN
     GVL_Simulation.SimTranslationActive := TRUE;
     GVL_Simulation.SimOperatorActive := TRUE;
     GVL_Simulation.SimSafetyActive := TRUE;
-    // 🔧 2026-08-15 : plus d'auto-arm `SimJoystickRawButton := TRUE` — il masquait le vrai
+    // Plus d'auto-arm `SimJoystickRawButton := TRUE` — il masquait le vrai
     // homme-mort (DeadmanArmed restait armé en permanence → rien de testé en sim). Le bouton
     // suit désormais le stimulus directionnel (FB_SimBench : JoyBtnRaw := SimJoystickRawButton
     // OR DirectionCount>0), ce qui rejoue fidèlement l'armement au commandement, la grâce 3 s
@@ -217,7 +217,7 @@ HwReal.Machine.M1_M2_M3_BrakeThermalOk_DI  := M1_M2_M3_BrakeThermalOk_DI;
 HwReal.Machine.M1_M2_KoboldBottomTouch_DI  := M1_M2_KoboldBottomTouch_DI;
 HwReal.Machine.HydraulicThermalOk_DI       := HydraulicThermalOk_DI;
 HwReal.Machine.ConveyorInfeedReady_DI      := ConveyorInfeedReady_DI;
-HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // 🆕 2026-08-12 : déclaré, pas encore consommé
+HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // Déclaré, pas encore consommé
 {endregion}
 
 {region "§1bis Diagnostic modules DI"}
@@ -307,7 +307,7 @@ END_IF;
 
 // 🔧 SEL(G, IN0, IN1) : brique standard IEC 61131-3, retourne IN1 si G=TRUE, IN0 sinon
 // (AF_Partie-03 §1 : composer l'existant avant réimplémentation) — remplace les 4 IF/ELSE
-// compactés qui cassaient le générateur ST→LD (REX 2026-08-13, CODE_QUALITY_STANDARDS.md §11).
+// compactés qui cassaient le générateur ST→LD (CODE_QUALITY_STANDARDS.md §11).
 // Utilisation explicite de HwSim.* et des 4 variables de sélection par domaine.
 HwIn.Winch       := SEL(WinchInputSourceSimulated, HwReal.Winch, HwSim.Winch);
 HwIn.Translation := SEL(TranslationInputSourceSimulated, HwReal.Translation, HwSim.Translation);

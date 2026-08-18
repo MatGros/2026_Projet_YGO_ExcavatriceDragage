@@ -71,6 +71,7 @@ VAR
     StopStartM2_M                   : REAL;                           // . [LOC] Position debut d'arret M2 (m)
 END_VAR
 
+{region "§1 Reset et qualification"}
 CycleTime(DefaultValueS := 0.010); ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN Data.DeltaStartDelay_Ms:=0; Data.DeltaBrakeReleaseTime_Ms:=0; Data.DeltaBrakeApplyTime_Ms:=0; Data.DeltaStopDistance_Mm:=0; Data.DeltaStopTime_Ms:=0; Data.MaxSyncDeviation_M:=0.0; END_IF;
 Comparable := M1CommandActive AND M2CommandActive AND (M1Direction = M2Direction) AND (M1Direction <> 0);
@@ -81,6 +82,9 @@ StopTimer(IN := Stopping, PT := T#1h);
 IF NOT Comparable THEN StartCapturedM1:=FALSE; StartCapturedM2:=FALSE; ReleaseMsM1:=0; ReleaseMsM2:=0; ApplyMsM1:=0; ApplyMsM2:=0; END_IF;
 IF Comparable AND (M1Speed_Mps >= Config.MinimumSpeed_Mps) AND NOT StartCapturedM1 THEN StartMsM1:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM1:=TRUE; END_IF;
 IF Comparable AND (M2Speed_Mps >= Config.MinimumSpeed_Mps) AND NOT StartCapturedM2 THEN StartMsM2:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM2:=TRUE; END_IF;
+{endregion}
+
+{region "§2 Mesure symétrie"}
 IF Qualified THEN
     IF M1BrakeCmd AND M1BrakeApplied THEN ReleaseMsM1 := ReleaseMsM1 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
     IF M2BrakeCmd AND M2BrakeApplied THEN ReleaseMsM2 := ReleaseMsM2 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
@@ -100,5 +104,9 @@ IF Stopping THEN
         Data.DeltaStopTime_Ms := ABS(UDINT_TO_DINT(StopMsM1)-UDINT_TO_DINT(StopMsM2)); Stopping:=FALSE; SymmetryValid:=TRUE;
     END_IF;
 END_IF;
+{endregion}
+
+{region "§3 Sortie"}
 SymmetryOk := SymmetryValid AND (Data.DeltaStartDelay_Ms<=Config.DeltaStartDelay_Ms) AND (Data.DeltaBrakeReleaseTime_Ms<=Config.DeltaBrakeReleaseTime_Ms) AND (Data.DeltaBrakeApplyTime_Ms<=Config.DeltaBrakeApplyTime_Ms) AND (Data.DeltaStopDistance_Mm<=Config.DeltaStopDistance_Mm) AND (Data.DeltaStopTime_Ms<=Config.DeltaStopTime_Ms);
 PreviousQualified := Qualified;
+{endregion}

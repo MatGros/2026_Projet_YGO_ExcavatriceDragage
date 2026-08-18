@@ -20,9 +20,9 @@ END_VAR
 
 VAR_OUTPUT
     Auth : ST_Modes_Autorisations;  // Bus d'autorisations (producteur unique)
-    // 🆕 Deux instances du séquenceur de cycle (D1) — gating sorties par mode.
+    // Deux instances du séquenceur de cycle (D1) — gating sorties par mode.
     // ⚠️ VAR_OUTPUT (pas VAR) : PRG_04/05 y accèdent via PRG_03_Modes_Cycle.instCycleSemiAuto
-    // (une variable locale d'un PROGRAM n'est pas accessible depuis un autre PROGRAM — REX compile 2026-08-15).
+    // (une variable locale d'un PROGRAM n'est pas accessible depuis un autre PROGRAM).
     instCycleMaintenance : FB_Cycle;  // utilisé en MAINT_N1/N2
     instCycleSemiAuto    : FB_Cycle;  // utilisé en SEMI_AUTO
 END_VAR
@@ -73,8 +73,8 @@ instCycleMaintenance(
     M2_CablePosM            := PRG_02_Acquisition.CablePosM2,
     M1_MeasuredSpeedMps     := PRG_02_Acquisition.M1_Speed_Mps,
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.M2_Speed_Mps,
-    SpeedMismatchThresholdMps := 1.5,   // 🆕 Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
-    SpeedMismatchTimeout    := T#500ms, // 🆕 Tempo confirmation écart vitesse (revue)
+    SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
+    SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
@@ -85,7 +85,7 @@ instCycleMaintenance(
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
     Benne_IsOpen            := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.BucketState.MechState.IsClosed,
-    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // 🆕 tolérance matière 2m
+    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -115,8 +115,8 @@ instCycleSemiAuto(
     M2_CablePosM            := PRG_02_Acquisition.CablePosM2,
     M1_MeasuredSpeedMps     := PRG_02_Acquisition.M1_Speed_Mps,
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.M2_Speed_Mps,
-    SpeedMismatchThresholdMps := 1.5,   // 🆕 Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
-    SpeedMismatchTimeout    := T#500ms, // 🆕 Tempo confirmation écart vitesse (revue)
+    SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
+    SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
@@ -127,7 +127,7 @@ instCycleSemiAuto(
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
     Benne_IsOpen            := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.BucketState.MechState.IsClosed,
-    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // 🆕 tolérance matière 2m
+    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,

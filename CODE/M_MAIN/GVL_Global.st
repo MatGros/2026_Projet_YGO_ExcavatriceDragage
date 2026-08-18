@@ -4,7 +4,7 @@
    🎯 Rôle : Regrouper les signaux et horloges système partagés qui
       ne sont pas spécifiques à la logique de simulation ni raccordés
       à des calibrations persistantes.
-   🔧 REX 2026-07-16 : BlinkClock1Hz renommé BlinkClock — alimenté via Util.BLINK
+   BlinkClock alimenté via Util.BLINK
       (asymétrique, durées réglables GVL_PERSISTENT._BlinkTimeOn/_BlinkTimeOff,
       câblage dans PRG_SUPERVISION_CFC §0). Le nom "1Hz" n'a plus de sens dès que
       le rythme n'est pas symétrique 500ms/500ms.
@@ -39,10 +39,8 @@ VAR_GLOBAL
     EmergencyArmingLockoutActive: BOOL;
     ArmingSeqStep                : INT;
 END_VAR
-(* 🗑️ REX LOT_STRUCTURE_INTERLOCKS_LD (2026-08) : instWinchOutputInterlockM1_LD /
-   M2_LD / instTranslationOutputInterlock_LD retirés d'ici — c'étaient des
-   instances FB déclarées mais JAMAIS appelées (orphelines, check_linkage L13-FB).
-   Les instances réelles vivent maintenant dans PRG_06_Outputs_LD (seul
-   producteur), qui publie déjà leurs sorties utiles (M1RelayFwd...) recopiées
-   ci-dessus. Une deuxième instance ici aurait dupliqué l'état sans jamais
-   être appelée : source de confusion, pas de valeur ajoutée. *)
+(* instWinchOutputInterlockM1_LD / M2_LD / instTranslationOutputInterlock_LD retirés d'ici —
+   c'étaient des instances FB déclarées mais JAMAIS appelées (orphelines, check_linkage L13-FB).
+   Les instances réelles vivent maintenant dans PRG_06_Outputs_LD (seul producteur), qui publie
+   déjà leurs sorties utiles (M1RelayFwd...) recopiées ci-dessus. Une deuxième instance ici aurait
+   dupliqué l'état sans jamais être appelée : source de confusion, pas de valeur ajoutée. *)

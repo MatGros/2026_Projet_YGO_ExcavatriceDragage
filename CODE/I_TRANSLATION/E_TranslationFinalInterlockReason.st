@@ -1,4 +1,9 @@
-(* 🛡️ Raisons mémorisées de la barrière finale frein / AC600 M3. *)
+(* =======================================================================
+   🛡️ E_TranslationFinalInterlockReason — Raisons d'interlock M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des raisons de blocage de la barrière finale M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   ======================================================================= *)
 {attribute 'qualified_only'}
 TYPE E_TranslationFinalInterlockReason :
 (

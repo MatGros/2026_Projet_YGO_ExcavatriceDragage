@@ -9,7 +9,7 @@ STRUCT
     Joystick            : ST_Diag_Device;  (* 🕹️ Diagnostics esclave Joystick *)
     CanError            : BOOL;           (* ⚠️ Anomalie CANopen *)
     CanErrorId          : WORD;           (* ❌ Code anomalie CANopen *)
-    
+
     BusEthercat         : ST_Diag_Device;  (* 📡 Diagnostics bus EtherCAT *)
     EncoderM1           : ST_Diag_Device;  (* 🧲 Diagnostics esclave COD1 *)
     EncoderM2           : ST_Diag_Device;  (* 🧲 Diagnostics esclave COD2 *)

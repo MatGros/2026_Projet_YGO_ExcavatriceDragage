@@ -107,7 +107,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
-    LastMode := Mode;   // 🆕 REX 2026-07-08 — pas de faux changement détecté à la réactivation
+    LastMode := Mode;   // Pas de faux changement détecté à la réactivation
     RETURN;
 END_IF;
 
@@ -145,7 +145,7 @@ LastCalibrate := BtnCalibrate;
 // 🧮 4bis. MISE À L'ÉCHELLE (avant homme-mort — le neutre s'évalue sur les 2 axes déjà deadbandés)
 ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
-AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // 🆕 2026-08-07 : IHM/diagnostic — position centrale (zone morte)
+AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic — position centrale (zone morte)
 
 {endregion}
 
@@ -155,7 +155,7 @@ AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // 🆕 2026-08-
 // de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
 IF Mode <> LastMode THEN
     DeadmanArmed := FALSE;
-    DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après changement de mode
+    DeadmanArmPending := FALSE;   // Nouvel appui exigé après changement de mode
 END_IF;
 LastMode := Mode;
 
@@ -165,7 +165,7 @@ LastMode := Mode;
 BenneBusyFallEdge(CLK := BenneBusy);
 IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmed := FALSE;
-    DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après fin de cycle benne
+    DeadmanArmPending := FALSE;   // Nouvel appui exigé après fin de cycle benne
 END_IF;
 
 {endregion}
@@ -173,16 +173,13 @@ END_IF;
 {region "§5 Armement homme mort"}
 // 4ter. BOUTON HOMME-MORT — armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la
 // position des axes pendant l'appui.
-// 🔧 2026-08-07 (retour terrain) : l'ancien armement ("front bouton" ET "axes strictement à
-// 0.0 sur le MÊME scan") échouait dès que l'opérateur poussait le joystick quelques ms après
-// avoir appuyé — trop contraignant en pratique (le geste naturel "j'appuie PUIS je pousse" ratait
-// systématiquement la fenêtre d'un seul scan). Nouvelle séquence : appui (front) → maintien
-// DeadmanArmHoldTime (100 ms) → armé, quelle que soit la position des axes durant ce maintien.
-// Relâchement AVANT la fin du maintien = tentative annulée (DeadmanArmPending retombe), un
-// nouvel appui (front) est requis — pas d'armement différé "surprise" sur un appui prolongé après
-// un désarmement (mode/benne/neutre). Sûr même si le joystick est déjà hors zone morte à la fin
-// du maintien : les rampes d'accel/décel restent gérées par les FB aval (FB_Winch/FB_Translation,
-// cf. §"Rôle" en tête de fichier), donc pas de démarrage brutal possible côté ce FB.
+// Armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la position des axes pendant
+// l'appui : appui (front) → maintien 100 ms → armé, quelle que soit la position des axes durant
+// ce maintien. Relâchement AVANT la fin du maintien = tentative annulée (DeadmanArmPending
+// retombe), un nouvel appui (front) est requis — pas d'armement différé "surprise" sur un appui
+// prolongé après un désarmement (mode/benne/neutre). Sûr même si le joystick est déjà hors zone
+// morte à la fin du maintien : les rampes d'accel/décel restent gérées par les FB aval
+// (FB_Winch/FB_Translation), donc pas de démarrage brutal possible côté ce FB.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN
     DeadmanArmPending := TRUE;

@@ -10,7 +10,7 @@ STRUCT
     Ready                   : BOOL;    (* 🟢 Translation prêt à fonctionner *)
     Busy                    : BOOL;    (* ⚙️ Mouvement en cours *)
     Done                    : BOOL;    (* ✅ Mouvement terminé avec succès *)
-    Error                   : BOOL;    (* 🔴 Translation en défaut *)
+    Error                   : BOOL;    (* Translation en défaut *)
     ErrorId                 : WORD;    (* ❌ Code du défaut actif *)
     BrakeCmd                : BOOL;    (* 🔓 Commande de desserrage du frein (lecture seule, TRUE = desserré) *)
     BrakeFeedback           : BOOL;    (* 🔌 Retour physique direct : TRUE = frein OUVERT (desserré) *)
@@ -39,7 +39,7 @@ STRUCT
     PositionP2              : BOOL;
     PositionP1              : BOOL;
     PositionMaintenance     : BOOL;
-    (* 🆕 2026-08-06 : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement) *)
+    (* : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement) *)
     AtTremie                : BOOL;
     AtPV                    : BOOL;
     AtP2                    : BOOL;
@@ -50,9 +50,9 @@ STRUCT
     SensorWordIncoherent    : BOOL;
     LimitSwitchFwd          : BOOL;
     LimitSwitchRev          : BOOL;
-    DriveThermalOk          : BOOL;    (* 🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même *)
+    DriveThermalOk          : BOOL;    (* T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même *)
     MaintenanceTargetEnable : BOOL;    (* 🔓 TRUE = Autorise le déplacement vers la cible 4 (Maintenance) ; actif uniquement en mode MAINT_N2 *)
     SimulationModeActive    : BOOL;
-    HeightInterlockBlocking : BOOL;    (* 🆕 2026-08-06 : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise *)
+    HeightInterlockBlocking : BOOL;    (* : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise *)
 END_STRUCT
 END_TYPE

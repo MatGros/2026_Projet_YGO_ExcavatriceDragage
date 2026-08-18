@@ -76,7 +76,7 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -92,7 +92,7 @@ END_IF;
 
 {endregion}
 
-{region "Initialisation et activation synchro"}
+{region "§2 Initialisation et activation synchro"}
 Ready := TRUE;
 State := E_State.READY;
 
@@ -104,19 +104,19 @@ IF BypassGlobal THEN
     ErrorId := 16#0000;
 END_IF;
 
-// 🎚️ 3. SyncActive SELON MODE (Partie9 §9, décisions actées 2026-07-02)
+// 🎚️ 3. SyncActive SELON MODE (Partie9 §9)
 CASE Mode OF
     E_Mode.MAINT_N1:
         SyncActive := TRUE;                  // Imposée, non désactivable (sécurité maintenue N1)
     E_Mode.MAINT_N2:
-        SyncActive := SyncEnable;             // 🔧 REX 2026-07-08 : ex-NOT OverrideSync, polarité déjà positive
+        SyncActive := SyncEnable;             // Polarité positive (TRUE = synchro active)
     ELSE
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
 
 {endregion}
 
-{region "Calcul ecart position"}
+{region "§3 Calcul ecart position"}
 // 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
 IF HomedM1 AND HomedM2 THEN
     SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
@@ -128,17 +128,16 @@ END_IF;
 
 {endregion}
 
-{region "Surveillance synchronisme"}
+{region "§4 Surveillance synchronisme"}
 // 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
 IF NOT BypassGlobal THEN
 
 // 🔍 5. DÉTECTION ÉCART HORS TOLÉRANCE — bit0
-// 🔧 REX 2026-07-08 (5) : filtre temporel (même pattern que MismatchTimer bit1) — absorbe le
-// transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2), évite le blocage
-// intempestif constaté sur incident terrain (0.24m transitoire).
-// 🆕 2026-08-15 (T113) : Si écart > CfgSyncToleranceM -> alarme d'écart (SyncWarn / bit0) et
-// dégradation en vitesse lente Palier 1 (SyncDegradedStep1). L'arrêt brutal SafeStop est
-// réservé à l'écart critique Méca E (> CriticalSyncToleranceM).
+// Filtre temporel (même pattern que MismatchTimer bit1) — absorbe le transitoire mécanique
+// normal d'arrêt (coast-down différentiel M1/M2), évite le blocage intempestif.
+// Si écart > CfgSyncToleranceM -> alarme d'écart (SyncWarn / bit0) et dégradation en vitesse
+// lente Palier 1 (SyncDegradedStep1). L'arrêt brutal SafeStop est réservé à l'écart critique
+// Méca E (> CriticalSyncToleranceM).
 DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM > CfgSyncToleranceM);
 DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
 IF DeviationTimer.Q THEN
@@ -176,7 +175,7 @@ END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
 
-{region "Etats et diagnostic"}
+{region "§5 Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);

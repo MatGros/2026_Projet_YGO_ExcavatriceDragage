@@ -2,84 +2,87 @@
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
-   🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
-      thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
+   Rôle : Surveillance joystick, bus EtherCAT, rotation de phases,
+      thermique frein commun, Méca A (vitesse non commandée à l'arrêt),
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
+   🎯 Invariant : les défauts de communication (bits 0/1/2) ne coupent
+      jamais la puissance amont (SafeStop seul) ; seuls les défauts
+      physiques (bits 3..7) déclenchent PowerCutOff.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_Translation
 VAR_INPUT
-    Enable              : BOOL;        // Active la surveillance
-    Reset               : BOOL;        // Front acquittement défauts
-    PowerContactorEngaged     : BOOL;        // Chaîne AU réarmée + conditions globales OK
-    Mode                : E_Mode;      // Mode courant
-    JoystickOnline      : BOOL;        // instDiagCanOpen.DeviceJoystick.Online
-    JoystickOperational : BOOL;        // instDiagCanOpen.DeviceJoystick.Operational
-    HeartbeatIhmOk      : BOOL;        // 💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
-    PhaseRotationOk     : BOOL;        // PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI (TRUE = OK)
-    BrakeThermalFeedback: BOOL;        // Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)
+    Enable              : BOOL;        // --> [CMD] Active la surveillance
+    Reset               : BOOL;        // --> [CMD] Front acquittement défauts
+    PowerContactorEngaged     : BOOL;        // --> [SAFE] Chaîne AU réarmée + conditions globales OK
+    Mode                : E_Mode;      // --> [CMD] Mode courant
+    JoystickOnline      : BOOL;        // --> [HW] instDiagCanOpen.DeviceJoystick.Online
+    JoystickOperational : BOOL;        // --> [HW] instDiagCanOpen.DeviceJoystick.Operational
+    HeartbeatIhmOk      : BOOL;        // --> [HW] IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur
+    PhaseRotationOk     : BOOL;        // --> [HW] PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI (TRUE = OK)
+    BrakeThermalFeedback: BOOL;        // --> [HW] Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)
 
     // 🔌 Spécifique EtherCAT & Capteurs réels
-    DriveOnline         : BOOL;        // Status diagnostic communication EtherCAT (Online)
-    DriveOperational    : BOOL;        // Status diagnostic communication EtherCAT (Operational)
-    DriveStatusWord     : WORD;        // Mot d'état variateur AC600
-    DriveActualFreqHz   : REAL;        // Vitesse réelle variateur (Hz)
-    BrakeFeedback       : BOOL;        // Retour d'état bobine frein (TRUE = ouvert/desserré — révocation 2026-08-03)
-    BrakeCmd            : BOOL;        // Commande frein
-    Direction           : INT;         // Direction commandée
-    LimitSwitchFwd      : BOOL;        // Fin de course extrême avant
-    LimitSwitchRev      : BOOL;        // Fin de course extrême arrière
-    SensorWordIncoherent: BOOL;        // 🆕 REX 2026-07-18 : mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)
+    DriveOnline         : BOOL;        // --> [HW] Status diagnostic communication EtherCAT (Online)
+    DriveOperational    : BOOL;        // --> [HW] Status diagnostic communication EtherCAT (Operational)
+    DriveStatusWord     : WORD;        // --> [HW] Mot d'état variateur AC600
+    DriveActualFreqHz   : REAL;        // --> [HW] Vitesse réelle variateur (Hz)
+    BrakeFeedback       : BOOL;        // --> [HW] Retour d'état bobine frein (TRUE = ouvert/desserré)
+    BrakeCmd            : BOOL;        // --> [HW] Commande frein
+    Direction           : INT;         // --> [CMD] Direction commandée
+    LimitSwitchFwd      : BOOL;        // --> [HW] Fin de course extrême avant
+    LimitSwitchRev      : BOOL;        // --> [HW] Fin de course extrême arrière
+    SensorWordIncoherent: BOOL;        // --> [HW] Mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)
 
     // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
-    BypassGlobal          : BOOL := FALSE;   // 🌐 Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)
-    BypassOperatorComm    : BOOL := FALSE;   // 🎮 Bypass perte communication opérateur
-    BypassDriveComm       : BOOL := FALSE;   // 📡 Bypass perte communication drive
-    BypassPhaseRotation   : BOOL := FALSE;   // ⚡ Bypass défaut rotation phases
-    BypassBrakeThermal    : BOOL := FALSE;   // 🌡️ Bypass surchauffe frein
-    BypassMecaB           : BOOL := FALSE;   // 🛑 Bypass Méca B
-    BypassMecaA           : BOOL := FALSE;   // 🔄 Bypass Méca A
-    BypassLimitSwitch     : BOOL := FALSE;   // 🚧 Bypass butées extrêmes
-    BypassSensorIncoherent: BOOL := FALSE;   // 🧭 Bypass incohérence mot capteurs
-    BypassSafety          : BOOL := FALSE;   // 🛡️ Bypass groupé PowerCutOff (BrakeThermal/MecaB/MecaA/LimitSwitch/SensorIncoherent)
-    BypassProcess         : BOOL := FALSE;   // ⚙️ Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)
+    BypassGlobal          : BOOL := FALSE;   // --> [TST] Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)
+    BypassOperatorComm    : BOOL := FALSE;   // --> [TST] Bypass perte communication opérateur
+    BypassDriveComm       : BOOL := FALSE;   // --> [TST] Bypass perte communication drive
+    BypassPhaseRotation   : BOOL := FALSE;   // --> [TST] Bypass défaut rotation phases
+    BypassBrakeThermal    : BOOL := FALSE;   // --> [TST] Bypass surchauffe frein
+    BypassMecaB           : BOOL := FALSE;   // --> [TST] Bypass Méca B
+    BypassMecaA           : BOOL := FALSE;   // --> [TST] Bypass Méca A
+    BypassLimitSwitch     : BOOL := FALSE;   // --> [TST] Bypass butées extrêmes
+    BypassSensorIncoherent: BOOL := FALSE;   // --> [TST] Bypass incohérence mot capteurs
+    BypassSafety          : BOOL := FALSE;   // --> [TST] Bypass groupé PowerCutOff (BrakeThermal/MecaB/MecaA/LimitSwitch/SensorIncoherent)
+    BypassProcess         : BOOL := FALSE;   // --> [TST] Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;
-    Busy                : BOOL;
-    Done                : BOOL;
-    Error               : BOOL;
-    ErrorId             : WORD;        // bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide
-    State               : E_State;
-    StateAtError        : E_State;
-    SafeStop            : BOOL;        // 🟧 Décélération rapide (PLC)
-    PowerCutOff         : BOOL;        // 🧨 Coup de poing / coupure puissance amont
-    ErrorOperatorComm   : BOOL;        // 🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)
-    ErrorDriveComm      : BOOL;        // 📡 Perte communication EtherCAT variateur (bit1)
-    ErrorPhaseRotation  : BOOL;        // ⚡ Mauvaise rotation de phases (bit2)
-    ErrorBrakeThermal   : BOOL;        // 🌡️ Surchauffe thermique frein commun (bit3)
-    ErrorMecaB          : BOOL;        // 🛑 Absence confirmation arrêt (Méca B - bit4)
-    ErrorMecaA          : BOOL;        // 🔄 Mouvement non commandé (Méca A - bit5)
-    ErrorLimitSwitch    : BOOL;        // 🚧 Limite extrême Translation atteinte (bit6)
-    ErrorSensorIncoherent: BOOL;       // 🧭 Incohérence mot capteurs position (bit7)
+    Ready               : BOOL;   // <-- [STAT] FB prêt
+    Busy                : BOOL;   // <-- [STAT] FB occupé
+    Done                : BOOL;   // <-- [STAT] Action terminée
+    Error               : BOOL;   // <-- [STAT] Synthèse défaut
+    ErrorId             : WORD;        // <-- [DIAG] bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide
+    State               : E_State;   // <-- [STAT] Etat courant
+    StateAtError        : E_State;   // <-- [DIAG] Etat mémorisé au dernier défaut
+    SafeStop            : BOOL;        // <-- [ACT] Décélération rapide (PLC)
+    PowerCutOff         : BOOL;        // <-- [ACT] Coup de poing / coupure puissance amont
+    ErrorOperatorComm   : BOOL;        // <-- [DIAG] Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)
+    ErrorDriveComm      : BOOL;        // <-- [DIAG] Perte communication EtherCAT variateur (bit1)
+    ErrorPhaseRotation  : BOOL;        // <-- [DIAG] Mauvaise rotation de phases (bit2)
+    ErrorBrakeThermal   : BOOL;        // <-- [DIAG] Surchauffe thermique frein commun (bit3)
+    ErrorMecaB          : BOOL;        // <-- [DIAG] Absence confirmation arrêt (Méca B - bit4)
+    ErrorMecaA          : BOOL;        // <-- [DIAG] Mouvement non commandé (Méca A - bit5)
+    ErrorLimitSwitch    : BOOL;        // <-- [DIAG] Limite extrême Translation atteinte (bit6)
+    ErrorSensorIncoherent: BOOL;       // <-- [DIAG] Incohérence mot capteurs position (bit7)
 END_VAR
 VAR
-    ResetEdge           : R_TRIG;
-    ErrorEdge           : R_TRIG;
-    TonMecaB            : TON;         // Sécurité à l'arrêt (Méca B)
-    TonMecaA            : TON;         // Sécurité mouvement non commandé (Méca A)
-    TonLimitSwitchOverrun : TON;       // 🆕 Surveillance poussée anormale / escalade fin de course
-    OverrunCondition    : BOOL;
-    PostRampTimeout     : TIME := T#3S;
-    UncommandedActiveB  : BOOL;
-    UncommandedActiveA  : BOOL;
-    FirstScanDone       : BOOL;
-    TonStartupWarmup    : TON;         // ⏱️ Inhibition 3s au boot + effacement auto coms
+    ResetEdge           : R_TRIG;   // . [LOC] Front Reset
+    ErrorEdge           : R_TRIG;   // . [LOC] Front Erreur
+    TonMecaB            : TON;         // . [LOC] Sécurité à l'arrêt (Méca B)
+    TonMecaA            : TON;         // . [LOC] Sécurité mouvement non commandé (Méca A)
+    TonLimitSwitchOverrun : TON;       // . [LOC] Surveillance poussée anormale / escalade fin de course
+    OverrunCondition    : BOOL;   // . [LOC] Condition escalade fin de course
+    PostRampTimeout     : TIME := T#3S;   // . [LOC] Délai Méca B
+    UncommandedActiveB  : BOOL;   // . [LOC] Méca B active
+    UncommandedActiveA  : BOOL;   // . [LOC] Méca A active
+    FirstScanDone       : BOOL;   // . [LOC] Initialisation premier scan
+    TonStartupWarmup    : TON;         // . [LOC] Inhibition 3s au boot + effacement auto coms
 END_VAR
 
 // === IMPLEMENTATION ===
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -105,7 +108,7 @@ END_IF;
 
 {endregion}
 
-{region "Initialisation et bypass global"}
+{region "§1bis Initialisation et bypass global"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
@@ -126,7 +129,7 @@ END_IF;
 
 {endregion}
 
-{region "Diagnostics et protections translation"}
+{region "§2 Diagnostics et protections translation"}
 // ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
 // On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
 IF NOT BypassGlobal THEN
@@ -240,7 +243,7 @@ END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
 
-{region "Arbitrage sorties et etat"}
+{region "§4 Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);

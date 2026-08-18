@@ -15,13 +15,13 @@ STRUCT
     (* 🚦 États, retours et mesures *)
     State                   : ST_WinchState;
 
-    (* 🔧 Configurations et limites *)
+    (* Configurations et limites *)
     Cfg                     : ST_WinchCfg;
 
     (* 🛡️ Sécurité (FB_Safety_Winch) *)
     Safety                  : ST_SafetyWinch;
 
-    (* 🔧 Bypass maintenance *)
+    (* Bypass maintenance *)
     Bypass                  : ST_BypassWinch;
 
     (* 🪣 Benne — pertinent uniquement pour M2 (M2TreuilBenne.Bucket) *)

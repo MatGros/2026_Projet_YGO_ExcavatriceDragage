@@ -23,7 +23,7 @@ VAR
     instCfgPersistBridgeBucket : FB_CfgPersistBridge_BucketCfg;
     instCfgPersistBridgeWinchM1 : FB_CfgPersistBridge_WinchCfg;
     instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg;
-    instCfgPersistBridgeTranslation : FB_CfgPersistBridge_TranslationCfg; // 🆕 2026-08-06 : Translation n'avait pas de slot Cfg
+    instCfgPersistBridgeTranslation : FB_CfgPersistBridge_TranslationCfg; // Translation n'avait pas de slot Cfg
     instDiagCanOpen : FB_Diag_CanOpen;
     instDiagEthercat : FB_Diag_Ethercat;
     instDiagIhmHeartbeat : FB_Diag_IhmHeartbeat;
@@ -135,7 +135,7 @@ IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
     GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
-// 🆕 2026-08-06 (retour terrain, mise en service) : jusqu'ici _TranslationSetFreq_Hz
+// Jusqu'ici _TranslationSetFreq_Hz
 // n'était JAMAIS réécrit après sa déclaration — la restauration au boot rejouait donc
 // toujours la valeur par défaut compilée (0.0), jamais le dernier réglage opérateur.
 // Recopie continue (après restauration) : toute consigne changée en session survit au
@@ -168,7 +168,7 @@ IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
 END_IF;
 
-// 🔧 REX 2026-08 : GVL_BypassRetain.BypassSyncGlobal (RETAIN) et
+// GVL_BypassRetain.BypassSyncGlobal (RETAIN) et
 // ST_BypassSync.Initialized existaient tous les deux, mais aucun bloc de
 // restauration boot ne les reliait (contrairement à Translation/M1/M2 ci-dessus)
 // — Initialized restait bloqué à FALSE indéfiniment, bypass synchro jamais
@@ -246,7 +246,7 @@ GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
 GVL_IHM.Commun.PhaseRotationFault        := NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;
 
-// 💓 Publication heartbeat IHM↔PLC (T83, LOT0_DIAG_IHM_HEARTBEAT 2026-08-05)
+// 💓 Publication heartbeat IHM↔PLC
 GVL_IHM.Commun.HeartbeatIhmOk            := instDiagIhmHeartbeat.HeartbeatIhmOk;
 GVL_IHM.Commun.HeartbeatIhmTimeout       := instDiagIhmHeartbeat.HeartbeatIhmTimeout;
 GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdge;
@@ -340,7 +340,7 @@ GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigital
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
 // 🖥️ Bandeau IHM 4 champs (AF-07 §4)
-// 🆕 Publication des états du cycle semi-auto (lecture seule) — alimente le bandeau (T115)
+// Publication des états du cycle semi-auto (lecture seule) — alimente le bandeau
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
 GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy;
 GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Done;

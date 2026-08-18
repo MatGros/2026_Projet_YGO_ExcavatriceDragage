@@ -63,11 +63,11 @@
 | **T123-F** | `CODE/F_MODES/` (2 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200..G410 PASS, logique métier 100% intacte) |
 | **T123-G** | `CODE/G_CYCLE/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200..G410 PASS, logique métier 100% intacte) |
 | **T123-H** | `CODE/H_TREUILS_BENNE/` (11 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ✅ | AGY-01 | ✅ Validé par l'orchestrateur (G200..G410 PASS, logique métier 100% intacte) |
-| **T123-I** | `CODE/I_TRANSLATION/` (5 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
-| **T123-J** | `CODE/J_SUPERVISION/` (1 fichier) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
-| **T123-K** | `CODE/K_DEPANNAGE/` (1 fichier) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
-| **T123-L** | `CODE/L_SIMULATION/` (8 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
-| **T123-M** | `CODE/M_MAIN/` (10 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags | ⬜ | — | — |
+| **T123-I** | `CODE/I_TRANSLATION/` (7 fichiers) | En-têtes concis ≤15L + Ordre VAR + Flèches ASCII (`-->`/`<--`/`*`/`.`) + Tags + purge REX/dates des commentaires (invariants reformulés) + régions `§N` | ✅ | AGY-01 | ✅ Validé (exécutable identique, diff --check PASS) |
+| **T123-J** | `CODE/J_SUPERVISION/` (3 FB + GVL + ~50 DUT `_TYPES`) | En-têtes concis ≤15L + Tags + purge REX/dates + régions `§N` | ✅ | AGY-01 | ✅ Validé (exécutable identique, diff --check PASS) |
+| **T123-K** | `CODE/K_DEPANNAGE/` (2 fichiers) | En-têtes concis ≤15L + Tags + purge REX/dates + régions `§N` | ✅ | AGY-01 | ✅ Validé (exécutable identique, diff --check PASS) |
+| **T123-L** | `CODE/L_SIMULATION/` (7 fichiers) | En-têtes concis ≤15L + Tags + purge REX/dates + régions `§N` | ✅ | AGY-01 | ✅ Validé (exécutable identique, diff --check PASS) |
+| **T123-M** | `CODE/M_MAIN/` (7 fichiers) | En-têtes concis ≤15L + Tags + purge REX/dates + régions `§N` | ✅ | AGY-01 | ✅ Validé (exécutable identique, diff --check PASS) |
 | **T123-VAL** | Validation & Bundle | `run_all_gates.py` + Régénération `CODE_Bundle_v2.xml` | ⬜ | — | — |
 
 ### Règles de conduite

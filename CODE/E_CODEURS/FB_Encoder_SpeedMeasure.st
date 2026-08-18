@@ -45,6 +45,7 @@ VAR CONSTANT
     SampleCount         : INT := 6;       // Nombre total d'echantillons requis
 END_VAR
 
+{region "§1 Horodatage et purge"}
 // ⏱️ Horodatage natif : le calcul utilise le temps réellement écoulé, jamais un cycle supposé.
 CurrentTimestamp := TIME();
 
@@ -57,7 +58,9 @@ IF NOT Enable OR Reset OR NOT PositionValid THEN
     TimestampInitialized := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Première position"}
 // 🕒 Première position de la nouvelle fenêtre.
 IF NOT TimestampInitialized THEN
     Positions_M[0] := Position_M;
@@ -70,7 +73,9 @@ IF NOT TimestampInitialized THEN
     Valid := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Rebouclage TIME"}
 // 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant (indépendant de T88).
 IF CurrentTimestamp < LastTimestamp THEN
     Positions_M[0] := Position_M;
@@ -89,7 +94,9 @@ ElapsedSinceSample := CurrentTimestamp - LastTimestamp;
 IF ElapsedSinceSample <= T#0MS THEN
     RETURN;
 END_IF;
+{endregion}
 
+{region "§4 Collecte échantillons"}
 // 📥 Six positions espacées d'au moins 10 ms donnent cinq intervalles sur la fenêtre interne de 50 ms.
 IF ElapsedSinceSample >= SamplePeriod THEN
     LastTimestamp := CurrentTimestamp;
@@ -106,7 +113,9 @@ IF ElapsedSinceSample >= SamplePeriod THEN
         Positions_M[5] := Position_M;
         Timestamps[5] := CurrentTimestamp;
     END_IF;
+{endregion}
 
+{region "§5 Calcul vitesse"}
     IF CollectedSamples = SampleCount THEN
         // 🛡️ Ordre temporel et durée minimale contrôlés avant toute conversion/division.
         IF Timestamps[5] >= Timestamps[0] THEN
@@ -130,3 +139,4 @@ IF ElapsedSinceSample >= SamplePeriod THEN
         END_IF;
     END_IF;
 END_IF;
+{endregion}

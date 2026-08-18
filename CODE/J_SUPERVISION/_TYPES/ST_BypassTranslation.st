@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
+   ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
    ───────────────────────────────────────────────────────────────
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
@@ -16,7 +16,7 @@ STRUCT
     (* 🚧 2. Limites physiques et Positionnement *)
     LimitSwitch       : BOOL; (* 🚧 Bypass fins de course physiques avant/arrière *)
     SensorIncoherent  : BOOL; (* 🧭 Bypass incohérence mot capteurs de position *)
-    MinHeight         : BOOL; (* 🆕 2026-08-06 : Bypass interlock hauteur mini M1/M2 requise pour translation *)
+    MinHeight         : BOOL; (* : Bypass interlock hauteur mini M1/M2 requise pour translation *)
 
     (* ⚙️ 3. Sécurité Mécanique (Méca A-B) *)
     MecaA             : BOOL; (* 🔄 Bypass Méca A : mouvement non commandé à l'arrêt *)
@@ -26,7 +26,7 @@ STRUCT
     Safety            : BOOL; (* 🛡️ Bypass groupé : tous les bits qui provoquent un PowerCutOff *)
     Process           : BOOL; (* ⚙️ Bypass groupé : tous les bits qui provoquent un SafeStop *)
     Global            : BOOL; (* 🌐 Bypass Global : ignore toutes les sécurités de cet axe *)
-    // 🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+    // FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
     // (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
     Initialized       : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT

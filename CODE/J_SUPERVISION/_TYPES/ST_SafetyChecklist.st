@@ -7,7 +7,7 @@ TYPE ST_SafetyChecklist :
 STRUCT
     (* 0. Aiguillage source — dit QUELLE entree alimente les steps 1-3 ci-dessous.
        Absent jusqu'ici : diagnostiquer un blocage AU en full simu obligeait a rouvrir
-       GVL_Simulation dans un Watch separe (REX 2026-08-14, banc sans HW). *)
+       GVL_Simulation dans un Watch separe (, banc sans HW). *)
     SimulationModeActive         : BOOL; (* TRUE = bit maitre simu actif (GVL_Simulation.SimulationModeActive) *)
     SimSafetyActive              : BOOL; (* TRUE = domaine Safety simule ➔ Step1-3 lisent FB_Sim_Safety, pas les DI/comm reelles *)
 

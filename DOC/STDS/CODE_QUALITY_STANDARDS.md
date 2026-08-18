@@ -47,7 +47,7 @@
 6. **Cartouche d'Entête des Fichiers Code ST (`CODE/*.st`) & Cohérence AF Stricte** :
    - **Concisions & Longueur Maximale (≤ 15 lignes)** : Le cartouche d'entête doit être **ultra-concis, direct et fonctionnel**. Il comporte au maximum 15 lignes de commentaires.
    - **Purge Absolue du Journal de Chantier / REX** : **Zéro historique REX, dates de correctifs terrain ou compte-rendus d'incidents** dans le cartouche d'entête du code ST (ex: ❌ *« REX 2026-07-01 bug corrigé... »*, ❌ *« ÉVOLUTION D72 suite retour terrain... »*). Tout l'historique vit exclusivement dans `DOC/VERSION_HISTORY.md`, `DOC/AF/` et Git.
-   - **Structure Multi-Lignes & Liste Blanchie d'Emojis** : Tout fichier ST commence par un cartouche structuré utilisant **exclusivement** les émojis de la liste blanchie universelle (visibilité garantie sans carrés vides dans l'éditeur CODESYS 3.5) :
+   - **Structure Multi-Lignes & Liste Blanchie d'Emojis** : Tout fichier ST commence par un cartouche structuré utilisant **exclusivement** les émojis de la liste blanchie du projet, validée empiriquement dans l'éditeur et la visualisation CODESYS 3.5 (aucun carré vide) :
      ```pascal
      (* =======================================================================
         🛡️ FB_Safety_Translation — Anti-télescopage & Verrouillage M3
@@ -58,7 +58,7 @@
         📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
         ======================================================================= *)
      ```
-   - **Guide des Émojis Blanchis Autorisés (Unicode BMP)** :
+   - **Guide des Émojis Blanchis Autorisés (whitelist CODESYS projet)** :
      - `🎯` = Rôle principal du composant (recopié de l'AF).
      - `📄` = Référence exacte à la spec métier active dans `DOC/AF/`.
      - `🛡️` = Bloc ou fonction de Sécurité Machine.
@@ -70,7 +70,7 @@
      - `📊` = Diagnostic / Mesures.
      - `💾` = Donnée Persistante (`GVL_PERSISTENT`).
      - `🧪` = Mode Test / Simulation.
-     *(Tout autre émoji exotique qui s'afficherait sous forme de carré vide `` selon la police Windows CODESYS est proscrit).*
+     *(Whitelist validée en visualisation CODESYS du projet. Tout émoji qui s'afficherait en carré vide `` selon la police Windows CODESYS est proscrit et doit être retiré sur signalement terrain.)*
    - **Source Unique de Vérité (Zéro Dérive)** : Le titre et le rôle décrits dans le cartouche d'entête `.st` doivent être **recopiés à l'identique** depuis l'AF spécifiée (`DOC/AF/`). Le script d'audit valide automatiquement cette cohérence.
 
 1. Le nom dit **le rôle**, jamais le type (`bFlag` ❌, `iCounter` ❌ — le type se lit en déclaration).
@@ -150,6 +150,41 @@ Détail complet (préfixes, suffixes d'unité, polarité booléenne, constructio
 - **`PERSISTENT`/`RETAIN`** : uniquement pour un réglage qui doit survivre à un redémarrage.
   Un paramètre influençant une fonction de sécurité n'est pas rendu réglable sans exigence
   métier validée, bornage et traçabilité.
+
+---
+
+## 2bis. 🧭 Convention des Régions `{region ...}` (Lisibilité Maintenance)
+
+Les régions CODESYS (`{region "..."}` / `{endregion}`) structurent le corps ST en blocs
+repliables. Elles **n'ont aucun effet sur la compilation ni la logique** (balises d'éditeur),
+mais elles guident la lecture maintenance. Convention projet :
+
+- **Format unique** : `{region "§N <Description concise>"}` — `N` = **numéro de section du corps**
+  que le bloc contient (aligné sur les commentaires `// §N` du corps, eux-mêmes référencés par
+  les fiches AF). L'ordre des régions suit l'ordre d'exécution du POU.
+- **Sous-sections** : `§Nbis`, `§Nter`, `§Nquater` pour un sous-bloc rattaché à `§N`
+  (ex. `§1bis Diagnostic modules DI`). Une région peut contenir plusieurs sous-sections du corps
+  (ex. une région `§2` contenant `§2` et `§3`).
+- **Description** : en français, **courte et TDAH-friendly**, sans REX, date, lot ni récit
+  d'essai (même règle que les commentaires, §2ter). Elle nomme le **rôle fonctionnel** du bloc.
+- **`{endregion}`** : inchangé, toujours présent pour fermer chaque région.
+- **Cohérence globale** : la numérotation `§N` des régions est **alignée sur les sections du corps**
+  dans chaque POU ; un POU ne mélange jamais style numéroté et style descriptif.
+
+Exemple conforme :
+```pascal
+{region "§1 Gate neutralisation"}
+...
+{endregion}
+{region "§2 Reset et arbitrage mode"}
+...
+{endregion}
+{region "§3 Calcul autorisations machine"}
+...
+{endregion}
+```
+
+Contrôle : la numérotation des régions est vérifiée par revue (pas de gate dédié à ce jour).
 
 ---
 

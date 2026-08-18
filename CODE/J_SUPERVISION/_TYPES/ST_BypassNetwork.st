@@ -16,7 +16,7 @@ STRUCT
 
     (* 🛡️ 2. Hiérarchie & Restauration *)
     Global      : BOOL; (* 🌐 Bypass Global : tous les esclaves réseau à la fois *)
-    // 🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+    // FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
     // (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
     Initialized : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT

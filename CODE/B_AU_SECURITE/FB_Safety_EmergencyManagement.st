@@ -53,6 +53,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
+{region "§1 Appels instances internes"}
 // 🛑 1. Appels des instances internes
 Logic(
     Enable := Enable,
@@ -78,7 +79,9 @@ Output(
     ArmFailed := Logic.EmergencyArmingFailed,
     LockoutActive := Logic.EmergencyArmingLockoutActive
 );
+{endregion}
 
+{region "§2 Propagation sorties et bus"}
 // 📤 2. Propagation des signaux vers les sorties du bloc parent
 Ready := Enable AND NOT Logic.StartupFail;
 Busy  := (Logic.ArmingSeqStep <> 0) OR Logic.EmergencyArmingLockoutActive;
@@ -94,9 +97,12 @@ ArmPulse_RQ    := Output.ArmPulse_RQ;
 // 🚦 Bus publics
 State := Output.State;
 Diag  := Output.Diag;
+{endregion}
 
+{region "§3 Diagnostics scalaires"}
 // 🩺 Diagnostics scalaires (rétrocompatibilité)
 ArmingSeqStep                := Logic.ArmingSeqStep;
 RedundancyTestFailed         := Logic.RedundancyTestFailed;
 EmergencyArmingFailed        := Logic.EmergencyArmingFailed;
 EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
+{endregion}

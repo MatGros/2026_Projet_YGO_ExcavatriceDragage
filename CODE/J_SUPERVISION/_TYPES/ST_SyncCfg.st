@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🔧 ST_SyncCfg — Configuration de la synchronisation M1/M2
+   ST_SyncCfg — Configuration de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_SyncCfg :
 STRUCT

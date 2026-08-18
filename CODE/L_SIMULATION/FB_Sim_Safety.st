@@ -19,32 +19,37 @@
 *)
 FUNCTION_BLOCK FB_Sim_Safety
 VAR_INPUT
-    Enable          : BOOL; // Activation de la simulation
-    PowerCutOff_A   : BOOL; // Commande coupure canal A (TRUE = OK/fermé)
-    PowerCutOff_B   : BOOL; // Commande coupure canal B (TRUE = OK/fermé)
-    EmergencyArming : BOOL; // Impulsion de réarmement (TRUE = pulse)
-    BtnEmergencyStop : BOOL; // Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)
+    Enable          : BOOL; // --> [CMD] Activation de la simulation
+    PowerCutOff_A   : BOOL; // --> [SAFE] Commande coupure canal A (TRUE = OK/fermé)
+    PowerCutOff_B   : BOOL; // --> [SAFE] Commande coupure canal B (TRUE = OK/fermé)
+    EmergencyArming : BOOL; // --> [CMD] Impulsion de réarmement (TRUE = pulse)
+    BtnEmergencyStop : BOOL; // --> [HW] Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)
 END_VAR
 VAR_OUTPUT
-    SimChainOk      : BOOL; // Boucle AU simulée saine
-    SimContactorOk  : BOOL; // Contacteur simulé engagé
+    SimChainOk      : BOOL; // <-- [STAT] Boucle AU simulée saine
+    SimContactorOk  : BOOL; // <-- [STAT] Contacteur simulé engagé
 END_VAR
 VAR
-    ContactorLatch  : BOOL; // Mémorisation de l'auto-maintien du contacteur
+    ContactorLatch  : BOOL; // . [LOC] Mémorisation de l'auto-maintien du contacteur
 END_VAR
 
 // === IMPLEMENTATION ===
+{region "§1 Gate"}
 IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
     ContactorLatch := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Chaîne AU"}
 // 1. La chaîne AU est saine si le PLC maintient les deux relais de coupure de puissance
 // AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE)
 SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop;
+{endregion}
 
+{region "§3 Auto-maintien contacteur"}
 // 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure
 IF NOT SimChainOk THEN
     ContactorLatch := FALSE;
@@ -54,3 +59,4 @@ END_IF;
 
 // Recopie vers la sortie
 SimContactorOk := ContactorLatch;
+{endregion}

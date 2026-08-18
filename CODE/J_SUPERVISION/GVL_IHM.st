@@ -16,19 +16,19 @@ VAR_GLOBAL RETAIN
     Banner  : ST_HmiBanner; (* 🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4) *)
     OperatorAction : ST_OperatorAction; (* 🎮 Unique consigne conduite, arbitré en supervision *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
-    Commun  : ST_CommunHMI; (* 🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
-    // 🔧 REX 2026-07-19 : IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire
-    // de mise en service urgence (2026-07-09), remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
+    Commun  : ST_CommunHMI; (* 🌐 Signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
+    // IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire de mise en service
+    // urgence, remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
     // Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)
 END_VAR
 
 (* ═══════════════════════════════════════════════════════════════
-   📝 NOTE — 🔧 REX 2026-07-27 : l'ancienne procédure de test sur banc (60 lignes) est
-   RETIRÉE d'ici. Elle décrivait un dispositif qui n'existe plus après le débranchement
-   de la simulation (lots L2→L4d) : `instSimJoystick`, `instSimEncoderM1/M2`,
-   `SimulationModeActive` par défaut TRUE, flags `*IsReal`, forçage du capteur haut.
-   Laisser une procédure périmée dans le code est plus dangereux que pas de procédure.
+   📝 NOTE — l'ancienne procédure de test sur banc (60 lignes) est RETIRÉE d'ici. Elle décrivait
+   un dispositif qui n'existe plus après le débranchement de la simulation (lots L2→L4d) :
+   `instSimJoystick`, `instSimEncoderM1/M2`, `SimulationModeActive` par défaut TRUE, flags
+   `*IsReal`, forçage du capteur haut. Laisser une procédure périmée dans le code est plus
+   dangereux que pas de procédure.
 
    👉 Simulation en cours de refonte (frontière unique `HwIn`, lots L5→L8) :
       voir ARCHIVES/Doc/AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md

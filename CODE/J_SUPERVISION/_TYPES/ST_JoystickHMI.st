@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_ModesHMI.
+   📄 Structuration en Cmd / State , homogène avec ST_ModesHMI.
    Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
    Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════ *)

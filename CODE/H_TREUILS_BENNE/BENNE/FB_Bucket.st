@@ -86,7 +86,7 @@ VAR
     LeftStartSinceArm               : BOOL;                           // . [LOC] Quitte position de depart
 END_VAR
 
-{region "Gate securite"}
+{region "§1 Gate securite"}
 // 🛑 1. GATE DE SÉCURITÉ
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
@@ -99,7 +99,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     M2_Direction := 0;
     M2_ForceSlowSpeed := FALSE;
     State := E_State.DISABLED;
-    M1SlipDetected := FALSE; // 🔧 REX 2026-07-07
+    M1SlipDetected := FALSE;
     // Les requêtes internes sont réinitialisées
     CloseReq := FALSE;
     OpenReq := FALSE;
@@ -113,7 +113,7 @@ END_IF;
 
 {endregion}
 
-{region "Reset et bypass"}
+{region "§2 Reset et bypass"}
 // 🔑 2. GESTION DU RESET (FRONT MONTANT)
 ResetEdge(CLK := Reset);
 
@@ -128,7 +128,7 @@ END_IF;
 
 {endregion}
 
-{region "Coherence et etat mecanique benne"}
+{region "§3 Coherence et etat mecanique benne"}
 // 📏 3. DÉTECTION D'INCOHÉRENCE AU BOOT (PREMIER CYCLE API)
 IF FirstCycle THEN
     FirstCycle := FALSE;
@@ -154,14 +154,14 @@ END_IF;
 // Met à jour le bit1 d'erreur si incohérence détectée
 IF BucketState.StateIncoherent THEN
     ErrorId := ErrorId OR 16#0002;
-    // 🆕 REX 2026-07-08 : Force l'état inconnu (ni ouvert ni fermé) si incohérence active
+    // Force l'état inconnu (ni ouvert ni fermé) si incohérence active
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := FALSE;
 ELSE
     ErrorId := ErrorId AND 16#FFFD;
 END_IF;
 
-// 🧲 3bis. GARDE-FOU CODEURS NON RÉFÉRENCÉS (bit 3) — REX 2026-07-07
+// 🧲 3bis. GARDE-FOU CODEURS NON RÉFÉRENCÉS (bit 3)
 // CablePosM1/CablePosM2 ne sont fiables que si le homing (Partie10) a été fait sur les 2 treuils.
 // Continu (pas de front Reset) : se lève/efface tout seul selon l'état réel du homing.
 IF NOT HomedM1 OR NOT HomedM2 THEN
@@ -170,7 +170,7 @@ ELSE
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
-// 🆕 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE (mise en service, REX 2026-07-08) — voir bandeau
+// 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE — voir bandeau
 // Action de CONFIRMATION (aucun mouvement, ne pilote pas M2) : acquitte les défauts et réinitialise
 // les demandes. L'état IsOpen/IsClosed reste STRICTEMENT évalué en continu (§3bis-quater) selon la position codeur réelle.
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
@@ -179,12 +179,12 @@ IF ConfirmOpenEdge.Q
    AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM;
-    ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts benne lors du référencement manuel
-    CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
+    ErrorId := 16#0000;             // Réinitialisation complète des défauts benne lors du référencement manuel
+    CloseReq := FALSE;              // Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
 
-// 🆕 3bis-ter. CONFIRMATION MANUELLE POSITION FERMÉE (mise en service, REX 2026-07-08)
+// 3bis-ter. CONFIRMATION MANUELLE POSITION FERMÉE
 // Même principe que ConfirmOpenPosition pour acquitter et réinitialiser.
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
 IF ConfirmCloseEdge.Q
@@ -192,12 +192,12 @@ IF ConfirmCloseEdge.Q
    AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.LastPosM2Close := CablePosM2;
     BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM;
-    ErrorId := 16#0000;             // 🆕 REX 2026-07-08 : Réinitialisation complète des défauts benne lors du référencement manuel
-    CloseReq := FALSE;              // 🆕 REX 2026-07-08 : Reset des demandes en attente pour éviter les démarrages intempestifs
+    ErrorId := 16#0000;             // Réinitialisation complète des défauts benne lors du référencement manuel
+    CloseReq := FALSE;              // Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
 
-// 🆕 3bis-quater. DÉTECTION AUTOMATIQUE EN CONTINU (5 ZONES CLAIRES OPÉRATEUR) :
+// 3bis-quater. DÉTECTION AUTOMATIQUE EN CONTINU (5 ZONES CLAIRES OPÉRATEUR) :
 // Recalcule IsOpen, IsClosed, TooOpen, TooClosed, IsIntermediate en PERMANENCE à partir de
 // l'écart réel Delta = CablePosM2 - CablePosM1 et de la tolérance Config.CoherenceLimitM.
 // Actif à l'arrêt (NOT M1_Busy/M2_Busy), hors séquence active (State <> BUSY), codeurs référencés.
@@ -253,15 +253,15 @@ IF (State <> E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND Homed
     END_IF;
 END_IF;
 
-// 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4) — REX 2026-07-07
+// 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4)
 // M1 doit rester immobile pendant que M2 bouge seul. Référence prise à l'entrée en Busy.
 BusyEdge(CLK := (State = E_State.BUSY));
 IF BusyEdge.Q THEN
     M1RefPosM := CablePosM1;
-    M2StartPosM := CablePosM2;   // 🆕 REX 2026-07-08 — borne le recul autorisé (voir §6 CASE BUSY)
-    // 🆕 REX 2026-07-08 (demande utilisateur) : mémorise l'état d'origine (restauré si recul complet
-    // jusqu'à M2StartPosM, voir §6 CASE BUSY) puis passe en position transitoire dès le démarrage du
-    // mouvement — ni ouvert ni fermé pendant le trajet, quel que soit l'état mémorisé avant.
+    M2StartPosM := CablePosM2;   // Borne le recul autorisé (voir §6 CASE BUSY)
+    // Mémorise l'état d'origine (restauré si recul complet jusqu'à M2StartPosM, voir §6 CASE BUSY)
+    // puis passe en position transitoire dès le démarrage du mouvement — ni ouvert ni fermé pendant
+    // le trajet, quel que soit l'état mémorisé avant.
     WasOpenAtStart := BucketState.IsOpen;
     WasClosedAtStart := BucketState.IsClosed;
     LeftStartSinceArm := FALSE;
@@ -278,7 +278,7 @@ M1SlipDetected := (ErrorId AND 16#0010) <> 16#0000;
 
 {endregion}
 
-{region "Surveillance limites timeout et arret"}
+{region "§4 Surveillance limites timeout et arret"}
 // 🚨 4. SURVEILLANCE DES LIMITES DE PLACEMENT (Limites dépassées - bit 2)
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
@@ -313,7 +313,7 @@ END_IF;
 
 {endregion}
 
-{region "Machine etat commande"}
+{region "§5 Machine etat commande"}
 // 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
 CASE State OF
     E_State.READY:
@@ -323,11 +323,11 @@ CASE State OF
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
-        RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : pas de mouvement en cours
+        RemainingTravelM := 0.0; // Pas de mouvement en cours
 
-        // 🆕 REX 2026-07-08 : demande benne acceptée UNIQUEMENT si M1 ET M2 sont à l'arrêt (tous
+        // Demande benne acceptée UNIQUEMENT si M1 ET M2 sont à l'arrêt (tous
         // modes) — évite qu'un mouvement en cours sur l'un des deux treuils "traverse" l'armement
-        // du benne (audit sécurité). Ni mémorisation de la requête, ni démarrage tant que ce
+        // du benne. Ni mémorisation de la requête, ni démarrage tant que ce
         // n'est pas vrai — l'opérateur doit refaire la demande une fois les treuils arrêtés.
         IF NOT M1_Busy AND NOT M2_Busy THEN
             // Mémorisation des requêtes IHM (l'une annule l'autre)
@@ -340,7 +340,7 @@ CASE State OF
             END_IF;
 
             // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
-            // ⚠️ REX 2026-07-07 : sens inversés (enroulage ferme désormais, déroulage ouvre)
+            // Sens inversés (enroulage ferme, déroulage ouvre)
             IF CloseReq AND MotionRequestActive AND (MotionDirection = 1) THEN
                 State := E_State.BUSY;
             ELSIF OpenReq AND MotionRequestActive AND (MotionDirection = -1) THEN
@@ -354,7 +354,7 @@ CASE State OF
         Done := FALSE;
         M2_ForceSlowSpeed := TRUE; // Vitesse lente forcée sans contacteurs
 
-        // 📏 REX 2026-07-07 : distance restante avant cible, pour affichage IHM (aiguille/jauge)
+        // Distance restante avant cible, pour affichage IHM (aiguille/jauge)
         // Toujours positive, décroît vers 0 à mesure que M2 approche la cible.
         IF CloseReq THEN
             RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
@@ -365,16 +365,16 @@ CASE State OF
         END_IF;
 
         // Interlock Homme-mort joystick
-        // 🆕 REX 2026-07-08 : sens inverse autorisé (recul/annulation partielle) pendant CloseReq/
-        // OpenReq, mais BORNÉ à la position de départ (M2StartPosM, mémorisée à l'entrée en Busy) —
-        // ne permet jamais de dépasser cette position dans le sens opposé au sens principal.
+        // Sens inverse autorisé (recul/annulation partielle) pendant CloseReq/OpenReq, mais BORNÉ
+        // à la position de départ (M2StartPosM, mémorisée à l'entrée en Busy) — ne permet jamais de
+        // dépasser cette position dans le sens opposé au sens principal.
         IF NOT MotionRequestActive THEN
             // Si relâchement de l'intention opérateur, arrêt temporaire du mouvement.
             M2_StartStop := FALSE;
             M2_Direction := 0;
         ELSIF CloseReq THEN
             IF (MotionDirection = 1) THEN
-                // Sens principal (fermeture) : M2 enroule (monte) — REX 2026-07-07
+                // Sens principal (fermeture) : M2 enroule (monte)
                 M2_StartStop := TRUE;
                 M2_Direction := 1;
             ELSIF (MotionDirection = -1) AND (CablePosM2 > M2StartPosM) THEN
@@ -389,7 +389,7 @@ CASE State OF
             END_IF;
         ELSIF OpenReq THEN
             IF (MotionDirection = -1) THEN
-                // Sens principal (ouverture) : M2 déroule (descend) — REX 2026-07-07
+                // Sens principal (ouverture) : M2 déroule (descend)
                 M2_StartStop := TRUE;
                 M2_Direction := -1;
             ELSIF (MotionDirection = 1) AND (CablePosM2 < M2StartPosM) THEN
@@ -406,19 +406,18 @@ CASE State OF
             M2_Direction := 0;
         END_IF;
 
-        // 🆕 REX 2026-07-08 : détecte qu'on a réellement quitté la position de départ (évite que le
-        // test de retour ci-dessous ne se déclenche instantanément au 1er cycle de Busy, où
-        // CablePosM2 = M2StartPosM par définition).
+        // Détecte qu'on a réellement quitté la position de départ (évite que le test de retour
+        // ci-dessous ne se déclenche instantanément au 1er cycle de Busy, où CablePosM2 =
+        // M2StartPosM par définition).
         IF (CloseReq AND (CablePosM2 > M2StartPosM)) OR (OpenReq AND (CablePosM2 < M2StartPosM)) THEN
             LeftStartSinceArm := TRUE;
         END_IF;
 
         // Condition d'arrêt automatique de la fermeture
         IF CloseReq THEN
-            // 🔴🔧 REX 2026-08-07 (20) — retour terrain : inertie mécanique (M2 continue sur sa
-            // lancée après StartStop:=FALSE) faisait dépasser la cible réelle. Coupe la commande
-            // CloseAnticipationM avant OffsetCloseM -- le coast-down amène l'arrêt réel près du
-            // vrai offset au lieu de le dépasser.
+            // Inertie mécanique (M2 continue sur sa lancée après StartStop:=FALSE) faisait dépasser
+            // la cible réelle. Coupe la commande CloseAnticipationM avant OffsetCloseM -- le
+            // coast-down amène l'arrêt réel près du vrai offset au lieu de le dépasser.
             IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
@@ -431,8 +430,8 @@ CASE State OF
 
                 CloseReq := FALSE;
                 State := E_State.DONE;
-            // 🆕 REX 2026-07-08 (demande utilisateur) : recul complet jusqu'à la position de départ —
-            // restaure l'état d'origine (physiquement, on est revenu là où on a commencé)
+            // Recul complet jusqu'à la position de départ — restaure l'état d'origine
+            // (physiquement, on est revenu là où on a commencé)
             ELSIF LeftStartSinceArm AND (CablePosM2 <= M2StartPosM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
@@ -447,8 +446,8 @@ CASE State OF
 
         // Condition d'arrêt automatique de l'ouverture
         IF OpenReq THEN
-            // 🔴🔧 REX 2026-08-07 (20) — retour terrain : même logique que la fermeture ci-dessus,
-            // inertie différente en ouverture (OpenAnticipationM distinct).
+            // Même logique que la fermeture ci-dessus, inertie différente en ouverture
+            // (OpenAnticipationM distinct).
             IF CablePosM2 <= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
@@ -461,8 +460,8 @@ CASE State OF
 
                 OpenReq := FALSE;
                 State := E_State.DONE;
-            // 🆕 REX 2026-07-08 (demande utilisateur) : recul complet jusqu'à la position de départ —
-            // restaure l'état d'origine (physiquement, on est revenu là où on a commencé)
+            // Recul complet jusqu'à la position de départ — restaure l'état d'origine
+            // (physiquement, on est revenu là où on a commencé)
             ELSIF LeftStartSinceArm AND (CablePosM2 >= M2StartPosM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
@@ -482,7 +481,7 @@ CASE State OF
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
-        RemainingTravelM := 0.0; // 🔧 REX 2026-07-07 : cible atteinte
+        RemainingTravelM := 0.0; // Cible atteinte
 
         // Attente du relâchement de la validation joystick pour repasser à READY
         IF NOT MotionRequestActive THEN
@@ -502,15 +501,15 @@ DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
 // (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
-// 🔧 REX 2026-07-08 : ajout de CloseReq/OpenReq (pas seulement IsClosed/IsOpen, qui sont FALSE
-// pendant TOUT le trajet depuis le REX du 2026-07-08 sur l'état transitoire) — sinon
-// ActiveOffsetM restait figé sur OffsetOpenM (défaut) pendant le trajet entier d'une fermeture,
-// donc M2PositionCorrected = CablePosM2 brut tout du long, avec un saut brutal uniquement à
-// l'arrivée (constat terrain) au lieu de converger progressivement vers M1 pendant l'enroulage.
+// Ajout de CloseReq/OpenReq (pas seulement IsClosed/IsOpen, qui sont FALSE pendant TOUT le trajet
+// depuis l'état transitoire) — sinon ActiveOffsetM restait figé sur OffsetOpenM (défaut) pendant
+// le trajet entier d'une fermeture, donc M2PositionCorrected = CablePosM2 brut tout du long, avec
+// un saut brutal uniquement à l'arrivée au lieu de converger progressivement vers M1 pendant
+// l'enroulage.
 IF State = E_State.BUSY THEN
-    // 🔧 REX 2026-07-08 : pendant le déplacement, l'offset actif suit la différence réelle
-    // de câble (M2 - M1) afin que la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne)
-    // sans à-coup, tandis que le câble brut de M2 montre son enroulement.
+    // Pendant le déplacement, l'offset actif suit la différence réelle de câble (M2 - M1) afin que
+    // la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne) sans à-coup,
+    // tandis que le câble brut de M2 montre son enroulement.
     ActiveOffsetM := CablePosM2 - CablePosM1;
 ELSIF CloseReq OR BucketState.IsClosed THEN
     ActiveOffsetM := Config.OffsetCloseM;
