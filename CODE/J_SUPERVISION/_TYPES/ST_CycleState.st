@@ -6,7 +6,7 @@ STRUCT
     Ready                  : BOOL;        (* 🟢 Séquenceur prêt *)
     Busy                   : BOOL;        (* ⚙️ Cycle en cours *)
     Done                   : BOOL;        (* ✅ Cycle terminé *)
-    Error                  : BOOL;        (* 🔴 Défaut cycle *)
+    Error                  : BOOL;        (* Défaut cycle *)
     ErrorId                : WORD;        (* ❌ Code défaut cycle *)
     CycleStep              : E_CycleStep; (* 🔄 Étape courante du Grafcet *)
     CycleStateStr          : STRING(80);  (* 📝 Libellé texte de l'étape courante *)
@@ -26,6 +26,6 @@ STRUCT
     JoystickMotionActive   : BOOL;        (* 🕹️ Mouvement joystick actif *)
     MotionPermit           : BOOL;        (* 🟢 Homme-mort + axe Y actif (CycleMotionPermit) *)
     CycleStepAtError       : E_CycleStep; (* 🧊 Étape spécifique au moment du défaut (R9) *)
-    SampleCount            : INT;         (* 🆕 Compteur de prélèvements (RETAIN, Q3bis) *)
+    SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
 END_STRUCT
 END_TYPE

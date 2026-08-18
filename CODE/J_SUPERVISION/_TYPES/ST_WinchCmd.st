@@ -10,9 +10,9 @@ STRUCT
     BtnReset            : BOOL;             (* 🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé *)
     BtnHome             : BOOL;             (* 🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2 *)
     BtnConfirmCoherence : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
-    BtnInhibit          : BOOL;             (* 🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,
+    BtnInhibit          : BOOL;             (* Bouton IHM inhibition treuil — mise en service,
                                                     UNIQUEMENT actif si MAINT_N2 (voir FB_Modes.InhibitM1/M2) *)
-    BtnHomingAtZero     : BOOL;             (* 🆕 REX mise en service : force le homing à 0 m (points codeur centre),
+    BtnHomingAtZero     : BOOL;             (* Force le homing à 0 m (points codeur centre),
                                                     sans devoir modifier CfgTopSensorPos_M *)
 END_STRUCT
 END_TYPE

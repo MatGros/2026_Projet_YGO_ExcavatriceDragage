@@ -13,7 +13,7 @@ VAR_GLOBAL
     LevageUnitaireM2      : ST_ChainWinch;         // 🛗 3. Levage Unitaire M2 (Treuil Benne)
     BenneOuvertureFermeture: ST_ChainBucket;        // 🪣 4. Ouverture / Fermeture Benne
     TranslationPontM3     : ST_ChainTranslation;   // ↔️ 5. Translation Pont M3 (Variateur AC600)
-    AssistanceDragage     : ST_ChainDredgingAssist; // 🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie (2026-08-07)
+    AssistanceDragage     : ST_ChainDredgingAssist; // 🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie
     HomingM1              : ST_HomingChecklist;   (* 🎯 Diagnostic chronologique Homing M1 (Treuil Retenue) *)
     HomingM2              : ST_HomingChecklist;   (* 🎯 Diagnostic chronologique Homing M2 (Treuil Benne) *)
     Safety                : ST_SafetyChecklist;   (* 🛡️ Diagnostic chronologique Chaîne de Sécurité & Réarmement AU *)

@@ -52,12 +52,15 @@ VAR
     RequestPending          : BOOL;         // . [LOC] Demande de verdict en attente
 END_VAR
 
+{region "§1 Gate et demande"}
 ExecuteEdge(CLK := Execute);
 RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
 PreflightBusy := RequestPending AND NOT MachineIsStill;
 IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
 IF NOT RequestPending THEN RETURN; END_IF;
+{endregion}
 
+{region "§2 Calcul verdict"}
 PreflightErrorId := 0;
 (* bit0..2 frein M1/M2/M3 serré; bit3..4 contacteurs M1/M2 retombés;
    bit5..6 thermique M1/M2 OK; bit7 thermique frein OK; bit8 phases OK;
@@ -79,4 +82,8 @@ IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000
 IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
 IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;
 IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#8000; END_IF;
+{endregion}
+
+{region "§3 Sortie"}
 PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+{endregion}

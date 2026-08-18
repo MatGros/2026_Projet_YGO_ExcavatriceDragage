@@ -22,9 +22,12 @@ VAR
     InitDone                : BOOL;               // . [LOC] Drapeau d'initialisation du premier cycle
 END_VAR
 
+{region "§1 Acquisition temps"}
 // 1. ACQUISITION DU TEMPS SYSTÈME
 TimeCurrent := TIME();
+{endregion}
 
+{region "§2 Initialisation"}
 // 2. INITIALISATION UNIQUE AU PREMIER CYCLE
 IF NOT InitDone THEN
     TimeLast := TimeCurrent;
@@ -32,16 +35,23 @@ IF NOT InitDone THEN
     CycleTimeS := DefaultValueS;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Calcul delta"}
 // 3. CALCUL DU DELTA EN MILLISECONDES
 DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
 
+{region "§4 Conversion et secours"}
 // 4. CONVERSION ET CHARGE DE SECOURS
 IF DeltaTimeMs > 0 THEN
     CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
     CycleTimeS := DefaultValueS;
 END_IF;
+{endregion}
 
+{region "§5 Archivage"}
 // 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
 TimeLast := TimeCurrent;
+{endregion}

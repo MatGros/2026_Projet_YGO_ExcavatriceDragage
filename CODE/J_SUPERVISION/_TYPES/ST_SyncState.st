@@ -8,7 +8,7 @@ STRUCT
     SyncWarn   : BOOL;    (* ⚠️ LED d'alarme écart hors tolérance *)
     SyncDegradedStep1 : BOOL; (* 🐢 Écart modéré actif : limitation forcée au Palier 1 *)
     Ready      : BOOL;    (* 🟢 Bloc de synchro prêt *)
-    Error      : BOOL;    (* 🔴 Alarme synchro active *)
+    Error      : BOOL;    (* Alarme synchro active *)
     ErrorId    : WORD;    (* ❌ Code défaut synchro *)
     FBState    : E_State; (* 🤖 État de l'automate interne (FB_WinchSync) — ex-"State", renommé pour éviter collision avec le sous-struct State *)
 END_STRUCT

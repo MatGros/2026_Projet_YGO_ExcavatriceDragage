@@ -48,6 +48,7 @@ VAR
     ErrorEdge             : R_TRIG;      // . [LOC] Detecteur front montant Error
 END_VAR
 
+{region "§1 Gate"}
 // 🛑 1. GATE
 IF NOT Enable THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -59,22 +60,30 @@ END_IF;
 
 Ready := TRUE;
 State := E_State.READY;
+{endregion}
 
+{region "§2 Reset front"}
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
+{endregion}
 
+{region "§3 Bypass global"}
 // 🌐 3. BYPASS GLOBAL
 IF BypassGlobal THEN
     ErrorId := 16#0000;
 END_IF;
+{endregion}
 
+{region "§4 Surveillance bornage"}
 // 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
 IF NOT BypassGlobal AND ((CablePosM < PositionMinM) OR (CablePosM > PositionMaxM)) THEN
     ErrorId := ErrorId OR 16#0001;
 ELSE
     ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
 END_IF;
+{endregion}
 
+{region "§5 Relais incohérence redémarrage"}
 // 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
 IF NOT BypassGlobal THEN
     IF HomingSuspect THEN
@@ -83,10 +92,14 @@ IF NOT BypassGlobal THEN
         ErrorId := ErrorId AND 16#FFFD;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§6 Transmission mesure"}
 // 📏 6. TRANSMISSION DE LA MESURE (Toujours réelle, non figée)
 CablePosMSafe := CablePosM;
+{endregion}
 
+{region "§7 Sorties état et sécurité"}
 // 📤 7. SORTIES ÉTAT & SÉCURITÉ
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
@@ -97,3 +110,4 @@ END_IF;
 EncoderIncoherent := Error;
 Busy := FALSE;
 Done := FALSE;
+{endregion}

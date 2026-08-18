@@ -21,85 +21,85 @@
 
 FUNCTION_BLOCK PUBLIC FB_SimBench
 VAR_INPUT
-    Enable                     : BOOL;             // Activation globale (GVL_Simulation.SimulationModeActive)
+    Enable                     : BOOL;             (* --> [CMD] Activation globale (GVL_Simulation.SimulationModeActive) *)
 
     // ── Commandes issues de l'automate (Scan N-1 / PRG_07 / PRG_10) ──────────
-    M1_RelayFwd                : BOOL;
-    M1_RelayRev                : BOOL;
-    // 🔧 REX 2026-07-27 : les 4 contacteurs de palier participent au retour unique
+    M1_RelayFwd                : BOOL;   (* --> [CMD] Sens avant M1 *)
+    M1_RelayRev                : BOOL;   (* --> [CMD] Sens arrière M1 *)
+    // Les 4 contacteurs de palier participent au retour unique
     // « tous contacteurs retombés » — sans eux, le modèle annonce l'arrêt alors qu'un
     // palier est encore engagé (fausse condition d'armement Méca A).
-    M1_SpeedContactor_1        : BOOL;
-    M1_SpeedContactor_2        : BOOL;
-    M1_SpeedContactor_3        : BOOL;
-    M1_SpeedContactor_4        : BOOL;
-    M1_SpeedRefPct             : REAL;
-    M1_PresetTriggerCmd        : WORD;
-    M1_PresetValueOut          : UDINT;
-    M1_BrakeCmd                : BOOL;             // TRUE = commande desserrage frein M1
+    M1_SpeedContactor_1        : BOOL;   (* --> [HW] Contacteur palier 1 M1 *)
+    M1_SpeedContactor_2        : BOOL;   (* --> [HW] Contacteur palier 2 M1 *)
+    M1_SpeedContactor_3        : BOOL;   (* --> [HW] Contacteur palier 3 M1 *)
+    M1_SpeedContactor_4        : BOOL;   (* --> [HW] Contacteur palier 4 M1 *)
+    M1_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M1 *)
+    M1_PresetTriggerCmd        : WORD;   (* --> [CMD] Trigger preset M1 *)
+    M1_PresetValueOut          : UDINT;   (* --> [CFG] Valeur preset M1 *)
+    M1_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M1 *)
 
-    M2_RelayFwd                : BOOL;
-    M2_RelayRev                : BOOL;
-    M2_SpeedContactor_1        : BOOL;   // 🔧 REX 2026-07-27 : idem M1, voir ci-dessus
-    M2_SpeedContactor_2        : BOOL;
-    M2_SpeedContactor_3        : BOOL;
-    M2_SpeedContactor_4        : BOOL;
-    M2_SpeedRefPct             : REAL;
-    M2_PresetTriggerCmd        : WORD;
-    M2_PresetValueOut          : UDINT;
-    M2_BrakeCmd                : BOOL;             // TRUE = commande desserrage frein M2
+    M2_RelayFwd                : BOOL;   (* --> [CMD] Sens avant M2 *)
+    M2_RelayRev                : BOOL;   (* --> [CMD] Sens arrière M2 *)
+    M2_SpeedContactor_1        : BOOL;   (* --> [HW] Idem M1, voir ci-dessus *)
+    M2_SpeedContactor_2        : BOOL;   (* --> [HW] Contacteur palier 2 M2 *)
+    M2_SpeedContactor_3        : BOOL;   (* --> [HW] Contacteur palier 3 M2 *)
+    M2_SpeedContactor_4        : BOOL;   (* --> [HW] Contacteur palier 4 M2 *)
+    M2_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M2 *)
+    M2_PresetTriggerCmd        : WORD;   (* --> [CMD] Trigger preset M2 *)
+    M2_PresetValueOut          : UDINT;   (* --> [CFG] Valeur preset M2 *)
+    M2_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M2 *)
 
-    M3_Direction               : INT;              // 1 = Avant, -1 = Arrière, 0 = Arrêt
-    M3_SpeedRefPct             : REAL;
-    M3_BrakeCmd                : BOOL;             // TRUE = commande desserrage frein M3
+    M3_Direction               : INT;              (* --> [CMD] 1 = Avant, -1 = Arrière, 0 = Arrêt *)
+    M3_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M3 *)
+    M3_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M3 *)
 
-    PowerKeepAlive_A           : BOOL;             // TRUE = relais A maintenu sagement par le PLC
-    PowerKeepAlive_B           : BOOL;             // TRUE = relais B maintenu sagement par le PLC
-    EmergencyArming_RQ         : BOOL;             // Impulsion de réarmement puissance
+    PowerKeepAlive_A           : BOOL;             (* --> [SAFE] TRUE = relais A maintenu sagement par le PLC *)
+    PowerKeepAlive_B           : BOOL;             (* --> [SAFE] TRUE = relais B maintenu sagement par le PLC *)
+    EmergencyArming_RQ         : BOOL;             (* --> [CMD] Impulsion de réarmement puissance *)
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
-    SimEncoderSpeedFactor      : REAL := 1.0;
-    SimSyncDeviationInjectM1   : BOOL := FALSE;
-    SimSyncDeviationInjectM2   : BOOL := FALSE;
-    SimSyncDeviationOffset_M   : REAL := 0.5;
+    SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
+    SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M1 *)
+    SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M2 *)
+    SimSyncDeviationOffset_M   : REAL := 0.5;   (* --> [TST] Offset écart synchro *)
 
-    SimM3SensorsWordOverrideActive : BOOL := FALSE;
-    SimM3SensorsWord               : BYTE := 16#07;
+    SimM3SensorsWordOverrideActive : BOOL := FALSE;   (* --> [TST] Override mot capteurs M3 *)
+    SimM3SensorsWord               : BYTE := 16#07;   (* --> [TST] Mot capteurs M3 forcé *)
 
-    SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;
-    SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;
-    SimJoystickFwd_Up_Close_Active     : BOOL := FALSE;
-    SimJoystickRev_Down_Open_Active    : BOOL := FALSE;
-    SimJoystickRawX                    : INT := 5000;
-    SimJoystickRawY                    : INT := 5000;
-    SimJoystickRawButton               : BOOL := FALSE;
+    SimJoystickLeft_Rev_TREMIE_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick gauche *)
+    SimJoystickRight_Fwd_MAINT_Active  : BOOL := FALSE;   (* --> [TST] Bouton joystick droite *)
+    SimJoystickFwd_Up_Close_Active     : BOOL := FALSE;   (* --> [TST] Bouton joystick avant *)
+    SimJoystickRev_Down_Open_Active    : BOOL := FALSE;   (* --> [TST] Bouton joystick arrière *)
+    SimJoystickRawX                    : INT := 5000;   (* --> [TST] Valeur brute X *)
+    SimJoystickRawY                    : INT := 5000;   (* --> [TST] Valeur brute Y *)
+    SimJoystickRawButton               : BOOL := FALSE;   (* --> [TST] Bouton homme-mort *)
 
-    SimKoboldContactValue      : BOOL := FALSE;
-    BtnEmergencyStop           : BOOL := FALSE;    // Simulation appui coup-de-poing AU
+    SimKoboldContactValue      : BOOL := FALSE;   (* --> [TST] Contact fond Kobold *)
+    BtnEmergencyStop           : BOOL := FALSE;    (* --> [TST] Simulation appui coup-de-poing AU *)
 
     // ── Image réelle fallback ────────────────────────────────────────────────
-    HwReal                     : ST_HardwareImage;
+    HwReal                     : ST_HardwareImage;   (* --> [HW] Image réelle fallback *)
 END_VAR
 
 VAR_OUTPUT
-    (* 🆕 2026-08-13 : sorties d'état du profil AF_Partie-03 §2, absentes jusque-là.
+    (* Sorties d'état du profil AF_Partie-03 §2.
        En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung (confirmé par
        l'oracle PRG_06 : `Ready` n'y porte jamais d'expression, les broches suivantes oui).
        Sans elles, `Winch` tombait sur cette broche réservée et se retrouvait câblée à une
-       branche au lieu de sa variable (retour terrain 2026-08-13). *)
-    Ready                      : BOOL;             (* TRUE = banc prêt (Enable actif, modèles à jour) *)
-    Busy                       : BOOL;             (* TRUE = cycle de simulation en cours *)
-    Done                       : BOOL;             (* TRUE = images de simulation publiées ce scan *)
+       branche au lieu de sa variable. *)
+    Ready                      : BOOL;             (* <-- [STAT] TRUE = banc prêt (Enable actif, modèles à jour) *)
+    Busy                       : BOOL;             (* <-- [STAT] TRUE = cycle de simulation en cours *)
+    Done                       : BOOL;             (* <-- [STAT] TRUE = images de simulation publiées ce scan *)
 
-    Winch                      : ST_HwWinch;
-    Translation                : ST_HwTranslation;
-    Operator                   : ST_HwOperator;
-    Machine                    : ST_HwMachine;
+    Winch                      : ST_HwWinch;   (* <-- [DIAG] Image treuils simulée *)
+    Translation                : ST_HwTranslation;   (* <-- [DIAG] Image translation simulée *)
+    Operator                   : ST_HwOperator;   (* <-- [DIAG] Image opérateur simulée *)
+    Machine                    : ST_HwMachine;   (* <-- [DIAG] Image machine simulée *)
 END_VAR
 
 VAR_IN_OUT
-    RawPosM1                   : UDINT;            // Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT
-    RawPosM2                   : UDINT;            // Mémoire _SimEncoderRawPosM2 dans GVL_PERSISTENT
+    RawPosM1                   : UDINT;            (* <-> [BUS] Mémoire _SimEncoderRawPosM1 dans GVL_PERSISTENT *)
+    RawPosM2                   : UDINT;            (* <-> [BUS] Mémoire _SimEncoderRawPosM2 dans GVL_PERSISTENT *)
 END_VAR
 
 VAR CONSTANT
@@ -108,25 +108,25 @@ END_VAR
 
 VAR
     // Modèles sous-jacents
-    instSimEncoderM1           : FB_Sim_Encoder;
-    instSimEncoderM2           : FB_Sim_Encoder;
-    instSimTranslation         : FB_Sim_Translation;
-    instSimJoystick            : FB_Sim_Joystick;
-    instSimSafety              : FB_Sim_Safety;
+    instSimEncoderM1           : FB_Sim_Encoder;   (* * [INST] Modèle codeur M1 *)
+    instSimEncoderM2           : FB_Sim_Encoder;   (* * [INST] Modèle codeur M2 *)
+    instSimTranslation         : FB_Sim_Translation;   (* * [INST] Modèle translation M3 *)
+    instSimJoystick            : FB_Sim_Joystick;   (* * [INST] Modèle joystick *)
+    instSimSafety              : FB_Sim_Safety;   (* * [INST] Modèle sécurité *)
 
     // Calculs internes
-    M1_PresetCmd               : BOOL;
-    M2_PresetCmd               : BOOL;
-    M1_OffsetPts               : DINT;
-    M2_OffsetPts               : DINT;
+    M1_PresetCmd               : BOOL;   (* . [LOC] Trigger preset M1 *)
+    M2_PresetCmd               : BOOL;   (* . [LOC] Trigger preset M2 *)
+    M1_OffsetPts               : DINT;   (* . [LOC] Offset synchro M1 *)
+    M2_OffsetPts               : DINT;   (* . [LOC] Offset synchro M2 *)
 
-    M3_RelayFwd                : BOOL;
-    M3_RelayRev                : BOOL;
+    M3_RelayFwd                : BOOL;   (* . [LOC] Sens avant M3 *)
+    M3_RelayRev                : BOOL;   (* . [LOC] Sens arrière M3 *)
 
-    SimJoystickDirectionCount  : INT;
+    SimJoystickDirectionCount  : INT;   (* . [LOC] Nombre de directions actives *)
 
-    M3_ActualFreqHz            : UINT;
-    M3_StatusWordSim           : WORD;
+    M3_ActualFreqHz            : UINT;   (* . [LOC] Fréquence simulée M3 *)
+    M3_StatusWordSim           : WORD;   (* . [LOC] StatusWord simulé M3 *)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -195,7 +195,7 @@ instSimEncoderM2(
 // 🛑 POLARITÉ DE FREIN SIMULÉ (P1 Lot L6) : 1 = contacteur commandé = frein OUVERT.
 // Câblage réel : DI = 1 ⟺ frein OUVERT. Le modèle produit donc M1_BrakeIsOpen_DI := M1_BrakeCmd !
 Winch.M1_BrakeIsOpen_DI        := M1_BrakeCmd;
-// 🔧 REX 2026-07-27 : retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
+// Retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
 // Omettre les paliers ferait croire à l'arrêt pendant les transitoires → Méca A armée à tort.
 Winch.M1_ContactorsReleased_DI := NOT (M1_RelayFwd OR M1_RelayRev
                                     OR M1_SpeedContactor_1 OR M1_SpeedContactor_2
@@ -255,18 +255,15 @@ END_IF;
 // Polarité frein M3 (1 = OUVERT)
 Translation.M3_BrakeIsOpen_DI    := M3_BrakeCmd;
 
-// 🆕 T96 : thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
+// Thermique moteur/variateur AC600 — pas de panne simulée, toujours OK (comme Winch.M1/M2_ThermalOk_DI)
 Translation.M3_ThermalOK_DI      := TRUE;
 
 // Simulation StatusWord AC600 : Bit 0 (Power Ready) = 1, Bit 7 (Comm Ready) = 1 -> 16#0087 en mouvement
-// 🐛 FIX 2026-08-14 (REX Troubleshooting AU simu) : Bit0 était forcé à 1 en continu à l'arrêt
-// (16#0081) -- FB_Safety_Translation.st:181 lit ce même bit comme indicateur "mouvement non
-// commandé" (Méca B, TonMecaB 3s) : le modèle déclenchait donc un PowerCutOff simulé permanent
-// après 3s d'arrêt, coupant PowerKeepAlive_A/B et bloquant Step3_EmergencyChainClosed en boucle
-// (Reset efface, TonMecaB re-déclenche 3s après). Jamais vu HW réel connecté (non testé dans
-// cette condition). Bit0 retombe désormais à l'arrêt, cohérent avec un variateur qui confirme
-// l'arrêt sans rester "actif" -- DrivePowerReady (diagnostic IHM seul, non consommé par un
-// interlock) est le seul autre lecteur, aucune régression de mouvement possible.
+// Bit0 retombe à l'arrêt, cohérent avec un variateur qui confirme l'arrêt sans rester "actif" —
+// FB_Safety_Translation lit ce bit comme indicateur "mouvement non commandé" (Méca B, TonMecaB 3s) :
+// un Bit0 forcé à 1 en continu à l'arrêt déclencherait un PowerCutOff simulé permanent après 3s.
+// DrivePowerReady (diagnostic IHM seul, non consommé par un interlock) est le seul autre lecteur,
+// aucune régression de mouvement possible.
 IF (M3_Direction <> 0) THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
     M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedRefPct * 50.0); // 50.0 Hz à 100% (x100 -> 5000)
@@ -345,7 +342,7 @@ Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
 Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
 Machine.HydraulicThermalOk_DI          := TRUE;
-Machine.HopperFull_OR_GateRaised_DI    := FALSE; // 🆕 2026-08-12 : pas encore câblé, simulé inactif par défaut
+Machine.HopperFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 
 // ✅ Cycle de simulation terminé : les 4 images sont publiées pour ce scan
 Busy := FALSE;

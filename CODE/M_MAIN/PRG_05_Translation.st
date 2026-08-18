@@ -5,7 +5,7 @@
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
    📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🛡️ Sécurité : instSafetyTranslationM3 (FB_Safety_Translation) câblée en parallèle
-      de instTranslationM3 depuis le 2026-08-05 (lot M4) — SafeStop/PowerCutOff réels.
+      de instTranslationM3 — SafeStop/PowerCutOff réels.
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_05_Translation
@@ -33,36 +33,35 @@ VAR
     M3_SafeStop_Active      : BOOL; // Cause historique : InputModuleFault (AF06 §3bis)
     M3_SafeStop_Aggregate   : BOOL; // 🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)
 
-    M3_HeightInterlockOk    : BOOL; // 🆕 2026-08-06 : TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)
-    M3_LimitSwitchRevEffective : BOOL; // 🆕 2026-08-06 : coupure dure §5bis — bascule sur P1 si Maintenance interdite
-    M3_LimitSwitchFwdStable : BOOL; // 🆕 2026-08-06 : verrou bistable Fdc Trémie (mémorisé stable contre les rebonds)
-    M3_LimitSwitchRevStable : BOOL; // 🆕 2026-08-06 : verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)
+    M3_HeightInterlockOk    : BOOL; // TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)
+    M3_LimitSwitchRevEffective : BOOL; // Coupure dure §5bis — bascule sur P1 si Maintenance interdite
+    M3_LimitSwitchFwdStable : BOOL; // Verrou bistable Fdc Trémie (mémorisé stable contre les rebonds)
+    M3_LimitSwitchRevStable : BOOL; // Verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)
 
-    // 🆕 2026-08-06 : verrous bistables des positions cibles (§0quater) — PositionDecoder n'émet
-    // plus qu'un front transitoire par capteur (REX décalage came), mémorisé ici jusqu'à dégagement.
+    // Verrous bistables des positions cibles (§0quater) — PositionDecoder n'émet
+    // plus qu'un front transitoire par capteur, mémorisé ici jusqu'à dégagement.
     M3_AtTremieStable      : BOOL;
     M3_AtPVStable          : BOOL;
     M3_AtP2Stable          : BOOL;
     M3_AtP1Stable          : BOOL;
     M3_AtMaintenanceStable : BOOL;
 
-    // 🆕 2026-08-06 (retour terrain, design opérateur) : libération du verrou §0quater sur
-    // MOUVEMENT CONFIRMÉ soutenu (fréquence réelle mesurée, pas juste une consigne de sens),
-    // pendant une durée mini avant de considérer qu'on a vraiment quitté le point — pas un
-    // changement de sens instantané (perdu à cause d'InvertDirection) ni un timer fixe
+    // Libération du verrou §0quater sur MOUVEMENT CONFIRMÉ soutenu (fréquence réelle mesurée,
+    // pas juste une consigne de sens), pendant une durée mini avant de considérer qu'on a
+    // vraiment quitté le point — pas un changement de sens instantané ni un timer fixe
     // indépendant du mouvement réel (rebond capteur mal filtré).
     TonM3ConfirmedMoving : TON;
     M3_ConfirmedMoving   : BOOL;
 END_VAR
 
 {region "§0 Interlock hauteur M1/M2"}
-// === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
+// === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (risque collision translation) ===
 // PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 < 05) : lecture
 // du même scan, aucun retard. Bypass = maintenance consciente, doctrine ST_BypassTranslation.
-// ⚠️ Revue 2026-08-06 : une position encodeur incohérente (hors plage OU homing suspect,
+// ⚠️ Une position encodeur incohérente (hors plage OU homing suspect,
 // FB_Encoder_Safety) ne doit PAS pouvoir se lire comme "≥ seuil" par accident — fail-safe :
 // hauteur non confirmée = interlock actif (comme une hauteur insuffisante), sauf bypass.
-// 🔒 Décision 2026-08-06 : Bypass.Global NE lève PLUS cet interlock (contrairement aux autres
+// 🔒 Bypass.Global NE lève PLUS cet interlock (contrairement aux autres
 // causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
 // générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
 M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
@@ -76,7 +75,7 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 {region "§0bis Coupure dure limite translation"}
 // === 🚧 §0bis COUPURE DURE (LimitSwitchRev) — bascule sur P1 si Maintenance interdite ===
-// 🆕 2026-08-06 (retour terrain) : LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
+// LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
 // (§5bis FB_Translation : coupure immédiate, sans rampe, dès que CommandedDirection insiste
 // dans l'extrémité). P1/P2 n'ont aucune protection dure équivalente — seul le verrou souple
 // (arrival-lock) les couvre. Quand Maintenance est interdite, la coupure dure doit protéger
@@ -102,12 +101,12 @@ ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEna
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
-// 🔒 §0quater MÉMORISATION DU DERNIER POINT ATTEINT (front → jeton unique, retour terrain)
+// 🔒 §0quater MÉMORISATION DU DERNIER POINT ATTEINT (front → jeton unique)
 // PositionDecoder n'émet qu'un front transitoire (1 cycle) par capteur, montant OU descendant
-// SELON LE SENS (REX décalage came, voir FB_Translation_PositionDecoder.st) — mémorisé ici pour
+// SELON LE SENS (voir FB_Translation_PositionDecoder.st) — mémorisé ici pour
 // tenir le niveau nécessaire au débounce (100ms) + verrou anti-rebond (§4ter DirectionAtArrival)
 // de FB_Translation, et pour l'affichage IHM. MUTUELLEMENT EXCLUSIFS : un nouveau front RAZ tous
-// les autres (jeton "dernier point franchi" unique). 🆕 2026-08-06 (design opérateur) : libéré
+// les autres (jeton "dernier point franchi" unique). Libéré
 // (RAZ complet) UNIQUEMENT sur mouvement CONFIRMÉ (fréquence réelle mesurée, pas juste la consigne
 // de sens) soutenu ≥1.5s — pas un rebond capteur ni un changement de sens instantané.
 M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0) > 0.5;
@@ -134,7 +133,7 @@ END_IF;
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // 🆕 Pont SEMI_AUTO (L4) : consomme la demande du séquenceur de cycle.
+    // Pont SEMI_AUTO (L4) : consomme la demande du séquenceur de cycle.
     // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M3_PositioningActive  := TRUE;
     SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
@@ -162,16 +161,16 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
         M3_Direction_Active := 0;
     END_IF;
 
-    // 🔫 T106 (audit M3 2026-08-05) : homme-mort exigé même pour boutons IHM en MAINT_N1/N2
+    // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2
     // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
-    // 🔀 2026-08-06 : TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd),
+    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd),
     // plus de doublon par axe (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé).
     M3_StartStop_Active := (M3_Direction_Active <> 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
                                 OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
                                 OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
                            AND PRG_02_Acquisition.JoystickDeadmanArmed
-                           AND M3_HeightInterlockOk; // 🆕 2026-08-06 : hauteur mini M1/M2 (risque collision)
+                           AND M3_HeightInterlockOk; // Hauteur mini M1/M2 (risque collision)
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz > 0.0,
                   100.0,
@@ -188,7 +187,7 @@ ELSE
     M3_SpeedRef_Active   := 0.0;
 END_IF;
 
-// 🆕 2026-08-06 (retour terrain, REX câblage) : InvertDirection NE s'applique PLUS ici. Appliqué
+// InvertDirection NE s'applique PLUS ici. Appliqué
 // en amont sur M3_Direction_Active, il désaccordait TOUTE la logique sécurité/ralentissement
 // appariée aux vrais capteurs physiques (LimitSwitchFwd/Rev, SlowdownSensorXxx, verrous §0quater)
 // dès que le câblage moteur réel l'exigeait à TRUE — seule la coupure dure indépendante du sens
@@ -206,12 +205,12 @@ END_IF;
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
 M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 
-// 🆕 2026-08-06 (retour terrain, anti-rebond arrêt) : SelTarget reste à 0 en mode manuel
+// SelTarget reste à 0 en mode manuel
 // (MAINT_N1/N2, T106 — aucun séquenceur SEMI_AUTO ne le réarbitre à ce jour), donc la CASE
 // ci-dessous tombait toujours en ELSE=FALSE et le verrou anti-rebond §4ter de FB_Translation
 // (DirectionAtArrival) ne s'armait jamais en usage réel. Repli explicite hors sélection
 // SEMI_AUTO : n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance) arme le verrou.
-// 🆕 2026-08-06 : mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
+// Mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
 // franc à l'arrivée quel que soit le sens de venue (voir FB_Translation_PositionDecoder.st).
 CASE SelTarget OF
     1: M3_PositionSensorTarget := M3_AtTremieStable;
@@ -226,7 +225,7 @@ ELSE
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -> arrêt sur Maintenance
         // - Si Maintenance interdite -> arrêt sur P1
-        // 🆕 2026-08-06 : réactivé — le retrait d'urgence précédent était dû à AtP1 armé sur le
+        // Réactivé — le retrait d'urgence précédent était dû à AtP1 armé sur le
         // front du capteur P2 (zone d'approche) au lieu du capteur P1 lui-même (franchissement
         // réel du point). Corrigé dans FB_Translation_PositionDecoder.st (front du capteur propre).
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
@@ -304,14 +303,13 @@ instTranslationM3(
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
-    // 🆕 2026-08-06 (retour terrain, URGENT, correction d'une erreur de calcul du commit précédent) :
-    // les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
+    // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
     // FB_Translation_PositionDecoder.st). Chaque zone est délimitée par "capteur PRÉCÉDENT retombé
     // à 0" ET "capteur de la zone encore à 1" — zone P2→P1 = NOT PosP2 AND PosP1 (mot 00011) ;
     // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
     // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
     SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.TranslationPosP1) AND PRG_02_Acquisition.TranslationPosMaintenance,
-    // 🆕 2026-08-06 (design opérateur) : ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
+    // Ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
     // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -> 100% vitesse jusqu'à
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
     SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1
@@ -352,7 +350,7 @@ instPosEstimatorM3(
     PersistedPositionM   := GVL_PERSISTENT._TranslationPosEstimated_M,
     PersistedInitialized := GVL_PERSISTENT._TranslationPosEstimatedInitialized
 );
-// 🆕 Recopie continue (reprise après reboot, doctrine _TranslationSetFreq_Hz) — pas de bridge dédié.
+// Recopie continue (reprise après reboot, doctrine _TranslationSetFreq_Hz) — pas de bridge dédié.
 GVL_PERSISTENT._TranslationPosEstimated_M := instPosEstimatorM3.PositionEstimatedM;
 GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initialized;
 
@@ -394,7 +392,7 @@ TranslationState.PositionPV := PRG_02_Acquisition.TranslationPosPV;
 TranslationState.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationState.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationState.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
-// 🆕 2026-08-06 (design opérateur) : affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
+// Affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
 // (direction-dépendant), libéré sur mouvement réel confirmé ≥1.5s (pas juste un rebond capteur
 // ni un changement de sens instantané). Même signal que celui consommé par M3_PositionSensorTarget.
 TranslationState.AtTremie := M3_AtTremieStable;

@@ -10,8 +10,8 @@
       de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
       (forcer `RawButton` en instance CODESYS) pour armer — comportement
       métier testé pour de vrai, pas contourné.
-   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal) — 🔧 REX
-      2026-07-08 : granularité séparée du bus CANopen (BusJoystickIsReal, voir GVL_Simulation)
+   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal) — granularité
+       séparée du bus CANopen (BusJoystickIsReal, voir GVL_Simulation)
    📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.TstJoystickForceNeutralRaw)
    📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.TstJoystickForceMaxRaw)
    📤 RawX/RawY     : forçables en instance CODESYS (par défaut = NeutralRaw, repos)
@@ -25,21 +25,22 @@
 
 FUNCTION_BLOCK PUBLIC FB_Sim_Joystick
 VAR_INPUT
-    Enable      : BOOL;
-    NeutralRaw  : INT := 5000;
-    MaxRaw      : INT := 10000;
+    Enable      : BOOL;   (* --> [CMD] Active la simulation *)
+    NeutralRaw  : INT := 5000;   (* --> [CFG] Valeur brute au repos *)
+    MaxRaw      : INT := 10000;   (* --> [CFG] Valeur brute à fond *)
 END_VAR
 VAR_OUTPUT
-    RawX        : INT;   // 🔧 Forçable en instance CODESYS (repos = NeutralRaw)
-    RawY        : INT;   // 🔧 Forçable en instance CODESYS (repos = NeutralRaw)
-    RawButton   : BOOL;  // 🔧 Forçable en instance CODESYS (repos = FALSE)
+    RawX        : INT;   (* <-- [DIAG] Forçable en instance CODESYS (repos = NeutralRaw) *)
+    RawY        : INT;   (* <-- [DIAG] Forçable en instance CODESYS (repos = NeutralRaw) *)
+    RawButton   : BOOL;  (* <-- [DIAG] Forçable en instance CODESYS (repos = FALSE) *)
 END_VAR
 VAR
-    FirstCycle  : BOOL := TRUE;
+    FirstCycle  : BOOL := TRUE;   (* . [LOC] Initialisation au neutre *)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Joystick) ===
 
+{region "§1 Gate"}
 // 🔑 Initialise au neutre au premier cycle uniquement — ensuite RawX/RawY/RawButton
 // restent forçables librement en instance CODESYS (un Force n'est jamais écrasé par TRUE,
 // mais une simple écriture cyclique l'écraserait — donc pas de ré-assignation continue ici).
@@ -47,10 +48,13 @@ IF NOT Enable THEN
     FirstCycle := TRUE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Initialisation neutre"}
 IF FirstCycle THEN
     RawX := NeutralRaw;
     RawY := NeutralRaw;
     RawButton := FALSE;
     FirstCycle := FALSE;
 END_IF;
+{endregion}

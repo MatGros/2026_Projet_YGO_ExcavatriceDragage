@@ -38,6 +38,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate"}
 IF NOT Enable THEN
     MaintainA_RQ   := FALSE;
     MaintainB_RQ   := FALSE;
@@ -56,7 +57,9 @@ IF NOT Enable THEN
     Diag.LockoutActive        := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Projection sorties et bus"}
 // ⚡ Sorties physiques — écriture directe des ordres logiques
 MaintainA_RQ := Cmd.MaintainA_Cmd;
 MaintainB_RQ := Cmd.MaintainB_Cmd;
@@ -75,3 +78,4 @@ Diag.ErrorId              := ErrorId;
 Diag.RedundancyTestFailed := RedundancyTestFailed;
 Diag.ArmFailed            := ArmFailed;
 Diag.LockoutActive        := LockoutActive;
+{endregion}

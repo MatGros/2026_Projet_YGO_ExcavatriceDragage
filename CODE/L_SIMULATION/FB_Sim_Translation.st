@@ -14,24 +14,24 @@
 
 FUNCTION_BLOCK PUBLIC FB_Sim_Translation
 VAR_INPUT
-    Enable          : BOOL;              // TRUE = modèle actif
-    Direction       : INT;               // +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position
-    SpeedRefPct     : REAL;              // Magnitude commande 0..100 %, bornée avant calcul
-    FullTravelTimeS : REAL := 8.0;       // Temps complet Trémie→Maintenance à 100 %, simulation seulement
+    Enable          : BOOL;              (* --> [CMD] TRUE = modèle actif *)
+    Direction       : INT;               (* --> [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position *)
+    SpeedRefPct     : REAL;              (* --> [CMD] Magnitude commande 0..100 %, bornée avant calcul *)
+    FullTravelTimeS : REAL := 8.0;       (* --> [CFG] Temps complet Trémie→Maintenance à 100 %, simulation seulement *)
 END_VAR
 VAR_OUTPUT
-    PosTremie      : BOOL;               // Bit4 du mot capteurs
-    PosPV          : BOOL;               // Bit3 du mot capteurs
-    PosP2          : BOOL;               // Bit2 du mot capteurs (point matériel PVP2)
-    PosP1          : BOOL;               // Bit1 du mot capteurs
-    PosMaintenance : BOOL;               // Bit0 du mot capteurs
+    PosTremie      : BOOL;               (* <-- [STAT] Bit4 du mot capteurs *)
+    PosPV          : BOOL;               (* <-- [STAT] Bit3 du mot capteurs *)
+    PosP2          : BOOL;               (* <-- [STAT] Bit2 du mot capteurs (point matériel PVP2) *)
+    PosP1          : BOOL;               (* <-- [STAT] Bit1 du mot capteurs *)
+    PosMaintenance : BOOL;               (* <-- [STAT] Bit0 du mot capteurs *)
 END_VAR
 VAR
-    instCycleTime              : FB_CycleTime;
-    PositionProgress           : REAL;   // 0=Trémie ... 5=Maintenance
-    SpeedPctBounded            : REAL;
-    PositionIncrement          : REAL;
-    Initialized                : BOOL := FALSE;
+    instCycleTime              : FB_CycleTime;   (* * [INST] Mesure temps de cycle *)
+    PositionProgress           : REAL;   (* . [LOC] 0=Trémie ... 5=Maintenance *)
+    SpeedPctBounded            : REAL;   (* . [LOC] Vitesse bornée *)
+    PositionIncrement          : REAL;   (* . [LOC] Incrément de progression *)
+    Initialized                : BOOL := FALSE;   (* . [LOC] Initialisation *)
 END_VAR
 VAR CONSTANT
     CST_PositionAtTremie       : REAL := 0.0;
@@ -45,6 +45,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate"}
 IF NOT Enable THEN
     // Prochain démarrage déterministe sur P2, comme l'ancien modèle de banc.
     PositionProgress := CST_PositionAtP2;
@@ -56,12 +57,16 @@ IF NOT Enable THEN
     PosMaintenance := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Initialisation"}
 IF NOT Initialized THEN
     PositionProgress := CST_PositionAtP2;
     Initialized := TRUE;
 END_IF;
+{endregion}
 
+{region "§3 Progression"}
 instCycleTime(DefaultValueS := 0.010);
 SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
 
@@ -80,7 +85,9 @@ IF Direction = 1 THEN
 ELSIF Direction = -1 THEN
     PositionProgress := MIN(CST_PositionAtMaintenance, PositionProgress + PositionIncrement);
 END_IF;
+{endregion}
 
+{region "§4 Publication capteurs"}
 // Réinitialisation explicite : aucune valeur transitoire héritée d'une zone précédente.
 PosTremie := FALSE;
 PosPV := FALSE;
@@ -110,3 +117,4 @@ ELSIF PositionProgress <= CST_PositionAtP1 THEN
 ELSIF PositionProgress < CST_PositionAtMaintenance THEN
     PosMaintenance := TRUE;
 END_IF;
+{endregion}

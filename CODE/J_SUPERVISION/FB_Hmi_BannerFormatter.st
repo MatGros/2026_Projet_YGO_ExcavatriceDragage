@@ -9,65 +9,65 @@
    ═══════════════════════════════════════════════════════════════ *)
 FUNCTION_BLOCK PUBLIC FB_Hmi_BannerFormatter
 VAR_INPUT
-    Enable               : BOOL := TRUE;
-    SimulationModeActive : BOOL;
-    CurrentMode          : E_Mode;
-    BothAxesCoupled      : BOOL;
-    WinchSelected        : INT; // 1 = M1, 2 = M2
+    Enable               : BOOL := TRUE;   // --> [CMD] Active le formateur
+    SimulationModeActive : BOOL;   // --> [TST] Mode simulation actif
+    CurrentMode          : E_Mode;   // --> [CMD] Mode courant
+    BothAxesCoupled      : BOOL;   // --> [HW] Treuils M1/M2 couplés
+    WinchSelected        : INT; // --> [CMD] 1 = M1, 2 = M2
 
     // 🔄 Cycle & sous-cycles
-    CycleStep            : E_CycleStep;
-    DiveState            : E_DiveSearchState;
-    ExtractionState      : E_ExtractionSequenceState;
-    HomingActive         : BOOL;
-    HomingStepM1         : INT;
-    HomingStepM2         : INT;
+    CycleStep            : E_CycleStep;   // --> [HW] Étape cycle
+    DiveState            : E_DiveSearchState;   // --> [HW] État plongée
+    ExtractionState      : E_ExtractionSequenceState;   // --> [HW] État extraction
+    HomingActive         : BOOL;   // --> [HW] Référencement en cours
+    HomingStepM1         : INT;   // --> [HW] Étape homing M1
+    HomingStepM2         : INT;   // --> [HW] Étape homing M2
 
     // 🛡️ Dérogations & particularités
-    BypassGlobalActive   : BOOL;
-    BypassWinchM1Active  : BOOL;
-    BypassWinchM2Active  : BOOL;
-    BypassTranslation    : BOOL;
-    BypassSyncActive     : BOOL;
-    SyncDegradedActive   : BOOL;
-    LegalLimitReached    : BOOL;
+    BypassGlobalActive   : BOOL;   // --> [TST] Bypass global
+    BypassWinchM1Active  : BOOL;   // --> [TST] Bypass treuil M1
+    BypassWinchM2Active  : BOOL;   // --> [TST] Bypass treuil M2
+    BypassTranslation    : BOOL;   // --> [TST] Bypass translation
+    BypassSyncActive     : BOOL;   // --> [TST] Bypass synchro
+    SyncDegradedActive   : BOOL;   // --> [TST] Synchro bridée
+    LegalLimitReached    : BOOL;   // --> [SAFE] Limite légale atteinte
 
     // 🎮 Sécurité, causes et intention de direction
-    EmergencyChainClosed : BOOL;
-    PowerContactorEngaged: BOOL;
-    PowerCutOffActiveAny : BOOL;
-    SafeStopActive       : BOOL; // Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)
-    DescendPermit        : BOOL; // Agrégat M1/M2 par AND
-    AscentPermit         : BOOL; // Agrégat M1/M2 par AND
-    BucketIsOpen         : BOOL;
-    DiveActive           : BOOL;
-    TopLimitReached      : BOOL; // Agrégat M1/M2 par OR — toute limite haute affichée
-    CoupledUserRequestDirection : INT;
-    M1LogicRequestDirection     : INT;
-    M2LogicRequestDirection     : INT;
-    CycleRequestDirection      : INT;
-    DeadmanArmed         : BOOL;
-    JoystickAtNeutral    : BOOL;
-    CycleAutoBusy        : BOOL;
+    EmergencyChainClosed : BOOL;   // --> [SAFE] Chaîne AU fermée
+    PowerContactorEngaged: BOOL;   // --> [SAFE] Contacteur puissance
+    PowerCutOffActiveAny : BOOL;   // --> [SAFE] Coupure puissance active
+    SafeStopActive       : BOOL; // --> [SAFE] Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)
+    DescendPermit        : BOOL; // --> [SAFE] Agrégat M1/M2 par AND
+    AscentPermit         : BOOL; // --> [SAFE] Agrégat M1/M2 par AND
+    BucketIsOpen         : BOOL;   // --> [HW] Benne ouverte
+    DiveActive           : BOOL;   // --> [HW] Plongée active
+    TopLimitReached      : BOOL; // --> [SAFE] Agrégat M1/M2 par OR — toute limite haute affichée
+    CoupledUserRequestDirection : INT;   // --> [CMD] Direction demandée couplée
+    M1LogicRequestDirection     : INT;   // --> [CMD] Direction logique M1
+    M2LogicRequestDirection     : INT;   // --> [CMD] Direction logique M2
+    CycleRequestDirection      : INT;   // --> [CMD] Direction cycle
+    DeadmanArmed         : BOOL;   // --> [SAFE] Homme-mort armé
+    JoystickAtNeutral    : BOOL;   // --> [HW] Joystick au neutre
+    CycleAutoBusy        : BOOL;   // --> [HW] Cycle auto actif
 END_VAR
 VAR_OUTPUT
-    Banner               : ST_HmiBanner;
+    Banner               : ST_HmiBanner;   // <-- [STAT] Bandeau IHM assemblé
 END_VAR
 VAR
-    PrefixContext        : STRING(20);
-    ModeStr              : STRING(30);
-    CouplingStr          : STRING(30);
-    CurrentDirection     : INT;
-    DirectionBlocked     : BOOL; // Interlock métier : mouvement demandé mais permit absent
-    AnyBypassActive      : BOOL;
-    CriticalActionActive : BOOL; // Défaut/interlock critique : affiché immédiatement (sans maintien)
-    SpecialConditionCandidate : STRING(120);
-    OperatorActionCandidate   : STRING(120);
-    AntiFlickSpecial     : FB_AntiFlickerText; // 🧊 §3 Condition spéciale (warning → maintenu)
-    AntiFlickOperator    : FB_AntiFlickerText; // 🧊 §4 Action opérateur (critique → direct, warning → maintenu)
+    PrefixContext        : STRING(20);   // . [LOC] Préfixe RÉEL/SIMU
+    ModeStr              : STRING(30);   // . [LOC] Libellé mode
+    CouplingStr          : STRING(30);   // . [LOC] Libellé couplage
+    CurrentDirection     : INT;   // . [LOC] Direction courante
+    DirectionBlocked     : BOOL; // . [LOC] Interlock métier : mouvement demandé mais permit absent
+    AnyBypassActive      : BOOL;   // . [LOC] Au moins un bypass actif
+    CriticalActionActive : BOOL; // . [LOC] Défaut/interlock critique : affiché immédiatement (sans maintien)
+    SpecialConditionCandidate : STRING(120);   // . [LOC] Texte condition spéciale
+    OperatorActionCandidate   : STRING(120);   // . [LOC] Texte action opérateur
+    AntiFlickSpecial     : FB_AntiFlickerText; // * [INST] §3 Condition spéciale (warning → maintenu)
+    AntiFlickOperator    : FB_AntiFlickerText; // * [INST] §4 Action opérateur (critique → direct, warning → maintenu)
 END_VAR
 VAR CONSTANT
-    CST_BannerHoldTime   : TIME := T#500ms; // 🧊 Anti-clignotement warnings/états (AF-07 §4.3)
+    CST_BannerHoldTime   : TIME := T#500ms; // . [LOC] Anti-clignotement warnings/états (AF-07 §4.3)
 END_VAR
 
 IF NOT Enable THEN
@@ -192,7 +192,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 // Format (AF-07 §4.1) : [ORGANE] <Action physique> > <Fin>
 // 🧊 Défauts (AU/puissance/SafeStop) + interlock DirectionBlocked
 //    → affichés immédiatement (ForceInstant=TRUE) ; les autres états
-//    → maintenus min (anti-clignotement). Décision revue 2026-08-17.
+//    → maintenus min (anti-clignotement).
 // ═══════════════════════════════════════════════════════════════
 IF CurrentMode = E_Mode.SEMI_AUTO THEN
     CurrentDirection := CycleRequestDirection;

@@ -54,6 +54,7 @@ VAR
     VariationActive        : BOOL;        // . [LOC] Condition de depassement de seuil active
 END_VAR
 
+{region "§1 Gate"}
 // 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
@@ -77,10 +78,14 @@ Ready := TRUE;
 Busy := FALSE;
 Done := FALSE;
 State := E_State.READY;
+{endregion}
 
+{region "§2 Reset front"}
 // 🔑 2. RESET FRONT — l'acquittement n'efface le défaut que si la cause a disparu.
 ResetEdge(CLK := Reset);
+{endregion}
 
+{region "§3 Calcul écart vitesse"}
 // 📏 3. CALCUL DE L'ÉCART DE VITESSE — première mesure utilisée comme référence.
 IF NOT HasPreviousSpeed THEN
     PreviousSpeedMps := SpeedMps;
@@ -90,7 +95,9 @@ ELSE
     SpeedDeltaMps := ABS(SpeedMps - PreviousSpeedMps);
     PreviousSpeedMps := SpeedMps;
 END_IF;
+{endregion}
 
+{region "§4 Détection et filtre temporel"}
 // 🔍 4. DÉTECTION BRUTE + FILTRE TEMPOREL — pas de déclenchement si la durée vaut zéro.
 VariationActive := HasPreviousSpeed
                    AND (SpeedVariationThresholdMps >= 0.0)
@@ -108,10 +115,13 @@ IF SpeedVariationConfirmed THEN
 ELSIF ResetEdge.Q AND NOT VariationActive THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
+{endregion}
 
+{region "§5 Sorties état"}
 // 📤 5. SORTIES D'ÉTAT — diagnostic standard, aucune commande mouvement.
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}

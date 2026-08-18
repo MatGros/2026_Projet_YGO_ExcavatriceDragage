@@ -8,10 +8,10 @@ STRUCT
     Idx202_SyncEnabled_IHM       : BOOL; // 1 = Couplage Synchro Actif (Nominal) | 0 = Découplé ⚠️
     Idx203_ArbitratedSpeed_Pct   : REAL; // [%] Consigne Vitesse Synchro Arbitrée
 
-    Idx301_EmergencyChainClosed  : BOOL; // 1 = Boucle Urgence OK | 0 = Arrêt Urgence 🔴
-    Idx302_SyncFaultActive       : BOOL; // 0 = Synchro OK | 1 = Écart Synchro Bloquant 🔴
-    Idx303_M1_AscentPermit       : BOOL; // 1 = Montée M1 Autorisée | 0 = Bloquée (Fdc/Safety) 🔴
-    Idx304_M2_AscentPermit       : BOOL; // 1 = Montée M2 Autorisée | 0 = Bloquée (Fdc/Safety) 🔴
+    Idx301_EmergencyChainClosed  : BOOL; // 1 = Boucle Urgence OK | 0 = Arrêt Urgence
+    Idx302_SyncFaultActive       : BOOL; // 0 = Synchro OK | 1 = Écart Synchro Bloquant
+    Idx303_M1_AscentPermit       : BOOL; // 1 = Montée M1 Autorisée | 0 = Bloquée (Fdc/Safety)
+    Idx304_M2_AscentPermit       : BOOL; // 1 = Montée M2 Autorisée | 0 = Bloquée (Fdc/Safety)
 
     Idx401_SyncMotionAllowed     : BOOL; // 1 = Mouvement Synchro Autorisé | 0 = Bloqué
     Idx402_M1_SetpointSpeed_Pct  : REAL; // [%] Consigne Vitesse Calculée M1

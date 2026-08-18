@@ -78,7 +78,7 @@ END_VAR
 
 // === IMPLEMENTATION ===
 
-{region "Fronts de commande"}
+{region "§1 Fronts de commande"}
 // 🔄 Fronts
 EnableRising(CLK := Enable);
 ResetEdge(CLK := Reset);
@@ -86,7 +86,7 @@ ArmReqEdge(CLK := ArmRequest);
 
 {endregion}
 
-{region "Gate neutralisation"}
+{region "§2 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -124,7 +124,7 @@ END_IF;
 
 {endregion}
 
-{region "Autotest demarrage"}
+{region "§3 Autotest demarrage"}
 // 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01)
 // Vérifications synchrones 1 cycle au premier passage Enable=TRUE
 IF EnableRising.Q THEN
@@ -147,7 +147,7 @@ END_IF;
 
 {endregion}
 
-{region "Acquittement defauts"}
+{region "§4 Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
 // ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
 // pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
@@ -163,7 +163,7 @@ END_IF;
 
 {endregion}
 
-{region "Sequence rearmement AU"}
+{region "§5 Sequence rearmement AU"}
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -> Ack remis a FALSE,
@@ -258,8 +258,8 @@ END_IF;
 
 {endregion}
 
-{region "Gestion cause et acquittement"}
-// 🆕 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+{region "§6 Gestion cause et acquittement"}
+// 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
 // L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
 // jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
 RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
@@ -274,7 +274,7 @@ END_IF;
 
 {endregion}
 
-{region "Commandes et etats publics"}
+{region "§7 Commandes et etats publics"}
 // 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES — basées sur la Cause brute (jamais sur l'Ack)
 Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
 Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
@@ -294,7 +294,7 @@ ArmingBusy := (ArmingSeqStep <> 0) OR EmergencyArmingLockoutActive;
 
 {endregion}
 
-{region "Affichage defauts IHM"}
+{region "§8 Affichage defauts IHM"}
 // 📤 7. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
 // ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
 // sur la Cause brute, jamais retardée par ce debounce.
@@ -306,7 +306,7 @@ EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAc
 
 {endregion}
 
-{region "Synthese ErrorId"}
+{region "§9 Synthese ErrorId"}
 // 📤 8. SYNTHÈSE DES ERREURS (bitfield affiché, basé sur RedundancyTestFailed/EmergencyArmingFailed affichés)
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN

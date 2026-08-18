@@ -4,6 +4,23 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `T123_Standardisation_Complete` — 2026-08-18 — standardisation commentaires/tags/régions sur tout CODE/
+- **Passage exhaustif A→M (169 fichiers ST)** : cartouches ≤15L, flèches ASCII + tags de rôle sur les déclarations, régions `{region "§N ..."}` sur les FB/PRG conséquents, purge des REX/dates/lots des commentaires avec reformulation des invariants liés aux AF.
+- **Preuve de non-impact logique** : 103 fichiers modifiés vérifiés — code exécutable identique à HEAD (comparaison hors commentaires), `git diff --check` PASS.
+- **Convention des régions documentée** dans `CODE_QUALITY_STANDARDS.md §2bis` (format `§N`, aligné sur les sections du corps).
+- **Aucun commit** créé.
+
+### `T123-I_Translation_Commentaires` — 2026-08-18 — standardisation commentaires Translation M3
+- **Purge REX/dates/lots des 7 sources `CODE/I_TRANSLATION/`** : cartouches ≤15L, flèches ASCII + tags, invariants safety reformulés de façon intemporelle (liés AF11/AF03).
+- **Aucune ligne exécutable ni interface modifiée** (comparaison HEAD vs working : code identique).
+- **Historique conservé** dans les fiches AF11 existantes (`FB_Translation_v1.1.md §10`, `FB_Translation_PositionDecoder_v1.1.md §3bis`) — pas de REX duplicatif créé.
+- **Standards** : `CODE_QUALITY_STANDARDS.md` corrigé — whitelist emojis validée CODESYS projet (remplace « Unicode BMP garanti »).
+
+### `T123_REGIONS_Standardisation` — 2026-08-18 — convention des régions `{region ...}`
+- **Convention documentée** dans `CODE_QUALITY_STANDARDS.md §2bis` : format `{region "§N <Description>"}`, numérotation alignée sur les sections du corps, sous-sections `§Nbis/§Nter`.
+- **8 fichiers convertis** du style descriptif au style `§N` : `FB_Safety_EmergencyManagementLogic`, `FB_Winch`, `FB_Safety_Winch`, `FB_WinchSync`, `FB_Bucket`, `FB_Cycle`, `FB_Translation`, `FB_Safety_Translation`.
+- **Aucune ligne exécutable modifiée** (les régions sont des balises d'éditeur sans effet logique) ; `git diff --check` PASS.
+
 ### `v0.6.8_Refactor_Indexation_Dossiers_Flux_Chronologique` — 2026-08-18 — refactoring architecture dossiers `CODE/` (flux logique chronologique)
 - **Refonte de l'arborescence `CODE/`** : indexation préfixée de `A_COMMUN` à `M_MAIN` pour refléter la logique et la chronologie du flux d'exécution automate :
   - `A_COMMUN` · `B_AU_SECURITE` · `C_DIAG_RESEAUX` · `D_JOYSTICK` · `E_CODEURS` · `F_MODES` · `G_CYCLE` · `H_TREUILS_BENNE` · `I_TRANSLATION` · `J_SUPERVISION` · `K_DEPANNAGE` · `L_SIMULATION` · `M_MAIN`

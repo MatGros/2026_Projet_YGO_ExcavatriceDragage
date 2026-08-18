@@ -72,6 +72,7 @@ END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
 
+{region "§1 Gate"}
 // 🛑 1. GATE
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
@@ -86,10 +87,14 @@ END_IF;
 
 Ready := TRUE;
 State := E_State.READY;
+{endregion}
 
+{region "§2 Reset front"}
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
+{endregion}
 
+{region "§3 Diagnostic bus et alarme"}
 // 🔍 3. DIAGNOSTIC BUS / ALARME
 IF (AlarmsIn <> 0) OR NOT SlaveOperational THEN
     ErrorId := ErrorId OR 16#0001;
@@ -97,26 +102,27 @@ ELSE
     ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
 END_IF;
 EncoderAvailable := (ErrorId AND 16#0001) = 0;
+{endregion}
 
+{region "§4 Lecture position"}
 // 📥 4. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
 // Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
 // global ici pour ne pas geler aussi la séquence preset/l'état — seule la lecture est gelée).
 IF EncoderAvailable THEN
-    RawPos := RawPosIn;   // 🔧 2026-07-03 : sens de comptage géré côté codeur (CoE 6000h bit0,
-                          // startup parameter CODESYS) — voir Partie10 §3bis. Plus de calcul ici.
+    RawPos := RawPosIn;   // Sens de comptage géré côté codeur (CoE 6000h bit0, startup parameter CODESYS) — voir Partie10 §3bis. Plus de calcul ici.
     AngleRaw := UDINT_TO_UINT(RawPos MOD PointsPerRev);
     TurnCount := RawPos / PointsPerRev;
 END_IF;
+{endregion}
 
+{region "§5 Séquence preset"}
 // 🔧 5. SÉQUENCE PRESET (écriture bus)
-// ✅ Confirmé terrain (2026-07-02) : PresettTrigCmd := 2 déclenche le référencement à
-//    PresetValue (valeur de commande, pas un masque de bits — corrige l'hypothèse initiale).
-// 🔴 CodeSeqTrigCmd : rôle NON identifié (même par l'utilisateur/terrain) — laissé à 0,
-//    PAS piloté tant que sa fonction n'est pas confirmée (fiche technique ou essai dédié).
-//    Ne jamais lui donner une valeur arbitraire "au cas où".
+// PresetTriggerCmd := 2 déclenche le référencement à PresetValue (valeur de commande, pas un
+// masque de bits). CodeSeqTriggerCmd : rôle non identifié — laissé à 0, PAS piloté tant que sa
+// fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
 PresetAck := FALSE; PresetNak := FALSE; // pulses 1 cycle uniquement
-CodeSeqTriggerCmd := 16#0000;           // 🔴 non piloté — rôle inconnu, voir note ci-dessus
+CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
         PresetTriggerCmd := 0;
@@ -126,7 +132,7 @@ CASE PresetSeqStep OF
             PresetTimer(IN := TRUE, PT := PresetTimeout);
         END_IF;
     1: // Déclenchement preset (laissé actif pendant 0.5s pour confort visuel en simulation/bus)
-        PresetTriggerCmd := 2;   // ✅ Valeur confirmée terrain — référence le codeur à PresetValueOut
+        PresetTriggerCmd := 2;   // Référence le codeur à PresetValueOut
         RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PresetValueOut);
         IF ABS(RawDiff) <= UDINT_TO_DINT(PresetTolerancePts) THEN
             PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -149,7 +155,9 @@ END_CASE;
 IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
     ErrorId := ErrorId AND 16#FFFD;
 END_IF;
+{endregion}
 
+{region "§6 Error et StateAtError"}
 // 🧾 6. ERROR / STATEATERROR
 Error := (ErrorId <> 16#0000);
 ErrorEdge(CLK := Error);
@@ -159,3 +167,4 @@ END_IF;
 
 Busy := (PresetSeqStep <> 0);
 Done := PresetAck;
+{endregion}

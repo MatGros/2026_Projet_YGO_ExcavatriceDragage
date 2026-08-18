@@ -15,15 +15,14 @@
    📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
    📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
    📥 PresetValue : valeur brute à charger lors du preset
-   📥 SpeedScaleFactor : 🔧 REX 2026-07-07 — multiplicateur de vitesse simulation (confort de test
+   📥 SpeedScaleFactor : multiplicateur de vitesse simulation (confort de test
       banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
       d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
-   🔧 REX 2026-07-08 : `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+   `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
       (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
-      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB (tenté en `VAR RETAIN` puis
-      `VAR PERSISTENT RETAIN` locaux, aucun des deux ne convient). Un vrai codeur absolu physique
+      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
       conserve son comptage brut même à travers un reset FROID (indépendant de l'automate) —
       il fallait donc bien du PERSISTENT RETAIN réel, regroupé avec le reste dans GVL_PERSISTENT.
    ═══════════════════════════════════════════════════════════════ *)
@@ -32,41 +31,46 @@
 
 FUNCTION_BLOCK PUBLIC FB_Sim_Encoder
 VAR_INPUT
-    Enable           : BOOL;
-    RelayFwd         : BOOL;
-    RelayRev         : BOOL;
-    SpeedRefPct      : REAL;
-    PresetCmd        : BOOL;
-    PresetValue      : UDINT;
-    SpeedScaleFactor : REAL := 1.0;   // 🔧 REX 2026-07-07 — confort de test, voir bandeau ci-dessus
-    TestOffsetCmd    : BOOL;          // 🆕 REX 2026-07-08 (4) — front montant = applique TestOffsetPts (test banc)
-    TestOffsetPts    : DINT := 0;     // 🆕 REX 2026-07-08 (4) — décalage signé à appliquer (points bruts)
+    Enable           : BOOL;   (* --> [CMD] Active la simulation *)
+    RelayFwd         : BOOL;   (* --> [HW] Sens commandé avant *)
+    RelayRev         : BOOL;   (* --> [HW] Sens commandé arrière *)
+    SpeedRefPct      : REAL;   (* --> [CMD] Vitesse rampée courante (%) *)
+    PresetCmd        : BOOL;   (* --> [CMD] Applique un preset (homing) *)
+    PresetValue      : UDINT;   (* --> [CFG] Valeur brute à charger au preset *)
+    SpeedScaleFactor : REAL := 1.0;   (* --> [CFG] Confort de test, voir bandeau ci-dessus *)
+    TestOffsetCmd    : BOOL;          (* --> [TST] Front montant = applique TestOffsetPts (test banc) *)
+    TestOffsetPts    : DINT := 0;     (* --> [TST] Décalage signé à appliquer (points bruts) *)
 END_VAR
 VAR_OUTPUT
-    RawPosOut   : UDINT;
+    RawPosOut   : UDINT;   (* <-- [DIAG] Position brute simulée *)
 END_VAR
 VAR_IN_OUT
-    RawPos      : UDINT;   // 🔧 REX 2026-07-08 : référence _SimEncoderRawPosM1/M2 (survit au reset froid)
+    RawPos      : UDINT;   (* <-> [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid) *)
 END_VAR
 VAR
-    Increment      : UDINT;              // 🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x
-    TestOffsetEdge : R_TRIG;             // 🆕 REX 2026-07-08 (4)
+    Increment      : UDINT;              (* . [LOC] Évite de dupliquer le calcul 2x *)
+    TestOffsetEdge : R_TRIG;             (* . [LOC] Front TestOffsetCmd *)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
 
+{region "§1 Gate"}
 IF NOT Enable THEN
     RawPosOut := RawPos;
     RETURN;
 END_IF;
+{endregion}
 
-// 🆕 REX 2026-07-08 (4) — injection test banc : VRAI saut de position (comme un glissement réel),
+{region "§2 Injection test"}
+// Injection test banc : VRAI saut de position (comme un glissement réel),
 // pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
 TestOffsetEdge(CLK := TestOffsetCmd);
 IF TestOffsetEdge.Q THEN
     RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
 END_IF;
+{endregion}
 
+{region "§3 Comptage"}
 Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
 
 IF PresetCmd THEN
@@ -80,5 +84,8 @@ ELSIF RelayRev THEN
         RawPos := 0;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Sortie"}
 RawPosOut := RawPos;
+{endregion}

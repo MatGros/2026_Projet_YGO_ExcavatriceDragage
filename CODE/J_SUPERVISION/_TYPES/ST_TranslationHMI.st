@@ -2,7 +2,7 @@
    ↔️ ST_TranslationHMI — Données d'échange IHM pour le Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
-   📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
+   📄 Structuration en Cmd / State / Safety / Bypass / Test —
       doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_TranslationHMI :
@@ -13,10 +13,10 @@ STRUCT
     (* 🚦 États & diagnostics *)
     State                   : ST_TranslationState;
 
-    (* 🔧 Configurations et limites — 🆕 2026-08-06, manquait (contrairement à ST_WinchHMI) *)
+    (* Configurations et limites — , manquait (contrairement à ST_WinchHMI) *)
     Cfg                     : ST_TranslationCfg;
 
-    (* 🔧 Bypass maintenance *)
+    (* Bypass maintenance *)
     Bypass                  : ST_BypassTranslation;
 
     (* 🛡️ Sécurité (FB_Safety_Translation) *)

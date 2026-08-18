@@ -24,8 +24,8 @@ VAR
 END_VAR
 
 // Détection du comportement (Accélération vs Décélération)
-// 🔧 CORRECTIF : classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut
-// de Target seul (l'ancienne version se trompait lors d'une traversée de zéro rapide).
+// Classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut de Target seul
+// (robuste à une traversée de zéro rapide).
 // 🛡️ Garde-fou : la rampe ne sort jamais de la plage normalisée ±100 %.
 TargetLimited := LIMIT(-100.0, Target, 100.0);
 Current := LIMIT(-100.0, Current, 100.0);

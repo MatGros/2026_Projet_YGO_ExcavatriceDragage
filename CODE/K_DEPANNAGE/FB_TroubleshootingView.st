@@ -10,7 +10,7 @@
       (LOT_TROUBLESHOOTING_VIEW_ET_WINCHHMI) a introduit ST_WinchBenneHMI pour porter
       Bucket côté M2 uniquement (GVL_IHM.M2TreuilBenne) — adaptation du port fiche §3
       nécessaire suite à AC5 (Bucket retiré de ST_WinchHMI commun M1/M2).
-   🔧 REX écriture GVL directe : seule exception au principe "pas de GVL comme bus de
+   Écriture GVL directe : seule exception au principe "pas de GVL comme bus de
       commande" (AF_Partie-03 §5) — GVL_Troubleshooting n'est jamais relue par un FB
       métier, uniquement par Watch CODESYS / export SCADA dépannage (fiche §3/§7).
    ⚠️ Idx201_JoystickSelected (ContexteMachineGlobal) lit GVL_IHM.Modes.Cmd.TglJoystickMaster
@@ -19,59 +19,59 @@
    ═══════════════════════════════════════════════════════════════ *)
 FUNCTION_BLOCK PUBLIC FB_TroubleshootingView
 VAR_INPUT
-    Enable                   : BOOL; (* TRUE en permanence — fiche §3, aucune condition de scan *)
+    Enable                   : BOOL; (* --> [CMD] TRUE en permanence — fiche §3, aucune condition de scan *)
 
     (* 📡 PRG_02_Acquisition *)
-    HwIn                     : ST_HardwareImage;
-    HwReal                   : ST_HardwareImage;
-    InputModuleFault         : BOOL;
-    LocalDigitalIoOk         : BOOL; (* Mirroir Network.InputModules — pas de champ ST_Chain* dédié ce lot *)
-    Vh0800EndOk              : BOOL; (* idem *)
-    Vh0808EtpOk              : BOOL; (* idem *)
+    HwIn                     : ST_HardwareImage;   (* --> [HW] Image entrées qualifiées *)
+    HwReal                   : ST_HardwareImage;   (* --> [HW] Image entrées réelles *)
+    InputModuleFault         : BOOL;   (* --> [HW] Défaut module d'entrée *)
+    LocalDigitalIoOk         : BOOL; (* --> [HW] Mirroir Network.InputModules — pas de champ ST_Chain* dédié ce lot *)
+    Vh0800EndOk              : BOOL; (* --> [HW] idem *)
+    Vh0808EtpOk              : BOOL; (* --> [HW] idem *)
 
     (* 🎚️ PRG_03_Modes_Cycle *)
-    Auth                     : ST_Modes_Autorisations;
+    Auth                     : ST_Modes_Autorisations;   (* --> [SAFE] Autorisations machine *)
 
     (* 🛗 PRG_04_Treuils_Benne — demandes publiques déjà arbitrées *)
-    M1LogicRequestSpeedRef_Pct : REAL;
-    M1LogicRequestDirection    : INT;
-    M2LogicRequestSpeedRef_Pct : REAL;
-    M2LogicRequestDirection    : INT;
-    CoupledUserRequestDirection : INT;
-    CoupledUserRequestActive    : BOOL;
-    CycleAutoBusy                : BOOL;
-    CycleM1SpeedRef_Pct          : REAL;
-    CycleM2SpeedRef_Pct          : REAL;
-    CycleBucketOpen              : BOOL;
-    CycleTargetPosition          : INT;
+    M1LogicRequestSpeedRef_Pct : REAL;   (* --> [CMD] Consigne vitesse M1 *)
+    M1LogicRequestDirection    : INT;   (* --> [CMD] Sens M1 *)
+    M2LogicRequestSpeedRef_Pct : REAL;   (* --> [CMD] Consigne vitesse M2 *)
+    M2LogicRequestDirection    : INT;   (* --> [CMD] Sens M2 *)
+    CoupledUserRequestDirection : INT;   (* --> [CMD] Direction couplée *)
+    CoupledUserRequestActive    : BOOL;   (* --> [CMD] Demande couplée active *)
+    CycleAutoBusy                : BOOL;   (* --> [HW] Cycle auto actif *)
+    CycleM1SpeedRef_Pct          : REAL;   (* --> [CMD] Consigne cycle M1 *)
+    CycleM2SpeedRef_Pct          : REAL;   (* --> [CMD] Consigne cycle M2 *)
+    CycleBucketOpen              : BOOL;   (* --> [HW] Benne ouverte cycle *)
+    CycleTargetPosition          : INT;   (* --> [CMD] Cible cycle *)
 
     (* 🎭 GVL_Simulation *)
-    SimulationModeActive     : BOOL;
-    SimWinchActive           : BOOL;
-    SimTranslationActive     : BOOL;
-    SimOperatorActive        : BOOL;
-    SimSafetyActive          : BOOL;
+    SimulationModeActive     : BOOL;   (* --> [TST] Mode simulation *)
+    SimWinchActive           : BOOL;   (* --> [TST] Sim treuils *)
+    SimTranslationActive     : BOOL;   (* --> [TST] Sim translation *)
+    SimOperatorActive        : BOOL;   (* --> [TST] Sim opérateur *)
+    SimSafetyActive          : BOOL;   (* --> [TST] Sim sécurité *)
 
     (* 🛗 GVL_IHM — images publiques déjà produites *)
-    WinchM1                  : ST_WinchHMI;      (* GVL_IHM.M1TreuilRetenue *)
-    WinchM2                  : ST_WinchBenneHMI; (* GVL_IHM.M2TreuilBenne — porte Bucket *)
-    Sync                     : ST_SyncHMI;       (* GVL_IHM.M1M2Sync *)
-    Translation              : ST_TranslationHMI;(* GVL_IHM.TranslationM3 *)
-    Commun                   : ST_CommunHMI;     (* GVL_IHM.Commun *)
-    Network                  : ST_NetworkDiagHMI;(* GVL_IHM.Network *)
-    DredgingAssist           : ST_DredgingAssistHMI; (* 🆕 2026-08-07 : GVL_IHM.DredgingAssist *)
-    JoystickHMI              : ST_JoystickHMI;   (* 🕹️ GVL_IHM.JOY1Joystick *)
+    WinchM1                  : ST_WinchHMI;      (* --> [HW] GVL_IHM.M1TreuilRetenue *)
+    WinchM2                  : ST_WinchBenneHMI; (* --> [HW] GVL_IHM.M2TreuilBenne — porte Bucket *)
+    Sync                     : ST_SyncHMI;       (* --> [HW] GVL_IHM.M1M2Sync *)
+    Translation              : ST_TranslationHMI;(* --> [HW] GVL_IHM.TranslationM3 *)
+    Commun                   : ST_CommunHMI;     (* --> [HW] GVL_IHM.Commun *)
+    Network                  : ST_NetworkDiagHMI;(* --> [HW] GVL_IHM.Network *)
+    DredgingAssist           : ST_DredgingAssistHMI; (* --> [HW] GVL_IHM.DredgingAssist *)
+    JoystickHMI              : ST_JoystickHMI;   (* --> [HW] GVL_IHM.JOY1Joystick *)
 
     (* 🛡️ Sorties publiques AU produites par PRG_06_Outputs_LD *)
-    EmergencyState           : ST_Safety_Emergency_State;
-    EmergencyDiag            : ST_Safety_Emergency_Diag;
-    PowerCutOffActive        : BOOL;
-    ArmingPulseActive        : BOOL;
-    MaintainAActive          : BOOL;
-    MaintainBActive          : BOOL;
+    EmergencyState           : ST_Safety_Emergency_State;   (* --> [SAFE] État AU *)
+    EmergencyDiag            : ST_Safety_Emergency_Diag;   (* --> [SAFE] Diagnostic AU *)
+    PowerCutOffActive        : BOOL;   (* --> [SAFE] Coupure puissance *)
+    ArmingPulseActive        : BOOL;   (* --> [SAFE] Impulsion réarmement *)
+    MaintainAActive          : BOOL;   (* --> [SAFE] Maintien canal A *)
+    MaintainBActive          : BOOL;   (* --> [SAFE] Maintien canal B *)
 END_VAR
 VAR_OUTPUT
-    Ready                    : BOOL; (* Diagnostic interne minimal — fiche §3 *)
+    Ready                    : BOOL; (* <-- [STAT] Diagnostic interne minimal — fiche §3 *)
 END_VAR
 
 // 🛑 GATE — neutralisation ; aucune écriture GVL_Troubleshooting si Enable=FALSE
@@ -259,7 +259,7 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD
 {endregion}
 
 {region "§4 Assistance dragage"}
-// === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist (2026-08-07) ===
+// === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist ===
 GVL_Troubleshooting.AssistanceDragage.Idx101_EnableDiveSearch         := DredgingAssist.Cmd.TglEnableDiveSearch;
 GVL_Troubleshooting.AssistanceDragage.Idx102_EnableExtractionSequence := DredgingAssist.Cmd.TglEnableExtractionSequence;
 GVL_Troubleshooting.AssistanceDragage.Idx103_EnableDumpAtTremie       := DredgingAssist.Cmd.TglEnableDumpAtTremie;
@@ -531,7 +531,7 @@ GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy 
 GVL_Troubleshooting.MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
 GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.ActiveSpeedRef_Pct;
 GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
-GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // 🆕 interlock hauteur M1/M2 (risque collision)
+GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // Interlock hauteur M1/M2 (risque collision)
 GVL_Troubleshooting.MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
 

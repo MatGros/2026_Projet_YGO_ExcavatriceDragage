@@ -49,6 +49,7 @@ VAR
     DeviceJoystickOnlineEff     : BOOL;         // . [LOC]  Operational effectif (reel OU bypass)
 END_VAR
 
+{region "§1 Gate"}
 // 🛑 1. GATE : Désactivation logique si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
@@ -69,14 +70,18 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
+{endregion}
 
+{region "§2 Interprétation valeurs brutes"}
 // 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
 CANbusOnlineReal         := (CANbusStateRaw = 2);
 DeviceJoystickOnlineReal := (DeviceJoystickStateRaw = DEVICE_STATE.RUNNING);
 BypassActive             := SimBypassActive OR NetworkBypassActive;
 CANbusOnlineEff          := CANbusOnlineReal OR BypassActive;
 DeviceJoystickOnlineEff  := DeviceJoystickOnlineReal OR BypassActive;
+{endregion}
 
+{region "§3 Reset front"}
 // 🔑 3. RESET FRONT — Efface les défauts si la cause a disparu
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
@@ -85,7 +90,9 @@ IF ResetEdge.Q THEN
         StateAtError := E_Diag_State.DISABLED;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Diagnostic joystick"}
 // 🔍 4. DIAGNOSTIC JOYSTICK
 // Bit 0 : Perte de communication CAN
 IF NOT CANbusOnlineEff THEN
@@ -103,7 +110,9 @@ ELSE
     DeviceJoystick.Operational := TRUE;
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFD; (* Effacement auto dès que RUNNING *)
 END_IF;
+{endregion}
 
+{region "§5 Machine d'état joystick"}
 // 🚦 5. MACHINE D'ÉTAT JOYSTICK
 IF DeviceJoystick.ErrorId <> 0 THEN
     DeviceJoystick.State := E_Diag_State.ERROR;
@@ -119,7 +128,9 @@ ELSE
 END_IF;
 
 State := DeviceJoystick.State;
+{endregion}
 
+{region "§6 Sorties globales"}
 // 📤 6. SORTIES GLOBALES
 DeviceJoystick.Error := (DeviceJoystick.ErrorId <> 0);
 Error := DeviceJoystick.Error;
@@ -143,3 +154,4 @@ DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
 // Briques génériques pour conformité standard
 Busy := FALSE;
 Done := FALSE;
+{endregion}

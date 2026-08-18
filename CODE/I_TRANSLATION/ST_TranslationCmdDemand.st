@@ -1,13 +1,12 @@
-(* ═══════════════════════════════════════════════════════════════
-   ↔️ ST_TranslationCmdDemand — Demande de commande translation M3 (depuis cycle)
+(* =======================================================================
+   🎯 ST_TranslationCmdDemand — Demande de commande translation M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
-            DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
-   🎯 Demande de mouvement pour translation M3 (depuis FB_Cycle).
-   ═══════════════════════════════════════════════════════════════ *)
+   🎯 Rôle : Regroupement des consignes de mouvement translation M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   ======================================================================= *)
 TYPE ST_TranslationCmdDemand :
 STRUCT
-    Start   : BOOL;  // TRUE = démarrer mouvement
-    Target  : INT;   // Cible de position (ex: 1=Trémie, 2=P2, 3=P1, 4=Maintenance)
+    Start   : BOOL;  // --> [CMD] Demande de demarrage du mouvement
+    Target  : INT;   // --> [CMD] Cible de position (1=Tremie, 2=P2, 3=P1, 4=Maintenance)
 END_STRUCT
 END_TYPE

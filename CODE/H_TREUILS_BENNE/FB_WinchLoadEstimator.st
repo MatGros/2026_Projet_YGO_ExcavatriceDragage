@@ -51,6 +51,7 @@ VAR
     SelectedLoadPct                 : REAL;                           // . [LOC] Valeur de charge extraite de la table
 END_VAR
 
+{region "§1 Gate"}
 // 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
@@ -77,7 +78,9 @@ Configured := LoadTable.IsConfigured;
 // La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
 // mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
 Ascending := (MeasuredSpeedSignedMps > 0.0);
+{endregion}
 
+{region "§2 Classement vitesse"}
 // 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
 IF (MeasuredSpeedMps < 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps <= 0.0) THEN
     ErrorId := ErrorId OR 16#0001;
@@ -119,7 +122,9 @@ ELSE
     END_IF;
     SpeedBand := PreviousSpeedBand;
 END_IF;
+{endregion}
 
+{region "§3 Lecture table"}
 // 📊 3. LECTURE TABLE — bornes séparées avant l'accès au tableau 5x5.
 EstimatedLoadPct := 0.0;
 IF Configured THEN
@@ -140,7 +145,9 @@ IF Configured THEN
         END_IF;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Sorties et acquittement"}
 // 📤 4. SORTIES D'ÉTAT ET ACQUITTEMENT.
 IF ResetEdge.Q AND (ErrorId <> 16#0000) AND (MeasuredSpeedMps >= 0.0) THEN
     ErrorId := 16#0000;
@@ -150,3 +157,4 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
