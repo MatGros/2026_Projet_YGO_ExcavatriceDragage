@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-23T22:47:12.790419" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-23T22:47:12.790419">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.295746" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.295746">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -47,7 +47,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_ModesHMI.
+   📄 Structuration en Cmd / State , homogène avec ST_ModesHMI.
    Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
    Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -149,7 +149,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
               </documentation>
             </variable>
             <variable name="Online">
@@ -173,7 +173,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Joystick en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -205,7 +205,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation FB (FALSE = neutralisation, sorties coupées)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE AXE ===
+--&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)</xhtml>
               </documentation>
             </variable>
             <variable name="StartStop">
@@ -213,7 +214,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération normale</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRef">
@@ -221,7 +222,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse signee (-100.0..+100.0 %, signe coherent avec Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -229,7 +230,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -240,17 +241,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de consigne d'axe 4 champs produite par FB_Joystick.
+   📤 Champs : Enable, StartStop, SpeedRef, Direction.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 4 champs exactement :
-      - Enable    : Autorisation globale du pipeline
-      - StartStop : RAMPE (TRUE = accélération, FALSE = décélération normale)
-      - SpeedRef  : Consigne vitesse signée (-100.0 .. +100.0 %)
-      - Direction : Sens d'axe (-1 = Rev, 0 = Neutre, +1 = Fwd)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

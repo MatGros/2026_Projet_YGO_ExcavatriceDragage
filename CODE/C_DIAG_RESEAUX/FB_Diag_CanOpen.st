@@ -112,7 +112,7 @@ ELSE
 END_IF;
 {endregion}
 
-{region "§5 Machine d'état joystick"}
+{region "§5 Machine etat joystick"}
 // 🚦 5. MACHINE D'ÉTAT JOYSTICK
 IF DeviceJoystick.ErrorId <> 0 THEN
     DeviceJoystick.State := E_Diag_State.ERROR;

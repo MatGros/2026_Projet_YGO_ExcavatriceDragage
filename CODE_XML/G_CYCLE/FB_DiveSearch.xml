@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.224264" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.224264">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:51:51.464257" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:51:51.464257">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -54,13 +54,13 @@
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0→1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>SEARCHING_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1→0 au fond</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1-&gt;0 au fond</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -213,28 +213,41 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Activation generale du FB (TRUE=Autorise)</xhtml>
+              </documentation>
             </variable>
             <variable name="Reset">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
+              </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine de securite OK</xhtml>
+              </documentation>
             </variable>
             <variable name="Mode">
               <type>
                 <derived name="E_Mode" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode de fonctionnement arbitre</xhtml>
+              </documentation>
             </variable>
             <variable name="MotionRequestActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention déjà arbitrée en amont</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention de mouvement active</xhtml>
               </documentation>
             </variable>
             <variable name="MotionDirection">
@@ -242,51 +255,74 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (-1 = descente)</xhtml>
               </documentation>
             </variable>
             <variable name="BucketIsOpen">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; ETATS BENNE ===
+--&gt; [HW] Benne ouverte confirmee</xhtml>
+              </documentation>
             </variable>
             <variable name="KoboldImmersed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FALSE hors eau/fond ; TRUE immergé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur Kobold immerge (FALSE=hors eau, TRUE=immerge)</xhtml>
               </documentation>
             </variable>
             <variable name="M1Position_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M1 (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="M2Position_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M2 (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="PositionsValid">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite des mesures de position</xhtml>
+              </documentation>
             </variable>
             <variable name="DiveStartMin_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; SEUILS ===
+--&gt; [CFG] Seuil position min pour debut plongee (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="ImmersionUpper_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne haute fenetre d'immersion (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="ImmersionLower_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne basse fenetre d'immersion (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassPreconditions">
               <type>
@@ -296,11 +332,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (14) — retour terrain, demande explicite : réglages DiveStartMin_M/
-ImmersionUpper_M/ImmersionLower_M pas encore calibrés sur site, bloquaient WAIT_PRECONDITIONS
-(bit2 config) sans aucun moyen de progresser dans la séquence pendant les essais. Si TRUE,
-saute entièrement ErrorCausePresent (bit2) ET le test WAIT_PRECONDITIONS -- transition directe
-vers READY_TO_DESCEND. Défaut FALSE : comportement standard inchangé.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass preconditions et seuils (mode test)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -309,72 +341,108 @@ vers READY_TO_DESCEND. Défaut FALSE : comportement standard inchangé.</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Recherche de fond en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fond detecte et confirme</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut sequence plongee</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: préconditions, bit1: séquence Kobold invalide, bit2: configuration seuils invalide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0:precond, bit1:seq, bit2:cfg)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat IEC standard</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat IEC au moment du defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="DiveState">
               <type>
                 <derived name="E_DiveSearchState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase interne de recherche fond</xhtml>
+              </documentation>
             </variable>
             <variable name="DescendPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorise uniquement la demande de descente active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS &amp; AUTORISATIONS ===
+&lt;-- [ACT] Autorisation de descente assistee</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldMeasureEnable">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Activation mesure/acquisition Kobold</xhtml>
+              </documentation>
             </variable>
             <variable name="BottomTouchConfirmed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contact fond valide et confirme</xhtml>
+              </documentation>
             </variable>
             <variable name="OperatorActionId">
               <type>
                 <WORD />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC IHM ===
+&lt;-- [DIAG] ID action operateur requise</xhtml>
+              </documentation>
             </variable>
             <variable name="OperatorAction">
               <type>
                 <string length="120" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Message explicatif operateur</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -382,37 +450,54 @@ vers READY_TO_DESCEND. Défaut FALSE : comportement standard inchangé.</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONTS ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="KoboldRiseEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front entrant eau (0-&gt;1)</xhtml>
+              </documentation>
             </variable>
             <variable name="KoboldFallEdge">
               <type>
                 <derived name="F_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front sortie eau / fond (1-&gt;0)</xhtml>
+              </documentation>
             </variable>
             <variable name="ImmersionConfirmed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Immersion dans la fenetre d'eau validee</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorCausePresent">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Presence d'une cause de defaut parametrage</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌊 FB_DiveSearch — Assistance plongée et recherche du fond Kobold
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_DiveSearch — Assistance plongée et recherche du fond Kobold
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
-   🛡️ Sécurité : T81/T82. Jamais de descente assistée sans séquence 0→1→0 valide.
-   🧩 Responsabilité : qualifie le Kobold et autorise uniquement la descente cohérente.
-   🔌 Interface : intention de descente + mesures → autorisation + fond validé.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Qualification du capteur Kobold et autorisation de descente
+   🛡️ Sécurité : Verrouillage si séquence d'immersion 0-&gt;1-&gt;0 invalide
+   🔌 Interface : Intention de descente et mesures vers permis de descente
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

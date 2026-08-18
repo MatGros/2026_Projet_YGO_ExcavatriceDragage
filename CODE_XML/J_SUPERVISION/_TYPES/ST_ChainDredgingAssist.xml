@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.670054" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T14:02:33.670054">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.516466" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.516466">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -87,7 +87,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Défaut Plongée 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Défaut Plongée</xhtml>
               </documentation>
             </variable>
             <variable name="Idx206_DiveErrorId">
@@ -143,7 +143,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Défaut Extraction 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Défaut Extraction</xhtml>
               </documentation>
             </variable>
             <variable name="Idx306_ExtractionErrorId">
@@ -215,7 +215,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (9) : 1 = Bypass séquence DiveSearch armé (IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : 1 = Bypass séquence DiveSearch armé (IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx602_BypassKoboldBottomTouched">
@@ -223,7 +223,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (9) : 1 = Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : 1 = Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -265,13 +265,13 @@
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0→1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>SEARCHING_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1→0 au fond</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1-&gt;0 au fond</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>

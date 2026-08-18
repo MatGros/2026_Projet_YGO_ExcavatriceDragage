@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-12T21:43:48.381961" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-12T21:43:48.381961">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:58:30.960999" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:58:30.960999">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -150,7 +150,7 @@ Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERV
    🎯 Rôle : Regrouper les signaux et horloges système partagés qui
       ne sont pas spécifiques à la logique de simulation ni raccordés
       à des calibrations persistantes.
-   🔧 REX 2026-07-16 : BlinkClock1Hz renommé BlinkClock — alimenté via Util.BLINK
+   BlinkClock alimenté via Util.BLINK
       (asymétrique, durées réglables GVL_PERSISTENT._BlinkTimeOn/_BlinkTimeOff,
       câblage dans PRG_SUPERVISION_CFC §0). Le nom "1Hz" n'a plus de sens dès que
       le rythme n'est pas symétrique 500ms/500ms.

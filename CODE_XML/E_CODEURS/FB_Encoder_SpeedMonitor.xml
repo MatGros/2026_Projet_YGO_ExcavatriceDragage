@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.755836" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.755836">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:34:05.367255" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:34:05.367255">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -149,7 +149,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorise la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -157,7 +158,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement par front</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -165,7 +166,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contexte sécurité global valide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
+--&gt; [HW]  Ligne puissance enclenchee</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -173,7 +175,7 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contexte de fonctionnement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMps">
@@ -181,7 +183,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse linéaire absolue mesurée (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; CONSIGNES SURVEILLANCE ===
+--&gt; [HW]  Vitesse lineaire absolue mesuree (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedVariationThresholdMps">
@@ -189,7 +192,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Variation minimale à surveiller (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil de variation minimale a surveiller (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedVariationTimeout">
@@ -197,7 +200,7 @@
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée minimale de confirmation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Duree minimale de confirmation variation</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedStabilityTimeout">
@@ -205,7 +208,7 @@
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée sans variation avant vitesse stable</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Duree sans variation avant vitesse stable</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -214,46 +217,66 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB en cours de traitement</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement termine</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut (ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : variation vitesse confirmée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut (bit0: variation vitesse confirmee)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat courant lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="SpeedDeltaMps">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart absolu entre deux mesures (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTATS &amp; MESURES DIAGNOSTIC ===
+&lt;-- [DIAG] Ecart absolu entre deux mesures (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedVariationDetected">
@@ -261,7 +284,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil dépassé sur le cycle courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Seuil depasse sur le cycle courant</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedVariationConfirmed">
@@ -269,7 +292,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil dépassé pendant la durée requise</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Seuil depasse pendant la duree requise</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedStable">
@@ -277,7 +300,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse stable pendant SpeedStabilityTimeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse stable pendant SpeedStabilityTimeout</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -286,56 +309,78 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+              </documentation>
             </variable>
             <variable name="VariationTimer">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
+. [LOC] Temporisateur de confirmation de variation</xhtml>
+              </documentation>
             </variable>
             <variable name="StabilityTimer">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisateur de confirmation de stabilite</xhtml>
+              </documentation>
             </variable>
             <variable name="PreviousSpeedMps">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES ET MEMOIRES INTERNES ===
+. [LOC] Vitesse mesuree au cycle precedent (m/s)</xhtml>
+              </documentation>
             </variable>
             <variable name="HasPreviousSpeed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Premiere mesure enregistree</xhtml>
+              </documentation>
             </variable>
             <variable name="VariationActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition de depassement de seuil active</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
-   🔍 FB_Encoder_SpeedMonitor — Détection de variation brusque de vitesse câble
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Brique standard de diagnostic — aucun pilotage moteur, aucun SafeStop.
-   🎯 Compare deux mesures successives de vitesse linéaire câble en m/s.
-   🧩 Le seuil et la durée de confirmation sont fournis par l'appelant :
-      aucun réglage métier n'est figé dans cette brique.
-   🛡️ Une variation confirmée pose ErrorId bit0. Le défaut reste mémorisé
-      jusqu'à disparition de la cause et acquittement par front Reset.
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Encoder_SpeedMonitor — Détection variation brusque vitesse câble
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Surveillance et détection de variation brusque de vitesse câble
+   🔒 Polarité : SpeedVariationConfirmed=TRUE si variation &gt; seuil pendant timeout
+   📊 Diagnostic : Brique de surveillance diagnostic sans actionneur direct
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate"}
 // 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
@@ -359,10 +404,14 @@ Ready := TRUE;
 Busy := FALSE;
 Done := FALSE;
 State := E_State.READY;
+{endregion}
 
+{region "§2 Reset front"}
 // 🔑 2. RESET FRONT — l'acquittement n'efface le défaut que si la cause a disparu.
 ResetEdge(CLK := Reset);
+{endregion}
 
+{region "§3 Calcul écart vitesse"}
 // 📏 3. CALCUL DE L'ÉCART DE VITESSE — première mesure utilisée comme référence.
 IF NOT HasPreviousSpeed THEN
     PreviousSpeedMps := SpeedMps;
@@ -372,7 +421,9 @@ ELSE
     SpeedDeltaMps := ABS(SpeedMps - PreviousSpeedMps);
     PreviousSpeedMps := SpeedMps;
 END_IF;
+{endregion}
 
+{region "§4 Détection et filtre temporel"}
 // 🔍 4. DÉTECTION BRUTE + FILTRE TEMPOREL — pas de déclenchement si la durée vaut zéro.
 VariationActive := HasPreviousSpeed
                    AND (SpeedVariationThresholdMps &gt;= 0.0)
@@ -390,13 +441,16 @@ IF SpeedVariationConfirmed THEN
 ELSIF ResetEdge.Q AND NOT VariationActive THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
+{endregion}
 
+{region "§5 Sorties état"}
 // 📤 5. SORTIES D'ÉTAT — diagnostic standard, aucune commande mouvement.
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>

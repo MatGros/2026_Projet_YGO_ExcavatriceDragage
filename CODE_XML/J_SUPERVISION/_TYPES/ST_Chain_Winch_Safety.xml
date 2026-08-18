@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.247496" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.247496">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.520985" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.520985">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK (Armé) | 0 = Arrêt d'Urgence Appuyé 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK (Armé) | 0 = Arrêt d'Urgence Appuyé</xhtml>
               </documentation>
             </variable>
             <variable name="Idx302_SafeStopActive">
@@ -39,7 +39,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Métier Actif 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Métier Actif</xhtml>
               </documentation>
             </variable>
             <variable name="Idx303_PowerCutOffActive">
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance Sécurité 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance Sécurité</xhtml>
               </documentation>
             </variable>
             <variable name="Idx304_TopSensorPhysical_DI">
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Capteur Haut Libre (Sain) | 0 = Butée Haute Atteinte 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Capteur Haut Libre (Sain) | 0 = Butée Haute Atteinte</xhtml>
               </documentation>
             </variable>
             <variable name="Idx305_TopSensorBypassActive">
@@ -71,7 +71,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx307_SlackCablePhysical_DI">
@@ -79,7 +79,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Câble Tendu (Sain) | 0 = Mou de Câble Détecté 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Câble Tendu (Sain) | 0 = Mou de Câble Détecté</xhtml>
               </documentation>
             </variable>
             <variable name="Idx308_SlackCableBypassActive">
@@ -95,7 +95,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx310_MecaFaultMask">
@@ -103,7 +103,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Pas de Défaut | &gt;0 = Bitfield Défauts Méca A-E 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Pas de Défaut | &gt;0 = Bitfield Défauts Méca A-E</xhtml>
               </documentation>
             </variable>
           </struct>

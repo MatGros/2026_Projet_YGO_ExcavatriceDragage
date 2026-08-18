@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-27T13:44:41.144048" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-27T13:44:41.144048">
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-27T13:44:41.144048">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -155,7 +155,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Palier plafonné à 1, approche limite haute</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Palier plafonné à 1, approche limite haute</xhtml>
               </documentation>
             </variable>
             <variable name="Idx413_InBottomSlowdownZone">
@@ -163,7 +163,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Palier plafonné à 1, approche limite basse (câble ou légale)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Palier plafonné à 1, approche limite basse (câble ou légale)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx414_BottomLimitActiveM">
@@ -171,7 +171,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Limite basse active (m) — câble physique OU légale, la plus restrictive</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Limite basse active (m) — câble physique OU légale, la plus restrictive</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -305,7 +305,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = OK (Tous contacteurs retombés à l'arrêt) | 0 = Contacteur collé 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = OK (Tous contacteurs retombés à l'arrêt) | 0 = Contacteur collé</xhtml>
               </documentation>
             </variable>
             <variable name="Idx104_BrakeApplied">
@@ -321,7 +321,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Température OK (Sain) | 0 = Surchauffe Moteur M1 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Température OK (Sain) | 0 = Surchauffe Moteur M1</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -391,7 +391,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK (Armé) | 0 = Arrêt d'Urgence Appuyé 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK (Armé) | 0 = Arrêt d'Urgence Appuyé</xhtml>
               </documentation>
             </variable>
             <variable name="Idx302_SafeStopActive">
@@ -399,7 +399,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Métier Actif 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Métier Actif</xhtml>
               </documentation>
             </variable>
             <variable name="Idx303_PowerCutOffActive">
@@ -407,7 +407,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance Sécurité 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance Sécurité</xhtml>
               </documentation>
             </variable>
             <variable name="Idx304_TopSensorPhysical_DI">
@@ -415,7 +415,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Capteur Haut Libre (Sain) | 0 = Butée Haute Atteinte 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Capteur Haut Libre (Sain) | 0 = Butée Haute Atteinte</xhtml>
               </documentation>
             </variable>
             <variable name="Idx305_TopSensorBypassActive">
@@ -431,7 +431,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx307_SlackCablePhysical_DI">
@@ -439,7 +439,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Câble Tendu (Sain) | 0 = Mou de Câble Détecté 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Câble Tendu (Sain) | 0 = Mou de Câble Détecté</xhtml>
               </documentation>
             </variable>
             <variable name="Idx308_SlackCableBypassActive">
@@ -455,7 +455,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx310_MecaFaultMask">
@@ -463,7 +463,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Pas de Défaut | &gt;0 = Bitfield Défauts Méca A-E 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Pas de Défaut | &gt;0 = Bitfield Défauts Méca A-E</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -485,6 +485,28 @@
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BRAKE_COMMAND_NOT_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence confirmation ouverture frein &gt; 500ms</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RESTART_INHIBITED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -510,6 +532,46 @@
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Desactive / Hors service</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Pret / Etat nominal</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_BRAKE_COMMAND_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation feedback frein</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_STEP_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation changement de palier</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_RESTART_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation anti-court-cycle redemarrage</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />

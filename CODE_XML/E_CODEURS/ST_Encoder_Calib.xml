@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.758694" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.758694">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:47:59.271028" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:47:59.271028">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,8 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute figée au dernier homing réussi</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES DE REFERENCE BRUTE (RETAIN) ===
+Valeur brute figee au dernier homing reussi</xhtml>
               </documentation>
             </variable>
             <variable name="LastKnownRawPos">
@@ -39,7 +40,7 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (§3.7, continu)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (continu)</xhtml>
               </documentation>
             </variable>
             <variable name="RestartCoherenceTolerancePts">
@@ -50,7 +51,8 @@
                 <simpleValue value="1000" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tolérance redémarrage (~12% PointsPerRev 8192)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; REGLAGES TOLERANCE ===
+Tolerance redemarrage (pts, ~12% de 8192)</xhtml>
               </documentation>
             </variable>
             <variable name="Homed">
@@ -58,7 +60,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE dès qu'un référencement a réussi</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS DE CALIBRATION &amp; SECURITE ===
+TRUE des qu'un referencement a reussi</xhtml>
               </documentation>
             </variable>
             <variable name="HomingSuspect">
@@ -66,7 +69,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incohérence détectée au redémarrage (§3.7)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incoherence detectee au redemarrage</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -77,13 +80,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧲 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
+   💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

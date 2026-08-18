@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-23T23:21:28.108376" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-23T23:21:28.108376">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:54.240462" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:54.240462">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -57,7 +57,7 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_SyncCfg — Configuration de la synchronisation M1/M2
+   ST_SyncCfg — Configuration de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -72,7 +72,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 TRUE pendant 1 scan le boot où la restauration a eu lieu —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -82,7 +83,8 @@
                 <derived name="ST_SyncCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.M1M2Sync.Cfg — struct exposé à l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -90,23 +92,18 @@
                 <derived name="ST_SyncCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._SyncCfgPersist — mémoire PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_SyncCfg — Pont persistance générique pour ST_SyncCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_SyncCfg — Pont persistance pour ST_SyncCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Remplace les blocs manuels restauration/sauvegarde dupliqués à chaque domaine
-   (voir DOC/AUDITS/ConfigPersistence/). Une instance = un couple (struct IHM, struct
-   GVL_PERSISTENT) du MÊME type. Logique :
-   - Hmi.Initialized = FALSE (RETAIN invalidé, ex. changement de layout DUT) → restaure
-     Hmi depuis Persist, marque Initialized, pulse JustRestored 1 scan.
-   - Hmi.Initialized = TRUE → sauvegarde continue Hmi vers Persist (jamais l'inverse).
-   🔒 Défense en profondeur : jamais d'écriture PERSISTENT avant qu'une restauration
-   réussie n'ait eu lieu (même principe que tous les blocs Cfg du Lot 2).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

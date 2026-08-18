@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T23:25:09.749700" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T23:25:09.749700">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:41:16.134843" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:41:16.134843">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -50,85 +50,85 @@
               <EnumValue>
                 <Name>X0_PREPARATION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X1_HOMING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 vitesses lentes pour chercher capteur top + référencement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesses lentes pour chercher capteur top + référencement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X2_WORK_POS_SELECT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 ouverture benne (si déjà ouverte → passe vite)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si déjà ouverte -&gt; passe vite)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X4_DESCEND_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X5_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X6_CLOSE_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fermeture benne — tolérance « à peu près fermé »</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne — tolérance « à peu près fermé »</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X7_CTRL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée palier 1 de contrôle</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 de contrôle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X8_ASCENT_LOADED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée nominale jusqu'à limite haute</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée nominale jusqu'à limite haute</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">égouttage temporisé — temps affiché IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">translation vers trémie + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X11_OPEN_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>STABILIZING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 état d'attente/stabilisation (ex-ERROR_HOLD) — pas une erreur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -175,13 +175,13 @@
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0→1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>SEARCHING_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1→0 au fond</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1-&gt;0 au fond</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -389,28 +389,40 @@
               <initialValue>
                 <simpleValue value="TRUE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active le formateur</xhtml>
+              </documentation>
             </variable>
             <variable name="SimulationModeActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Mode simulation actif</xhtml>
+              </documentation>
             </variable>
             <variable name="CurrentMode">
               <type>
                 <derived name="E_Mode" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant</xhtml>
+              </documentation>
             </variable>
             <variable name="BothAxesCoupled">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuils M1/M2 couplés</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchSelected">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = M1, 2 = M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] 1 = M1, 2 = M2</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStep">
@@ -418,96 +430,138 @@
                 <derived name="E_CycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Cycle &amp; sous-cycles</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Cycle &amp; sous-cycles
+--&gt; [HW] Étape cycle</xhtml>
               </documentation>
             </variable>
             <variable name="DiveState">
               <type>
                 <derived name="E_DiveSearchState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État plongée</xhtml>
+              </documentation>
             </variable>
             <variable name="ExtractionState">
               <type>
                 <derived name="E_ExtractionSequenceState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État extraction</xhtml>
+              </documentation>
             </variable>
             <variable name="HomingActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Référencement en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="HomingStepM1">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Étape homing M1</xhtml>
+              </documentation>
             </variable>
             <variable name="HomingStepM2">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Étape homing M2</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassGlobalActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Dérogations &amp; particularités</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Dérogations &amp; particularités
+--&gt; [TST] Bypass global</xhtml>
               </documentation>
             </variable>
             <variable name="BypassWinchM1Active">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass treuil M1</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassWinchM2Active">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass treuil M2</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassTranslation">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass translation</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassSyncActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass synchro</xhtml>
+              </documentation>
             </variable>
             <variable name="SyncDegradedActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Synchro bridée</xhtml>
+              </documentation>
             </variable>
             <variable name="LegalLimitReached">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite légale atteinte</xhtml>
+              </documentation>
             </variable>
             <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Sécurité, causes et intention de direction</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Sécurité, causes et intention de direction
+--&gt; [SAFE] Chaîne AU fermée</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Contacteur puissance</xhtml>
+              </documentation>
             </variable>
             <variable name="PowerCutOffActiveAny">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Coupure puissance active</xhtml>
+              </documentation>
             </variable>
             <variable name="SafeStopActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)</xhtml>
               </documentation>
             </variable>
             <variable name="DescendPermit">
@@ -515,7 +569,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par AND</xhtml>
               </documentation>
             </variable>
             <variable name="AscentPermit">
@@ -523,61 +577,88 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par AND</xhtml>
               </documentation>
             </variable>
             <variable name="BucketIsOpen">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne ouverte</xhtml>
+              </documentation>
             </variable>
             <variable name="DiveActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Plongée active</xhtml>
+              </documentation>
             </variable>
             <variable name="TopLimitReached">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par OR — toute limite haute affichée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par OR — toute limite haute affichée</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledUserRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction demandée couplée</xhtml>
+              </documentation>
             </variable>
             <variable name="M1LogicRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction logique M1</xhtml>
+              </documentation>
             </variable>
             <variable name="M2LogicRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction logique M2</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="DeadmanArmed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Homme-mort armé</xhtml>
+              </documentation>
             </variable>
             <variable name="JoystickAtNeutral">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Joystick au neutre</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleAutoBusy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle auto actif</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -585,6 +666,9 @@
               <type>
                 <derived name="ST_HmiBanner" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bandeau IHM assemblé</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -592,59 +676,80 @@
               <type>
                 <string length="20" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Préfixe RÉEL/SIMU</xhtml>
+              </documentation>
             </variable>
             <variable name="ModeStr">
               <type>
                 <string length="30" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Libellé mode</xhtml>
+              </documentation>
             </variable>
             <variable name="CouplingStr">
               <type>
                 <string length="30" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Libellé couplage</xhtml>
+              </documentation>
             </variable>
             <variable name="CurrentDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction courante</xhtml>
+              </documentation>
             </variable>
             <variable name="DirectionBlocked">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interlock métier : mouvement demandé mais permit absent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interlock métier : mouvement demandé mais permit absent</xhtml>
               </documentation>
             </variable>
             <variable name="AnyBypassActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins un bypass actif</xhtml>
+              </documentation>
             </variable>
             <variable name="CriticalActionActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut/interlock critique : affiché immédiatement (sans maintien)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut/interlock critique : affiché immédiatement (sans maintien)</xhtml>
               </documentation>
             </variable>
             <variable name="SpecialConditionCandidate">
               <type>
                 <string length="120" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Texte condition spéciale</xhtml>
+              </documentation>
             </variable>
             <variable name="OperatorActionCandidate">
               <type>
                 <string length="120" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Texte action opérateur</xhtml>
+              </documentation>
             </variable>
             <variable name="AntiFlickSpecial">
               <type>
                 <derived name="FB_AntiFlickerText" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 §3 Condition spéciale (warning → maintenu)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] §3 Condition spéciale (warning → maintenu)</xhtml>
               </documentation>
             </variable>
             <variable name="AntiFlickOperator">
@@ -652,7 +757,7 @@
                 <derived name="FB_AntiFlickerText" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 §4 Action opérateur (critique → direct, warning → maintenu)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] §4 Action opérateur (critique → direct, warning → maintenu)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_BannerHoldTime">
@@ -663,7 +768,7 @@
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Anti-clignotement warnings/états (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-clignotement warnings/états (AF-07 §4.3)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -805,7 +910,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 // Format (AF-07 §4.1) : [ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;
 // 🧊 Défauts (AU/puissance/SafeStop) + interlock DirectionBlocked
 //    → affichés immédiatement (ForceInstant=TRUE) ; les autres états
-//    → maintenus min (anti-clignotement). Décision revue 2026-08-17.
+//    → maintenus min (anti-clignotement).
 // ═══════════════════════════════════════════════════════════════
 IF CurrentMode = E_Mode.SEMI_AUTO THEN
     CurrentDirection := CycleRequestDirection;
@@ -875,7 +980,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte candidat à afficher</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Texte candidat à afficher</xhtml>
               </documentation>
             </variable>
             <variable name="ForceInstant">
@@ -883,7 +988,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = afficher immédiatement (défaut critique), sans maintien</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = afficher immédiatement (défaut critique), sans maintien</xhtml>
               </documentation>
             </variable>
             <variable name="HoldTime">
@@ -894,7 +999,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -904,7 +1009,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte stabilisé exposé à l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Texte stabilisé exposé à l'IHM</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -913,6 +1018,9 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de maintien</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>

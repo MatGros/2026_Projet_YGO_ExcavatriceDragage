@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.239418" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.239418">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:56:48.862035" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:56:48.862035">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation de la simulation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation de la simulation</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOff_A">
@@ -40,7 +40,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande coupure canal A (TRUE = OK/fermé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal A (TRUE = OK/fermé)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOff_B">
@@ -48,7 +48,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande coupure canal B (TRUE = OK/fermé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArming">
@@ -56,7 +56,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion de réarmement (TRUE = pulse)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Impulsion de réarmement (TRUE = pulse)</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyStop">
@@ -64,7 +64,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -74,7 +74,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU simulée saine</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Boucle AU simulée saine</xhtml>
               </documentation>
             </variable>
             <variable name="SimContactorOk">
@@ -82,7 +82,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur simulé engagé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur simulé engagé</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -92,7 +92,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémorisation de l'auto-maintien du contacteur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémorisation de l'auto-maintien du contacteur</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -122,17 +122,22 @@
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 // === IMPLEMENTATION ===
+{region "§1 Gate"}
 IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
     ContactorLatch := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Chaîne AU"}
 // 1. La chaîne AU est saine si le PLC maintient les deux relais de coupure de puissance
 // AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE)
 SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop;
+{endregion}
 
+{region "§3 Auto-maintien contacteur"}
 // 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure
 IF NOT SimChainOk THEN
     ContactorLatch := FALSE;
@@ -142,6 +147,7 @@ END_IF;
 
 // Recopie vers la sortie
 SimContactorOk := ContactorLatch;
+{endregion}
 </xhtml>
           </ST>
         </body>

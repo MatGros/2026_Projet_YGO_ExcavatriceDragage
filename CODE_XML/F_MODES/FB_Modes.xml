@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:13:36.944245" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-13T23:13:36.944245">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:49:30.411512" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:49:30.411512">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -227,7 +227,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active l'arbitrage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GESTION FB &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE = active)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -235,7 +236,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défaut (bit0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement defauts</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -243,7 +244,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine AU OK (TRUE = armee)</xhtml>
               </documentation>
             </variable>
             <variable name="SelMode">
@@ -251,7 +252,8 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélecteur IHM (GVL_IHM.Modes.Cmd.SelMode)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SELECTIONS IHM &amp; COMMANDES MODES ===
+--&gt; [CMD] Selecteur de mode IHM</xhtml>
               </documentation>
             </variable>
             <variable name="SelSyncEnable">
@@ -259,7 +261,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Case IHM synchro (GVL_IHM.M1M2Sync.Cmd.SelSyncEnable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Selection synchro treuils IHM</xhtml>
               </documentation>
             </variable>
             <variable name="InhibitM1Request">
@@ -267,7 +269,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton IHM inhibition M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande inhibition treuil M1</xhtml>
               </documentation>
             </variable>
             <variable name="InhibitM2Request">
@@ -275,7 +277,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton IHM inhibition M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande inhibition treuil M2</xhtml>
               </documentation>
             </variable>
             <variable name="SelHomingApproachEnable">
@@ -283,15 +285,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Case IHM autorisant dépassement arrêt haut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderFaultPresent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut codeur (agrégat M1/M2, 1 cycle retard)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Selection approche homing IHM</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickWinchSelectRequest">
@@ -299,7 +293,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (brut IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Selection treuils joystick (0=Couple, 1=M1, 2=M2)</xhtml>
               </documentation>
             </variable>
             <variable name="SelMaintenanceZoneAccess">
@@ -307,7 +301,16 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : bit IHM dédié, autorisation CONSCIENTE zone Maintenance M3 (GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess) — MAINT_N2 seul ne suffit plus</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation acces zone maintenance M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFaultPresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS CAPTEURS &amp; DIAGNOSTICS ===
+--&gt; [HW] Defaut codeur agrege (1 cycle retard)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -316,46 +319,66 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS &amp; DIAGNOSTICS IEC ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB en traitement</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement termine</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut present</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Mode Semi-Auto refusé (Défaut Codeur)"</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0=Semi-Auto refuse)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat au moment du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="Auth">
               <type>
                 <derived name="ST_Modes_Autorisations" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus d'autorisations typé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'AUTORISATIONS ARBITREES ===
+&lt;-- [STAT] Bus d'autorisations typees machine</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -364,18 +387,26 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant Error</xhtml>
+              </documentation>
             </variable>
             <variable name="PrevInhibitM1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire état inhibition M1 (exclusion mutuelle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES &amp; MEMOIRES ===
+. [LOC] Memoire etat inhibition M1 (exclusion mutuelle)</xhtml>
               </documentation>
             </variable>
             <variable name="PrevInhibitM2">
@@ -383,24 +414,20 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire état inhibition M2 (exclusion mutuelle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire etat inhibition M2 (exclusion mutuelle)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ FB_Modes — Arbitrage du mode machine
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
+   🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur
+   🔌 Interface : Standard composant d'arbitrage applicatif
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🔌 FB STANDARD : pas un FB de mouvement, pas de StartStop/SafeStop.
-   🎯 Rôle : Source unique du mode arbitré + bus d'autorisations.
-      - Arbitrage mode (DISABLE/N1/N2/SEMI_AUTO) + garde-fou codeur.
-      - Calcul bus autorisations (SyncEnable, Inhibit, Sélection, Homing, Maintenance).
-   🔒 Authentification : gérée côté IHM. FB_Modes accepte SelMode tel quel.
-   ⚠️ EncoderFaultPresent consommé avec 1 cycle de retard (FB_Encoder_Safety appelé après).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION ===</xhtml>
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -521,9 +548,7 @@ ELSE
 END_IF;
 
 // 5quinquies. CIBLE TRANSLATION MAINTENANCE
-// 🆕 2026-08-06 (retour terrain) : MAINT_N2 seul ne suffit plus — bit IHM dédié
-// (SelMaintenanceZoneAccess) exigé EN PLUS, action consciente distincte du simple
-// changement de mode. PRG_TRANSLATION_CFC consomme ce bit.
+// MAINT_N2 ou MAINT_N1 + bit IHM dédié (SelMaintenanceZoneAccess) exigé EN PLUS
 Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
 
 // GATE — désactivation inhibitions/sync si mode change (sortie N1/N2)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-23T22:36:09.204784" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-23T22:36:09.204784">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.310106" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.310106">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -47,7 +47,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎚️ ST_ModesHMI — Données d'échange IHM pour les modes de marche
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_WinchHMI/ST_SyncHMI/ST_BucketHMI.
+   📄 Structuration en Cmd / State , homogène avec ST_WinchHMI/ST_SyncHMI/ST_BucketHMI.
    Pas de Cfg (aucun réglage numérique dans ce domaine) ni de Bypass (concept absent de Modes).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -63,7 +63,7 @@
                 <simpleValue value="E_Mode.MAINT_N1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM (REX 2026-07-07)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM ()</xhtml>
               </documentation>
             </variable>
             <variable name="BtnFaultReset">
@@ -71,7 +71,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07, ex-MachineReset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (, ex-MachineReset)</xhtml>
               </documentation>
             </variable>
             <variable name="BtnModeReset">
@@ -79,7 +79,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement (REX 2026-07-07)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement ()</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyArming">
@@ -87,7 +87,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §5)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">— Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §5)
 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
               </documentation>
             </variable>
@@ -107,7 +107,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-19 : rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
 sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</xhtml>
               </documentation>
@@ -120,13 +120,13 @@ sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 un
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX (session WINCH-BTN-01) — bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">— bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
 SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
 sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
-🔀 2026-08-06 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
+🔀 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
 (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé, doublon). ⚠️ Le défaut TRUE
 (joystick) s'applique désormais à M3 aussi au boot — M3 démarrait avant en boutons IHM
-(FALSE) : changement de comportement au démarrage, assumé (décision 2026-08-06).
+(FALSE) : changement de comportement au démarrage, assumé (décision ).
 🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 (comportement historique Winch, préservé au boot) ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
               </documentation>
             </variable>
@@ -167,7 +167,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 REX 2026-07-07 : au moins un défaut/alarme actif dans le domaine</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: au moins un défaut/alarme actif dans le domaine</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffActive">
@@ -175,7 +175,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 REX 2026-07-07 : au moins un Méca A/B/C (FB_Safety_Winch) ou</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 : au moins un Méca A/B/C (FB_Safety_Winch) ou</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyChainOk">
@@ -215,7 +215,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
@@ -223,7 +223,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis)</xhtml>
               </documentation>
             </variable>
           </struct>

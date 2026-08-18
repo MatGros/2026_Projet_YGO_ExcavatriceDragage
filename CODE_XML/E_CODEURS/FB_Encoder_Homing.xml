@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.217090" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.217090">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:32:29.741668" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:32:29.741668">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -147,7 +147,8 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute figée au dernier homing réussi</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES DE REFERENCE BRUTE (RETAIN) ===
+Valeur brute figee au dernier homing reussi</xhtml>
               </documentation>
             </variable>
             <variable name="LastKnownRawPos">
@@ -155,7 +156,7 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (§3.7, continu)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (continu)</xhtml>
               </documentation>
             </variable>
             <variable name="RestartCoherenceTolerancePts">
@@ -166,7 +167,8 @@
                 <simpleValue value="1000" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tolérance redémarrage (~12% PointsPerRev 8192)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; REGLAGES TOLERANCE ===
+Tolerance redemarrage (pts, ~12% de 8192)</xhtml>
               </documentation>
             </variable>
             <variable name="Homed">
@@ -174,7 +176,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE dès qu'un référencement a réussi</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS DE CALIBRATION &amp; SECURITE ===
+TRUE des qu'un referencement a reussi</xhtml>
               </documentation>
             </variable>
             <variable name="HomingSuspect">
@@ -182,7 +185,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incohérence détectée au redémarrage (§3.7)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incoherence detectee au redemarrage</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -193,13 +196,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧲 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
+   💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎛️ Une instance RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -212,7 +215,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -220,23 +224,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front) — bits 0/2/3/4/5 (voir §ErrorId)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">MAINT_N1 requis pour le flux nominal</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
               </documentation>
             </variable>
             <variable name="Home">
@@ -244,7 +232,32 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de référencement (front, bouton IHM UNIQUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de referencement (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnConfirmCoherence">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Levee de doute d'incoherence au boot (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; MODES ===
+--&gt; [HW]  Ligne puissance enclenchee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif (MAINT_N1/N2 requis)</xhtml>
               </documentation>
             </variable>
             <variable name="UnitaryMode">
@@ -252,7 +265,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = flux unitaire à cible libre (MAINT_N2 uniquement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode unitaire a cible libre (MAINT_N2)</xhtml>
               </documentation>
             </variable>
             <variable name="WinchSelected">
@@ -260,7 +273,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = cette instance est le treuil sélectionné</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Instance est le treuil selectionne</xhtml>
               </documentation>
             </variable>
             <variable name="CfgHomingTargetM">
@@ -268,7 +281,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre unitaire, limitée à [-99.0 ; +99.0] m</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CIBLES &amp; CONFIGURATION HOMING ===
+--&gt; [CFG] Cible libre homing unitaire (m)</xhtml>
               </documentation>
             </variable>
             <variable name="UseDynamicTarget">
@@ -279,11 +293,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (19) — retour terrain, demande client : BtnConfirmOpenPos/ClosePos (benne)
-doivent aussi référencer le codeur M2 (comme BtnHome), pas seulement mémoriser un état
-logique -- cible DYNAMIQUE (position réelle de M1, calculée côté appelant), pas une valeur
-de config fixe comme CfgHomingTargetM. Si TRUE au front Home, DynamicHomingTargetM prime
-sur UnitaryMode/CfgTopSensorPosM.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Activation cible dynamique</xhtml>
               </documentation>
             </variable>
             <variable name="DynamicHomingTargetM">
@@ -293,21 +303,8 @@ sur UnitaryMode/CfgTopSensorPosM.</xhtml>
               <initialValue>
                 <simpleValue value="0" />
               </initialValue>
-            </variable>
-            <variable name="BtnConfirmCoherence">
-              <type>
-                <BOOL />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front — lève le doute §3.7 (bit9), sans réhoming complet</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TopPositionSensor">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-07-02 : capteur position haute UNIQUE, COMMUN aux 2 treuils</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible dynamique de referencement (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgTopSensorPosM">
@@ -318,10 +315,16 @@ sur UnitaryMode/CfgTopSensorPosM.</xhtml>
                 <simpleValue value="8.5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(les 2 câbles hissent ensemble le même ensemble mécanique) — câblé
-IDENTIQUEMENT sur les instances M1 ET M2 (PAS un capteur par treuil),
-voir PRG_MAIN.st
-Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible homing nominal capteur haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensor">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS HW &amp; CAPTEURS ===
+--&gt; [HW]  Capteur physique position haute unique</xhtml>
               </documentation>
             </variable>
             <variable name="FwdRevSpeedFeedbackOff">
@@ -329,7 +332,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour unique "tous contacteurs sens+vitesse retombés" CE TREUIL — arrêt confirmé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteurs sens et vitesse retombes</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedback">
@@ -337,7 +340,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour contacteur frein CE TREUIL (TRUE = ouvert/desserré — révocation 2026-08-03)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteur frein ouvert/desserre</xhtml>
               </documentation>
             </variable>
             <variable name="RawPos">
@@ -345,7 +348,8 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Abs (déjà gelée sur doute)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; RETOURS FB CODEUR ABSOLU ===
+--&gt; [HW]  Position brute codeur (sortie FB_Encoder_Abs)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderAvailable">
@@ -353,7 +357,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Abs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codeur absolu disponible et valide</xhtml>
               </documentation>
             </variable>
             <variable name="PresetAck">
@@ -361,7 +365,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse — sortie FB_Encoder_Abs (écriture confirmée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Pulse confirmation ecriture preset reussie</xhtml>
               </documentation>
             </variable>
             <variable name="PresetNak">
@@ -369,7 +373,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse — sortie FB_Encoder_Abs (écriture refusée/timeout)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Pulse echec / timeout ecriture preset</xhtml>
               </documentation>
             </variable>
             <variable name="PointsPerRev">
@@ -380,7 +384,8 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <simpleValue value="8192" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmé fiche technique (Partie10 §3.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CARACTERISTIQUES MECANIQUES &amp; BUS ===
+--&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
               </documentation>
             </variable>
             <variable name="MultiTurnRevsMax">
@@ -391,7 +396,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <simpleValue value="4096" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmé fiche technique (Partie10 §3.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Capacite multitour max codeur (tours)</xhtml>
               </documentation>
             </variable>
             <variable name="CableM_PerRev">
@@ -402,7 +407,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmé terrain 2026-07-02 (Partie10 §2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Perimetre tambour / developpement cable (m/tour)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassGlobal">
@@ -413,7 +418,8 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Ignore arrêt confirmé et capteur haut (mise en service)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TESTS &amp; BYPASS ===
+--&gt; [TST] Neutralisation securites pour mise en service</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -422,49 +428,66 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence SDO preset en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse 1 cycle — référencement réussi (miroir PresetAck)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Referencement effectue avec succes</xhtml>
               </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut (ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voir table de bits en en-tête de fichier / doc §5</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de bits de defaut</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat courant lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="PresetRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse → FB_Encoder_Abs.PresetRequest</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES VERS FB_ENCODER_ABS ===
+&lt;-- [ACT]  Pulse demande d'ecriture preset SDO</xhtml>
               </documentation>
             </variable>
             <variable name="PresetValue">
@@ -472,7 +495,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">→ FB_Encoder_Abs.PresetValue (= HomingRefTargetNominal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Valeur de cible brute pour preset SDO</xhtml>
               </documentation>
             </variable>
             <variable name="Homed">
@@ -480,7 +503,8 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">RETAIN interne, miroir Calib.Homed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTATS &amp; MEMOIRE CALIBRATION ===
+&lt;-- [STAT] Codeur pagine et referencie</xhtml>
               </documentation>
             </variable>
             <variable name="HomingSuspect">
@@ -488,7 +512,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">RETAIN interne, miroir Calib.HomingSuspect</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incoherence redemarrage a lever</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRefRaw">
@@ -496,7 +520,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">RETAIN interne, miroir Calib.HomingRefRaw → FB_Encoder_Scale</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Offset de reference brut calcule</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -506,7 +530,8 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <derived name="ST_Encoder_Calib" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référence vers l'état persistant global (survit aux téléchargements)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURE DE CALIBRATION PERSISTANTE ===
+&lt;-&gt; [BUS] Structure de calibration RETAIN</xhtml>
               </documentation>
             </variable>
           </inOutVars>
@@ -515,65 +540,33 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+              </documentation>
             </variable>
             <variable name="HomeEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Home</xhtml>
+              </documentation>
             </variable>
             <variable name="ConfirmCoherenceEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
-            </variable>
-            <variable name="InitDone">
-              <type>
-                <BOOL />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle cohérence §3.7 fait une fois par session Enable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArretConfirme">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="PresetValueCalc">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">= HomingRefTargetNominal (constant tant que PointsPerRev/MultiTurnRevsMax fixes)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TargetPoints">
-              <type>
-                <DINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart signé CfgTopSensorPosM → points, figé pendant la séquence</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TargetPositionM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible retenue : nominale ou unitaire</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawDiffRestart">
-              <type>
-                <DINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart |RawPos - LastKnownRawPos| au redémarrage (§3.7)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant BtnConfirmCoherence</xhtml>
               </documentation>
             </variable>
             <variable name="TopSensorEdge">
@@ -581,14 +574,7 @@ Cible homing nominal (RETAIN site, voir Partie10 §7bis)</xhtml>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX audit 2026-08-14 : le homing s'exécutait sans AUCUNE condition (Mode, treuil
-sélectionné, capteur haut, bornage cible déclarés en interface mais jamais lus). Gate
-différencié par chemin, validé avec l'utilisateur : le nominal capture AU FRONT du
-capteur haut (répétable à vitesse d'accostage constante — AscentPermit de FB_Safety_Winch
-coupe déjà la montée indépendamment, pas d'attente d'arrêt confirmé) ; l'unitaire exige
-le bon treuil sélectionné ; le dynamique (benne) est déjà gardé Mode+arrêt à l'appel
-(PRG_02_Acquisition.st, M2BucketRefRequested) — rien à ajouter ici pour ce chemin.
-Front montant TopPositionSensor — déclenche le nominal</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant TopPositionSensor</xhtml>
               </documentation>
             </variable>
             <variable name="DynamicTargetEdge">
@@ -596,7 +582,24 @@ Front montant TopPositionSensor — déclenche le nominal</xhtml>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant UseDynamicTarget — déclenche le homing dynamique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant UseDynamicTarget</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InitDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS &amp; DRAPEAUX INTERNES ===
+. [LOC] Controle incoherence boot effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArretConfirme">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition d'arret moteur confirmee</xhtml>
               </documentation>
             </variable>
             <variable name="HomingModeOk">
@@ -604,43 +607,84 @@ Front montant TopPositionSensor — déclenche le nominal</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode MAINT_N1/N2 requis, tous chemins</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode de fonctionnement valide pour homing</xhtml>
               </documentation>
             </variable>
             <variable name="NominalHomingTrigger">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition de declenchement homing nominal</xhtml>
+              </documentation>
             </variable>
             <variable name="UnitaryHomingTrigger">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition de declenchement homing unitaire</xhtml>
+              </documentation>
             </variable>
             <variable name="DynamicHomingTrigger">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition de declenchement homing dynamique</xhtml>
+              </documentation>
             </variable>
             <variable name="HomingTrigger">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Synthese declenchement homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueCalc">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES DE CALCUL ===
+. [LOC] Valeur cible de preset (centre plage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetPoints">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart cible converti en points</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetPositionM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible retenue en metres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawDiffRestart">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut de position au redemarrage</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎯 FB_Encoder_Homing — Référencement codeur nominal ou unitaire MAINT_N2
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Encoder_Homing — Référencement codeur nominal ou unitaire
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §1/§5/§7bis
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 Rôle : Gestion du flux de homing nominal (capteur haut + cible paramétrable)
-      ou unitaire (MAINT_N2, treuil sélectionné).
-   🧮 Calcul du point de calage :
-      - PresetValue = centre de la plage multi-tour (marge anti-débordement)
-      - HomingRefRaw = PresetValue - round(CfgTopSensorPosM × PointsPerRev / CableM_PerRev)
-   🧊 Expose ST_Encoder_Calib en VAR_IN_OUT (RETAIN).
-   ═══════════════════════════════════════════════════════════════
+   🎯 Rôle : Séquence de référencement nominal (capteur haut) ou unitaire (MAINT_N2)
+   🔒 Polarité : Homed=TRUE dès qu'un référencement valide est enregistré
+   🔌 Architecture : Expose ST_Encoder_Calib en VAR_IN_OUT
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===</xhtml>
           </documentation>
         </interface>
@@ -653,7 +697,7 @@ Front montant TopPositionSensor — déclenche le nominal</xhtml>
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
 // (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
-// 🆕 2026-08-06 : PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
+// PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
 IF NOT Enable THEN
     PresetRequest := FALSE;
     PresetValue := 0;
@@ -704,7 +748,7 @@ PresetRequest := FALSE;
 TopSensorEdge(CLK := TopPositionSensor);
 DynamicTargetEdge(CLK := UseDynamicTarget);
 
-// 🆕 Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
+// Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
 ErrorId := ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
@@ -743,7 +787,7 @@ IF HomingTrigger THEN
         TargetPositionM := CfgTopSensorPosM;
     END_IF;
 
-    // 🆕 Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
+    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
     // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
     // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
     IF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
@@ -803,7 +847,7 @@ IF EncoderAvailable AND (State &lt;&gt; E_State.BUSY) THEN
 END_IF;
 
 Busy := (State = E_State.BUSY);
-Homed := Calib.Homed AND NOT Calib.HomingSuspect; // 🆕 REX 2026-07-08 : Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
+Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
 

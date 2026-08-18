@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.268688" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.268688">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:55:31.108009" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:55:31.108009">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arret mouvement (TRUE=Marche)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -39,7 +39,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Descente, 0 = Arrêt, +1 = Montée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens de marche (-1: Descente, 0: Stop, 1: Montee)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPct">
@@ -47,7 +47,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse % (0.0 .. 100.0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse (0.0 a 100.0 %)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -58,13 +58,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_WinchCmdDemand — Demande de commande treuil (depuis cycle/sequenceur)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
-            DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   🎯 Demande de mouvement pour treuil M1 ou M2 (depuis FB_Cycle).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Regroupement des consignes de mouvement treuil (StartStop, Direction, Vitesse)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

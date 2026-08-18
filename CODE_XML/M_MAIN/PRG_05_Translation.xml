@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.233840" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.233840">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:01:35.946583" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:01:35.946583">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -233,8 +233,8 @@
    📥 Consommateur unique : PRG_06_Outputs_LD, avant
       FB_TranslationOutputInterlock_LD.
    🔒 Ne contient jamais une commande PDO autorisée.
-   🆕 PowerCutOff (2026-08-05, LOT M4) : demande safety M3 (FB_Safety_Translation).
-      🔧 FIX 2026-08-14 : consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
+   PowerCutOff : demande safety M3 (FB_Safety_Translation).
+      FIX : consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
       d'Enable (barrière finale) — SafeStop n'y est plus lu, il reste géré en amont
       par FB_Translation (rampe rapide, Enable maintenu, AF06 §5).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -281,7 +281,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Translation en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -470,7 +470,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
               </documentation>
             </variable>
             <variable name="AtPV">
@@ -529,7 +529,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenanceTargetEnable">
@@ -550,7 +550,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -727,16 +727,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §3,
-                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
-   Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
-   détecter un collage / une absence de fermeture d'un contacteur de
-   puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
-   appelant).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_TranslationFinalInterlockReason">
@@ -855,7 +852,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_LimitSwitchRevEffective">
@@ -863,7 +860,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : coupure dure §5bis — bascule sur P1 si Maintenance interdite</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure dure §5bis — bascule sur P1 si Maintenance interdite</xhtml>
               </documentation>
             </variable>
             <variable name="M3_LimitSwitchFwdStable">
@@ -871,7 +868,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : verrou bistable Fdc Trémie (mémorisé stable contre les rebonds)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou bistable Fdc Trémie (mémorisé stable contre les rebonds)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_LimitSwitchRevStable">
@@ -879,7 +876,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_AtTremieStable">
@@ -887,8 +884,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : verrous bistables des positions cibles (§0quater) — PositionDecoder n'émet
-plus qu'un front transitoire par capteur (REX décalage came), mémorisé ici jusqu'à dégagement.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrous bistables des positions cibles (§0quater) — PositionDecoder n'émet
+plus qu'un front transitoire par capteur, mémorisé ici jusqu'à dégagement.</xhtml>
               </documentation>
             </variable>
             <variable name="M3_AtPVStable">
@@ -916,10 +913,9 @@ plus qu'un front transitoire par capteur (REX décalage came), mémorisé ici ju
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 (retour terrain, design opérateur) : libération du verrou §0quater sur
-MOUVEMENT CONFIRMÉ soutenu (fréquence réelle mesurée, pas juste une consigne de sens),
-pendant une durée mini avant de considérer qu'on a vraiment quitté le point — pas un
-changement de sens instantané (perdu à cause d'InvertDirection) ni un timer fixe
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Libération du verrou §0quater sur MOUVEMENT CONFIRMÉ soutenu (fréquence réelle mesurée,
+pas juste une consigne de sens), pendant une durée mini avant de considérer qu'on a
+vraiment quitté le point — pas un changement de sens instantané ni un timer fixe
 indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
               </documentation>
             </variable>
@@ -937,7 +933,7 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
    ✅ Arbitre entre les commandes Manuelles (Joystick) et Automatiques (PRG_03_Modes_Cycle).
    📄 Docs : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🛡️ Sécurité : instSafetyTranslationM3 (FB_Safety_Translation) câblée en parallèle
-      de instTranslationM3 depuis le 2026-08-05 (lot M4) — SafeStop/PowerCutOff réels.
+      de instTranslationM3 — SafeStop/PowerCutOff réels.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -946,13 +942,13 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 {region "§0 Interlock hauteur M1/M2"}
-// === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (retour terrain, risque collision translation) ===
+// === 🚧 §0 INTERLOCK HAUTEUR M1/M2 (risque collision translation) ===
 // PRG_02_Acquisition s'exécute avant ce POU dans la MainTask (rang 01 &lt; 05) : lecture
 // du même scan, aucun retard. Bypass = maintenance consciente, doctrine ST_BypassTranslation.
-// ⚠️ Revue 2026-08-06 : une position encodeur incohérente (hors plage OU homing suspect,
+// ⚠️ Une position encodeur incohérente (hors plage OU homing suspect,
 // FB_Encoder_Safety) ne doit PAS pouvoir se lire comme "≥ seuil" par accident — fail-safe :
 // hauteur non confirmée = interlock actif (comme une hauteur insuffisante), sauf bypass.
-// 🔒 Décision 2026-08-06 : Bypass.Global NE lève PLUS cet interlock (contrairement aux autres
+// 🔒 Bypass.Global NE lève PLUS cet interlock (contrairement aux autres
 // causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
 // générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
 M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
@@ -966,7 +962,7 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 {region "§0bis Coupure dure limite translation"}
 // === 🚧 §0bis COUPURE DURE (LimitSwitchRev) — bascule sur P1 si Maintenance interdite ===
-// 🆕 2026-08-06 (retour terrain) : LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
+// LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
 // (§5bis FB_Translation : coupure immédiate, sans rampe, dès que CommandedDirection insiste
 // dans l'extrémité). P1/P2 n'ont aucune protection dure équivalente — seul le verrou souple
 // (arrival-lock) les couvre. Quand Maintenance est interdite, la coupure dure doit protéger
@@ -992,12 +988,12 @@ ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEna
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
-// 🔒 §0quater MÉMORISATION DU DERNIER POINT ATTEINT (front → jeton unique, retour terrain)
+// 🔒 §0quater MÉMORISATION DU DERNIER POINT ATTEINT (front → jeton unique)
 // PositionDecoder n'émet qu'un front transitoire (1 cycle) par capteur, montant OU descendant
-// SELON LE SENS (REX décalage came, voir FB_Translation_PositionDecoder.st) — mémorisé ici pour
+// SELON LE SENS (voir FB_Translation_PositionDecoder.st) — mémorisé ici pour
 // tenir le niveau nécessaire au débounce (100ms) + verrou anti-rebond (§4ter DirectionAtArrival)
 // de FB_Translation, et pour l'affichage IHM. MUTUELLEMENT EXCLUSIFS : un nouveau front RAZ tous
-// les autres (jeton "dernier point franchi" unique). 🆕 2026-08-06 (design opérateur) : libéré
+// les autres (jeton "dernier point franchi" unique). Libéré
 // (RAZ complet) UNIQUEMENT sur mouvement CONFIRMÉ (fréquence réelle mesurée, pas juste la consigne
 // de sens) soutenu ≥1.5s — pas un rebond capteur ni un changement de sens instantané.
 M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0) &gt; 0.5;
@@ -1024,7 +1020,7 @@ END_IF;
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // 🆕 Pont SEMI_AUTO (L4) : consomme la demande du séquenceur de cycle.
+    // Pont SEMI_AUTO (L4) : consomme la demande du séquenceur de cycle.
     // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M3_PositioningActive  := TRUE;
     SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
@@ -1052,16 +1048,16 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
         M3_Direction_Active := 0;
     END_IF;
 
-    // 🔫 T106 (audit M3 2026-08-05) : homme-mort exigé même pour boutons IHM en MAINT_N1/N2
+    // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2
     // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
-    // 🔀 2026-08-06 : TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd),
+    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd),
     // plus de doublon par axe (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé).
     M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
                                 OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
                                 OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
                            AND PRG_02_Acquisition.JoystickDeadmanArmed
-                           AND M3_HeightInterlockOk; // 🆕 2026-08-06 : hauteur mini M1/M2 (risque collision)
+                           AND M3_HeightInterlockOk; // Hauteur mini M1/M2 (risque collision)
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
                   100.0,
@@ -1078,7 +1074,7 @@ ELSE
     M3_SpeedRef_Active   := 0.0;
 END_IF;
 
-// 🆕 2026-08-06 (retour terrain, REX câblage) : InvertDirection NE s'applique PLUS ici. Appliqué
+// InvertDirection NE s'applique PLUS ici. Appliqué
 // en amont sur M3_Direction_Active, il désaccordait TOUTE la logique sécurité/ralentissement
 // appariée aux vrais capteurs physiques (LimitSwitchFwd/Rev, SlowdownSensorXxx, verrous §0quater)
 // dès que le câblage moteur réel l'exigeait à TRUE — seule la coupure dure indépendante du sens
@@ -1096,12 +1092,12 @@ END_IF;
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
 M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 
-// 🆕 2026-08-06 (retour terrain, anti-rebond arrêt) : SelTarget reste à 0 en mode manuel
+// SelTarget reste à 0 en mode manuel
 // (MAINT_N1/N2, T106 — aucun séquenceur SEMI_AUTO ne le réarbitre à ce jour), donc la CASE
 // ci-dessous tombait toujours en ELSE=FALSE et le verrou anti-rebond §4ter de FB_Translation
 // (DirectionAtArrival) ne s'armait jamais en usage réel. Repli explicite hors sélection
 // SEMI_AUTO : n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance) arme le verrou.
-// 🆕 2026-08-06 : mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
+// Mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
 // franc à l'arrivée quel que soit le sens de venue (voir FB_Translation_PositionDecoder.st).
 CASE SelTarget OF
     1: M3_PositionSensorTarget := M3_AtTremieStable;
@@ -1116,7 +1112,7 @@ ELSE
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -&gt; arrêt sur Maintenance
         // - Si Maintenance interdite -&gt; arrêt sur P1
-        // 🆕 2026-08-06 : réactivé — le retrait d'urgence précédent était dû à AtP1 armé sur le
+        // Réactivé — le retrait d'urgence précédent était dû à AtP1 armé sur le
         // front du capteur P2 (zone d'approche) au lieu du capteur P1 lui-même (franchissement
         // réel du point). Corrigé dans FB_Translation_PositionDecoder.st (front du capteur propre).
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
@@ -1194,14 +1190,13 @@ instTranslationM3(
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
-    // 🆕 2026-08-06 (retour terrain, URGENT, correction d'une erreur de calcul du commit précédent) :
-    // les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
+    // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
     // FB_Translation_PositionDecoder.st). Chaque zone est délimitée par "capteur PRÉCÉDENT retombé
     // à 0" ET "capteur de la zone encore à 1" — zone P2→P1 = NOT PosP2 AND PosP1 (mot 00011) ;
     // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
     // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
     SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.TranslationPosP1) AND PRG_02_Acquisition.TranslationPosMaintenance,
-    // 🆕 2026-08-06 (design opérateur) : ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
+    // Ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
     // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -&gt; 100% vitesse jusqu'à
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
     SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1
@@ -1242,7 +1237,7 @@ instPosEstimatorM3(
     PersistedPositionM   := GVL_PERSISTENT._TranslationPosEstimated_M,
     PersistedInitialized := GVL_PERSISTENT._TranslationPosEstimatedInitialized
 );
-// 🆕 Recopie continue (reprise après reboot, doctrine _TranslationSetFreq_Hz) — pas de bridge dédié.
+// Recopie continue (reprise après reboot, doctrine _TranslationSetFreq_Hz) — pas de bridge dédié.
 GVL_PERSISTENT._TranslationPosEstimated_M := instPosEstimatorM3.PositionEstimatedM;
 GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initialized;
 
@@ -1284,7 +1279,7 @@ TranslationState.PositionPV := PRG_02_Acquisition.TranslationPosPV;
 TranslationState.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
 TranslationState.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
 TranslationState.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
-// 🆕 2026-08-06 (design opérateur) : affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
+// Affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
 // (direction-dépendant), libéré sur mouvement réel confirmé ≥1.5s (pas juste un rebond capteur
 // ni un changement de sens instantané). Même signal que celui consommé par M3_PositionSensorTarget.
 TranslationState.AtTremie := M3_AtTremieStable;
@@ -1350,7 +1345,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la surveillance</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -1358,7 +1353,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement défauts</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -1366,7 +1361,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU réarmée + conditions globales OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaîne AU réarmée + conditions globales OK</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -1374,7 +1369,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickOnline">
@@ -1382,7 +1377,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">instDiagCanOpen.DeviceJoystick.Online</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] instDiagCanOpen.DeviceJoystick.Online</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickOperational">
@@ -1390,7 +1385,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">instDiagCanOpen.DeviceJoystick.Operational</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] instDiagCanOpen.DeviceJoystick.Operational</xhtml>
               </documentation>
             </variable>
             <variable name="HeartbeatIhmOk">
@@ -1398,7 +1393,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur</xhtml>
               </documentation>
             </variable>
             <variable name="PhaseRotationOk">
@@ -1406,7 +1401,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI (TRUE = OK)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI (TRUE = OK)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeThermalFeedback">
@@ -1414,7 +1409,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveOnline">
@@ -1423,7 +1418,7 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Spécifique EtherCAT &amp; Capteurs réels
-Status diagnostic communication EtherCAT (Online)</xhtml>
+--&gt; [HW] Status diagnostic communication EtherCAT (Online)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveOperational">
@@ -1431,7 +1426,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Status diagnostic communication EtherCAT (Operational)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Status diagnostic communication EtherCAT (Operational)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveStatusWord">
@@ -1439,7 +1434,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot d'état variateur AC600</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mot d'état variateur AC600</xhtml>
               </documentation>
             </variable>
             <variable name="DriveActualFreqHz">
@@ -1447,7 +1442,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse réelle variateur (Hz)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse réelle variateur (Hz)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedback">
@@ -1455,7 +1450,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour d'état bobine frein (TRUE = ouvert/desserré — révocation 2026-08-03)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retour d'état bobine frein (TRUE = ouvert/desserré)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCmd">
@@ -1463,7 +1458,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Commande frein</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -1471,7 +1466,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction commandée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction commandée</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchFwd">
@@ -1479,7 +1474,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême avant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême avant</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchRev">
@@ -1487,7 +1482,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême arrière</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême arrière</xhtml>
               </documentation>
             </variable>
             <variable name="SensorWordIncoherent">
@@ -1495,7 +1490,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassGlobal">
@@ -1507,7 +1502,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
-🌐 Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)</xhtml>
+--&gt; [TST] Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassOperatorComm">
@@ -1518,7 +1513,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Bypass perte communication opérateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass perte communication opérateur</xhtml>
               </documentation>
             </variable>
             <variable name="BypassDriveComm">
@@ -1529,7 +1524,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass perte communication drive</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass perte communication drive</xhtml>
               </documentation>
             </variable>
             <variable name="BypassPhaseRotation">
@@ -1540,7 +1535,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Bypass défaut rotation phases</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass défaut rotation phases</xhtml>
               </documentation>
             </variable>
             <variable name="BypassBrakeThermal">
@@ -1551,7 +1546,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Bypass surchauffe frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass surchauffe frein</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaB">
@@ -1562,7 +1557,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Bypass Méca B</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Méca B</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaA">
@@ -1573,7 +1568,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Bypass Méca A</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Méca A</xhtml>
               </documentation>
             </variable>
             <variable name="BypassLimitSwitch">
@@ -1584,7 +1579,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass butées extrêmes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass butées extrêmes</xhtml>
               </documentation>
             </variable>
             <variable name="BypassSensorIncoherent">
@@ -1595,7 +1590,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Bypass incohérence mot capteurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass incohérence mot capteurs</xhtml>
               </documentation>
             </variable>
             <variable name="BypassSafety">
@@ -1606,7 +1601,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bypass groupé PowerCutOff (BrakeThermal/MecaB/MecaA/LimitSwitch/SensorIncoherent)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass groupé PowerCutOff (BrakeThermal/MecaB/MecaA/LimitSwitch/SensorIncoherent)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassProcess">
@@ -1617,7 +1612,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1626,46 +1621,64 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB occupé</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminée</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthèse défaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat mémorisé au dernier défaut</xhtml>
+              </documentation>
             </variable>
             <variable name="SafeStop">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 Décélération rapide (PLC)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Décélération rapide (PLC)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOff">
@@ -1673,7 +1686,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coup de poing / coupure puissance amont</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Coup de poing / coupure puissance amont</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorOperatorComm">
@@ -1681,7 +1694,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorDriveComm">
@@ -1689,7 +1702,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Perte communication EtherCAT variateur (bit1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Perte communication EtherCAT variateur (bit1)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorPhaseRotation">
@@ -1697,7 +1710,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Mauvaise rotation de phases (bit2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mauvaise rotation de phases (bit2)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorBrakeThermal">
@@ -1705,7 +1718,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Surchauffe thermique frein commun (bit3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Surchauffe thermique frein commun (bit3)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorMecaB">
@@ -1713,7 +1726,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Absence confirmation arrêt (Méca B - bit4)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Absence confirmation arrêt (Méca B - bit4)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorMecaA">
@@ -1721,7 +1734,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Mouvement non commandé (Méca A - bit5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mouvement non commandé (Méca A - bit5)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorLimitSwitch">
@@ -1729,7 +1742,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Limite extrême Translation atteinte (bit6)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Limite extrême Translation atteinte (bit6)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorSensorIncoherent">
@@ -1737,7 +1750,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Incohérence mot capteurs position (bit7)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incohérence mot capteurs position (bit7)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1746,18 +1759,24 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Erreur</xhtml>
+              </documentation>
             </variable>
             <variable name="TonMecaB">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sécurité à l'arrêt (Méca B)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sécurité à l'arrêt (Méca B)</xhtml>
               </documentation>
             </variable>
             <variable name="TonMecaA">
@@ -1765,7 +1784,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sécurité mouvement non commandé (Méca A)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sécurité mouvement non commandé (Méca A)</xhtml>
               </documentation>
             </variable>
             <variable name="TonLimitSwitchOverrun">
@@ -1773,13 +1792,16 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Surveillance poussée anormale / escalade fin de course</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Surveillance poussée anormale / escalade fin de course</xhtml>
               </documentation>
             </variable>
             <variable name="OverrunCondition">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition escalade fin de course</xhtml>
+              </documentation>
             </variable>
             <variable name="PostRampTimeout">
               <type>
@@ -1788,28 +1810,40 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               <initialValue>
                 <simpleValue value="TIME#3S" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Délai Méca B</xhtml>
+              </documentation>
             </variable>
             <variable name="UncommandedActiveB">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Méca B active</xhtml>
+              </documentation>
             </variable>
             <variable name="UncommandedActiveA">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Méca A active</xhtml>
+              </documentation>
             </variable>
             <variable name="FirstScanDone">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation premier scan</xhtml>
+              </documentation>
             </variable>
             <variable name="TonStartupWarmup">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Inhibition 3s au boot + effacement auto coms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Inhibition 3s au boot + effacement auto coms</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -1818,9 +1852,12 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
-   🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
-      thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
+   Rôle : Surveillance joystick, bus EtherCAT, rotation de phases,
+      thermique frein commun, Méca A (vitesse non commandée à l'arrêt),
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
+   🎯 Invariant : les défauts de communication (bits 0/1/2) ne coupent
+      jamais la puissance amont (SafeStop seul) ; seuls les défauts
+      physiques (bits 3..7) déclenchent PowerCutOff.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -1830,7 +1867,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
 
 // === IMPLEMENTATION ===
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -1856,7 +1893,7 @@ END_IF;
 
 {endregion}
 
-{region "Initialisation et bypass global"}
+{region "§1bis Initialisation et bypass global"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
@@ -1877,7 +1914,7 @@ END_IF;
 
 {endregion}
 
-{region "Diagnostics et protections translation"}
+{region "§2 Diagnostics et protections translation"}
 // ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
 // On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
 IF NOT BypassGlobal THEN
@@ -1991,7 +2028,7 @@ END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
 
-{region "Arbitrage sorties et etat"}
+{region "§4 Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -2041,7 +2078,7 @@ State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le FB. FALSE = neutralisation totale (sorties coupées)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active le FB. FALSE = neutralisation totale (sorties coupées)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -2049,7 +2086,7 @@ State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement défaut (front)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -2057,7 +2094,7 @@ State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU réarmée + conditions globales OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaîne AU réarmée + conditions globales OK</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -2065,7 +2102,7 @@ State := E_State.READY;
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant</xhtml>
               </documentation>
             </variable>
             <variable name="StartStop">
@@ -2073,7 +2110,7 @@ State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération NORMALE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -2081,7 +2118,7 @@ State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -2089,7 +2126,7 @@ State := E_State.READY;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRefPct">
@@ -2097,7 +2134,7 @@ State := E_State.READY;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Magnitude de la consigne (de 0 à 100%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Magnitude de la consigne (de 0 à 100%)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionSensorTarget">
@@ -2105,7 +2142,7 @@ State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position cible courante</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur position cible courante</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownSensorTremie">
@@ -2113,9 +2150,9 @@ State := E_State.READY;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : 3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
 (même principe que PV→Trémie, généralisé — voir §4bis dans le corps ST)
-Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
+--&gt; [HW] Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownSensorMaintenance">
@@ -2123,7 +2160,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur P1 — ralentissement avant Maintenance (Direction=-1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P1 — ralentissement avant Maintenance (Direction=-1)</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownSensorP1">
@@ -2131,7 +2168,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchFwd">
@@ -2139,7 +2176,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême avant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême avant</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchRev">
@@ -2147,7 +2184,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême arrière</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême arrière</xhtml>
               </documentation>
             </variable>
             <variable name="DriveStatusWord">
@@ -2156,7 +2193,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Spécifique ETHERCAT (image process EtherCAT, rafraîchie par EtherCatTask 4ms)
-Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
+--&gt; [HW] Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="DriveActualFreqHz">
@@ -2164,7 +2201,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence réelle mesurée (Hz)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fréquence réelle mesurée (Hz)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassContactorCheck">
@@ -2172,7 +2209,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassLimitSwitch">
@@ -2180,7 +2217,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 TRUE = ignore les fins de course extrêmes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = ignore les fins de course extrêmes</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedback">
@@ -2188,7 +2225,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique direct : TRUE = frein OUVERT (desserré)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retour physique direct : TRUE = frein OUVERT (desserré)</xhtml>
               </documentation>
             </variable>
             <variable name="InvertDriveDirection">
@@ -2196,14 +2233,10 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 (retour terrain, REX câblage) : compense le câblage moteur (U/V inversés) —
-UNIQUEMENT sur le mot de commande variateur en sortie (§5bis). Direction/CommandedDirection
-reste partout ailleurs le sens SÉMANTIQUE réel (+1 = physiquement vers Trémie), pour rester
-apparié aux vrais capteurs (LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.
-⚠️ AVANT ce correctif, l'inversion était appliquée en amont (PRG_05, sur M3_Direction_Active
-lui-même) : avec le câblage réel de la machine, ça désaccordait TOUTE la logique sécurité/
-ralentissement appariée aux capteurs physiques (seule la coupure dure indépendante du sens,
-§0bis PRG_05, arrêtait encore la machine — le verrou d'arrivée logiciel ne s'armait jamais).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compense le câblage moteur (U/V inversés) — UNIQUEMENT sur le mot de commande variateur
+en sortie (§5bis). Direction/CommandedDirection reste partout ailleurs le sens SÉMANTIQUE
+réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
+(LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampAccelRate">
@@ -2215,7 +2248,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages rampe (RETAIN)
-%/s — accélération</xhtml>
+--&gt; [CFG] %/s — accélération</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampDecelNormalRate">
@@ -2226,7 +2259,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
                 <simpleValue value="40" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">%/s — décélération normale</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] %/s — décélération normale</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampDecelFastRate">
@@ -2237,7 +2270,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
                 <simpleValue value="100" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">%/s — décélération RAPIDE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] %/s — décélération RAPIDE</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionInterlockDelay">
@@ -2248,7 +2281,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
                 <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai avant d'autoriser un changement de sens à l'arrêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Délai avant d'autoriser un changement de sens à l'arrêt</xhtml>
               </documentation>
             </variable>
             <variable name="ApproachSpeedTremieHz">
@@ -2260,7 +2293,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages ETHERCAT uniquement (RETAIN)
-Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xhtml>
+--&gt; [CFG] Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xhtml>
               </documentation>
             </variable>
             <variable name="ApproachSpeedMaintenanceHz">
@@ -2271,7 +2304,7 @@ Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xh
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)</xhtml>
               </documentation>
             </variable>
             <variable name="ApproachSpeedP1Hz">
@@ -2282,7 +2315,7 @@ Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xh
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveFreqScaleMaxHz">
@@ -2293,7 +2326,7 @@ Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xh
                 <simpleValue value="60" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)</xhtml>
               </documentation>
             </variable>
             <variable name="CaptorDebounce">
@@ -2305,7 +2338,7 @@ Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xh
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages communs
-Filtrage capteur de position cible</xhtml>
+--&gt; [CFG] Filtrage capteur de position cible</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeDelayContactClose">
@@ -2316,7 +2349,7 @@ Filtrage capteur de position cible</xhtml>
                 <simpleValue value="TIME#100ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voir FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeDelayMagnetise">
@@ -2327,7 +2360,7 @@ Filtrage capteur de position cible</xhtml>
                 <simpleValue value="TIME#300ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voir FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeDelayMotorDecel">
@@ -2338,7 +2371,7 @@ Filtrage capteur de position cible</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voir FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedbackTimeout">
@@ -2349,7 +2382,7 @@ Filtrage capteur de position cible</xhtml>
                 <simpleValue value="TIME#300ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Strictement sous watchdog final 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Strictement sous watchdog final 500 ms</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -2358,46 +2391,64 @@ Filtrage capteur de position cible</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB occupé</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminée</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthèse défaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat mémorisé au dernier défaut</xhtml>
+              </documentation>
             </variable>
             <variable name="TargetReached">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position cible</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Capteur position cible</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedDriveControlWord">
@@ -2405,7 +2456,7 @@ Filtrage capteur de position cible</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedDriveFreqHz">
@@ -2413,7 +2464,7 @@ Filtrage capteur de position cible</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
@@ -2421,7 +2472,7 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande métier desserrage, issue de FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier desserrage, issue de FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCommandOpenConfirmed">
@@ -2429,7 +2480,7 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeContactorCheck">
@@ -2437,7 +2488,7 @@ Filtrage capteur de position cible</xhtml>
                 <derived name="ST_ContactorCheck" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag contacteur frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diag contacteur frein</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -2447,38 +2498,47 @@ Filtrage capteur de position cible</xhtml>
                 <derived name="FB_Brake" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Séquence frein</xhtml>
               </documentation>
             </variable>
             <variable name="CycleTimeCalc">
               <type>
                 <derived name="FB_CycleTime" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mesure temps de cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="SpeedRamp">
               <type>
                 <derived name="FB_Ramp" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rampe de vitesse logicielle (PLC)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Rampe de vitesse logicielle (PLC)</xhtml>
               </documentation>
             </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Erreur</xhtml>
+              </documentation>
             </variable>
             <variable name="DirectionChangeDelay">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interlock changement de sens</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interlock changement de sens</xhtml>
               </documentation>
             </variable>
             <variable name="CommandedDirection">
@@ -2486,7 +2546,7 @@ Filtrage capteur de position cible</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens réellement appliqué</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens réellement appliqué</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangePending">
@@ -2494,7 +2554,7 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-05 : force la rampe à 0 pendant une inversion de sens en attente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Force la rampe à 0 pendant une inversion de sens en attente</xhtml>
               </documentation>
             </variable>
             <variable name="PhysicalDriveDirection">
@@ -2502,35 +2562,47 @@ Filtrage capteur de position cible</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur</xhtml>
               </documentation>
             </variable>
             <variable name="RampTargetPct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible rampe en %</xhtml>
+              </documentation>
             </variable>
             <variable name="CaptorDebounceTon">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce capteur cible</xhtml>
+              </documentation>
             </variable>
             <variable name="ArrivalEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front arrivée sur capteur</xhtml>
+              </documentation>
             </variable>
             <variable name="DirectionAtArrival">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens d'arrivée mémorisé</xhtml>
+              </documentation>
             </variable>
             <variable name="ArrivalLock">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrêt exact sur capteur cible</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arrêt exact sur capteur cible</xhtml>
               </documentation>
             </variable>
             <variable name="MovementRequested">
@@ -2538,44 +2610,42 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pilote FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pilote FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="FirstScanDone">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation premier scan</xhtml>
+              </documentation>
             </variable>
             <variable name="TonBrakeRealFreqTimeout">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 (revue sécurité) : garde-fou watchdog — DriveActualFreqHz est un passthrough
-EtherCAT SANS contrôle de fraîcheur (PRG_02_Acquisition, TimeConst=0ms). Si la comm variateur
-se fige (perte EtherCAT) sur une dernière valeur ≥1.0 Hz, plus rien ne referme le frein tant
-que ce garde-fou n'existe pas — même si SafeStop a déjà ramené la rampe théorique à 0. Force
-le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise DriveActualFreqHz.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde-fou watchdog : DriveActualFreqHz est un passthrough EtherCAT sans contrôle de fraîcheur.
+Si la communication variateur se fige sur une dernière valeur ≥1.0 Hz, plus rien ne referme
+le frein tant que ce garde-fou n'existe pas — même si SafeStop a déjà ramené la rampe théorique
+à 0. Force le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise
+DriveActualFreqHz.</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
+   ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
-   📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
+   Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
    🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
-   ⚠️ CORRECTIF (retour terrain 2026-08-05) : une inversion de sens PLUS RAPIDE que le
-      temps de décélération réel bloquait indéfiniment `CommandedDirection` (la translation
-      ne s'arrêtait jamais, continuait dans l'ancien sens) — la cible de rampe suivait la
-      magnitude joystick en continu, sans garantie de croiser le seuil d'arrêt qui
-      autorise l'interlock changement de sens (§5). Même bug déjà corrigé sur `FB_Winch`
-      (REX 2026-07-02), jamais porté ici. Corrigé : `DirectionChangePending` FORCE
-      désormais la cible à 0.0 dès qu'un changement de sens est en attente, de façon
-      déterministe et indépendante du joystick (voir §4 dans le corps ST).
+   🎯 Invariant : toute inversion de sens force la cible de rampe à 0.0 tant que le
+      changement de sens est en attente, pour garantir le croisement du seuil d'arrêt
+      qui autorise l'interlock de changement de sens (§5).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -2585,7 +2655,7 @@ le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise 
 
 // === IMPLEMENTATION ===
 
-{region "Gate et initialisation"}
+{region "§1 Gate et initialisation"}
 // 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
@@ -2617,7 +2687,7 @@ END_IF;
 
 {endregion}
 
-{region "Acquisition commandes et position cible"}
+{region "§2 Acquisition commandes et position cible"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms
 
@@ -2630,13 +2700,12 @@ TargetReached := CaptorDebounceTon.Q;
 
 {endregion}
 
-{region "Consigne vitesse ralentissement verrou arrivee"}
+{region "§4 Consigne vitesse ralentissement verrou arrivee"}
 // ⚙️ 4. CORE — arbitrage rampe : Enable &gt; SafeStop &gt; StartStop
-// 🆕 2026-08-05 : DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de
-// sens est en attente — sans ça, la cible suit la magnitude joystick en continu et ne
-// croise jamais le seuil d'arrêt (0.1%) qui autorise l'interlock §5 à basculer
-// CommandedDirection. Une inversion plus rapide que la décélération réelle bloquait donc
-// indéfiniment le mouvement dans l'ancien sens (même bug que FB_Winch, REX 2026-07-02).
+// DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de sens est en attente —
+// sans cela, la cible suit la magnitude joystick en continu et ne croise jamais le seuil
+// d'arrêt (0.1%) qui autorise l'interlock §5 à basculer CommandedDirection. Une inversion
+// plus rapide que la décélération réelle bloquerait indéfiniment le mouvement dans l'ancien sens.
 DirectionChangePending := (Direction &lt;&gt; CommandedDirection) AND (CommandedDirection &lt;&gt; 0);
 
 RampTargetPct := 0.0;
@@ -2654,11 +2723,9 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     END_IF;
 END_IF;
 
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur, remplace le timer)
-// 🔧 REX 2026-07-18 : ApproachTime (timer générique, toute direction confondue) remplacé par un
-// capteur dédié qui ne déclenche le ralentissement QU'à l'approche de sa cible, jamais l'inverse.
-// 🆕 2026-08-06 : généralisé à 3 paires capteur/cible indépendantes — chaque capteur "un cran
-// avant" la cible finale déclenche SA propre vitesse réduite, dans SON sens de marche uniquement :
+// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur)
+// Chaque capteur "un cran avant" la cible finale déclenche SA propre vitesse réduite, dans SON
+// sens de marche uniquement — le ralentissement ne se déclenche qu'à l'approche de sa cible :
 //   PV       + Direction=1  → approche Trémie
 //   P1       + Direction=-1 → approche Maintenance
 //   P2       + Direction=-1 → approche P1 (arrêt propre pour travail)
@@ -2673,14 +2740,11 @@ IF (Direction = -1) AND SlowdownSensorP1 THEN
 END_IF;
 
 // 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1, Maintenance, Fdc extrêmes)
-// 🆕 2026-08-06 (retour terrain + revue) : élargi à P1 (arrêt travail), pas seulement les 2
-// extrémités. Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de
-// course dur (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même
-// brève arme le même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ.
-// 🔧 REX 2026-08-06 (revue) : LimitSwitchFwd/Rev ne passaient PAS par ce verrou — un Fdc qui
-// s'ouvre quelques ms pendant le freinage laissait le §5bis relâcher SA coupure directe sans que
-// rien ne prenne le relais, la rampe (encore haute en interne) revenait en sortie -&gt; ré-accélération.
-// Désormais toute activation, même un instant, arme DirectionAtArrival comme un TargetReached.
+// Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de course dur
+// (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même brève arme le
+// même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ. Toute activation,
+// même un instant, arme DirectionAtArrival comme un TargetReached — un Fdc qui s'ouvre quelques ms
+// pendant le freinage ne doit pas laisser la rampe (encore haute en interne) revenir en sortie.
 ArrivalEdge(CLK := TargetReached
                  OR (LimitSwitchFwd AND (CommandedDirection = 1))
                  OR (LimitSwitchRev AND (CommandedDirection = -1)));
@@ -2688,12 +2752,12 @@ IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
 
-// 🔧 REX 2026-08-06 (revue) : un retour au neutre, même SOUTENU (&gt;100ms), ne doit JAMAIS lever
-// le verrou — seul un vrai changement de sens (dégagement volontaire, sans ambiguïté) le fait.
-// Sinon : neutre 100ms+ puis réappui dans le MÊME sens (le capteur/Fdc étant resté au niveau
-// haut en continu, TargetReached ne montre plus de front) contournait le verrou et M3 repartait
-// vers la butée. Conforme à la demande d'origine : "on doit repartir dans l'AUTRE sens", jamais
-// juste relâcher-réappuyer pareil. Instantané, jamais retardé (le dégagement doit rester rapide).
+// Un retour au neutre, même SOUTENU (&gt;100ms), ne doit JAMAIS lever le verrou — seul un vrai
+// changement de sens (dégagement volontaire, sans ambiguïté) le fait. Sinon, un neutre 100ms+
+// puis un réappui dans le MÊME sens (le capteur/Fdc restant au niveau haut en continu,
+// TargetReached ne montre plus de front) contournerait le verrou et M3 repartirait vers la butée.
+// On doit repartir dans l'AUTRE sens, jamais juste relâcher-réappuyer pareil. Instantané, jamais
+// retardé (le dégagement doit rester rapide).
 IF (Direction = DirectionAtArrival * (-1)) OR ResetEdge.Q OR (NOT TargetReached AND NOT LimitSwitchFwd AND NOT LimitSwitchRev) THEN
     DirectionAtArrival := 0;
 END_IF;
@@ -2711,7 +2775,7 @@ SpeedRamp(Target := RampTargetPct,
 
 {endregion}
 
-{region "Interlock changement sens"}
+{region "§5 Interlock changement sens"}
 // 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (vitesse confirmée nulle)
 IF Direction &lt;&gt; CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
@@ -2732,16 +2796,16 @@ END_IF;
 
 {endregion}
 
-{region "Commande variateur et protections fin course"}
+{region "§5bis Commande variateur et protections fin course"}
 // 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
 // OU que la fréquence réelle mesurée du variateur M3 est &gt;= 1.0 Hz.
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
-// 🆕 2026-08-06 (revue sécurité) : borné par un garde-fou 2s — DriveActualFreqHz n'a aucun
-// contrôle de fraîcheur EtherCAT ; si la comm se fige sur une valeur ≥1.0 Hz (perte réseau en
-// mouvement), rien d'autre en aval ne referme le frein (FB_TranslationOutputInterlock_LD ignore
-// volontairement SafeStop par conception). Le garde-fou force la fermeture du frein 2s après la
-// fin de la rampe THÉORIQUE, quoi que dise la mesure réelle — combine attente réelle (évite un
-// serrage sur arbre encore tournant) et certitude de fermeture (n'attend jamais indéfiniment).
+// Borné par un garde-fou 2s — DriveActualFreqHz n'a aucun contrôle de fraîcheur EtherCAT ; si la
+// communication se fige sur une valeur ≥1.0 Hz (perte réseau en mouvement), rien d'autre en aval
+// ne referme le frein (FB_TranslationOutputInterlock_LD ignore volontairement SafeStop par
+// conception). Le garde-fou force la fermeture du frein 2s après la fin de la rampe THÉORIQUE, quoi
+// que dise la mesure réelle — combine attente réelle (évite un serrage sur arbre encore tournant)
+// et certitude de fermeture (n'attend jamais indéfiniment).
 TonBrakeRealFreqTimeout(IN := NOT ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1)), PT := T#2s);
 MovementRequested := ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1))
                      OR (ABS(DriveActualFreqHz) &gt;= 1.0 AND NOT TonBrakeRealFreqTimeout.Q);
@@ -2749,7 +2813,7 @@ MovementRequested := ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
 RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
 
-// 🆕 2026-08-06 : compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
+// Compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
 // CommandedDirection (sécurité/capteurs juste au-dessus, §4/§4bis/§4ter) reste le sens réel.
 PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, CommandedDirection * (-1));
 
@@ -2781,7 +2845,7 @@ END_IF;
 
 {endregion}
 
-{region "Commande frein"}
+{region "§6 Commande frein"}
 // 🛑 6. FREIN (composé, réutilisé tel quel)
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       ContactorFeedback := BrakeFeedback,
@@ -2799,7 +2863,7 @@ BrakeContactorCheck := Brake.ContactorCheck;
 
 {endregion}
 
-{region "Diagnostic etat et repli defaut"}
+{region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
@@ -2868,7 +2932,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le calcul</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active le calcul</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -2876,7 +2940,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front d'acquittement / réinitialisation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement / réinitialisation</xhtml>
               </documentation>
             </variable>
             <variable name="DriveActualFreqHz">
@@ -2884,7 +2948,7 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence réelle variateur en Hz (ex: 5.0 Hz)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fréquence réelle variateur en Hz (ex: 5.0 Hz)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -2892,7 +2956,7 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens effectif : +1 = Fwd (vers Trémie), -1 = Rev (vers Maint), 0 = Arrêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens effectif : +1 = Fwd (vers Trémie), -1 = Rev (vers Maint), 0 = Arrêt</xhtml>
               </documentation>
             </variable>
             <variable name="SensorMaintenance">
@@ -2901,7 +2965,7 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">5 Capteurs de position fixes
-Capteur 0 : Maintenance (0.0 m)</xhtml>
+--&gt; [HW] Capteur 0 : Maintenance (0.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorP1">
@@ -2909,7 +2973,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur 1 : P1 (ex: 6.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 1 : P1 (ex: 6.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorP2">
@@ -2917,7 +2981,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur 2 : P2 (ex: 14.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 2 : P2 (ex: 14.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorPV">
@@ -2925,7 +2989,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur 3 : PV (ex: 21.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 3 : PV (ex: 21.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorTremie">
@@ -2933,7 +2997,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur 4 : Trémie (ex: 25.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 4 : Trémie (ex: 25.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="PosMaintenanceM">
@@ -2944,7 +3008,8 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Positions de référence calibrées (mètres) depuis GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Positions de référence calibrées (mètres) depuis GVL_PERSISTENT
+--&gt; [CFG] Position Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="PosP1M">
@@ -2954,6 +3019,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="6" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position P1</xhtml>
+              </documentation>
             </variable>
             <variable name="PosP2M">
               <type>
@@ -2962,6 +3030,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="14" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position P2</xhtml>
+              </documentation>
             </variable>
             <variable name="PosPVM">
               <type>
@@ -2970,6 +3041,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="21" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position PV</xhtml>
+              </documentation>
             </variable>
             <variable name="PosTremieM">
               <type>
@@ -2978,6 +3052,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="25" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position Trémie</xhtml>
+              </documentation>
             </variable>
             <variable name="GainMetersPerHzSec">
               <type>
@@ -2987,7 +3064,8 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <simpleValue value="0.008333" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gain de vitesse : mètres parcourus par Hz par seconde (ex: 50 Hz = 0.416 m/s =&gt; Gain = 0.008333 m/Hz.s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gain de vitesse : mètres parcourus par Hz par seconde (ex: 50 Hz = 0.416 m/s =&gt; Gain = 0.008333 m/Hz.s)
+--&gt; [CFG] Gain odométrie</xhtml>
               </documentation>
             </variable>
             <variable name="PersistedPositionM">
@@ -2998,9 +3076,10 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : reprise après reboot — l'appelant recopie en continu PositionEstimatedM/
-       Initialized vers GVL_PERSISTENT (pas de bridge dédié, simple recopie comme _TranslationSetFreq_Hz)
-       et réinjecte ici au redémarrage, pour ne pas perdre l'estimation odométrique à chaque coupure.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reprise après reboot — l'appelant recopie en continu PositionEstimatedM/Initialized vers
+       GVL_PERSISTENT (pas de bridge dédié, simple recopie) et réinjecte ici au redémarrage, pour
+       ne pas perdre l'estimation odométrique à chaque coupure.
+--&gt; [CFG] Position persistée</xhtml>
               </documentation>
             </variable>
             <variable name="PersistedInitialized">
@@ -3010,6 +3089,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="FALSE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Initialisation persistée</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -3018,7 +3100,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position continue estimée en mètres</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Position continue estimée en mètres</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -3026,7 +3108,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 exposé pour recopie persistante côté appelant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Exposé pour recopie persistante côté appelant</xhtml>
               </documentation>
             </variable>
             <variable name="Recalibrated">
@@ -3034,7 +3116,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse 1 cycle lors d'un recalage sur capteur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Pulse 1 cycle lors d'un recalage sur capteur</xhtml>
               </documentation>
             </variable>
             <variable name="RecalibratedSensorId">
@@ -3042,7 +3124,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] 0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -3051,31 +3133,49 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Trémie</xhtml>
+              </documentation>
             </variable>
             <variable name="TrigPV">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PV</xhtml>
+              </documentation>
             </variable>
             <variable name="TrigP2">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant P2</xhtml>
+              </documentation>
             </variable>
             <variable name="TrigP1">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant P1</xhtml>
+              </documentation>
             </variable>
             <variable name="TrigMaintenance">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Maintenance</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleTimeCalc">
               <type>
                 <derived name="FB_CycleTime" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mesure temps de cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="ColdStart">
               <type>
@@ -3085,13 +3185,13 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 seed unique depuis Persisted* au premier scan utile</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Seed unique depuis Persisted* au premier scan utile</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ↔️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
+   ⚙️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
@@ -3106,6 +3206,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate et initialisation"}
 IF NOT Enable THEN
     Recalibrated := FALSE;
     RecalibratedSensorId := -1;
@@ -3120,14 +3221,18 @@ END_IF;
 
 CycleTimeCalc(DefaultValueS := 0.010);
 Recalibrated := FALSE;
+{endregion}
 
+{region "§2 Fronts capteurs"}
 // 1. Détection des fronts montants sur franchissement des capteurs fixes
 TrigTremie(CLK := SensorTremie);
 TrigPV(CLK := SensorPV);
 TrigP2(CLK := SensorP2);
 TrigP1(CLK := SensorP1);
 TrigMaintenance(CLK := SensorMaintenance);
+{endregion}
 
+{region "§3 Recalage et intégration"}
 // 2. Recalage absolu prioritaire sur contact capteur
 IF TrigMaintenance.Q THEN
     PositionEstimatedM := PosMaintenanceM;
@@ -3166,9 +3271,12 @@ ELSE
         PositionEstimatedM := PositionEstimatedM + (INT_TO_REAL(Direction) * DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Bornage"}
 // Bornage de sécurité pour éviter la dérive infinie hors rail
 PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremieM + 0.5);
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -3186,7 +3294,8 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contexte général (comme tout FB) — FALSE = frein collé (sûr)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD]  Autorisation generale (FALSE = frein colle)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -3194,7 +3303,7 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Acquittement defaut (front)</xhtml>
               </documentation>
             </variable>
             <variable name="MovementRequested">
@@ -3202,7 +3311,7 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = FB_Winch demande un mouvement (sens+palier actifs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Demande de mouvement (sens+palier actifs)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorFeedback">
@@ -3210,7 +3319,16 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein (`PRG_02_Acquisition.HwIn`) : TRUE = frein OUVERT (desserré)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MATERIELS &amp; SIMULATION ===
+--&gt; [HW]   Retour contacteur frein (TRUE = relache/ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassContactorCheck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST]  Bypass controle contacteur (simu)</xhtml>
               </documentation>
             </variable>
             <variable name="DelayContactClose">
@@ -3221,10 +3339,8 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <simpleValue value="TIME#100ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-08-03 : même sens que BrakeCmd (TRUE = relâché)
-→ en marche normale les deux sont ÉGAUX ; c'est leur
-DIFFÉRENCE qui trahit un contacteur collé (voir §4).
-Temps de fermeture contacteur de puissance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS ET REGLAGES ===
+--&gt; [CFG]  Temps de fermeture contacteur de puissance</xhtml>
               </documentation>
             </variable>
             <variable name="DelayMagnetise">
@@ -3235,7 +3351,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#300ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai magnétisation moteur avant ouverture frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai magnetisation moteur avant ouverture frein</xhtml>
               </documentation>
             </variable>
             <variable name="DelayMotorDecel">
@@ -3246,7 +3362,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai décélération/ouverture contacteur avant collage frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai deceleration avant collage frein</xhtml>
               </documentation>
             </variable>
             <variable name="FeedbackTimeout">
@@ -3257,15 +3373,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#1s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai max cohérence commande/retour frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassContactorCheck">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai max coherence commande/retour frein</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -3274,46 +3382,66 @@ Temps de fermeture contacteur de puissance</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DERIVATION ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence temporisee en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Frein ouvert/relache confirme</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut actif sur le frein</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut engagement frein" - incohérence commande/retour frein (collage ou non-relâche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de defauts (bit0: incoherence retour)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat operationnel courant</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat memorise lors du defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande sortie bobine frein : TRUE = relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONFIRMATIONS ===
+&lt;-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCommandOpenConfirmed">
@@ -3321,7 +3449,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein ouvert = commande ouverture confirmée (même sens que ContactorFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Confirmation ouverture frein pour verrous</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorCheck">
@@ -3329,7 +3457,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="ST_ContactorCheck" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag détaillé (IHM / FB_Safety_Winch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostic detaille retour contacteur</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -3338,18 +3466,25 @@ Temps de fermeture contacteur de puissance</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TRIGGERS ET DETECTION FRONTS ===
+. [LOC]  Detecteur front acquittement</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Detecteur front apparition defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 REX 2026-07-24 : Front montant activation bypass pour réarmement immédiat</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Detecteur front activation bypass</xhtml>
               </documentation>
             </variable>
             <variable name="TonMagnetise">
@@ -3357,7 +3492,8 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation avant relâche</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
+. [LOC]  Temporisation avant relachement frein</xhtml>
               </documentation>
             </variable>
             <variable name="TonDecel">
@@ -3365,7 +3501,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation avant collage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Temporisation avant collage frein</xhtml>
               </documentation>
             </variable>
             <variable name="TonFeedback">
@@ -3373,41 +3509,26 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout cohérence commande/retour</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Timeout de coherence commande/retour</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🛡️ FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
+   🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
+   🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
-                   (règles issues de DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §4)
-   🛠️ Frein à manque de courant : colle au repos (sécurité positive).
-   📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
-   📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
-   ⏱️ Séquence démarrage : attend fermeture contacteur + magnétisation
-      moteur AVANT de relâcher (sinon charge retombe → à-coup).
-   ⏱️ Séquence arrêt     : attend décélération/ouverture contacteur AVANT
-      de coller (sinon usure/casse mécanique en plein mouvement).
-   🔍 Double vérification retour contacteur bobine (ST_ContactorCheck) :
-      incohérence commande/retour au-delà de FeedbackTimeout → ErrorId.
-   🆕 REX 2026-08-03 (révocation 2026-07-26) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
-      (DI = 1 ⟺ frein ouvert). Plus d'inversion à la frontière : ce FB reçoit maintenant un
-      signal dans le MÊME sens que `BrakeCmd` en marche saine (TRUE = relâché = ouvert) → le test d'incohérence est `&lt;&gt;`, pas `=`.
-      ⚠️ Ce retour n'est PAS une mesure du frein : il détecte un contacteur/bobine défaillant, mais
-      pas un frein usé ou qui patine. Le patinage reste couvert par Méca A (dérive codeur,
-      FB_Safety_Winch bit7) — pas par ce bloc.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Brake) ===</xhtml>
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Brake) ===
-
+{region "§1 Gate"}
 // 🛑 1. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
 IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
@@ -3419,11 +3540,15 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
+{endregion}
 
+{region "§2 Reset et fronts"}
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
 BypassEdge(CLK := BypassContactorCheck);
+{endregion}
 
+{region "§3 Séquence temporisée"}
 // 🛠️ 3. SÉQUENCE TEMPORISÉE (démarrage vs arrêt)
 IF MovementRequested THEN
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
@@ -3436,7 +3561,7 @@ IF MovementRequested THEN
         State := E_State.BUSY;
     END_IF;
 ELSE
-    // 🆕 REX 2026-07-08 : Sécurité positive - fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
+    // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
@@ -3445,15 +3570,16 @@ END_IF;
 
 Busy := (State = E_State.BUSY);
 Done := (State = E_State.DONE);
+{endregion}
 
+{region "§4 Double vérification contacteur"}
 // 🔍 4. DOUBLE VÉRIFICATION RETOUR CONTACTEUR (ST_ContactorCheck)
 ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
-// 🆕 REX 2026-08-03 (révocation 2026-07-26) : `ContactorFeedback` est maintenant dans le MÊME sens
-// que `BrakeCmd` (TRUE = relâché = frein ouvert). En marche saine les deux sont ÉGAUX → c'est leur
-// DIFFÉRENCE qui signale l'incohérence (contacteur collé).
-// ⚠️ Le test repasse en `&lt;&gt;` (retour à la logique d'origine pré-2026-07-26).
+// ContactorFeedback est dans le MÊME sens que BrakeCmd (TRUE = relâché = frein ouvert).
+// En marche saine les deux sont ÉGAUX → c'est leur DIFFÉRENCE qui signale l'incohérence
+// (contacteur collé). Le test compare donc `&lt;&gt;`.
 TonFeedback(IN := (BrakeCmd &lt;&gt; ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
@@ -3474,24 +3600,32 @@ ELSE
     END_IF;
 END_IF;
 
+{endregion}
+
+{region "§5 Arbitrage error"}
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
 
+{region "§6 Sortie sûre"}
 // 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
 IF Error THEN
     BrakeCmd := FALSE;
 END_IF;
+{endregion}
 
+{region "§7 Confirmation ouverture"}
 // 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback, ou image de BrakeCmd si BypassContactorCheck=TRUE)
 IF BypassContactorCheck THEN
     BrakeCommandOpenConfirmed := BrakeCmd;
 ELSE
     BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -3512,7 +3646,8 @@ END_IF;
                 <simpleValue value="0.004" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de secours par défaut (ex. 4ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES DE SECOURS ===
+--&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -3522,7 +3657,8 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé réel calculé (secondes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET DIAGNOSTIC ===
+&lt;-- [DIAG] Temps ecoule reel calcule (secondes)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -3532,7 +3668,8 @@ END_IF;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps système actuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORLOGE ET MEMOIRE TEMPORELLE ===
+. [LOC] Temps systeme actuel</xhtml>
               </documentation>
             </variable>
             <variable name="TimeLast">
@@ -3540,7 +3677,7 @@ END_IF;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Empreinte de temps du cycle précédent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Empreinte de temps du cycle precedent</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaTimeMs">
@@ -3548,7 +3685,7 @@ END_IF;
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart brut calculé (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut calcule (ms)</xhtml>
               </documentation>
             </variable>
             <variable name="InitDone">
@@ -3556,26 +3693,30 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau d'initialisation du premier cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation du premier cycle</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
-      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Acquisition temps"}
 // 1. ACQUISITION DU TEMPS SYSTÈME
 TimeCurrent := TIME();
+{endregion}
 
+{region "§2 Initialisation"}
 // 2. INITIALISATION UNIQUE AU PREMIER CYCLE
 IF NOT InitDone THEN
     TimeLast := TimeCurrent;
@@ -3583,19 +3724,26 @@ IF NOT InitDone THEN
     CycleTimeS := DefaultValueS;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Calcul delta"}
 // 3. CALCUL DU DELTA EN MILLISECONDES
 DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
 
+{region "§4 Conversion et secours"}
 // 4. CONVERSION ET CHARGE DE SECOURS
 IF DeltaTimeMs &gt; 0 THEN
     CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
     CycleTimeS := DefaultValueS;
 END_IF;
+{endregion}
 
+{region "§5 Archivage"}
 // 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
 TimeLast := TimeCurrent;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -3613,7 +3761,8 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible visée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES ET TAUX DE RAMPE ===
+--&gt; [CMD] Valeur cible visee (-100.0..+100.0 %)</xhtml>
               </documentation>
             </variable>
             <variable name="AccelRate">
@@ -3621,7 +3770,7 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Taux d'accélération (%/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Taux d'acceleration (%/s)</xhtml>
               </documentation>
             </variable>
             <variable name="DecelRate">
@@ -3629,7 +3778,7 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Taux de décélération (%/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Taux de deceleration (%/s)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleTimeS">
@@ -3637,7 +3786,7 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de cycle réel en secondes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de cycle reel en secondes (dt)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -3647,7 +3796,8 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur courante amortie</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VALEUR RAMPEE ===
+&lt;-- [STAT] Valeur courante amortie (-100.0..+100.0 %)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -3656,57 +3806,37 @@ TimeLast := TimeCurrent;
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS INTERNES ===
+. [LOC] Pas de variation pour le cycle courant</xhtml>
+              </documentation>
             </variable>
             <variable name="TargetLimited">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible bornee a [-100.0, +100.0]</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📈 FB_Ramp — Rampe accel/décel anti-à-coups (retour zéro plus rapide)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Ramp — Rampe d'accélération et décélération asymétrique
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2 (usage),
-                   DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md (correctif ci-dessous)
-   🧩 Instancié 3 fois dans le projet : RampX/RampY (FB_Joystick, cible
-      SIGNÉE -100..+100 %) et SpeedRamp (FB_Winch, cible TOUJOURS &gt;= 0,
-      jamais concernée par ce bug — voir analyse d'impact ci-dessous).
-
-   ⚠️ CORRECTIF (retour terrain 2026-07-02) : le choix accel/décel
-   comparait `Target`/`Current` AVEC LEUR SIGNE, pas leur magnitude.
-   Conséquence : lors d'une inversion RAPIDE du joystick (Current très
-   négatif, Target qui redevient positif), la condition
-   `(Target &gt; 0.0 AND Target &gt; Current)` devenait vraie dès que `Target`
-   passait légèrement positif — alors que `Current` était encore très
-   loin de zéro côté négatif — et sélectionnait à tort `AccelRate` (lent,
-   "s'éloigne du zéro") au lieu de `DecelRate` (rapide, "retourne vers le
-   zéro") pour toute la portion du trajet qui ramène réellement vers
-   zéro. Résultat observé : lors d'un flick rapide du joystick, `Current`
-   mettait ~3× plus longtemps que prévu à repasser par zéro, ce qui
-   retardait en cascade `AxisCmdY.Direction`/`SpeedRef`, puis l'interlock
-   de sens de `FB_Winch` (`CommandedDirection` bloqué sur l'ancien sens
-   plus longtemps que nécessaire).
-   🔬 Analyse d'impact (avant correctif) : `FB_Ramp` n'est instancié que
-   dans `FB_Joystick` (`RampX`/`RampY`, cible signée → CONCERNÉ) et dans
-   `FB_Winch` (`SpeedRamp`, cible = `RampTargetPct` toujours &gt;= 0 → JAMAIS
-   de traversée de signe possible → NON concerné, comportement inchangé).
-   ✅ Correction : classification basée sur le CÔTÉ de zéro où se trouve
-   `Current` et le sens de déplacement (pas le signe brut de `Target`),
-   vérifiée sur les 8 cas (Current&gt;0/&lt;0/=0 × s'éloigne/retourne/traverse).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Ramp) ===</xhtml>
+   🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
+   🔒 Polarité : Distingue l'éloignement de zéro (Accel) et le retour à zéro (Decel)
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Ramp) ===
-
 // Détection du comportement (Accélération vs Décélération)
-// 🔧 CORRECTIF : classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut
-// de Target seul (l'ancienne version se trompait lors d'une traversée de zéro rapide).
+// Classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut de Target seul
+// (robuste à une traversée de zéro rapide).
 // 🛡️ Garde-fou : la rampe ne sort jamais de la plage normalisée ±100 %.
 TargetLimited := LIMIT(-100.0, Target, 100.0);
 Current := LIMIT(-100.0, Current, 100.0);

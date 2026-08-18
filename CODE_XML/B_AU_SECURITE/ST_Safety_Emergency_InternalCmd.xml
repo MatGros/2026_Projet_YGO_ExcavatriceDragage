@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.752319" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.752319">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:39:34.892391" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:39:34.892391">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainB_Cmd">
@@ -39,7 +39,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulse_Cmd">
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de réarmement (TRUE = bobine réarmement activée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de rearmement (TRUE = bobine rearmement activee)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -58,15 +58,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ ST_Safety_Emergency_InternalCmd — Structure de commande interne
    ───────────────────────────────────────────────────────────────
-   📄 Transporte les ordres logiques entre le bloc de décision
-      et le bloc de sortie de la boucle d'urgence.
-   🔒 Polarité maintien : TRUE = voie maintenue saine, FALSE = coupure demandée
-      (conforme règle C1 — polarité explicite).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
+   🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
+   🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

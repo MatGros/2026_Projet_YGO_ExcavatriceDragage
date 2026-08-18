@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T23:54:33.675523" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T23:54:33.675523">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:29:36.380149" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:29:36.380149">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Synthèse : (ErrorId &lt;&gt; 0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synthese defaut active : (ErrorId &lt;&gt; 0)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -39,7 +39,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ bit0 = RedundancyTestFailed (auto-test A/B), bit1 = EmergencyArmingFailed (timeout confirm contacteur)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield erreurs : bit0=Redundancy, bit1=Arming, bit3=Startup</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Canal A ou B resté collé/shunté détecté à l'auto-test — Reset requis (cause disparue)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B reste colle/shunte detecte a l'auto-test (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmFailed">
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance non confirmé sous 2 s — Reset + contacteur engagé requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="LockoutActive">
@@ -63,7 +63,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Verrouillage temporel de 5 s entre tentatives de réarmement échouées</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre tentatives de rearmement echouees</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -74,15 +74,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
-      Consommé par PRG_SUPERVISION_CFC et GVL_Troubleshooting.
-   🎯 Champs lecture seule — producteur unique = FB composite.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_Safety_Emergency_State">
@@ -93,7 +91,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Boucle AU fermée (EmergencyChainClosed_DI = TRUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorOk">
@@ -101,7 +99,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur puissance confirmé engagé (PowerContactorEngaged_DI = TRUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)</xhtml>
               </documentation>
             </variable>
             <variable name="Step">
@@ -109,7 +107,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Étape séquence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -117,7 +115,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Réarmement possible maintenant : chain OK, step=0, pas de lockout, pas de redondance échouée, pas de contacteur déjà engagé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -125,7 +123,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence armement OU lockout en cours (nouvelle demande ignorée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement OU lockout en cours (nouvelle demande ignoree)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -136,16 +134,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚦 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie State).
-      Consommé par PRG_SUPERVISION_CFC → GVL_IHM.Modes.State pour IHM,
-      et par GVL_Troubleshooting pour diagnostic.
-   🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_Safety_Emergency_InternalCmd">
@@ -156,7 +151,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainB_Cmd">
@@ -164,7 +159,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulse_Cmd">
@@ -172,7 +167,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de réarmement (TRUE = bobine réarmement activée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de rearmement (TRUE = bobine rearmement activee)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -183,15 +178,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ ST_Safety_Emergency_InternalCmd — Structure de commande interne
    ───────────────────────────────────────────────────────────────
-   📄 Transporte les ordres logiques entre le bloc de décision
-      et le bloc de sortie de la boucle d'urgence.
-   🔒 Polarité maintien : TRUE = voie maintenue saine, FALSE = coupure demandée
-      (conforme règle C1 — polarité explicite).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
+   🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
+   🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -204,7 +197,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONSIGNES ===
+--&gt; [CMD]  Active la surveillance (TRUE = autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -212,7 +206,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Front acquittement defauts</xhtml>
               </documentation>
             </variable>
             <variable name="ArmRequest">
@@ -220,23 +214,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (BtnEmergencyArming)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyChainClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation contacteur de puissance principal</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Demande de rearmement (BtnEmergencyArming)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffRequest">
@@ -244,7 +222,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure logique issue des métiers</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requete de coupure logique issue des metiers</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyCutOff">
@@ -252,7 +230,24 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MATERIELS (HW) ===
+--&gt; [HW]   Retour physique boucle d'urgence amont contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Confirmation contacteur de puissance principal</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -261,28 +256,42 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence ou lockout en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur puissance confirme engage</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIQUES &amp; ERREURS ===
+&lt;-- [DIAG] Synthese defaut (TRUE = defaut actif)</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed, bit3: StartupFail</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainA_RQ">
@@ -290,8 +299,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Sorties physiques (polarité maintien explicite)
-Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES PHYSIQUES (FAIL-SAFE) ===
+&lt;-- [ACT]  Sortie pilotage canal A (TRUE = voie maintenue)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainB_RQ">
@@ -299,7 +308,7 @@ Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie de pilotage canal B (TRUE = voie maintenue, FALSE = coupure)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Sortie pilotage canal B (TRUE = voie maintenue)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulse_RQ">
@@ -307,7 +316,7 @@ Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion réarmement physique (1s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Impulsion rearmement physique (1s)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -315,8 +324,8 @@ Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
                 <derived name="ST_Safety_Emergency_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus d'état public (AF §8.2)
-ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'ETAT &amp; DIAGNOSTIC ===
+&lt;-- [STAT] Bus d'etat public</xhtml>
               </documentation>
             </variable>
             <variable name="Diag">
@@ -324,7 +333,7 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
                 <derived name="ST_Safety_Emergency_Diag" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Error, ErrorId, Redundancy, ArmFailed, Lockout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bus de diagnostic public</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingSeqStep">
@@ -332,23 +341,33 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostics scalaires (rétrocompatibilité PRG_10/GVL_Global)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS SCALAIRES (RETROCOMPATIBILITE) ===
+&lt;-- [DIAG] Etape sequence rearmement (0=IDLE..6=Confirm)</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut auto-test canal A ou B reste colle</xhtml>
+              </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut rearmement contacteur puissance (timeout 2s)</xhtml>
+              </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Verrouillage temporel 5s entre essais</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -357,24 +376,28 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
                 <derived name="FB_Safety_EmergencyManagementLogic" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Composition interne des sous-blocs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Machinerie d'etat et decision AU</xhtml>
               </documentation>
             </variable>
             <variable name="Output">
               <type>
                 <derived name="FB_Safety_EmergencyManagementOutput" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Projection fail-safe vers sorties physiques</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🛡️ FB_Safety_EmergencyManagement — Composite &amp; Façade Publique
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Façade publique, instance unique ; câblage interne Logic/Output &amp; exposition des bus d'état
-   🧩 Architecture : Câblage interne Logic/Output &amp; exposition des bus d'état
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
+   🔌 Architecture : Composition interne Logic/Output
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -383,6 +406,7 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "§1 Appels instances internes"}
 // 🛑 1. Appels des instances internes
 Logic(
     Enable := Enable,
@@ -408,7 +432,9 @@ Output(
     ArmFailed := Logic.EmergencyArmingFailed,
     LockoutActive := Logic.EmergencyArmingLockoutActive
 );
+{endregion}
 
+{region "§2 Propagation sorties et bus"}
 // 📤 2. Propagation des signaux vers les sorties du bloc parent
 Ready := Enable AND NOT Logic.StartupFail;
 Busy  := (Logic.ArmingSeqStep &lt;&gt; 0) OR Logic.EmergencyArmingLockoutActive;
@@ -424,12 +450,15 @@ ArmPulse_RQ    := Output.ArmPulse_RQ;
 // 🚦 Bus publics
 State := Output.State;
 Diag  := Output.Diag;
+{endregion}
 
+{region "§3 Diagnostics scalaires"}
 // 🩺 Diagnostics scalaires (rétrocompatibilité)
 ArmingSeqStep                := Logic.ArmingSeqStep;
 RedundancyTestFailed         := Logic.RedundancyTestFailed;
 EmergencyArmingFailed        := Logic.EmergencyArmingFailed;
 EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -447,7 +476,8 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONSIGNES ===
+--&gt; [CMD]  Active la surveillance (TRUE = autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -455,7 +485,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Front acquittement defauts</xhtml>
               </documentation>
             </variable>
             <variable name="ArmRequest">
@@ -463,23 +493,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (BtnEmergencyArming)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyChainClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation contacteur de puissance principal</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Demande de rearmement (BtnEmergencyArming)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffRequest">
@@ -487,7 +501,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure logique issue des métiers</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requete de coupure logique issue des metiers</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyCutOff">
@@ -495,7 +509,24 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MATERIELS (HW) ===
+--&gt; [HW]   Retour physique boucle d'urgence amont contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Confirmation contacteur de puissance principal</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -504,13 +535,17 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ERREURS &amp; CONSIGNES LOGIQUES ===
+&lt;-- [DIAG] Synthese defaut actif</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed (affiché), bit1: EmergencyArmingFailed (affiché)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -518,7 +553,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <derived name="ST_Safety_Emergency_InternalCmd" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Structure de commande logique produite</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Structure de commande logique produite</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingSeqStep">
@@ -526,7 +561,8 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; RETOURS D'ETAT ===
+&lt;-- [DIAG] Etape sequence (0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm)</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -534,7 +570,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut auto-test redondance (Cause lissee OR NOT Ack)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
@@ -542,7 +578,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut rearmement contacteur (Cause lissee OR NOT Ack)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
@@ -550,7 +586,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre les essais</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Verrouillage temporel 5s entre essais</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -558,8 +594,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Bus State/Diag internes — repris par le composite pour les DUT publics
-🟢 Réarmement possible maintenant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Rearmement possible actuellement</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -567,7 +602,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence ou lockout en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence ou lockout en cours</xhtml>
               </documentation>
             </variable>
             <variable name="StartupFail">
@@ -575,11 +610,198 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Autotest démarche échoué</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Autotest demarrage echoue</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmReqEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant ArmRequest</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EnableRising">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Enable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur nouvelle occurrence cause redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingFailedCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur nouvelle occurrence cause rearmement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceTestA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DRAPEAUX &amp; FORCAGES LOGIQUES ===
+. [LOC] Forcage coupure canal A pendant test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceTestB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Forcage coupure canal B pendant test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupCheckDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Autotest demarrage effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupCheckOK">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Resultat autotest demarrage (latche)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSE &amp; ACK DEFAUT REDONDANCE ===
+. [LOC] Cause brute : canal colle detecte a l'auto-test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accuse operateur (TRUE = pas d'alarme a afficher)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSE &amp; ACK DEFAUT REARMEMENT ===
+. [LOC] Cause brute : contacteur non confirme sous 2s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accuse operateur (TRUE = pas d'alarme a afficher)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonTestA">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS LOGIQUES ===
+. [LOC] Timer auto-test canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRestoreA">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer restauration canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonTestB">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer auto-test canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRestoreB">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer restauration canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingPulse">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer impulsion rearmement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingConfirm">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer attente confirmation contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingLockout">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer lockout anti-reessai</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRedundancyDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingFailedDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM rearmement</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_TestDuration">
               <type>
                 <TIME />
@@ -588,7 +810,7 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[CST] Temporisations normatives de securite AU (fixes, non modifiables RETAIN/IHM)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS NORMATIVES DE SECURITE (FIXES) ===
 Duree auto-test canal A ou B</xhtml>
               </documentation>
             </variable>
@@ -633,168 +855,18 @@ Duree auto-test canal A ou B</xhtml>
                 <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Anti-clignotement affichage IHM uniquement (§9 STD) — jamais sur l'action</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="ArmReqEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="EnableRising">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="ForceTestA">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ForceTestB">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TonTestA">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonRestoreA">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonTestB">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonRestoreB">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingPulse">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingConfirm">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingLockout">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="StartupCheckDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Autotest démarrage
-TRUE = autotest passé, attente réarmement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StartupCheckOK">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Résultat autotest (latche le temps du front)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailedCause">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Pattern Cause/Ack (§3.4bis AF01, §9 STD) — Reset jamais conditionné
-Latch brut : canal collé détecté à l'auto-test</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailedAck">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyCauseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonRedundancyDisplay">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailedCause">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Latch brut : contacteur non confirmé sous 2s</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailedAck">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmingFailedCauseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonArmingFailedDisplay">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anti-clignotement affichage IHM uniquement</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🛡️ FB_Safety_EmergencyManagementLogic — Décision &amp; Séquencement AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Machine d'état, fronts Reset/Arm, calcul ErrorId &amp; consignes logiques
-   🛡️ Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
-            DOC/STDS/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🔒 Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -803,7 +875,7 @@ Latch brut : canal collé détecté à l'auto-test</xhtml>
 
 // === IMPLEMENTATION ===
 
-{region "Fronts de commande"}
+{region "§1 Fronts de commande"}
 // 🔄 Fronts
 EnableRising(CLK := Enable);
 ResetEdge(CLK := Reset);
@@ -811,7 +883,7 @@ ArmReqEdge(CLK := ArmRequest);
 
 {endregion}
 
-{region "Gate neutralisation"}
+{region "§2 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -849,7 +921,7 @@ END_IF;
 
 {endregion}
 
-{region "Autotest demarrage"}
+{region "§3 Autotest demarrage"}
 // 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01)
 // Vérifications synchrones 1 cycle au premier passage Enable=TRUE
 IF EnableRising.Q THEN
@@ -872,7 +944,7 @@ END_IF;
 
 {endregion}
 
-{region "Acquittement defauts"}
+{region "§4 Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
 // ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
 // pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
@@ -888,7 +960,7 @@ END_IF;
 
 {endregion}
 
-{region "Sequence rearmement AU"}
+{region "§5 Sequence rearmement AU"}
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
@@ -983,8 +1055,8 @@ END_IF;
 
 {endregion}
 
-{region "Gestion cause et acquittement"}
-// 🆕 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+{region "§6 Gestion cause et acquittement"}
+// 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
 // L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
 // jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
 RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
@@ -999,7 +1071,7 @@ END_IF;
 
 {endregion}
 
-{region "Commandes et etats publics"}
+{region "§7 Commandes et etats publics"}
 // 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES — basées sur la Cause brute (jamais sur l'Ack)
 Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
 Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
@@ -1019,7 +1091,7 @@ ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
 
 {endregion}
 
-{region "Affichage defauts IHM"}
+{region "§8 Affichage defauts IHM"}
 // 📤 7. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
 // ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
 // sur la Cause brute, jamais retardée par ce debounce.
@@ -1031,7 +1103,7 @@ EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAc
 
 {endregion}
 
-{region "Synthese ErrorId"}
+{region "§9 Synthese ErrorId"}
 // 📤 8. SYNTHÈSE DES ERREURS (bitfield affiché, basé sur RedundancyTestFailed/EmergencyArmingFailed affichés)
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN
@@ -1063,7 +1135,8 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le pilote (FALSE = toutes sorties à FALSE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES &amp; COMMANDES LOGIQUES ===
+--&gt; [CMD]  Active le pilote (FALSE = toutes sorties a FALSE)</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -1071,7 +1144,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <derived name="ST_Safety_Emergency_InternalCmd" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordres logiques reçus du bloc logique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ordres logiques recus du bloc logique</xhtml>
               </documentation>
             </variable>
             <variable name="ChainOk">
@@ -1079,7 +1152,8 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir EmergencyChainClosed (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS D'ETAT &amp; DIAGNOSTICS (MIROIRS) ===
+--&gt; [HW]   Miroir EmergencyChainClosed (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorOk">
@@ -1087,7 +1161,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir PowerContactorEngaged (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Miroir PowerContactorEngaged (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingStep">
@@ -1095,7 +1169,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir ArmingSeqStep (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Miroir ArmingSeqStep (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -1103,7 +1177,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Calculé par Logic (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Calcule par Logic (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -1111,7 +1185,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Calculé par Logic (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Calcule par Logic (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="Error">
@@ -1119,7 +1193,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir Error (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir Error (pour bus Diag)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -1127,7 +1201,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir ErrorId (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir ErrorId (pour bus Diag)</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -1135,7 +1209,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir RedundancyTestFailed (pour bus Diag)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmFailed">
@@ -1143,7 +1217,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir ArmFailed (pour bus Diag)</xhtml>
               </documentation>
             </variable>
             <variable name="LockoutActive">
@@ -1151,7 +1225,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir LockoutActive (pour bus Diag)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1161,8 +1235,8 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Sorties physiques terminales
-Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES PHYSIQUES TERMINALES ===
+&lt;-- [ACT]  Vers relais maintien canal A (TRUE = voie maintenue)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainB_RQ">
@@ -1170,7 +1244,7 @@ Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers relais maintien canal B — TRUE = voie maintenue, FALSE = coupure</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Vers relais maintien canal B (TRUE = voie maintenue)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulse_RQ">
@@ -1178,7 +1252,7 @@ Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers contacteur impulsion réarmement — TRUE = pulse actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Vers contacteur impulsion rearmement (TRUE = pulse actif)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -1186,24 +1260,28 @@ Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
                 <derived name="ST_Safety_Emergency_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus d'état public</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'ETAT &amp; DIAGNOSTIC PUBLICS ===
+&lt;-- [STAT] Bus d'etat public</xhtml>
               </documentation>
             </variable>
             <variable name="Diag">
               <type>
                 <derived name="ST_Safety_Emergency_Diag" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bus diagnostic public</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔒 FB_Safety_EmergencyManagementOutput — Projection Physique Fail-Safe
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Enable gate + copie consignes logiques vers sorties physiques
    🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🔌 Architecture : Projection physique fail-safe
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -1212,6 +1290,7 @@ Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate"}
 IF NOT Enable THEN
     MaintainA_RQ   := FALSE;
     MaintainB_RQ   := FALSE;
@@ -1230,7 +1309,9 @@ IF NOT Enable THEN
     Diag.LockoutActive        := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Projection sorties et bus"}
 // ⚡ Sorties physiques — écriture directe des ordres logiques
 MaintainA_RQ := Cmd.MaintainA_Cmd;
 MaintainB_RQ := Cmd.MaintainB_Cmd;
@@ -1249,6 +1330,7 @@ Diag.ErrorId              := ErrorId;
 Diag.RedundancyTestFailed := RedundancyTestFailed;
 Diag.ArmFailed            := ArmFailed;
 Diag.LockoutActive        := LockoutActive;
+{endregion}
 </xhtml>
           </ST>
         </body>

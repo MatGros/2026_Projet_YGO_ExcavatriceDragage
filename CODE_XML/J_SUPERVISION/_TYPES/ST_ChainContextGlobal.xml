@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-30T14:51:12.631250" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-30T14:51:12.631250">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.516466" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.516466">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Comm CANopen Joystick OK (Sain) | 0 = Perte Comm CAN 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Comm CANopen Joystick OK (Sain) | 0 = Perte Comm CAN</xhtml>
               </documentation>
             </variable>
             <variable name="Idx201_JoystickSelected">
@@ -79,7 +79,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle AU Matérielle Fermée (OK) | 0 = AU APPUYÉ 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle AU Matérielle Fermée (OK) | 0 = AU APPUYÉ</xhtml>
               </documentation>
             </variable>
             <variable name="Idx302_PowerContactorEngaged">
@@ -87,7 +87,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Puissance Armée | 0 = Puissance Coupée 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Puissance Armée | 0 = Puissance Coupée</xhtml>
               </documentation>
             </variable>
             <variable name="Idx303_SafeStopActiveAny">
@@ -95,7 +95,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = AU MOINS UN SAFESTOP MÉTIER ACTIF 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = AU MOINS UN SAFESTOP MÉTIER ACTIF</xhtml>
               </documentation>
             </variable>
             <variable name="Idx304_PowerCutOffActiveAny">
@@ -103,7 +103,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = COUPURE GENERAL COLLAGE ACTIVEE 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = COUPURE GENERAL COLLAGE ACTIVEE</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_HmiHeartbeatOk">
@@ -111,7 +111,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Liaison IHM Active | 0 = Perte Liaison IHM 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Liaison IHM Active | 0 = Perte Liaison IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Idx402_CycleAutoBusy">

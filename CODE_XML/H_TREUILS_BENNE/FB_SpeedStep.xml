@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.792045" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.792045">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:39:50.848131" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:39:50.848131">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,115 +31,165 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier 1 (vitesse la plus faible)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 1 (VITESSE MINIMALE) ===
+Contacteur 1 pour Palier 1</xhtml>
               </documentation>
             </variable>
             <variable name="P1R2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 1</xhtml>
+              </documentation>
             </variable>
             <variable name="P1R3">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 1</xhtml>
+              </documentation>
             </variable>
             <variable name="P1R4">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 1</xhtml>
+              </documentation>
             </variable>
             <variable name="P2R1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier 2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 2 ===
+Contacteur 1 pour Palier 2</xhtml>
               </documentation>
             </variable>
             <variable name="P2R2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 2</xhtml>
+              </documentation>
             </variable>
             <variable name="P2R3">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 2</xhtml>
+              </documentation>
             </variable>
             <variable name="P2R4">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 2</xhtml>
+              </documentation>
             </variable>
             <variable name="P3R1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier 3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 3 ===
+Contacteur 1 pour Palier 3</xhtml>
               </documentation>
             </variable>
             <variable name="P3R2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 3</xhtml>
+              </documentation>
             </variable>
             <variable name="P3R3">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 3</xhtml>
+              </documentation>
             </variable>
             <variable name="P3R4">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 3</xhtml>
+              </documentation>
             </variable>
             <variable name="P4R1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier 4</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 4 ===
+Contacteur 1 pour Palier 4</xhtml>
               </documentation>
             </variable>
             <variable name="P4R2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 4</xhtml>
+              </documentation>
             </variable>
             <variable name="P4R3">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 4</xhtml>
+              </documentation>
             </variable>
             <variable name="P4R4">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 4</xhtml>
+              </documentation>
             </variable>
             <variable name="P5R1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier 5 (vitesse la plus élevée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 5 (VITESSE MAXIMALE) ===
+Contacteur 1 pour Palier 5</xhtml>
               </documentation>
             </variable>
             <variable name="P5R2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 5</xhtml>
+              </documentation>
             </variable>
             <variable name="P5R3">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 5</xhtml>
+              </documentation>
             </variable>
             <variable name="P5R4">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 5</xhtml>
+              </documentation>
             </variable>
             <variable name="StepThreshold_Pct">
               <type>
@@ -151,8 +201,8 @@
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuils de changement de palier (%), utilisés par paires successives (HYSTERESIS)
-Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1→2..4→5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEUILS DE TRANSITION (%) ===
+Seuils de changement de palier (0..100%)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -163,21 +213,12 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🪜 ST_SpeedStepTable — Table des paliers de vitesse (1 par treuil)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   🎛️ Table INDÉPENDANTE par treuil (M1 et M2 ont chacun la leur).
-   ⚠️ ÉVOLUTION (retour terrain 2026-07-01, remplace le masque BYTE
-      packé de la 1ère version) : chaque contacteur de vitesse de
-      chaque palier est un BOOL nommé individuellement
-      `P&lt;palier&gt;R&lt;relais&gt;` (ex. `P1R1`, `P3R2`) — paramétrable un par
-      un pendant la mise en service (visible/modifiable directement
-      dans la vue instance CODESYS), sans manipuler un masque binaire
-      packé. `P` = Palier, `R` = Relais (contacteur de vitesse 1..4).
-   L'ordre d'actionnement n'est pas implicite : il est défini ICI,
-   dans les données, pas codé en dur dans la logique (FB_SpeedStep).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -190,7 +231,8 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Piloté par FB_Winch : FALSE = treuil à l'arrêt (palier 0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD] Pilotage actif (FALSE = palier 0 / arret)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRefPct">
@@ -198,7 +240,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse 0..100 % (déjà rampée par FB_Winch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse 0..100%</xhtml>
               </documentation>
             </variable>
             <variable name="Table">
@@ -206,7 +248,8 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <derived name="ST_SpeedStepTable" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Table des 5 paliers (contacteurs + seuils), propre à CE treuil</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
+--&gt; [CFG] Table des 5 paliers propre au treuil</xhtml>
               </documentation>
             </variable>
             <variable name="HystMargin">
@@ -217,7 +260,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge anti-battement (%) autour de chaque seuil</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Marge anti-battement (%)</xhtml>
               </documentation>
             </variable>
             <variable name="MaxStepNumber">
@@ -228,7 +271,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Plafond palier atteignable (1..5) — 5 = pas de restriction</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond palier atteignable (1..5)</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedBand">
@@ -239,7 +282,8 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bande vitesse réelle validée (0 = inconnue)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET GARDE-FOUS ===
+--&gt; [HW] Bande vitesse reelle validee</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedGuardEnable">
@@ -250,7 +294,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Garde-fou palier activable après validation terrain</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Garde-fou palier activable</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedGuardReady">
@@ -261,17 +305,27 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Vitesse stable et conditions de passage validées</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Conditions de passage validees</xhtml>
               </documentation>
             </variable>
           </inputVars>
           <outputVars>
+            <variable name="StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC ET SYNOPTIQUE ===
+&lt;-- [STAT] Numero de palier courant (0..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Contactor1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de vitesse 1 pour le palier courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES ACTIONNEURS (CONTACTEURS) ===
+&lt;-- [ACT] Ordre contacteur vitesse palier 1</xhtml>
               </documentation>
             </variable>
             <variable name="Contactor2">
@@ -279,7 +333,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de vitesse 2 pour le palier courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 2</xhtml>
               </documentation>
             </variable>
             <variable name="Contactor3">
@@ -287,7 +341,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de vitesse 3 pour le palier courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 3</xhtml>
               </documentation>
             </variable>
             <variable name="Contactor4">
@@ -295,15 +349,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur de vitesse 4 pour le palier courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepNumber">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">N° palier courant (0 = arrêt, 1..5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 4</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedGuardLimited">
@@ -311,7 +357,8 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si le garde-fou a limité le palier demandé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS ET ERREURS ===
+&lt;-- [DIAG] Statut limitation par garde-fou</xhtml>
               </documentation>
             </variable>
             <variable name="ConfigError">
@@ -319,7 +366,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Miroir de ConfigErrorId &lt;&gt; 0 (config table invalide)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Synthese erreur configuration</xhtml>
               </documentation>
             </variable>
             <variable name="ConfigErrorId">
@@ -327,25 +374,18 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bitfield config : bit0 = table invalide (seuils, hyst, contacteurs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bitfield erreur configuration</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="SpeedRefInt">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne convertie en INT (interface HYSTERESIS)</xhtml>
-              </documentation>
-            </variable>
             <variable name="Hyst1">
               <type>
                 <derived name="HYSTERESIS" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Lib Util — transition palier 1→2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Transition palier 1 vers 2</xhtml>
               </documentation>
             </variable>
             <variable name="Hyst2">
@@ -353,7 +393,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <derived name="HYSTERESIS" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Lib Util — transition palier 2→3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Transition palier 2 vers 3</xhtml>
               </documentation>
             </variable>
             <variable name="Hyst3">
@@ -361,7 +401,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <derived name="HYSTERESIS" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Lib Util — transition palier 3→4</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Transition palier 3 vers 4</xhtml>
               </documentation>
             </variable>
             <variable name="Hyst4">
@@ -369,24 +409,7 @@ Seul StepThreshold_Pct[1..4] est consommé par FB_SpeedStep (transitions palier1
                 <derived name="HYSTERESIS" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Lib Util — transition palier 4→5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="_ConfigValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Validation config locale (P0.2 audit)
-Résultat validation table + MaxStepNumber</xhtml>
-              </documentation>
-            </variable>
-            <variable name="_ConfigValidPrev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire cycle précédent pour détection front</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Transition palier 4 vers 5</xhtml>
               </documentation>
             </variable>
             <variable name="_ConfigErrorTrig">
@@ -394,7 +417,32 @@ Résultat validation table + MaxStepNumber</xhtml>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front montant erreur config (pour reset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant erreur configuration</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedRefInt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Consigne convertie en INT pour Hysteresis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="_ConfigValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Resultat validation table et MaxStep</xhtml>
+              </documentation>
+            </variable>
+            <variable name="_ConfigValidPrev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire cycle precedent validation</xhtml>
               </documentation>
             </variable>
             <variable name="_ConfigErrorIdInt">
@@ -402,7 +450,7 @@ Résultat validation table + MaxStepNumber</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accumulateur interne défauts config</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accumulateur interne defauts config</xhtml>
               </documentation>
             </variable>
             <variable name="_MaxStepClamped">
@@ -410,53 +458,19 @@ Résultat validation table + MaxStepNumber</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">MaxStepNumber borné [1..5]</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] MaxStepNumber borne dans [1..5]</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🪜 FB_SpeedStep — Décodeur palier → 4 contacteurs (1 par treuil)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪜 FB_SpeedStep — Décodeur palier vitesse vers contacteurs
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §2, §6
-   📄 Audit P0.2 : AUDIT_Winch_v1.0 (archivé) §2.2
-   📥 SpeedRefPct    : consigne 0..100 % (déjà rampée en amont, ABS)
-   📥 Table          : ST_SpeedStepTable propre AU TREUIL appelant
-                        (M1 et M2 ont chacune la leur — pas de table globale)
-   📥 MaxStepNumber  : plafond palier (1..5), borné et validé ici
-   📤 Contactor1..4  : état de chaque contacteur de vitesse (BOOL individuel,
-                        lu directement dans `Table.P&lt;palier&gt;R&lt;relais&gt;`)
-   📤 StepNumber     : n° palier courant (0 = arrêt, 1..5)
-   📤 ConfigError    : TRUE si table invalide ou MaxStepNumber hors bornes
-   📤 ConfigErrorId  : WORD bitfield (bit0 = config invalide)
-   🧩 Réutilisation lib Util (Partie3 §0) : HYSTERESIS pour la sélection
-      de palier anti-battement — AUCUN seuil "maison" recalculé.
-   ⚠️ CORRECTIF interface HYSTERESIS (2026-07-01) : `Util` 3.5.19.0 expose
-      `HYSTERESIS(IN, HIGH, LOW : INT → OUT : BOOL)` (TRUE si IN &lt; LOW,
-      FALSE si IN &gt; HIGH, maintien entre les deux) — `SpeedRefPct` (REAL)
-      est converti en INT (`REAL_TO_INT`) avant appel.
-   ⚠️ ÉVOLUTION (retour terrain 2026-07-01) : `StepMask` (BYTE packé) est
-      remplacé par 4 sorties BOOL individuelles, lues directement dans la
-      table (`P&lt;palier&gt;R&lt;relais&gt;`) — plus de bit-extraction côté FB_Winch,
-      paramétrage un contacteur à la fois pendant la mise en service.
-   ⚠️ Brique réduite (Partie3 §1bis) : pas d'Enable/Reset/ErrorId/State
-      au sens "FB métier" — c'est un décodeur pur, composé À L'INTÉRIEUR de
-      FB_Winch, qui porte lui la sécurité/le contrat complet.
-      ➕ MAIS on ajoute 2 sorties locales `ConfigError` + `ConfigErrorId`
-      pour signaler une table de config invalide (P0.2 audit).
-   🆕 AJOUT (2026-07-03quinquies, spec descente/couple) : `MaxStepNumber` plafonne
-      le palier atteignable (défaut 5 = comportement inchangé). Sert à `FB_Winch`
-      pour limiter la vitesse en descente (charge entraînante, pas besoin d'aller
-      vite) SANS changer la logique de décodage elle-même — juste un plafond
-      appliqué APRÈS la sélection par hystérésis, avant la lecture de la table.
-   🛡️ CORRECTIF P0.2 (2026-07-21) :
-      - Bornage `MaxStepNumber` ∈ [1..5] dès l'entrée
-      - Validation table : seuils croissants 0..100 %, hystérésis &gt; 0,
-        contacteurs cohérents (au moins 1 par palier 2..MaxStepNumber ; palier 1 tout FALSE autorisé)
-      - Sortie `ConfigError` / `ConfigErrorId` (bit0 = table invalide)
-      - Forçage sorties sûres (contacteurs FALSE, StepNumber=0) si erreur config
-      - Reset sur front (R_TRIG) + cause disparue (conforme Partie 3 §5)
-   ════════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Décodage consigne vitesse 0..100% en paliers et pilotage contacteurs
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Décodeur interne (compose FB_Winch)
+   🔒 Sécurité : Validation configuration table et anti-battement hysteresis
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -465,6 +479,7 @@ Résultat validation table + MaxStepNumber</xhtml>
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_SpeedStep) ===
 
+{region "§0 Validation configuration"}
 // ─────────────────────────────────────────────────────────────────────────
 // 🛡️ 0. VALIDATION CONFIGURATION (P0.2) — exécutée CHAQUE cycle pour détecter
 //    toute corruption IHM/PERSISTENT, même siEnable=FALSE (sorties sûres forcée)
@@ -480,7 +495,7 @@ ELSE
 END_IF;
 
 // 🔍 Validation table ST_SpeedStepTable
-// Critères (Partie 9 §2 + audit P0.2) :
+// Critères (Partie 9 §2) :
 // 1. Seuils croissants stricts : StepThreshold_Pct[1] &lt; [2] &lt; [3] &lt; [4] &lt; [5]
 // 2. Seuils dans [0..100] %
 // 3. HystMargin &gt; 0
@@ -564,7 +579,9 @@ END_IF;
 // Sorties erreur config (miroir standard Partie 3)
 ConfigErrorId := _ConfigErrorIdInt;
 ConfigError   := (ConfigErrorId &lt;&gt; 16#0000);
+{endregion}
 
+{region "§1 Gate"}
 // ─────────────────────────────────────────────────────────────────────────
 // 🛑 1. GATE — Enable FALSE OU config invalide = palier 0, sorties sûres
 // ─────────────────────────────────────────────────────────────────────────
@@ -574,7 +591,9 @@ IF (NOT Enable) OR (NOT _ConfigValid) THEN
     SpeedGuardLimited := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Sélection palier"}
 // ─────────────────────────────────────────────────────────────────────────
 // 🪜 2. SÉLECTION DU PALIER (HYSTERESIS lib Util : IN/HIGH/LOW → OUT)
 //    OUT = TRUE tant que IN &lt; LOW (régime "bas") ; OUT bascule à FALSE une fois
@@ -595,14 +614,16 @@ IF NOT Hyst3.OUT THEN StepNumber := 4; END_IF;
 IF NOT Hyst4.OUT THEN StepNumber := 5; END_IF;
 
 // ─────────────────────────────────────────────────────────────────────────
-// 🆕 2bis. PLAFOND (2026-07-03quinquies) — appliqué APRÈS la sélection hystérésis,
+// 2bis. PLAFOND — appliqué APRÈS la sélection hystérésis,
 // AVANT la lecture table : le 0..100% de la consigne peut réclamer le palier 5,
 // mais ne dépassera jamais _MaxStepClamped (ex. limitation couple en descente)
 // ─────────────────────────────────────────────────────────────────────────
 IF StepNumber &gt; _MaxStepClamped THEN
     StepNumber := _MaxStepClamped;
 END_IF;
+{endregion}
 
+{region "§2ter Garde-fou vitesse"}
 // ─────────────────────────────────────────────────────────────────────────
 // 🛡️ 2ter. GARDE-FOU VITESSE RÉELLE — limite uniquement la consigne de palier.
 // Si la vitesse n'est pas validée stable, seul le palier 1 reste autorisé.
@@ -619,7 +640,9 @@ IF SpeedGuardEnable THEN
         SpeedGuardLimited := TRUE;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§3 Contacteurs"}
 // ─────────────────────────────────────────────────────────────────────────
 // 📤 3. CONTACTEURS — lus dans la table (donnée, jamais codé en dur)
 //    CASE couvre explicitement 0..5 : StepNumber=0 → tous FALSE (sécurité)
@@ -637,6 +660,7 @@ ELSE
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     StepNumber := 0;
 END_CASE;
+{endregion}
 
 (* ═══════════════════════════════════════════════════════════════
    📝 NOTE D'APPLICATION MANUELLE CODESYS 3.5

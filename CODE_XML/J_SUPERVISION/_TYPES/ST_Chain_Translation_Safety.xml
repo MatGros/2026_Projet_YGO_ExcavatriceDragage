@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.671560" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T14:02:33.671560">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.518977" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.518977">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = Arrêt d'Urgence Appuyé 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = Arrêt d'Urgence Appuyé</xhtml>
               </documentation>
             </variable>
             <variable name="Idx302_SafeStopActive">
@@ -39,7 +39,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Translation 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Translation</xhtml>
               </documentation>
             </variable>
             <variable name="Idx303_PowerCutOffActive">
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance</xhtml>
               </documentation>
             </variable>
             <variable name="Idx304_LimitSwitchFwdActive">
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Avance 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Avance</xhtml>
               </documentation>
             </variable>
             <variable name="Idx305_LimitSwitchRevActive">
@@ -63,7 +63,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Recul 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Recul</xhtml>
               </documentation>
             </variable>
             <variable name="Idx306_BypassLimitSwitch">
@@ -79,7 +79,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Décodage 5 Capteurs OK | 1 = Incohérence Position 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Décodage 5 Capteurs OK | 1 = Incohérence Position</xhtml>
               </documentation>
             </variable>
             <variable name="Idx308_HeightInterlockBlocking">
@@ -87,7 +87,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : 0 = M1 ET M2 ≥ hauteur mini (ou bypass) | 1 = Translation bloquée (risque collision) 🔴</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 0 = M1 ET M2 ≥ hauteur mini (ou bypass) | 1 = Translation bloquée (risque collision)</xhtml>
               </documentation>
             </variable>
           </struct>

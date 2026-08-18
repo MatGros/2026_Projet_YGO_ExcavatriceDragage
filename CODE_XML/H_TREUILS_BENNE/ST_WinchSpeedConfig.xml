@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.796535" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.796535">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:55:39.548210" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:55:39.548210">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesurée de référence</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesuree de reference (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedBandMaxMps">
@@ -44,7 +44,7 @@
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond vitesse mesurée de chaque palier</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafonds vitesse mesuree par palier (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedBandHysteresisMps">
@@ -52,7 +52,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hystérésis de classement (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hysteresis anti-battement classement vitesse (m/s)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -63,16 +63,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
-   🪜 ST_WinchSpeedConfig — Plages de vitesse linéaire mesurée des 5 paliers
-   ═══════════════════════════════════════════════════════════════════════════════
-   🎯 Configuration de caractérisation, séparée de ST_SpeedStepTable :
-      - ST_SpeedStepTable = contacteurs commandés par palier (% vitesse)
-      - ST_WinchSpeedConfig = vitesse câble réellement mesurée (m/s)
-   ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
-      Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_WinchSpeedConfig — Configuration des plages de vitesse linéaire
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

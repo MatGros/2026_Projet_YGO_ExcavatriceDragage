@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-01T01:07:49.040305" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-01T01:07:49.040305">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:35:34.676100" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:35:34.676100">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -33,6 +33,9 @@
               <initialValue>
                 <simpleValue value="100" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max tolere au demarrage (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaBrakeReleaseTime_Ms">
               <type>
@@ -41,6 +44,9 @@
               <initialValue>
                 <simpleValue value="100" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps desserrage frein (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaBrakeApplyTime_Ms">
               <type>
@@ -49,6 +55,9 @@
               <initialValue>
                 <simpleValue value="100" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps serrage frein (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaStopDistance_Mm">
               <type>
@@ -57,6 +66,9 @@
               <initialValue>
                 <simpleValue value="100" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max distance d'arret (mm)</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaStopTime_Ms">
               <type>
@@ -65,6 +77,9 @@
               <initialValue>
                 <simpleValue value="200" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps d'arret (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="MinimumCommandTime_Ms">
               <type>
@@ -73,6 +88,9 @@
               <initialValue>
                 <simpleValue value="1000" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree minimale de commande pour qualification (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="MinimumSpeed_Mps">
               <type>
@@ -81,6 +99,9 @@
               <initialValue>
                 <simpleValue value="0.05" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse minimale pour qualification (m/s)</xhtml>
+              </documentation>
             </variable>
           </struct>
         </baseType>
@@ -89,24 +110,65 @@
             <ObjectId>cafdebf4-b7e5-5000-bdd0-033e76a6b7c7</ObjectId>
           </data>
         </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚖️ ST_Winch_SymmetryCfg — Configuration des seuils de symétrie M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
       <dataType name="ST_Winch_SymmetryData">
         <baseType>
           <struct>
-            <variable name="DeltaStartDelay_Ms, DeltaBrakeReleaseTime_Ms, DeltaBrakeApplyTime_Ms">
+            <variable name="DeltaStartDelay_Ms">
               <type>
                 <UDINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure au demarrage (ms)</xhtml>
+              </documentation>
             </variable>
-            <variable name="DeltaStopDistance_Mm, DeltaStopTime_Ms">
+            <variable name="DeltaBrakeReleaseTime_Ms">
               <type>
                 <UDINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps desserrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaBrakeApplyTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps serrage frein (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopDistance_Mm">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure distance d'arret (mm)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaStopTime_Ms">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart mesure temps d'arret (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="MaxSyncDeviation_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart maximal de synchronisme enregistre (m)</xhtml>
+              </documentation>
             </variable>
           </struct>
         </baseType>
@@ -115,6 +177,14 @@
             <ObjectId>f7635572-022c-5fdd-93e8-106b5d2eea3e</ObjectId>
           </data>
         </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Winch_SymmetryData — Données mesurées de symétrie M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure des résultats de mesures et d'écarts du diagnostic symétrie
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
     </dataTypes>
     <pous>
@@ -125,41 +195,125 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD] Reinitialisation des mesures sur front</xhtml>
+              </documentation>
             </variable>
             <variable name="M1CommandActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande active sur treuil M1</xhtml>
+              </documentation>
             </variable>
             <variable name="M2CommandActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande active sur treuil M2</xhtml>
+              </documentation>
             </variable>
             <variable name="M1Direction">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens commande M1 (-1/0/+1)</xhtml>
+              </documentation>
             </variable>
             <variable name="M2Direction">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens commande M2 (-1/0/+1)</xhtml>
+              </documentation>
             </variable>
-            <variable name="M1BrakeCmd, M2BrakeCmd, M1BrakeApplied, M2BrakeApplied">
+            <variable name="M1BrakeCmd">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FEEDBACKS HARWARE ET FREINS ===
+--&gt; [HW] Ordre ouverture frein M1</xhtml>
+              </documentation>
             </variable>
-            <variable name="M1Position_M, M2Position_M, M1Speed_Mps, M2Speed_Mps, SyncDeviation_M">
+            <variable name="M2BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Ordre ouverture frein M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Etat frein M1 serre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Etat frein M2 serre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Position_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES POSITIONS ET VITESSES ===
+--&gt; [HW] Position mesuree M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position mesuree M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse mesuree M1 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse mesuree M2 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncDeviation_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Ecart instantane synchro (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="Config">
               <type>
                 <derived name="ST_Winch_SymmetryCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION ===
+--&gt; [CFG] Configuration des seuils de symetrie</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -167,11 +321,18 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC ET SYNOPTIQUE ===
+&lt;-- [STAT] Symetrie globale conforme aux criteres</xhtml>
+              </documentation>
             </variable>
             <variable name="SymmetryValid">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Mesure de symetrie valide et calculee</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <inOutVars>
@@ -179,6 +340,10 @@
               <type>
                 <derived name="ST_Winch_SymmetryData" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES DE DONNÉES PARTAGÉES ===
+&lt;-&gt; [BUS] Donnees de mesures de symetrie</xhtml>
+              </documentation>
             </variable>
           </inOutVars>
           <localVars>
@@ -186,50 +351,205 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Detecteur front reinitialisation</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleTime">
               <type>
                 <derived name="FB_CycleTime" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Calcul du temps de cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="CommandTon">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TIMERS INTERNES ===
+. [LOC] Tempo qualification commande stable</xhtml>
+              </documentation>
             </variable>
-            <variable name="Comparable, Qualified, PreviousQualified, Stopping, StartCapturedM1, StartCapturedM2, StopCapturedM1, StopCapturedM2">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="StartMsM1, StartMsM2, ReleaseMsM1, ReleaseMsM2, ApplyMsM1, ApplyMsM2, StopMsM1, StopMsM2">
-              <type>
-                <UDINT />
-              </type>
-            </variable>
-            <variable name="MotionTimer, StopTimer">
+            <variable name="MotionTimer">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Chronometre de mouvement</xhtml>
+              </documentation>
             </variable>
-            <variable name="StopStartM1_M, StopStartM2_M">
+            <variable name="StopTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Chronometre d'arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Comparable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
+. [LOC] Conditions de comparaison remplies</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Qualified">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Phase de mesure qualifiee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PreviousQualified">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat qualifie cycle precedent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Stopping">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Phase d'arret en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartCapturedM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Top depart capture M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartCapturedM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Top depart capture M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopCapturedM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Top arret capture M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopCapturedM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Top arret capture M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartMsM1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage d'ouverture M1 (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartMsM2">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage d'ouverture M2 (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReleaseMsM1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps de desserrage frein M1 (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReleaseMsM2">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps de desserrage frein M2 (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ApplyMsM1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps de serrage frein M1 (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ApplyMsM2">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps de serrage frein M2 (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopMsM1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage d'arret M1 (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopMsM2">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage d'arret M2 (ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopStartM1_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position debut d'arret M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopStartM2_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position debut d'arret M2 (m)</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚖️ FB_Winch_Symmetry — Mesure passive MES-008 M1/M2
-   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
-   🔒 Observateur pur : aucune écriture de commande, sécurité ou mouvement.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Observateur de symétrie et de synchronisme des treuils M1/M2
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔒 Observateur pur : Aucune ecriture de commande, securite ou mouvement
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Reset et qualification"}
 CycleTime(DefaultValueS := 0.010); ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN Data.DeltaStartDelay_Ms:=0; Data.DeltaBrakeReleaseTime_Ms:=0; Data.DeltaBrakeApplyTime_Ms:=0; Data.DeltaStopDistance_Mm:=0; Data.DeltaStopTime_Ms:=0; Data.MaxSyncDeviation_M:=0.0; END_IF;
 Comparable := M1CommandActive AND M2CommandActive AND (M1Direction = M2Direction) AND (M1Direction &lt;&gt; 0);
@@ -240,6 +560,9 @@ StopTimer(IN := Stopping, PT := T#1h);
 IF NOT Comparable THEN StartCapturedM1:=FALSE; StartCapturedM2:=FALSE; ReleaseMsM1:=0; ReleaseMsM2:=0; ApplyMsM1:=0; ApplyMsM2:=0; END_IF;
 IF Comparable AND (M1Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND NOT StartCapturedM1 THEN StartMsM1:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM1:=TRUE; END_IF;
 IF Comparable AND (M2Speed_Mps &gt;= Config.MinimumSpeed_Mps) AND NOT StartCapturedM2 THEN StartMsM2:=TIME_TO_UDINT(MotionTimer.ET); StartCapturedM2:=TRUE; END_IF;
+{endregion}
+
+{region "§2 Mesure symétrie"}
 IF Qualified THEN
     IF M1BrakeCmd AND M1BrakeApplied THEN ReleaseMsM1 := ReleaseMsM1 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
     IF M2BrakeCmd AND M2BrakeApplied THEN ReleaseMsM2 := ReleaseMsM2 + REAL_TO_UDINT(CycleTime.CycleTimeS * 1000.0); END_IF;
@@ -259,8 +582,12 @@ IF Stopping THEN
         Data.DeltaStopTime_Ms := ABS(UDINT_TO_DINT(StopMsM1)-UDINT_TO_DINT(StopMsM2)); Stopping:=FALSE; SymmetryValid:=TRUE;
     END_IF;
 END_IF;
+{endregion}
+
+{region "§3 Sortie"}
 SymmetryOk := SymmetryValid AND (Data.DeltaStartDelay_Ms&lt;=Config.DeltaStartDelay_Ms) AND (Data.DeltaBrakeReleaseTime_Ms&lt;=Config.DeltaBrakeReleaseTime_Ms) AND (Data.DeltaBrakeApplyTime_Ms&lt;=Config.DeltaBrakeApplyTime_Ms) AND (Data.DeltaStopDistance_Mm&lt;=Config.DeltaStopDistance_Mm) AND (Data.DeltaStopTime_Ms&lt;=Config.DeltaStopTime_Ms);
 PreviousQualified := Qualified;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -281,7 +608,8 @@ PreviousQualified := Qualified;
                 <simpleValue value="0.004" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de secours par défaut (ex. 4ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES DE SECOURS ===
+--&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -291,7 +619,8 @@ PreviousQualified := Qualified;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé réel calculé (secondes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET DIAGNOSTIC ===
+&lt;-- [DIAG] Temps ecoule reel calcule (secondes)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -301,7 +630,8 @@ PreviousQualified := Qualified;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps système actuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORLOGE ET MEMOIRE TEMPORELLE ===
+. [LOC] Temps systeme actuel</xhtml>
               </documentation>
             </variable>
             <variable name="TimeLast">
@@ -309,7 +639,7 @@ PreviousQualified := Qualified;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Empreinte de temps du cycle précédent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Empreinte de temps du cycle precedent</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaTimeMs">
@@ -317,7 +647,7 @@ PreviousQualified := Qualified;
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart brut calculé (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut calcule (ms)</xhtml>
               </documentation>
             </variable>
             <variable name="InitDone">
@@ -325,26 +655,30 @@ PreviousQualified := Qualified;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau d'initialisation du premier cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation du premier cycle</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
-      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Acquisition temps"}
 // 1. ACQUISITION DU TEMPS SYSTÈME
 TimeCurrent := TIME();
+{endregion}
 
+{region "§2 Initialisation"}
 // 2. INITIALISATION UNIQUE AU PREMIER CYCLE
 IF NOT InitDone THEN
     TimeLast := TimeCurrent;
@@ -352,19 +686,26 @@ IF NOT InitDone THEN
     CycleTimeS := DefaultValueS;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Calcul delta"}
 // 3. CALCUL DU DELTA EN MILLISECONDES
 DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
 
+{region "§4 Conversion et secours"}
 // 4. CONVERSION ET CHARGE DE SECOURS
 IF DeltaTimeMs &gt; 0 THEN
     CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
     CycleTimeS := DefaultValueS;
 END_IF;
+{endregion}
 
+{region "§5 Archivage"}
 // 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
 TimeLast := TimeCurrent;
+{endregion}
 </xhtml>
           </ST>
         </body>

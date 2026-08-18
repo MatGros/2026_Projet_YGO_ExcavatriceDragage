@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-01T01:07:26.910723" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-01T01:07:26.910723">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:55:43.658487" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:55:43.658487">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -33,6 +33,9 @@
               <initialValue>
                 <simpleValue value="100" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max tolere au demarrage (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaBrakeReleaseTime_Ms">
               <type>
@@ -41,6 +44,9 @@
               <initialValue>
                 <simpleValue value="100" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps desserrage frein (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaBrakeApplyTime_Ms">
               <type>
@@ -49,6 +55,9 @@
               <initialValue>
                 <simpleValue value="100" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps serrage frein (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaStopDistance_Mm">
               <type>
@@ -57,6 +66,9 @@
               <initialValue>
                 <simpleValue value="100" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max distance d'arret (mm)</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaStopTime_Ms">
               <type>
@@ -65,6 +77,9 @@
               <initialValue>
                 <simpleValue value="200" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart max temps d'arret (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="MinimumCommandTime_Ms">
               <type>
@@ -73,6 +88,9 @@
               <initialValue>
                 <simpleValue value="1000" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree minimale de commande pour qualification (ms)</xhtml>
+              </documentation>
             </variable>
             <variable name="MinimumSpeed_Mps">
               <type>
@@ -81,6 +99,9 @@
               <initialValue>
                 <simpleValue value="0.05" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse minimale pour qualification (m/s)</xhtml>
+              </documentation>
             </variable>
           </struct>
         </baseType>
@@ -89,6 +110,14 @@
             <ObjectId>cafdebf4-b7e5-5000-bdd0-033e76a6b7c7</ObjectId>
           </data>
         </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚖️ ST_Winch_SymmetryCfg — Configuration des seuils de symétrie M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Seuils de tolérance pour le diagnostic passif de symétrie treuils
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
     </dataTypes>
     <pous />

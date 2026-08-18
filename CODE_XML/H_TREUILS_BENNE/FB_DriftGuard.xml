@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.790044" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.790044">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:54:58.998599" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:54:58.998599">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Condition d'armement (calculée par l'appelant, ex. FwdRevSpeedFeedbackOff AND BrakeFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET SEUILS ===
+--&gt; [CMD] Condition d'armement de la surveillance</xhtml>
               </documentation>
             </variable>
             <variable name="PositionM">
@@ -40,7 +41,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position courante à surveiller</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position courante a surveiller (m)</xhtml>
               </documentation>
             </variable>
             <variable name="ToleranceM">
@@ -48,7 +49,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tolérance de dérive (m) au-delà de laquelle Violation se déclenche</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance de derive maximale autorisee (m)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -58,7 +59,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position de référence capturée à l'armement (diagnostic/IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET ETATS ===
+&lt;-- [DIAG] Position de reference capturee a l'armement (m)</xhtml>
               </documentation>
             </variable>
             <variable name="DriftM">
@@ -66,7 +68,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dérive absolue courante (m), 0.0 si non armé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Derive absolue courante (m)</xhtml>
               </documentation>
             </variable>
             <variable name="Violation">
@@ -74,7 +76,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si DriftM &gt; ToleranceM pendant que Arm=TRUE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Alarme derive maximale depassee</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -84,32 +86,20 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte le passage FALSE→TRUE de Arm (1er cycle armé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Memoire etat armement cycle precedent</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📐 FB_DriftGuard — Détection de dérive de position pendant armement
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📐 FB_DriftGuard — Détection de dérive de position sous armement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §4quinquies (Méca A/C)
-   🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
-      Méca C de FB_Safety_Winch (armement + capture position référence + calcul
-      dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.
-   📂 REX 2026-07-08 (2) : placé dans CODE/WINCH/ (pas COMMUN) — son seul
-      consommateur réel est FB_Safety_Winch (2 instances, Méca A et C, dans le
-      MÊME FB). COMMUN est réservé aux briques à usage cross-domaine AVÉRÉ
-      (ex. FB_Brake, réutilisé par Winch ET Translation aujourd'hui) — pas à un
-      usage hypothétique futur. À remonter en COMMUN le jour où un autre
-      domaine (ex. FB_Safety_Translation) l'utilise réellement.
-   🎯 Rôle : tant que Arm=TRUE, mémorise la position au moment du premier cycle
-      armé (RefPosM), puis calcule en continu la dérive absolue par rapport à
-      cette référence. Violation si la dérive dépasse ToleranceM.
-   ⚠️ Ne fait AUCUNE vérification de vitesse (Méca A ajoute son propre check
-      vitesse en plus, câblé en OR par l'appelant — hors périmètre de cette
-      brique, qui ne gère QUE la dérive de position).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_DriftGuard) ===</xhtml>
+   🎯 Rôle : Capture position de référence et détection de dérive anormale
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Brique interne de sécurité (compose FB_Safety_Winch)
+   🔒 Sécurité : Détection de mouvement non commandé et glissement
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

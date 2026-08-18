@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.218668" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.218668">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:48:09.869955" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:48:09.869955">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,8 @@
                 <derived name="ST_EncoderMeasurement" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne de mesure treuil M1 (COD1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAINES DE MESURE PAR TREUIL ===
+Chaine de mesure treuil M1 (COD1)</xhtml>
               </documentation>
             </variable>
             <variable name="M2">
@@ -39,7 +40,7 @@
                 <derived name="ST_EncoderMeasurement" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne de mesure treuil M2 (COD2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaine de mesure treuil M2 (COD2)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -50,15 +51,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📏 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
    ───────────────────────────────────────────────────────────────
-   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2ter
-   🎨 Un sous-DUT par treuil (M1, M2) de la chaîne de mesure pure.
-   🔗 Producteur unique : PRG_02_Acquisition_CFC (rang 02, chaîne codeur M1/M2).
-      Lecteurs : PRG_04_Treuils_Benne_CFC, PRG_03_Modes_Cycle_CFC, Supervision/IHM.
-   🛡️ Sans simulation : M1 reflète COD1, M2 reflète COD2 — jamais croisés.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure frontière regroupant les sous-DUTs de mesure des treuils M1 et M2
+   🔌 Interface : Producteur unique PRG_02_Acquisition
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_EncoderMeasurement">
@@ -69,7 +68,8 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position brute codeur — gelée si EncoderAvailable=FALSE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES BRUTES &amp; STATUT BUS ===
+Position brute codeur (gelee si EncoderAvailable=FALSE)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderAvailable">
@@ -77,7 +77,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bus/esclave opérationnel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bus/esclave EtherCAT operationnel et disponible</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosM">
@@ -85,7 +85,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble (m, signée, + enroulé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE POSITION CABLE ===
+Position cable (m, signee, + enroule)</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosMSafe">
@@ -93,7 +94,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble (m) — mesure instantanée réelle validée par EncoderIncoherent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable instantanee validee par EncoderIncoherent (m)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderIncoherent">
@@ -101,7 +102,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incohérence redémarrage ou hors bornes → refuse SEMI_AUTO</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incoherence redemarrage ou hors bornes</xhtml>
               </documentation>
             </variable>
             <variable name="Speed_Mps">
@@ -109,7 +110,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse absolue (m/s) — 0.0 si SpeedValid=FALSE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
+Vitesse absolue sur fenetre glissante (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedSpeed_Mps">
@@ -117,7 +119,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée (m/s, + montée) — 0.0 si SpeedValid=FALSE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedValid">
@@ -125,7 +127,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si ≥ 6 éch. couvrant 50 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -136,15 +138,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📏 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Lot M1 · Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §2ter
-   🎨 Facts de la chaîne de mesure pure : Abs → Scale → Safety → SpeedMeasure.
-   🔗 Producteur : PRG_02_Acquisition_CFC (chaîne codeur du treuil concerné).
-   ✅ Tout BOOL = TRUE état normalisé. Aucun brut EtherCAT (alarmes/warnings,
-      DEVICE_STATE) : ils restent exposés via ST_EncoderHMI (Supervision).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
+   🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

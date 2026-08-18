@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T14:02:33.650710" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T14:02:33.650710">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:59.874428" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:59.874428">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -67,7 +67,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
@@ -80,10 +80,10 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
+   ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 2026-08-06 : créé suite constat terrain — Translation n'avait pas de slot Cfg
+   📄 : créé suite constat terrain — Translation n'avait pas de slot Cfg
    (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
    n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -100,7 +100,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 TRUE pendant le scan de restauration</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -110,7 +111,8 @@
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Struct exposé à l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -118,17 +120,18 @@
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 Mémoire PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_TranslationCfg — Pont persistance générique pour ST_TranslationCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_TranslationCfg — Pont persistance pour ST_TranslationCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Instance unique : TranslationM3.Cfg (un seul axe M3, contrairement à M1/M2).
-   Restaure Persist → Hmi au boot si nécessaire, puis sauvegarde Hmi → Persist.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

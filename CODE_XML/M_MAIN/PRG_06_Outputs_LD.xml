@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.234843" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.234843">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:03:02.593557" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:03:02.593557">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Synthèse : (ErrorId &lt;&gt; 0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synthese defaut active : (ErrorId &lt;&gt; 0)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -39,7 +39,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ bit0 = RedundancyTestFailed (auto-test A/B), bit1 = EmergencyArmingFailed (timeout confirm contacteur)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield erreurs : bit0=Redundancy, bit1=Arming, bit3=Startup</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Canal A ou B resté collé/shunté détecté à l'auto-test — Reset requis (cause disparue)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B reste colle/shunte detecte a l'auto-test (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmFailed">
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance non confirmé sous 2 s — Reset + contacteur engagé requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="LockoutActive">
@@ -63,7 +63,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Verrouillage temporel de 5 s entre tentatives de réarmement échouées</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre tentatives de rearmement echouees</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -74,15 +74,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
-      Consommé par PRG_SUPERVISION_CFC et GVL_Troubleshooting.
-   🎯 Champs lecture seule — producteur unique = FB composite.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_Safety_Emergency_State">
@@ -93,7 +91,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Boucle AU fermée (EmergencyChainClosed_DI = TRUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorOk">
@@ -101,7 +99,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur puissance confirmé engagé (PowerContactorEngaged_DI = TRUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)</xhtml>
               </documentation>
             </variable>
             <variable name="Step">
@@ -109,7 +107,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Étape séquence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -117,7 +115,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Réarmement possible maintenant : chain OK, step=0, pas de lockout, pas de redondance échouée, pas de contacteur déjà engagé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -125,7 +123,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence armement OU lockout en cours (nouvelle demande ignorée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement OU lockout en cours (nouvelle demande ignoree)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -136,16 +134,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚦 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie State).
-      Consommé par PRG_SUPERVISION_CFC → GVL_IHM.Modes.State pour IHM,
-      et par GVL_Troubleshooting pour diagnostic.
-   🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_State">
@@ -246,6 +241,28 @@
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BRAKE_COMMAND_NOT_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence confirmation ouverture frein &gt; 500ms</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RESTART_INHIBITED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -271,6 +288,46 @@
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Desactive / Hors service</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Pret / Etat nominal</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_BRAKE_COMMAND_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation feedback frein</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_STEP_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation changement de palier</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_RESTART_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation anti-court-cycle redemarrage</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -290,7 +347,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainB_Cmd">
@@ -298,7 +355,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulse_Cmd">
@@ -306,7 +363,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de réarmement (TRUE = bobine réarmement activée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de rearmement (TRUE = bobine rearmement activee)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -317,15 +374,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ ST_Safety_Emergency_InternalCmd — Structure de commande interne
    ───────────────────────────────────────────────────────────────
-   📄 Transporte les ordres logiques entre le bloc de décision
-      et le bloc de sortie de la boucle d'urgence.
-   🔒 Polarité maintien : TRUE = voie maintenue saine, FALSE = coupure demandée
-      (conforme règle C1 — polarité explicite).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
+   🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
+   🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -339,7 +394,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-08-05 (confirmé câblé réel par l'utilisateur) : PowerKeepAlive_A_RQ/
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PowerKeepAlive_A_RQ/
        PowerKeepAlive_B_RQ/EmergencyArming_RQ retirés d'ici — même collision de portée
        que M1/M2/M3 (voir §2). Cibles renommées : PowerKeepAliveACmd/BCmd/
        EmergencyArmingCmd, déclarées en VAR locale ci-dessous.</xhtml>
@@ -399,7 +454,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 FIX 2026-08-14 (audit sécurité) : Enable ne coupe plus que sur PowerCutOff (barrière
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable ne coupe plus que sur PowerCutOff (barrière
 finale, AF02 §2, AF06 §5 "SafeStop laisse la décélération métier se terminer"). SafeStop/
 Error retirés du calcul — SafeStop est une rampe rapide gérée en amont par FB_Winch/
 FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ; Error mirait tout ErrorId y
@@ -430,7 +485,7 @@ Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1FinalInterlo
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Réseau informatif séparé (demande utilisateur) : visibilité maintenance de ce qui
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réseau informatif séparé : visibilité maintenance de ce qui
 bloque (PowerCutOff / SafeStop / Global), SANS influencer Enable — juste de l'information en Watch/Ladder.</xhtml>
               </documentation>
             </variable>
@@ -479,7 +534,7 @@ bloque (PowerCutOff / SafeStop / Global), SANS influencer Enable — juste de l'
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-08-05 : les noms Device bruts ( *_DQ / *_RQ ), ex. M1_RelayFwd_Up_DQ,
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les noms Device bruts ( *_DQ / *_RQ ), ex. M1_RelayFwd_Up_DQ,
        M3_BrakeRelease_RQ) NE SONT PLUS déclarés ici — les déclarer créait une collision
        de portée avec la variable GLOBALE homonyme créée par le mapping E/S CODESYS
        (Device.export), qui masquait silencieusement le pilotage matériel réel (voir §2
@@ -637,7 +692,7 @@ Demande frein M3 arbitrée — cible du mapping E/S</xhtml>
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
    ⚙️ Exécuté par la tâche PLC en position 6 (après PRG_05_Translation).
    📄 Converti automatiquement en Ladder Diagram (&lt;LD&gt;) dans CODESYS.
-   🛡️ LOT_STRUCTURE_INTERLOCKS_LD (2026-08) : barrières finales M1/M2/M3
+   🛡️ Barrières finales M1/M2/M3
       rendues visibles — FB_WinchOutputInterlock_LD (×2) et
       FB_TranslationOutputInterlock_LD (×1) câblés en amont des coils,
       contacts nommés sur variables qualifiées (visibilité maintenance :
@@ -653,14 +708,13 @@ Demande frein M3 arbitrée — cible du mapping E/S</xhtml>
       ne portent donc que SafeStop (partiel) — voir PLAN_TASK lot "5
       Reliquats safety" (T72-T74). Ce lot ne câble que ce qui existe déjà
       en amont ; ne pas déduire que la safety métier complète est active.
-   🗑️ FB_Output retiré (2026-08) : inverseur pur (State := Command XOR
-      InvertLogic) jamais utilisé avec InvertLogic &lt;&gt; FALSE (REX
-      2026-08-04, feedback déjà retiré). Coils câblées directement sur
+   🗑️ FB_Output retiré : inverseur pur (State := Command XOR
+      InvertLogic) jamais utilisé avec InvertLogic &lt;&gt; FALSE. Coils câblées directement sur
       les sorties des interlocks finaux — élimine 15 blocs sans valeur
       ajoutée et simplifie la lecture maintenance.
-   🆕 LOT2 (2026-08-05) : sortie moteur AC600 M3 raccordée. DriveControlWord
+   Sortie moteur AC600 M3 raccordée. DriveControlWord
       (mot commande 0x3101) et DriveFreqRefWord (consigne fréquence WORD,
-      registre 0x3100, échelle ×100 confirmée terrain — WORD 5000 = 50,00 Hz)
+      registre 0x3100, échelle ×100 — WORD 5000 = 50,00 Hz)
       capturés en variables locales M3_DriveControlWord / M3_DriveFreqRefWord.
       Mapping E/S CODESYS (Device.export) manuel restant — voir §2 ci-dessous.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1064,7 +1118,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged</variable>
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop</variable>
             </contact>
             <contact localId="81" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -1072,7 +1126,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop</variable>
+              <variable>PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
             <contact localId="83" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -1156,12 +1210,12 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                     <connection refLocalId="77" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="PowerContactorEngaged">
+                <variable formalParameter="SafeStop">
                   <connectionPointIn>
                     <connection refLocalId="79" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="SafeStop">
+                <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
                     <connection refLocalId="81" />
                   </connectionPointIn>
@@ -1322,7 +1376,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
             <comment localId="101" height="0" width="0">
               <position x="0" y="0" />
               <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT sur les DQ
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// Recalcul INDEPENDANT sur les DQ
 // finaux (pas une simple recopie de instWinchOutputInterlockM1.BrakeCmd) -- visible ici
 // sans ouvrir FB_WinchOutputInterlock_LD, meme doctrine que le reste de ce POU.</xhtml>
               </content>
@@ -1763,7 +1817,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged</variable>
+              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop</variable>
             </contact>
             <contact localId="201" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -1771,7 +1825,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop</variable>
+              <variable>PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
             <contact localId="203" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -1855,12 +1909,12 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                     <connection refLocalId="197" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="PowerContactorEngaged">
+                <variable formalParameter="SafeStop">
                   <connectionPointIn>
                     <connection refLocalId="199" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="SafeStop">
+                <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
                     <connection refLocalId="201" />
                   </connectionPointIn>
@@ -2021,7 +2075,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
             <comment localId="221" height="0" width="0">
               <position x="0" y="0" />
               <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🆕 2026-08-06 (retrait FB_Brake, demande client) : recalcul INDEPENDANT, voir M1 ci-dessus.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// Recalcul INDEPENDANT, voir M1 ci-dessus.</xhtml>
               </content>
             </comment>
             <vendorElement localId="222">
@@ -2063,11 +2117,10 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
             <comment localId="237" height="0" width="0">
               <position x="0" y="0" />
               <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">// 🔴🔧 REX 2026-08-07 (12) — retour terrain, GAP CONFIRMÉ : KoboldContactorCmd était déclaré
-// (VAR ci-dessus) mais jamais écrit -- la chaîne instDiveSearch.KoboldMeasureEnable -&gt;
-// PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated s'arrêtait net ici, sans erreur de
-// compilation ni de gate pour le signaler (même classe de bug que le fix M3 frein du
-// 2026-08-05). Mapping E/S CODESYS à (re)faire côté utilisateur (voir §2 plus bas) :
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// KoboldContactorCmd était déclaré (VAR ci-dessus) mais jamais écrit -- la chaîne
+// instDiveSearch.KoboldMeasureEnable -&gt; PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated
+// s'arrêtait net ici, sans erreur de compilation ni de gate pour le signaler. Mapping E/S
+// CODESYS à (re)faire côté utilisateur (voir §2 plus bas) :
 // M1_M2_KoboldMeasureEnable_DQ &lt;- PRG_06_Outputs_LD.KoboldContactorCmd.</xhtml>
               </content>
             </comment>
@@ -2102,8 +2155,8 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// ── Interlock final M3 (Translation, variateur AC600) ────────────────────
-// 🛡️ 2026-08-06 (demande maintenance) : déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
-// 🔧 FIX 2026-08-14 : ne coupe plus que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête
+// 🛡️ Déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
+// Ne coupe plus que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête
 // de fichier (SafeStop/Error écrasaient la rampe rapide gérée en amont par FB_Translation).</xhtml>
               </content>
             </comment>
@@ -2441,7 +2494,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged</variable>
+              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop</variable>
             </contact>
             <contact localId="321" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -2449,7 +2502,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop</variable>
+              <variable>PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged</variable>
             </contact>
             <contact localId="323" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -2490,12 +2543,12 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                     <connection refLocalId="317" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="PowerContactorEngaged">
+                <variable formalParameter="SafeStop">
                   <connectionPointIn>
                     <connection refLocalId="319" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="SafeStop">
+                <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
                     <connection refLocalId="321" />
                   </connectionPointIn>
@@ -2561,16 +2614,6 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                     <expression />
                   </connectionPointOut>
                 </variable>
-                <variable formalParameter="BrakeTimeoutElapsed">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
-                <variable formalParameter="RestartInhibit">
-                  <connectionPointOut>
-                    <expression />
-                  </connectionPointOut>
-                </variable>
                 <variable formalParameter="DriveControlWord">
                   <connectionPointOut>
                     <expression>M3_CommandWord</expression>
@@ -2589,6 +2632,16 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
                 <variable formalParameter="BrakeCmd">
                   <connectionPointOut>
                     <expression>TranslationBrakeCmd</expression>
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="BrakeTimeoutElapsed">
+                  <connectionPointOut>
+                    <expression />
+                  </connectionPointOut>
+                </variable>
+                <variable formalParameter="RestartInhibit">
+                  <connectionPointOut>
+                    <expression />
                   </connectionPointOut>
                 </variable>
               </outputVariables>
@@ -3761,13 +3814,13 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// === 🛡️ §3 SÉCURITÉ &amp; COUPURE PUISSANCE AMONT ===
-// 🆕 REX 2026-08-05 (audit sécurité, trouvé après LOT2) : PowerCutOffReq était figé à FALSE en dur —
+// PowerCutOffReq était figé à FALSE en dur —
 instSafetyTranslationM3.PowerCutOff (5 mécanismes/8 : thermique frein, Méca A/B, butées, incohérence
 capteurs) était donc calculé mais totalement inerte, sans aucune coupure amont réelle possible
 (seul le frein mécanique réagissait via SafeStop). Agrégation OU strict par procédé (M5, A-04) —
 M1/M2 (FB_Safety_Winch, pas encore instanciée) rejoindront ce OU dès leur safety câblée, aucune
 demande vraie ne doit jamais être masquée par l'absence d'une autre source.
-🆕 2026-08-05 : M1/M2 (FB_Safety_Winch) + M3 câblés — OU strict (M5, A-04).
+M1/M2 (FB_Safety_Winch) + M3 câblés — OU strict (M5, A-04).
 ⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD est
 intégralement généré par l'oracle Python (gen_prg06_oracle.py), jamais par la conversion
 .st-&gt;LD générique (qui plante sur une variable réassignée en OU chaîné — bug pré-existant du
@@ -3866,7 +3919,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</variable>
+              <variable>PowerCutOffReq</variable>
             </contact>
             <contact localId="777" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -3874,7 +3927,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</variable>
+              <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
             </contact>
             <contact localId="779" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -3882,7 +3935,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>PowerCutOffReq</variable>
+              <variable>PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</variable>
             </contact>
             <contact localId="781" negated="false" storage="none" edge="none">
               <position x="0" y="0" />
@@ -3890,7 +3943,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <connection refLocalId="0" />
               </connectionPointIn>
               <connectionPointOut />
-              <variable>GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</variable>
+              <variable>PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</variable>
             </contact>
             <block localId="759" typeName="FB_Safety_EmergencyManagement" instanceName="instSafetyEmergencyManagement">
               <position x="0" y="0" />
@@ -3910,22 +3963,22 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                     <connection refLocalId="773" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="EmergencyChainClosed">
+                <variable formalParameter="PowerCutOffRequest">
                   <connectionPointIn>
                     <connection refLocalId="775" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="PowerContactorEngaged">
+                <variable formalParameter="BtnEmergencyCutOff">
                   <connectionPointIn>
                     <connection refLocalId="777" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="PowerCutOffRequest">
+                <variable formalParameter="EmergencyChainClosed">
                   <connectionPointIn>
                     <connection refLocalId="779" />
                   </connectionPointIn>
                 </variable>
-                <variable formalParameter="BtnEmergencyCutOff">
+                <variable formalParameter="PowerContactorEngaged">
                   <connectionPointIn>
                     <connection refLocalId="781" />
                   </connectionPointIn>
@@ -4061,7 +4114,8 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONSIGNES ===
+--&gt; [CMD]  Active la surveillance (TRUE = autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -4069,7 +4123,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Front acquittement defauts</xhtml>
               </documentation>
             </variable>
             <variable name="ArmRequest">
@@ -4077,23 +4131,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (BtnEmergencyArming)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyChainClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation contacteur de puissance principal</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Demande de rearmement (BtnEmergencyArming)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffRequest">
@@ -4101,7 +4139,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure logique issue des métiers</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requete de coupure logique issue des metiers</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyCutOff">
@@ -4109,7 +4147,24 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MATERIELS (HW) ===
+--&gt; [HW]   Retour physique boucle d'urgence amont contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Confirmation contacteur de puissance principal</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -4118,28 +4173,42 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence ou lockout en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur puissance confirme engage</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIQUES &amp; ERREURS ===
+&lt;-- [DIAG] Synthese defaut (TRUE = defaut actif)</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed, bit1: EmergencyArmingFailed, bit3: StartupFail</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainA_RQ">
@@ -4147,8 +4216,8 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Sorties physiques (polarité maintien explicite)
-Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES PHYSIQUES (FAIL-SAFE) ===
+&lt;-- [ACT]  Sortie pilotage canal A (TRUE = voie maintenue)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainB_RQ">
@@ -4156,7 +4225,7 @@ Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie de pilotage canal B (TRUE = voie maintenue, FALSE = coupure)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Sortie pilotage canal B (TRUE = voie maintenue)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulse_RQ">
@@ -4164,7 +4233,7 @@ Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion réarmement physique (1s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Impulsion rearmement physique (1s)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -4172,8 +4241,8 @@ Sortie de pilotage canal A (TRUE = voie maintenue, FALSE = coupure)</xhtml>
                 <derived name="ST_Safety_Emergency_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus d'état public (AF §8.2)
-ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'ETAT &amp; DIAGNOSTIC ===
+&lt;-- [STAT] Bus d'etat public</xhtml>
               </documentation>
             </variable>
             <variable name="Diag">
@@ -4181,7 +4250,7 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
                 <derived name="ST_Safety_Emergency_Diag" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Error, ErrorId, Redundancy, ArmFailed, Lockout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bus de diagnostic public</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingSeqStep">
@@ -4189,23 +4258,33 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostics scalaires (rétrocompatibilité PRG_10/GVL_Global)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS SCALAIRES (RETROCOMPATIBILITE) ===
+&lt;-- [DIAG] Etape sequence rearmement (0=IDLE..6=Confirm)</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut auto-test canal A ou B reste colle</xhtml>
+              </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut rearmement contacteur puissance (timeout 2s)</xhtml>
+              </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Verrouillage temporel 5s entre essais</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -4214,24 +4293,28 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
                 <derived name="FB_Safety_EmergencyManagementLogic" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧱 Composition interne des sous-blocs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Machinerie d'etat et decision AU</xhtml>
               </documentation>
             </variable>
             <variable name="Output">
               <type>
                 <derived name="FB_Safety_EmergencyManagementOutput" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Projection fail-safe vers sorties physiques</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🛡️ FB_Safety_EmergencyManagement — Composite &amp; Façade Publique
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Façade publique, instance unique ; câblage interne Logic/Output &amp; exposition des bus d'état
-   🧩 Architecture : Câblage interne Logic/Output &amp; exposition des bus d'état
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
+   🔌 Architecture : Composition interne Logic/Output
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -4240,6 +4323,7 @@ ChainOk, ContactorOk, Step, Armable, ArmingBusy</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "§1 Appels instances internes"}
 // 🛑 1. Appels des instances internes
 Logic(
     Enable := Enable,
@@ -4265,7 +4349,9 @@ Output(
     ArmFailed := Logic.EmergencyArmingFailed,
     LockoutActive := Logic.EmergencyArmingLockoutActive
 );
+{endregion}
 
+{region "§2 Propagation sorties et bus"}
 // 📤 2. Propagation des signaux vers les sorties du bloc parent
 Ready := Enable AND NOT Logic.StartupFail;
 Busy  := (Logic.ArmingSeqStep &lt;&gt; 0) OR Logic.EmergencyArmingLockoutActive;
@@ -4281,12 +4367,15 @@ ArmPulse_RQ    := Output.ArmPulse_RQ;
 // 🚦 Bus publics
 State := Output.State;
 Diag  := Output.Diag;
+{endregion}
 
+{region "§3 Diagnostics scalaires"}
 // 🩺 Diagnostics scalaires (rétrocompatibilité)
 ArmingSeqStep                := Logic.ArmingSeqStep;
 RedundancyTestFailed         := Logic.RedundancyTestFailed;
 EmergencyArmingFailed        := Logic.EmergencyArmingFailed;
 EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -4303,23 +4392,33 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; ETATS GENERAL ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
             </variable>
             <variable name="Reset">
               <type>
                 <BOOL />
               </type>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
+              </documentation>
             </variable>
             <variable name="SafeStop">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-08-05 (audit sécurité) : volontairement non lu ci-dessous —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Entree securite pour interface standard</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine AU rearmee et puissance OK</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
@@ -4327,32 +4426,33 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop est une rampe rapide gérée en amont par FB_Translation
-(Enable maintenu, AGENTS.md "SafeStop = rampe rapide"). Cette barrière
-ne coupe qu'après la retombée effective de la demande à zéro, sauf
-gate dur/timeout/défaut final (§4) — couper ici immédiatement sur
-SafeStop dupliquerait la rampe en un arrêt brutal, contraire au
-comportement spécifié. Entrée conservée pour interface standard
-complète (AF_Partie-03 §1bis), pas un oubli.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DEMANDES DE COMMANDE AMONT ===
+--&gt; [CMD] Demande de desserrage frein</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCommandOpenConfirmed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Confirmation ouverture frein (contacteur/bobine)</xhtml>
+              </documentation>
             </variable>
             <variable name="RequestedDriveControlWord">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=None, 1=Fwd, 2=Rev, 7=Reset AC600</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mot de commande variateur (0=None, 1=Fwd, 2=Rev, 7=Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedDriveFreqHz">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Frequence de consigne variateur (Hz)</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -4360,80 +4460,116 @@ complète (AF_Partie-03 §1bis), pas un oubli.</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Interlock actif</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : absence confirmation contacteur desserrage &gt; 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0: timeout desserrage frein)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="Reason">
               <type>
                 <derived name="E_TranslationFinalInterlockReason" />
               </type>
-            </variable>
-            <variable name="BrakeTimeoutElapsed">
-              <type>
-                <TIME />
-              </type>
-            </variable>
-            <variable name="RestartInhibit">
-              <type>
-                <BOOL />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE : neutralisation puis nouvelle demande exigées après défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Cause de blocage</xhtml>
               </documentation>
             </variable>
             <variable name="DriveControlWord">
               <type>
                 <WORD />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES ACTIONNEURS VALIDES ===
+&lt;-- [ACT] Mot de commande variateur valide</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveFreqRefHz">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Frequence de consigne variateur valide (Hz)</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveFreqRefWord">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 LOT2 2026-08-05 : DriveFreqRefHz mis à l'échelle registre PDO 0x3100 (WORD, écriture EtherCAT)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Frequence mise a l'echelle registre PDO 0x3100</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCmd">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre ouverture frein valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeoutElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; TEMPORISATIONS ===
+&lt;-- [DIAG] Ecoule temporisation watchdog frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartInhibit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -4441,33 +4577,59 @@ complète (AF_Partie-03 §1bis), pas un oubli.</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONTS ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeoutCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur nouvelle occurrence cause timeout</xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeTimeout">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
+. [LOC] Temporisateur watchdog desserrage frein</xhtml>
+              </documentation>
             </variable>
             <variable name="MovementRequested">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Demande de mouvement active</xhtml>
+              </documentation>
             </variable>
             <variable name="NeutralRequestSeen">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande neutre (mot 0) observee</xhtml>
+              </documentation>
             </variable>
             <variable name="ResetRequired">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout : front Reset obligatoire avant toute nouvelle marche</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Reset obligatoire avant nouvelle marche</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeTimeoutCause">
@@ -4475,7 +4637,7 @@ complète (AF_Partie-03 §1bis), pas un oubli.</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-08-05 : pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) — voir §2 ci-dessous</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cause brute timeout desserrage frein</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeTimeoutAck">
@@ -4485,11 +4647,9 @@ complète (AF_Partie-03 §1bis), pas un oubli.</xhtml>
               <initialValue>
                 <simpleValue value="TRUE" />
               </initialValue>
-            </variable>
-            <variable name="BrakeTimeoutCauseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accuse operateur (TRUE = pas d'alarme)</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveFreqWordScale">
               <type>
@@ -4499,9 +4659,8 @@ complète (AF_Partie-03 §1bis), pas un oubli.</xhtml>
                 <simpleValue value="100" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 LOT2 2026-08-05 : échelle confirmée terrain (utilisateur) sur le registre 0x3100
-AC600 (M3_SetpointFrequencyHz, %QW7) — WORD=5000 correspond à 50,00 Hz, même
-résolution 0,01 Hz que le retour mesuré 0x3102 (M3_ActualFrequencyHz_Filtered).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ECHELLE &amp; BORNES REGISTRE PDO ===
+Echelle registre 0x3100 (WORD=5000 -&gt; 50,00 Hz)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveFreqWordMaxHz">
@@ -4512,36 +4671,26 @@ résolution 0,01 Hz que le retour mesuré 0x3102 (M3_ActualFrequencyHz_Filtered)
                 <simpleValue value="600" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute avant conversion : marge large sous le plafond WORD (655,35 Hz à l'échelle
-ci-dessus) tout en restant très au-dessus de _TranslationMaxFreq_Hz (60,0 Hz nominal) —
-protège uniquement contre un débordement WORD, pas une limite métier (déjà bornée en amont).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute anti-debordement WORD (Hz)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🛡️ FB_TranslationOutputInterlock_LD — Barrière finale frein / AC600 M3
    ───────────────────────────────────────────────────────────────
-   📥 Reçoit exclusivement les demandes métier de FB_Translation.
-   📤 Produit seul les commandes AC600 et frein vers PRG_06_Outputs_LD.
-   🆕 LOT2 2026-08-05 : DriveFreqRefWord (WORD, échelle ×100 confirmée terrain)
-      ajouté en sortie — seule forme exploitable par le mapping E/S CODESYS du
-      registre PDO 0x3100 (DriveFreqRefHz en REAL reste disponible, IHM/diag).
-   🔒 BrakeCommandOpenConfirmed confirme le contacteur/bobine de desserrage,
-      jamais la position mécanique du frein.
-   ⏱️ Watchdog fixe T#500ms, démarré uniquement par BrakeReleaseRequest.
-   🔑 Après timeout, RestartInhibit exige : Reset avec cause disparue,
-      demande neutre explicite (mot 0), puis nouvelle demande 1 ou 2.
-   🔧 REX 2026-08-05 : Reset du watchdog frein reconstruit en pattern Cause/Ack
-      (CODE_QUALITY_STANDARDS §9) — plus jamais conditionné par un état externe
-      instantané (audit sécurité M3, même classe que l'incident EmergencyArmingFailed).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Barrière de sécurité finale pour frein et variateur AC600 M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   🔌 Interface : Interlock de sortie (entre FB_Translation et PRG_06_Outputs_LD)
+   🔒 Sécurité : Surveillance feedback frein et watchdog de desserrage
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Front reset et gate"}
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
 // Le front est échantillonné même pendant Enable/AU faux. Un Reset maintenu
 // durant une gate ne peut donc jamais devenir un faux acquittement au retour.
@@ -4566,17 +4715,17 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2);
+{endregion}
 
+{region "§2 Watchdog frein"}
 // ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
 // Pendant RestartInhibit, BrakeCmd reste coupé : l'ordre amont n'est donc plus
 // effectif et le watchdog ne doit pas créer une nouvelle faute en boucle.
-// 🔧 REX 2026-08-05 : pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) — l'ancien
-// "ELSIF ResetEdge.Q AND BrakeCommandOpenConfirmed" pouvait perdre silencieusement
-// un front Reset si BrakeCommandOpenConfirmed rebondissait à FALSE exactement au
-// scan du Reset (même classe que l'incident EmergencyArmingFailed). Le Reset est
-// désormais TOUJOURS effectif sur l'acquittement (BrakeTimeoutAck) ; l'interlock de
-// sécurité (RestartInhibit, §3) reste basé sur la cause brute (BrakeTimeoutCause /
-// Error), jamais sur l'acquittement seul — l'acquittement n'ouvre jamais l'interlock.
+// Pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) : le Reset est TOUJOURS effectif sur
+// l'acquittement (BrakeTimeoutAck), sans condition externe — un front Reset ne peut
+// jamais être perdu si la confirmation rebondit au même scan. L'interlock de sécurité
+// (RestartInhibit, §3) reste basé sur la cause brute (BrakeTimeoutCause / Error), jamais
+// sur l'acquittement seul — l'acquittement n'ouvre jamais l'interlock.
 BrakeTimeout(IN := BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed
                    AND NOT RestartInhibit, PT := T#500ms);
 BrakeTimeoutElapsed := BrakeTimeout.ET;
@@ -4608,7 +4757,9 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
 
+{region "§3 Réarmement anti-redémarrage"}
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
 // Le mot 7 est un reset AC600, pas un neutre opérateur : il reste autorisé avec
 // fréquence nulle mais ne solde pas RestartInhibit. Seul le mot 0, vu APRÈS
@@ -4621,7 +4772,9 @@ IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
         NeutralRequestSeen := FALSE;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Décision finale"}
 // ── 4. Décision finale : zéro couple utile sans confirmation frein ──────
 DriveControlWord := 0;
 DriveFreqRefHz := 0.0;
@@ -4658,11 +4811,14 @@ ELSIF MovementRequested THEN
         State := E_State.INIT;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§5 Mise a lechelle"}
 // ── 5. Mise à l'échelle finale REAL Hz -&gt; WORD registre PDO 0x3100 ──────
-// 🆕 LOT2 2026-08-05 : conversion unique en sortie de chaîne, quelle que soit la branche
-// qui a fixé DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).
+// Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
+// DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).
 DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) * DriveFreqWordScale);
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -4679,23 +4835,34 @@ DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) 
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET ETATS GENERAL ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
             </variable>
             <variable name="Reset">
               <type>
                 <BOOL />
               </type>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
+              </documentation>
             </variable>
             <variable name="SafeStop">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-08-05 (audit sécurité) : volontairement non lu ci-dessous —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Entree securite pour interface standard</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HARDWARE ET FEEDBACKS ===
+--&gt; [SAFE] Chaine AU rearmee et puissance OK</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedback">
@@ -4703,14 +4870,7 @@ DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) 
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop est une rampe rapide gérée en amont par FB_Winch
-(Enable maintenu, AGENTS.md "SafeStop = rampe rapide"). Cette barrière
-ne coupe qu'après la retombée effective de la demande à zéro, sauf
-gate dur/timeout/défaut final (§5) — couper ici immédiatement sur
-SafeStop dupliquerait la rampe en un arrêt brutal, contraire au
-comportement spécifié. Entrée conservée pour interface standard
-complète (AF_Partie-03 §1bis), pas un oubli.
-🆕 2026-08-06 : retour PHYSIQUE brut du contacteur/bobine frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback physique ouverture frein (NC)</xhtml>
               </documentation>
             </variable>
             <variable name="FwdRevSpeedFeedbackOff">
@@ -4718,27 +4878,32 @@ complète (AF_Partie-03 §1bis), pas un oubli.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(PRG_02_Acquisition.HwIn.Winch.Mx_BrakeIsOpen_DI), câblé DIRECTEMENT
-depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
-(FB_Brake retiré du treuil, voir bandeau). TRUE = frein ouvert/relâché.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback retombe tous contacteurs sens/vitesse</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedRelayFwd">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DEMANDES DE COMMANDE AMONT ===
+--&gt; [CMD] Demande contacteur sens montee</xhtml>
+              </documentation>
             </variable>
             <variable name="RequestedRelayRev">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur sens descente</xhtml>
+              </documentation>
             </variable>
             <variable name="RequestedContactor1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mapping métier FB_Winch / SpeedStepTable</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur vitesse palier 1</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedContactor2">
@@ -4746,7 +4911,7 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mapping métier FB_Winch / SpeedStepTable</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur vitesse palier 2</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedContactor3">
@@ -4754,7 +4919,7 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mapping métier FB_Winch / SpeedStepTable</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur vitesse palier 3</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedContactor4">
@@ -4762,13 +4927,16 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mapping métier FB_Winch / SpeedStepTable</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur vitesse palier 4</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedStep">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier de vitesse demande</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -4776,86 +4944,130 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC ET SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Interlock actif</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : absence confirmation contacteur desserrage &gt; 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0: timeout frein)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_WinchFinalInterlockState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat interlock</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_WinchFinalInterlockState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="Reason">
               <type>
                 <derived name="E_WinchFinalInterlockReason" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Cause de neutralisation ou blocage</xhtml>
+              </documentation>
             </variable>
             <variable name="AuthorizedStep">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES ACTIONNEURS VALIDES ===
+&lt;-- [ACT] Palier de vitesse autorise</xhtml>
+              </documentation>
             </variable>
             <variable name="RelayFwd">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur sens montee valide</xhtml>
+              </documentation>
             </variable>
             <variable name="RelayRev">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur sens descente valide</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor1">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 1 valide</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 2 valide</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor3">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 3 valide</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor4">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 4 valide</xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : dérivé UNIQUEMENT de RelayFwd OR RelayRev (fin §5) —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre ouverture frein valide</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeTimeoutElapsed">
@@ -4863,7 +5075,8 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">plus de FB_Brake, plus de gate ContactorEngaged/anti-retombée séparée.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS ET TEMPORISATIONS ===
+&lt;-- [DIAG] Ecoule temporisation watchdog frein</xhtml>
               </documentation>
             </variable>
             <variable name="RestartInhibit">
@@ -4871,18 +5084,24 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE : timeout acquitté mais neutre/nouvelle demande exigés</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
               </documentation>
             </variable>
             <variable name="RestartDelayElapsed">
               <type>
                 <TIME />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temporisation anti-court-cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="StepDelayElapsed">
               <type>
                 <TIME />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temporisation palier</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -4890,38 +5109,66 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeoutCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front cause timeout frein</xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeTimeout">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation watchdog frein</xhtml>
+              </documentation>
             </variable>
             <variable name="StepDelay">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation changement de palier</xhtml>
+              </documentation>
             </variable>
             <variable name="RestartDelay">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation anti-court-cycle redemarrage</xhtml>
+              </documentation>
             </variable>
             <variable name="RestartRequired">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
+. [LOC] Exigence de retour au neutre pour redemarrage</xhtml>
+              </documentation>
             </variable>
             <variable name="ResetRequired">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout : front Reset conscient obligatoire</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Exigence d'acquittement Reset conscient</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralRequestSeen">
@@ -4929,33 +5176,39 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande moteur zéro observée après acquittement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Observation passage consigne au neutre</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedStepClamped">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier demande borne dans [0..5]</xhtml>
+              </documentation>
             </variable>
             <variable name="StepDelayTarget">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible mémorisée : tout changement annule le temps en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible palier memorisee</xhtml>
               </documentation>
             </variable>
             <variable name="MotorRequest">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande mouvement moteur active</xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeTimeoutCause">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-08-05 : pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) — voir §6bis ci-dessous</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cause timeout frein presente</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeTimeoutAck">
@@ -4965,65 +5218,34 @@ depuis PRG_04 — remplace BrakeReleaseRequest/BrakeCommandOpenConfirmed
               <initialValue>
                 <simpleValue value="TRUE" />
               </initialValue>
-            </variable>
-            <variable name="BrakeTimeoutCauseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Acquittement cause timeout frein</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🛡️ FB_WinchOutputInterlock_LD — Barrière finale frein / puissance M1 ou M2
    ───────────────────────────────────────────────────────────────
-   📥 Commandes métier déjà calculées par FB_Winch.
-   📤 Producteur unique des commandes finales vers PRG_06_Outputs_LD.
-   🔒 Le retour (`BrakeFeedback`) confirme le contacteur/bobine de desserrage ;
-      il ne mesure pas mécaniquement le frein.
-   ⏱️ Watchdog fixe 500 ms après demande effective de desserrage.
-   🔧 REX 2026-08-05 : Reset du watchdog frein reconstruit en pattern Cause/Ack
-      (CODE_QUALITY_STANDARDS §9) — plus jamais conditionné par un état externe
-      instantané (audit sécurité M3, même classe que l'incident EmergencyArmingFailed).
-   🆕 REX 2026-08-06 (retrait FB_Brake, demande client) : plus de séquence temporisée
-      frein — le frein n'est plus qu'un consommateur direct de RelayFwd/RelayRev
-      (`BrakeCmd := RelayFwd OR RelayRev`, câblé au grand jour dans PRG_06_Outputs_LD
-      à partir des DQ RelayFwd/RelayRev). Aucun risque d'écart frein/mouvement : le
-      frein SUIT structurellement le contacteur de sens, il ne peut jamais en diverger
-      puisque c'est la MÊME variable qui pilote les deux. `FB_Brake` reste utilisé tel
-      quel pour Translation (M3) — non touché par ce lot.
-   🔧 REX 2026-08-06bis (review croisée Codex) : le watchdog frein a d'abord été armé sur
-      `RequestedRelayFwd OR RequestedRelayRev` (demande BRUTE, disponible tôt dans le scan)
-      — bug réel trouvé : cette demande brute passe à TRUE dès l'appui joystick, alors que
-      `RelayFwd`/`RelayRev` FINAUX (§5) restent à FALSE jusqu'à T#1000ms (retombée +
-      `RestartDelay`, voir §4). Le watchdog (seuil 500ms) se déclenchait donc À TORT sur
-      quasiment CHAQUE redémarrage normal. Corrigé : le watchdog est désormais armé sur
-      `BrakeCmd` (§6, calculé APRÈS §5 — la valeur réellement et définitivement commandée),
-      jamais sur une demande amont non encore autorisée. Conséquence acceptée : le bit0
-      `ErrorId` (et donc `Error`) n'est mis à jour qu'après le calcul de `BrakeCmd`, donc lu
-      par §3/§5 avec un retard d'UN scan (~10ms) sur une nouvelle occurrence de défaut —
-      négligeable face au budget 500ms du watchdog, et strictement nécessaire pour éviter
-      les faux déclenchements.
-   🔴🔧 REX 2026-08-07 — RestartDelay COMPTAIT SANS ATTENDRE LE FREIN PHYSIQUE (audit croisé,
-      demande client) : un lot précédent avait fait démarrer le décompte 1500ms sur `NOT
-      MotorRequest` seul (relâchement joystick, instantané), perdant la dépendance à
-      `BrakeFeedback` (retombée physique bobine/mâchoires, ~200-300ms mécaniques après la
-      commande). Un redémarrage pouvait donc être autorisé alors que le frein n'était pas
-      encore réellement fermé au moment où le décompte a commencé. Corrigé (§4) :
-      `NOT BrakeFeedback` réintégré en ET avec `NOT MotorRequest` — le décompte ne
-      démarre/continue que si les deux conditions (moteur non demandé ET frein physiquement
-      fermé) sont vraies. Comportement "purge pendant la pause" conservé.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Barrière de sécurité finale pour frein et contacteurs M1/M2
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs_LD)
+   🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Front reset avant gate"}
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
 // Le front est échantillonné même pendant Enable/AU faux : un Reset maintenu
 // pendant une gate ne devient jamais un faux acquittement au retour.
 ResetEdge(CLK := Reset);
+{endregion}
 
+{region "§2 Gate"}
 // ── 2. GATE : neutralisation sûre ───────────────────────────────────────
 // ErrorId, RestartInhibit et ResetRequired ne sont jamais effacés par une perte
 // Enable/AU : celle-ci coupe uniquement les sorties. Le retour exige toujours un
@@ -5048,7 +5270,9 @@ RequestedStepClamped := LIMIT(0, RequestedStep, 5);
 // La demande métier reste donc autorisée ici pendant la décélération ; l'interlock
 // ne coupe qu'après sa retombée effective à zéro, sauf gate dur ou défaut final.
 MotorRequest := (RequestedStepClamped &gt; 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
+{endregion}
 
+{region "§2bis Arbitrage error"}
 // ── 2bis. Arbitrage Error/ErrorId AVANT §3/§5 ────────────────────────────
 // ErrorId bit0 (défaut frein) est mis à jour en FIN de scan (§6bis, après BrakeCmd) —
 // la valeur lue ici est donc celle de la fin du scan PRÉCÉDENT (retard d'un scan sur une
@@ -5058,7 +5282,9 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
 
+{region "§3 Réarmement anti-redémarrage"}
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
 // Après timeout : cause disparue + front Reset, puis demande moteur à zéro,
 // puis nouvelle demande distincte. La retombée + T#1000ms sera ensuite refaite.
@@ -5073,22 +5299,16 @@ IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
         Reason := E_WinchFinalInterlockReason.NONE;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Mémorisation arrêt et anti-redémarrage chaud"}
 // ── 4. Mémorisation de l'arrêt : temporisation d'anti-redémarrage chaud ──────────
-// 🆕 2026-08-07 (retour terrain) : la temporisation RestartDelay (1500ms) s'arme à
-// l'arrêt du mouvement (NOT MotorRequest) et s'écoule pendant la pause à l'arrêt (au lieu
-// de repartir de zéro à chaque nouvel appui) — permet un redémarrage instantané si la pause
-// dépasse 1.5s.
-// 🔧 REX 2026-08-07 (2) (audit croisé, demande client "sécuriser avec l'info frein") : la
-// version ci-dessus comptait dès `NOT MotorRequest` (relâchement joystick, INSTANTANÉ) sans
-// attendre la retombée PHYSIQUE du frein (`NOT BrakeFeedback` = bobine retombée, mâchoires
-// serrées — ~200-300ms mécaniques après la commande). Un nouveau départ pouvait donc être
-// autorisé après 1500ms décomptés dès le relâchement, alors que le frein n'était même pas
-// encore complètement fermé au début du décompte — la protection perdait son sens (protéger
-// le moteur/frein d'un réengagement trop rapide après un arrêt RÉELLEMENT confirmé). Corrigé :
-// `NOT BrakeFeedback` réintégré en ET — le décompte ne démarre/continue que si le moteur n'est
-// plus demandé ET que le frein est physiquement confirmé fermé. Garde le comportement "purge
-// pendant la pause" (RestartRequired ne s'arme qu'à NOT MotorRequest, indépendant de la tempo).
+// La temporisation RestartDelay (1500ms) s'arme à l'arrêt du mouvement (NOT MotorRequest) et
+// s'écoule pendant la pause à l'arrêt (au lieu de repartir de zéro à chaque nouvel appui) —
+// permet un redémarrage instantané si la pause dépasse 1.5s. Le décompte ne démarre/continue que
+// si le moteur n'est plus demandé ET que le frein est physiquement confirmé fermé
+// (NOT BrakeFeedback = bobine retombée, mâchoires serrées). Garde le comportement "purge pendant
+// la pause" (RestartRequired ne s'arme qu'à NOT MotorRequest, indépendant de la tempo).
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
@@ -5097,7 +5317,9 @@ RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;
 END_IF;
+{endregion}
 
+{region "§5 Autorisation moteur"}
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -5155,9 +5377,11 @@ ELSE
         State := E_WinchFinalInterlockState.READY;
     END_IF;
 END_IF;
+{endregion}
 
-// ── 6. Commande frein — couplage direct (demande client 2026-08-06) ────────
-// 🆕 BrakeCmd suit STRUCTURELLEMENT RelayFwd/RelayRev, calculé APRÈS leur
+{region "§6 Commande frein"}
+// ── 6. Commande frein — couplage direct ────────────────────────────────
+// BrakeCmd suit STRUCTURELLEMENT RelayFwd/RelayRev, calculé APRÈS leur
 // finalisation ci-dessus (§5) : il hérite donc automatiquement de toutes leurs
 // conditions de sécurité (Error, RestartInhibit, RestartRequired, MotorRequest)
 // sans avoir à les répéter. Aucun risque d'écart frein/mouvement possible : le
@@ -5167,12 +5391,14 @@ END_IF;
 // pour piloter physiquement la bobine — ce BrakeCmd ici sert de miroir/diagnostic
 // (State, IHM) mais n'est plus câblé sur la sortie physique (voir PRG_06 §2).
 BrakeCmd := RelayFwd OR RelayRev;
+{endregion}
 
+{region "§6bis Watchdog frein"}
 // ── 6bis. Watchdog frein : uniquement sur la commande RÉELLEMENT FINALE ────
-// 🔧 REX 2026-08-06bis (review croisée) : armé sur BrakeCmd (fin §5/§6), JAMAIS sur
-// RequestedRelayFwd/Rev (demande amont pas encore autorisée par le state-machine
-// §5 — RestartRequired peut la retenir jusqu'à T#1000ms, largement &gt; le seuil 500ms
-// ci-dessous, ce qui déclenchait un faux défaut à quasiment CHAQUE redémarrage normal).
+// Watchdog armé sur BrakeCmd (fin §5/§6), JAMAIS sur RequestedRelayFwd/Rev (demande amont pas
+// encore autorisée par le state-machine §5 — RestartRequired peut la retenir jusqu'à T#1000ms,
+// largement &gt; le seuil 500ms ci-dessous, ce qui déclencherait un faux défaut à chaque redémarrage
+// normal).
 BrakeTimeout(IN := BrakeCmd AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#500ms);
 BrakeTimeoutElapsed := BrakeTimeout.ET;
 IF BrakeTimeout.Q THEN
@@ -5198,6 +5424,7 @@ IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
 ELSE
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -5215,7 +5442,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONSIGNES ===
+--&gt; [CMD]  Active la surveillance (TRUE = autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -5223,7 +5451,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Front acquittement defauts</xhtml>
               </documentation>
             </variable>
             <variable name="ArmRequest">
@@ -5231,23 +5459,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (BtnEmergencyArming)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyChainClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation contacteur de puissance principal</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Demande de rearmement (BtnEmergencyArming)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffRequest">
@@ -5255,7 +5467,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure logique issue des métiers</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requete de coupure logique issue des metiers</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyCutOff">
@@ -5263,7 +5475,24 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MATERIELS (HW) ===
+--&gt; [HW]   Retour physique boucle d'urgence amont contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Confirmation contacteur de puissance principal</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -5272,13 +5501,17 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ERREURS &amp; CONSIGNES LOGIQUES ===
+&lt;-- [DIAG] Synthese defaut actif</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed (affiché), bit1: EmergencyArmingFailed (affiché)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -5286,7 +5519,7 @@ END_IF;
                 <derived name="ST_Safety_Emergency_InternalCmd" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Structure de commande logique produite</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Structure de commande logique produite</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingSeqStep">
@@ -5294,7 +5527,8 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; RETOURS D'ETAT ===
+&lt;-- [DIAG] Etape sequence (0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm)</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -5302,7 +5536,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut auto-test redondance (Cause lissee OR NOT Ack)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
@@ -5310,7 +5544,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut rearmement contacteur (Cause lissee OR NOT Ack)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
@@ -5318,7 +5552,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre les essais</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Verrouillage temporel 5s entre essais</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -5326,8 +5560,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Bus State/Diag internes — repris par le composite pour les DUT publics
-🟢 Réarmement possible maintenant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Rearmement possible actuellement</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -5335,7 +5568,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence ou lockout en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence ou lockout en cours</xhtml>
               </documentation>
             </variable>
             <variable name="StartupFail">
@@ -5343,11 +5576,198 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Autotest démarche échoué</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Autotest demarrage echoue</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmReqEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant ArmRequest</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EnableRising">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Enable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur nouvelle occurrence cause redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingFailedCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur nouvelle occurrence cause rearmement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceTestA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DRAPEAUX &amp; FORCAGES LOGIQUES ===
+. [LOC] Forcage coupure canal A pendant test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceTestB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Forcage coupure canal B pendant test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupCheckDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Autotest demarrage effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupCheckOK">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Resultat autotest demarrage (latche)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSE &amp; ACK DEFAUT REDONDANCE ===
+. [LOC] Cause brute : canal colle detecte a l'auto-test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accuse operateur (TRUE = pas d'alarme a afficher)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSE &amp; ACK DEFAUT REARMEMENT ===
+. [LOC] Cause brute : contacteur non confirme sous 2s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accuse operateur (TRUE = pas d'alarme a afficher)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonTestA">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS LOGIQUES ===
+. [LOC] Timer auto-test canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRestoreA">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer restauration canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonTestB">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer auto-test canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRestoreB">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer restauration canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingPulse">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer impulsion rearmement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingConfirm">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer attente confirmation contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingLockout">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer lockout anti-reessai</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRedundancyDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingFailedDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM rearmement</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_TestDuration">
               <type>
                 <TIME />
@@ -5356,7 +5776,7 @@ END_IF;
                 <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[CST] Temporisations normatives de securite AU (fixes, non modifiables RETAIN/IHM)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS NORMATIVES DE SECURITE (FIXES) ===
 Duree auto-test canal A ou B</xhtml>
               </documentation>
             </variable>
@@ -5401,168 +5821,18 @@ Duree auto-test canal A ou B</xhtml>
                 <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Anti-clignotement affichage IHM uniquement (§9 STD) — jamais sur l'action</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="ArmReqEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="EnableRising">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="ForceTestA">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ForceTestB">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TonTestA">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonRestoreA">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonTestB">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonRestoreB">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingPulse">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingConfirm">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingLockout">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="StartupCheckDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Autotest démarrage
-TRUE = autotest passé, attente réarmement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StartupCheckOK">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Résultat autotest (latche le temps du front)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailedCause">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Pattern Cause/Ack (§3.4bis AF01, §9 STD) — Reset jamais conditionné
-Latch brut : canal collé détecté à l'auto-test</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailedAck">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyCauseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonRedundancyDisplay">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailedCause">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Latch brut : contacteur non confirmé sous 2s</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailedAck">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmingFailedCauseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonArmingFailedDisplay">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anti-clignotement affichage IHM uniquement</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🛡️ FB_Safety_EmergencyManagementLogic — Décision &amp; Séquencement AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Machine d'état, fronts Reset/Arm, calcul ErrorId &amp; consignes logiques
-   🛡️ Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
-            DOC/STDS/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🔒 Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -5571,7 +5841,7 @@ Latch brut : canal collé détecté à l'auto-test</xhtml>
 
 // === IMPLEMENTATION ===
 
-{region "Fronts de commande"}
+{region "§1 Fronts de commande"}
 // 🔄 Fronts
 EnableRising(CLK := Enable);
 ResetEdge(CLK := Reset);
@@ -5579,7 +5849,7 @@ ArmReqEdge(CLK := ArmRequest);
 
 {endregion}
 
-{region "Gate neutralisation"}
+{region "§2 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -5617,7 +5887,7 @@ END_IF;
 
 {endregion}
 
-{region "Autotest demarrage"}
+{region "§3 Autotest demarrage"}
 // 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01)
 // Vérifications synchrones 1 cycle au premier passage Enable=TRUE
 IF EnableRising.Q THEN
@@ -5640,7 +5910,7 @@ END_IF;
 
 {endregion}
 
-{region "Acquittement defauts"}
+{region "§4 Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
 // ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
 // pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
@@ -5656,7 +5926,7 @@ END_IF;
 
 {endregion}
 
-{region "Sequence rearmement AU"}
+{region "§5 Sequence rearmement AU"}
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
@@ -5751,8 +6021,8 @@ END_IF;
 
 {endregion}
 
-{region "Gestion cause et acquittement"}
-// 🆕 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+{region "§6 Gestion cause et acquittement"}
+// 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
 // L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
 // jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
 RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
@@ -5767,7 +6037,7 @@ END_IF;
 
 {endregion}
 
-{region "Commandes et etats publics"}
+{region "§7 Commandes et etats publics"}
 // 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES — basées sur la Cause brute (jamais sur l'Ack)
 Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
 Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
@@ -5787,7 +6057,7 @@ ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
 
 {endregion}
 
-{region "Affichage defauts IHM"}
+{region "§8 Affichage defauts IHM"}
 // 📤 7. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
 // ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
 // sur la Cause brute, jamais retardée par ce debounce.
@@ -5799,7 +6069,7 @@ EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAc
 
 {endregion}
 
-{region "Synthese ErrorId"}
+{region "§9 Synthese ErrorId"}
 // 📤 8. SYNTHÈSE DES ERREURS (bitfield affiché, basé sur RedundancyTestFailed/EmergencyArmingFailed affichés)
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN
@@ -5831,7 +6101,8 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le pilote (FALSE = toutes sorties à FALSE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES &amp; COMMANDES LOGIQUES ===
+--&gt; [CMD]  Active le pilote (FALSE = toutes sorties a FALSE)</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -5839,7 +6110,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <derived name="ST_Safety_Emergency_InternalCmd" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordres logiques reçus du bloc logique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ordres logiques recus du bloc logique</xhtml>
               </documentation>
             </variable>
             <variable name="ChainOk">
@@ -5847,7 +6118,8 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir EmergencyChainClosed (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS D'ETAT &amp; DIAGNOSTICS (MIROIRS) ===
+--&gt; [HW]   Miroir EmergencyChainClosed (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorOk">
@@ -5855,7 +6127,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir PowerContactorEngaged (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Miroir PowerContactorEngaged (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingStep">
@@ -5863,7 +6135,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir ArmingSeqStep (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Miroir ArmingSeqStep (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -5871,7 +6143,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Calculé par Logic (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Calcule par Logic (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -5879,7 +6151,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Calculé par Logic (pour bus State)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Calcule par Logic (pour bus State)</xhtml>
               </documentation>
             </variable>
             <variable name="Error">
@@ -5887,7 +6159,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir Error (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir Error (pour bus Diag)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -5895,7 +6167,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir ErrorId (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir ErrorId (pour bus Diag)</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -5903,7 +6175,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir RedundancyTestFailed (pour bus Diag)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmFailed">
@@ -5911,7 +6183,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir ArmFailed (pour bus Diag)</xhtml>
               </documentation>
             </variable>
             <variable name="LockoutActive">
@@ -5919,7 +6191,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir (pour bus Diag)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Miroir LockoutActive (pour bus Diag)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -5929,8 +6201,8 @@ Error := (ErrorId &lt;&gt; 16#0000);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Sorties physiques terminales
-Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES PHYSIQUES TERMINALES ===
+&lt;-- [ACT]  Vers relais maintien canal A (TRUE = voie maintenue)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainB_RQ">
@@ -5938,7 +6210,7 @@ Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers relais maintien canal B — TRUE = voie maintenue, FALSE = coupure</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Vers relais maintien canal B (TRUE = voie maintenue)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulse_RQ">
@@ -5946,7 +6218,7 @@ Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers contacteur impulsion réarmement — TRUE = pulse actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Vers contacteur impulsion rearmement (TRUE = pulse actif)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -5954,24 +6226,28 @@ Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
                 <derived name="ST_Safety_Emergency_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Bus d'état public</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'ETAT &amp; DIAGNOSTIC PUBLICS ===
+&lt;-- [STAT] Bus d'etat public</xhtml>
               </documentation>
             </variable>
             <variable name="Diag">
               <type>
                 <derived name="ST_Safety_Emergency_Diag" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bus diagnostic public</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔒 FB_Safety_EmergencyManagementOutput — Projection Physique Fail-Safe
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Enable gate + copie consignes logiques vers sorties physiques
    🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🔌 Architecture : Projection physique fail-safe
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -5980,6 +6256,7 @@ Vers relais maintien canal A — TRUE = voie maintenue, FALSE = coupure</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate"}
 IF NOT Enable THEN
     MaintainA_RQ   := FALSE;
     MaintainB_RQ   := FALSE;
@@ -5998,7 +6275,9 @@ IF NOT Enable THEN
     Diag.LockoutActive        := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Projection sorties et bus"}
 // ⚡ Sorties physiques — écriture directe des ordres logiques
 MaintainA_RQ := Cmd.MaintainA_Cmd;
 MaintainB_RQ := Cmd.MaintainB_Cmd;
@@ -6017,6 +6296,7 @@ Diag.ErrorId              := ErrorId;
 Diag.RedundancyTestFailed := RedundancyTestFailed;
 Diag.ArmFailed            := ArmFailed;
 Diag.LockoutActive        := LockoutActive;
+{endregion}
 </xhtml>
           </ST>
         </body>

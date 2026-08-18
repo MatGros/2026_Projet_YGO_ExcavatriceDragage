@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.793550" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.793550">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:35:34.694883" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:35:34.694883">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -146,6 +146,9 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validation explicite de la table</xhtml>
+              </documentation>
             </variable>
             <variable name="LoadPctByStepAndSpeedBand">
               <type>
@@ -162,7 +165,7 @@
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/ST_PLCOPENXML_GENERATOR</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Matrice [palier][bande_vitesse] charge (%)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -173,16 +176,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
-   📊 ST_WinchLoadEstimateTable — Table empirique charge estimée
-   ═══════════════════════════════════════════════════════════════════════════════
-   ⚠️ Valeur informative uniquement : ce tableau ne remplace pas une mesure de
-      charge certifiée et ne participe à aucune fonction de sécurité.
-   🧭 Index 1 : palier contacteurs commandé (1..5)
-   🧭 Index 2 : bande de vitesse câble mesurée (1..5)
-   📐 Valeur : estimation charge en pourcentage (0..100 %), réglée sur site.
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_WinchLoadEstimateTable — Table empirique de charge estimée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Matrice 5x5 d'estimation de charge (palier commandé x bande vitesse)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchSpeedConfig">
@@ -193,7 +192,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesurée de référence</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse maximale mesuree de reference (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedBandMaxMps">
@@ -206,7 +205,7 @@
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond vitesse mesurée de chaque palier</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafonds vitesse mesuree par palier (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedBandHysteresisMps">
@@ -214,7 +213,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hystérésis de classement (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Hysteresis anti-battement classement vitesse (m/s)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -225,16 +224,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
-   🪜 ST_WinchSpeedConfig — Plages de vitesse linéaire mesurée des 5 paliers
-   ═══════════════════════════════════════════════════════════════════════════════
-   🎯 Configuration de caractérisation, séparée de ST_SpeedStepTable :
-      - ST_SpeedStepTable = contacteurs commandés par palier (% vitesse)
-      - ST_WinchSpeedConfig = vitesse câble réellement mesurée (m/s)
-   ⚠️ Valeurs initiales provisoires : vitesse maximale terrain encore à confirmer.
-      Aucun garde-fou ni calcul de charge ne consomme cette structure dans T45.
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_WinchSpeedConfig — Configuration des plages de vitesse linéaire
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Caractérisation des plages de vitesse mesurée par palier (m/s)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -246,28 +241,42 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD] Autorisation generale FB</xhtml>
+              </documentation>
             </variable>
             <variable name="Reset">
               <type>
                 <BOOL />
               </type>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
+              </documentation>
             </variable>
             <variable name="Mode">
               <type>
                 <derived name="E_Mode" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
+              </documentation>
             </variable>
             <variable name="ActiveSpeedStep">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier commandé 0..5</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier commande actif (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SECOURS ET HARDWARE ===
+--&gt; [SAFE] Chaine AU rearmee et puissance OK</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedMps">
@@ -275,7 +284,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble absolue</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse cable absolue (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedSignedMps">
@@ -283,7 +292,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée : positive = montée, négative = descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse signee (+: montee, -: descente) (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedConfig">
@@ -291,7 +300,8 @@
                 <derived name="ST_WinchSpeedConfig" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plages vitesse mesurée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET TABLES ===
+--&gt; [CFG] Configuration des plages de vitesse</xhtml>
               </documentation>
             </variable>
             <variable name="LoadTable">
@@ -299,7 +309,7 @@
                 <derived name="ST_WinchLoadEstimateTable" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Table empirique 5x5</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table empirique d'estimation 5x5</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -308,46 +318,66 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC ET SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0 : entrée/table invalide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0: entree/table invalide)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="SpeedBand">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bande vitesse courante 0..5</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS ET ESTIMATIONS ===
+&lt;-- [DIAG] Bande de vitesse courante (0..5)</xhtml>
               </documentation>
             </variable>
             <variable name="EstimatedLoadPct">
@@ -355,7 +385,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Estimation informative 0..100 %</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Estimation de charge (0..100%)</xhtml>
               </documentation>
             </variable>
             <variable name="Configured">
@@ -363,7 +393,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si table explicitement validée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Table explicitement validee</xhtml>
               </documentation>
             </variable>
             <variable name="Ascending">
@@ -371,7 +401,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE uniquement pendant une montée mesurée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Montee effective mesuree en cours</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -380,45 +410,61 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Erreur</xhtml>
+              </documentation>
             </variable>
             <variable name="PreviousSpeedBand">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
+. [LOC] Memoire bande de vitesse cycle precedent</xhtml>
+              </documentation>
             </variable>
             <variable name="HasPreviousBand">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur premiere bande memorisee</xhtml>
+              </documentation>
             </variable>
             <variable name="SelectedLoadPct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur de charge extraite de la table</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    📊 FB_WinchLoadEstimator — Estimation empirique de charge treuil
-   ═══════════════════════════════════════════════════════════════════════════════
-   🧩 Brique de diagnostic/information, sans commande moteur et sans SafeStop.
-   🎯 Croise le palier commandé et la bande de vitesse mesurée pour lire une
-      estimation dans ST_WinchLoadEstimateTable.
-   ⚠️ La table doit être explicitement marquée IsConfigured : sinon la sortie
-      reste à 0 % et Configured reste FALSE.
-   ═══════════════════════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md</xhtml>
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Estimation informative de la charge par croisement palier/vitesse
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Brique de diagnostic/mesure (1 instance par treuil)
+   🔒 Sécurité : Aucune commande moteur ni action sur SafeStop (information IHM)
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate"}
 // 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
@@ -445,7 +491,9 @@ Configured := LoadTable.IsConfigured;
 // La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
 // mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
 Ascending := (MeasuredSpeedSignedMps &gt; 0.0);
+{endregion}
 
+{region "§2 Classement vitesse"}
 // 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
 IF (MeasuredSpeedMps &lt; 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps &lt;= 0.0) THEN
     ErrorId := ErrorId OR 16#0001;
@@ -487,7 +535,9 @@ ELSE
     END_IF;
     SpeedBand := PreviousSpeedBand;
 END_IF;
+{endregion}
 
+{region "§3 Lecture table"}
 // 📊 3. LECTURE TABLE — bornes séparées avant l'accès au tableau 5x5.
 EstimatedLoadPct := 0.0;
 IF Configured THEN
@@ -508,7 +558,9 @@ IF Configured THEN
         END_IF;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Sorties et acquittement"}
 // 📤 4. SORTIES D'ÉTAT ET ACQUITTEMENT.
 IF ResetEdge.Q AND (ErrorId &lt;&gt; 16#0000) AND (MeasuredSpeedMps &gt;= 0.0) THEN
     ErrorId := 16#0000;
@@ -518,6 +570,7 @@ ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.260673" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.260673">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:22:56.007846" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:22:56.007846">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -149,7 +149,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la surveillance</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -157,7 +157,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement défauts</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -165,7 +165,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU réarmée + conditions globales OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaîne AU réarmée + conditions globales OK</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -173,7 +173,7 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickOnline">
@@ -181,7 +181,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">instDiagCanOpen.DeviceJoystick.Online</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] instDiagCanOpen.DeviceJoystick.Online</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickOperational">
@@ -189,7 +189,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">instDiagCanOpen.DeviceJoystick.Operational</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] instDiagCanOpen.DeviceJoystick.Operational</xhtml>
               </documentation>
             </variable>
             <variable name="HeartbeatIhmOk">
@@ -197,7 +197,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur</xhtml>
               </documentation>
             </variable>
             <variable name="PhaseRotationOk">
@@ -205,7 +205,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI (TRUE = OK)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI (TRUE = OK)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeThermalFeedback">
@@ -213,7 +213,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Thermique frein commun M1/M2/M3 (NC, TRUE = surchauffe/perte)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveOnline">
@@ -222,7 +222,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Spécifique EtherCAT &amp; Capteurs réels
-Status diagnostic communication EtherCAT (Online)</xhtml>
+--&gt; [HW] Status diagnostic communication EtherCAT (Online)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveOperational">
@@ -230,7 +230,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Status diagnostic communication EtherCAT (Operational)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Status diagnostic communication EtherCAT (Operational)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveStatusWord">
@@ -238,7 +238,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot d'état variateur AC600</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mot d'état variateur AC600</xhtml>
               </documentation>
             </variable>
             <variable name="DriveActualFreqHz">
@@ -246,7 +246,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse réelle variateur (Hz)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse réelle variateur (Hz)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedback">
@@ -254,7 +254,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour d'état bobine frein (TRUE = ouvert/desserré — révocation 2026-08-03)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retour d'état bobine frein (TRUE = ouvert/desserré)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCmd">
@@ -262,7 +262,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Commande frein</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -270,7 +270,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction commandée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction commandée</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchFwd">
@@ -278,7 +278,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême avant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême avant</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchRev">
@@ -286,7 +286,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême arrière</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême arrière</xhtml>
               </documentation>
             </variable>
             <variable name="SensorWordIncoherent">
@@ -294,7 +294,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassGlobal">
@@ -306,7 +306,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
-🌐 Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)</xhtml>
+--&gt; [TST] Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassOperatorComm">
@@ -317,7 +317,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Bypass perte communication opérateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass perte communication opérateur</xhtml>
               </documentation>
             </variable>
             <variable name="BypassDriveComm">
@@ -328,7 +328,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass perte communication drive</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass perte communication drive</xhtml>
               </documentation>
             </variable>
             <variable name="BypassPhaseRotation">
@@ -339,7 +339,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Bypass défaut rotation phases</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass défaut rotation phases</xhtml>
               </documentation>
             </variable>
             <variable name="BypassBrakeThermal">
@@ -350,7 +350,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Bypass surchauffe frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass surchauffe frein</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaB">
@@ -361,7 +361,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Bypass Méca B</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Méca B</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaA">
@@ -372,7 +372,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Bypass Méca A</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Méca A</xhtml>
               </documentation>
             </variable>
             <variable name="BypassLimitSwitch">
@@ -383,7 +383,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass butées extrêmes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass butées extrêmes</xhtml>
               </documentation>
             </variable>
             <variable name="BypassSensorIncoherent">
@@ -394,7 +394,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Bypass incohérence mot capteurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass incohérence mot capteurs</xhtml>
               </documentation>
             </variable>
             <variable name="BypassSafety">
@@ -405,7 +405,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bypass groupé PowerCutOff (BrakeThermal/MecaB/MecaA/LimitSwitch/SensorIncoherent)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass groupé PowerCutOff (BrakeThermal/MecaB/MecaA/LimitSwitch/SensorIncoherent)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassProcess">
@@ -416,7 +416,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -425,46 +425,64 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB occupé</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminée</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthèse défaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat mémorisé au dernier défaut</xhtml>
+              </documentation>
             </variable>
             <variable name="SafeStop">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 Décélération rapide (PLC)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Décélération rapide (PLC)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOff">
@@ -472,7 +490,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coup de poing / coupure puissance amont</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Coup de poing / coupure puissance amont</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorOperatorComm">
@@ -480,7 +498,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorDriveComm">
@@ -488,7 +506,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Perte communication EtherCAT variateur (bit1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Perte communication EtherCAT variateur (bit1)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorPhaseRotation">
@@ -496,7 +514,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Mauvaise rotation de phases (bit2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mauvaise rotation de phases (bit2)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorBrakeThermal">
@@ -504,7 +522,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Surchauffe thermique frein commun (bit3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Surchauffe thermique frein commun (bit3)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorMecaB">
@@ -512,7 +530,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Absence confirmation arrêt (Méca B - bit4)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Absence confirmation arrêt (Méca B - bit4)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorMecaA">
@@ -520,7 +538,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Mouvement non commandé (Méca A - bit5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mouvement non commandé (Méca A - bit5)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorLimitSwitch">
@@ -528,7 +546,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Limite extrême Translation atteinte (bit6)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Limite extrême Translation atteinte (bit6)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorSensorIncoherent">
@@ -536,7 +554,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Incohérence mot capteurs position (bit7)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incohérence mot capteurs position (bit7)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -545,18 +563,24 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Erreur</xhtml>
+              </documentation>
             </variable>
             <variable name="TonMecaB">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sécurité à l'arrêt (Méca B)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sécurité à l'arrêt (Méca B)</xhtml>
               </documentation>
             </variable>
             <variable name="TonMecaA">
@@ -564,7 +588,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sécurité mouvement non commandé (Méca A)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sécurité mouvement non commandé (Méca A)</xhtml>
               </documentation>
             </variable>
             <variable name="TonLimitSwitchOverrun">
@@ -572,13 +596,16 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Surveillance poussée anormale / escalade fin de course</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Surveillance poussée anormale / escalade fin de course</xhtml>
               </documentation>
             </variable>
             <variable name="OverrunCondition">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition escalade fin de course</xhtml>
+              </documentation>
             </variable>
             <variable name="PostRampTimeout">
               <type>
@@ -587,28 +614,40 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
               <initialValue>
                 <simpleValue value="TIME#3S" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Délai Méca B</xhtml>
+              </documentation>
             </variable>
             <variable name="UncommandedActiveB">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Méca B active</xhtml>
+              </documentation>
             </variable>
             <variable name="UncommandedActiveA">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Méca A active</xhtml>
+              </documentation>
             </variable>
             <variable name="FirstScanDone">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation premier scan</xhtml>
+              </documentation>
             </variable>
             <variable name="TonStartupWarmup">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Inhibition 3s au boot + effacement auto coms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Inhibition 3s au boot + effacement auto coms</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -617,9 +656,12 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
    🛡️ FB_Safety_Translation — Bloc Safety pour le Translation M3 (EtherCAT)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
-   🔁 Rôle : Surveillance joystick, bus EtherCAT, rotation de phases, 
-      thermique frein commun, Méca A (vitesse non commandée à l'arrêt), 
+   Rôle : Surveillance joystick, bus EtherCAT, rotation de phases,
+      thermique frein commun, Méca A (vitesse non commandée à l'arrêt),
       Méca B (frein/variateur en mouvement à l'arrêt), et Fdc extrêmes.
+   🎯 Invariant : les défauts de communication (bits 0/1/2) ne coupent
+      jamais la puissance amont (SafeStop seul) ; seuls les défauts
+      physiques (bits 3..7) déclenchent PowerCutOff.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -629,7 +671,7 @@ Status diagnostic communication EtherCAT (Online)</xhtml>
 
 // === IMPLEMENTATION ===
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -655,7 +697,7 @@ END_IF;
 
 {endregion}
 
-{region "Initialisation et bypass global"}
+{region "§1bis Initialisation et bypass global"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 
@@ -676,7 +718,7 @@ END_IF;
 
 {endregion}
 
-{region "Diagnostics et protections translation"}
+{region "§2 Diagnostics et protections translation"}
 // ⚠️ ResetEdge doit être traité même si bypass actif, pour que le reset IHM fonctionne.
 // On ne l'exécute que si on n'est PAS en bypass global (sinon ErrorId déjà à 0).
 IF NOT BypassGlobal THEN
@@ -790,7 +832,7 @@ END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
 
-{region "Arbitrage sorties et etat"}
+{region "§4 Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);

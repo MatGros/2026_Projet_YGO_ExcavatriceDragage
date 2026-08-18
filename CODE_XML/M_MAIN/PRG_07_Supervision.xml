@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T07:05:54.356527" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T07:05:54.356527">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:03:27.924564" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:03:27.924564">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <derived name="ST_BucketConfig" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Offsets Open/Close/Coherence</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Offsets Open/Close/Coherence</xhtml>
               </documentation>
             </variable>
             <variable name="CfgTimeoutDuration">
@@ -65,7 +65,7 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BucketCfg — Configuration de la benne (M2)
+   ST_BucketCfg — Configuration de la benne (M2)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -80,7 +80,7 @@
                 <simpleValue value="-999" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴🔧 REX 2026-08-07 (5) — retour terrain, blocage instantané à 0m : sans défaut explicite,
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blocage instantané à 0m : sans défaut explicite,
 ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM &lt;= 0.0" se déclenche
 dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
 (jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
@@ -145,9 +145,9 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
 pas une vitesse continue.
-🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
+: Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
@@ -158,7 +158,7 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableCoupledBucketSequencing">
@@ -169,7 +169,7 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴🔧 REX 2026-08-07 (4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
 Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
 gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
               </documentation>
@@ -194,8 +194,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_CommunCfg — Configuration des paramètres communs machine
-   📄 2026-07-24 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
+   ST_CommunCfg — Configuration des paramètres communs machine
+   📄 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
    WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
    ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -246,8 +246,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_CycleCfg — Configuration du cycle semi-automatique
-   🐛 T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
+   ST_CycleCfg — Configuration du cycle semi-automatique
+   T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -351,7 +351,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
+   ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
    📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -390,7 +390,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_SyncCfg — Configuration de la synchronisation M1/M2
+   ST_SyncCfg — Configuration de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -438,7 +438,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
@@ -451,10 +451,10 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
+   ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 2026-08-06 : créé suite constat terrain — Translation n'avait pas de slot Cfg
+   📄 : créé suite constat terrain — Translation n'avait pas de slot Cfg
    (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
    n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -482,7 +482,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampAccelRate">
@@ -537,7 +537,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="6.75" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m) -- REX 2026-08-07 (25), aligné sur GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m) -- (25), aligné sur GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -548,7 +548,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
        métier dont le défaut peut valoir n'importe quoi) — PRG_SUPERVISION_CFC.st §2/§3
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
@@ -562,10 +562,10 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
+   ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
-   📄 2026-07-24 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
+   📄 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
    déplacés vers GVL_IHM.Commun.Cfg (WinchMaxStepDescente/etc.) — étaient partagés M1/M2 via
    réconciliation ad-hoc, une seule instance dans Commun élimine le besoin de réconciliation.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -695,9 +695,12 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
-   ═══════════════════════════════════════════════════════════════</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_CycleStep">
@@ -727,85 +730,85 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
               <EnumValue>
                 <Name>X0_PREPARATION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X1_HOMING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 vitesses lentes pour chercher capteur top + référencement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesses lentes pour chercher capteur top + référencement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X2_WORK_POS_SELECT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 ouverture benne (si déjà ouverte → passe vite)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si déjà ouverte -&gt; passe vite)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X4_DESCEND_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X5_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X6_CLOSE_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fermeture benne — tolérance « à peu près fermé »</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne — tolérance « à peu près fermé »</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X7_CTRL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée palier 1 de contrôle</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 de contrôle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X8_ASCENT_LOADED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée nominale jusqu'à limite haute</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée nominale jusqu'à limite haute</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">égouttage temporisé — temps affiché IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">translation vers trémie + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X11_OPEN_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>STABILIZING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 état d'attente/stabilisation (ex-ERROR_HOLD) — pas une erreur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -852,13 +855,13 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0→1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>SEARCHING_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1→0 au fond</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1-&gt;0 au fond</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -1078,7 +1081,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalReached">
@@ -1094,7 +1097,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <derived name="ST_CommunCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configuration des paramètres communs machine</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configuration des paramètres communs machine</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalFault">
@@ -1102,7 +1105,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -1110,8 +1113,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <derived name="ST_BypassCommun" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-🆕 2026-08-07 : granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
+: granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopSensorBypassActive">
@@ -1119,7 +1122,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
        (etaient ecrits par erreur dans Bypass.SlackCable/TopPositionSensor avant ce lot, ce qui
        empechait ces champs de servir de vrai bypass RETAIN operateur).
 🩺 Capteur haut ignore car simulation active</xhtml>
@@ -1179,7 +1182,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
 ⬆️ Monte les 2 treuils simultanément</xhtml>
               </documentation>
             </variable>
@@ -1196,7 +1199,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
 struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
 (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
 ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
@@ -1231,7 +1234,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal)
 Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </documentation>
             </variable>
@@ -1254,7 +1257,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🌐 ST_CommunHMI — Données d'échange IHM COMMUNES (pas propres à un axe)
    ───────────────────────────────────────────────────────────────
-   🆕 REX 2026-07-08 (demande utilisateur) : regroupe les signaux qui ne concernent
+   (demande utilisateur) : regroupe les signaux qui ne concernent
    PAS un axe/mécanisme en particulier (1 seul capteur/signal partagé par toute la
    machine) — évite de les dupliquer ou de les laisser en variables isolées
    directement dans GVL_IHM. Exemple : TopPositionSensorActive (capteur unique,
@@ -1370,7 +1373,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_ModesHMI.
+   📄 Structuration en Cmd / State , homogène avec ST_ModesHMI.
    Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
    Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1576,7 +1579,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Synthèse : (ErrorId &lt;&gt; 0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synthese defaut active : (ErrorId &lt;&gt; 0)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -1584,7 +1587,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ bit0 = RedundancyTestFailed (auto-test A/B), bit1 = EmergencyArmingFailed (timeout confirm contacteur)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield erreurs : bit0=Redundancy, bit1=Arming, bit3=Startup</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -1592,7 +1595,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Canal A ou B resté collé/shunté détecté à l'auto-test — Reset requis (cause disparue)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B reste colle/shunte detecte a l'auto-test (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmFailed">
@@ -1600,7 +1603,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance non confirmé sous 2 s — Reset + contacteur engagé requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="LockoutActive">
@@ -1608,7 +1611,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Verrouillage temporel de 5 s entre tentatives de réarmement échouées</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre tentatives de rearmement echouees</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1619,15 +1622,13 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
-      Consommé par PRG_SUPERVISION_CFC et GVL_Troubleshooting.
-   🎯 Champs lecture seule — producteur unique = FB composite.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_Safety_Emergency_State">
@@ -1638,7 +1639,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Boucle AU fermée (EmergencyChainClosed_DI = TRUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorOk">
@@ -1646,7 +1647,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur puissance confirmé engagé (PowerContactorEngaged_DI = TRUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)</xhtml>
               </documentation>
             </variable>
             <variable name="Step">
@@ -1654,7 +1655,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Étape séquence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -1662,7 +1663,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Réarmement possible maintenant : chain OK, step=0, pas de lockout, pas de redondance échouée, pas de contacteur déjà engagé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -1670,7 +1671,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence armement OU lockout en cours (nouvelle demande ignorée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement OU lockout en cours (nouvelle demande ignoree)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1681,16 +1682,13 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚦 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie State).
-      Consommé par PRG_SUPERVISION_CFC → GVL_IHM.Modes.State pour IHM,
-      et par GVL_Troubleshooting pour diagnostic.
-   🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_SyncHMI">
@@ -1727,7 +1725,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_SyncHMI — Données d'échange IHM pour la synchronisation M1/M2
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State / Cfg / Bypass (2026-07-23), homogène avec ST_WinchHMI.
+   📄 Structuration en Cmd / State / Cfg / Bypass , homogène avec ST_WinchHMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1755,7 +1753,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configurations et limites — 🆕 2026-08-06, manquait (contrairement à ST_WinchHMI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — , manquait (contrairement à ST_WinchHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -1763,7 +1761,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_BypassTranslation" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -1786,7 +1784,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ↔️ ST_TranslationHMI — Données d'échange IHM pour le Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
-   📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
+   📄 Structuration en Cmd / State / Safety / Bypass / Test —
       doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -1815,7 +1813,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_WinchCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configurations et limites</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -1831,7 +1829,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_BypassWinch" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="Bucket">
@@ -1885,7 +1883,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_WinchCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configurations et limites</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -1901,7 +1899,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_BypassWinch" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1916,7 +1914,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ⚙️ ST_WinchHMI — Données d'échange IHM pour un treuil (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des bargraphes, LEDs, mesures et réglages.
-   📄 Structuration en Cmd / State / Cfg / Safety / Bypass (2026-07-22)
+   📄 Structuration en Cmd / State / Cfg / Safety / Bypass
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1928,7 +1926,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart M1/M2 en mètres benne ouvert</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
               </documentation>
             </variable>
             <variable name="OffsetCloseM">
@@ -1936,7 +1934,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart M1/M2 en mètres benne fermé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CoherenceLimitM">
@@ -1944,7 +1942,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de détection d'incohérence au boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CloseAnticipationM">
@@ -1955,11 +1953,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (20) — retour terrain, demande client : inertie mécanique du benne (M2 continue
-sur sa lancée après coupure StartStop) -- couper la commande EN AVANCE de la cible pour que
-l'arrêt réel (après coast-down) tombe proche du vrai offset, au lieu de dépasser. Anticipation
-distincte par sens (fermeture/ouverture ont des inerties différentes selon retour terrain).
-Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
               </documentation>
             </variable>
             <variable name="OpenAnticipationM">
@@ -1970,7 +1964,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <simpleValue value="1.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe la commande d'ouverture 1.3m avant OffsetOpenM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1981,11 +1975,12 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.A
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_BypassCommun">
@@ -2020,7 +2015,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitSwitch">
@@ -2028,7 +2023,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite basse physique (longueur câble), OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite basse physique (longueur câble), OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegal">
@@ -2036,7 +2031,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -2056,9 +2051,9 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
+   ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
    ───────────────────────────────────────────────────────────────
-   🎨 2026-08-07 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
+   🎨 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
       GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
@@ -2067,7 +2062,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
       n'entraîne la désactivation de l'autre.
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
-   🔧 2026-08-07 : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
+   : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
       était de toute façon inutilisé comme bypass réel jusqu'ici (PRG_07_Supervision y écrivait un
       indicateur simulation par erreur, voir ST_CommunHMI.SimTopSensorBypassActive).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -2209,7 +2204,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (9) : bypass simplifié de la séquence FB_DiveSearch complète (préconditions
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : bypass simplifié de la séquence FB_DiveSearch complète (préconditions
 strictes -- benne ouverte, DiveStartMin_M, fenêtre immersion). Si TRUE, un front MONTANT
 Kobold pendant une descente confirme directement le fond, sans passer par l'état-machine
 FB_DiveSearch (qui continue de tourner en parallèle, inchangée -- utile pour
@@ -2225,7 +2220,7 @@ seule source de confirmation).</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : mode vidage à la trémie —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mode vidage à la trémie —</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2330,7 +2325,7 @@ seule source de confirmation).</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : mode vidage à la trémie (pas de FB dédié, logique combinatoire PRG_04)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mode vidage à la trémie (pas de FB dédié, logique combinatoire PRG_04)
 TglEnableDumpAtTremie (bit IHM brut)</xhtml>
               </documentation>
             </variable>
@@ -2371,7 +2366,7 @@ TglEnableDumpAtTremie (bit IHM brut)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (9) : diagnostic bypass séquence DiveSearch
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : diagnostic bypass séquence DiveSearch
 TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
               </documentation>
             </variable>
@@ -2428,7 +2423,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — 🆕 2026-08-12 : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_KoboldBottomTouch_DI">
@@ -2436,7 +2431,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — 🆕 2026-08-12 : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -2460,7 +2455,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-12 : Trémie pleine OU grille levée — pas encore câblé électriquement,</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Trémie pleine OU grille levée — pas encore câblé électriquement,</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2594,7 +2589,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="M3_StatusWord">
@@ -2880,7 +2875,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
               </documentation>
             </variable>
             <variable name="Online">
@@ -2904,7 +2899,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Joystick en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -2992,7 +2987,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -3102,7 +3097,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassSync — Bypass de la surveillance synchronisation M1/M2
+   ST_BypassSync — Bypass de la surveillance synchronisation M1/M2
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -3183,7 +3178,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Alarme synchro active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme synchro active</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -3281,7 +3276,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : Bypass interlock hauteur mini M1/M2 requise pour translation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass interlock hauteur mini M1/M2 requise pour translation</xhtml>
               </documentation>
             </variable>
             <variable name="MecaA">
@@ -3334,7 +3329,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -3348,7 +3343,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
+   ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
    ───────────────────────────────────────────────────────────────
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
@@ -3541,7 +3536,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 2026-08-06 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
 GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
               </documentation>
@@ -3551,7 +3546,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -3577,7 +3572,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
    🎮 ST_TranslationCmd — Commandes IHM pour la Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
-   📄 2026-07-24 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
+   📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
       sans pont générique pour ne jamais persister BtnFwd/BtnRev.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -3623,7 +3618,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Translation en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -3812,7 +3807,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
               </documentation>
             </variable>
             <variable name="AtPV">
@@ -3871,7 +3866,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenanceTargetEnable">
@@ -3892,7 +3887,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3944,7 +3939,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketHMI — Données d'échange IHM pour la benne (M2)
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State / Cfg / Bypass (2026-07-23), homogène avec ST_WinchHMI.
+   📄 Structuration en Cmd / State / Cfg / Bypass , homogène avec ST_WinchHMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3997,7 +3992,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI)</xhtml>
               </documentation>
             </variable>
             <variable name="TopLimitSwitch">
@@ -4014,7 +4009,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée CablePosM &gt;= TopLimitM, symétrique CableLimitSwitch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass fin de course logiciel haut (position calculée CablePosM &gt;= TopLimitM, symétrique CableLimitSwitch)</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitSwitch">
@@ -4030,7 +4025,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached)</xhtml>
               </documentation>
             </variable>
             <variable name="MecaA">
@@ -4107,7 +4102,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -4121,7 +4116,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
+   ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
    ───────────────────────────────────────────────────────────────
    🎨 Regroupe les bypass "dégradé assumé" propres à un axe (codeur,
       contacteurs) — chaque treuil a son propre matériel, donc son
@@ -4205,7 +4200,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass codeur effectivement accepté, uniquement MAINT_N2</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitDescent">
@@ -4432,7 +4427,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton IHM inhibition treuil — mise en service,</xhtml>
               </documentation>
             </variable>
             <variable name="BtnHomingAtZero">
@@ -4440,7 +4435,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX mise en service : force le homing à 0 m (points codeur centre),</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le homing à 0 m (points codeur centre),</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4515,7 +4510,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut mémorisé du moniteur vitesse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut mémorisé du moniteur vitesse</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMonitorErrorId">
@@ -4603,7 +4598,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Treuil en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Treuil en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -4782,7 +4777,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 miroir lecture seule — inhibition arbitrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">miroir lecture seule — inhibition arbitrée</xhtml>
               </documentation>
             </variable>
             <variable name="BottomLimitActiveM">
@@ -4790,7 +4785,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 2026-08-07 : ralentissement sur bordure — diagnostic zone/limite active
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 : ralentissement sur bordure — diagnostic zone/limite active
 📏 Limite basse active (m) — câble physique OU légale, la plus restrictive</xhtml>
               </documentation>
             </variable>
@@ -4815,7 +4810,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 : diagnostic retour terrain — délai ressenti à la remontée
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic délai ressenti à la remontée
 🩺 Sens interne mémorisé FB_Winch (-1/0/+1)</xhtml>
               </documentation>
             </variable>
@@ -4858,7 +4853,8 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation FB (FALSE = neutralisation, sorties coupées)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE AXE ===
+--&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)</xhtml>
               </documentation>
             </variable>
             <variable name="StartStop">
@@ -4866,7 +4862,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération normale</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRef">
@@ -4874,7 +4870,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse signee (-100.0..+100.0 %, signe coherent avec Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -4882,7 +4878,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4893,17 +4889,13 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de consigne d'axe 4 champs produite par FB_Joystick.
+   📤 Champs : Enable, StartStop, SpeedRef, Direction.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 4 champs exactement :
-      - Enable    : Autorisation globale du pipeline
-      - StartStop : RAMPE (TRUE = accélération, FALSE = décélération normale)
-      - SpeedRef  : Consigne vitesse signée (-100.0 .. +100.0 %)
-      - Direction : Sens d'axe (-1 = Rev, 0 = Neutre, +1 = Fwd)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_State">
@@ -5025,7 +5017,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement benne position ouverte (mise en service) — confirmation pure, aucun mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référencement benne position ouverte (mise en service) — confirmation pure, aucun mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="BtnConfirmClosePos">
@@ -5033,7 +5025,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="TglManualBucketLimits">
@@ -5044,12 +5036,12 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
 uniquement en SelJoystickWinch=2 (unitaire M2). Si TRUE : borne le déplacement entre les
 positions ouvert/fermé configurées (OffsetOpenM/OffsetCloseM relatif à M1, mêmes bornes que
 FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
 CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
-🆕 2026-08-07 (18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
+(18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5145,7 +5137,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Benne en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -5177,7 +5169,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Demande de fermeture active (image FB_Bucket)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de fermeture active (image FB_Bucket)</xhtml>
               </documentation>
             </variable>
             <variable name="OpenActive">
@@ -5185,7 +5177,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Demande d'ouverture active (image FB_Bucket)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande d'ouverture active (image FB_Bucket)</xhtml>
               </documentation>
             </variable>
             <variable name="M2PositionCorrected">
@@ -5209,7 +5201,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Ouverture auto armée (descente couplée demandée, benne pas ouverte)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Ouverture auto armée (descente couplée demandée, benne pas ouverte)</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledAscentCloseArmed">
@@ -5217,7 +5209,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
               </documentation>
             </variable>
             <variable name="ControlAscentActive">
@@ -5225,7 +5217,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledMotionBlockedByBucket">
@@ -5233,7 +5225,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 2026-08-07 : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5269,7 +5261,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -5283,7 +5275,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassBucket — Bypass de la surveillance benne (M2)
+   ST_BypassBucket — Bypass de la surveillance benne (M2)
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -5300,6 +5292,28 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BRAKE_COMMAND_NOT_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence confirmation ouverture frein &gt; 500ms</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RESTART_INHIBITED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -5325,6 +5339,46 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Desactive / Hors service</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Pret / Etat nominal</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_BRAKE_COMMAND_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation feedback frein</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_STEP_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation changement de palier</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_RESTART_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation anti-court-cycle redemarrage</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -5379,16 +5433,13 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §3,
-                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
-   Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
-   détecter un collage / une absence de fermeture d'un contacteur de
-   puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
-   appelant).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_EncoderHMI">
@@ -5447,7 +5498,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Codeur en défaut (liaison EtherCAT ou preset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur en défaut (liaison EtherCAT ou preset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -5488,7 +5539,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut de référencement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut de référencement</xhtml>
               </documentation>
             </variable>
             <variable name="HomingErrorId">
@@ -5554,7 +5605,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne ouvert mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ouvert memorise</xhtml>
               </documentation>
             </variable>
             <variable name="IsClosed">
@@ -5562,7 +5613,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne fermé mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ferme memorise</xhtml>
               </documentation>
             </variable>
             <variable name="TooOpen">
@@ -5570,7 +5621,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)</xhtml>
               </documentation>
             </variable>
             <variable name="TooClosed">
@@ -5578,7 +5629,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement fermeture (Delta &gt; OffsetClose + Tolerance)</xhtml>
               </documentation>
             </variable>
             <variable name="IsIntermediate">
@@ -5586,7 +5637,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entre Ouvert et Fermé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position intermediaire (entre Ouvert et Ferme)</xhtml>
               </documentation>
             </variable>
             <variable name="LastPosM2Open">
@@ -5594,7 +5645,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernière position M2 mémorisée ouvert</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ouvert (m)</xhtml>
               </documentation>
             </variable>
             <variable name="LastPosM2Close">
@@ -5602,7 +5653,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernière position M2 mémorisée fermé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
               </documentation>
             </variable>
             <variable name="StateIncoherent">
@@ -5610,7 +5661,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État non sûr (divergence boot/réel)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat non sur (divergence boot/reel)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5621,11 +5672,12 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.B
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -5691,7 +5743,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <derived name="FB_CfgPersistBridge_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : Translation n'avait pas de slot Cfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation n'avait pas de slot Cfg</xhtml>
               </documentation>
             </variable>
             <variable name="instDiagCanOpen">
@@ -5780,8 +5832,6 @@ instDiagIhmHeartbeat(
     TglHeartbeatIhm := SEL(GVL_IHM.Network.Bypass.IhmHeartbeat, GVL_IHM.Commun.TglHeartbeatIhm, GVL_Global.BlinkClock)
 );
 
-StubTranslationPositionSelect_IHM          := GVL_IHM.TranslationM3.Cmd.SelTarget;
-
 FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
@@ -5845,7 +5895,7 @@ IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
     GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
-// 🆕 2026-08-06 (retour terrain, mise en service) : jusqu'ici _TranslationSetFreq_Hz
+// Jusqu'ici _TranslationSetFreq_Hz
 // n'était JAMAIS réécrit après sa déclaration — la restauration au boot rejouait donc
 // toujours la valeur par défaut compilée (0.0), jamais le dernier réglage opérateur.
 // Recopie continue (après restauration) : toute consigne changée en session survit au
@@ -5878,7 +5928,7 @@ IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
 END_IF;
 
-// 🔧 REX 2026-08 : GVL_BypassRetain.BypassSyncGlobal (RETAIN) et
+// GVL_BypassRetain.BypassSyncGlobal (RETAIN) et
 // ST_BypassSync.Initialized existaient tous les deux, mais aucun bloc de
 // restauration boot ne les reliait (contrairement à Translation/M1/M2 ci-dessus)
 // — Initialized restait bloqué à FALSE indéfiniment, bypass synchro jamais
@@ -5956,7 +6006,7 @@ GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
 GVL_IHM.Commun.PhaseRotationFault        := NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;
 
-// 💓 Publication heartbeat IHM↔PLC (T83, LOT0_DIAG_IHM_HEARTBEAT 2026-08-05)
+// 💓 Publication heartbeat IHM↔PLC
 GVL_IHM.Commun.HeartbeatIhmOk            := instDiagIhmHeartbeat.HeartbeatIhmOk;
 GVL_IHM.Commun.HeartbeatIhmTimeout       := instDiagIhmHeartbeat.HeartbeatIhmTimeout;
 GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdge;
@@ -6050,7 +6100,7 @@ GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigital
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
 // 🖥️ Bandeau IHM 4 champs (AF-07 §4)
-// 🆕 Publication des états du cycle semi-auto (lecture seule) — alimente le bandeau (T115)
+// Publication des états du cycle semi-auto (lecture seule) — alimente le bandeau
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
 GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy;
 GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Done;
@@ -6177,36 +6227,174 @@ instTroubleshootingView(
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; ETATS MACHINE ===
+--&gt; [CMD] Lancement du verdict (front montant)</xhtml>
+              </documentation>
             </variable>
             <variable name="MachineIsStill">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Machine a l'arret complet (vitesse nulle)</xhtml>
+              </documentation>
             </variable>
-            <variable name="M1BrakeApplied, M2BrakeApplied, M3BrakeApplied">
+            <variable name="M1BrakeApplied">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS FREINS &amp; CONTACTEURS ===
+--&gt; [HW]  Frein M1 serre</xhtml>
+              </documentation>
             </variable>
-            <variable name="M1ContactorsReleased, M2ContactorsReleased, M1ThermalOk, M2ThermalOk">
+            <variable name="M2BrakeApplied">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Frein M2 serre</xhtml>
+              </documentation>
             </variable>
-            <variable name="BrakeThermalOk, PhaseRotationOk, SlackCableTensioned, M3SensorWordIncoherent">
+            <variable name="M3BrakeApplied">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Frein M3 serre</xhtml>
+              </documentation>
             </variable>
-            <variable name="EmergencyChainClosed, PowerContactorEngaged, EncoderM1Operational, EncoderM2Operational">
+            <variable name="M1ContactorsReleased">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteurs M1 retombes</xhtml>
+              </documentation>
             </variable>
-            <variable name="HomedM1, HomedM2, M1PositionInBounds, M2PositionInBounds">
+            <variable name="M2ContactorsReleased">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteurs M2 retombes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1ThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PROTECTION THERMIQUE &amp; RESEAU ===
+--&gt; [HW]  Thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Thermique freins OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotationOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Ordre des phases reseau OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlackCableTensioned">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; CHAINE DE SECURITE ===
+--&gt; [HW]  Cable M2 tendu (anti-mou)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3SensorWordIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Incoherence mot capteurs M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine d'arret d'urgence fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteur de puissance enclenche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CODEURS &amp; HOMING ===
+--&gt; [HW]  Codeur M1 operationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codeur M2 operationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Homing M1 effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Homing M2 effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1PositionInBounds">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Position M1 dans les bornes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PositionInBounds">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Position M2 dans les bornes</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -6214,21 +6402,34 @@ instTroubleshootingView(
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS ET DIAGNOSTIC ===
+&lt;-- [STAT] Verdict preflight OK (aucun defaut)</xhtml>
+              </documentation>
             </variable>
             <variable name="PreflightDone">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Verdict preflight termine</xhtml>
+              </documentation>
             </variable>
             <variable name="PreflightBusy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Diagnostic preflight en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="PreflightErrorId">
               <type>
                 <WORD />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de defauts preflight (16 bits)</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -6236,6 +6437,10 @@ instTroubleshootingView(
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TRIGGERS &amp; ETATS INTERNES ===
+. [LOC] Trigger front montant Execute</xhtml>
+              </documentation>
             </variable>
             <variable name="BootPending">
               <type>
@@ -6244,31 +6449,42 @@ instTroubleshootingView(
               <initialValue>
                 <simpleValue value="TRUE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande preflight initiale au demarrage</xhtml>
+              </documentation>
             </variable>
             <variable name="RequestPending">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande de verdict en attente</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🩺 FB_Acquisition_Preflight — Verdict passif machine arrêtée
-   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
-   🔒 Observateur pur : aucun SafeStop, PowerCutOff ou ordre machine.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Acquisition_Preflight — Verdict passif machine arrêtée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Verdict passif de qualification E/S machine arrêtée (16 contrôles)
+   🔒 Polarité : Observateur pur (aucun SafeStop, PowerCutOff ou ordre machine)
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §6
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate et demande"}
 ExecuteEdge(CLK := Execute);
 RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
 PreflightBusy := RequestPending AND NOT MachineIsStill;
 IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
 IF NOT RequestPending THEN RETURN; END_IF;
+{endregion}
 
+{region "§2 Calcul verdict"}
 PreflightErrorId := 0;
 (* bit0..2 frein M1/M2/M3 serré; bit3..4 contacteurs M1/M2 retombés;
    bit5..6 thermique M1/M2 OK; bit7 thermique frein OK; bit8 phases OK;
@@ -6290,7 +6506,11 @@ IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000
 IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
 IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;
 IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#8000; END_IF;
+{endregion}
+
+{region "§3 Sortie"}
 PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -6308,6 +6528,10 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <inOutVars>
@@ -6316,7 +6540,8 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
                 <derived name="ST_BucketCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.M2TreuilBenne.Bucket.Cfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -6324,18 +6549,18 @@ PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FAL
                 <derived name="ST_BucketCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._BucketCfgPersist</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_BucketCfg — Pont persistance générique pour ST_BucketCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_BucketCfg — Pont persistance pour ST_BucketCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
-   seul le type ST_BucketCfg change. La copie struct-à-struct gère aussi le sous-struct imbriqué
-   Config : ST_BucketConfig automatiquement (pas de traitement spécial nécessaire).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -6367,6 +6592,10 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <inOutVars>
@@ -6375,7 +6604,8 @@ END_IF;
                 <derived name="ST_CommunCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.Commun.Cfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -6383,17 +6613,18 @@ END_IF;
                 <derived name="ST_CommunCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._CommunCfgPersist</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_CommunCfg — Pont persistance générique pour ST_CommunCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_CommunCfg — Pont persistance pour ST_CommunCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
-   seul le type ST_CommunCfg change.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -6425,6 +6656,10 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <inOutVars>
@@ -6433,7 +6668,8 @@ END_IF;
                 <derived name="ST_CycleCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.Cycle.Cfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -6441,17 +6677,18 @@ END_IF;
                 <derived name="ST_CycleCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._CycleCfgPersist</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_CycleCfg — Pont persistance générique pour ST_CycleCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_CycleCfg — Pont persistance pour ST_CycleCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
-   seul le type ST_CycleCfg change.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -6483,6 +6720,10 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <inOutVars>
@@ -6490,17 +6731,28 @@ END_IF;
               <type>
                 <derived name="ST_DredgingAssistCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
+              </documentation>
             </variable>
             <variable name="Persist">
               <type>
                 <derived name="ST_DredgingAssistCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
+              </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_DredgingAssistCfg — Pont IHM/persistance prélèvement
-   ═══════════════════════════════════════════════════════════════</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_DredgingAssistCfg — Pont persistance prélèvement
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -6533,7 +6785,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 TRUE pendant 1 scan le boot où la restauration a eu lieu —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -6543,7 +6796,8 @@ END_IF;
                 <derived name="ST_SyncCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.M1M2Sync.Cfg — struct exposé à l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -6551,23 +6805,18 @@ END_IF;
                 <derived name="ST_SyncCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._SyncCfgPersist — mémoire PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_SyncCfg — Pont persistance générique pour ST_SyncCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_SyncCfg — Pont persistance pour ST_SyncCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Remplace les blocs manuels restauration/sauvegarde dupliqués à chaque domaine
-   (voir DOC/AUDITS/ConfigPersistence/). Une instance = un couple (struct IHM, struct
-   GVL_PERSISTENT) du MÊME type. Logique :
-   - Hmi.Initialized = FALSE (RETAIN invalidé, ex. changement de layout DUT) → restaure
-     Hmi depuis Persist, marque Initialized, pulse JustRestored 1 scan.
-   - Hmi.Initialized = TRUE → sauvegarde continue Hmi vers Persist (jamais l'inverse).
-   🔒 Défense en profondeur : jamais d'écriture PERSISTENT avant qu'une restauration
-   réussie n'ait eu lieu (même principe que tous les blocs Cfg du Lot 2).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -6600,7 +6849,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 TRUE pendant le scan de restauration</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -6610,7 +6860,8 @@ END_IF;
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Struct exposé à l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -6618,17 +6869,18 @@ END_IF;
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 Mémoire PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_TranslationCfg — Pont persistance générique pour ST_TranslationCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_TranslationCfg — Pont persistance pour ST_TranslationCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Instance unique : TranslationM3.Cfg (un seul axe M3, contrairement à M1/M2).
-   Restaure Persist → Hmi au boot si nécessaire, puis sauvegarde Hmi → Persist.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -6661,7 +6913,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 TRUE pendant le scan de restauration</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -6671,7 +6924,8 @@ END_IF;
                 <derived name="ST_WinchCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Struct exposé à l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -6679,17 +6933,18 @@ END_IF;
                 <derived name="ST_WinchCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 Mémoire PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_WinchCfg — Pont persistance générique pour ST_WinchCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_WinchCfg — Pont persistance pour ST_WinchCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Deux instances indépendantes : M1TreuilRetenue.Cfg et M2TreuilBenne.Cfg.
-   Restaure Persist → Hmi au boot si nécessaire, puis sauvegarde Hmi → Persist.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -6721,7 +6976,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance CAN</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONTROLE ===
+--&gt; [CMD] Active la surveillance CAN</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -6729,7 +6985,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front d'acquittement des défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement des defauts</xhtml>
               </documentation>
             </variable>
             <variable name="CANbusStateRaw">
@@ -6737,7 +6993,8 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute CANbus.GetBusState() (2 = ACTIVE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS BRUTS MATERIEL ===
+--&gt; [HW]  Valeur brute CANbus.GetBusState() (2 = ACTIVE)</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickStateRaw">
@@ -6745,7 +7002,7 @@ END_IF;
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute JOY1.GetDeviceState()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Valeur brute JOY1.GetDeviceState()</xhtml>
               </documentation>
             </variable>
             <variable name="SimBypassActive">
@@ -6753,7 +7010,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active pour ce device</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASS &amp; SIMULATION ===
+--&gt; [TST] TRUE = simulation active pour ce device</xhtml>
               </documentation>
             </variable>
             <variable name="NetworkBypassActive">
@@ -6761,7 +7019,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = bypass reseau global IHM</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -6771,7 +7029,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Logique de surveillance active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; CONFORMITE ===
+&lt;-- [STAT] Logique de surveillance active</xhtml>
               </documentation>
             </variable>
             <variable name="Busy">
@@ -6779,7 +7038,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Non utilisé (conformité interface)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise (conformite interface)</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -6787,23 +7046,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Non utilisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Présence anomalie de communication</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut global résumé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -6811,7 +7054,24 @@ END_IF;
                 <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante (INIT/SIMULATED/READY/ERROR)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase courante (INIT/SIMULATED/READY/ERROR)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; ALARMES ===
+&lt;-- [DIAG] Presence anomalie de communication</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut global resume</xhtml>
               </documentation>
             </variable>
             <variable name="StateAtError">
@@ -6819,7 +7079,7 @@ END_IF;
                 <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase figée à l'apparition de l'erreur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Phase figee a l'apparition de l'erreur</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceCanOpenMaster">
@@ -6827,7 +7087,7 @@ END_IF;
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics bus CANopen</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics bus CANopen</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystick">
@@ -6835,7 +7095,7 @@ END_IF;
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave Joystick</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave Joystick</xhtml>
               </documentation>
             </variable>
             <variable name="CANbusStateRawOut">
@@ -6843,13 +7103,17 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroirs bruts lisibles directement sur l'instance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIRS BRUTS MATERIEL ===
+&lt;-- [DIAG] Miroir brut status CANbus</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickStateRawOut">
               <type>
                 <derived name="DEVICE_STATE" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Miroir brut status Joystick</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -6858,7 +7122,8 @@ END_IF;
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecteur front de reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Detecteur front de reset</xhtml>
               </documentation>
             </variable>
             <variable name="CANbusOnlineReal">
@@ -6866,7 +7131,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus réellement actif, hors tout bypass</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS ET ETATS INTERNES ===
+. [LOC]  Bus reellement actif, hors tout bypass</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickOnlineReal">
@@ -6874,7 +7140,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick réellement RUNNING, hors tout bypass</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Joystick reellement RUNNING, hors tout bypass</xhtml>
               </documentation>
             </variable>
             <variable name="BypassActive">
@@ -6882,7 +7148,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation OU bypass réseau IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Simulation OU bypass reseau IHM</xhtml>
               </documentation>
             </variable>
             <variable name="CANbusOnlineEff">
@@ -6890,7 +7156,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Online effectif (reel OU bypass)</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickOnlineEff">
@@ -6898,29 +7164,25 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Operational effectif (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Operational effectif (reel OU bypass)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Diag_CanOpen — Diagnostic bus CANopen &amp; Esclave Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
-   🎯 Rôle : Décide Online/Operational et publie ST_Diag_Device.
-      Distinction explicite dans State :
-      - INIT       : pas encore online (ni réel, ni bypass)
-      - SIMULATED  : bypass actif (simulation ou bypass réseau IHM)
-      - READY      : bus réellement online
-      - ERROR      : défaut détecté
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Surveillance bus CANopen master et esclave Joystick (Online/Op)
+   🔌 Architecture : Publication ST_Diag_Device &amp; E_Diag_State
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate"}
 // 🛑 1. GATE : Désactivation logique si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
@@ -6941,14 +7203,18 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
+{endregion}
 
+{region "§2 Interprétation valeurs brutes"}
 // 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
 CANbusOnlineReal         := (CANbusStateRaw = 2);
 DeviceJoystickOnlineReal := (DeviceJoystickStateRaw = DEVICE_STATE.RUNNING);
 BypassActive             := SimBypassActive OR NetworkBypassActive;
 CANbusOnlineEff          := CANbusOnlineReal OR BypassActive;
 DeviceJoystickOnlineEff  := DeviceJoystickOnlineReal OR BypassActive;
+{endregion}
 
+{region "§3 Reset front"}
 // 🔑 3. RESET FRONT — Efface les défauts si la cause a disparu
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
@@ -6957,12 +7223,13 @@ IF ResetEdge.Q THEN
         StateAtError := E_Diag_State.DISABLED;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Diagnostic joystick"}
 // 🔍 4. DIAGNOSTIC JOYSTICK
 // Bit 0 : Perte de communication CAN
 IF NOT CANbusOnlineEff THEN
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId OR 16#0001;  (* Perte liaison CAN joystick *)
-    DeviceJoystick.Online := FALSE;
 ELSE
     DeviceJoystick.Online := TRUE;
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFE; (* Effacement auto si la liaison revient *)
@@ -6976,7 +7243,9 @@ ELSE
     DeviceJoystick.Operational := TRUE;
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFD; (* Effacement auto dès que RUNNING *)
 END_IF;
+{endregion}
 
+{region "§5 Machine etat joystick"}
 // 🚦 5. MACHINE D'ÉTAT JOYSTICK
 IF DeviceJoystick.ErrorId &lt;&gt; 0 THEN
     DeviceJoystick.State := E_Diag_State.ERROR;
@@ -6992,7 +7261,9 @@ ELSE
 END_IF;
 
 State := DeviceJoystick.State;
+{endregion}
 
+{region "§6 Sorties globales"}
 // 📤 6. SORTIES GLOBALES
 DeviceJoystick.Error := (DeviceJoystick.ErrorId &lt;&gt; 0);
 Error := DeviceJoystick.Error;
@@ -7016,6 +7287,7 @@ DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
 // Briques génériques pour conformité standard
 Busy := FALSE;
 Done := FALSE;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -7033,7 +7305,8 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance EtherCAT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONTROLE ===
+--&gt; [CMD] Active la surveillance EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -7041,7 +7314,7 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front d'acquittement des défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement des defauts</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateurStateRaw">
@@ -7049,8 +7322,8 @@ Done := FALSE;
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Variateur M3 (AC600_ECAT_Drive)
-Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS BRUTS MATERIEL &amp; BYPASS VARIATEUR M3 ===
+--&gt; [HW]  Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateurSimBypass">
@@ -7058,7 +7331,7 @@ Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = simulation active variateur M3</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1StateRaw">
@@ -7066,8 +7339,8 @@ Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Encodeur M1 (COD1_CODEUR)
-Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS BRUTS MATERIEL &amp; BYPASS ENCODEUR M1 ===
+--&gt; [HW]  Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1SimBypass">
@@ -7075,7 +7348,7 @@ Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = simulation active encodeur M1</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM2StateRaw">
@@ -7083,8 +7356,8 @@ Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Encodeur M2 (COD2_CODEUR)
-Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS BRUTS MATERIEL &amp; BYPASS ENCODEUR M2 ===
+--&gt; [HW]  Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM2SimBypass">
@@ -7092,7 +7365,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = simulation active encodeur M2</xhtml>
               </documentation>
             </variable>
             <variable name="NetworkBypassActive">
@@ -7100,7 +7373,8 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASS RESEAU IHM ===
+--&gt; [TST] TRUE = bypass reseau global IHM</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -7110,7 +7384,8 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Logique de surveillance active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; CONFORMITE ===
+&lt;-- [STAT] Logique de surveillance active</xhtml>
               </documentation>
             </variable>
             <variable name="Busy">
@@ -7118,7 +7393,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Non utilisé (conformité)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise (conformite interface)</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -7126,23 +7401,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Non utilisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Résumé anomalie de communication bus</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut global résumé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -7150,7 +7409,24 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du diagnostic global — voir en-tête</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase courante du diagnostic global</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; ALARMES ===
+&lt;-- [DIAG] Resume anomalie de communication bus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut global resume</xhtml>
               </documentation>
             </variable>
             <variable name="StateAtError">
@@ -7158,7 +7434,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase figée à l'apparition de l'erreur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Phase figee a l'apparition de l'erreur</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEthercatMaster">
@@ -7166,7 +7442,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics bus EtherCAT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics bus EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateur">
@@ -7174,7 +7450,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave AC600</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave AC600</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1">
@@ -7182,7 +7458,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave COD1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave COD1</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM2">
@@ -7190,7 +7466,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave COD2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave COD2</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateurStateRawOut">
@@ -7198,18 +7474,25 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroirs bruts lisibles directement sur l'instance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIRS BRUTS MATERIEL ===
+&lt;-- [DIAG] Miroir brut status variateur M3</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1StateRawOut">
               <type>
                 <derived name="DEVICE_STATE" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Miroir brut status encodeur M1</xhtml>
+              </documentation>
             </variable>
             <variable name="DeviceEncoderM2StateRawOut">
               <type>
                 <derived name="DEVICE_STATE" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Miroir brut status encodeur M2</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -7218,7 +7501,8 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecteur front de reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Detecteur front de reset</xhtml>
               </documentation>
             </variable>
             <variable name="VariateurOnlineReal">
@@ -7226,65 +7510,83 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">GetDeviceState() = RUNNING, hors tout bypass</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS ET ETATS INTERNES ===
+. [LOC]  GetDeviceState() = RUNNING, hors tout bypass</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1OnlineReal">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  GetDeviceState() = RUNNING, hors tout bypass</xhtml>
+              </documentation>
             </variable>
             <variable name="EncoderM2OnlineReal">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  GetDeviceState() = RUNNING, hors tout bypass</xhtml>
+              </documentation>
             </variable>
             <variable name="VariateurBypass">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation OU bypass réseau IHM, pour ce device</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Simulation OU bypass reseau IHM variateur</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1Bypass">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Simulation OU bypass reseau IHM encodeur M1</xhtml>
+              </documentation>
             </variable>
             <variable name="EncoderM2Bypass">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Simulation OU bypass reseau IHM encodeur M2</xhtml>
+              </documentation>
             </variable>
             <variable name="VariateurOnlineEff">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Online effectif (reel OU bypass)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1OnlineEff">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Online effectif (reel OU bypass)</xhtml>
+              </documentation>
             </variable>
             <variable name="EncoderM2OnlineEff">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Online effectif (reel OU bypass)</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 FB_Diag_Ethercat — Diagnostic bus EtherCAT (3 esclaves)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Diag_Ethercat — Diagnostic bus EtherCAT &amp; Esclaves (M3, COD1, COD2)
    ───────────────────────────────────────────────────────────────
-   📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
-   🎯 Rôle : Décide Online/Operational pour variateur M3 + codeurs M1/M2.
-      Publie ST_Diag_Device par device + state global.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Surveillance bus EtherCAT master, variateur M3 et codeurs M1/M2
+   🔌 Architecture : Publication ST_Diag_Device par esclave &amp; E_Diag_State
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -7474,7 +7776,8 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance ; FALSE = IHM non valide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; REGLAGES ===
+--&gt; [CMD] Active la surveillance (FALSE = IHM invalide)</xhtml>
               </documentation>
             </variable>
             <variable name="TglHeartbeatIhm">
@@ -7482,7 +7785,7 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Toggle IHM, inversion attendue toutes les 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Toggle IHM, inversion attendue toutes les 500 ms</xhtml>
               </documentation>
             </variable>
             <variable name="IhmTimeout">
@@ -7493,7 +7796,7 @@ Done := FALSE;
                 <simpleValue value="TIME#2s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence maximale de front IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Absence maximale de front IHM</xhtml>
               </documentation>
             </variable>
             <variable name="PlcTogglePeriod">
@@ -7504,7 +7807,7 @@ Done := FALSE;
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Période du clignotant PLC</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Periode du clignotant PLC</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -7514,7 +7817,8 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE après front IHM post-boot et avant timeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS &amp; DIAGNOSTICS IHM ===
+&lt;-- [STAT] TRUE apres front IHM post-boot et avant timeout</xhtml>
               </documentation>
             </variable>
             <variable name="HeartbeatIhmTimeout">
@@ -7522,7 +7826,7 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = aucun front IHM depuis IhmTimeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] TRUE = aucun front IHM depuis IhmTimeout</xhtml>
               </documentation>
             </variable>
             <variable name="TglHeartbeatPlc">
@@ -7530,7 +7834,7 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Clignotant PLC à superviser côté IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Clignotant PLC a superviser cote IHM</xhtml>
               </documentation>
             </variable>
             <variable name="TimeSinceIhmEdge">
@@ -7538,50 +7842,62 @@ Done := FALSE;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic : temps depuis le dernier front IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Temps ecoule depuis le dernier front IHM</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
+            <variable name="IhmTimeoutTon">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Timer de surveillance timeout IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PlcToggleTon">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Timer clignotant heartbeat PLC</xhtml>
+              </documentation>
+            </variable>
             <variable name="LastIhmToggle">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS ET ETATS INTERNES ===
+. [LOC]  Memoire du dernier etat toggle IHM</xhtml>
+              </documentation>
             </variable>
             <variable name="IhmEdgeSeen">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interdit de valider une valeur RETAIN au boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Verrou front vu (interdit RETAIN au boot)</xhtml>
               </documentation>
             </variable>
             <variable name="IhmEdgeDetected">
               <type>
                 <BOOL />
               </type>
-            </variable>
-            <variable name="IhmTimeoutTon">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="PlcToggleTon">
-              <type>
-                <derived name="TON" />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Front de changement toggle IHM detecte</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💓 FB_Diag_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Diag_IhmHeartbeat — Surveillance bidirectionnelle Heartbeat IHM/PLC
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md (mise à jour Heartbeat requise)
-   🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
-      et expose un diagnostic. Ne produit ni SafeStop ni PowerCutOff.
-   🛡️ Les FB_Safety_Winch / FB_Safety_Translation restent propriétaires
-      de leurs réactions métier.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Surveillance toggle IHM, generation toggle PLC et diagnostic timeout
+   🛡️ Protection : FB de diagnostic autonome (sans action directe sur AU)
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -7590,6 +7906,7 @@ Done := FALSE;
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate"}
 // 🛑 Sans Enable, aucune valeur mémorisée ne peut déclarer l'IHM valide.
 IF NOT Enable THEN
     HeartbeatIhmOk := FALSE;
@@ -7602,26 +7919,33 @@ IF NOT Enable THEN
     PlcToggleTon(IN := FALSE, PT := PlcTogglePeriod);
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Front IHM"}
 // 📥 Front par comparaison : l'IHM écrit un BOOL toggle, pas une impulsion courte.
 IhmEdgeDetected := (TglHeartbeatIhm &lt;&gt; LastIhmToggle);
 LastIhmToggle := TglHeartbeatIhm;
 IF IhmEdgeDetected THEN
     IhmEdgeSeen := TRUE;
 END_IF;
+{endregion}
 
+{region "§3 Timeout IHM"}
 // ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout au bout de IhmTimeout.
 // HeartbeatIhmOk reste TRUE tant que le timeout n'est pas expiré (boot propre sans alarme au scan 1).
 IhmTimeoutTon(IN := NOT IhmEdgeDetected, PT := IhmTimeout);
 TimeSinceIhmEdge := IhmTimeoutTon.ET;
 HeartbeatIhmTimeout := IhmTimeoutTon.Q;
 HeartbeatIhmOk := NOT HeartbeatIhmTimeout;
+{endregion}
 
-// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
+{region "§4 Clignotant PLC"}
+// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Signal Safety autonome.
 PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);
 IF PlcToggleTon.Q THEN
     TglHeartbeatPlc := NOT TglHeartbeatPlc;
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -7641,28 +7965,40 @@ END_IF;
               <initialValue>
                 <simpleValue value="TRUE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active le formateur</xhtml>
+              </documentation>
             </variable>
             <variable name="SimulationModeActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Mode simulation actif</xhtml>
+              </documentation>
             </variable>
             <variable name="CurrentMode">
               <type>
                 <derived name="E_Mode" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant</xhtml>
+              </documentation>
             </variable>
             <variable name="BothAxesCoupled">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuils M1/M2 couplés</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchSelected">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = M1, 2 = M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] 1 = M1, 2 = M2</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStep">
@@ -7670,96 +8006,138 @@ END_IF;
                 <derived name="E_CycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Cycle &amp; sous-cycles</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Cycle &amp; sous-cycles
+--&gt; [HW] Étape cycle</xhtml>
               </documentation>
             </variable>
             <variable name="DiveState">
               <type>
                 <derived name="E_DiveSearchState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État plongée</xhtml>
+              </documentation>
             </variable>
             <variable name="ExtractionState">
               <type>
                 <derived name="E_ExtractionSequenceState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État extraction</xhtml>
+              </documentation>
             </variable>
             <variable name="HomingActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Référencement en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="HomingStepM1">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Étape homing M1</xhtml>
+              </documentation>
             </variable>
             <variable name="HomingStepM2">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Étape homing M2</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassGlobalActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Dérogations &amp; particularités</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Dérogations &amp; particularités
+--&gt; [TST] Bypass global</xhtml>
               </documentation>
             </variable>
             <variable name="BypassWinchM1Active">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass treuil M1</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassWinchM2Active">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass treuil M2</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassTranslation">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass translation</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassSyncActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass synchro</xhtml>
+              </documentation>
             </variable>
             <variable name="SyncDegradedActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Synchro bridée</xhtml>
+              </documentation>
             </variable>
             <variable name="LegalLimitReached">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite légale atteinte</xhtml>
+              </documentation>
             </variable>
             <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Sécurité, causes et intention de direction</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Sécurité, causes et intention de direction
+--&gt; [SAFE] Chaîne AU fermée</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Contacteur puissance</xhtml>
+              </documentation>
             </variable>
             <variable name="PowerCutOffActiveAny">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Coupure puissance active</xhtml>
+              </documentation>
             </variable>
             <variable name="SafeStopActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par OR — tout SafeStop affiché (bandeau conservateur)</xhtml>
               </documentation>
             </variable>
             <variable name="DescendPermit">
@@ -7767,7 +8145,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par AND</xhtml>
               </documentation>
             </variable>
             <variable name="AscentPermit">
@@ -7775,61 +8153,88 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par AND</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par AND</xhtml>
               </documentation>
             </variable>
             <variable name="BucketIsOpen">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne ouverte</xhtml>
+              </documentation>
             </variable>
             <variable name="DiveActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Plongée active</xhtml>
+              </documentation>
             </variable>
             <variable name="TopLimitReached">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégat M1/M2 par OR — toute limite haute affichée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Agrégat M1/M2 par OR — toute limite haute affichée</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledUserRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction demandée couplée</xhtml>
+              </documentation>
             </variable>
             <variable name="M1LogicRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction logique M1</xhtml>
+              </documentation>
             </variable>
             <variable name="M2LogicRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction logique M2</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="DeadmanArmed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Homme-mort armé</xhtml>
+              </documentation>
             </variable>
             <variable name="JoystickAtNeutral">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Joystick au neutre</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleAutoBusy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle auto actif</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -7837,6 +8242,9 @@ END_IF;
               <type>
                 <derived name="ST_HmiBanner" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bandeau IHM assemblé</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -7844,59 +8252,80 @@ END_IF;
               <type>
                 <string length="20" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Préfixe RÉEL/SIMU</xhtml>
+              </documentation>
             </variable>
             <variable name="ModeStr">
               <type>
                 <string length="30" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Libellé mode</xhtml>
+              </documentation>
             </variable>
             <variable name="CouplingStr">
               <type>
                 <string length="30" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Libellé couplage</xhtml>
+              </documentation>
             </variable>
             <variable name="CurrentDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Direction courante</xhtml>
+              </documentation>
             </variable>
             <variable name="DirectionBlocked">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interlock métier : mouvement demandé mais permit absent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interlock métier : mouvement demandé mais permit absent</xhtml>
               </documentation>
             </variable>
             <variable name="AnyBypassActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins un bypass actif</xhtml>
+              </documentation>
             </variable>
             <variable name="CriticalActionActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut/interlock critique : affiché immédiatement (sans maintien)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut/interlock critique : affiché immédiatement (sans maintien)</xhtml>
               </documentation>
             </variable>
             <variable name="SpecialConditionCandidate">
               <type>
                 <string length="120" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Texte condition spéciale</xhtml>
+              </documentation>
             </variable>
             <variable name="OperatorActionCandidate">
               <type>
                 <string length="120" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Texte action opérateur</xhtml>
+              </documentation>
             </variable>
             <variable name="AntiFlickSpecial">
               <type>
                 <derived name="FB_AntiFlickerText" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 §3 Condition spéciale (warning → maintenu)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] §3 Condition spéciale (warning → maintenu)</xhtml>
               </documentation>
             </variable>
             <variable name="AntiFlickOperator">
@@ -7904,7 +8333,7 @@ END_IF;
                 <derived name="FB_AntiFlickerText" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 §4 Action opérateur (critique → direct, warning → maintenu)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] §4 Action opérateur (critique → direct, warning → maintenu)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_BannerHoldTime">
@@ -7915,7 +8344,7 @@ END_IF;
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Anti-clignotement warnings/états (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-clignotement warnings/états (AF-07 §4.3)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -8057,7 +8486,7 @@ Banner.SpecialConditionText := AntiFlickSpecial.Text;
 // Format (AF-07 §4.1) : [ORGANE] &lt;Action physique&gt; &gt; &lt;Fin&gt;
 // 🧊 Défauts (AU/puissance/SafeStop) + interlock DirectionBlocked
 //    → affichés immédiatement (ForceInstant=TRUE) ; les autres états
-//    → maintenus min (anti-clignotement). Décision revue 2026-08-17.
+//    → maintenus min (anti-clignotement).
 // ═══════════════════════════════════════════════════════════════
 IF CurrentMode = E_Mode.SEMI_AUTO THEN
     CurrentDirection := CycleRequestDirection;
@@ -8127,7 +8556,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE en permanence — fiche §3, aucune condition de scan</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE en permanence — fiche §3, aucune condition de scan</xhtml>
               </documentation>
             </variable>
             <variable name="HwIn">
@@ -8135,25 +8564,32 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <derived name="ST_HardwareImage" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 PRG_02_Acquisition</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 PRG_02_Acquisition
+--&gt; [HW] Image entrées qualifiées</xhtml>
               </documentation>
             </variable>
             <variable name="HwReal">
               <type>
                 <derived name="ST_HardwareImage" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Image entrées réelles</xhtml>
+              </documentation>
             </variable>
             <variable name="InputModuleFault">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Défaut module d'entrée</xhtml>
+              </documentation>
             </variable>
             <variable name="LocalDigitalIoOk">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mirroir Network.InputModules — pas de champ ST_Chain* dédié ce lot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mirroir Network.InputModules — pas de champ ST_Chain* dédié ce lot</xhtml>
               </documentation>
             </variable>
             <variable name="Vh0800EndOk">
@@ -8161,7 +8597,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">idem</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] idem</xhtml>
               </documentation>
             </variable>
             <variable name="Vh0808EtpOk">
@@ -8169,7 +8605,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">idem</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] idem</xhtml>
               </documentation>
             </variable>
             <variable name="Auth">
@@ -8177,7 +8613,8 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <derived name="ST_Modes_Autorisations" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎚️ PRG_03_Modes_Cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎚️ PRG_03_Modes_Cycle
+--&gt; [SAFE] Autorisations machine</xhtml>
               </documentation>
             </variable>
             <variable name="M1LogicRequestSpeedRef_Pct">
@@ -8185,86 +8622,130 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 PRG_04_Treuils_Benne — demandes publiques déjà arbitrées</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 PRG_04_Treuils_Benne — demandes publiques déjà arbitrées
+--&gt; [CMD] Consigne vitesse M1</xhtml>
               </documentation>
             </variable>
             <variable name="M1LogicRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens M1</xhtml>
+              </documentation>
             </variable>
             <variable name="M2LogicRequestSpeedRef_Pct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse M2</xhtml>
+              </documentation>
             </variable>
             <variable name="M2LogicRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens M2</xhtml>
+              </documentation>
             </variable>
             <variable name="CoupledUserRequestDirection">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction couplée</xhtml>
+              </documentation>
             </variable>
             <variable name="CoupledUserRequestActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande couplée active</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleAutoBusy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle auto actif</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleM1SpeedRef_Pct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne cycle M1</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleM2SpeedRef_Pct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne cycle M2</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleBucketOpen">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne ouverte cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleTargetPosition">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Cible cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="SimulationModeActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 GVL_Simulation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 GVL_Simulation
+--&gt; [TST] Mode simulation</xhtml>
               </documentation>
             </variable>
             <variable name="SimWinchActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Sim treuils</xhtml>
+              </documentation>
             </variable>
             <variable name="SimTranslationActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Sim translation</xhtml>
+              </documentation>
             </variable>
             <variable name="SimOperatorActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Sim opérateur</xhtml>
+              </documentation>
             </variable>
             <variable name="SimSafetyActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Sim sécurité</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchM1">
               <type>
@@ -8272,7 +8753,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 GVL_IHM — images publiques déjà produites
-GVL_IHM.M1TreuilRetenue</xhtml>
+--&gt; [HW] GVL_IHM.M1TreuilRetenue</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM2">
@@ -8280,7 +8761,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <derived name="ST_WinchBenneHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">GVL_IHM.M2TreuilBenne — porte Bucket</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.M2TreuilBenne — porte Bucket</xhtml>
               </documentation>
             </variable>
             <variable name="Sync">
@@ -8288,7 +8769,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <derived name="ST_SyncHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">GVL_IHM.M1M2Sync</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.M1M2Sync</xhtml>
               </documentation>
             </variable>
             <variable name="Translation">
@@ -8296,7 +8777,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <derived name="ST_TranslationHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">GVL_IHM.TranslationM3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.TranslationM3</xhtml>
               </documentation>
             </variable>
             <variable name="Commun">
@@ -8304,7 +8785,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <derived name="ST_CommunHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">GVL_IHM.Commun</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.Commun</xhtml>
               </documentation>
             </variable>
             <variable name="Network">
@@ -8312,7 +8793,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <derived name="ST_NetworkDiagHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">GVL_IHM.Network</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.Network</xhtml>
               </documentation>
             </variable>
             <variable name="DredgingAssist">
@@ -8320,7 +8801,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <derived name="ST_DredgingAssistHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : GVL_IHM.DredgingAssist</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.DredgingAssist</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickHMI">
@@ -8328,7 +8809,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <derived name="ST_JoystickHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ GVL_IHM.JOY1Joystick</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.JOY1Joystick</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyState">
@@ -8336,33 +8817,49 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <derived name="ST_Safety_Emergency_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sorties publiques AU produites par PRG_06_Outputs_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sorties publiques AU produites par PRG_06_Outputs_LD
+--&gt; [SAFE] État AU</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyDiag">
               <type>
                 <derived name="ST_Safety_Emergency_Diag" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Diagnostic AU</xhtml>
+              </documentation>
             </variable>
             <variable name="PowerCutOffActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Coupure puissance</xhtml>
+              </documentation>
             </variable>
             <variable name="ArmingPulseActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Impulsion réarmement</xhtml>
+              </documentation>
             </variable>
             <variable name="MaintainAActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Maintien canal A</xhtml>
+              </documentation>
             </variable>
             <variable name="MaintainBActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Maintien canal B</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -8371,7 +8868,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic interne minimal — fiche §3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Diagnostic interne minimal — fiche §3</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -8388,7 +8885,7 @@ GVL_IHM.M1TreuilRetenue</xhtml>
       (LOT_TROUBLESHOOTING_VIEW_ET_WINCHHMI) a introduit ST_WinchBenneHMI pour porter
       Bucket côté M2 uniquement (GVL_IHM.M2TreuilBenne) — adaptation du port fiche §3
       nécessaire suite à AC5 (Bucket retiré de ST_WinchHMI commun M1/M2).
-   🔧 REX écriture GVL directe : seule exception au principe "pas de GVL comme bus de
+   Écriture GVL directe : seule exception au principe "pas de GVL comme bus de
       commande" (AF_Partie-03 §5) — GVL_Troubleshooting n'est jamais relue par un FB
       métier, uniquement par Watch CODESYS / export SCADA dépannage (fiche §3/§7).
    ⚠️ Idx201_JoystickSelected (ContexteMachineGlobal) lit GVL_IHM.Modes.Cmd.TglJoystickMaster
@@ -8586,7 +9083,7 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD
 {endregion}
 
 {region "§4 Assistance dragage"}
-// === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist (2026-08-07) ===
+// === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist ===
 GVL_Troubleshooting.AssistanceDragage.Idx101_EnableDiveSearch         := DredgingAssist.Cmd.TglEnableDiveSearch;
 GVL_Troubleshooting.AssistanceDragage.Idx102_EnableExtractionSequence := DredgingAssist.Cmd.TglEnableExtractionSequence;
 GVL_Troubleshooting.AssistanceDragage.Idx103_EnableDumpAtTremie       := DredgingAssist.Cmd.TglEnableDumpAtTremie;
@@ -8637,7 +9134,7 @@ GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := Tran
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd := Translation.Cmd.BtnFwd;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev := Translation.Cmd.BtnRev;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition := Translation.Cmd.SelTarget;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition := CycleTargetPosition
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition := CycleTargetPosition;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive := Auth.Mode;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx208_BypassNetworkActive := Translation.Bypass.Global;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct := Translation.State.ActiveSpeedRef_Pct;
@@ -8858,7 +9355,7 @@ GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy 
 GVL_Troubleshooting.MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
 GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.ActiveSpeedRef_Pct;
 GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
-GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // 🆕 interlock hauteur M1/M2 (risque collision)
+GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // Interlock hauteur M1/M2 (risque collision)
 GVL_Troubleshooting.MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
 
@@ -8904,7 +9401,7 @@ GVL_Troubleshooting.Inputs := HwIn;
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte candidat à afficher</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Texte candidat à afficher</xhtml>
               </documentation>
             </variable>
             <variable name="ForceInstant">
@@ -8912,7 +9409,7 @@ GVL_Troubleshooting.Inputs := HwIn;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = afficher immédiatement (défaut critique), sans maintien</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = afficher immédiatement (défaut critique), sans maintien</xhtml>
               </documentation>
             </variable>
             <variable name="HoldTime">
@@ -8923,7 +9420,7 @@ GVL_Troubleshooting.Inputs := HwIn;
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -8933,7 +9430,7 @@ GVL_Troubleshooting.Inputs := HwIn;
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte stabilisé exposé à l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Texte stabilisé exposé à l'IHM</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -8942,6 +9439,9 @@ GVL_Troubleshooting.Inputs := HwIn;
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de maintien</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
