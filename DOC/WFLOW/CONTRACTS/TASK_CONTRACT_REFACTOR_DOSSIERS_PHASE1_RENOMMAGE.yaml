@@ -1,0 +1,62 @@
+contract:
+  task_id: REFACTOR_DOSSIERS_PHASE1_RENOMMAGE
+  criticality: C2
+  strategy: patch
+
+  objective: "Renommer physiquement les 13 sous-dossiers de CODE/ avec leurs préfixes alphabétiques (A_ à M_) pour aligner l'explorateur CODESYS avec l'ordre séquentiel de la MainTask."
+
+  acceptance:
+    - id: AC1
+      statement: "Les 13 répertoires d'origine sous CODE/ sont tous renommés avec leurs nouveaux préfixes A_ à M_ (COMMUN -> A_COMMUN, AU -> B_AU_SECURITE, etc.)."
+      verified_by: "python -c 'import pathlib; assert not pathlib.Path(\"CODE/COMMUN\").exists() and pathlib.Path(\"CODE/A_COMMUN\").exists()'"
+    - id: AC2
+      statement: "Aucun contenu de fichier .st n'est altéré ou supprimé lors du renommage des répertoires."
+      verified_by: "git status --porcelain montre uniquement des entrées R (renamed) sans modification de contenu."
+
+  scope:
+    allowed:
+      - CODE/A_COMMUN/
+      - CODE/B_AU_SECURITE/
+      - CODE/C_DIAG_RESEAUX/
+      - CODE/D_JOYSTICK/
+      - CODE/E_CODEURS/
+      - CODE/F_MODES/
+      - CODE/G_CYCLE/
+      - CODE/H_TREUILS_BENNE/
+      - CODE/I_TRANSLATION/
+      - CODE/J_SUPERVISION/
+      - CODE/K_DEPANNAGE/
+      - CODE/L_SIMULATION/
+      - CODE/M_MAIN/
+    forbidden:
+      - TOOLS/
+      - DOC/
+      - CODE_XML/
+
+  evidence_required:
+    - check_linkage
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "codex/gpt-5.6-luna"
+    - "agy/gemini-3.6-flash-high"
+
+  alert_duty: "Tout problème d'accès fichier ou suppression non désirée est signalé immédiatement à l'orchestrateur."
+
+status: COMPLETED
+
+execution:
+  executed_by: "AGY-01 (Antigravity gemini-3.6-flash-high)"
+  completed_at: "2026-08-17T12:00:00+02:00"
+  status: COMPLETED
+  summary: "Les 13 répertoires sous CODE/ ont tous été renommés avec succès via git mv vers A_COMMUN à M_MAIN sans altération de contenu."
+  evidence_submitted:
+    - "git status: 169 fichiers renommés R sans altération"
+    - "Get-ChildItem CODE: A_COMMUN à M_MAIN confirmés"
+
+validation:
+  status: APPROVED
+  validated_by: "Antigravity (Orchestrateur)"
+  validated_at: "2026-08-17T12:00:00+02:00"
+  notes: "Phase 1 validée avec succès."

@@ -32,7 +32,7 @@
       déterministe et indépendante du joystick (voir §3 dans le corps ST).
    🔴 Ce lot (M1 seul, Maintenance N1, test banc) : pas de dépendance
       codeur. SafeStop vient de FB_Safety_Winch (perte joystick/CAN
-      uniquement pour l'instant — voir CODE/TREUILS/FB_Safety_Winch.st).
+      uniquement pour l'instant — voir CODE/H_TREUILS_BENNE/FB_Safety_Winch.st).
    🆕 AJOUT (2026-07-02, retour terrain — détecteur mou de câble) : nouvelle
       entrée `DescendPermit` (sortie dédiée FB_Safety_Winch, DISTINCTE de
       `SafeStop`). ⚠️ ÉVOLUTION D72 (2026-07-03vicies, voir plus bas) :
