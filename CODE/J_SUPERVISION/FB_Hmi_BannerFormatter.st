@@ -19,6 +19,7 @@ VAR_INPUT
     CycleStep            : E_CycleStep;   // --> [HW] Étape cycle
     CycleStateStr        : STRING(80);   // --> [HW] Libellé détaillé de l'étape cycle (FB_Cycle.CycleStateStr)
     CycleErrorId         : WORD;   // --> [DIAG] Code défaut cycle (FB_Cycle.ErrorId) — notifié à STABILIZING
+    CycleStepAtError     : E_CycleStep;   // --> [DIAG] Dernière étape avant le défaut (FB_Cycle.CycleStepAtError)
     DiveState            : E_DiveSearchState;   // --> [HW] État plongée
     ExtractionState      : E_ExtractionSequenceState;   // --> [HW] État extraction
     HomingActive         : BOOL;   // --> [HW] Référencement en cours
@@ -65,6 +66,7 @@ VAR
     CriticalActionActive : BOOL; // . [LOC] Défaut/interlock critique : affiché immédiatement (sans maintien)
     SpecialConditionCandidate : STRING(120);   // . [LOC] Texte condition spéciale
     OperatorActionCandidate   : STRING(120);   // . [LOC] Texte action opérateur
+    StepAtErrorStr            : STRING(40);   // . [LOC] Libellé de l'étape d'origine du défaut
     AntiFlickSpecial     : FB_AntiFlickerText; // * [INST] §3 Condition spéciale (warning → maintenu)
     AntiFlickOperator    : FB_AntiFlickerText; // * [INST] §4 Action opérateur (critique → direct, warning → maintenu)
 END_VAR
@@ -258,19 +260,37 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_CycleStep.X13_DONE_SYNC:
             OperatorActionCandidate := '[IHM] Cycle terminé';
         E_CycleStep.STABILIZING:
-            // Notifier le défaut cycle (ErrorId) — acquittement requis.
+            // Libellé de l'étape d'origine du défaut (CycleStepAtError).
+            CASE CycleStepAtError OF
+                E_CycleStep.X0_PREPARATION: StepAtErrorStr := 'X0 (préparation)';
+                E_CycleStep.X1_HOMING: StepAtErrorStr := 'X1 (référencement)';
+                E_CycleStep.X2_WORK_POS_SELECT: StepAtErrorStr := 'X2 (sélection position)';
+                E_CycleStep.X3_OPEN_BUCKET: StepAtErrorStr := 'X3 (ouverture benne)';
+                E_CycleStep.X4_DESCEND_OPEN: StepAtErrorStr := 'X4 (descente)';
+                E_CycleStep.X5_BOTTOM_CONFIRMED: StepAtErrorStr := 'X5 (fond confirmé)';
+                E_CycleStep.X6_CLOSE_BUCKET: StepAtErrorStr := 'X6 (fermeture benne)';
+                E_CycleStep.X7_CTRL_ASCENT: StepAtErrorStr := 'X7 (remontée contrôle)';
+                E_CycleStep.X8_ASCENT_LOADED: StepAtErrorStr := 'X8 (remontée chargée)';
+                E_CycleStep.X9_DRAIN_PAUSE: StepAtErrorStr := 'X9 (égouttage)';
+                E_CycleStep.X10_TRANSLATE_DUMP: StepAtErrorStr := 'X10 (translation trémie)';
+                E_CycleStep.X11_OPEN_DUMP: StepAtErrorStr := 'X11 (vidage benne)';
+                E_CycleStep.X13_DONE_SYNC: StepAtErrorStr := 'X13 (cycle terminé)';
+                E_CycleStep.STABILIZING: StepAtErrorStr := 'X14 (stabilisation)';
+                ELSE: StepAtErrorStr := '?';
+            END_CASE;
+            // Notifier le défaut cycle (ErrorId) + étape d'origine — acquittement requis.
             IF (CycleErrorId AND 16#0002) <> 0 THEN
-                OperatorActionCandidate := '[PUPITRE] Défaut synchronisme treuils - acquitter';
+                OperatorActionCandidate := CONCAT('[PUPITRE] Défaut synchronisme treuils (étape ', CONCAT(StepAtErrorStr, ') - acquitter'));
             ELSIF (CycleErrorId AND 16#0004) <> 0 THEN
-                OperatorActionCandidate := '[IHM] Sélectionner position travail - acquitter';
+                OperatorActionCandidate := CONCAT('[IHM] Défaut à ', CONCAT(StepAtErrorStr, ' - sélectionner position travail puis acquitter'));
             ELSIF (CycleErrorId AND 16#0010) <> 0 THEN
-                OperatorActionCandidate := '[PUPITRE] Écart vitesse M1/M2 - acquitter';
+                OperatorActionCandidate := CONCAT('[PUPITRE] Écart vitesse M1/M2 (étape ', CONCAT(StepAtErrorStr, ') - acquitter'));
             ELSIF (CycleErrorId AND 16#0020) <> 0 THEN
-                OperatorActionCandidate := '[PUPITRE] Perte communication IHM - acquitter';
+                OperatorActionCandidate := CONCAT('[PUPITRE] Perte communication IHM (étape ', CONCAT(StepAtErrorStr, ') - acquitter'));
             ELSIF (CycleErrorId AND 16#0040) <> 0 THEN
-                OperatorActionCandidate := '[PUPITRE] Tempo max étape dépassée - acquitter';
+                OperatorActionCandidate := CONCAT('[PUPITRE] Tempo max étape dépassée (étape ', CONCAT(StepAtErrorStr, ') - acquitter'));
             ELSE
-                OperatorActionCandidate := '[PUPITRE] Défaut cycle - acquitter';
+                OperatorActionCandidate := CONCAT('[PUPITRE] Défaut cycle (étape ', CONCAT(StepAtErrorStr, ') - acquitter'));
             END_IF;
         ELSE
             OperatorActionCandidate := '[IHM] Cycle en cours...';
