@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.262671" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.262671">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:40:41.896182" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:40:41.896182">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le calcul</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active le calcul</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -40,7 +40,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front d'acquittement / réinitialisation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement / réinitialisation</xhtml>
               </documentation>
             </variable>
             <variable name="DriveActualFreqHz">
@@ -48,7 +48,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence réelle variateur en Hz (ex: 5.0 Hz)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fréquence réelle variateur en Hz (ex: 5.0 Hz)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -56,7 +56,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens effectif : +1 = Fwd (vers Trémie), -1 = Rev (vers Maint), 0 = Arrêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens effectif : +1 = Fwd (vers Trémie), -1 = Rev (vers Maint), 0 = Arrêt</xhtml>
               </documentation>
             </variable>
             <variable name="SensorMaintenance">
@@ -65,7 +65,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">5 Capteurs de position fixes
-Capteur 0 : Maintenance (0.0 m)</xhtml>
+--&gt; [HW] Capteur 0 : Maintenance (0.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorP1">
@@ -73,7 +73,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur 1 : P1 (ex: 6.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 1 : P1 (ex: 6.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorP2">
@@ -81,7 +81,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur 2 : P2 (ex: 14.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 2 : P2 (ex: 14.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorPV">
@@ -89,7 +89,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur 3 : PV (ex: 21.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 3 : PV (ex: 21.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorTremie">
@@ -97,7 +97,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur 4 : Trémie (ex: 25.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 4 : Trémie (ex: 25.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="PosMaintenanceM">
@@ -108,7 +108,8 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Positions de référence calibrées (mètres) depuis GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Positions de référence calibrées (mètres) depuis GVL_PERSISTENT
+--&gt; [CFG] Position Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="PosP1M">
@@ -118,6 +119,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="6" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position P1</xhtml>
+              </documentation>
             </variable>
             <variable name="PosP2M">
               <type>
@@ -126,6 +130,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="14" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position P2</xhtml>
+              </documentation>
             </variable>
             <variable name="PosPVM">
               <type>
@@ -134,6 +141,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="21" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position PV</xhtml>
+              </documentation>
             </variable>
             <variable name="PosTremieM">
               <type>
@@ -142,6 +152,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="25" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position Trémie</xhtml>
+              </documentation>
             </variable>
             <variable name="GainMetersPerHzSec">
               <type>
@@ -151,7 +164,8 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <simpleValue value="0.008333" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gain de vitesse : mètres parcourus par Hz par seconde (ex: 50 Hz = 0.416 m/s =&gt; Gain = 0.008333 m/Hz.s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Gain de vitesse : mètres parcourus par Hz par seconde (ex: 50 Hz = 0.416 m/s =&gt; Gain = 0.008333 m/Hz.s)
+--&gt; [CFG] Gain odométrie</xhtml>
               </documentation>
             </variable>
             <variable name="PersistedPositionM">
@@ -162,9 +176,10 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : reprise après reboot — l'appelant recopie en continu PositionEstimatedM/
-       Initialized vers GVL_PERSISTENT (pas de bridge dédié, simple recopie comme _TranslationSetFreq_Hz)
-       et réinjecte ici au redémarrage, pour ne pas perdre l'estimation odométrique à chaque coupure.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reprise après reboot — l'appelant recopie en continu PositionEstimatedM/Initialized vers
+       GVL_PERSISTENT (pas de bridge dédié, simple recopie) et réinjecte ici au redémarrage, pour
+       ne pas perdre l'estimation odométrique à chaque coupure.
+--&gt; [CFG] Position persistée</xhtml>
               </documentation>
             </variable>
             <variable name="PersistedInitialized">
@@ -174,6 +189,9 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <initialValue>
                 <simpleValue value="FALSE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Initialisation persistée</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -182,7 +200,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position continue estimée en mètres</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Position continue estimée en mètres</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -190,7 +208,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 exposé pour recopie persistante côté appelant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Exposé pour recopie persistante côté appelant</xhtml>
               </documentation>
             </variable>
             <variable name="Recalibrated">
@@ -198,7 +216,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse 1 cycle lors d'un recalage sur capteur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Pulse 1 cycle lors d'un recalage sur capteur</xhtml>
               </documentation>
             </variable>
             <variable name="RecalibratedSensorId">
@@ -206,7 +224,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] 0=Maint, 1=P1, 2=P2, 3=PV, 4=Trémie, -1=Aucun</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -215,31 +233,49 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Trémie</xhtml>
+              </documentation>
             </variable>
             <variable name="TrigPV">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PV</xhtml>
+              </documentation>
             </variable>
             <variable name="TrigP2">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant P2</xhtml>
+              </documentation>
             </variable>
             <variable name="TrigP1">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant P1</xhtml>
+              </documentation>
             </variable>
             <variable name="TrigMaintenance">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Maintenance</xhtml>
+              </documentation>
             </variable>
             <variable name="CycleTimeCalc">
               <type>
                 <derived name="FB_CycleTime" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mesure temps de cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="ColdStart">
               <type>
@@ -249,13 +285,13 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 seed unique depuis Persisted* au premier scan utile</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Seed unique depuis Persisted* au premier scan utile</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ↔️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
+   ⚙️ FB_Translation_PositionEstimator — Estimateur de Position Continue M3
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
@@ -270,6 +306,7 @@ Capteur 0 : Maintenance (0.0 m)</xhtml>
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate et initialisation"}
 IF NOT Enable THEN
     Recalibrated := FALSE;
     RecalibratedSensorId := -1;
@@ -284,14 +321,18 @@ END_IF;
 
 CycleTimeCalc(DefaultValueS := 0.010);
 Recalibrated := FALSE;
+{endregion}
 
+{region "§2 Fronts capteurs"}
 // 1. Détection des fronts montants sur franchissement des capteurs fixes
 TrigTremie(CLK := SensorTremie);
 TrigPV(CLK := SensorPV);
 TrigP2(CLK := SensorP2);
 TrigP1(CLK := SensorP1);
 TrigMaintenance(CLK := SensorMaintenance);
+{endregion}
 
+{region "§3 Recalage et intégration"}
 // 2. Recalage absolu prioritaire sur contact capteur
 IF TrigMaintenance.Q THEN
     PositionEstimatedM := PosMaintenanceM;
@@ -330,9 +371,12 @@ ELSE
         PositionEstimatedM := PositionEstimatedM + (INT_TO_REAL(Direction) * DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Bornage"}
 // Bornage de sécurité pour éviter la dérive infinie hors rail
 PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremieM + 0.5);
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -353,7 +397,8 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <simpleValue value="0.004" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de secours par défaut (ex. 4ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES DE SECOURS ===
+--&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -363,7 +408,8 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé réel calculé (secondes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET DIAGNOSTIC ===
+&lt;-- [DIAG] Temps ecoule reel calcule (secondes)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -373,7 +419,8 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps système actuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORLOGE ET MEMOIRE TEMPORELLE ===
+. [LOC] Temps systeme actuel</xhtml>
               </documentation>
             </variable>
             <variable name="TimeLast">
@@ -381,7 +428,7 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Empreinte de temps du cycle précédent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Empreinte de temps du cycle precedent</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaTimeMs">
@@ -389,7 +436,7 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart brut calculé (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut calcule (ms)</xhtml>
               </documentation>
             </variable>
             <variable name="InitDone">
@@ -397,26 +444,30 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau d'initialisation du premier cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation du premier cycle</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
-      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Acquisition temps"}
 // 1. ACQUISITION DU TEMPS SYSTÈME
 TimeCurrent := TIME();
+{endregion}
 
+{region "§2 Initialisation"}
 // 2. INITIALISATION UNIQUE AU PREMIER CYCLE
 IF NOT InitDone THEN
     TimeLast := TimeCurrent;
@@ -424,19 +475,26 @@ IF NOT InitDone THEN
     CycleTimeS := DefaultValueS;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Calcul delta"}
 // 3. CALCUL DU DELTA EN MILLISECONDES
 DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
 
+{region "§4 Conversion et secours"}
 // 4. CONVERSION ET CHARGE DE SECOURS
 IF DeltaTimeMs &gt; 0 THEN
     CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
     CycleTimeS := DefaultValueS;
 END_IF;
+{endregion}
 
+{region "§5 Archivage"}
 // 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
 TimeLast := TimeCurrent;
+{endregion}
 </xhtml>
           </ST>
         </body>

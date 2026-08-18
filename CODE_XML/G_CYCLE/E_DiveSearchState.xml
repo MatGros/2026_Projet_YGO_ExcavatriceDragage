@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.222121" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.222121">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:51:37.361131" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:51:37.361131">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -54,13 +54,13 @@
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0→1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>SEARCHING_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1→0 au fond</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1-&gt;0 au fond</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>

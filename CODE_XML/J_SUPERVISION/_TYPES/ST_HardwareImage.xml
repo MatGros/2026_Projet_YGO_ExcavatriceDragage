@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
   <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-27T16:14:37.178831" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-27T16:14:37.178831">
+  <contentHeader name="Generated.project" modificationDateTime="2026-07-27T16:14:37.178831">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -106,7 +106,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — 🆕 2026-08-12 : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_KoboldBottomTouch_DI">
@@ -114,7 +114,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — 🆕 2026-08-12 : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -138,7 +138,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-12 : Trémie pleine OU grille levée — pas encore câblé électriquement,</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Trémie pleine OU grille levée — pas encore câblé électriquement,</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -272,7 +272,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="M3_StatusWord">

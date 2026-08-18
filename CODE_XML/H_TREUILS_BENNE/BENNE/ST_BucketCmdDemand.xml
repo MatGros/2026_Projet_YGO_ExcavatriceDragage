@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.797537" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.797537">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:55:51.995922" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:55:51.995922">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture benne</xhtml>
               </documentation>
             </variable>
             <variable name="Close">
@@ -39,7 +39,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldContactorCmd">
@@ -58,12 +58,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🪣 ST_BucketCmdDemand — Demande de commande benne (depuis cycle/sequenceur)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪣 ST_BucketCmdDemand — Demande de commande benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md (Benne incluse)
-   🎯 Demande de mouvement pour benne (depuis FB_Cycle / FB_ExtractionSequence).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de consigne de mouvement benne (Ouverture, Fermeture, Kobold)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

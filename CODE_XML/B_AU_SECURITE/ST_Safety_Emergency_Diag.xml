@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.751317" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.751317">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:39:33.559330" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:39:33.559330">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Synthèse : (ErrorId &lt;&gt; 0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synthese defaut active : (ErrorId &lt;&gt; 0)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -39,7 +39,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ bit0 = RedundancyTestFailed (auto-test A/B), bit1 = EmergencyArmingFailed (timeout confirm contacteur)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield erreurs : bit0=Redundancy, bit1=Arming, bit3=Startup</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Canal A ou B resté collé/shunté détecté à l'auto-test — Reset requis (cause disparue)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B reste colle/shunte detecte a l'auto-test (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmFailed">
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance non confirmé sous 2 s — Reset + contacteur engagé requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="LockoutActive">
@@ -63,7 +63,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Verrouillage temporel de 5 s entre tentatives de réarmement échouées</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre tentatives de rearmement echouees</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -74,15 +74,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie Diag).
-      Consommé par PRG_SUPERVISION_CFC et GVL_Troubleshooting.
-   🎯 Champs lecture seule — producteur unique = FB composite.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

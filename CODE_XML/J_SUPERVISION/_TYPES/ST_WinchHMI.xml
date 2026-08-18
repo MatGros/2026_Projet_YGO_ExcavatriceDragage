@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-04T14:34:02.240289" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-04T14:34:02.240289">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.540500" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.540500">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -47,7 +47,7 @@
                 <derived name="ST_WinchCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configurations et limites</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -63,7 +63,7 @@
                 <derived name="ST_BypassWinch" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -78,7 +78,7 @@
    ⚙️ ST_WinchHMI — Données d'échange IHM pour un treuil (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des bargraphes, LEDs, mesures et réglages.
-   📄 Structuration en Cmd / State / Cfg / Safety / Bypass (2026-07-22)
+   📄 Structuration en Cmd / State / Cfg / Safety / Bypass
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -131,7 +131,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI)</xhtml>
               </documentation>
             </variable>
             <variable name="TopLimitSwitch">
@@ -148,7 +148,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée CablePosM &gt;= TopLimitM, symétrique CableLimitSwitch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass fin de course logiciel haut (position calculée CablePosM &gt;= TopLimitM, symétrique CableLimitSwitch)</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitSwitch">
@@ -164,7 +164,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached)</xhtml>
               </documentation>
             </variable>
             <variable name="MecaA">
@@ -241,7 +241,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -255,7 +255,7 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
+   ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
    ───────────────────────────────────────────────────────────────
    🎨 Regroupe les bypass "dégradé assumé" propres à un axe (codeur,
       contacteurs) — chaque treuil a son propre matériel, donc son
@@ -339,7 +339,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass codeur effectivement accepté, uniquement MAINT_N2</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitDescent">
@@ -540,7 +540,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampAccelRate">
@@ -595,7 +595,7 @@
                 <simpleValue value="6.75" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m) -- REX 2026-08-07 (25), aligné sur GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m) -- (25), aligné sur GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -606,7 +606,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
        métier dont le défaut peut valoir n'importe quoi) — PRG_SUPERVISION_CFC.st §2/§3
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
@@ -620,10 +620,10 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
+   ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
-   📄 2026-07-24 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
+   📄 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
    déplacés vers GVL_IHM.Commun.Cfg (WinchMaxStepDescente/etc.) — étaient partagés M1/M2 via
    réconciliation ad-hoc, une seule instance dans Commun élimine le besoin de réconciliation.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -677,7 +677,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton IHM inhibition treuil — mise en service,</xhtml>
               </documentation>
             </variable>
             <variable name="BtnHomingAtZero">
@@ -685,7 +685,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX mise en service : force le homing à 0 m (points codeur centre),</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le homing à 0 m (points codeur centre),</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -760,7 +760,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut mémorisé du moniteur vitesse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut mémorisé du moniteur vitesse</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMonitorErrorId">
@@ -848,7 +848,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Treuil en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Treuil en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -1027,7 +1027,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 miroir lecture seule — inhibition arbitrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">miroir lecture seule — inhibition arbitrée</xhtml>
               </documentation>
             </variable>
             <variable name="BottomLimitActiveM">
@@ -1035,7 +1035,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 2026-08-07 : ralentissement sur bordure — diagnostic zone/limite active
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 : ralentissement sur bordure — diagnostic zone/limite active
 📏 Limite basse active (m) — câble physique OU légale, la plus restrictive</xhtml>
               </documentation>
             </variable>
@@ -1060,7 +1060,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 : diagnostic retour terrain — délai ressenti à la remontée
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic délai ressenti à la remontée
 🩺 Sens interne mémorisé FB_Winch (-1/0/+1)</xhtml>
               </documentation>
             </variable>
@@ -1171,6 +1171,28 @@
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BRAKE_COMMAND_NOT_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence confirmation ouverture frein &gt; 500ms</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RESTART_INHIBITED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -1196,6 +1218,46 @@
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Desactive / Hors service</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Pret / Etat nominal</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_BRAKE_COMMAND_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation feedback frein</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_STEP_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation changement de palier</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_RESTART_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation anti-court-cycle redemarrage</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -1250,16 +1312,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §3,
-                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
-   Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
-   détecter un collage / une absence de fermeture d'un contacteur de
-   puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
-   appelant).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_EncoderHMI">
@@ -1318,7 +1377,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Codeur en défaut (liaison EtherCAT ou preset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur en défaut (liaison EtherCAT ou preset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -1359,7 +1418,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut de référencement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut de référencement</xhtml>
               </documentation>
             </variable>
             <variable name="HomingErrorId">

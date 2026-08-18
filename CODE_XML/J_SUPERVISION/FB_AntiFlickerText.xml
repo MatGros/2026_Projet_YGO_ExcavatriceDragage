@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T23:35:29.769647" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T23:35:29.769647">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:41:03.192128" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:41:03.192128">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,7 @@
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte candidat à afficher</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Texte candidat à afficher</xhtml>
               </documentation>
             </variable>
             <variable name="ForceInstant">
@@ -40,7 +40,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = afficher immédiatement (défaut critique), sans maintien</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = afficher immédiatement (défaut critique), sans maintien</xhtml>
               </documentation>
             </variable>
             <variable name="HoldTime">
@@ -51,7 +51,7 @@
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée de maintien min avant changement (AF-07 §4.3)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -61,7 +61,7 @@
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte stabilisé exposé à l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Texte stabilisé exposé à l'IHM</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -70,6 +70,9 @@
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de maintien</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>

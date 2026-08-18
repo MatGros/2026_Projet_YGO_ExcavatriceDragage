@@ -187,7 +187,7 @@ ELSIF MovementRequested THEN
 END_IF;
 {endregion}
 
-{region "§5 Mise à l'échelle"}
+{region "§5 Mise a lechelle"}
 // ── 5. Mise à l'échelle finale REAL Hz -> WORD registre PDO 0x3100 ──────
 // Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
 // DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-23T23:39:21.084731" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-23T23:39:21.084731">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:45.707726" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:45.707726">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -34,7 +34,7 @@
                 <simpleValue value="-999" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴🔧 REX 2026-08-07 (5) — retour terrain, blocage instantané à 0m : sans défaut explicite,
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blocage instantané à 0m : sans défaut explicite,
 ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM &lt;= 0.0" se déclenche
 dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
 (jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
@@ -99,9 +99,9 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
 pas une vitesse continue.
-🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
+: Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
@@ -112,7 +112,7 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableCoupledBucketSequencing">
@@ -123,7 +123,7 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴🔧 REX 2026-08-07 (4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
 Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
 gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
               </documentation>
@@ -148,8 +148,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_CommunCfg — Configuration des paramètres communs machine
-   📄 2026-07-24 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
+   ST_CommunCfg — Configuration des paramètres communs machine
+   📄 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
    WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
    ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -165,6 +165,10 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <inOutVars>
@@ -173,7 +177,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <derived name="ST_CommunCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ ex. GVL_IHM.Commun.Cfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
               </documentation>
             </variable>
             <variable name="Persist">
@@ -181,17 +186,18 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <derived name="ST_CommunCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 ex. GVL_PERSISTENT._CommunCfgPersist</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
               </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_CommunCfg — Pont persistance générique pour ST_CommunCfg
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_CommunCfg — Pont persistance pour ST_CommunCfg
    ───────────────────────────────────────────────────────────────
-   🎯 Voir FB_CfgPersistBridge_SyncCfg.st (Lot 3a) pour la logique de référence — identique,
-   seul le type ST_CommunCfg change.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

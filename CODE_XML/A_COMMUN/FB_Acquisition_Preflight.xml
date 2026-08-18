@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-31T21:39:26.940540" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-31T21:39:26.940540">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:28:41.706957" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:28:41.706957">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,36 +31,174 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; ETATS MACHINE ===
+--&gt; [CMD] Lancement du verdict (front montant)</xhtml>
+              </documentation>
             </variable>
             <variable name="MachineIsStill">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Machine a l'arret complet (vitesse nulle)</xhtml>
+              </documentation>
             </variable>
-            <variable name="M1BrakeApplied, M2BrakeApplied, M3BrakeApplied">
+            <variable name="M1BrakeApplied">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS FREINS &amp; CONTACTEURS ===
+--&gt; [HW]  Frein M1 serre</xhtml>
+              </documentation>
             </variable>
-            <variable name="M1ContactorsReleased, M2ContactorsReleased, M1ThermalOk, M2ThermalOk">
+            <variable name="M2BrakeApplied">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Frein M2 serre</xhtml>
+              </documentation>
             </variable>
-            <variable name="BrakeThermalOk, PhaseRotationOk, SlackCableTensioned, M3SensorWordIncoherent">
+            <variable name="M3BrakeApplied">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Frein M3 serre</xhtml>
+              </documentation>
             </variable>
-            <variable name="EmergencyChainClosed, PowerContactorEngaged, EncoderM1Operational, EncoderM2Operational">
+            <variable name="M1ContactorsReleased">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteurs M1 retombes</xhtml>
+              </documentation>
             </variable>
-            <variable name="HomedM1, HomedM2, M1PositionInBounds, M2PositionInBounds">
+            <variable name="M2ContactorsReleased">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteurs M2 retombes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1ThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PROTECTION THERMIQUE &amp; RESEAU ===
+--&gt; [HW]  Thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermalOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Thermique freins OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotationOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Ordre des phases reseau OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlackCableTensioned">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; CHAINE DE SECURITE ===
+--&gt; [HW]  Cable M2 tendu (anti-mou)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3SensorWordIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Incoherence mot capteurs M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine d'arret d'urgence fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteur de puissance enclenche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CODEURS &amp; HOMING ===
+--&gt; [HW]  Codeur M1 operationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codeur M2 operationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Homing M1 effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Homing M2 effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1PositionInBounds">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Position M1 dans les bornes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PositionInBounds">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Position M2 dans les bornes</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -68,21 +206,34 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS ET DIAGNOSTIC ===
+&lt;-- [STAT] Verdict preflight OK (aucun defaut)</xhtml>
+              </documentation>
             </variable>
             <variable name="PreflightDone">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Verdict preflight termine</xhtml>
+              </documentation>
             </variable>
             <variable name="PreflightBusy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Diagnostic preflight en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="PreflightErrorId">
               <type>
                 <WORD />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de defauts preflight (16 bits)</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -90,6 +241,10 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TRIGGERS &amp; ETATS INTERNES ===
+. [LOC] Trigger front montant Execute</xhtml>
+              </documentation>
             </variable>
             <variable name="BootPending">
               <type>
@@ -98,31 +253,42 @@
               <initialValue>
                 <simpleValue value="TRUE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande preflight initiale au demarrage</xhtml>
+              </documentation>
             </variable>
             <variable name="RequestPending">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande de verdict en attente</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🩺 FB_Acquisition_Preflight — Verdict passif machine arrêtée
-   📄 Doc : ARCHIVES/Doc/AUDITS/PreLivraison/TASKS/TASK_D1_Preflight_et_Symetrie_Winch_v1.0.md
-   🔒 Observateur pur : aucun SafeStop, PowerCutOff ou ordre machine.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Acquisition_Preflight — Verdict passif machine arrêtée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Verdict passif de qualification E/S machine arrêtée (16 contrôles)
+   🔒 Polarité : Observateur pur (aucun SafeStop, PowerCutOff ou ordre machine)
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §6
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate et demande"}
 ExecuteEdge(CLK := Execute);
 RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
 PreflightBusy := RequestPending AND NOT MachineIsStill;
 IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
 IF NOT RequestPending THEN RETURN; END_IF;
+{endregion}
 
+{region "§2 Calcul verdict"}
 PreflightErrorId := 0;
 (* bit0..2 frein M1/M2/M3 serré; bit3..4 contacteurs M1/M2 retombés;
    bit5..6 thermique M1/M2 OK; bit7 thermique frein OK; bit8 phases OK;
@@ -144,7 +310,11 @@ IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000
 IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
 IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;
 IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#8000; END_IF;
+{endregion}
+
+{region "§3 Sortie"}
 PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+{endregion}
 </xhtml>
           </ST>
         </body>

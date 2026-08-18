@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.247496" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.247496">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.266642" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.266642">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalReached">
@@ -63,7 +63,7 @@
                 <derived name="ST_CommunCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configuration des paramètres communs machine</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configuration des paramètres communs machine</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalFault">
@@ -71,7 +71,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -79,8 +79,8 @@
                 <derived name="ST_BypassCommun" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-🆕 2026-08-07 : granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
+: granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopSensorBypassActive">
@@ -88,7 +88,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
        (etaient ecrits par erreur dans Bypass.SlackCable/TopPositionSensor avant ce lot, ce qui
        empechait ces champs de servir de vrai bypass RETAIN operateur).
 🩺 Capteur haut ignore car simulation active</xhtml>
@@ -148,7 +148,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
 ⬆️ Monte les 2 treuils simultanément</xhtml>
               </documentation>
             </variable>
@@ -165,7 +165,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
 struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
 (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
 ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
@@ -200,7 +200,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal)
 Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </documentation>
             </variable>
@@ -223,7 +223,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🌐 ST_CommunHMI — Données d'échange IHM COMMUNES (pas propres à un axe)
    ───────────────────────────────────────────────────────────────
-   🆕 REX 2026-07-08 (demande utilisateur) : regroupe les signaux qui ne concernent
+   (demande utilisateur) : regroupe les signaux qui ne concernent
    PAS un axe/mécanisme en particulier (1 seul capteur/signal partagé par toute la
    machine) — évite de les dupliquer ou de les laisser en variables isolées
    directement dans GVL_IHM. Exemple : TopPositionSensorActive (capteur unique,
@@ -265,7 +265,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitSwitch">
@@ -273,7 +273,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite basse physique (longueur câble), OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite basse physique (longueur câble), OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegal">
@@ -281,7 +281,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -301,9 +301,9 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
+   ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
    ───────────────────────────────────────────────────────────────
-   🎨 2026-08-07 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
+   🎨 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
       GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
@@ -312,7 +312,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
       n'entraîne la désactivation de l'autre.
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
-   🔧 2026-08-07 : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
+   : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
       était de toute façon inutilisé comme bypass réel jusqu'ici (PRG_07_Supervision y écrivait un
       indicateur simulation par erreur, voir ST_CommunHMI.SimTopSensorBypassActive).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -329,7 +329,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <simpleValue value="-999" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴🔧 REX 2026-08-07 (5) — retour terrain, blocage instantané à 0m : sans défaut explicite,
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blocage instantané à 0m : sans défaut explicite,
 ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM &lt;= 0.0" se déclenche
 dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
 (jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
@@ -394,9 +394,9 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
 pas une vitesse continue.
-🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
+: Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
@@ -407,7 +407,7 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableCoupledBucketSequencing">
@@ -418,7 +418,7 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴🔧 REX 2026-08-07 (4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
 Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
 gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
               </documentation>
@@ -443,8 +443,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_CommunCfg — Configuration des paramètres communs machine
-   📄 2026-07-24 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
+   ST_CommunCfg — Configuration des paramètres communs machine
+   📄 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
    WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
    ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════</xhtml>

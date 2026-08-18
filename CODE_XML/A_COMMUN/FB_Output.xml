@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.761386" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.761386">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:35:11.329559" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:35:11.329559">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre logique, déjà résolu/rampé par le FB métier appelant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONFIGURATION ===
+--&gt; [CMD] Ordre logique issu du FB metier appelant</xhtml>
               </documentation>
             </variable>
             <variable name="InvertLogic">
@@ -40,7 +41,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = câblage NC (inversion de la sortie)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] TRUE = cablage NC (inversion de la sortie)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -50,33 +51,24 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vers la carte de sortie</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES PHYSIQUES ===
+&lt;-- [ACT] Etat logique physique vers la carte de sortie</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📤 FB_Output — Sortie relais (brique réduite, REX 2026-08-04)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📤 FB_Output — Adaptateur de sortie physique TOR (inversion NO/NC)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Conditionnement et inversion optionnelle de la commande TOR
+   🔌 Interface : Interface directe vers carte de sortie physique
    📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §Câblage
-   🧭 Interface RÉDUITE (validée utilisateur 2026-08-04) : relais de
-      commande BAS NIVEAU — transmet fidèlement `Command` (déjà
-      résolu/rampé par le FB métier appelant), ne décide JAMAIS lui-même
-      d'un arrêt de mouvement.
-   🔁 Rôle : inversion NO/NC uniquement.
-   🗑️ REX 2026-08-04 : partie FEEDBACK retirée (FeedbackRaw, UseFeedback,
-      Blink1Hz, FeedbackTimeout, ChannelOk, FeedbackOk, Error, ErrorId) —
-      jamais câblée (0 usage dans PRG_06, 15 instances Command→State).
-      Diagnostic contacteur déjà couvert au niveau métier par
-      FB_Safety_Winch (FwdRevSpeedFeedbackOff, BrakeFeedback).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Output) ===
 
 State := Command XOR InvertLogic;
 </xhtml>

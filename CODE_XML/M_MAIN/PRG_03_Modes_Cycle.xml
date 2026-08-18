@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.231841" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.231841">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:58:55.198030" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:58:55.198030">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -128,85 +128,85 @@
               <EnumValue>
                 <Name>X0_PREPARATION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X1_HOMING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 vitesses lentes pour chercher capteur top + référencement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesses lentes pour chercher capteur top + référencement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X2_WORK_POS_SELECT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 ouverture benne (si déjà ouverte → passe vite)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si déjà ouverte -&gt; passe vite)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X4_DESCEND_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X5_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X6_CLOSE_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fermeture benne — tolérance « à peu près fermé »</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne — tolérance « à peu près fermé »</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X7_CTRL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée palier 1 de contrôle</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 de contrôle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X8_ASCENT_LOADED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée nominale jusqu'à limite haute</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée nominale jusqu'à limite haute</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">égouttage temporisé — temps affiché IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">translation vers trémie + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X11_OPEN_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>STABILIZING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 état d'attente/stabilisation (ex-ERROR_HOLD) — pas une erreur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -281,7 +281,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande ouverture benne</xhtml>
               </documentation>
             </variable>
             <variable name="Close">
@@ -289,7 +289,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande fermeture benne</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldContactorCmd">
@@ -308,12 +308,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🪣 ST_BucketCmdDemand — Demande de commande benne (depuis cycle/sequenceur)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪣 ST_BucketCmdDemand — Demande de commande benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md (Benne incluse)
-   🎯 Demande de mouvement pour benne (depuis FB_Cycle / FB_ExtractionSequence).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de consigne de mouvement benne (Ouverture, Fermeture, Kobold)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_TranslationCmdDemand">
@@ -324,7 +324,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = démarrer mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de demarrage du mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="Target">
@@ -332,7 +332,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de position (ex: 1=Trémie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Cible de position (1=Tremie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -343,13 +343,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ↔️ ST_TranslationCmdDemand — Demande de commande translation M3 (depuis cycle)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎯 ST_TranslationCmdDemand — Demande de commande translation M3
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
-            DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
-   🎯 Demande de mouvement pour translation M3 (depuis FB_Cycle).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Regroupement des consignes de mouvement translation M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_WinchCmdDemand">
@@ -360,7 +359,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arret mouvement (TRUE=Marche)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -368,7 +367,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Descente, 0 = Arrêt, +1 = Montée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens de marche (-1: Descente, 0: Stop, 1: Montee)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPct">
@@ -376,7 +375,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse % (0.0 .. 100.0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse (0.0 a 100.0 %)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -387,13 +386,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_WinchCmdDemand — Demande de commande treuil (depuis cycle/sequenceur)
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
-            DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   🎯 Demande de mouvement pour treuil M1 ou M2 (depuis FB_Cycle).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Regroupement des consignes de mouvement treuil (StartStop, Direction, Vitesse)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_State">
@@ -480,9 +478,9 @@
                 <derived name="FB_Cycle" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Deux instances du séquenceur de cycle (D1) — gating sorties par mode.
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Deux instances du séquenceur de cycle (D1) — gating sorties par mode.
 ⚠️ VAR_OUTPUT (pas VAR) : PRG_04/05 y accèdent via PRG_03_Modes_Cycle.instCycleSemiAuto
-(une variable locale d'un PROGRAM n'est pas accessible depuis un autre PROGRAM — REX compile 2026-08-15).
+(une variable locale d'un PROGRAM n'est pas accessible depuis un autre PROGRAM).
 utilisé en MAINT_N1/N2</xhtml>
               </documentation>
             </variable>
@@ -571,8 +569,8 @@ instCycleMaintenance(
     M2_CablePosM            := PRG_02_Acquisition.CablePosM2,
     M1_MeasuredSpeedMps     := PRG_02_Acquisition.M1_Speed_Mps,
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.M2_Speed_Mps,
-    SpeedMismatchThresholdMps := 1.5,   // 🆕 Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
-    SpeedMismatchTimeout    := T#500ms, // 🆕 Tempo confirmation écart vitesse (revue)
+    SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
+    SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
@@ -583,7 +581,7 @@ instCycleMaintenance(
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
     Benne_IsOpen            := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.BucketState.MechState.IsClosed,
-    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // 🆕 tolérance matière 2m
+    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -613,8 +611,8 @@ instCycleSemiAuto(
     M2_CablePosM            := PRG_02_Acquisition.CablePosM2,
     M1_MeasuredSpeedMps     := PRG_02_Acquisition.M1_Speed_Mps,
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.M2_Speed_Mps,
-    SpeedMismatchThresholdMps := 1.5,   // 🆕 Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
-    SpeedMismatchTimeout    := T#500ms, // 🆕 Tempo confirmation écart vitesse (revue)
+    SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
+    SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
@@ -625,7 +623,7 @@ instCycleSemiAuto(
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
     Benne_IsOpen            := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.BucketState.MechState.IsClosed,
-    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // 🆕 tolérance matière 2m
+    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -654,7 +652,8 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation générale du séquenceur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Activation generale du sequenceur</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -662,7 +661,7 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -670,7 +669,7 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne de sécurité OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine de securite OK</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -678,7 +677,7 @@ Auth := instModes.Auth;
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (SEMI_AUTO pour l'instance cycle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode arbitre (SEMI_AUTO pour instance cycle)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleMotionPermit">
@@ -686,7 +685,7 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Manche défléchi (non centré) — D2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Manche deflecte (non centre)</xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmed">
@@ -694,7 +693,7 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔫 Appui homme-mort (fenêtre 3 s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Appui homme-mort (fenetre 3 s)</xhtml>
               </documentation>
             </variable>
             <variable name="HeartbeatIhmOk">
@@ -702,7 +701,7 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 IHM↔PLC valide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] IHM&lt;-&gt;PLC valide</xhtml>
               </documentation>
             </variable>
             <variable name="StartCycle">
@@ -710,8 +709,8 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes opérateur
-Demande lancement / reprise (IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES OPERATEUR ===
+--&gt; [CMD] Demande lancement / reprise (IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="AbortCycle">
@@ -719,7 +718,7 @@ Demande lancement / reprise (IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande abandon (IHM) — pas de Pause (D3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande abandon (IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="SelTarget">
@@ -727,8 +726,8 @@ Demande lancement / reprise (IHM)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cibles et paramètres (réutilise config maintenance — Q4)
-🎯 Cible sélectionnée (GVL_IHM.TranslationM3.Cmd.SelTarget) : 1=Trémie, 2=P2, 3=P1, 4=Maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CIBLES ET CONFIGURATION ===
+--&gt; [CFG] Cible selectionnee (1=Tremie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
               </documentation>
             </variable>
             <variable name="SetDepthM">
@@ -736,7 +735,7 @@ Demande lancement / reprise (IHM)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profondeur de consigne (négative)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Profondeur de consigne (negative)</xhtml>
               </documentation>
             </variable>
             <variable name="SetOffsetM">
@@ -744,7 +743,7 @@ Demande lancement / reprise (IHM)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart de fermeture benne cible</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Ecart de fermeture benne cible</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldContactFond">
@@ -752,8 +751,8 @@ Demande lancement / reprise (IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Feedbacks physique &amp; matériel
-Retour dédié Kobold : TRUE = contact fond</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FEEDBACKS CAPTEURS &amp; MATERIEL ===
+--&gt; [HW] Retour dedie Kobold : TRUE = contact fond</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalReached">
@@ -761,7 +760,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Limite légale atteinte (descente interdite)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite legale atteinte (descente interdite)</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalDepthM">
@@ -769,7 +768,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profondeur légale minimale autorisée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Profondeur legale minimale autorisee</xhtml>
               </documentation>
             </variable>
             <variable name="WinchSyncError">
@@ -777,7 +776,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Désynchronisme bloquant M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Desynchronisme bloquant M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="WinchSyncDeltaM">
@@ -785,7 +784,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart codeurs M1/M2 pour diagnostic</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Ecart codeurs M1/M2 pour diagnostic</xhtml>
               </documentation>
             </variable>
             <variable name="M1_CablePosM">
@@ -793,7 +792,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble treuil M1 (recalée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position cable treuil M1 (recalee)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_CablePosM">
@@ -801,7 +800,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble treuil M2 (recalée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position cable treuil M2 (recalee)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_MeasuredSpeedMps">
@@ -809,7 +808,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse linéaire mesurée M1 (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse lineaire mesuree M1 (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_MeasuredSpeedMps">
@@ -817,7 +816,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse linéaire mesurée M2 (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse lineaire mesuree M2 (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchThresholdMps">
@@ -825,7 +824,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil écart vitesse ; 0 = contrôle désactivé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil ecart vitesse ; 0 = controle desactive</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchTimeout">
@@ -833,7 +832,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée de confirmation ; 0 = contrôle désactivé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Duree de confirmation ; 0 = controle desactive</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitM1AscentM">
@@ -841,7 +840,7 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Limite haute d'exploitation M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation M1</xhtml>
               </documentation>
             </variable>
             <variable name="Translation_At_P1">
@@ -849,8 +848,8 @@ Retour dédié Kobold : TRUE = contact fond</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Feedbacks Translation M3
-Capteur position P1 (arrêt travail)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FEEDBACKS TRANSLATION M3 ===
+--&gt; [HW] Capteur position P1 (arret travail)</xhtml>
               </documentation>
             </variable>
             <variable name="Translation_At_Tremie">
@@ -858,7 +857,7 @@ Capteur position P1 (arrêt travail)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur fin de course trémie</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur fin de course tremie</xhtml>
               </documentation>
             </variable>
             <variable name="Translation_At_Maintenance">
@@ -866,7 +865,7 @@ Capteur position P1 (arrêt travail)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur fin de course maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur fin de course maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="Translation_Busy">
@@ -874,7 +873,7 @@ Capteur position P1 (arrêt travail)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mouvement translation en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mouvement translation en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Translation_Done">
@@ -882,7 +881,7 @@ Capteur position P1 (arrêt travail)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible translation atteinte</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cible translation atteinte</xhtml>
               </documentation>
             </variable>
             <variable name="Benne_Busy">
@@ -890,8 +889,8 @@ Capteur position P1 (arrêt travail)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Feedbacks Benne
-Mouvement mâchoires benne en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FEEDBACKS BENNE ===
+--&gt; [HW] Mouvement machoires benne en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Benne_Done">
@@ -899,7 +898,7 @@ Mouvement mâchoires benne en cours</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mouvement ouverture/fermeture terminé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mouvement ouverture/fermeture termine</xhtml>
               </documentation>
             </variable>
             <variable name="Benne_IsOpen">
@@ -907,7 +906,7 @@ Mouvement mâchoires benne en cours</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne mécaniquement ouvert mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne mecaniquement ouverte memorisee</xhtml>
               </documentation>
             </variable>
             <variable name="Benne_IsClosed">
@@ -915,7 +914,7 @@ Mouvement mâchoires benne en cours</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne mécaniquement fermé mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne mecaniquement fermee memorisee</xhtml>
               </documentation>
             </variable>
             <variable name="Benne_IsRoughlyClosed">
@@ -923,7 +922,7 @@ Mouvement mâchoires benne en cours</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Benne « à peu près fermée » (tolérance matière)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne a peu pres fermee (tolerance matiere)</xhtml>
               </documentation>
             </variable>
             <variable name="HomedM1">
@@ -931,8 +930,8 @@ Mouvement mâchoires benne en cours</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement (X1_HOMING)
-Codeur M1 référencé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REFERENCEMENT CODEURS ===
+--&gt; [HW] Codeur M1 reference</xhtml>
               </documentation>
             </variable>
             <variable name="HomedM2">
@@ -940,7 +939,7 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur M2 référencé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M2 reference</xhtml>
               </documentation>
             </variable>
             <variable name="TopPositionSensor">
@@ -948,7 +947,7 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute (référencement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur position haute (referencement)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequest">
@@ -956,7 +955,7 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de référencement (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de referencement (front)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -966,7 +965,8 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquenceur disponible</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
+&lt;-- [STAT] Sequenceur disponible</xhtml>
               </documentation>
             </variable>
             <variable name="Busy">
@@ -974,7 +974,7 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle automatique actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cycle automatique actif</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -982,7 +982,7 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle automatique complété</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cycle automatique complete</xhtml>
               </documentation>
             </variable>
             <variable name="Error">
@@ -990,7 +990,7 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut cycle</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -998,7 +998,7 @@ Codeur M1 référencé</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: timeout/limite, bit1: désynchronisme, bit2: cible invalide, bit3: stabilisation impossible, bit4: écart vitesse, bit5: perte heartbeat, bit6: tempo max étape</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchMps">
@@ -1006,7 +1006,7 @@ Codeur M1 référencé</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart absolu vitesse M1/M2 (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart absolu vitesse M1/M2 (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchActive">
@@ -1014,7 +1014,7 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil vitesse dépassé sur le cycle courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Seuil vitesse depasse sur cycle courant</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchConfirmed">
@@ -1022,7 +1022,7 @@ Codeur M1 référencé</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant SpeedMismatchTimeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart vitesse confirme pendant timeout</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM1Cmd">
@@ -1030,8 +1030,8 @@ Codeur M1 référencé</xhtml>
                 <derived name="ST_WinchCmdDemand" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes structurées (demandes de mouvement)
-Demande treuil M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES ACTIONNEURS (COMMANDES STRUCTUREES) ===
+&lt;-- [ACT] Demande treuil M1</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM2Cmd">
@@ -1039,7 +1039,7 @@ Demande treuil M1</xhtml>
                 <derived name="ST_WinchCmdDemand" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande treuil M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande treuil M2</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationCmd">
@@ -1047,7 +1047,7 @@ Demande treuil M1</xhtml>
                 <derived name="ST_TranslationCmdDemand" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande translation M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande translation M3</xhtml>
               </documentation>
             </variable>
             <variable name="BucketCmd">
@@ -1055,7 +1055,7 @@ Demande treuil M1</xhtml>
                 <derived name="ST_BucketCmdDemand" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande benne</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande benne</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStep">
@@ -1063,8 +1063,8 @@ Demande treuil M1</xhtml>
                 <derived name="E_CycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Métadonnées d'affichage IHM
-Étape active du Grafcet</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== METADONNEES &amp; SYNOPTIQUE ===
+&lt;-- [STAT] Etape active du Grafcet</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStateStr">
@@ -1072,7 +1072,7 @@ Demande treuil M1</xhtml>
                 <string length="80" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Libellé en clair de l'étape (Xn - texte)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Libelle en clair de l'etape</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStepAtError">
@@ -1080,7 +1080,7 @@ Demande treuil M1</xhtml>
                 <derived name="E_CycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Étape spécifique au moment du défaut (R9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape specifique au moment du defaut</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1090,7 +1090,8 @@ Demande treuil M1</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Compteur de prélèvements (RETAIN, Q3bis) — référence vers _CycleSampleCount</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURES PARTAGEES &amp; COMPTEURS ===
+&lt;-&gt; [BUS] Compteur de prelevements (RETAIN)</xhtml>
               </documentation>
             </variable>
           </inOutVars>
@@ -1099,23 +1100,33 @@ Demande treuil M1</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONTS ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="StartEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant StartCycle</xhtml>
+              </documentation>
             </variable>
             <variable name="AbortEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant AbortCycle</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Capture CycleStepAtError avant bascule (R9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -1126,7 +1137,8 @@ Demande treuil M1</xhtml>
                 <simpleValue value="E_CycleStep.X0_PREPARATION" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS INTERNES ===
+. [LOC] Etape courante machine d'etat</xhtml>
               </documentation>
             </variable>
             <variable name="SavedState">
@@ -1136,14 +1148,17 @@ Demande treuil M1</xhtml>
               <initialValue>
                 <simpleValue value="E_CycleStep.X0_PREPARATION" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etape memorisee</xhtml>
+              </documentation>
             </variable>
             <variable name="TouchPositionM">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémorisations et Timers
-Position M1 mémorisée lors du contact fond</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MEMORISATIONS &amp; REGISTRES INTERNES ===
+. [LOC] Position M1 memorisee lors du contact fond</xhtml>
               </documentation>
             </variable>
             <variable name="RaiseTargetM">
@@ -1151,39 +1166,7 @@ Position M1 mémorisée lors du contact fond</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Profondeur de remontée mémorisée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DrainingTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisateur de vidage (égouttage)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StabilizationTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation maximale de remontée lente</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedMismatchTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation temporelle écart de vitesse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepMaxTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Tempo max d'étape (R5) — lancée si pilotage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Profondeur de remontee memorisee</xhtml>
               </documentation>
             </variable>
             <variable name="SelectedWorkTarget">
@@ -1191,7 +1174,40 @@ Position M1 mémorisée lors du contact fond</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de travail mémorisée (1=Trémie, 3=P1, 4=Maintenance)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible de travail memorisee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DrainingTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
+. [LOC] Temporisateur de vidage (egouttage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StabilizationTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation maximale de remontee lente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMismatchTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation temporelle ecart de vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepMaxTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo max d'etape</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentDistM">
@@ -1202,8 +1218,8 @@ Position M1 mémorisée lors du contact fond</xhtml>
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Paramètres internes
-Distance de remontée lente de contrôle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES &amp; CONFIGURATIONS INTERNES ===
+. [LOC] Distance de remontee lente de controle</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentToleranceM">
@@ -1214,7 +1230,7 @@ Distance de remontée lente de contrôle</xhtml>
                 <simpleValue value="0.25" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart maximal admis entre les deux codeurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart maximal admis entre codeurs</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentTimeout">
@@ -1225,7 +1241,7 @@ Distance de remontée lente de contrôle</xhtml>
                 <simpleValue value="TIME#30s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps max pour atteindre la zone de stabilisation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps max pour zone de stabilisation</xhtml>
               </documentation>
             </variable>
             <variable name="DrainingTime">
@@ -1236,7 +1252,7 @@ Distance de remontée lente de contrôle</xhtml>
                 <simpleValue value="TIME#5s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps d'égouttage par défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps d'egouttage par defaut</xhtml>
               </documentation>
             </variable>
             <variable name="StepMaxTimeout">
@@ -1247,24 +1263,19 @@ Distance de remontée lente de contrôle</xhtml>
                 <simpleValue value="TIME#60s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Tempo max d'étape (à valider, Q4)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo max d'etape</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔄 FB_Cycle — Séquenceur du Cycle Automatique (Grafcet de dragage)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Cycle — Séquenceur du cycle automatique (Grafcet de dragage)
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
-   🔌 Conforme au contrat FB standard (Partie3 §1bis) + §11bis R1-R9.
-   🧩 Deux instances : instCycleMaintenance (MAINT_N1/N2) et
-      instCycleSemiAuto (SEMI_AUTO) — gating sorties par mode.
-   🕹️ Homme-mort (D2) : appui = autorisation 3 s ; mouvement continue
-      sans appui ; arrêt au centre du manche (CycleMotionPermit).
-   ⏱️ Tempo max d'étape : lancée SEULEMENT si pilotage joystick actif.
-   🧊 CycleStepAtError : étape spécifique mémorisée avant STABILIZING (R9).
-   🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE — rebouclage sur X0.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Automate de cycle automatique de dragage (X0 à X13 + STABILIZING)
+   🔒 Sécurité : Gating par mode et homme-mort, repli STABILIZING sur défaut
+   🔌 Interface : Demandes de mouvements (treuils, translation, benne)
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -1273,7 +1284,7 @@ Distance de remontée lente de contrôle</xhtml>
 
 // === IMPLEMENTATION ===
 
-{region "Gate securite"}
+{region "§1 Gate securite"}
 // 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE (R8)
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     WinchM1Cmd.StartStop   := FALSE;
@@ -1301,7 +1312,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 {endregion}
 
-{region "Preparation surveillance et commandes cycle"}
+{region "§2 Preparation surveillance et commandes cycle"}
 Ready := TRUE;
 ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
@@ -1326,7 +1337,7 @@ SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
-// 🆕 Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
+// Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
 StepMaxTimer(IN := CycleMotionPermit AND (State &lt;&gt; E_CycleStep.X0_PREPARATION)
                   AND (State &lt;&gt; E_CycleStep.X13_DONE_SYNC)
                   AND (State &lt;&gt; E_CycleStep.STABILIZING),
@@ -1362,7 +1373,7 @@ IF SpeedMismatchConfirmed AND State &lt;&gt; E_CycleStep.STABILIZING THEN
     State := E_CycleStep.STABILIZING;
 END_IF;
 
-// 🆕 Tempo max d'étape dépassée (blocage probable) → défaut
+// Tempo max d'étape dépassée (blocage probable) → défaut
 IF StepMaxTimer.Q AND State &lt;&gt; E_CycleStep.STABILIZING THEN
     Error := TRUE;
     ErrorId := ErrorId OR 16#0040;
@@ -1375,7 +1386,7 @@ IF AbortEdge.Q THEN
 END_IF;
 {endregion}
 
-{region "Machine etat cycle automatique"}
+{region "§3 Machine etat cycle automatique"}
 // 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d'état) — CASE sur enum unique (R1)
 CASE State OF
 
@@ -1400,7 +1411,7 @@ CASE State OF
         CycleStateStr := 'X1 - Référencement codeurs (vitesses lentes)';
         Busy := TRUE;
 
-        // 🆕 Vitesses lentes pour chercher capteur top + référencement
+        // Vitesses lentes pour chercher capteur top + référencement
         IF NOT HomedM1 OR NOT HomedM2 THEN
             WinchM1Cmd.StartStop := CycleMotionPermit;
             WinchM1Cmd.Direction := 1;   // montée lente vers capteur top
@@ -1422,7 +1433,7 @@ CASE State OF
         CycleStateStr := 'X2 - Sélection position travail';
         Busy := TRUE;
 
-        // 🆕 Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).
+        // Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).
         // P2(2) n'est PAS une destination — capteur de passage en petite vitesse (PV).
         IF (SelTarget &lt;&gt; 1) AND (SelTarget &lt;&gt; 3) AND (SelTarget &lt;&gt; 4) THEN
             Error := TRUE;
@@ -1447,7 +1458,7 @@ CASE State OF
         CycleStateStr := 'X3 - Ouverture benne';
         Busy := TRUE;
 
-        // 🆕 Ouverture benne ; si déjà ouverte → passe vite
+        // Ouverture benne ; si déjà ouverte → passe vite
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
@@ -1517,7 +1528,7 @@ CASE State OF
         WinchM1Cmd.StartStop := FALSE;
         BucketCmd.Close := TRUE;
 
-        // 🆕 Tolérance : si benne « à peu près fermée » (matière/objet), on remonte et on contrôle
+        // Tolérance : si benne « à peu près fermée » (matière/objet), on remonte et on contrôle
         IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.Close := FALSE;
             State := E_CycleStep.X7_CTRL_ASCENT;
@@ -1575,7 +1586,7 @@ CASE State OF
         WinchM2Cmd.StartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
-        // 🆕 Temps écoulé affiché IHM (CycleStateStr + champ dédié)
+        // Temps écoulé affiché IHM (CycleStateStr + champ dédié)
         IF CycleMotionPermit AND DrainingTimer.Q THEN
             DrainingTimer(IN := FALSE);
             State := E_CycleStep.X10_TRANSLATE_DUMP;
@@ -1588,7 +1599,7 @@ CASE State OF
         TranslationCmd.Target := 1; // Trémie
         TranslationCmd.Start := CycleMotionPermit;
 
-        // 🆕 Avertissement IHM : grille abaissée/libre, crible libre pour réceptionner la charge
+        // Avertissement IHM : grille abaissée/libre, crible libre pour réceptionner la charge
         // (porté par CycleStateStr + OperatorAction côté supervision)
 
         // Transition si translation arrivé à la trémie
@@ -1601,7 +1612,7 @@ CASE State OF
         CycleStep := E_CycleStep.X11_OPEN_DUMP;
         CycleStateStr := 'X11 - Vidange / ouverture du godet (montée possible, descente ouvre)';
 
-        // 🆕 Montée possible (treuils vers le haut) ; descente fait ouvrir la benne.
+        // Montée possible (treuils vers le haut) ; descente fait ouvrir la benne.
         // Montée : on laisse l'opérateur remonter les 2 treuils en synchro si besoin.
         WinchM1Cmd.StartStop := CycleMotionPermit AND (WinchM1Cmd.Direction = 1);
         WinchM1Cmd.Direction := 1;
@@ -1613,7 +1624,7 @@ CASE State OF
         // Descente → ouverture benne (vidage)
         BucketCmd.Open := CycleMotionPermit AND (WinchM1Cmd.Direction = -1);
 
-        // 🆕 Contrôle convoyeurs par MESSAGE utilisateur (pas encore câblé) :
+        // Contrôle convoyeurs par MESSAGE utilisateur (pas encore câblé) :
         // CycleStateStr + OperatorAction côté supervision demandent de vérifier
         // que les convoyeurs sont en route avant/au lâcher.
         IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
@@ -1630,10 +1641,10 @@ CASE State OF
         Done := TRUE;
         Busy := FALSE;
 
-        // 🆕 Compteur de prélèvements (RETAIN, Q3bis) — compte inconditionnellement
+        // Compteur de prélèvements (RETAIN, Q3bis) — compte inconditionnellement
         SampleCount := SampleCount + 1;
 
-        // 🆕 Rebouclage sur X0_PREPARATION (trémie, treuils hauts) — pas de retour P1
+        // Rebouclage sur X0_PREPARATION (trémie, treuils hauts) — pas de retour P1
         IF StartEdge.Q THEN
             Done := FALSE;
             State := E_CycleStep.X0_PREPARATION;
@@ -1651,7 +1662,7 @@ CASE State OF
 END_CASE;
 {endregion}
 
-{region "Repli homme mort"}
+{region "§4 Repli homme mort"}
 // 🛑 Relâchement du manche (retour au centre) : aucune demande d'actionneur ne reste active.
 // L'étape est mémorisée et reprend au prochain appui valide (D2).
 IF Busy AND NOT CycleMotionPermit THEN
@@ -1680,7 +1691,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active l'arbitrage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GESTION FB &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE = active)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -1688,7 +1700,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défaut (bit0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement defauts</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -1696,7 +1708,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine AU OK (TRUE = armee)</xhtml>
               </documentation>
             </variable>
             <variable name="SelMode">
@@ -1704,7 +1716,8 @@ END_IF;
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélecteur IHM (GVL_IHM.Modes.Cmd.SelMode)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SELECTIONS IHM &amp; COMMANDES MODES ===
+--&gt; [CMD] Selecteur de mode IHM</xhtml>
               </documentation>
             </variable>
             <variable name="SelSyncEnable">
@@ -1712,7 +1725,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Case IHM synchro (GVL_IHM.M1M2Sync.Cmd.SelSyncEnable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Selection synchro treuils IHM</xhtml>
               </documentation>
             </variable>
             <variable name="InhibitM1Request">
@@ -1720,7 +1733,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton IHM inhibition M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande inhibition treuil M1</xhtml>
               </documentation>
             </variable>
             <variable name="InhibitM2Request">
@@ -1728,7 +1741,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton IHM inhibition M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande inhibition treuil M2</xhtml>
               </documentation>
             </variable>
             <variable name="SelHomingApproachEnable">
@@ -1736,15 +1749,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Case IHM autorisant dépassement arrêt haut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderFaultPresent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut codeur (agrégat M1/M2, 1 cycle retard)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Selection approche homing IHM</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickWinchSelectRequest">
@@ -1752,7 +1757,7 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (brut IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Selection treuils joystick (0=Couple, 1=M1, 2=M2)</xhtml>
               </documentation>
             </variable>
             <variable name="SelMaintenanceZoneAccess">
@@ -1760,7 +1765,16 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : bit IHM dédié, autorisation CONSCIENTE zone Maintenance M3 (GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess) — MAINT_N2 seul ne suffit plus</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation acces zone maintenance M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFaultPresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS CAPTEURS &amp; DIAGNOSTICS ===
+--&gt; [HW] Defaut codeur agrege (1 cycle retard)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1769,46 +1783,66 @@ END_IF;
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS &amp; DIAGNOSTICS IEC ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB en traitement</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement termine</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut present</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Mode Semi-Auto refusé (Défaut Codeur)"</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0=Semi-Auto refuse)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat au moment du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="Auth">
               <type>
                 <derived name="ST_Modes_Autorisations" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus d'autorisations typé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'AUTORISATIONS ARBITREES ===
+&lt;-- [STAT] Bus d'autorisations typees machine</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1817,18 +1851,26 @@ END_IF;
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant Error</xhtml>
+              </documentation>
             </variable>
             <variable name="PrevInhibitM1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire état inhibition M1 (exclusion mutuelle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES &amp; MEMOIRES ===
+. [LOC] Memoire etat inhibition M1 (exclusion mutuelle)</xhtml>
               </documentation>
             </variable>
             <variable name="PrevInhibitM2">
@@ -1836,24 +1878,20 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire état inhibition M2 (exclusion mutuelle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire etat inhibition M2 (exclusion mutuelle)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ FB_Modes — Arbitrage du mode machine
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
+   🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur
+   🔌 Interface : Standard composant d'arbitrage applicatif
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🔌 FB STANDARD : pas un FB de mouvement, pas de StartStop/SafeStop.
-   🎯 Rôle : Source unique du mode arbitré + bus d'autorisations.
-      - Arbitrage mode (DISABLE/N1/N2/SEMI_AUTO) + garde-fou codeur.
-      - Calcul bus autorisations (SyncEnable, Inhibit, Sélection, Homing, Maintenance).
-   🔒 Authentification : gérée côté IHM. FB_Modes accepte SelMode tel quel.
-   ⚠️ EncoderFaultPresent consommé avec 1 cycle de retard (FB_Encoder_Safety appelé après).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION ===</xhtml>
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -1974,9 +2012,7 @@ ELSE
 END_IF;
 
 // 5quinquies. CIBLE TRANSLATION MAINTENANCE
-// 🆕 2026-08-06 (retour terrain) : MAINT_N2 seul ne suffit plus — bit IHM dédié
-// (SelMaintenanceZoneAccess) exigé EN PLUS, action consciente distincte du simple
-// changement de mode. PRG_TRANSLATION_CFC consomme ce bit.
+// MAINT_N2 ou MAINT_N1 + bit IHM dédié (SelMaintenanceZoneAccess) exigé EN PLUS
 Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
 
 // GATE — désactivation inhibitions/sync si mode change (sortie N1/N2)

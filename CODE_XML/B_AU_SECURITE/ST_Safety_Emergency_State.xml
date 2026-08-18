@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.752825" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.752825">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:39:36.366328" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:39:36.366328">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Boucle AU fermée (EmergencyChainClosed_DI = TRUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorOk">
@@ -39,7 +39,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur puissance confirmé engagé (PowerContactorEngaged_DI = TRUE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)</xhtml>
               </documentation>
             </variable>
             <variable name="Step">
@@ -47,7 +47,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Étape séquence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Réarmement possible maintenant : chain OK, step=0, pas de lockout, pas de redondance échouée, pas de contacteur déjà engagé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -63,7 +63,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence armement OU lockout en cours (nouvelle demande ignorée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement OU lockout en cours (nouvelle demande ignoree)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -74,16 +74,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚦 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
    ───────────────────────────────────────────────────────────────
-   📄 Produit par FB_Safety_EmergencyManagement (sortie State).
-      Consommé par PRG_SUPERVISION_CFC → GVL_IHM.Modes.State pour IHM,
-      et par GVL_Troubleshooting pour diagnostic.
-   🎯 Champs lecture seule — aucun lecteur n'est autorisé à l'écrire.
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §8.2
-              DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

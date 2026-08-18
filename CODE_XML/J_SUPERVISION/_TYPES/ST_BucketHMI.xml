@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-23T21:44:13.804544" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-23T21:44:13.804544">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.203735" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.203735">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -57,7 +57,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketHMI — Données d'échange IHM pour la benne (M2)
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State / Cfg / Bypass (2026-07-23), homogène avec ST_WinchHMI.
+   📄 Structuration en Cmd / State / Cfg / Bypass , homogène avec ST_WinchHMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -69,7 +69,7 @@
                 <derived name="ST_BucketConfig" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Offsets Open/Close/Coherence</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Offsets Open/Close/Coherence</xhtml>
               </documentation>
             </variable>
             <variable name="CfgTimeoutDuration">
@@ -103,7 +103,7 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BucketCfg — Configuration de la benne (M2)
+   ST_BucketCfg — Configuration de la benne (M2)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -139,7 +139,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement benne position ouverte (mise en service) — confirmation pure, aucun mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référencement benne position ouverte (mise en service) — confirmation pure, aucun mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="BtnConfirmClosePos">
@@ -147,7 +147,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="TglManualBucketLimits">
@@ -158,12 +158,12 @@
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
 uniquement en SelJoystickWinch=2 (unitaire M2). Si TRUE : borne le déplacement entre les
 positions ouvert/fermé configurées (OffsetOpenM/OffsetCloseM relatif à M1, mêmes bornes que
 FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
 CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
-🆕 2026-08-07 (18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
+(18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -259,7 +259,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Benne en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -291,7 +291,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Demande de fermeture active (image FB_Bucket)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de fermeture active (image FB_Bucket)</xhtml>
               </documentation>
             </variable>
             <variable name="OpenActive">
@@ -299,7 +299,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Demande d'ouverture active (image FB_Bucket)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande d'ouverture active (image FB_Bucket)</xhtml>
               </documentation>
             </variable>
             <variable name="M2PositionCorrected">
@@ -323,7 +323,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Ouverture auto armée (descente couplée demandée, benne pas ouverte)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Ouverture auto armée (descente couplée demandée, benne pas ouverte)</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledAscentCloseArmed">
@@ -331,7 +331,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
               </documentation>
             </variable>
             <variable name="ControlAscentActive">
@@ -339,7 +339,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledMotionBlockedByBucket">
@@ -347,7 +347,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 2026-08-07 : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -383,7 +383,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -397,7 +397,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassBucket — Bypass de la surveillance benne (M2)
+   ST_BypassBucket — Bypass de la surveillance benne (M2)
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -411,7 +411,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart M1/M2 en mètres benne ouvert</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
               </documentation>
             </variable>
             <variable name="OffsetCloseM">
@@ -419,7 +419,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart M1/M2 en mètres benne fermé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CoherenceLimitM">
@@ -427,7 +427,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de détection d'incohérence au boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CloseAnticipationM">
@@ -438,11 +438,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (20) — retour terrain, demande client : inertie mécanique du benne (M2 continue
-sur sa lancée après coupure StartStop) -- couper la commande EN AVANCE de la cible pour que
-l'arrêt réel (après coast-down) tombe proche du vrai offset, au lieu de dépasser. Anticipation
-distincte par sens (fermeture/ouverture ont des inerties différentes selon retour terrain).
-Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
               </documentation>
             </variable>
             <variable name="OpenAnticipationM">
@@ -453,7 +449,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <simpleValue value="1.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe la commande d'ouverture 1.3m avant OffsetOpenM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -464,11 +460,12 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.A
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_State">
@@ -544,7 +541,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne ouvert mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ouvert memorise</xhtml>
               </documentation>
             </variable>
             <variable name="IsClosed">
@@ -552,7 +549,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne fermé mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ferme memorise</xhtml>
               </documentation>
             </variable>
             <variable name="TooOpen">
@@ -560,7 +557,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)</xhtml>
               </documentation>
             </variable>
             <variable name="TooClosed">
@@ -568,7 +565,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement fermeture (Delta &gt; OffsetClose + Tolerance)</xhtml>
               </documentation>
             </variable>
             <variable name="IsIntermediate">
@@ -576,7 +573,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entre Ouvert et Fermé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position intermediaire (entre Ouvert et Ferme)</xhtml>
               </documentation>
             </variable>
             <variable name="LastPosM2Open">
@@ -584,7 +581,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernière position M2 mémorisée ouvert</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ouvert (m)</xhtml>
               </documentation>
             </variable>
             <variable name="LastPosM2Close">
@@ -592,7 +589,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernière position M2 mémorisée fermé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
               </documentation>
             </variable>
             <variable name="StateIncoherent">
@@ -600,7 +597,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État non sûr (divergence boot/réel)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat non sur (divergence boot/reel)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -611,11 +608,12 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.B
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>

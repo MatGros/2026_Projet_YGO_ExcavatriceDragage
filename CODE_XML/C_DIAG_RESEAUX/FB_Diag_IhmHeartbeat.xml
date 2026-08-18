@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.770881" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.770881">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:30:16.915572" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:30:16.915572">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance ; FALSE = IHM non valide</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; REGLAGES ===
+--&gt; [CMD] Active la surveillance (FALSE = IHM invalide)</xhtml>
               </documentation>
             </variable>
             <variable name="TglHeartbeatIhm">
@@ -40,7 +41,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Toggle IHM, inversion attendue toutes les 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Toggle IHM, inversion attendue toutes les 500 ms</xhtml>
               </documentation>
             </variable>
             <variable name="IhmTimeout">
@@ -51,7 +52,7 @@
                 <simpleValue value="TIME#2s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence maximale de front IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Absence maximale de front IHM</xhtml>
               </documentation>
             </variable>
             <variable name="PlcTogglePeriod">
@@ -62,7 +63,7 @@
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Période du clignotant PLC</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Periode du clignotant PLC</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -72,7 +73,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE après front IHM post-boot et avant timeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS &amp; DIAGNOSTICS IHM ===
+&lt;-- [STAT] TRUE apres front IHM post-boot et avant timeout</xhtml>
               </documentation>
             </variable>
             <variable name="HeartbeatIhmTimeout">
@@ -80,7 +82,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = aucun front IHM depuis IhmTimeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] TRUE = aucun front IHM depuis IhmTimeout</xhtml>
               </documentation>
             </variable>
             <variable name="TglHeartbeatPlc">
@@ -88,7 +90,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Clignotant PLC à superviser côté IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Clignotant PLC a superviser cote IHM</xhtml>
               </documentation>
             </variable>
             <variable name="TimeSinceIhmEdge">
@@ -96,50 +98,62 @@
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic : temps depuis le dernier front IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Temps ecoule depuis le dernier front IHM</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
+            <variable name="IhmTimeoutTon">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Timer de surveillance timeout IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PlcToggleTon">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Timer clignotant heartbeat PLC</xhtml>
+              </documentation>
+            </variable>
             <variable name="LastIhmToggle">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS ET ETATS INTERNES ===
+. [LOC]  Memoire du dernier etat toggle IHM</xhtml>
+              </documentation>
             </variable>
             <variable name="IhmEdgeSeen">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interdit de valider une valeur RETAIN au boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Verrou front vu (interdit RETAIN au boot)</xhtml>
               </documentation>
             </variable>
             <variable name="IhmEdgeDetected">
               <type>
                 <BOOL />
               </type>
-            </variable>
-            <variable name="IhmTimeoutTon">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="PlcToggleTon">
-              <type>
-                <derived name="TON" />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Front de changement toggle IHM detecte</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   💓 FB_Diag_IhmHeartbeat — Surveillance bidirectionnelle IHM↔PLC
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Diag_IhmHeartbeat — Surveillance bidirectionnelle Heartbeat IHM/PLC
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md (mise à jour Heartbeat requise)
-   🧩 Brique réduite : surveille le toggle IHM, génère le toggle PLC
-      et expose un diagnostic. Ne produit ni SafeStop ni PowerCutOff.
-   🛡️ Les FB_Safety_Winch / FB_Safety_Translation restent propriétaires
-      de leurs réactions métier.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Surveillance toggle IHM, generation toggle PLC et diagnostic timeout
+   🛡️ Protection : FB de diagnostic autonome (sans action directe sur AU)
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -148,6 +162,7 @@
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate"}
 // 🛑 Sans Enable, aucune valeur mémorisée ne peut déclarer l'IHM valide.
 IF NOT Enable THEN
     HeartbeatIhmOk := FALSE;
@@ -160,26 +175,33 @@ IF NOT Enable THEN
     PlcToggleTon(IN := FALSE, PT := PlcTogglePeriod);
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Front IHM"}
 // 📥 Front par comparaison : l'IHM écrit un BOOL toggle, pas une impulsion courte.
 IhmEdgeDetected := (TglHeartbeatIhm &lt;&gt; LastIhmToggle);
 LastIhmToggle := TglHeartbeatIhm;
 IF IhmEdgeDetected THEN
     IhmEdgeSeen := TRUE;
 END_IF;
+{endregion}
 
+{region "§3 Timeout IHM"}
 // ⏱️ Le timer repart à chaque front. Au boot, il atteint le timeout au bout de IhmTimeout.
 // HeartbeatIhmOk reste TRUE tant que le timeout n'est pas expiré (boot propre sans alarme au scan 1).
 IhmTimeoutTon(IN := NOT IhmEdgeDetected, PT := IhmTimeout);
 TimeSinceIhmEdge := IhmTimeoutTon.ET;
 HeartbeatIhmTimeout := IhmTimeoutTon.Q;
 HeartbeatIhmOk := NOT HeartbeatIhmTimeout;
+{endregion}
 
-// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Safety autonome.
+{region "§4 Clignotant PLC"}
+// 💡 Clignotant PLC indépendant : information de vie pour l'IHM, jamais signal Signal Safety autonome.
 PlcToggleTon(IN := NOT PlcToggleTon.Q, PT := PlcTogglePeriod);
 IF PlcToggleTon.Q THEN
     TglHeartbeatPlc := NOT TglHeartbeatPlc;
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>

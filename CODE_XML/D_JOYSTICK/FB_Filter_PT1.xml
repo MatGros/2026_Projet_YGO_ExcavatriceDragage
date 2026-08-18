@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.772569" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.772569">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:44:00.119461" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:44:00.119461">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Consigne brute entrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE &amp; CONFIGURATION ===
+--&gt; [CMD] Consigne d'axe brute a filtrer</xhtml>
               </documentation>
             </variable>
             <variable name="TimeConst">
@@ -40,7 +41,7 @@
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Constante de temps du filtre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Constante de temps du filtre (ex: T#200ms)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleTimeS">
@@ -48,7 +49,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Temps de cycle réel en secondes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de cycle reel de la tache en secondes (ex: 0.02)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -58,7 +59,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Consigne filtrée sortie</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES LISSÉES ===
+&lt;-- [STAT] Consigne d'axe lissee par filtre PT1</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -67,23 +69,28 @@
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC]  Constante de temps convertie en secondes</xhtml>
+              </documentation>
             </variable>
             <variable name="Alpha">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Facteur d'attenuation du filtre exponentiel</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔁 FB_Filter_PT1 — Filtre passe-bas premier ordre (PT1 numérique)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Filter_PT1 — Filtre passe-bas premier ordre (PT1 numérique)
    ───────────────────────────────────────────────────────────────
-   📄 Extrait depuis le projet CODESYS (Device.export, JOYSTICK/)
-   🎯 Filtre exponentiel discret : y[k] = α·x[k] + (1-α)·y[k-1]
-      où α = CycleTimeS / (T + CycleTimeS), T = TimeConst en secondes.
-   ⚠️ Si TimeConst = 0 ou CycleTimeS = 0, sortie = entrée (pass-through).
-   ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md</xhtml>
+   🎯 Rôle : Filtre exponentiel discret y[k] = a*x[k] + (1-a)*y[k-1]
+             avec a = CycleTimeS / (T + CycleTimeS). Pass-through si T=0 ou Cycle=0.
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

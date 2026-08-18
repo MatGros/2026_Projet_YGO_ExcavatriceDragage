@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.225264" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.225264">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:51:55.433856" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:51:55.433856">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -213,89 +213,140 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Activation generale du FB (TRUE=Autorise)</xhtml>
+              </documentation>
             </variable>
             <variable name="Reset">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
+              </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine de securite OK</xhtml>
+              </documentation>
             </variable>
             <variable name="Mode">
               <type>
                 <derived name="E_Mode" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode de fonctionnement arbitre</xhtml>
+              </documentation>
             </variable>
             <variable name="MotionRequestActive">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention de mouvement active</xhtml>
+              </documentation>
             </variable>
             <variable name="MotionDirection">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = montée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (+1 = montee)</xhtml>
               </documentation>
             </variable>
             <variable name="BottomPositionConfirmed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Attestation fond confirme (Kobold ou op)</xhtml>
+              </documentation>
             </variable>
             <variable name="BucketIsClosed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; ETATS MATERIELS ===
+--&gt; [HW] Benne fermee confirmee</xhtml>
+              </documentation>
             </variable>
             <variable name="BucketBusy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mouvement benne en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="BucketError">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Defaut sur sous-systeme benne</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchSyncError">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Defaut de desynchronisme treuils M1/M2</xhtml>
+              </documentation>
             </variable>
             <variable name="M1Position_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M1 (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="M2Position_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M2 (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="M1MeasuredSpeedValid">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite mesure vitesse M1</xhtml>
+              </documentation>
             </variable>
             <variable name="M2MeasuredSpeedValid">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite mesure vitesse M2</xhtml>
+              </documentation>
             </variable>
             <variable name="PositionsValid">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite des mesures de position</xhtml>
+              </documentation>
             </variable>
             <variable name="ControlAscentDistance_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; REGLAGES ===
+--&gt; [CFG] Distance palier 1 de controle remontee (m)</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -303,74 +354,116 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extraction en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Remontee nominale atteinte</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut sequence extraction</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: configuration</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0:fond, bit1:ferme, bit2:ctrl, bit3:cfg)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat IEC standard</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat IEC au moment du defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ExtractionState">
               <type>
                 <derived name="E_ExtractionSequenceState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase interne extraction</xhtml>
+              </documentation>
             </variable>
             <variable name="BucketCloseRequest">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES &amp; AUTORISATIONS ===
+&lt;-- [ACT] Demande de fermeture benne</xhtml>
+              </documentation>
             </variable>
             <variable name="AscentPermit">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Autorisation de remontee assistee</xhtml>
+              </documentation>
             </variable>
             <variable name="ForceMinSpeedStep">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Forcage vitesse minimale (palier de controle)</xhtml>
+              </documentation>
             </variable>
             <variable name="BottomConfirmationConsumed">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Signal confirmation fond consomme</xhtml>
+              </documentation>
             </variable>
             <variable name="OperatorActionId">
               <type>
                 <WORD />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC IHM ===
+&lt;-- [DIAG] ID action operateur requise</xhtml>
+              </documentation>
             </variable>
             <variable name="OperatorAction">
               <type>
                 <string length="120" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Message explicatif operateur</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -378,31 +471,46 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONTS ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ControlStartM1Position_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MEMORISATIONS &amp; POSITIONS INTERNES ===
+. [LOC] Position M1 au debut du palier de controle (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="ControlStartM2Position_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 au debut du palier de controle (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorCausePresent">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Presence d'une cause de defaut parametrage</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⛏️ FB_ExtractionSequence — Fermeture benne et remontée assistée
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_ExtractionSequence — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
-   🛡️ Sécurité : aucune remontée assistée sans fond confirmé ; palier 1 au contrôle.
-   🧩 Responsabilité : séquence métier, jamais commande directe de contacteur.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Séquence d'extraction (fermeture benne, remontée de contrôle, remontée nominale)
+   🛡️ Sécurité : Aucune remontée assistée sans fond confirmé, contrôle palier 1
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

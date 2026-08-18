@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.261672" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.261672">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:22:55.934730" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:22:55.934730">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -182,16 +182,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §3,
-                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
-   Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
-   détecter un collage / une absence de fermeture d'un contacteur de
-   puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
-   appelant).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -204,7 +201,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le FB. FALSE = neutralisation totale (sorties coupées)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active le FB. FALSE = neutralisation totale (sorties coupées)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -212,7 +209,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement défaut (front)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -220,7 +217,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU réarmée + conditions globales OK</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaîne AU réarmée + conditions globales OK</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -228,7 +225,7 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant</xhtml>
               </documentation>
             </variable>
             <variable name="StartStop">
@@ -236,7 +233,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération NORMALE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -244,7 +241,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -252,7 +249,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRefPct">
@@ -260,7 +257,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Magnitude de la consigne (de 0 à 100%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Magnitude de la consigne (de 0 à 100%)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionSensorTarget">
@@ -268,7 +265,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position cible courante</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur position cible courante</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownSensorTremie">
@@ -276,9 +273,9 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : 3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3 capteurs déclencheurs de ralentissement, un cran avant chaque cible
 (même principe que PV→Trémie, généralisé — voir §4bis dans le corps ST)
-Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
+--&gt; [HW] Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownSensorMaintenance">
@@ -286,7 +283,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur P1 — ralentissement avant Maintenance (Direction=-1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P1 — ralentissement avant Maintenance (Direction=-1)</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownSensorP1">
@@ -294,7 +291,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P2 — ralentissement avant P1 (Direction=-1, arrêt propre pour travail)</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchFwd">
@@ -302,7 +299,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême avant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême avant</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchRev">
@@ -310,7 +307,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de course extrême arrière</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême arrière</xhtml>
               </documentation>
             </variable>
             <variable name="DriveStatusWord">
@@ -319,7 +316,7 @@ Capteur PV — ralentissement avant Trémie (Direction=1)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Spécifique ETHERCAT (image process EtherCAT, rafraîchie par EtherCatTask 4ms)
-Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
+--&gt; [HW] Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="DriveActualFreqHz">
@@ -327,7 +324,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence réelle mesurée (Hz)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fréquence réelle mesurée (Hz)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassContactorCheck">
@@ -335,7 +332,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = désactive StuckClosed/StuckOpen pour le frein (simulation)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassLimitSwitch">
@@ -343,7 +340,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 TRUE = ignore les fins de course extrêmes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = ignore les fins de course extrêmes</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedback">
@@ -351,7 +348,7 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique direct : TRUE = frein OUVERT (desserré)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retour physique direct : TRUE = frein OUVERT (desserré)</xhtml>
               </documentation>
             </variable>
             <variable name="InvertDriveDirection">
@@ -359,14 +356,10 @@ Mot d'état AC600 lu depuis l'image d'entrée EtherCAT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 (retour terrain, REX câblage) : compense le câblage moteur (U/V inversés) —
-UNIQUEMENT sur le mot de commande variateur en sortie (§5bis). Direction/CommandedDirection
-reste partout ailleurs le sens SÉMANTIQUE réel (+1 = physiquement vers Trémie), pour rester
-apparié aux vrais capteurs (LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.
-⚠️ AVANT ce correctif, l'inversion était appliquée en amont (PRG_05, sur M3_Direction_Active
-lui-même) : avec le câblage réel de la machine, ça désaccordait TOUTE la logique sécurité/
-ralentissement appariée aux capteurs physiques (seule la coupure dure indépendante du sens,
-§0bis PRG_05, arrêtait encore la machine — le verrou d'arrivée logiciel ne s'armait jamais).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compense le câblage moteur (U/V inversés) — UNIQUEMENT sur le mot de commande variateur
+en sortie (§5bis). Direction/CommandedDirection reste partout ailleurs le sens SÉMANTIQUE
+réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
+(LimitSwitchFwd/Rev, SlowdownSensorXxx) quel que soit le câblage.</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampAccelRate">
@@ -378,7 +371,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages rampe (RETAIN)
-%/s — accélération</xhtml>
+--&gt; [CFG] %/s — accélération</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampDecelNormalRate">
@@ -389,7 +382,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
                 <simpleValue value="40" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">%/s — décélération normale</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] %/s — décélération normale</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampDecelFastRate">
@@ -400,7 +393,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
                 <simpleValue value="100" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">%/s — décélération RAPIDE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] %/s — décélération RAPIDE</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionInterlockDelay">
@@ -411,7 +404,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
                 <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai avant d'autoriser un changement de sens à l'arrêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Délai avant d'autoriser un changement de sens à l'arrêt</xhtml>
               </documentation>
             </variable>
             <variable name="ApproachSpeedTremieHz">
@@ -423,7 +416,7 @@ ralentissement appariée aux capteurs physiques (seule la coupure dure indépend
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages ETHERCAT uniquement (RETAIN)
-Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xhtml>
+--&gt; [CFG] Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xhtml>
               </documentation>
             </variable>
             <variable name="ApproachSpeedMaintenanceHz">
@@ -434,7 +427,7 @@ Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xh
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche Maintenance en Hz (piloté par SlowdownSensorMaintenance)</xhtml>
               </documentation>
             </variable>
             <variable name="ApproachSpeedP1Hz">
@@ -445,7 +438,7 @@ Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xh
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche P1 en Hz (piloté par SlowdownSensorP1)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveFreqScaleMaxHz">
@@ -456,7 +449,7 @@ Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xh
                 <simpleValue value="60" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Échelle 0..100 % → MaxHz (câblé depuis _TranslationMaxFreq_Hz par PRG_07 — defaut 60.0 si non raccordé)</xhtml>
               </documentation>
             </variable>
             <variable name="CaptorDebounce">
@@ -468,7 +461,7 @@ Vitesse réduite d'approche Trémie en Hz (piloté par SlowdownSensorTremie)</xh
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages communs
-Filtrage capteur de position cible</xhtml>
+--&gt; [CFG] Filtrage capteur de position cible</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeDelayContactClose">
@@ -479,7 +472,7 @@ Filtrage capteur de position cible</xhtml>
                 <simpleValue value="TIME#100ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voir FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeDelayMagnetise">
@@ -490,7 +483,7 @@ Filtrage capteur de position cible</xhtml>
                 <simpleValue value="TIME#300ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voir FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeDelayMotorDecel">
@@ -501,7 +494,7 @@ Filtrage capteur de position cible</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Voir FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedbackTimeout">
@@ -512,7 +505,7 @@ Filtrage capteur de position cible</xhtml>
                 <simpleValue value="TIME#300ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Strictement sous watchdog final 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Strictement sous watchdog final 500 ms</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -521,46 +514,64 @@ Filtrage capteur de position cible</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB occupé</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminée</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthèse défaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat mémorisé au dernier défaut</xhtml>
+              </documentation>
             </variable>
             <variable name="TargetReached">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position cible</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Capteur position cible</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedDriveControlWord">
@@ -568,7 +579,7 @@ Filtrage capteur de position cible</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedDriveFreqHz">
@@ -576,7 +587,7 @@ Filtrage capteur de position cible</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
@@ -584,7 +595,7 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande métier desserrage, issue de FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier desserrage, issue de FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCommandOpenConfirmed">
@@ -592,7 +603,7 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeContactorCheck">
@@ -600,7 +611,7 @@ Filtrage capteur de position cible</xhtml>
                 <derived name="ST_ContactorCheck" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag contacteur frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diag contacteur frein</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -610,38 +621,47 @@ Filtrage capteur de position cible</xhtml>
                 <derived name="FB_Brake" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Séquence frein</xhtml>
               </documentation>
             </variable>
             <variable name="CycleTimeCalc">
               <type>
                 <derived name="FB_CycleTime" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mesure temps de cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="SpeedRamp">
               <type>
                 <derived name="FB_Ramp" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rampe de vitesse logicielle (PLC)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Rampe de vitesse logicielle (PLC)</xhtml>
               </documentation>
             </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front Erreur</xhtml>
+              </documentation>
             </variable>
             <variable name="DirectionChangeDelay">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Interlock changement de sens</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interlock changement de sens</xhtml>
               </documentation>
             </variable>
             <variable name="CommandedDirection">
@@ -649,7 +669,7 @@ Filtrage capteur de position cible</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens réellement appliqué</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens réellement appliqué</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangePending">
@@ -657,7 +677,7 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-05 : force la rampe à 0 pendant une inversion de sens en attente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Force la rampe à 0 pendant une inversion de sens en attente</xhtml>
               </documentation>
             </variable>
             <variable name="PhysicalDriveDirection">
@@ -665,35 +685,47 @@ Filtrage capteur de position cible</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CommandedDirection compensé câblage (InvertDriveDirection) — UNIQUEMENT pour le mot de commande variateur, jamais pour l'appariement capteur</xhtml>
               </documentation>
             </variable>
             <variable name="RampTargetPct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible rampe en %</xhtml>
+              </documentation>
             </variable>
             <variable name="CaptorDebounceTon">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce capteur cible</xhtml>
+              </documentation>
             </variable>
             <variable name="ArrivalEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front arrivée sur capteur</xhtml>
+              </documentation>
             </variable>
             <variable name="DirectionAtArrival">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens d'arrivée mémorisé</xhtml>
+              </documentation>
             </variable>
             <variable name="ArrivalLock">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrêt exact sur capteur cible</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arrêt exact sur capteur cible</xhtml>
               </documentation>
             </variable>
             <variable name="MovementRequested">
@@ -701,44 +733,42 @@ Filtrage capteur de position cible</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pilote FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pilote FB_Brake</xhtml>
               </documentation>
             </variable>
             <variable name="FirstScanDone">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation premier scan</xhtml>
+              </documentation>
             </variable>
             <variable name="TonBrakeRealFreqTimeout">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 (revue sécurité) : garde-fou watchdog — DriveActualFreqHz est un passthrough
-EtherCAT SANS contrôle de fraîcheur (PRG_02_Acquisition, TimeConst=0ms). Si la comm variateur
-se fige (perte EtherCAT) sur une dernière valeur ≥1.0 Hz, plus rien ne referme le frein tant
-que ce garde-fou n'existe pas — même si SafeStop a déjà ramené la rampe théorique à 0. Force
-le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise DriveActualFreqHz.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde-fou watchdog : DriveActualFreqHz est un passthrough EtherCAT sans contrôle de fraîcheur.
+Si la communication variateur se fige sur une dernière valeur ≥1.0 Hz, plus rien ne referme
+le frein tant que ce garde-fou n'existe pas — même si SafeStop a déjà ramené la rampe théorique
+à 0. Force le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise
+DriveActualFreqHz.</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ↔️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
+   ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
-   📡 Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
+   Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
    🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
-   ⚠️ CORRECTIF (retour terrain 2026-08-05) : une inversion de sens PLUS RAPIDE que le
-      temps de décélération réel bloquait indéfiniment `CommandedDirection` (la translation
-      ne s'arrêtait jamais, continuait dans l'ancien sens) — la cible de rampe suivait la
-      magnitude joystick en continu, sans garantie de croiser le seuil d'arrêt qui
-      autorise l'interlock changement de sens (§5). Même bug déjà corrigé sur `FB_Winch`
-      (REX 2026-07-02), jamais porté ici. Corrigé : `DirectionChangePending` FORCE
-      désormais la cible à 0.0 dès qu'un changement de sens est en attente, de façon
-      déterministe et indépendante du joystick (voir §4 dans le corps ST).
+   🎯 Invariant : toute inversion de sens force la cible de rampe à 0.0 tant que le
+      changement de sens est en attente, pour garantir le croisement du seuil d'arrêt
+      qui autorise l'interlock de changement de sens (§5).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -748,7 +778,7 @@ le relâchement du frein 2s après la fin de la rampe théorique, quoi que dise 
 
 // === IMPLEMENTATION ===
 
-{region "Gate et initialisation"}
+{region "§1 Gate et initialisation"}
 // 🛑 1. GATE (Enable / PowerContactorEngaged) — neutralisation totale, sorties sûres
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
@@ -780,7 +810,7 @@ END_IF;
 
 {endregion}
 
-{region "Acquisition commandes et position cible"}
+{region "§2 Acquisition commandes et position cible"}
 Ready := TRUE;
 CycleTimeCalc(DefaultValueS := 0.010);   // MainTask = 10 ms
 
@@ -793,13 +823,12 @@ TargetReached := CaptorDebounceTon.Q;
 
 {endregion}
 
-{region "Consigne vitesse ralentissement verrou arrivee"}
+{region "§4 Consigne vitesse ralentissement verrou arrivee"}
 // ⚙️ 4. CORE — arbitrage rampe : Enable &gt; SafeStop &gt; StartStop
-// 🆕 2026-08-05 : DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de
-// sens est en attente — sans ça, la cible suit la magnitude joystick en continu et ne
-// croise jamais le seuil d'arrêt (0.1%) qui autorise l'interlock §5 à basculer
-// CommandedDirection. Une inversion plus rapide que la décélération réelle bloquait donc
-// indéfiniment le mouvement dans l'ancien sens (même bug que FB_Winch, REX 2026-07-02).
+// DirectionChangePending FORCE la cible à 0.0 dès qu'une inversion de sens est en attente —
+// sans cela, la cible suit la magnitude joystick en continu et ne croise jamais le seuil
+// d'arrêt (0.1%) qui autorise l'interlock §5 à basculer CommandedDirection. Une inversion
+// plus rapide que la décélération réelle bloquerait indéfiniment le mouvement dans l'ancien sens.
 DirectionChangePending := (Direction &lt;&gt; CommandedDirection) AND (CommandedDirection &lt;&gt; 0);
 
 RampTargetPct := 0.0;
@@ -817,11 +846,9 @@ IF NOT SafeStop AND StartStop AND NOT DirectionChangePending THEN
     END_IF;
 END_IF;
 
-// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur, remplace le timer)
-// 🔧 REX 2026-07-18 : ApproachTime (timer générique, toute direction confondue) remplacé par un
-// capteur dédié qui ne déclenche le ralentissement QU'à l'approche de sa cible, jamais l'inverse.
-// 🆕 2026-08-06 : généralisé à 3 paires capteur/cible indépendantes — chaque capteur "un cran
-// avant" la cible finale déclenche SA propre vitesse réduite, dans SON sens de marche uniquement :
+// ⏱️ 4bis. RALENTISSEMENT AUTO À L'APPROCHE (piloté par capteur)
+// Chaque capteur "un cran avant" la cible finale déclenche SA propre vitesse réduite, dans SON
+// sens de marche uniquement — le ralentissement ne se déclenche qu'à l'approche de sa cible :
 //   PV       + Direction=1  → approche Trémie
 //   P1       + Direction=-1 → approche Maintenance
 //   P2       + Direction=-1 → approche P1 (arrêt propre pour travail)
@@ -836,14 +863,11 @@ IF (Direction = -1) AND SlowdownSensorP1 THEN
 END_IF;
 
 // 🎯 4ter. VERROUILLAGE ANTI-REBONDS SENS EN BUTÉE (Trémie, P1, Maintenance, Fdc extrêmes)
-// 🆕 2026-08-06 (retour terrain + revue) : élargi à P1 (arrêt travail), pas seulement les 2
-// extrémités. Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de
-// course dur (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même
-// brève arme le même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ.
-// 🔧 REX 2026-08-06 (revue) : LimitSwitchFwd/Rev ne passaient PAS par ce verrou — un Fdc qui
-// s'ouvre quelques ms pendant le freinage laissait le §5bis relâcher SA coupure directe sans que
-// rien ne prenne le relais, la rampe (encore haute en interne) revenait en sortie -&gt; ré-accélération.
-// Désormais toute activation, même un instant, arme DirectionAtArrival comme un TargetReached.
+// Dès qu'on touche un capteur d'arrêt (TargetReached, débounce 100ms) OU un fin de course dur
+// (LimitSwitchFwd/Rev, §5bis — immédiat, non débounce, mais toute activation même brève arme le
+// même verrou), le sens d'arrivée (DirectionAtArrival) est MÉMORISÉ et BLOQUÉ. Toute activation,
+// même un instant, arme DirectionAtArrival comme un TargetReached — un Fdc qui s'ouvre quelques ms
+// pendant le freinage ne doit pas laisser la rampe (encore haute en interne) revenir en sortie.
 ArrivalEdge(CLK := TargetReached
                  OR (LimitSwitchFwd AND (CommandedDirection = 1))
                  OR (LimitSwitchRev AND (CommandedDirection = -1)));
@@ -851,12 +875,12 @@ IF ArrivalEdge.Q THEN
     DirectionAtArrival := CommandedDirection;
 END_IF;
 
-// 🔧 REX 2026-08-06 (revue) : un retour au neutre, même SOUTENU (&gt;100ms), ne doit JAMAIS lever
-// le verrou — seul un vrai changement de sens (dégagement volontaire, sans ambiguïté) le fait.
-// Sinon : neutre 100ms+ puis réappui dans le MÊME sens (le capteur/Fdc étant resté au niveau
-// haut en continu, TargetReached ne montre plus de front) contournait le verrou et M3 repartait
-// vers la butée. Conforme à la demande d'origine : "on doit repartir dans l'AUTRE sens", jamais
-// juste relâcher-réappuyer pareil. Instantané, jamais retardé (le dégagement doit rester rapide).
+// Un retour au neutre, même SOUTENU (&gt;100ms), ne doit JAMAIS lever le verrou — seul un vrai
+// changement de sens (dégagement volontaire, sans ambiguïté) le fait. Sinon, un neutre 100ms+
+// puis un réappui dans le MÊME sens (le capteur/Fdc restant au niveau haut en continu,
+// TargetReached ne montre plus de front) contournerait le verrou et M3 repartirait vers la butée.
+// On doit repartir dans l'AUTRE sens, jamais juste relâcher-réappuyer pareil. Instantané, jamais
+// retardé (le dégagement doit rester rapide).
 IF (Direction = DirectionAtArrival * (-1)) OR ResetEdge.Q OR (NOT TargetReached AND NOT LimitSwitchFwd AND NOT LimitSwitchRev) THEN
     DirectionAtArrival := 0;
 END_IF;
@@ -874,7 +898,7 @@ SpeedRamp(Target := RampTargetPct,
 
 {endregion}
 
-{region "Interlock changement sens"}
+{region "§5 Interlock changement sens"}
 // 🔒 5. INTERLOCK CHANGEMENT DE SENS — jamais Fwd+Rev simultanés (vitesse confirmée nulle)
 IF Direction &lt;&gt; CommandedDirection THEN
     IF CommandedDirection = 0 AND Direction &lt;&gt; 0 THEN
@@ -895,16 +919,16 @@ END_IF;
 
 {endregion}
 
-{region "Commande variateur et protections fin course"}
+{region "§5bis Commande variateur et protections fin course"}
 // 🛑 Pilotage du frein : le mouvement est considéré actif tant que la consigne est supérieure à 0.1%
 // OU que la fréquence réelle mesurée du variateur M3 est &gt;= 1.0 Hz.
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
-// 🆕 2026-08-06 (revue sécurité) : borné par un garde-fou 2s — DriveActualFreqHz n'a aucun
-// contrôle de fraîcheur EtherCAT ; si la comm se fige sur une valeur ≥1.0 Hz (perte réseau en
-// mouvement), rien d'autre en aval ne referme le frein (FB_TranslationOutputInterlock_LD ignore
-// volontairement SafeStop par conception). Le garde-fou force la fermeture du frein 2s après la
-// fin de la rampe THÉORIQUE, quoi que dise la mesure réelle — combine attente réelle (évite un
-// serrage sur arbre encore tournant) et certitude de fermeture (n'attend jamais indéfiniment).
+// Borné par un garde-fou 2s — DriveActualFreqHz n'a aucun contrôle de fraîcheur EtherCAT ; si la
+// communication se fige sur une valeur ≥1.0 Hz (perte réseau en mouvement), rien d'autre en aval
+// ne referme le frein (FB_TranslationOutputInterlock_LD ignore volontairement SafeStop par
+// conception). Le garde-fou force la fermeture du frein 2s après la fin de la rampe THÉORIQUE, quoi
+// que dise la mesure réelle — combine attente réelle (évite un serrage sur arbre encore tournant)
+// et certitude de fermeture (n'attend jamais indéfiniment).
 TonBrakeRealFreqTimeout(IN := NOT ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1)), PT := T#2s);
 MovementRequested := ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current) &gt; 0.1))
                      OR (ABS(DriveActualFreqHz) &gt;= 1.0 AND NOT TonBrakeRealFreqTimeout.Q);
@@ -912,7 +936,7 @@ MovementRequested := ((CommandedDirection &lt;&gt; 0) AND (ABS(SpeedRamp.Current
 // 🔀 5bis. SORTIE PHYSIQUE (ETHERCAT)
 RequestedDriveFreqHz := (ABS(SpeedRamp.Current) / 100.0) * DriveFreqScaleMaxHz;
 
-// 🆕 2026-08-06 : compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
+// Compensation câblage moteur appliquée ICI SEULEMENT, sur le mot de commande —
 // CommandedDirection (sécurité/capteurs juste au-dessus, §4/§4bis/§4ter) reste le sens réel.
 PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, CommandedDirection * (-1));
 
@@ -944,7 +968,7 @@ END_IF;
 
 {endregion}
 
-{region "Commande frein"}
+{region "§6 Commande frein"}
 // 🛑 6. FREIN (composé, réutilisé tel quel)
 Brake(Enable := TRUE, Reset := Reset, MovementRequested := MovementRequested,
       ContactorFeedback := BrakeFeedback,
@@ -962,7 +986,7 @@ BrakeContactorCheck := Brake.ContactorCheck;
 
 {endregion}
 
-{region "Diagnostic etat et repli defaut"}
+{region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
     ErrorId := ErrorId OR 16#0001;
@@ -1031,7 +1055,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contexte général (comme tout FB) — FALSE = frein collé (sûr)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD]  Autorisation generale (FALSE = frein colle)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -1039,7 +1064,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Acquittement defaut (front)</xhtml>
               </documentation>
             </variable>
             <variable name="MovementRequested">
@@ -1047,7 +1072,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = FB_Winch demande un mouvement (sens+palier actifs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Demande de mouvement (sens+palier actifs)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorFeedback">
@@ -1055,7 +1080,16 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein (`PRG_02_Acquisition.HwIn`) : TRUE = frein OUVERT (desserré)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MATERIELS &amp; SIMULATION ===
+--&gt; [HW]   Retour contacteur frein (TRUE = relache/ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassContactorCheck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST]  Bypass controle contacteur (simu)</xhtml>
               </documentation>
             </variable>
             <variable name="DelayContactClose">
@@ -1066,10 +1100,8 @@ END_IF;
                 <simpleValue value="TIME#100ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-08-03 : même sens que BrakeCmd (TRUE = relâché)
-→ en marche normale les deux sont ÉGAUX ; c'est leur
-DIFFÉRENCE qui trahit un contacteur collé (voir §4).
-Temps de fermeture contacteur de puissance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS ET REGLAGES ===
+--&gt; [CFG]  Temps de fermeture contacteur de puissance</xhtml>
               </documentation>
             </variable>
             <variable name="DelayMagnetise">
@@ -1080,7 +1112,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#300ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai magnétisation moteur avant ouverture frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai magnetisation moteur avant ouverture frein</xhtml>
               </documentation>
             </variable>
             <variable name="DelayMotorDecel">
@@ -1091,7 +1123,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai décélération/ouverture contacteur avant collage frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai deceleration avant collage frein</xhtml>
               </documentation>
             </variable>
             <variable name="FeedbackTimeout">
@@ -1102,15 +1134,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#1s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai max cohérence commande/retour frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassContactorCheck">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai max coherence commande/retour frein</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1119,46 +1143,66 @@ Temps de fermeture contacteur de puissance</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DERIVATION ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence temporisee en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Frein ouvert/relache confirme</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut actif sur le frein</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut engagement frein" - incohérence commande/retour frein (collage ou non-relâche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de defauts (bit0: incoherence retour)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat operationnel courant</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat memorise lors du defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande sortie bobine frein : TRUE = relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONFIRMATIONS ===
+&lt;-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCommandOpenConfirmed">
@@ -1166,7 +1210,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein ouvert = commande ouverture confirmée (même sens que ContactorFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Confirmation ouverture frein pour verrous</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorCheck">
@@ -1174,7 +1218,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="ST_ContactorCheck" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag détaillé (IHM / FB_Safety_Winch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostic detaille retour contacteur</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1183,18 +1227,25 @@ Temps de fermeture contacteur de puissance</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TRIGGERS ET DETECTION FRONTS ===
+. [LOC]  Detecteur front acquittement</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Detecteur front apparition defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 REX 2026-07-24 : Front montant activation bypass pour réarmement immédiat</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Detecteur front activation bypass</xhtml>
               </documentation>
             </variable>
             <variable name="TonMagnetise">
@@ -1202,7 +1253,8 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation avant relâche</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
+. [LOC]  Temporisation avant relachement frein</xhtml>
               </documentation>
             </variable>
             <variable name="TonDecel">
@@ -1210,7 +1262,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation avant collage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Temporisation avant collage frein</xhtml>
               </documentation>
             </variable>
             <variable name="TonFeedback">
@@ -1218,41 +1270,26 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout cohérence commande/retour</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Timeout de coherence commande/retour</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🛡️ FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
+   🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
+   🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
-                   (règles issues de DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §4)
-   🛠️ Frein à manque de courant : colle au repos (sécurité positive).
-   📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
-   📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
-   ⏱️ Séquence démarrage : attend fermeture contacteur + magnétisation
-      moteur AVANT de relâcher (sinon charge retombe → à-coup).
-   ⏱️ Séquence arrêt     : attend décélération/ouverture contacteur AVANT
-      de coller (sinon usure/casse mécanique en plein mouvement).
-   🔍 Double vérification retour contacteur bobine (ST_ContactorCheck) :
-      incohérence commande/retour au-delà de FeedbackTimeout → ErrorId.
-   🆕 REX 2026-08-03 (révocation 2026-07-26) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
-      (DI = 1 ⟺ frein ouvert). Plus d'inversion à la frontière : ce FB reçoit maintenant un
-      signal dans le MÊME sens que `BrakeCmd` en marche saine (TRUE = relâché = ouvert) → le test d'incohérence est `&lt;&gt;`, pas `=`.
-      ⚠️ Ce retour n'est PAS une mesure du frein : il détecte un contacteur/bobine défaillant, mais
-      pas un frein usé ou qui patine. Le patinage reste couvert par Méca A (dérive codeur,
-      FB_Safety_Winch bit7) — pas par ce bloc.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Brake) ===</xhtml>
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Brake) ===
-
+{region "§1 Gate"}
 // 🛑 1. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
 IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
@@ -1264,11 +1301,15 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
+{endregion}
 
+{region "§2 Reset et fronts"}
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
 BypassEdge(CLK := BypassContactorCheck);
+{endregion}
 
+{region "§3 Séquence temporisée"}
 // 🛠️ 3. SÉQUENCE TEMPORISÉE (démarrage vs arrêt)
 IF MovementRequested THEN
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
@@ -1281,7 +1322,7 @@ IF MovementRequested THEN
         State := E_State.BUSY;
     END_IF;
 ELSE
-    // 🆕 REX 2026-07-08 : Sécurité positive - fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
+    // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
@@ -1290,15 +1331,16 @@ END_IF;
 
 Busy := (State = E_State.BUSY);
 Done := (State = E_State.DONE);
+{endregion}
 
+{region "§4 Double vérification contacteur"}
 // 🔍 4. DOUBLE VÉRIFICATION RETOUR CONTACTEUR (ST_ContactorCheck)
 ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
-// 🆕 REX 2026-08-03 (révocation 2026-07-26) : `ContactorFeedback` est maintenant dans le MÊME sens
-// que `BrakeCmd` (TRUE = relâché = frein ouvert). En marche saine les deux sont ÉGAUX → c'est leur
-// DIFFÉRENCE qui signale l'incohérence (contacteur collé).
-// ⚠️ Le test repasse en `&lt;&gt;` (retour à la logique d'origine pré-2026-07-26).
+// ContactorFeedback est dans le MÊME sens que BrakeCmd (TRUE = relâché = frein ouvert).
+// En marche saine les deux sont ÉGAUX → c'est leur DIFFÉRENCE qui signale l'incohérence
+// (contacteur collé). Le test compare donc `&lt;&gt;`.
 TonFeedback(IN := (BrakeCmd &lt;&gt; ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
@@ -1319,24 +1361,32 @@ ELSE
     END_IF;
 END_IF;
 
+{endregion}
+
+{region "§5 Arbitrage error"}
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
 
+{region "§6 Sortie sûre"}
 // 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
 IF Error THEN
     BrakeCmd := FALSE;
 END_IF;
+{endregion}
 
+{region "§7 Confirmation ouverture"}
 // 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback, ou image de BrakeCmd si BypassContactorCheck=TRUE)
 IF BypassContactorCheck THEN
     BrakeCommandOpenConfirmed := BrakeCmd;
 ELSE
     BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -1357,7 +1407,8 @@ END_IF;
                 <simpleValue value="0.004" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de secours par défaut (ex. 4ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES DE SECOURS ===
+--&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1367,7 +1418,8 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé réel calculé (secondes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET DIAGNOSTIC ===
+&lt;-- [DIAG] Temps ecoule reel calcule (secondes)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1377,7 +1429,8 @@ END_IF;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps système actuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORLOGE ET MEMOIRE TEMPORELLE ===
+. [LOC] Temps systeme actuel</xhtml>
               </documentation>
             </variable>
             <variable name="TimeLast">
@@ -1385,7 +1438,7 @@ END_IF;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Empreinte de temps du cycle précédent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Empreinte de temps du cycle precedent</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaTimeMs">
@@ -1393,7 +1446,7 @@ END_IF;
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart brut calculé (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut calcule (ms)</xhtml>
               </documentation>
             </variable>
             <variable name="InitDone">
@@ -1401,26 +1454,30 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau d'initialisation du premier cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation du premier cycle</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
-      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Acquisition temps"}
 // 1. ACQUISITION DU TEMPS SYSTÈME
 TimeCurrent := TIME();
+{endregion}
 
+{region "§2 Initialisation"}
 // 2. INITIALISATION UNIQUE AU PREMIER CYCLE
 IF NOT InitDone THEN
     TimeLast := TimeCurrent;
@@ -1428,19 +1485,26 @@ IF NOT InitDone THEN
     CycleTimeS := DefaultValueS;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Calcul delta"}
 // 3. CALCUL DU DELTA EN MILLISECONDES
 DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
 
+{region "§4 Conversion et secours"}
 // 4. CONVERSION ET CHARGE DE SECOURS
 IF DeltaTimeMs &gt; 0 THEN
     CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
     CycleTimeS := DefaultValueS;
 END_IF;
+{endregion}
 
+{region "§5 Archivage"}
 // 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
 TimeLast := TimeCurrent;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -1458,7 +1522,8 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible visée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES ET TAUX DE RAMPE ===
+--&gt; [CMD] Valeur cible visee (-100.0..+100.0 %)</xhtml>
               </documentation>
             </variable>
             <variable name="AccelRate">
@@ -1466,7 +1531,7 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Taux d'accélération (%/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Taux d'acceleration (%/s)</xhtml>
               </documentation>
             </variable>
             <variable name="DecelRate">
@@ -1474,7 +1539,7 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Taux de décélération (%/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Taux de deceleration (%/s)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleTimeS">
@@ -1482,7 +1547,7 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de cycle réel en secondes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de cycle reel en secondes (dt)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1492,7 +1557,8 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur courante amortie</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VALEUR RAMPEE ===
+&lt;-- [STAT] Valeur courante amortie (-100.0..+100.0 %)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1501,57 +1567,37 @@ TimeLast := TimeCurrent;
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS INTERNES ===
+. [LOC] Pas de variation pour le cycle courant</xhtml>
+              </documentation>
             </variable>
             <variable name="TargetLimited">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible bornee a [-100.0, +100.0]</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📈 FB_Ramp — Rampe accel/décel anti-à-coups (retour zéro plus rapide)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Ramp — Rampe d'accélération et décélération asymétrique
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2 (usage),
-                   DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md (correctif ci-dessous)
-   🧩 Instancié 3 fois dans le projet : RampX/RampY (FB_Joystick, cible
-      SIGNÉE -100..+100 %) et SpeedRamp (FB_Winch, cible TOUJOURS &gt;= 0,
-      jamais concernée par ce bug — voir analyse d'impact ci-dessous).
-
-   ⚠️ CORRECTIF (retour terrain 2026-07-02) : le choix accel/décel
-   comparait `Target`/`Current` AVEC LEUR SIGNE, pas leur magnitude.
-   Conséquence : lors d'une inversion RAPIDE du joystick (Current très
-   négatif, Target qui redevient positif), la condition
-   `(Target &gt; 0.0 AND Target &gt; Current)` devenait vraie dès que `Target`
-   passait légèrement positif — alors que `Current` était encore très
-   loin de zéro côté négatif — et sélectionnait à tort `AccelRate` (lent,
-   "s'éloigne du zéro") au lieu de `DecelRate` (rapide, "retourne vers le
-   zéro") pour toute la portion du trajet qui ramène réellement vers
-   zéro. Résultat observé : lors d'un flick rapide du joystick, `Current`
-   mettait ~3× plus longtemps que prévu à repasser par zéro, ce qui
-   retardait en cascade `AxisCmdY.Direction`/`SpeedRef`, puis l'interlock
-   de sens de `FB_Winch` (`CommandedDirection` bloqué sur l'ancien sens
-   plus longtemps que nécessaire).
-   🔬 Analyse d'impact (avant correctif) : `FB_Ramp` n'est instancié que
-   dans `FB_Joystick` (`RampX`/`RampY`, cible signée → CONCERNÉ) et dans
-   `FB_Winch` (`SpeedRamp`, cible = `RampTargetPct` toujours &gt;= 0 → JAMAIS
-   de traversée de signe possible → NON concerné, comportement inchangé).
-   ✅ Correction : classification basée sur le CÔTÉ de zéro où se trouve
-   `Current` et le sens de déplacement (pas le signe brut de `Target`),
-   vérifiée sur les 8 cas (Current&gt;0/&lt;0/=0 × s'éloigne/retourne/traverse).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Ramp) ===</xhtml>
+   🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
+   🔒 Polarité : Distingue l'éloignement de zéro (Accel) et le retour à zéro (Decel)
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Ramp) ===
-
 // Détection du comportement (Accélération vs Décélération)
-// 🔧 CORRECTIF : classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut
-// de Target seul (l'ancienne version se trompait lors d'une traversée de zéro rapide).
+// Classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut de Target seul
+// (robuste à une traversée de zéro rapide).
 // 🛡️ Garde-fou : la rampe ne sort jamais de la plage normalisée ±100 %.
 TargetLimited := LIMIT(-100.0, Target, 100.0);
 Current := LIMIT(-100.0, Current, 100.0);

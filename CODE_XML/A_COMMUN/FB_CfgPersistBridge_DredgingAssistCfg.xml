@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-28T18:42:11.375772" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-07-28T18:42:11.375772">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:50.927930" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:50.927930">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -123,7 +123,7 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
+   ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
    📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -138,6 +138,10 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <inOutVars>
@@ -145,17 +149,28 @@
               <type>
                 <derived name="ST_DredgingAssistCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
+              </documentation>
             </variable>
             <variable name="Persist">
               <type>
                 <derived name="ST_DredgingAssistCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
+              </documentation>
             </variable>
           </inOutVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🌉 FB_CfgPersistBridge_DredgingAssistCfg — Pont IHM/persistance prélèvement
-   ═══════════════════════════════════════════════════════════════</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_DredgingAssistCfg — Pont persistance prélèvement
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

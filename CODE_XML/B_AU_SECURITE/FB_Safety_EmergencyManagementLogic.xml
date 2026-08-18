@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-13T23:13:36.931471" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-13T23:13:36.931471">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:29:40.239339" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:29:40.239339">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,7 +31,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintainB_Cmd">
@@ -39,7 +39,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulse_Cmd">
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de réarmement (TRUE = bobine réarmement activée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de rearmement (TRUE = bobine rearmement activee)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -58,15 +58,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ ST_Safety_Emergency_InternalCmd — Structure de commande interne
    ───────────────────────────────────────────────────────────────
-   📄 Transporte les ordres logiques entre le bloc de décision
-      et le bloc de sortie de la boucle d'urgence.
-   🔒 Polarité maintien : TRUE = voie maintenue saine, FALSE = coupure demandée
-      (conforme règle C1 — polarité explicite).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md</xhtml>
+   🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
+   🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -79,7 +77,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONSIGNES ===
+--&gt; [CMD]  Active la surveillance (TRUE = autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -87,7 +86,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Front acquittement defauts</xhtml>
               </documentation>
             </variable>
             <variable name="ArmRequest">
@@ -95,23 +94,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de réarmement (BtnEmergencyArming)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyChainClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour physique boucle d'urgence amont contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation contacteur de puissance principal</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Demande de rearmement (BtnEmergencyArming)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffRequest">
@@ -119,7 +102,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Requête de coupure logique issue des métiers</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requete de coupure logique issue des metiers</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyCutOff">
@@ -127,7 +110,24 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Commande d'ouverture d'urgence depuis l'IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MATERIELS (HW) ===
+--&gt; [HW]   Retour physique boucle d'urgence amont contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Confirmation contacteur de puissance principal</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -136,13 +136,17 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ERREURS &amp; CONSIGNES LOGIQUES ===
+&lt;-- [DIAG] Synthese defaut actif</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: RedundancyTestFailed (affiché), bit1: EmergencyArmingFailed (affiché)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -150,7 +154,7 @@
                 <derived name="ST_Safety_Emergency_InternalCmd" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Structure de commande logique produite</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Structure de commande logique produite</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingSeqStep">
@@ -158,7 +162,8 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape de diagnostic : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; RETOURS D'ETAT ===
+&lt;-- [DIAG] Etape sequence (0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm)</xhtml>
               </documentation>
             </variable>
             <variable name="RedundancyTestFailed">
@@ -166,7 +171,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut auto-test redondance (Cause lissee OR NOT Ack)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
@@ -174,7 +179,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Affiché = Cause lissée OR NOT Ack (pattern §3.4bis) — pour IHM/diag</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut rearmement contacteur (Cause lissee OR NOT Ack)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
@@ -182,7 +187,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre les essais</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Verrouillage temporel 5s entre essais</xhtml>
               </documentation>
             </variable>
             <variable name="Armable">
@@ -190,8 +195,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Bus State/Diag internes — repris par le composite pour les DUT publics
-🟢 Réarmement possible maintenant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Rearmement possible actuellement</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -199,7 +203,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Séquence ou lockout en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence ou lockout en cours</xhtml>
               </documentation>
             </variable>
             <variable name="StartupFail">
@@ -207,11 +211,198 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Autotest démarche échoué</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Autotest demarrage echoue</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmReqEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant ArmRequest</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EnableRising">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Enable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur nouvelle occurrence cause redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingFailedCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur nouvelle occurrence cause rearmement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceTestA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DRAPEAUX &amp; FORCAGES LOGIQUES ===
+. [LOC] Forcage coupure canal A pendant test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceTestB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Forcage coupure canal B pendant test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupCheckDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Autotest demarrage effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartupCheckOK">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Resultat autotest demarrage (latche)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSE &amp; ACK DEFAUT REDONDANCE ===
+. [LOC] Cause brute : canal colle detecte a l'auto-test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accuse operateur (TRUE = pas d'alarme a afficher)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSE &amp; ACK DEFAUT REARMEMENT ===
+. [LOC] Cause brute : contacteur non confirme sous 2s</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailedAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Accuse operateur (TRUE = pas d'alarme a afficher)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonTestA">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS LOGIQUES ===
+. [LOC] Timer auto-test canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRestoreA">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer restauration canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonTestB">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer auto-test canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRestoreB">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer restauration canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingPulse">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer impulsion rearmement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingConfirm">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer attente confirmation contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingLockout">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer lockout anti-reessai</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonRedundancyDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonArmingFailedDisplay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM rearmement</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_TestDuration">
               <type>
                 <TIME />
@@ -220,7 +411,7 @@
                 <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[CST] Temporisations normatives de securite AU (fixes, non modifiables RETAIN/IHM)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS NORMATIVES DE SECURITE (FIXES) ===
 Duree auto-test canal A ou B</xhtml>
               </documentation>
             </variable>
@@ -265,168 +456,18 @@ Duree auto-test canal A ou B</xhtml>
                 <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Anti-clignotement affichage IHM uniquement (§9 STD) — jamais sur l'action</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="ArmReqEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="EnableRising">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="ForceTestA">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ForceTestB">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="TonTestA">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonRestoreA">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonTestB">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonRestoreB">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingPulse">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingConfirm">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonArmingLockout">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="StartupCheckDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Autotest démarrage
-TRUE = autotest passé, attente réarmement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StartupCheckOK">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Résultat autotest (latche le temps du front)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailedCause">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩹 Pattern Cause/Ack (§3.4bis AF01, §9 STD) — Reset jamais conditionné
-Latch brut : canal collé détecté à l'auto-test</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailedAck">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyCauseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonRedundancyDisplay">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailedCause">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Latch brut : contacteur non confirmé sous 2s</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailedAck">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Accusé opérateur — TRUE = pas d'alarme à afficher</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmingFailedCauseEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte une NOUVELLE occurrence de la cause</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonArmingFailedDisplay">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Debounce affichage IHM uniquement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anti-clignotement affichage IHM uniquement</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🛡️ FB_Safety_EmergencyManagementLogic — Décision &amp; Séquencement AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Machine d'état, fronts Reset/Arm, calcul ErrorId &amp; consignes logiques
-   🛡️ Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
-   📄 Docs : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
-            DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §3.4/§3.4bis
-            DOC/STDS/CODE_QUALITY_STANDARDS.md §9 (pattern Cause/Ack)
-            DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md</xhtml>
+   🔒 Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -435,7 +476,7 @@ Latch brut : canal collé détecté à l'auto-test</xhtml>
 
 // === IMPLEMENTATION ===
 
-{region "Fronts de commande"}
+{region "§1 Fronts de commande"}
 // 🔄 Fronts
 EnableRising(CLK := Enable);
 ResetEdge(CLK := Reset);
@@ -443,7 +484,7 @@ ArmReqEdge(CLK := ArmRequest);
 
 {endregion}
 
-{region "Gate neutralisation"}
+{region "§2 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Error := FALSE;
@@ -481,7 +522,7 @@ END_IF;
 
 {endregion}
 
-{region "Autotest demarrage"}
+{region "§3 Autotest demarrage"}
 // 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01)
 // Vérifications synchrones 1 cycle au premier passage Enable=TRUE
 IF EnableRising.Q THEN
@@ -504,7 +545,7 @@ END_IF;
 
 {endregion}
 
-{region "Acquittement defauts"}
+{region "§4 Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
 // ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
 // pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
@@ -520,7 +561,7 @@ END_IF;
 
 {endregion}
 
-{region "Sequence rearmement AU"}
+{region "§5 Sequence rearmement AU"}
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
@@ -615,8 +656,8 @@ END_IF;
 
 {endregion}
 
-{region "Gestion cause et acquittement"}
-// 🆕 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+{region "§6 Gestion cause et acquittement"}
+// 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
 // L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
 // jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
 RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
@@ -631,7 +672,7 @@ END_IF;
 
 {endregion}
 
-{region "Commandes et etats publics"}
+{region "§7 Commandes et etats publics"}
 // 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES — basées sur la Cause brute (jamais sur l'Ack)
 Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
 Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
@@ -651,7 +692,7 @@ ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
 
 {endregion}
 
-{region "Affichage defauts IHM"}
+{region "§8 Affichage defauts IHM"}
 // 📤 7. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
 // ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
 // sur la Cause brute, jamais retardée par ce debounce.
@@ -663,7 +704,7 @@ EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAc
 
 {endregion}
 
-{region "Synthese ErrorId"}
+{region "§9 Synthese ErrorId"}
 // 📤 8. SYNTHÈSE DES ERREURS (bitfield affiché, basé sur RedundancyTestFailed/EmergencyArmingFailed affichés)
 ErrorId := 16#0000;
 IF RedundancyTestFailed THEN

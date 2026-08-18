@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.237841" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.237841">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:56:19.386328" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:56:19.386328">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,31 +31,49 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la simulation</xhtml>
+              </documentation>
             </variable>
             <variable name="RelayFwd">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé avant</xhtml>
+              </documentation>
             </variable>
             <variable name="RelayRev">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé arrière</xhtml>
+              </documentation>
             </variable>
             <variable name="SpeedRefPct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse rampée courante (%)</xhtml>
+              </documentation>
             </variable>
             <variable name="PresetCmd">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique un preset (homing)</xhtml>
+              </documentation>
             </variable>
             <variable name="PresetValue">
               <type>
                 <UDINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute à charger au preset</xhtml>
+              </documentation>
             </variable>
             <variable name="SpeedScaleFactor">
               <type>
@@ -65,7 +83,7 @@
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — confort de test, voir bandeau ci-dessus</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Confort de test, voir bandeau ci-dessus</xhtml>
               </documentation>
             </variable>
             <variable name="TestOffsetCmd">
@@ -73,7 +91,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — front montant = applique TestOffsetPts (test banc)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Front montant = applique TestOffsetPts (test banc)</xhtml>
               </documentation>
             </variable>
             <variable name="TestOffsetPts">
@@ -84,7 +102,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — décalage signé à appliquer (points bruts)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Décalage signé à appliquer (points bruts)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -93,6 +111,9 @@
               <type>
                 <UDINT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Position brute simulée</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <inOutVars>
@@ -101,7 +122,7 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-08 : référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid)</xhtml>
               </documentation>
             </variable>
           </inOutVars>
@@ -111,7 +132,7 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — évite de dupliquer le calcul 2x</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Évite de dupliquer le calcul 2x</xhtml>
               </documentation>
             </variable>
             <variable name="TestOffsetEdge">
@@ -119,7 +140,7 @@
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front TestOffsetCmd</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -141,15 +162,14 @@
    📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
    📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
    📥 PresetValue : valeur brute à charger lors du preset
-   📥 SpeedScaleFactor : 🔧 REX 2026-07-07 — multiplicateur de vitesse simulation (confort de test
+   📥 SpeedScaleFactor : multiplicateur de vitesse simulation (confort de test
       banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
       d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
-   🔧 REX 2026-07-08 : `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+   `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
       (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
-      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB (tenté en `VAR RETAIN` puis
-      `VAR PERSISTENT RETAIN` locaux, aucun des deux ne convient). Un vrai codeur absolu physique
+      `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
       conserve son comptage brut même à travers un reset FROID (indépendant de l'automate) —
       il fallait donc bien du PERSISTENT RETAIN réel, regroupé avec le reste dans GVL_PERSISTENT.
    ═══════════════════════════════════════════════════════════════
@@ -162,18 +182,23 @@
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
 
+{region "§1 Gate"}
 IF NOT Enable THEN
     RawPosOut := RawPos;
     RETURN;
 END_IF;
+{endregion}
 
-// 🆕 REX 2026-07-08 (4) — injection test banc : VRAI saut de position (comme un glissement réel),
+{region "§2 Injection test"}
+// Injection test banc : VRAI saut de position (comme un glissement réel),
 // pour tester Concept 1 / Méca E ET le rattrapage joystick (voir GVL_Simulation bandeau).
 TestOffsetEdge(CLK := TestOffsetCmd);
 IF TestOffsetEdge.Q THEN
     RawPos := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) + TestOffsetPts);
 END_IF;
+{endregion}
 
+{region "§3 Comptage"}
 Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
 
 IF PresetCmd THEN
@@ -187,8 +212,11 @@ ELSIF RelayRev THEN
         RawPos := 0;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Sortie"}
 RawPosOut := RawPos;
+{endregion}
 </xhtml>
           </ST>
         </body>

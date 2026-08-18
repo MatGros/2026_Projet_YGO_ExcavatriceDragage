@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.227328" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.227328">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:43:07.778128" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:43:07.778128">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -147,9 +147,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
-   ═══════════════════════════════════════════════════════════════</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -162,7 +165,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance EtherCAT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONTROLE ===
+--&gt; [CMD] Active la surveillance EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -170,7 +174,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front d'acquittement des défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement des defauts</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateurStateRaw">
@@ -178,8 +182,8 @@
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Variateur M3 (AC600_ECAT_Drive)
-Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS BRUTS MATERIEL &amp; BYPASS VARIATEUR M3 ===
+--&gt; [HW]  Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateurSimBypass">
@@ -187,7 +191,7 @@ Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = simulation active variateur M3</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1StateRaw">
@@ -195,8 +199,8 @@ Valeur brute AC600_ECAT_Drive.GetDeviceState()</xhtml>
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Encodeur M1 (COD1_CODEUR)
-Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS BRUTS MATERIEL &amp; BYPASS ENCODEUR M1 ===
+--&gt; [HW]  Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1SimBypass">
@@ -204,7 +208,7 @@ Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = simulation active encodeur M1</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM2StateRaw">
@@ -212,8 +216,8 @@ Valeur brute COD1_CODEUR.GetDeviceState()</xhtml>
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Encodeur M2 (COD2_CODEUR)
-Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS BRUTS MATERIEL &amp; BYPASS ENCODEUR M2 ===
+--&gt; [HW]  Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM2SimBypass">
@@ -221,7 +225,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = simulation active encodeur M2</xhtml>
               </documentation>
             </variable>
             <variable name="NetworkBypassActive">
@@ -229,7 +233,8 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASS RESEAU IHM ===
+--&gt; [TST] TRUE = bypass reseau global IHM</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -239,7 +244,8 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Logique de surveillance active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; CONFORMITE ===
+&lt;-- [STAT] Logique de surveillance active</xhtml>
               </documentation>
             </variable>
             <variable name="Busy">
@@ -247,7 +253,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Non utilisé (conformité)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise (conformite interface)</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -255,23 +261,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Non utilisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Résumé anomalie de communication bus</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut global résumé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -279,7 +269,24 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du diagnostic global — voir en-tête</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase courante du diagnostic global</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; ALARMES ===
+&lt;-- [DIAG] Resume anomalie de communication bus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut global resume</xhtml>
               </documentation>
             </variable>
             <variable name="StateAtError">
@@ -287,7 +294,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase figée à l'apparition de l'erreur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Phase figee a l'apparition de l'erreur</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEthercatMaster">
@@ -295,7 +302,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics bus EtherCAT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics bus EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateur">
@@ -303,7 +310,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave AC600</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave AC600</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1">
@@ -311,7 +318,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave COD1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave COD1</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM2">
@@ -319,7 +326,7 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave COD2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave COD2</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceVariateurStateRawOut">
@@ -327,18 +334,25 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroirs bruts lisibles directement sur l'instance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIRS BRUTS MATERIEL ===
+&lt;-- [DIAG] Miroir brut status variateur M3</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceEncoderM1StateRawOut">
               <type>
                 <derived name="DEVICE_STATE" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Miroir brut status encodeur M1</xhtml>
+              </documentation>
             </variable>
             <variable name="DeviceEncoderM2StateRawOut">
               <type>
                 <derived name="DEVICE_STATE" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Miroir brut status encodeur M2</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -347,7 +361,8 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecteur front de reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Detecteur front de reset</xhtml>
               </documentation>
             </variable>
             <variable name="VariateurOnlineReal">
@@ -355,65 +370,83 @@ Valeur brute COD2_CODEUR.GetDeviceState()</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">GetDeviceState() = RUNNING, hors tout bypass</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS ET ETATS INTERNES ===
+. [LOC]  GetDeviceState() = RUNNING, hors tout bypass</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1OnlineReal">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  GetDeviceState() = RUNNING, hors tout bypass</xhtml>
+              </documentation>
             </variable>
             <variable name="EncoderM2OnlineReal">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  GetDeviceState() = RUNNING, hors tout bypass</xhtml>
+              </documentation>
             </variable>
             <variable name="VariateurBypass">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation OU bypass réseau IHM, pour ce device</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Simulation OU bypass reseau IHM variateur</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1Bypass">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Simulation OU bypass reseau IHM encodeur M1</xhtml>
+              </documentation>
             </variable>
             <variable name="EncoderM2Bypass">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Simulation OU bypass reseau IHM encodeur M2</xhtml>
+              </documentation>
             </variable>
             <variable name="VariateurOnlineEff">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Online effectif (reel OU bypass)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1OnlineEff">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Online effectif (reel OU bypass)</xhtml>
+              </documentation>
             </variable>
             <variable name="EncoderM2OnlineEff">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Online effectif (reel OU bypass)</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 FB_Diag_Ethercat — Diagnostic bus EtherCAT (3 esclaves)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Diag_Ethercat — Diagnostic bus EtherCAT &amp; Esclaves (M3, COD1, COD2)
    ───────────────────────────────────────────────────────────────
-   📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
-   🎯 Rôle : Décide Online/Operational pour variateur M3 + codeurs M1/M2.
-      Publie ST_Diag_Device par device + state global.
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Surveillance bus EtherCAT master, variateur M3 et codeurs M1/M2
+   🔌 Architecture : Publication ST_Diag_Device par esclave &amp; E_Diag_State
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

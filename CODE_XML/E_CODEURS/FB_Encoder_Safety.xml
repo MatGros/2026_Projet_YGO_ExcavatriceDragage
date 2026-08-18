@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.218090" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.218090">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:34:05.329680" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:34:05.329680">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -149,7 +149,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active le bloc</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -157,7 +158,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -165,7 +166,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ligne puissance enclenchée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
+--&gt; [HW]  Ligne puissance enclenchee</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -173,7 +175,7 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode d'exploitation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosM">
@@ -181,7 +183,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position calculée (FB_Encoder_Scale)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; ALERTE HOMING ===
+--&gt; [HW]  Position calculee (m, sortie FB_Encoder_Scale)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingSuspect">
@@ -189,7 +192,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alerte incohérence redémarrage (FB_Encoder_Homing)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Alerte incoherence redemarrage (FB_Encoder_Homing)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionMinM">
@@ -200,7 +203,8 @@
                 <simpleValue value="-99" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bornage physique bas</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES &amp; BORNES PHYSIQUES ===
+--&gt; [CFG] Plafond bornage physique bas (m)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionMaxM">
@@ -211,7 +215,7 @@
                 <simpleValue value="99" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bornage physique haut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond bornage physique haut (m)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassGlobal">
@@ -222,7 +226,8 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mise en service : neutralise le défaut de bornage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TESTS &amp; BYPASS ===
+--&gt; [TST] Neutralisation defaut de bornage pour mise en service</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -231,46 +236,66 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB en cours de traitement</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement termine</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut (ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: Position hors bornes [-99..+99]m ; bit1: Incohérence boot (HomingSuspect)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut (bit0: Bornes, bit1: Boot suspect)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat courant lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="CablePosMSafe">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble instantanée (non figée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES SURE &amp; SECURITE ===
+&lt;-- [DIAG] Position cable instantanee transmise (m)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderIncoherent">
@@ -278,7 +303,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">= Error — consommé par FB_Modes et IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Incoherence ou hors bornes (TRUE = defaut)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -287,29 +312,36 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🛡️ FB_Encoder_Safety — Bornage physique &amp; surveillance cohérence
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3.6/§3.7
-   🎯 Rôle :
-      - Surveillance bornage absolu [-99.00 ; +99.00] m
-      - Relais de HomingSuspect (ErrorId bit1)
-      - Expose EncoderIncoherent (= Error) et transmet CablePosMSafe
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d'incohérence redémarrage
+   🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
+   🛡️ Sécurité : Verrouillage de la position câble sûre
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate"}
 // 🛑 1. GATE
 IF NOT Enable THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -321,22 +353,30 @@ END_IF;
 
 Ready := TRUE;
 State := E_State.READY;
+{endregion}
 
+{region "§2 Reset front"}
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
+{endregion}
 
+{region "§3 Bypass global"}
 // 🌐 3. BYPASS GLOBAL
 IF BypassGlobal THEN
     ErrorId := 16#0000;
 END_IF;
+{endregion}
 
+{region "§4 Surveillance bornage"}
 // 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
 IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
     ErrorId := ErrorId OR 16#0001;
 ELSE
     ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
 END_IF;
+{endregion}
 
+{region "§5 Relais incohérence redémarrage"}
 // 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
 IF NOT BypassGlobal THEN
     IF HomingSuspect THEN
@@ -345,10 +385,14 @@ IF NOT BypassGlobal THEN
         ErrorId := ErrorId AND 16#FFFD;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§6 Transmission mesure"}
 // 📏 6. TRANSMISSION DE LA MESURE (Toujours réelle, non figée)
 CablePosMSafe := CablePosM;
+{endregion}
 
+{region "§7 Sorties état et sécurité"}
 // 📤 7. SORTIES ÉTAT &amp; SÉCURITÉ
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -359,6 +403,7 @@ END_IF;
 EncoderIncoherent := Error;
 Busy := FALSE;
 Done := FALSE;
+{endregion}
 </xhtml>
           </ST>
         </body>

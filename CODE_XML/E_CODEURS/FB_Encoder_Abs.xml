@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T20:37:50.222571" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T20:37:50.222571">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:32:17.381884" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:32:17.381884">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -149,7 +149,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -157,7 +158,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de preset (front montant)</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -165,7 +174,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
+--&gt; [HW]  Ligne puissance enclenchee</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -173,7 +183,7 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard (contexte, pas encore exploité ce lot)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
               </documentation>
             </variable>
             <variable name="RawPosIn">
@@ -181,7 +191,8 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Brut EtherCAT (ex. COD1_PosValue, %ID)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS ETHERCAT &amp; CAPTEUR HW ===
+--&gt; [HW]  Position brute EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="AlarmsIn">
@@ -189,7 +200,7 @@
                 <UINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Brut EtherCAT (ex. COD1_Alarms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes alarmes bruts EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="WarningsIn">
@@ -197,7 +208,7 @@
                 <UINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Brut EtherCAT (ex. COD1_Warnings) — informatif seulement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes avertissements bruts EtherCAT</xhtml>
               </documentation>
             </variable>
             <variable name="SlaveOperational">
@@ -205,7 +216,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Diag_Ethercat — esclave EtherCAT opérationnel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Statut esclave EtherCAT operationnel</xhtml>
               </documentation>
             </variable>
             <variable name="PointsPerRev">
@@ -216,15 +227,8 @@
                 <simpleValue value="8192" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Résolution codeur confirmée (Partie10 §3.3)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetRequest">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front — piloté par FB_Encoder_Homing via PRG_02_Encoders</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES &amp; REGLAGES ===
+--&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
               </documentation>
             </variable>
             <variable name="PresetValue">
@@ -232,7 +236,7 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible brute — piloté par FB_Encoder_Homing (stub 0 ce lot)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur cible de preset</xhtml>
               </documentation>
             </variable>
             <variable name="PresetTimeout">
@@ -242,6 +246,9 @@
               <initialValue>
                 <simpleValue value="TIME#2s0ms" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temporisation max attente preset</xhtml>
+              </documentation>
             </variable>
             <variable name="PresetTolerancePts">
               <type>
@@ -251,7 +258,7 @@
                 <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tolérance relecture post-preset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance relecture post-preset (pts)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -260,59 +267,82 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence de preset en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Preset effectue avec succes</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut (ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut communication codeur" - alarme/bus codeur ; bit1: "Erreur référencement (timeout)" - preset refusé/timeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut (bit0: Com, bit1: Preset Timeout)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat courant lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="RawPos">
               <type>
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position brute — GELÉE si EncoderAvailable=FALSE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; DONNEES CODEUR ===
+&lt;-- [DIAG] Position brute gelee si non disponible</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderAvailable">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Codeur operationnel et disponible</xhtml>
+              </documentation>
             </variable>
             <variable name="AngleRaw">
               <type>
                 <UINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Informatif maintenance : RawPos MOD PointsPerRev</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Angle brut sur un tour (MOD PointsPerRev)</xhtml>
               </documentation>
             </variable>
             <variable name="TurnCount">
@@ -320,7 +350,7 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Informatif maintenance : RawPos / PointsPerRev</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Nombre de tours bruts (RawPos / PointsPerRev)</xhtml>
               </documentation>
             </variable>
             <variable name="PresetAck">
@@ -328,7 +358,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse 1 cycle — écriture confirmée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; ECHANGE BUS ETHERCAT ===
+&lt;-- [STAT] Pulse confirmation preset reussi</xhtml>
               </documentation>
             </variable>
             <variable name="PresetNak">
@@ -336,7 +367,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse 1 cycle — écriture refusée/timeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Pulse refus / timeout preset</xhtml>
               </documentation>
             </variable>
             <variable name="PresetTriggerCmd">
@@ -344,7 +375,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">→ à câbler sur COD_PresettTrigCmd (RxPDO)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Ordre declenchement preset vers PDO Rx</xhtml>
               </documentation>
             </variable>
             <variable name="CodeSeqTriggerCmd">
@@ -352,7 +383,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">→ à câbler sur COD_CodeSeqTrigCmd (RxPDO)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Ordre sequence code vers PDO Rx</xhtml>
               </documentation>
             </variable>
             <variable name="PresetValueOut">
@@ -360,7 +391,7 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">→ à câbler sur COD_PresetValue (RxPDO)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Valeur de preset transmise au PDO Rx</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -369,55 +400,71 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+              </documentation>
             </variable>
             <variable name="PresetReqEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant PresetRequest</xhtml>
+              </documentation>
             </variable>
             <variable name="PresetTimer">
               <type>
                 <derived name="TON" />
               </type>
-            </variable>
-            <variable name="PresetSeqStep">
-              <type>
-                <INT />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=IDLE, 1=pulse CodeSeq, 2=pulse Trig, 3=attente confirmation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
+. [LOC] Temporisateur timeout sequence preset</xhtml>
               </documentation>
-            </variable>
-            <variable name="RawDiff">
-              <type>
-                <DINT />
-              </type>
             </variable>
             <variable name="PresetTimerVisual">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timer pour laisser le temps de voir l'impulsion (1.5s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisateur maintien visuel impulsion (500ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetSeqStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES INTERNES DE CALCUL &amp; ETAT ===
+. [LOC] Etape sequence preset (0:IDLE, 1:PULSE/WAIT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawDiff">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart signe entre RawPos et PresetValueOut</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🧲 FB_Encoder_Abs — Acquisition codeur absolu (accès bus EtherCAT)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 FB_Encoder_Abs — Acquisition codeur absolu (accès bus EtherCAT)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3/§6
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 Accès bus EtherCAT, statut esclave, extraction positions brutes
-      et séquence de Preset SDO (PresetTriggerCmd := 2).
-   🧊 Principe « geler sur doute » (§6) : RawPos/AngleRaw/TurnCount
-      conservent leur dernière valeur valide si EncoderAvailable = FALSE.
-   ═══════════════════════════════════════════════════════════════
+   🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
+   🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
+   🔌 Architecture : Module d'acquisition codeur absolu
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===</xhtml>
           </documentation>
         </interface>
@@ -427,6 +474,7 @@
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
 
+{region "§1 Gate"}
 // 🛑 1. GATE
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
@@ -441,10 +489,14 @@ END_IF;
 
 Ready := TRUE;
 State := E_State.READY;
+{endregion}
 
+{region "§2 Reset front"}
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
+{endregion}
 
+{region "§3 Diagnostic bus et alarme"}
 // 🔍 3. DIAGNOSTIC BUS / ALARME
 IF (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational THEN
     ErrorId := ErrorId OR 16#0001;
@@ -452,26 +504,27 @@ ELSE
     ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
 END_IF;
 EncoderAvailable := (ErrorId AND 16#0001) = 0;
+{endregion}
 
+{region "§4 Lecture position"}
 // 📥 4. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
 // Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
 // global ici pour ne pas geler aussi la séquence preset/l'état — seule la lecture est gelée).
 IF EncoderAvailable THEN
-    RawPos := RawPosIn;   // 🔧 2026-07-03 : sens de comptage géré côté codeur (CoE 6000h bit0,
-                          // startup parameter CODESYS) — voir Partie10 §3bis. Plus de calcul ici.
+    RawPos := RawPosIn;   // Sens de comptage géré côté codeur (CoE 6000h bit0, startup parameter CODESYS) — voir Partie10 §3bis. Plus de calcul ici.
     AngleRaw := UDINT_TO_UINT(RawPos MOD PointsPerRev);
     TurnCount := RawPos / PointsPerRev;
 END_IF;
+{endregion}
 
+{region "§5 Séquence preset"}
 // 🔧 5. SÉQUENCE PRESET (écriture bus)
-// ✅ Confirmé terrain (2026-07-02) : PresettTrigCmd := 2 déclenche le référencement à
-//    PresetValue (valeur de commande, pas un masque de bits — corrige l'hypothèse initiale).
-// 🔴 CodeSeqTrigCmd : rôle NON identifié (même par l'utilisateur/terrain) — laissé à 0,
-//    PAS piloté tant que sa fonction n'est pas confirmée (fiche technique ou essai dédié).
-//    Ne jamais lui donner une valeur arbitraire "au cas où".
+// PresetTriggerCmd := 2 déclenche le référencement à PresetValue (valeur de commande, pas un
+// masque de bits). CodeSeqTriggerCmd : rôle non identifié — laissé à 0, PAS piloté tant que sa
+// fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
 PresetAck := FALSE; PresetNak := FALSE; // pulses 1 cycle uniquement
-CodeSeqTriggerCmd := 16#0000;           // 🔴 non piloté — rôle inconnu, voir note ci-dessus
+CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
         PresetTriggerCmd := 0;
@@ -481,7 +534,7 @@ CASE PresetSeqStep OF
             PresetTimer(IN := TRUE, PT := PresetTimeout);
         END_IF;
     1: // Déclenchement preset (laissé actif pendant 0.5s pour confort visuel en simulation/bus)
-        PresetTriggerCmd := 2;   // ✅ Valeur confirmée terrain — référence le codeur à PresetValueOut
+        PresetTriggerCmd := 2;   // Référence le codeur à PresetValueOut
         RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PresetValueOut);
         IF ABS(RawDiff) &lt;= UDINT_TO_DINT(PresetTolerancePts) THEN
             PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -504,7 +557,9 @@ END_CASE;
 IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
     ErrorId := ErrorId AND 16#FFFD;
 END_IF;
+{endregion}
 
+{region "§6 Error et StateAtError"}
 // 🧾 6. ERROR / STATEATERROR
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
@@ -514,6 +569,7 @@ END_IF;
 
 Busy := (PresetSeqStep &lt;&gt; 0);
 Done := PresetAck;
+{endregion}
 </xhtml>
           </ST>
         </body>

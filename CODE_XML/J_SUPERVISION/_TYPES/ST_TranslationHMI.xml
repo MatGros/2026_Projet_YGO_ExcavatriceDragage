@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.259666" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.259666">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.333863" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.333863">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -47,7 +47,7 @@
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configurations et limites — 🆕 2026-08-06, manquait (contrairement à ST_WinchHMI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — , manquait (contrairement à ST_WinchHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -55,7 +55,7 @@
                 <derived name="ST_BypassTranslation" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -78,7 +78,7 @@
    ↔️ ST_TranslationHMI — Données d'échange IHM pour le Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
-   📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
+   📄 Structuration en Cmd / State / Safety / Bypass / Test —
       doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -149,7 +149,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : Bypass interlock hauteur mini M1/M2 requise pour translation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass interlock hauteur mini M1/M2 requise pour translation</xhtml>
               </documentation>
             </variable>
             <variable name="MecaA">
@@ -202,7 +202,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -216,7 +216,7 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
+   ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
    ───────────────────────────────────────────────────────────────
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
@@ -405,7 +405,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
@@ -418,10 +418,10 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
+   ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 2026-08-06 : créé suite constat terrain — Translation n'avait pas de slot Cfg
+   📄 : créé suite constat terrain — Translation n'avait pas de slot Cfg
    (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
    n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -475,7 +475,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 2026-08-06 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
 GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
               </documentation>
@@ -485,7 +485,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -511,7 +511,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
    🎮 ST_TranslationCmd — Commandes IHM pour la Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
-   📄 2026-07-24 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
+   📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
       sans pont générique pour ne jamais persister BtnFwd/BtnRev.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -557,7 +557,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Translation en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -746,7 +746,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
               </documentation>
             </variable>
             <variable name="AtPV">
@@ -805,7 +805,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenanceTargetEnable">
@@ -826,7 +826,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
               </documentation>
             </variable>
           </struct>

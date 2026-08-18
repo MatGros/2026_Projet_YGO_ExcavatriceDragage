@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.226329" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.226329">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:21:42.739913" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:21:42.739913">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -147,9 +147,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
-   ═══════════════════════════════════════════════════════════════</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -162,7 +165,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance CAN</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; CONTROLE ===
+--&gt; [CMD] Active la surveillance CAN</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -170,7 +174,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front d'acquittement des défauts</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement des defauts</xhtml>
               </documentation>
             </variable>
             <variable name="CANbusStateRaw">
@@ -178,7 +182,8 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute CANbus.GetBusState() (2 = ACTIVE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS BRUTS MATERIEL ===
+--&gt; [HW]  Valeur brute CANbus.GetBusState() (2 = ACTIVE)</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickStateRaw">
@@ -186,7 +191,7 @@
                 <derived name="DEVICE_STATE" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute JOY1.GetDeviceState()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Valeur brute JOY1.GetDeviceState()</xhtml>
               </documentation>
             </variable>
             <variable name="SimBypassActive">
@@ -194,7 +199,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = simulation active pour ce device</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASS &amp; SIMULATION ===
+--&gt; [TST] TRUE = simulation active pour ce device</xhtml>
               </documentation>
             </variable>
             <variable name="NetworkBypassActive">
@@ -202,7 +208,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass réseau global IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] TRUE = bypass reseau global IHM</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -212,7 +218,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Logique de surveillance active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; CONFORMITE ===
+&lt;-- [STAT] Logique de surveillance active</xhtml>
               </documentation>
             </variable>
             <variable name="Busy">
@@ -220,7 +227,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Non utilisé (conformité interface)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise (conformite interface)</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -228,23 +235,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Non utilisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Présence anomalie de communication</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut global résumé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Non utilise</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -252,7 +243,24 @@
                 <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante (INIT/SIMULATED/READY/ERROR)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase courante (INIT/SIMULATED/READY/ERROR)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS &amp; ALARMES ===
+&lt;-- [DIAG] Presence anomalie de communication</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut global resume</xhtml>
               </documentation>
             </variable>
             <variable name="StateAtError">
@@ -260,7 +268,7 @@
                 <derived name="E_Diag_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase figée à l'apparition de l'erreur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Phase figee a l'apparition de l'erreur</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceCanOpenMaster">
@@ -268,7 +276,7 @@
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics bus CANopen</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics bus CANopen</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystick">
@@ -276,7 +284,7 @@
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostics esclave Joystick</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostics esclave Joystick</xhtml>
               </documentation>
             </variable>
             <variable name="CANbusStateRawOut">
@@ -284,13 +292,17 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroirs bruts lisibles directement sur l'instance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIRS BRUTS MATERIEL ===
+&lt;-- [DIAG] Miroir brut status CANbus</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickStateRawOut">
               <type>
                 <derived name="DEVICE_STATE" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Miroir brut status Joystick</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -299,7 +311,8 @@
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecteur front de reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Detecteur front de reset</xhtml>
               </documentation>
             </variable>
             <variable name="CANbusOnlineReal">
@@ -307,7 +320,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus réellement actif, hors tout bypass</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS ET ETATS INTERNES ===
+. [LOC]  Bus reellement actif, hors tout bypass</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickOnlineReal">
@@ -315,7 +329,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick réellement RUNNING, hors tout bypass</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Joystick reellement RUNNING, hors tout bypass</xhtml>
               </documentation>
             </variable>
             <variable name="BypassActive">
@@ -323,7 +337,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Simulation OU bypass réseau IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Simulation OU bypass reseau IHM</xhtml>
               </documentation>
             </variable>
             <variable name="CANbusOnlineEff">
@@ -331,7 +345,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Online effectif (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Online effectif (reel OU bypass)</xhtml>
               </documentation>
             </variable>
             <variable name="DeviceJoystickOnlineEff">
@@ -339,29 +353,25 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Operational effectif (réel OU bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Operational effectif (reel OU bypass)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 FB_Diag_CanOpen — Diagnostic bus CANopen / Joystick
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_Diag_CanOpen — Diagnostic bus CANopen &amp; Esclave Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
-              DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §3
-   🎯 Rôle : Décide Online/Operational et publie ST_Diag_Device.
-      Distinction explicite dans State :
-      - INIT       : pas encore online (ni réel, ni bypass)
-      - SIMULATED  : bypass actif (simulation ou bypass réseau IHM)
-      - READY      : bus réellement online
-      - ERROR      : défaut détecté
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Surveillance bus CANopen master et esclave Joystick (Online/Op)
+   🔌 Architecture : Publication ST_Diag_Device &amp; E_Diag_State
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Gate"}
 // 🛑 1. GATE : Désactivation logique si Enable = FALSE
 IF NOT Enable THEN
     Ready := FALSE;
@@ -382,14 +392,18 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
+{endregion}
 
+{region "§2 Interprétation valeurs brutes"}
 // 🧮 2. INTERPRÉTATION DES VALEURS BRUTES
 CANbusOnlineReal         := (CANbusStateRaw = 2);
 DeviceJoystickOnlineReal := (DeviceJoystickStateRaw = DEVICE_STATE.RUNNING);
 BypassActive             := SimBypassActive OR NetworkBypassActive;
 CANbusOnlineEff          := CANbusOnlineReal OR BypassActive;
 DeviceJoystickOnlineEff  := DeviceJoystickOnlineReal OR BypassActive;
+{endregion}
 
+{region "§3 Reset front"}
 // 🔑 3. RESET FRONT — Efface les défauts si la cause a disparu
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
@@ -398,12 +412,13 @@ IF ResetEdge.Q THEN
         StateAtError := E_Diag_State.DISABLED;
     END_IF;
 END_IF;
+{endregion}
 
+{region "§4 Diagnostic joystick"}
 // 🔍 4. DIAGNOSTIC JOYSTICK
 // Bit 0 : Perte de communication CAN
 IF NOT CANbusOnlineEff THEN
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId OR 16#0001;  (* Perte liaison CAN joystick *)
-    DeviceJoystick.Online := FALSE;
 ELSE
     DeviceJoystick.Online := TRUE;
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFE; (* Effacement auto si la liaison revient *)
@@ -417,7 +432,9 @@ ELSE
     DeviceJoystick.Operational := TRUE;
     DeviceJoystick.ErrorId := DeviceJoystick.ErrorId AND 16#FFFD; (* Effacement auto dès que RUNNING *)
 END_IF;
+{endregion}
 
+{region "§5 Machine etat joystick"}
 // 🚦 5. MACHINE D'ÉTAT JOYSTICK
 IF DeviceJoystick.ErrorId &lt;&gt; 0 THEN
     DeviceJoystick.State := E_Diag_State.ERROR;
@@ -433,7 +450,9 @@ ELSE
 END_IF;
 
 State := DeviceJoystick.State;
+{endregion}
 
+{region "§6 Sorties globales"}
 // 📤 6. SORTIES GLOBALES
 DeviceJoystick.Error := (DeviceJoystick.ErrorId &lt;&gt; 0);
 Error := DeviceJoystick.Error;
@@ -457,6 +476,7 @@ DeviceJoystickStateRawOut := DeviceJoystickStateRaw;
 // Briques génériques pour conformité standard
 Busy := FALSE;
 Done := FALSE;
+{endregion}
 </xhtml>
           </ST>
         </body>

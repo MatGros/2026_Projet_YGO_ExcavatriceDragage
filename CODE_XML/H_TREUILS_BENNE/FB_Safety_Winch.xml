@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.266673" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.266673">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:38:22.446489" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:38:22.446489">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -149,7 +149,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la surveillance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET ETATS GENERAL ===
+--&gt; [CMD] Active la surveillance globale FB</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -157,15 +158,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Front acquittement défauts</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU réarmée + conditions globales OK (info de contexte)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement defauts</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -173,7 +166,7 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode courant (autorisations)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
               </documentation>
             </variable>
             <variable name="SyncEnable">
@@ -181,119 +174,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-08 : ex-OverrideSync inversé — FALSE (MAINT N1/N2) → désactive synchro ET lève SafeStop mou câble (récupération manuelle)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickOnline">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">instDiagCanOpen.DeviceJoystick.Online</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickOperational">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">instDiagCanOpen.DeviceJoystick.Operational</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HeartbeatIhmOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">💓 IHM↔PLC : TRUE après front post-boot, FALSE = perte communication opérateur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderAvailable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Abs DU TREUIL concerné par cette instance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EncoderFaultBypass">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Autorisation maintenance sans codeur ; effective uniquement en MAINT_N2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ThermalFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour TOR thermique CE moteur (NC) — source normalisée par PRG_02_Acquisition.HwIn</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeThermalFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : retour TOR thermique frein commun — source normalisée par PRG_02_Acquisition.HwIn</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SlackCableDetected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mou câble sur tambour M2 (NC, câblé sur les 2 instances) : TRUE=mou détecté → SafeStop sauf si NOT SyncEnable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PhaseRotationOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI — TRUE = rotation phases correcte</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TopPositionSensor">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute (NC commun) — TRUE=libre, FALSE=butée atteinte</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InReferencingMode">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si treuil en cours de homing (référencement)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position actuelle câble en mètres (scalée)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgCableLimitDescentM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Limite basse physique descente en mètres (valeur négative)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LimitLegalReached">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : GVL_IHM.Commun.LimitLegalReached — limite légale de profondeur atteinte</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation synchronisation treuils</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -301,7 +182,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : Consigne active de direction (-1/0/+1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne active de direction (-1/0/+1)</xhtml>
               </documentation>
             </variable>
             <variable name="MovementCommanded">
@@ -309,31 +190,88 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si au moins un contacteur de sens est réellement commandé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Au moins un contacteur de sens commande</xhtml>
               </documentation>
             </variable>
-            <variable name="Homed">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Indique si le treuil est référencé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS SECOURS ET HARDWARE ===
+--&gt; [SAFE] Chaine AU rearmee + puissance OK</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingSuspect">
+            <variable name="JoystickOnline">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Indique si le référencement est suspect</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Statut bus CAN Joystick Online</xhtml>
               </documentation>
             </variable>
-            <variable name="TopLimitM">
+            <variable name="JoystickOperational">
               <type>
-                <REAL />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position limite haute active (cible homing, m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Statut bus CAN Joystick Operational</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeartbeatIhmOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Communication IHM-PLC valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur disponible pour ce treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ThermalFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retour thermique moteur (NC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeThermalFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retour thermique frein (NC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlackCableDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Delecteur mou de cable (NC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotationOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens de rotation des phases OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensor">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur fin de course haut (NC)</xhtml>
               </documentation>
             </variable>
             <variable name="FwdRevSpeedFeedbackOff">
@@ -341,8 +279,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Méca A/B/C (voir bandeau en-tête)
-Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback retombe tous contacteurs</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedback">
@@ -350,7 +287,7 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein CE treuil (TRUE = ouvert/desserré — révocation 2026-08-03)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback frein ouvert</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickYNeutral">
@@ -358,7 +295,7 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = joystick axe Y au neutre (magnitude ~0), précalculé en amont</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Joystick au neutre</xhtml>
               </documentation>
             </variable>
             <variable name="BenneHoldStillActive">
@@ -366,7 +303,80 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE seulement pour l'instance M1 pendant que le benne bouge M2 seul (instBucket.Busy) — toujours FALSE côté M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Maintien fixe M1 actif pendant benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BenneBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle benne actif sur l'autre treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OtherWinchInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Autre treuil inhibe (maintenance)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InReferencingMode">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET LIMITES SÉCURITÉ ===
+--&gt; [CFG] Treuil en cours de homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position actuelle cable (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitDescentM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite basse physique descente (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite legale de profondeur atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Treuil reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Referencement suspect</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopLimitM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position limite haute active (m)</xhtml>
               </documentation>
             </variable>
             <variable name="UncommandedSpeedThresholdMps">
@@ -377,7 +387,7 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <simpleValue value="0.02" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Méca A — théorique, à ajuster sur site</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil vitesse non commandee Meca A (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="UncommandedDriftToleranceM">
@@ -388,7 +398,7 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Méca A — théorique, à ajuster sur site</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance derive position Meca A (m)</xhtml>
               </documentation>
             </variable>
             <variable name="PostRampTimeout">
@@ -396,10 +406,10 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#3S" />
+                <simpleValue value="TIME#3s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Méca B — théorique, à ajuster sur site</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai attente retombee contacteurs/frein Meca B</xhtml>
               </documentation>
             </variable>
             <variable name="BenneSlipToleranceM">
@@ -410,7 +420,7 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Méca C — escalade safety (&gt; 1.0 m déjà surveillé côté FB_Bucket)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance glissement M1 pendant benne (m)</xhtml>
               </documentation>
             </variable>
             <variable name="ExpectedOtherWinchPosM">
@@ -418,18 +428,7 @@ Retour unique "tous contacteurs sens+vitesse retombés" CE treuil</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — Méca E (bits 12/13), écart synchro M1/M2 critique
-Position ATTENDUE de l'AUTRE treuil, DÉJÀ corrigée de</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BenneBusy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">l'offset benne actif par l'appelant (PRG_SAFETY_CFC) —
-ce FB ne fait qu'un ABS(CablePosM - ExpectedOtherWinchPosM)
-instBucket.Busy (les 2 instances) — suppression pendant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position attendue de l'autre treuil (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CriticalSyncToleranceM">
@@ -440,21 +439,7 @@ instBucket.Busy (les 2 instances) — suppression pendant</xhtml>
                 <simpleValue value="2.5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">le trajet actif (écart transitoire normal, pas un défaut)
-🔧 Méca E — écart critique SafeStop (Zone 3 dès 2.5m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OtherWinchInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (7) : retour terrain — InhibitM1 côté instance M1 (Enable global) ne suffit
-pas : si c'est l'AUTRE treuil qui est inhibé (ex. M2 en maintenance), M1 continue de comparer
-sa position à ExpectedOtherWinchPosM (calculé depuis la position figée de M2) — écart croît
-sans borne pendant que M1 travaille seul normalement → faux Méca E. Croisé (M2 côté instance
-M1, M1 côté instance M2), même principe que ExpectedOtherWinchPosM.
-Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance ecart critique synchro (m)</xhtml>
               </documentation>
             </variable>
             <variable name="MovementSpeedThresholdMps">
@@ -465,7 +450,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="0.02" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil mouvement mesurable pour contrôles sens/absence</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil vitesse mesurable (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedMps">
@@ -473,7 +458,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mesure absolue produite par PRG_02 chaîne codeur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Mesure absolue vitesse (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedSignedMps">
@@ -481,7 +466,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mesure signée produite par PRG_02 chaîne codeur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Mesure signee vitesse (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedValid">
@@ -489,7 +474,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si la fenêtre horodatée codeur est complète et fiable</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Mesure vitesse valide</xhtml>
               </documentation>
             </variable>
             <variable name="OppositeDirectionTimeout">
@@ -497,10 +482,10 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#500MS" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation sens réel opposé à la commande</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai confirmation sens oppose</xhtml>
               </documentation>
             </variable>
             <variable name="NoMovementTimeout">
@@ -508,10 +493,19 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#3S" />
+                <simpleValue value="TIME#3s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation absence de mouvement malgré commande</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai confirmation absence mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFaultBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASSES ET SIMULATION ===
+--&gt; [TST] Bypass defaut codeur</xhtml>
               </documentation>
             </variable>
             <variable name="BypassGlobal">
@@ -522,7 +516,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global : si TRUE, force ErrorId=0 et saute toutes les vérifications</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Force ErrorId=0 global</xhtml>
               </documentation>
             </variable>
             <variable name="BypassSafety">
@@ -533,7 +527,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bypass groupé PowerCutOff (bits 2,7,8,9,10,11,13)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass groupe PowerCutOff</xhtml>
               </documentation>
             </variable>
             <variable name="BypassProcess">
@@ -544,7 +538,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Bypass groupé SafeStop/Permit seul (bits 0,1,3,4,5,6,12,14,15) + limite légale (hors bit, ErrorId plein)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass groupe SafeStop/Permit</xhtml>
               </documentation>
             </variable>
             <variable name="BypassTopLimitSwitch">
@@ -555,7 +549,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass individuel fin de course haute PHYSIQUE (capteur, bit5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass individuel fin de course haut capteur</xhtml>
               </documentation>
             </variable>
             <variable name="BypassTopLimitSoftware">
@@ -566,7 +560,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass individuel fin de course haute LOGICIEL (position calculée, hors bit)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass individuel fin de course haut logiciel</xhtml>
               </documentation>
             </variable>
             <variable name="BypassCableLimitSwitch">
@@ -577,7 +571,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass individuel limite basse câble (bit6)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass individuel limite basse cable</xhtml>
               </documentation>
             </variable>
             <variable name="BypassLimitLegal">
@@ -588,7 +582,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass individuel limite légale de profondeur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass individuel limite legale</xhtml>
               </documentation>
             </variable>
             <variable name="BypassOperatorComm">
@@ -599,7 +593,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Bypass perte communication opérateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass perte com operateur</xhtml>
               </documentation>
             </variable>
             <variable name="BypassPhaseRotation">
@@ -610,7 +604,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Bypass défaut rotation phases</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass defaut rotation phases</xhtml>
               </documentation>
             </variable>
             <variable name="BypassBrakeThermal">
@@ -621,7 +615,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Bypass surchauffe frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass surchauffe frein</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMotorThermal">
@@ -632,7 +626,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 🌡️ Bypass surchauffe moteur (bit2) —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass surchauffe moteur</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaA">
@@ -643,9 +637,7 @@ Inhibition de l'AUTRE treuil (mise en service N2)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">manquait alors que BypassBrakeThermal existe déjà pour
-le même niveau de sévérité (SafeStop+PowerCutOff)
-🔄 Bypass Méca A</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Meca A</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaB">
@@ -656,7 +648,7 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Bypass Méca B</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Meca B</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaC">
@@ -667,7 +659,7 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏋️ Bypass Méca C</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Meca C</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaD">
@@ -678,7 +670,7 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Bypass Méca D</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Meca D</xhtml>
               </documentation>
             </variable>
             <variable name="BypassMecaE">
@@ -689,7 +681,7 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Bypass Méca E</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass Meca E</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -698,46 +690,66 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC ET SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement securite en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bits0..13 : protections existantes ; bit14 : sens réel opposé ; bit15 : absence mouvement malgré commande</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (0..15)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="SafeStop">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 Arrêt rapide 2 sens (Enable maintenu) — bits 0/1/2/3/4/7/8/9/10/11 (mou câble inclus SAUF si NOT SyncEnable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES DE SÉCURITÉ ET AUTORISATIONS ===
+&lt;-- [SAFE] Arret rapide 2 sens (Enable maintenu)</xhtml>
               </documentation>
             </variable>
             <variable name="DescendPermit">
@@ -745,7 +757,7 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Autorise descente — TRUE = OK, FALSE = interdit (bit6 limite basse câble, mou câble mode récup)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis de descente autorise</xhtml>
               </documentation>
             </variable>
             <variable name="AscentPermit">
@@ -753,7 +765,7 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Autorise montée — TRUE = OK, FALSE = interdit (bit5 fin course haut)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis de montee autorise</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOff">
@@ -761,7 +773,7 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont réelle — bits 2/7/8/9/10/11 (voir bandeau en-tête)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Coupure puissance amont</xhtml>
               </documentation>
             </variable>
             <variable name="MecaADriftM">
@@ -769,9 +781,8 @@ le même niveau de sévérité (SafeStop+PowerCutOff)
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : diagnostic/réglage tolérances — miroirs des bricks internes, à consommer
-par l'IHM pour la mise en service (voir PRG_SUPERVISION_CFC, GVL_IHM.M1Winch/M2Winch)
-Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS ET MESURES ===
+&lt;-- [DIAG] Derive mesuree Meca A (m)</xhtml>
               </documentation>
             </variable>
             <variable name="MecaCDriftM">
@@ -779,7 +790,7 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dérive mesurée Méca C (m, benne M1) — réglage BenneSlipToleranceM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Derive mesuree Meca C (m)</xhtml>
               </documentation>
             </variable>
             <variable name="MecaBElapsedTime">
@@ -787,55 +798,18 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé confirmation contacteurs/frein — réglage PostRampTimeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule confirmation contacteurs/frein</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="ErrorEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-            </variable>
-            <variable name="FirstScanDone">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="DriftGuardA">
               <type>
                 <derived name="FB_DriftGuard" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Méca A (bit7) — la vitesse est désormais reçue de la chaîne codeur (T84/T85)
-🔧 REX 2026-07-08 : factorise Méca A (remplace MecaA_Armed/MecaA_RefPosM)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MecaB_NoOperatorCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Méca B (bit8)
-(perte CAN joystick) OU (joystick au neutre)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonMecaB">
-              <type>
-                <derived name="TON" />
-              </type>
-            </variable>
-            <variable name="TonMecaD">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (3) — Méca D (bit11) : arrivée capteur haut hors référencement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Surveillance derive Meca A</xhtml>
               </documentation>
             </variable>
             <variable name="DriftGuardC">
@@ -843,16 +817,40 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <derived name="FB_DriftGuard" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Méca C (bit9, escalade)
-🔧 REX 2026-07-08 : factorise Méca C (remplace MecaC_Armed/MecaC_RefPosM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Surveillance derive Meca C</xhtml>
               </documentation>
             </variable>
-            <variable name="LastInReferencingMode">
+            <variable name="ResetEdge">
               <type>
-                <BOOL />
+                <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition référencement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonMecaB">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo confirmation arret Meca B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonMecaD">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo arret fin de course haut Meca D</xhtml>
               </documentation>
             </variable>
             <variable name="TonMecaE">
@@ -860,31 +858,23 @@ Dérive mesurée Méca A (m) — réglage UncommandedDriftToleranceM</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (4) — Méca E (bits 12/13)
-Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo confirmation arret synchro Meca E</xhtml>
               </documentation>
             </variable>
             <variable name="TonOppositeDirection">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo confirmation sens oppose</xhtml>
+              </documentation>
             </variable>
             <variable name="TonNoMovement">
               <type>
                 <derived name="TON" />
               </type>
-            </variable>
-            <variable name="OppositeDirectionActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="EncoderAvailableEffective">
-              <type>
-                <BOOL />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur valide OU bypass individuel autorisé en MAINT_N2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo confirmation absence mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="TonStartupWarmup">
@@ -892,152 +882,59 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Inhibition 3s au boot + effacement auto coms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo masquage transitoire au boot</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Premier cycle effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MecaB_NoOperatorCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Absence commande operateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastInReferencingMode">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memorisation etat homing precedent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OppositeDirectionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens oppose confirme actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderAvailableEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Codeur valide ou bypass effectif</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔌 FB_Safety_Winch — Bloc safety MÉTIER du domaine Treuils (M1: moteur de retenue / M2: moteur Benne)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🛡️ FB_Safety_Winch — Surveillance et sécurité d'un treuil (M1 / M2)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md,
-                   DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §7
-                    (contrat : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2/§3)
-   🛡️ Interface STANDARD COMPLÈTE (Partie3 §1) : FB_Safety_&lt;Metier&gt; est
-      un FB métier à part entière (pas une brique réduite).
-   📤 Sortie maîtresse SafeStop : consommée en entrée par le FB_Winch
-      DU MÊME TREUIL (instSafetyWinchM1→instWinchM1, idem M2).
-   ⚠️ ÉVOLUTION (lot Codeur, 2026-07-02) : `FB_Safety_Winch` reste UN
-      SEUL type FB — le "split M1/M2" acté en Partie10 §7 s'obtient par
-      DEUX INSTANCES (`instSafetyWinchM1`/`instSafetyWinchM2`), chacune
-      câblée sur l'`EncoderAvailable` de SON treuil (pas deux FB
-      distincts — composition, pas duplication de code).
-      - ✅ Détecte la perte joystick/CAN (sans commande valide, un
-        treuil ne doit pas pouvoir bouger).
-      - ✅ Détecte la perte codeur DE CE TREUIL (`EncoderAvailable`,
-        sortie `FB_Encoder_Abs` — désormais câblée, ErrorId bit1).
-      - 🔴 TBD (non simulé) : perte bus EtherCAT spécifique (au-delà de
-        ce que `EncoderAvailable` reflète déjà, si besoin d'un signal
-        distinct plus tard).
-      - `PowerCutOff` : FALSE pour ce lot (pas encore de
-        ST_ContactorCheck de puissance câblé — FB_Output
-        transverse hors périmètre de ce lot, voir Partie6).
-   🆕 AJOUT (2026-07-02, retour terrain — nouvel export Device.export avec
-      I/O réel `M1_ThermalFeedback`/`M2_ThermalFeedback` et
-      `M1_M2_SlackCableSwitch`, demande utilisateur) — Partie9 §4ter :
-      - ✅ `ThermalFeedback` (par instance, retour thermique CE moteur) :
-        défaut → bit2 ErrorId → `SafeStop` (arrêt total, protection moteur,
-        comme les autres défauts du domaine).
-      - ✅ `SlackCableDetected` (COMMUN aux 2 treuils, même capteur — même
-        principe que `M1_M2_TopPositionSensor`, câblé IDENTIQUEMENT sur
-        les 2 instances) : mou de câble détecté (descente non arrêtée à
-        temps) → bit3 ErrorId (visible IHM, reset front requis dès que la
-        cause disparaît) → sortie **`DescendPermit`** DÉDIÉE, DISTINCTE de
-        `SafeStop` — bloque UNIQUEMENT la descente (`FB_Winch.RelayRev`),
-        la remontée (`RelayFwd`) reste libre pour permettre à l'opérateur
-        d'aller vérifier le câblage. Nouveau pattern (pas un simple
-        `SafeStop`, qui aurait arrêté les 2 sens) — voir Partie9 §4ter
-        pour la justification complète.
-   🔴🔧 REX 2026-07-07 — IMPLÉMENTATION DU CAS B (roue libre) + 2 NOUVEAUX GARDE-FOUS
-      (demande utilisateur, suite à la consolidation du feedback contacteur unique) :
-      - **Bit7 — Méca A "mouvement non commandé général"** : arme une surveillance
-        position/vitesse dès que `FwdRevSpeedFeedbackOff AND BrakeFeedback` (tout
-        confirmé physiquement coupé). Si pendant que c'est armé, la vitesse mesurée
-        codeur dépasse `UncommandedSpeedThresholdMps` (0.02 m/s, théorique — à
-        ajuster sur site) OU la position dérive de plus de `UncommandedDriftToleranceM`
-        (2.0 m) par rapport à la référence prise à l'armement → défaut → `SafeStop`
-        ET `PowerCutOff` (les contacteurs sont déjà confirmés coupés, `SafeStop` seul
-        ne suffit pas — c'est le rôle de `PowerCutOff`).
-      - **Bit8 — Méca B "pilotage actif malgré absence de commande opérateur"** :
-        indépendant de la logique interne FB_Winch (défense en profondeur — reste
-        valable même si l'arbitrage FB_Winch est en défaut). Si (perte CAN joystick,
-        bit0 déjà existant) OU (joystick au neutre, `JoystickYNeutral`) ET que
-        `FwdRevSpeedFeedbackOff` ne repasse PAS à `TRUE` dans `PostRampTimeout` (3s,
-        théorique) → défaut → `SafeStop` ET `PowerCutOff`.
-      - **Bit9 — Méca C "glissement M1 pendant mouvement Benne" (escalade)** :
-        armé UNIQUEMENT si `BenneHoldStillActive=TRUE` (câblé sur `instBucket.Busy`
-        pour l'instance M1 SEULEMENT — toujours `FALSE` côté M2, qui doit bouger
-        pendant le benne). Référence position prise à l'armement ; si dérive
-        `BenneSlipToleranceM` (2.0 m, &gt; à la tolérance 1.0 m déjà surveillée côté
-        `FB_Bucket` lui-même) dépassée → la couche Benne (`SafeStop` M1 seul, 1m)
-        n'a pas suffi → escalade `PowerCutOff` (dernier recours).
-      - **Bit14** : sens codeur opposé au sens commandé, confirmé 500 ms → `SafeStop`.
-      - **Bit15** : absence de vitesse malgré relais de sens commandé, confirmée 3 s → `SafeStop`.
-   🆕 REX 2026-07-08 (demande utilisateur, retour terrain frein) :
-      - `BrakeThermalFeedback` (COMMUN aux 3 freins M1/M2/M3, 1 seul fil, câblé IDENTIQUEMENT
-        sur les 2 instances Winch + l'instance Translation — même principe que `SlackCableDetected`) :
-        défaut/perte → bit10 ErrorId → `SafeStop` **ET `PowerCutOff`**. Justification : le frein
-        est à manque de courant (colle au repos, voir FB_Brake) — la perte de ce retour peut
-        signifier qu'un frein colle INSTANTANÉMENT alors que le moteur est encore sous couple/en
-        mouvement ; une simple rampe de décélération (`SafeStop`) ne protège pas la mécanique
-        dans ce cas précis, il faut couper la puissance immédiatement.
-      - **Escalade PowerCutOff étendue à bit2 (surchauffe moteur, déjà existant)** : même
-        raisonnement — la perte du retour thermique moteur M1/M2 est traitée à l'identique du
-        thermique frein (défense en profondeur, demande explicite utilisateur), donc ajoutée au
-        masque `PowerCutOff` en plus du masque `SafeStop` (déjà présente).
-   🔧 REX 2026-07-08 (audit + demande utilisateur, factorisation/renforcement Méca A/B/C) :
-      - **Méca A et Méca C factorisés** via la nouvelle brique réutilisable `FB_DriftGuard`
-        (`CODE/WINCH/` — seul consommateur réel à ce jour, pas `COMMUN` : voir bandeau du FB) :
-        les deux partageaient ~15 lignes identiques (armement + capture position référence +
-        calcul dérive) — remplacé par 2 instances (`DriftGuardA`/`DriftGuardC`), comportement
-        strictement inchangé. Méca A garde son propre check vitesse en plus (câblé en OR, hors
-        périmètre de la brique). `MecaADriftM`/`MecaCDriftM`/`MecaBElapsedTime` exposés en sortie
-        pour diagnostic/réglage tolérances côté IHM (voir §6 mapping).
-      - **Méca B étendu au frein** : vérifiait uniquement `FwdRevSpeedFeedbackOff` (contacteurs)
-        sous `PostRampTimeout` — `BrakeFeedback` (frein) ajouté à la même condition. Un frein qui
-        ne confirme pas son engagement dans ce délai est tout aussi dangereux qu'un contacteur qui
-        ne retombe pas (risque de mouvement/roue libre non détecté).
-   🆕 REX 2026-07-08 (3) — MÉCA D (bit11), demande utilisateur (retour terrain test banc) :
-      modèle à 3 couches en fonctionnement NORMAL (hors référencement) à l'approche du capteur
-      haut : (1) ~arrêt rampé normal à `HomingTargetMx_M - WinchTopStopMarginM` (voir
-       `PRG_TREUILS_CFC.st`, gardé par `HomingApproachEnable` désormais — REX 2026-07-08 (2)) ;
-      (2) coupure immédiate `AscentPermit` si le capteur physique est réellement atteint (bit5,
-      déjà existant) ; (3) **Méca D** : si malgré la coupure (2), les contacteurs ET le frein ne
-      confirment pas être retombés/serrés dans `PostRampTimeout` → `SafeStop` ET `PowerCutOff` —
-      même motif exact que Méca B (`TonMecaD`, même vérification), juste une condition d'armement
-      différente (capteur haut atteint hors référencement, au lieu de perte commande opérateur).
-   🆕 REX 2026-07-08 (4) — MÉCA E (bits 12/13), écart synchro M1/M2 CRITIQUE, demande utilisateur
-      (analyse redondance synchro) : `FB_WinchSync` (écart mineur, `WinchSyncTolerance_M`) reste
-      le 1er niveau (arrêt rampe normale, `PRG_TREUILS_CFC.st`). Méca E est une couche
-      SUPPLÉMENTAIRE et INDÉPENDANTE dans `FB_Safety_Winch` pour un écart VRAIMENT important
-      (`CriticalSyncToleranceM`, théorique 2.0m) — défense en profondeur si le 1er niveau n'a pas
-      suffi (ex. treuil qui continue malgré l'arrêt demandé). Nouvelles entrées `OtherWinchPosM`
-      (position croisée : M2 côté instance M1, M1 côté instance M2) et `BenneBusy` (suppression
-      pendant un cycle benne — l'écart M1/M2 y est volontaire, PAS un défaut ; 1 cycle de retard
-      accepté, même principe que `BenneHoldStillActive`, négligeable vu l'amplitude en jeu).
-      - **Bit12** : écart critique détecté (`SyncEnable AND NOT BenneBusy AND NOT
-        InReferencingMode AND ABS(CablePosM - OtherWinchPosM) &gt; CriticalSyncToleranceM`) →
-        `SafeStop` immédiat (rampe rapide), PAS de `PowerCutOff` à ce stade.
-      - **Bit13** : escalade — si l'arrêt (bit12) n'est PAS confirmé (contacteurs ET frein) dans
-        `PostRampTimeout` → `SafeStop` ET `PowerCutOff` (dernier recours, même logique que Méca
-        B/D : la rampe seule n'a visiblement pas suffi à arrêter réellement le treuil).
-   🔴🔧 REX 2026-08-07 — BypassGlobal DÉSACTIVAIT LES FINS DE COURSE PHYSIQUES (demande client,
-      audit confirmé à 100% par lecture directe du fichier) : `AscentPermit`/`DescendPermit`
-      étaient calculés puis ANDés avec `NOT BypassGlobal` en toute fin de logique — même le check
-      brut indépendant du capteur haut (déjà conçu pour "rester actif" selon son propre commentaire
-      REX 2026-07-08) se retrouvait masqué. Concrètement : `Bypass.Global` sur M1/M2 empêchait
-      l'arrêt réel sur fin de course haute/basse au joystick, aucun crash mécanique visible tant
-      que l'opérateur ne relâchait pas. Corrigé : `BypassGlobal` retiré des deux formules finales
-      (`AscentPermit`/`DescendPermit`) — seuls `BypassTopLimitSwitch`/`BypassCableLimitSwitch`
-      (individuels, conscients) peuvent désormais lever CES deux protections précises. Le reste du
-      domaine (Méca A-E, thermique, phase, comm, sync, codeur) reste masqué par `BypassGlobal`
-      exactement comme avant — changement strictement limité aux 2 fins de course physiques.
-      🔧 COMPLÉTÉ (même jour, demande client "intègre-le totalement côté IHM/troubleshooting") :
-      les calculs bit5/bit6 (§3sexties/§3septies) sont EUX AUSSI sortis du bloc `IF NOT
-      BypassGlobal` — `ErrorId`/`Error` (donc l'alarme IHM `WinchM1/M2SafetyHMI.Error`) reflètent
-      désormais le vrai état des fins de course même sous `BypassGlobal`, cohérent avec le
-      blocage réel déjà corrigé. Seuls `BypassProcess`/`BypassTopLimitSwitch`/
-      `BypassCableLimitSwitch` (conscients, individuels/groupés) peuvent encore éteindre CETTE
-      alarme précise — plus jamais `BypassGlobal` seul.
-   🔴🔧 REX 2026-08-07 (2) — LIMITE LÉGALE JAMAIS APPLIQUÉE EN MANUEL (demande client) :
-      `GVL_IHM.Commun.LimitLegalReached` n'était consommé QUE par `FB_Cycle` (séquenceur
-      semi-automatique) — la descente manuelle au joystick M1/M2 pouvait dépasser la profondeur
-      légale sans AUCUN blocage réel. Ajouté : `LimitLegalReached`/`BypassLimitLegal` en entrée,
-      nouveau terme OR direct sur `DescendPermit` (pas de nouveau bit `ErrorId` : les 16 bits du
-      WORD sont déjà tous utilisés). Bypassable par `BypassProcess` (groupé) ou `BypassLimitLegal`
-      (individuel, `ST_BypassWinch.LimitLegal`, MAINT_N2) — jamais par `BypassGlobal` seul.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Safety_Winch) ===</xhtml>
+   🎯 Rôle : Protection machine, surveillance codeurs, dérives et interlocks
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔒 Sécurité : Gestion des autorisations SafeStop, PowerCutOff et permis
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -1046,7 +943,7 @@ Confirmation arrêt après détection écart critique (escalade PowerCutOff)</xh
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Safety_Winch) ===
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
@@ -1059,8 +956,8 @@ IF NOT Enable THEN
     State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
-    // 🔧 REX 2026-07-08 : force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement
-    // identique à l'ancien MecaA_Armed/MecaC_Armed := FALSE.
+    // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement identique à l'ancien
+    // MecaA_Armed/MecaC_Armed := FALSE.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
     TonMecaB(IN := FALSE);
@@ -1077,18 +974,18 @@ State := E_State.READY;
 
 {endregion}
 
-{region "Initialisation et bypass global"}
+{region "§2 Initialisation et bypass global"}
 // Détecte la fin du référencement pour éviter le pic de vitesse au cycle de transition (offset appliqué)
 IF LastInReferencingMode AND NOT InReferencingMode THEN
-    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
+    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
 END_IF;
 LastInReferencingMode := InReferencingMode;
 
 // Si le contacteur de puissance est ouvert (PowerContactorEngaged = FALSE), on force les sorties de sécurité
 // mais on ne fait pas de RETURN pour permettre le diagnostic et l'acquittement (Reset) des défauts.
 IF NOT PowerContactorEngaged THEN
-    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM); // 🔧 REX 2026-07-08
-    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);       // 🔧 REX 2026-07-08
+    DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
+    DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
 END_IF;
 
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
@@ -1112,19 +1009,19 @@ END_IF;
 
 {endregion}
 
-{region "Protections immediates position"}
+{region "§3 Protections immediates position"}
 // 🔍 3sexties. FIN DE COURSE HAUT / CAPTEUR DE POSITION HAUTE (anti-débordement) — bit5
 // ⚠️ Convention NAMING_CONVENTION.md : TopPositionSensor TRUE = sain/non atteint (NF), FALSE =
 // position haute réellement atteinte (contact ouvert). Si la position haute EST atteinte
 // (TopPositionSensor=FALSE), qu'on n'est pas en phase de référencement (homing), ET qu'on
 // commande un mouvement vers le haut (Direction &gt; 0), alors on lève le défaut.
-// 🔧 REX 2026-08-07 (demande client, suite fix AscentPermit/DescendPermit) : SORTI du bloc
-// "IF NOT BypassGlobal" ci-dessous — même doctrine que le blocage réel (§4) : BypassGlobal M1/M2
-// ne doit masquer NI le mouvement NI l'alarme IHM de ces 2 fins de course physiques. Seuls
-// BypassProcess (groupé, conscient) ou BypassTopLimitSwitch (individuel) peuvent encore éteindre
-// CETTE alarme — exactement comme tous les autres bypass individuels du fichier (une alarme ne
-// s'éteint QUE si on a explicitement demandé à ignorer CETTE protection précise, jamais via le
-// bypass global qui vise le reste du domaine : Méca A-E, thermique, phase, comm, sync, codeur).
+// SORTI du bloc "IF NOT BypassGlobal" ci-dessous — même doctrine que le blocage réel (§4) :
+// BypassGlobal M1/M2 ne doit masquer NI le mouvement NI l'alarme IHM de ces 2 fins de course
+// physiques. Seuls BypassProcess (groupé, conscient) ou BypassTopLimitSwitch (individuel)
+// peuvent encore éteindre CETTE alarme — exactement comme tous les autres bypass individuels du
+// fichier (une alarme ne s'éteint QUE si on a explicitement demandé à ignorer CETTE protection
+// précise, jamais via le bypass global qui vise le reste du domaine : Méca A-E, thermique, phase,
+// comm, sync, codeur).
 IF NOT (BypassProcess OR BypassTopLimitSwitch) AND NOT TopPositionSensor AND NOT InReferencingMode AND (Direction &gt; 0) THEN
     ErrorId := ErrorId OR 16#0020;
 ELSIF ResetEdge.Q THEN
@@ -1134,7 +1031,7 @@ END_IF;
 // 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
 // Sécurité active hors référencement. Si la position de câble descend sous la limite basse
 // physique (CablePosM &lt;= CfgCableLimitDescentM), alors on interdit uniquement la descente.
-// 🔧 REX 2026-08-07 : SORTI du bloc "IF NOT BypassGlobal" — même doctrine que bit5 ci-dessus.
+// SORTI du bloc "IF NOT BypassGlobal" — même doctrine que bit5 ci-dessus.
 IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
     ErrorId := ErrorId OR 16#0040;
 ELSIF ResetEdge.Q THEN
@@ -1143,7 +1040,7 @@ END_IF;
 
 {endregion}
 
-{region "Diagnostics et protections treuil"}
+{region "§4 Diagnostics et protections treuil"}
 // 🔍 3. DIAGNOSTIC DU DOMAINE TREUIL (uniquement si bypass global désactivé)
 IF NOT BypassGlobal THEN
 
@@ -1163,7 +1060,7 @@ IF NOT BypassGlobal THEN
         ErrorId := ErrorId AND 16#FFFE;
     END_IF;
 
-// 🔍 3bis. PERTE CODEUR DE CE TREUIL (câblé — lot Codeur 2026-07-02)
+// 🔍 3bis. PERTE CODEUR DE CE TREUIL
 // 🔧 WINCH-CORE-01 : le fonctionnement sans codeur reste interdit par défaut.
 // Le bypass est individuel, maintenu consciemment depuis l'IHM et strictement limité à MAINT_N2.
 // Il ne masque aucun autre défaut du treuil et n'agit jamais sur l'autre instance.
@@ -1176,8 +1073,8 @@ ELSE
     ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
 END_IF;
 
-// 🔍 3ter. SURCHAUFFE MOTEUR (câblé — I/O réel 2026-07-02) — bit2, participe au SafeStop total
-// 🆕 2026-08-07 : ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
+// 🔍 3ter. SURCHAUFFE MOTEUR — bit2, participe au SafeStop total
+// ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
 // bypass dédié plutôt que de dépendre uniquement du bypass groupé BypassSafety.
 IF NOT (BypassSafety OR BypassMotorThermal) AND ThermalFeedback THEN
     ErrorId := ErrorId OR 16#0004;
@@ -1194,7 +1091,7 @@ ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
     ErrorId := ErrorId AND 16#FFF7;
 END_IF;
 
-// 🔍 3quinquies. ROTATION DE PHASE (câblé — I/O réel, commun M1/M2, 2026-07-03octodecies) —
+// 🔍 3quinquies. ROTATION DE PHASE —
 // bit4, participe au SafeStop total (sens moteur potentiellement inversé, danger 2 sens).
 IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN
     ErrorId := ErrorId OR 16#0010;
@@ -1202,16 +1099,16 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FFEF;
 END_IF;
 
-// 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL (REX 2026-07-07) — bit7
+// 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL — bit7
 // Armé quand tout est physiquement confirmé coupé (contacteurs + frein). Si dérive ou vitesse
 // détectée pendant que c'est armé → roue libre / frein insuffisant.
-// 🔧 T84/T85 : la chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
+// La chaîne codeur produit la mesure ; ce bloc safety la surveille seulement.
 DriftGuardA(
     Arm        := MeasuredSpeedValid AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode,
     PositionM  := CablePosM,
     ToleranceM := UncommandedDriftToleranceM
 );
-MecaADriftM := DriftGuardA.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
+MecaADriftM := DriftGuardA.DriftM;   // Diagnostic IHM
 
 IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
     ErrorId := ErrorId OR 16#0080;
@@ -1219,33 +1116,33 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FF7F;
 END_IF;
 
-// 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR (REX 2026-07-07) — bit8
+// 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR — bit8
 // Indépendant de FB_Winch (défense en profondeur). Perte CAN (bit0) OU joystick au neutre ;
 // si les contacteurs OU LE FREIN ne confirment pas être retombés/serrés dans PostRampTimeout, défaut.
-// 🔧 REX 2026-07-08 (demande utilisateur) : BrakeFeedback ajouté — un frein qui ne confirme pas
-// son engagement dans ce délai est tout aussi dangereux qu'un contacteur qui ne retombe pas
-// (risque de mouvement/roue libre non détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
+// BrakeFeedback ajouté — un frein qui ne confirme pas son engagement dans ce délai est tout
+// aussi dangereux qu'un contacteur qui ne retombe pas (risque de mouvement/roue libre non
+// détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
 MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
                        OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
 TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
-MecaBElapsedTime := TonMecaB.ET;   // 🆕 REX 2026-07-08 : diagnostic IHM
+MecaBElapsedTime := TonMecaB.ET;   // Diagnostic IHM
 IF TonMecaB.Q THEN
     ErrorId := ErrorId OR 16#0100;
 ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FEFF;
 END_IF;
 
-// 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT BENNE, ESCALADE (REX 2026-07-07) — bit9
+// 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT BENNE, ESCALADE — bit9
 // Armé UNIQUEMENT pour l'instance M1 (BenneHoldStillActive câblé sur instBucket.Busy côté M1
 // seulement, toujours FALSE côté M2). Tolérance plus large que celle de FB_Bucket (1.0 m) —
 // n'intervient que si la couche Benne (SafeStop M1 seul) n'a pas suffi.
-// 🔧 REX 2026-07-08 : dérive factorisée via FB_DriftGuard (CODE/WINCH/) — comportement inchangé.
+// Dérive factorisée via FB_DriftGuard — comportement inchangé.
 DriftGuardC(
     Arm        := NOT (BypassSafety OR BypassMecaC) AND BenneHoldStillActive,
     PositionM  := CablePosM,
     ToleranceM := BenneSlipToleranceM
 );
-MecaCDriftM := DriftGuardC.DriftM;   // 🆕 REX 2026-07-08 : diagnostic IHM
+MecaCDriftM := DriftGuardC.DriftM;   // Diagnostic IHM
 
 IF DriftGuardC.Violation THEN
     ErrorId := ErrorId OR 16#0200;
@@ -1253,7 +1150,7 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FDFF;
 END_IF;
 
-// 🔍 3undecies. THERMIQUE FREIN COMMUN M1/M2/M3 (REX 2026-07-08, demande utilisateur) — bit10
+// 🔍 3undecies. THERMIQUE FREIN COMMUN M1/M2/M3 — bit10
 // Signal commun (1 seul fil, câblé identiquement sur les 3 instances Safety) : sa perte peut
 // signifier qu'un frein colle instantanément (frein à manque de courant) → SafeStop ET
 // PowerCutOff (voir bandeau en-tête).
@@ -1263,8 +1160,7 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#FBFF;
 END_IF;
 
-// 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT (REX 2026-07-08 (3),
-// demande utilisateur) — bit11
+// 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT — bit11
 // Complète le bit5 (AscentPermit immédiat) : arme la MÊME condition (capteur haut atteint, hors
 // homing) mais avec un délai de confirmation, comme Méca B. Si les contacteurs ET le frein ne
 // confirment pas être retombés/serrés dans PostRampTimeout après l'arrivée au capteur → défaut
@@ -1273,7 +1169,7 @@ END_IF;
 TonMecaD(
     IN := NOT (BypassSafety OR BypassMecaD) AND ((((NOT TopPositionSensor AND NOT InReferencingMode) 
             OR (Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM + 0.10))))
-           AND (Direction &gt;= 0)) // 🆕 Neutralise la butée haute en descente (Direction = -1)
+           AND (Direction &gt;= 0)) // Neutralise la butée haute en descente (Direction = -1)
           AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)), 
     PT := PostRampTimeout
 );
@@ -1283,13 +1179,13 @@ ELSIF ResetEdge.Q THEN
     ErrorId := ErrorId AND 16#F7FF;
 END_IF;
 
-// 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE (REX 2026-07-08 (4)) — bits 12/13
+// 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE — bits 12/13
 // Couche INDÉPENDANTE de FB_WinchSync (écart mineur, 1er niveau) — défense en profondeur pour un
 // écart VRAIMENT important. ExpectedOtherWinchPosM est DÉJÀ corrigé de l'offset benne actif par
 // l'appelant : comparaison directe valable que le benne soit ouvert, fermé, ou absent du calcul.
 // Suppression pendant BenneBusy (trajet actif = écart transitoire normal, pas un défaut),
-// InReferencingMode (position pas fiable pendant homing) et OtherWinchInhibited (🆕 REX
-// 2026-07-08 (7) : l'autre treuil en maintenance a une position figée, non comparable).
+// InReferencingMode (position pas fiable pendant homing) et OtherWinchInhibited (l'autre treuil
+// en maintenance a une position figée, non comparable).
 // Bit12 : détection → SafeStop immédiat. Bit13 : escalade si pas confirmé arrêté → PowerCutOff.
 IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
    AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
@@ -1337,7 +1233,7 @@ END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
 
-{region "Arbitrage sorties securite"}
+{region "§5 Arbitrage sorties securite"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
 Error := (ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
 ErrorEdge(CLK := Error);
@@ -1346,8 +1242,7 @@ IF ErrorEdge.Q THEN
 END_IF;
 
 // 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
-// (Méca A/B/C) + 10 (thermique frein commun) + 11 (Méca D) + 12/13 (🆕 REX 2026-07-08 (4) :
-// Méca E, écart synchro critique) ou si contacteur coupé
+// (Méca A/B/C) + 10 (thermique frein commun) + 11 (Méca D) + 12/13 (Méca E, écart synchro critique) ou si contacteur coupé
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
@@ -1357,7 +1252,7 @@ ELSE
 END_IF;
 
 // ⬇️ DescendPermit : TRUE = descente autorisée (pas de limite basse, pas de mou câble en mode récup, contacteur engagé)
-// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (TRUE = mouvement autorisé).
+// Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 DescendPermit := NOT (
     (((ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
@@ -1366,7 +1261,7 @@ DescendPermit := NOT (
 );
 
 // ⬆️ AscentPermit : TRUE = montée autorisée (pas de fin course haut, pas de dépassement position)
-// 🆕 2026-08-15 (T112) : Polarité positive Fail-Safe (TRUE = mouvement autorisé).
+// Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 AscentPermit := NOT (
     (((ErrorId AND 16#0020) &lt;&gt; 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
@@ -1374,19 +1269,19 @@ AscentPermit := NOT (
     OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM)) AND NOT BypassTopLimitSoftware)
 );
 
-// 🧨 REX 2026-07-07 : PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
+// PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
 // SafeStop seul ne sert à rien dans ces 3 cas précis.
-// 🆕 REX 2026-07-08 (demande utilisateur) : bit2 (surchauffe/perte thermique MOTEUR) et bit10
-// (surchauffe/perte thermique FREIN commun) ajoutés — un frein à manque de courant peut coller
-// instantanément sur perte de son retour thermique : une rampe SafeStop seule ne protège pas la
-// mécanique dans ce cas, coupure puissance immédiate nécessaire. Même raisonnement appliqué au
-// thermique moteur par cohérence/défense en profondeur (demande explicite).
-// 🆕 REX 2026-07-08 (3) : bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B :
-// contacteurs/frein déjà censés être coupés (AscentPermit immédiat sur capteur), une confirmation
-// manquante après délai signifie que la coupure locale n'a pas suffi.
-// 🆕 REX 2026-07-08 (4) : bit13 (Méca E escalade) ajouté — PAS bit12 seul (détection immédiate =
-// SafeStop uniquement ; PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
+// bit2 (surchauffe/perte thermique MOTEUR) et bit10 (surchauffe/perte thermique FREIN commun)
+// ajoutés — un frein à manque de courant peut coller instantanément sur perte de son retour
+// thermique : une rampe SafeStop seule ne protège pas la mécanique dans ce cas, coupure puissance
+// immédiate nécessaire. Même raisonnement appliqué au thermique moteur par cohérence/défense en
+// profondeur.
+// bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B : contacteurs/frein déjà
+// censés être coupés (AscentPermit immédiat sur capteur), une confirmation manquante après délai
+// signifie que la coupure locale n'a pas suffi.
+// bit13 (Méca E escalade) ajouté — PAS bit12 seul (détection immédiate = SafeStop uniquement ;
+// PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
 PowerCutOff := (ErrorId AND 16#2F84) &lt;&gt; 16#0000;
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
@@ -1411,7 +1306,8 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Condition d'armement (calculée par l'appelant, ex. FwdRevSpeedFeedbackOff AND BrakeFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET SEUILS ===
+--&gt; [CMD] Condition d'armement de la surveillance</xhtml>
               </documentation>
             </variable>
             <variable name="PositionM">
@@ -1419,7 +1315,7 @@ Done := FALSE;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position courante à surveiller</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position courante a surveiller (m)</xhtml>
               </documentation>
             </variable>
             <variable name="ToleranceM">
@@ -1427,7 +1323,7 @@ Done := FALSE;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Tolérance de dérive (m) au-delà de laquelle Violation se déclenche</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance de derive maximale autorisee (m)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1437,7 +1333,8 @@ Done := FALSE;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position de référence capturée à l'armement (diagnostic/IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET ETATS ===
+&lt;-- [DIAG] Position de reference capturee a l'armement (m)</xhtml>
               </documentation>
             </variable>
             <variable name="DriftM">
@@ -1445,7 +1342,7 @@ Done := FALSE;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dérive absolue courante (m), 0.0 si non armé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Derive absolue courante (m)</xhtml>
               </documentation>
             </variable>
             <variable name="Violation">
@@ -1453,7 +1350,7 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si DriftM &gt; ToleranceM pendant que Arm=TRUE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Alarme derive maximale depassee</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1463,32 +1360,20 @@ Done := FALSE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détecte le passage FALSE→TRUE de Arm (1er cycle armé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Memoire etat armement cycle precedent</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📐 FB_DriftGuard — Détection de dérive de position pendant armement
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📐 FB_DriftGuard — Détection de dérive de position sous armement
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §4quinquies (Méca A/C)
-   🧩 Brique réduite (Partie3 §1bis) — factorise la logique commune à Méca A et
-      Méca C de FB_Safety_Winch (armement + capture position référence + calcul
-      dérive), suite audit REX 2026-07-08 : ~15 lignes identiques dans les 2 cas.
-   📂 REX 2026-07-08 (2) : placé dans CODE/WINCH/ (pas COMMUN) — son seul
-      consommateur réel est FB_Safety_Winch (2 instances, Méca A et C, dans le
-      MÊME FB). COMMUN est réservé aux briques à usage cross-domaine AVÉRÉ
-      (ex. FB_Brake, réutilisé par Winch ET Translation aujourd'hui) — pas à un
-      usage hypothétique futur. À remonter en COMMUN le jour où un autre
-      domaine (ex. FB_Safety_Translation) l'utilise réellement.
-   🎯 Rôle : tant que Arm=TRUE, mémorise la position au moment du premier cycle
-      armé (RefPosM), puis calcule en continu la dérive absolue par rapport à
-      cette référence. Violation si la dérive dépasse ToleranceM.
-   ⚠️ Ne fait AUCUNE vérification de vitesse (Méca A ajoute son propre check
-      vitesse en plus, câblé en OR par l'appelant — hors périmètre de cette
-      brique, qui ne gère QUE la dérive de position).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_DriftGuard) ===</xhtml>
+   🎯 Rôle : Capture position de référence et détection de dérive anormale
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Brique interne de sécurité (compose FB_Safety_Winch)
+   🔒 Sécurité : Détection de mouvement non commandé et glissement
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

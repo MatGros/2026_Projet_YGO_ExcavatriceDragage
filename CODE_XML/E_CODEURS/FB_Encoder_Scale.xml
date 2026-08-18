@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.754833" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.754833">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:47:48.965332" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:47:48.965332">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,8 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position brute (sortie FB_Encoder_Abs, déjà gelée sur doute)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES ENTREE &amp; REFERENCES BRUTES ===
+--&gt; [HW]  Position brute codeur (sortie FB_Encoder_Abs, gelee sur doute)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRefRaw">
@@ -40,7 +41,7 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référence brute figée au dernier homing (ST_Encoder_Calib)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Reference brute figee au dernier homing (ST_Encoder_Calib)</xhtml>
               </documentation>
             </variable>
             <variable name="CableM_PerRev">
@@ -51,7 +52,8 @@
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Câble déroulé par tour (périmètre tambour confirmé 2026-07-02, réglable site)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES &amp; RATIOS DE CONVERSION ===
+--&gt; [CFG] Developpement cable par tour tambour (m/tour)</xhtml>
               </documentation>
             </variable>
             <variable name="PointsPerRev">
@@ -62,7 +64,7 @@
                 <simpleValue value="8192" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Résolution codeur confirmée (Partie10 §3.3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -72,7 +74,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble en mètres, signée (+ enroulé, − sous l'eau)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE CONVERTIE ===
+&lt;-- [DIAG] Position cable en metres (+ enroule, - sous l'eau)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -82,19 +85,20 @@
                 <DINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart signé RawPos - HomingRefRaw (§3.1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS INTERNES ===
+. [LOC] Ecart signe RawPos - HomingRefRaw</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📏 FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §2/§3.1
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 Formule : CablePosM = (RawPos - HomingRefRaw) × (CableM_PerRev / PointsPerRev)
-   🧮 Arithmétique signée sûre : conversion en DINT avant la soustraction.
-   ═══════════════════════════════════════════════════════════════
+   🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
+   🔒 Polarité : CablePosM signée (+ enroulé, - sous l'eau)
+   🔌 Architecture : Convertisseur de mesure unitaire par treuil
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===</xhtml>
           </documentation>
         </interface>

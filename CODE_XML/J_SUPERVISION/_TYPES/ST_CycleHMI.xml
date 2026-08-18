@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-01T00:07:15.208027" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-01T00:07:15.208027">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.270651" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.270651">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -52,8 +52,8 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔄 ST_CycleHMI — Données d'échange IHM du cycle semi-automatique
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State / Cfg / Test (2026-07-24), homogène avec ST_WinchHMI.
-   🐛 T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3) —
+   📄 Structuration en Cmd / State / Cfg / Test , homogène avec ST_WinchHMI.
+   T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3) —
    avant ce lot, SetDepth_M/SetOffset_M n'avaient AUCUN backing persistant (juste un défaut
    compilé dans le DUT), contrairement à tous les autres domaines déjà traités.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -104,8 +104,8 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_CycleCfg — Configuration du cycle semi-automatique
-   🐛 T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
+   ST_CycleCfg — Configuration du cycle semi-automatique
+   T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -141,7 +141,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général (REX 2026-07-07)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général ()</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -189,7 +189,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut cycle</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -349,7 +349,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -392,85 +392,85 @@
               <EnumValue>
                 <Name>X0_PREPARATION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X1_HOMING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 vitesses lentes pour chercher capteur top + référencement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesses lentes pour chercher capteur top + référencement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X2_WORK_POS_SELECT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 ouverture benne (si déjà ouverte → passe vite)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si déjà ouverte -&gt; passe vite)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X4_DESCEND_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X5_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X6_CLOSE_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fermeture benne — tolérance « à peu près fermé »</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne — tolérance « à peu près fermé »</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X7_CTRL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée palier 1 de contrôle</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 de contrôle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X8_ASCENT_LOADED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée nominale jusqu'à limite haute</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée nominale jusqu'à limite haute</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">égouttage temporisé — temps affiché IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">translation vers trémie + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X11_OPEN_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>STABILIZING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 état d'attente/stabilisation (ex-ERROR_HOLD) — pas une erreur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

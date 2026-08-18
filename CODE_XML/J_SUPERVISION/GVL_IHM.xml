@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.242196" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.242196">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:41:30.281597" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:41:30.281597">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalReached">
@@ -63,7 +63,7 @@
                 <derived name="ST_CommunCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configuration des paramètres communs machine</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configuration des paramètres communs machine</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalFault">
@@ -71,7 +71,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-18 : défaut/perte thermique centrale hydraulique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -79,8 +79,8 @@
                 <derived name="ST_BypassCommun" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-🆕 2026-08-07 : granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
+: granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopSensorBypassActive">
@@ -88,7 +88,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
        (etaient ecrits par erreur dans Bypass.SlackCable/TopPositionSensor avant ce lot, ce qui
        empechait ces champs de servir de vrai bypass RETAIN operateur).
 🩺 Capteur haut ignore car simulation active</xhtml>
@@ -148,7 +148,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
 ⬆️ Monte les 2 treuils simultanément</xhtml>
               </documentation>
             </variable>
@@ -165,7 +165,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
 struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
 (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
 ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
@@ -200,7 +200,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal)
 Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </documentation>
             </variable>
@@ -223,7 +223,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🌐 ST_CommunHMI — Données d'échange IHM COMMUNES (pas propres à un axe)
    ───────────────────────────────────────────────────────────────
-   🆕 REX 2026-07-08 (demande utilisateur) : regroupe les signaux qui ne concernent
+   (demande utilisateur) : regroupe les signaux qui ne concernent
    PAS un axe/mécanisme en particulier (1 seul capteur/signal partagé par toute la
    machine) — évite de les dupliquer ou de les laisser en variables isolées
    directement dans GVL_IHM. Exemple : TopPositionSensorActive (capteur unique,
@@ -262,8 +262,8 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🔄 ST_CycleHMI — Données d'échange IHM du cycle semi-automatique
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State / Cfg / Test (2026-07-24), homogène avec ST_WinchHMI.
-   🐛 T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3) —
+   📄 Structuration en Cmd / State / Cfg / Test , homogène avec ST_WinchHMI.
+   T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3) —
    avant ce lot, SetDepth_M/SetOffset_M n'avaient AUCUN backing persistant (juste un défaut
    compilé dans le DUT), contrairement à tous les autres domaines déjà traités.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -376,7 +376,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕹️ ST_JoystickHMI — Données d'échange IHM pour le Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_ModesHMI.
+   📄 Structuration en Cmd / State , homogène avec ST_ModesHMI.
    Pas de Cfg (les vrais réglages de calibration vivent dans GVL_PERSISTENT, pas ici) ni de
    Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -406,7 +406,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎚️ ST_ModesHMI — Données d'échange IHM pour les modes de marche
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State (2026-07-24), homogène avec ST_WinchHMI/ST_SyncHMI/ST_BucketHMI.
+   📄 Structuration en Cmd / State , homogène avec ST_WinchHMI/ST_SyncHMI/ST_BucketHMI.
    Pas de Cfg (aucun réglage numérique dans ce domaine) ni de Bypass (concept absent de Modes).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -595,7 +595,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_SyncHMI — Données d'échange IHM pour la synchronisation M1/M2
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State / Cfg / Bypass (2026-07-23), homogène avec ST_WinchHMI.
+   📄 Structuration en Cmd / State / Cfg / Bypass , homogène avec ST_WinchHMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -623,7 +623,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configurations et limites — 🆕 2026-08-06, manquait (contrairement à ST_WinchHMI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — , manquait (contrairement à ST_WinchHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -631,7 +631,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_BypassTranslation" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -654,7 +654,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ↔️ ST_TranslationHMI — Données d'échange IHM pour le Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des états, commandes et diagnostics du translation.
-   📄 Structuration en Cmd / State / Safety / Bypass / Test (2026-07-22) —
+   📄 Structuration en Cmd / State / Safety / Bypass / Test —
       doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -683,7 +683,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_WinchCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configurations et limites</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -699,7 +699,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_BypassWinch" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="Bucket">
@@ -753,7 +753,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_WinchCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configurations et limites</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites</xhtml>
               </documentation>
             </variable>
             <variable name="Safety">
@@ -769,7 +769,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_BypassWinch" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -784,7 +784,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    ⚙️ ST_WinchHMI — Données d'échange IHM pour un treuil (M1: moteur de retenue / M2: moteur Benne)
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des bargraphes, LEDs, mesures et réglages.
-   📄 Structuration en Cmd / State / Cfg / Safety / Bypass (2026-07-22)
+   📄 Structuration en Cmd / State / Cfg / Safety / Bypass
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -820,7 +820,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass fin de course logiciel haut (position calculée), OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitSwitch">
@@ -828,7 +828,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite basse physique (longueur câble), OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite basse physique (longueur câble), OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegal">
@@ -836,7 +836,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite légale de profondeur, OR avec bypass individuel</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -856,9 +856,9 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
+   ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
    ───────────────────────────────────────────────────────────────
-   🎨 2026-08-07 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
+   🎨 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
       GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
@@ -867,7 +867,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
       n'entraîne la désactivation de l'autre.
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
-   🔧 2026-08-07 : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
+   : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
       était de toute façon inutilisé comme bypass réel jusqu'ici (PRG_07_Supervision y écrivait un
       indicateur simulation par erreur, voir ST_CommunHMI.SimTopSensorBypassActive).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -884,7 +884,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <simpleValue value="-999" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴🔧 REX 2026-08-07 (5) — retour terrain, blocage instantané à 0m : sans défaut explicite,
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blocage instantané à 0m : sans défaut explicite,
 ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM &lt;= 0.0" se déclenche
 dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
 (jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
@@ -949,9 +949,9 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 2026-08-07 : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
 pas une vitesse continue.
-🆕 2026-08-07 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
+: Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
@@ -962,7 +962,7 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableCoupledBucketSequencing">
@@ -973,7 +973,7 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴🔧 REX 2026-08-07 (4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
 Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
 gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
               </documentation>
@@ -998,8 +998,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_CommunCfg — Configuration des paramètres communs machine
-   📄 2026-07-24 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
+   ST_CommunCfg — Configuration des paramètres communs machine
+   📄 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
    WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
    ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1142,8 +1142,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_CycleCfg — Configuration du cycle semi-automatique
-   🐛 T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
+   ST_CycleCfg — Configuration du cycle semi-automatique
+   T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1179,7 +1179,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général (REX 2026-07-07)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général ()</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1227,7 +1227,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut cycle</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -1387,7 +1387,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1503,7 +1503,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
+   ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
    📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -1552,7 +1552,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (9) : bypass simplifié de la séquence FB_DiveSearch complète (préconditions
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : bypass simplifié de la séquence FB_DiveSearch complète (préconditions
 strictes -- benne ouverte, DiveStartMin_M, fenêtre immersion). Si TRUE, un front MONTANT
 Kobold pendant une descente confirme directement le fond, sans passer par l'état-machine
 FB_DiveSearch (qui continue de tourner en parallèle, inchangée -- utile pour
@@ -1568,7 +1568,7 @@ seule source de confirmation).</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : mode vidage à la trémie —</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mode vidage à la trémie —</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1673,7 +1673,7 @@ seule source de confirmation).</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : mode vidage à la trémie (pas de FB dédié, logique combinatoire PRG_04)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mode vidage à la trémie (pas de FB dédié, logique combinatoire PRG_04)
 TglEnableDumpAtTremie (bit IHM brut)</xhtml>
               </documentation>
             </variable>
@@ -1714,7 +1714,7 @@ TglEnableDumpAtTremie (bit IHM brut)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (9) : diagnostic bypass séquence DiveSearch
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : diagnostic bypass séquence DiveSearch
 TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
               </documentation>
             </variable>
@@ -1835,7 +1835,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
               </documentation>
             </variable>
             <variable name="Online">
@@ -1859,7 +1859,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Joystick en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Joystick en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -1894,7 +1894,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <simpleValue value="E_Mode.MAINT_N1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM (REX 2026-07-07)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM ()</xhtml>
               </documentation>
             </variable>
             <variable name="BtnFaultReset">
@@ -1902,7 +1902,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (REX 2026-07-07, ex-MachineReset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (, ex-MachineReset)</xhtml>
               </documentation>
             </variable>
             <variable name="BtnModeReset">
@@ -1910,7 +1910,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement (REX 2026-07-07)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement ()</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyArming">
@@ -1918,7 +1918,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-07 — Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §5)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">— Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md §5)
 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
               </documentation>
             </variable>
@@ -1938,7 +1938,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-19 : rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
 sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</xhtml>
               </documentation>
@@ -1951,13 +1951,13 @@ sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 un
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX (session WINCH-BTN-01) — bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">— bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
 SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
 sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
-🔀 2026-08-06 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
+🔀 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
 (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé, doublon). ⚠️ Le défaut TRUE
 (joystick) s'applique désormais à M3 aussi au boot — M3 démarrait avant en boutons IHM
-(FALSE) : changement de comportement au démarrage, assumé (décision 2026-08-06).
+(FALSE) : changement de comportement au démarrage, assumé (décision ).
 🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 (comportement historique Winch, préservé au boot) ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
               </documentation>
             </variable>
@@ -1998,7 +1998,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 REX 2026-07-07 : au moins un défaut/alarme actif dans le domaine</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: au moins un défaut/alarme actif dans le domaine</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffActive">
@@ -2006,7 +2006,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 REX 2026-07-07 : au moins un Méca A/B/C (FB_Safety_Winch) ou</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 : au moins un Méca A/B/C (FB_Safety_Winch) ou</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyChainOk">
@@ -2046,7 +2046,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingFailed">
@@ -2054,7 +2054,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2134,7 +2134,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -2215,9 +2215,12 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
-   ═══════════════════════════════════════════════════════════════</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_InputModuleDiagHMI">
@@ -2308,7 +2311,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassSync — Bypass de la surveillance synchronisation M1/M2
+   ST_BypassSync — Bypass de la surveillance synchronisation M1/M2
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -2348,7 +2351,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_SyncCfg — Configuration de la synchronisation M1/M2
+   ST_SyncCfg — Configuration de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -2427,7 +2430,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Alarme synchro active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme synchro active</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -2525,7 +2528,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : Bypass interlock hauteur mini M1/M2 requise pour translation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass interlock hauteur mini M1/M2 requise pour translation</xhtml>
               </documentation>
             </variable>
             <variable name="MecaA">
@@ -2578,7 +2581,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -2592,7 +2595,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
+   ST_BypassTranslation — Bypass maintenance dédiés à Translation M3
    ───────────────────────────────────────────────────────────────
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
@@ -2781,7 +2784,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
@@ -2794,10 +2797,10 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
+   ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 2026-08-06 : créé suite constat terrain — Translation n'avait pas de slot Cfg
+   📄 : créé suite constat terrain — Translation n'avait pas de slot Cfg
    (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
    n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -2851,7 +2854,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 2026-08-06 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
 GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
               </documentation>
@@ -2861,7 +2864,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -2887,7 +2890,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
    🎮 ST_TranslationCmd — Commandes IHM pour la Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
-   📄 2026-07-24 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
+   📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
       sans pont générique pour ne jamais persister BtnFwd/BtnRev.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -2933,7 +2936,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Translation en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -3122,7 +3125,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
               </documentation>
             </variable>
             <variable name="AtPV">
@@ -3181,7 +3184,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenanceTargetEnable">
@@ -3202,7 +3205,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-06 : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3254,7 +3257,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_BucketHMI — Données d'échange IHM pour la benne (M2)
    ───────────────────────────────────────────────────────────────
-   📄 Structuration en Cmd / State / Cfg / Bypass (2026-07-23), homogène avec ST_WinchHMI.
+   📄 Structuration en Cmd / State / Cfg / Bypass , homogène avec ST_WinchHMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3307,7 +3310,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 🌡️ Bypass surchauffe thermique moteur CE treuil (M1_ThermalOk_DI/M2_ThermalOk_DI)</xhtml>
               </documentation>
             </variable>
             <variable name="TopLimitSwitch">
@@ -3324,7 +3327,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass fin de course logiciel haut (position calculée CablePosM &gt;= TopLimitM, symétrique CableLimitSwitch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass fin de course logiciel haut (position calculée CablePosM &gt;= TopLimitM, symétrique CableLimitSwitch)</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitSwitch">
@@ -3340,7 +3343,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Bypass limite légale de profondeur (GVL_IHM.Commun.LimitLegalReached)</xhtml>
               </documentation>
             </variable>
             <variable name="MecaA">
@@ -3417,7 +3420,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -3431,7 +3434,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
+   ST_BypassWinch — Bypass maintenance dédiés à UN treuil (M1 ou M2)
    ───────────────────────────────────────────────────────────────
    🎨 Regroupe les bypass "dégradé assumé" propres à un axe (codeur,
       contacteurs) — chaque treuil a son propre matériel, donc son
@@ -3515,7 +3518,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass codeur effectivement accepté, uniquement MAINT_N2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass codeur effectivement accepté, uniquement MAINT_N2</xhtml>
               </documentation>
             </variable>
             <variable name="CableLimitDescent">
@@ -3716,7 +3719,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
               </documentation>
             </variable>
             <variable name="CfgRampAccelRate">
@@ -3771,7 +3774,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="6.75" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m) -- REX 2026-08-07 (25), aligné sur GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m) -- (25), aligné sur GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -3782,7 +3785,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX 2026-07-23 : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
        métier dont le défaut peut valoir n'importe quoi) — PRG_SUPERVISION_CFC.st §2/§3
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
@@ -3796,10 +3799,10 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
+   ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
-   📄 2026-07-24 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
+   📄 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
    déplacés vers GVL_IHM.Commun.Cfg (WinchMaxStepDescente/etc.) — étaient partagés M1/M2 via
    réconciliation ad-hoc, une seule instance dans Commun élimine le besoin de réconciliation.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -3853,7 +3856,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 : bouton IHM inhibition treuil — mise en service,</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton IHM inhibition treuil — mise en service,</xhtml>
               </documentation>
             </variable>
             <variable name="BtnHomingAtZero">
@@ -3861,7 +3864,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX mise en service : force le homing à 0 m (points codeur centre),</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Force le homing à 0 m (points codeur centre),</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3936,7 +3939,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut mémorisé du moniteur vitesse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut mémorisé du moniteur vitesse</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMonitorErrorId">
@@ -4024,7 +4027,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Treuil en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Treuil en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -4203,7 +4206,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 miroir lecture seule — inhibition arbitrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">miroir lecture seule — inhibition arbitrée</xhtml>
               </documentation>
             </variable>
             <variable name="BottomLimitActiveM">
@@ -4211,7 +4214,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 2026-08-07 : ralentissement sur bordure — diagnostic zone/limite active
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 : ralentissement sur bordure — diagnostic zone/limite active
 📏 Limite basse active (m) — câble physique OU légale, la plus restrictive</xhtml>
               </documentation>
             </variable>
@@ -4236,7 +4239,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 2026-08-07 : diagnostic retour terrain — délai ressenti à la remontée
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic délai ressenti à la remontée
 🩺 Sens interne mémorisé FB_Winch (-1/0/+1)</xhtml>
               </documentation>
             </variable>
@@ -4298,85 +4301,85 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
               <EnumValue>
                 <Name>X0_PREPARATION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🏁 Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X1_HOMING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 vitesses lentes pour chercher capteur top + référencement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesses lentes pour chercher capteur top + référencement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X2_WORK_POS_SELECT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 ouverture benne (si déjà ouverte → passe vite)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si déjà ouverte -&gt; passe vite)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X4_DESCEND_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X5_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X6_CLOSE_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fermeture benne — tolérance « à peu près fermé »</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne — tolérance « à peu près fermé »</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X7_CTRL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée palier 1 de contrôle</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 de contrôle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X8_ASCENT_LOADED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">remontée nominale jusqu'à limite haute</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée nominale jusqu'à limite haute</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">égouttage temporisé — temps affiché IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">translation vers trémie + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X11_OPEN_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>STABILIZING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 état d'attente/stabilisation (ex-ERROR_HOLD) — pas une erreur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -4423,13 +4426,13 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
               <EnumValue>
                 <Name>SEARCHING_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0→1 dans fenêtre eau</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descente : attente front 0-&gt;1 dans fenêtre eau</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>SEARCHING_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1→0 au fond</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1-&gt;0 au fond</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -4530,7 +4533,8 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation FB (FALSE = neutralisation, sorties coupées)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE AXE ===
+--&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)</xhtml>
               </documentation>
             </variable>
             <variable name="StartStop">
@@ -4538,7 +4542,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération normale</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRef">
@@ -4546,7 +4550,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse signee (-100.0..+100.0 %, signe coherent avec Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -4554,7 +4558,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4565,17 +4569,13 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de consigne d'axe 4 champs produite par FB_Joystick.
+   📤 Champs : Enable, StartStop, SpeedRef, Direction.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 4 champs exactement :
-      - Enable    : Autorisation globale du pipeline
-      - StartStop : RAMPE (TRUE = accélération, FALSE = décélération normale)
-      - SpeedRef  : Consigne vitesse signée (-100.0 .. +100.0 %)
-      - Direction : Sens d'axe (-1 = Rev, 0 = Neutre, +1 = Fwd)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_Mode">
@@ -4789,7 +4789,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <derived name="ST_BucketConfig" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Offsets Open/Close/Coherence</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Offsets Open/Close/Coherence</xhtml>
               </documentation>
             </variable>
             <variable name="CfgTimeoutDuration">
@@ -4823,7 +4823,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BucketCfg — Configuration de la benne (M2)
+   ST_BucketCfg — Configuration de la benne (M2)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4859,7 +4859,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement benne position ouverte (mise en service) — confirmation pure, aucun mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référencement benne position ouverte (mise en service) — confirmation pure, aucun mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="BtnConfirmClosePos">
@@ -4867,7 +4867,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Référencement benne position fermée (mise en service) — confirmation pure, aucun mouvement</xhtml>
               </documentation>
             </variable>
             <variable name="TglManualBucketLimits">
@@ -4878,12 +4878,12 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
 uniquement en SelJoystickWinch=2 (unitaire M2). Si TRUE : borne le déplacement entre les
 positions ouvert/fermé configurées (OffsetOpenM/OffsetCloseM relatif à M1, mêmes bornes que
 FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
 CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
-🆕 2026-08-07 (18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
+(18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4979,7 +4979,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Benne en défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne en défaut</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -5011,7 +5011,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Demande de fermeture active (image FB_Bucket)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de fermeture active (image FB_Bucket)</xhtml>
               </documentation>
             </variable>
             <variable name="OpenActive">
@@ -5019,7 +5019,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Demande d'ouverture active (image FB_Bucket)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande d'ouverture active (image FB_Bucket)</xhtml>
               </documentation>
             </variable>
             <variable name="M2PositionCorrected">
@@ -5043,7 +5043,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Ouverture auto armée (descente couplée demandée, benne pas ouverte)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Ouverture auto armée (descente couplée demandée, benne pas ouverte)</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledAscentCloseArmed">
@@ -5051,7 +5051,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
               </documentation>
             </variable>
             <variable name="ControlAscentActive">
@@ -5059,7 +5059,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledMotionBlockedByBucket">
@@ -5067,7 +5067,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 2026-08-07 : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5103,7 +5103,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐛 FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
 (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
@@ -5117,7 +5117,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔧 ST_BypassBucket — Bypass de la surveillance benne (M2)
+   ST_BypassBucket — Bypass de la surveillance benne (M2)
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -5134,6 +5134,28 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BRAKE_COMMAND_NOT_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence confirmation ouverture frein &gt; 500ms</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RESTART_INHIBITED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -5159,6 +5181,46 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           </enum>
         </baseType>
         <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Desactive / Hors service</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Pret / Etat nominal</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_BRAKE_COMMAND_CONFIRMATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation feedback frein</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_STEP_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation changement de palier</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_RESTART_DELAY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation anti-court-cycle redemarrage</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
               <Attribute Name="qualified_only" Value="" />
@@ -5213,16 +5275,13 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §3,
-                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
-   Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
-   détecter un collage / une absence de fermeture d'un contacteur de
-   puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
-   appelant).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_EncoderHMI">
@@ -5281,7 +5340,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Codeur en défaut (liaison EtherCAT ou preset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur en défaut (liaison EtherCAT ou preset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -5322,7 +5381,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Défaut de référencement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut de référencement</xhtml>
               </documentation>
             </variable>
             <variable name="HomingErrorId">
@@ -5388,7 +5447,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart M1/M2 en mètres benne ouvert</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
               </documentation>
             </variable>
             <variable name="OffsetCloseM">
@@ -5396,7 +5455,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart M1/M2 en mètres benne fermé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CoherenceLimitM">
@@ -5404,7 +5463,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de détection d'incohérence au boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CloseAnticipationM">
@@ -5415,11 +5474,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 (20) — retour terrain, demande client : inertie mécanique du benne (M2 continue
-sur sa lancée après coupure StartStop) -- couper la commande EN AVANCE de la cible pour que
-l'arrêt réel (après coast-down) tombe proche du vrai offset, au lieu de dépasser. Anticipation
-distincte par sens (fermeture/ouverture ont des inerties différentes selon retour terrain).
-Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
               </documentation>
             </variable>
             <variable name="OpenAnticipationM">
@@ -5430,7 +5485,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <simpleValue value="1.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe la commande d'ouverture 1.3m avant OffsetOpenM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5441,11 +5496,12 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ ST_BucketConfig — Configuration des offsets du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.A
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_BucketState">
@@ -5456,7 +5512,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne ouvert mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ouvert memorise</xhtml>
               </documentation>
             </variable>
             <variable name="IsClosed">
@@ -5464,7 +5520,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Benne fermé mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne ferme memorise</xhtml>
               </documentation>
             </variable>
             <variable name="TooOpen">
@@ -5472,7 +5528,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement ouverture : Delta &lt; OffsetOpen - Tolerance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)</xhtml>
               </documentation>
             </variable>
             <variable name="TooClosed">
@@ -5480,7 +5536,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Dépassement fermeture : Delta &gt; OffsetClose + Tolerance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement fermeture (Delta &gt; OffsetClose + Tolerance)</xhtml>
               </documentation>
             </variable>
             <variable name="IsIntermediate">
@@ -5488,7 +5544,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Position intermédiaire (entre Ouvert et Fermé)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position intermediaire (entre Ouvert et Ferme)</xhtml>
               </documentation>
             </variable>
             <variable name="LastPosM2Open">
@@ -5496,7 +5552,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernière position M2 mémorisée ouvert</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ouvert (m)</xhtml>
               </documentation>
             </variable>
             <variable name="LastPosM2Close">
@@ -5504,7 +5560,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernière position M2 mémorisée fermé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Derniere position M2 memorisee ferme (m)</xhtml>
               </documentation>
             </variable>
             <variable name="StateIncoherent">
@@ -5512,7 +5568,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État non sûr (divergence boot/réel)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat non sur (divergence boot/reel)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5523,11 +5579,12 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🚦 ST_BucketState — État mémorisé et diagnostic du benne
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md §4.B
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure d'état physique mémorisé et de diagnostic du benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -5632,7 +5689,7 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
             <derived name="ST_CommunHMI" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 REX 2026-07-08 : signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal)</xhtml>
           </documentation>
         </variable>
         <variable name="HmiInitDone">
@@ -5640,8 +5697,8 @@ Coupe la commande de fermeture 1m avant OffsetCloseM</xhtml>
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-19 : IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire
-de mise en service urgence (2026-07-09), remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire de mise en service
+urgence, remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
 Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
 🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
           </documentation>

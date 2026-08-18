@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.228835" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.228835">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:30:42.898079" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:30:42.898079">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -133,9 +133,12 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📡 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
-   ═══════════════════════════════════════════════════════════════</xhtml>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_Joystick_AxisCmd">
@@ -146,7 +149,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation FB (FALSE = neutralisation, sorties coupées)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE AXE ===
+--&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)</xhtml>
               </documentation>
             </variable>
             <variable name="StartStop">
@@ -154,7 +158,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = rampe accélération, FALSE = rampe décélération normale</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRef">
@@ -162,7 +166,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse SIGNÉE -100..+100 % (signe = sens, cohérent avec Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse signee (-100.0..+100.0 %, signe coherent avec Direction)</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -170,7 +174,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Rev, 0 = Neutre, +1 = Fwd</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -181,17 +185,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de consigne d'axe 4 champs produite par FB_Joystick.
+   📤 Champs : Enable, StartStop, SpeedRef, Direction.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
-   🎯 4 champs exactement :
-      - Enable    : Autorisation globale du pipeline
-      - StartStop : RAMPE (TRUE = accélération, FALSE = décélération normale)
-      - SpeedRef  : Consigne vitesse signée (-100.0 .. +100.0 %)
-      - Direction : Sens d'axe (-1 = Rev, 0 = Neutre, +1 = Fwd)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="E_Diag_State">
@@ -269,7 +269,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Active la logique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS SÉCURITÉ &amp; ETATS SYSTEME ===
+--&gt; [CMD]  Active la logique du bloc (TRUE=Autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -277,7 +278,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Acquittement defaut</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -285,7 +286,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conditions globales OK (chaîne AU réarmée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Conditions globales OK (chaine AU rearmee)</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -293,7 +294,7 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Changement de mode désarme le homme-mort</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Changement de mode desarme l'homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="BenneBusy">
@@ -301,7 +302,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle benne (front descendant) désarme le homme-mort</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fin de cycle benne (front descendant) desarme l'homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="PreserveArmingAfterBucket">
@@ -309,7 +310,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE uniquement pendant fermeture ExtractionSequence : enchaînement palier 1 autorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Maintien armement pendant fermeture ExtractionSequence</xhtml>
               </documentation>
             </variable>
             <variable name="BusCanOpenOP">
@@ -317,7 +318,8 @@
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État présence nœud CAN</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACQUISITION MATERIELLE &amp; DIAGNOSTIC ===
+--&gt; [HW]   Etat presence noeud CAN</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickOP">
@@ -325,7 +327,7 @@
                 <derived name="ST_Diag_Device" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode esclave CANopen actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Mode esclave CANopen actif</xhtml>
               </documentation>
             </variable>
             <variable name="RawX">
@@ -333,7 +335,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute axe X</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Valeur brute axe X (0..10000)</xhtml>
               </documentation>
             </variable>
             <variable name="RawY">
@@ -341,7 +343,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute axe Y</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Valeur brute axe Y (0..10000)</xhtml>
               </documentation>
             </variable>
             <variable name="RawButton">
@@ -349,7 +351,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">État brut bouton</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Etat brut bouton homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="BtnCalibrate">
@@ -357,7 +359,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de recalage neutre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES OPÉRATEUR &amp; CALIBRATION ===
+--&gt; [CMD]  Demande de recalage neutre</xhtml>
               </documentation>
             </variable>
             <variable name="InvertX">
@@ -367,6 +370,10 @@
               <initialValue>
                 <simpleValue value="FALSE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES &amp; CONFIGURATION ===
+--&gt; [CFG]  Inversion sens de l'axe X</xhtml>
+              </documentation>
             </variable>
             <variable name="InvertY">
               <type>
@@ -375,6 +382,9 @@
               <initialValue>
                 <simpleValue value="FALSE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Inversion sens de l'axe Y</xhtml>
+              </documentation>
             </variable>
             <variable name="DeadbandRaw">
               <type>
@@ -384,7 +394,7 @@
                 <simpleValue value="300" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Zone morte en points ADC bruts (0..10000)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Zone morte en points ADC bruts (0..10000)</xhtml>
               </documentation>
             </variable>
             <variable name="FilterTime">
@@ -392,10 +402,10 @@
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#0ms" />
+                <simpleValue value="TIME#0MS" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Filtrage premier ordre axe</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Filtrage premier ordre axe</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralHoldTime">
@@ -406,7 +416,7 @@
                 <simpleValue value="TIME#100MS" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien continu au neutre avant désarmement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Maintien continu au neutre avant desarmement</xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmHoldTime">
@@ -417,7 +427,7 @@
                 <simpleValue value="TIME#100MS" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui continu bouton requis pour armer</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Appui continu bouton requis pour armer</xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmGraceTime">
@@ -428,7 +438,7 @@
                 <simpleValue value="TIME#3S" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai de grâce post-armement avant application du désarmement neutre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai de grace post-armement avant desarmement neutre</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -438,7 +448,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à commuter</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
             <variable name="Busy">
@@ -446,7 +457,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Traitement en cours</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -454,39 +465,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Données valides dispo</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Présence anomalie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Échec calibration Joystick" - Valeurs RawX/Y hors plage lors du recalage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AxisCmdX">
-              <type>
-                <derived name="ST_Joystick_AxisCmd" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie normalisée X</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AxisCmdY">
-              <type>
-                <derived name="ST_Joystick_AxisCmd" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie normalisée Y</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Donnees valides disponibles</xhtml>
               </documentation>
             </variable>
             <variable name="Button">
@@ -494,7 +473,41 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton filtré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bouton homme-mort filtre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC &amp; ANOMALIES ===
+&lt;-- [DIAG] Presence anomalie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bit0: Echec calibration Joystick (RawX/Y hors plage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisCmdX">
+              <type>
+                <derived name="ST_Joystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES AXES NORMALISEES ===
+&lt;-- [ACT]  Sortie normalisee axe X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisCmdY">
+              <type>
+                <derived name="ST_Joystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Sortie normalisee axe Y</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralXAct">
@@ -502,7 +515,8 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Point neutre X actuel pour IHM/Test</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; MIROIRS MAINTENANCE ===
+&lt;-- [STAT] Point neutre X actuel pour IHM/Test</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralYAct">
@@ -510,7 +524,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Point neutre Y actuel pour IHM/Test</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Point neutre Y actuel pour IHM/Test</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedXPct">
@@ -518,9 +532,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Miroirs directs (maintenance) — mêmes valeurs que AxisCmdX/Y.SpeedRef/.Direction,
-exposés à plat pour lecture immédiate en vue instance CODESYS (pas de dépliage struct).
-Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionX">
@@ -528,7 +540,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens axe X (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdX.Direction</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdX.Direction</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedYPct">
@@ -536,7 +548,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne vitesse axe Y en % SIGNÉE (-100..+100), miroir AxisCmdY.SpeedRef</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionY">
@@ -544,7 +556,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdY.Direction</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), miroir AxisCmdY.Direction</xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmed">
@@ -552,7 +564,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Geste armé (bouton appuyé au neutre) — IHM/diagnostic</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Geste arme (bouton appuye au neutre) - IHM/diagnostic</xhtml>
               </documentation>
             </variable>
             <variable name="AtNeutral">
@@ -560,7 +572,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 2026-08-07 : TRUE si les 2 axes sont en zone morte (position centrale) — IHM/diagnostic</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -570,7 +582,8 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Point neutre X persistant global</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETENTION &amp; CALIBRATION PERSISTANTE ===
+&lt;-&gt; [BUS]  Point neutre X persistant global</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralYMem">
@@ -578,7 +591,7 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Point neutre Y persistant global</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS]  Point neutre Y persistant global</xhtml>
               </documentation>
             </variable>
           </inOutVars>
@@ -587,109 +600,149 @@ Consigne vitesse axe X en % SIGNÉE (-100..+100), miroir AxisCmdX.SpeedRef</xhtm
               <type>
                 <derived name="FB_CycleTime" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB &amp; TIMERS ===
+* [INST] Calcul du temps de cycle reel</xhtml>
+              </documentation>
             </variable>
             <variable name="ScaleX">
               <type>
                 <derived name="FB_AxisScale" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Normalisation et zone morte axe X</xhtml>
+              </documentation>
             </variable>
             <variable name="ScaleY">
               <type>
                 <derived name="FB_AxisScale" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Normalisation et zone morte axe Y</xhtml>
+              </documentation>
             </variable>
             <variable name="FilterX">
               <type>
                 <derived name="FB_Filter_PT1" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Filtre passe-bas PT1 axe X</xhtml>
+              </documentation>
             </variable>
             <variable name="FilterY">
               <type>
                 <derived name="FB_Filter_PT1" />
               </type>
-            </variable>
-            <variable name="CmdXVal">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="CmdYVal">
-              <type>
-                <REAL />
-              </type>
-            </variable>
-            <variable name="LastCalibrate">
-              <type>
-                <BOOL />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Filtre passe-bas PT1 axe Y</xhtml>
+              </documentation>
             </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="DeadmanEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant Bouton homme-mort</xhtml>
+              </documentation>
             </variable>
             <variable name="NeutralHoldTimer">
               <type>
                 <derived name="TON" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Temporisation maintien au neutre</xhtml>
+              </documentation>
             </variable>
             <variable name="DeadmanArmTimer">
               <type>
                 <derived name="TON" />
               </type>
-            </variable>
-            <variable name="DeadmanArmPending">
-              <type>
-                <BOOL />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Temporisation maintien bouton armement</xhtml>
+              </documentation>
             </variable>
             <variable name="DeadmanArmGraceTimer">
               <type>
                 <derived name="TON" />
               </type>
-            </variable>
-            <variable name="LastMode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Temporisation delai de grace post-armement</xhtml>
+              </documentation>
             </variable>
             <variable name="BenneBusyFallEdge">
               <type>
                 <derived name="F_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front descendant Fin de cycle benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdXVal">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC]  Consigne axe X calculee apres filtrage/homme-mort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdYVal">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Consigne axe Y calculee apres filtrage/homme-mort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCalibrate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Memorisation etat precedent bouton calibration</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmPending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Armement en cours d'attente de la tempo maintien</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastMode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Memorisation mode scan precedent pour detection changement</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🕹️ FB_Joystick — Acquisition &amp; traitement Hall (Homme-mort ISO 13850)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🕹️ FB_Joystick — Acquisition &amp; conditionnement du geste opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
-      Pipeline par axe : FB_AxisScale → FB_Filter_PT1 → Homme-Mort → ST_Joystick_AxisCmd.
-      Les rampes d'accélération/décélération sont gérées exclusivement par les
-      FB de mouvement aval (FB_Winch, FB_Translation), hors de ce bloc.
-    🔒 Bouton homme-mort :
-       - Armement au neutre strict (ScaleX/Y.OutPct = 0.0).
-       - Consentement au démarrage : mouvement libre SANS surveillance du bouton
-         (défaut, DeadmanReconfEnable := FALSE). Optionnel : reconfirmation périodique
-         en mouvement (délai DeadmanRearmTimeout) si DeadmanReconfEnable := TRUE.
-       - Désarmement sur maintien au neutre (durée NeutralHoldTime) + gate/mode/fin benne.
-   📤 Produit AxisCmdX, AxisCmdY, et signaux de diagnostic/miroir.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Joystick) ===</xhtml>
+             Pipeline par axe : FB_AxisScale -&gt; FB_Filter_PT1 -&gt; Homme-Mort -&gt; ST_Joystick_AxisCmd.
+   🔒 Sécurité : Armement homme-mort par maintien au neutre.
+                 Désarmement sur neutre prolongé, changement mode ou fin benne.
+   📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Joystick) ===
 
 {region "§1 Gate securite"}
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
@@ -708,7 +761,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
-    LastMode := Mode;   // 🆕 REX 2026-07-08 — pas de faux changement détecté à la réactivation
+    LastMode := Mode;   // Pas de faux changement détecté à la réactivation
     RETURN;
 END_IF;
 
@@ -746,7 +799,7 @@ LastCalibrate := BtnCalibrate;
 // 🧮 4bis. MISE À L'ÉCHELLE (avant homme-mort — le neutre s'évalue sur les 2 axes déjà deadbandés)
 ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
-AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // 🆕 2026-08-07 : IHM/diagnostic — position centrale (zone morte)
+AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic — position centrale (zone morte)
 
 {endregion}
 
@@ -756,7 +809,7 @@ AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // 🆕 2026-08-
 // de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
 IF Mode &lt;&gt; LastMode THEN
     DeadmanArmed := FALSE;
-    DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après changement de mode
+    DeadmanArmPending := FALSE;   // Nouvel appui exigé après changement de mode
 END_IF;
 LastMode := Mode;
 
@@ -766,7 +819,7 @@ LastMode := Mode;
 BenneBusyFallEdge(CLK := BenneBusy);
 IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
     DeadmanArmed := FALSE;
-    DeadmanArmPending := FALSE;   // 🆕 2026-08-07 — nouvel appui exigé après fin de cycle benne
+    DeadmanArmPending := FALSE;   // Nouvel appui exigé après fin de cycle benne
 END_IF;
 
 {endregion}
@@ -774,16 +827,13 @@ END_IF;
 {region "§5 Armement homme mort"}
 // 4ter. BOUTON HOMME-MORT — armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la
 // position des axes pendant l'appui.
-// 🔧 2026-08-07 (retour terrain) : l'ancien armement ("front bouton" ET "axes strictement à
-// 0.0 sur le MÊME scan") échouait dès que l'opérateur poussait le joystick quelques ms après
-// avoir appuyé — trop contraignant en pratique (le geste naturel "j'appuie PUIS je pousse" ratait
-// systématiquement la fenêtre d'un seul scan). Nouvelle séquence : appui (front) → maintien
-// DeadmanArmHoldTime (100 ms) → armé, quelle que soit la position des axes durant ce maintien.
-// Relâchement AVANT la fin du maintien = tentative annulée (DeadmanArmPending retombe), un
-// nouvel appui (front) est requis — pas d'armement différé "surprise" sur un appui prolongé après
-// un désarmement (mode/benne/neutre). Sûr même si le joystick est déjà hors zone morte à la fin
-// du maintien : les rampes d'accel/décel restent gérées par les FB aval (FB_Winch/FB_Translation,
-// cf. §"Rôle" en tête de fichier), donc pas de démarrage brutal possible côté ce FB.
+// Armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la position des axes pendant
+// l'appui : appui (front) → maintien 100 ms → armé, quelle que soit la position des axes durant
+// ce maintien. Relâchement AVANT la fin du maintien = tentative annulée (DeadmanArmPending
+// retombe), un nouvel appui (front) est requis — pas d'armement différé "surprise" sur un appui
+// prolongé après un désarmement (mode/benne/neutre). Sûr même si le joystick est déjà hors zone
+// morte à la fin du maintien : les rampes d'accel/décel restent gérées par les FB aval
+// (FB_Winch/FB_Translation), donc pas de démarrage brutal possible côté ce FB.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN
     DeadmanArmPending := TRUE;
@@ -894,7 +944,8 @@ Done := NOT Error;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Valeur brute (0..10000)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ENTRÉES MESURÉES &amp; CONFIGURATION ===
+--&gt; [HW]  Valeur brute potentiometre/Hall (0..10000)</xhtml>
               </documentation>
             </variable>
             <variable name="Neutral">
@@ -902,7 +953,7 @@ Done := NOT Error;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Point milieu calibré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Point milieu calibre (compte brut ADC)</xhtml>
               </documentation>
             </variable>
             <variable name="DeadbandRaw">
@@ -910,7 +961,7 @@ Done := NOT Error;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Zone morte en unités brutes (compte ADC, ex: 300 sur plage 0..10000)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Zone morte en unites brutes ADC (ex: 300)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -920,7 +971,8 @@ Done := NOT Error;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Valeur finale (-100.0..100.0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES CALCULÉES ===
+&lt;-- [STAT] Consigne d'axe mise a l'echelle (-100.0..+100.0 %)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -929,21 +981,21 @@ Done := NOT Error;
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC]  Amplitude utile de la demi-plage d'axe</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📐 FB_AxisScale — Mise à l'échelle d'un axe joystick Hall
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_AxisScale — Normalisation et zone morte d'un axe joystick
    ───────────────────────────────────────────────────────────────
-   📄 Extrait depuis le projet CODESYS (Device.export, JOYSTICK/)
-   🎯 Normalise une valeur brute (0..10000) par rapport au neutre calibré
-      et applique une zone morte en unités brutes (compte ADC, pas en %).
-   Sortie : OutPct ∈ [-100.0 .. +100.0] (0.0 si dans la deadband)
-   🔧 2026-08-07 (demande client) : Deadband (REAL, %) → DeadbandRaw (INT, compte brut 0..10000).
-      Raison : plus simple à régler directement depuis le bruit mesuré au neutre (ex: ±200 sur le
-      terrain → DeadbandRaw=300 avec marge), sans recalculer un % à chaque calibration.
-   ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md</xhtml>
+   🎯 Rôle : Normalise une valeur brute (0..10000) selon le neutre calibré
+             et applique une zone morte en unités brutes (compte ADC).
+   🛡️ Garde-fou : Saturation stricte de la consigne à +/-100.0 %.
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -994,7 +1046,8 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <simpleValue value="0.004" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de secours par défaut (ex. 4ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES DE SECOURS ===
+--&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1004,7 +1057,8 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé réel calculé (secondes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET DIAGNOSTIC ===
+&lt;-- [DIAG] Temps ecoule reel calcule (secondes)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1014,7 +1068,8 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps système actuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORLOGE ET MEMOIRE TEMPORELLE ===
+. [LOC] Temps systeme actuel</xhtml>
               </documentation>
             </variable>
             <variable name="TimeLast">
@@ -1022,7 +1077,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Empreinte de temps du cycle précédent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Empreinte de temps du cycle precedent</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaTimeMs">
@@ -1030,7 +1085,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart brut calculé (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut calcule (ms)</xhtml>
               </documentation>
             </variable>
             <variable name="InitDone">
@@ -1038,26 +1093,30 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau d'initialisation du premier cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation du premier cycle</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
-      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Acquisition temps"}
 // 1. ACQUISITION DU TEMPS SYSTÈME
 TimeCurrent := TIME();
+{endregion}
 
+{region "§2 Initialisation"}
 // 2. INITIALISATION UNIQUE AU PREMIER CYCLE
 IF NOT InitDone THEN
     TimeLast := TimeCurrent;
@@ -1065,19 +1124,26 @@ IF NOT InitDone THEN
     CycleTimeS := DefaultValueS;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Calcul delta"}
 // 3. CALCUL DU DELTA EN MILLISECONDES
 DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
 
+{region "§4 Conversion et secours"}
 // 4. CONVERSION ET CHARGE DE SECOURS
 IF DeltaTimeMs &gt; 0 THEN
     CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
     CycleTimeS := DefaultValueS;
 END_IF;
+{endregion}
 
+{region "§5 Archivage"}
 // 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
 TimeLast := TimeCurrent;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -1095,7 +1161,8 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Consigne brute entrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE &amp; CONFIGURATION ===
+--&gt; [CMD] Consigne d'axe brute a filtrer</xhtml>
               </documentation>
             </variable>
             <variable name="TimeConst">
@@ -1103,7 +1170,7 @@ TimeLast := TimeCurrent;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Constante de temps du filtre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Constante de temps du filtre (ex: T#200ms)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleTimeS">
@@ -1111,7 +1178,7 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Temps de cycle réel en secondes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de cycle reel de la tache en secondes (ex: 0.02)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1121,7 +1188,8 @@ TimeLast := TimeCurrent;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">/ Consigne filtrée sortie</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES LISSÉES ===
+&lt;-- [STAT] Consigne d'axe lissee par filtre PT1</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1130,23 +1198,28 @@ TimeLast := TimeCurrent;
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC]  Constante de temps convertie en secondes</xhtml>
+              </documentation>
             </variable>
             <variable name="Alpha">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Facteur d'attenuation du filtre exponentiel</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🔁 FB_Filter_PT1 — Filtre passe-bas premier ordre (PT1 numérique)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Filter_PT1 — Filtre passe-bas premier ordre (PT1 numérique)
    ───────────────────────────────────────────────────────────────
-   📄 Extrait depuis le projet CODESYS (Device.export, JOYSTICK/)
-   🎯 Filtre exponentiel discret : y[k] = α·x[k] + (1-α)·y[k-1]
-      où α = CycleTimeS / (T + CycleTimeS), T = TimeConst en secondes.
-   ⚠️ Si TimeConst = 0 ou CycleTimeS = 0, sortie = entrée (pass-through).
-   ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md</xhtml>
+   🎯 Rôle : Filtre exponentiel discret y[k] = a*x[k] + (1-a)*y[k-1]
+             avec a = CycleTimeS / (T + CycleTimeS). Pass-through si T=0 ou Cycle=0.
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.239418" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.239418">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:56:48.882624" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:56:48.882624">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = modèle actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = modèle actif</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -40,7 +40,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">+1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRefPct">
@@ -48,7 +48,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Magnitude commande 0..100 %, bornée avant calcul</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Magnitude commande 0..100 %, bornée avant calcul</xhtml>
               </documentation>
             </variable>
             <variable name="FullTravelTimeS">
@@ -59,7 +59,7 @@
                 <simpleValue value="8" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps complet Trémie→Maintenance à 100 %, simulation seulement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps complet Trémie→Maintenance à 100 %, simulation seulement</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -69,7 +69,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit4 du mot capteurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit4 du mot capteurs</xhtml>
               </documentation>
             </variable>
             <variable name="PosPV">
@@ -77,7 +77,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit3 du mot capteurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit3 du mot capteurs</xhtml>
               </documentation>
             </variable>
             <variable name="PosP2">
@@ -85,7 +85,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit2 du mot capteurs (point matériel PVP2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit2 du mot capteurs (point matériel PVP2)</xhtml>
               </documentation>
             </variable>
             <variable name="PosP1">
@@ -93,7 +93,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit1 du mot capteurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit1 du mot capteurs</xhtml>
               </documentation>
             </variable>
             <variable name="PosMaintenance">
@@ -101,7 +101,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit0 du mot capteurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bit0 du mot capteurs</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -110,24 +110,33 @@
               <type>
                 <derived name="FB_CycleTime" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mesure temps de cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="PositionProgress">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=Trémie ... 5=Maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0=Trémie ... 5=Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPctBounded">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse bornée</xhtml>
+              </documentation>
             </variable>
             <variable name="PositionIncrement">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Incrément de progression</xhtml>
+              </documentation>
             </variable>
             <variable name="Initialized">
               <type>
@@ -136,6 +145,9 @@
               <initialValue>
                 <simpleValue value="FALSE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation</xhtml>
+              </documentation>
             </variable>
             <variable name="CST_PositionAtTremie">
               <type>
@@ -219,6 +231,7 @@
 
 // === IMPLEMENTATION ===
 
+{region "§1 Gate"}
 IF NOT Enable THEN
     // Prochain démarrage déterministe sur P2, comme l'ancien modèle de banc.
     PositionProgress := CST_PositionAtP2;
@@ -230,12 +243,16 @@ IF NOT Enable THEN
     PosMaintenance := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Initialisation"}
 IF NOT Initialized THEN
     PositionProgress := CST_PositionAtP2;
     Initialized := TRUE;
 END_IF;
+{endregion}
 
+{region "§3 Progression"}
 instCycleTime(DefaultValueS := 0.010);
 SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
 
@@ -254,7 +271,9 @@ IF Direction = 1 THEN
 ELSIF Direction = -1 THEN
     PositionProgress := MIN(CST_PositionAtMaintenance, PositionProgress + PositionIncrement);
 END_IF;
+{endregion}
 
+{region "§4 Publication capteurs"}
 // Réinitialisation explicite : aucune valeur transitoire héritée d'une zone précédente.
 PosTremie := FALSE;
 PosPV := FALSE;
@@ -284,6 +303,7 @@ ELSIF PositionProgress &lt;= CST_PositionAtP1 THEN
 ELSIF PositionProgress &lt; CST_PositionAtMaintenance THEN
     PosMaintenance := TRUE;
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -304,7 +324,8 @@ END_IF;
                 <simpleValue value="0.004" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de secours par défaut (ex. 4ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES DE SECOURS ===
+--&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -314,7 +335,8 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps écoulé réel calculé (secondes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE ET DIAGNOSTIC ===
+&lt;-- [DIAG] Temps ecoule reel calcule (secondes)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -324,7 +346,8 @@ END_IF;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps système actuel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORLOGE ET MEMOIRE TEMPORELLE ===
+. [LOC] Temps systeme actuel</xhtml>
               </documentation>
             </variable>
             <variable name="TimeLast">
@@ -332,7 +355,7 @@ END_IF;
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Empreinte de temps du cycle précédent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Empreinte de temps du cycle precedent</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaTimeMs">
@@ -340,7 +363,7 @@ END_IF;
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart brut calculé (ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut calcule (ms)</xhtml>
               </documentation>
             </variable>
             <variable name="InitDone">
@@ -348,26 +371,30 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau d'initialisation du premier cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation du premier cycle</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⏱️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
-      (base de temps utilisée par FB_Filter_PT1, composé dans FB_Joystick)
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Acquisition temps"}
 // 1. ACQUISITION DU TEMPS SYSTÈME
 TimeCurrent := TIME();
+{endregion}
 
+{region "§2 Initialisation"}
 // 2. INITIALISATION UNIQUE AU PREMIER CYCLE
 IF NOT InitDone THEN
     TimeLast := TimeCurrent;
@@ -375,19 +402,26 @@ IF NOT InitDone THEN
     CycleTimeS := DefaultValueS;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Calcul delta"}
 // 3. CALCUL DU DELTA EN MILLISECONDES
 DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
 
+{region "§4 Conversion et secours"}
 // 4. CONVERSION ET CHARGE DE SECOURS
 IF DeltaTimeMs &gt; 0 THEN
     CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
 ELSE
     CycleTimeS := DefaultValueS;
 END_IF;
+{endregion}
 
+{region "§5 Archivage"}
 // 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
 TimeLast := TimeCurrent;
+{endregion}
 </xhtml>
           </ST>
         </body>

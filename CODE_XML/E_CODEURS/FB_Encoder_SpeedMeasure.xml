@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-11T18:19:14.754833" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-11T18:19:14.754833">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:34:05.347311" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:34:05.347311">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -32,7 +32,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorise l'acquisition</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -40,7 +41,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Purge immédiate de l'historique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Purge immediate de l'historique (front montant)</xhtml>
               </documentation>
             </variable>
             <variable name="Position_M">
@@ -48,7 +49,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble sûre en mètres</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE SURES EN ENTREE ===
+--&gt; [HW]  Position cable sure en metres (FB_Encoder_Safety)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionValid">
@@ -56,7 +58,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si la chaîne codeur garantit la position</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Validite de la chaine codeur</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -66,7 +68,8 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse absolue sur la fenêtre horodatée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSE CALCULÉE &amp; VALIDITE ===
+&lt;-- [DIAG] Vitesse absolue sur la fenetre glissante (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedSpeed_Mps">
@@ -74,7 +77,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée : positive montée, négative descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse signee (+ montee, - descente) (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="Valid">
@@ -82,35 +85,11 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE après 6 positions couvrant au moins 50 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse valide (6 ech. sur 50 ms)</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="WindowTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#50MS" />
-              </initialValue>
-            </variable>
-            <variable name="SamplePeriod">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#10MS" />
-              </initialValue>
-            </variable>
-            <variable name="SampleCount">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="6" />
-              </initialValue>
-            </variable>
             <variable name="Positions_M">
               <type>
                 <array>
@@ -120,6 +99,10 @@
                   </baseType>
                 </array>
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HISTORIQUE &amp; ECHANTILLONS ===
+. [LOC] Tableau des 6 positions enregistrees</xhtml>
+              </documentation>
             </variable>
             <variable name="Timestamps">
               <type>
@@ -130,57 +113,118 @@
                   </baseType>
                 </array>
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage associe aux 6 positions</xhtml>
+              </documentation>
             </variable>
             <variable name="CurrentTimestamp">
               <type>
                 <TIME />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORODATAGE &amp; TEMPORISATION ===
+. [LOC] Horodatage courant du cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="LastTimestamp">
               <type>
                 <TIME />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage de l'echantillon precedent</xhtml>
+              </documentation>
             </variable>
             <variable name="ElapsedSinceSample">
               <type>
                 <TIME />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps ecoule depuis le dernier echantillon</xhtml>
+              </documentation>
             </variable>
             <variable name="WindowElapsed">
               <type>
                 <TIME />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps total ecoule sur la fenetre de mesure</xhtml>
+              </documentation>
             </variable>
             <variable name="CollectedSamples">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEURS &amp; ETATS INTERNES ===
+. [LOC] Nombre d'echantillons collectes dans la fenetre</xhtml>
+              </documentation>
             </variable>
             <variable name="Index">
               <type>
                 <INT />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de boucle de decalage</xhtml>
+              </documentation>
             </variable>
             <variable name="TimestampInitialized">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur d'initialisation du premier horodatage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WindowTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES DE LA FENETRE GLISSANTE ===
+Fenetre glissante de mesure</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SamplePeriod">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#10MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Periode minimale entre deux echantillons</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total d'echantillons requis</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📐 FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §3.8
-   🛡️ Sécurité : mesure propriétaire de la chaîne codeur ; aucune réaction machine
-   🧩 Dépendances : position sûre fournie par FB_Encoder_Safety
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
+   🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
+{region "§1 Horodatage et purge"}
 // ⏱️ Horodatage natif : le calcul utilise le temps réellement écoulé, jamais un cycle supposé.
 CurrentTimestamp := TIME();
 
@@ -193,7 +237,9 @@ IF NOT Enable OR Reset OR NOT PositionValid THEN
     TimestampInitialized := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Première position"}
 // 🕒 Première position de la nouvelle fenêtre.
 IF NOT TimestampInitialized THEN
     Positions_M[0] := Position_M;
@@ -206,7 +252,9 @@ IF NOT TimestampInitialized THEN
     Valid := FALSE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§3 Rebouclage TIME"}
 // 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant (indépendant de T88).
 IF CurrentTimestamp &lt; LastTimestamp THEN
     Positions_M[0] := Position_M;
@@ -225,7 +273,9 @@ ElapsedSinceSample := CurrentTimestamp - LastTimestamp;
 IF ElapsedSinceSample &lt;= T#0MS THEN
     RETURN;
 END_IF;
+{endregion}
 
+{region "§4 Collecte échantillons"}
 // 📥 Six positions espacées d'au moins 10 ms donnent cinq intervalles sur la fenêtre interne de 50 ms.
 IF ElapsedSinceSample &gt;= SamplePeriod THEN
     LastTimestamp := CurrentTimestamp;
@@ -242,7 +292,9 @@ IF ElapsedSinceSample &gt;= SamplePeriod THEN
         Positions_M[5] := Position_M;
         Timestamps[5] := CurrentTimestamp;
     END_IF;
+{endregion}
 
+{region "§5 Calcul vitesse"}
     IF CollectedSamples = SampleCount THEN
         // 🛡️ Ordre temporel et durée minimale contrôlés avant toute conversion/division.
         IF Timestamps[5] &gt;= Timestamps[0] THEN
@@ -266,6 +318,7 @@ IF ElapsedSinceSample &gt;= SamplePeriod THEN
         END_IF;
     END_IF;
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>

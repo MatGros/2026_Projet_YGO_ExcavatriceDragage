@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.238840" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.238840">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:57:04.541394" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:57:04.541394">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -31,6 +31,9 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active la simulation</xhtml>
+              </documentation>
             </variable>
             <variable name="NeutralRaw">
               <type>
@@ -39,6 +42,9 @@
               <initialValue>
                 <simpleValue value="5000" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute au repos</xhtml>
+              </documentation>
             </variable>
             <variable name="MaxRaw">
               <type>
@@ -47,6 +53,9 @@
               <initialValue>
                 <simpleValue value="10000" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur brute à fond</xhtml>
+              </documentation>
             </variable>
           </inputVars>
           <outputVars>
@@ -55,7 +64,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Forçable en instance CODESYS (repos = NeutralRaw)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Forçable en instance CODESYS (repos = NeutralRaw)</xhtml>
               </documentation>
             </variable>
             <variable name="RawY">
@@ -63,7 +72,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Forçable en instance CODESYS (repos = NeutralRaw)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Forçable en instance CODESYS (repos = NeutralRaw)</xhtml>
               </documentation>
             </variable>
             <variable name="RawButton">
@@ -71,7 +80,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Forçable en instance CODESYS (repos = FALSE)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Forçable en instance CODESYS (repos = FALSE)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -83,6 +92,9 @@
               <initialValue>
                 <simpleValue value="TRUE" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation au neutre</xhtml>
+              </documentation>
             </variable>
           </localVars>
           <documentation>
@@ -98,8 +110,8 @@
       de `FB_Joystick` reste pleinement actif et doit toujours être "actionné"
       (forcer `RawButton` en instance CODESYS) pour armer — comportement
       métier testé pour de vrai, pas contourné.
-   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal) — 🔧 REX
-      2026-07-08 : granularité séparée du bus CANopen (BusJoystickIsReal, voir GVL_Simulation)
+   📥 Enable        : simulation active (SimulationModeActive AND NOT BusJoystickSignalIsReal) — granularité
+       séparée du bus CANopen (BusJoystickIsReal, voir GVL_Simulation)
    📥 NeutralRaw    : valeur brute simulée au repos (voir GVL_Simulation.TstJoystickForceNeutralRaw)
    📥 MaxRaw        : valeur brute simulée à fond (voir GVL_Simulation.TstJoystickForceMaxRaw)
    📤 RawX/RawY     : forçables en instance CODESYS (par défaut = NeutralRaw, repos)
@@ -117,6 +129,7 @@
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Joystick) ===
 
+{region "§1 Gate"}
 // 🔑 Initialise au neutre au premier cycle uniquement — ensuite RawX/RawY/RawButton
 // restent forçables librement en instance CODESYS (un Force n'est jamais écrasé par TRUE,
 // mais une simple écriture cyclique l'écraserait — donc pas de ré-assignation continue ici).
@@ -124,13 +137,16 @@ IF NOT Enable THEN
     FirstCycle := TRUE;
     RETURN;
 END_IF;
+{endregion}
 
+{region "§2 Initialisation neutre"}
 IF FirstCycle THEN
     RawX := NeutralRaw;
     RawY := NeutralRaw;
     RawButton := FALSE;
     FirstCycle := FALSE;
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>

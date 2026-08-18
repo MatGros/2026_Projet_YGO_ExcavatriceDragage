@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.219674" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.219674">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:28:53.859754" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:28:53.859754">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -131,16 +131,13 @@
           </data>
         </addData>
         <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
    ───────────────────────────────────────────────────────────────
-    📄 Doc métier : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §3,
-                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
-   Utilisé par FB_Brake (frein) et FB_Winch (contacteurs de sens) pour
-   détecter un collage / une absence de fermeture d'un contacteur de
-   puissance, au-delà d'un délai de cohérence (FeedbackTimeout du FB
-   appelant).
-   ═══════════════════════════════════════════════════════════════</xhtml>
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
@@ -153,7 +150,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contexte général (comme tout FB) — FALSE = frein collé (sûr)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD]  Autorisation generale (FALSE = frein colle)</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -161,7 +159,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Acquittement defaut (front)</xhtml>
               </documentation>
             </variable>
             <variable name="MovementRequested">
@@ -169,7 +167,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = FB_Winch demande un mouvement (sens+palier actifs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Demande de mouvement (sens+palier actifs)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorFeedback">
@@ -177,7 +175,16 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein (`PRG_02_Acquisition.HwIn`) : TRUE = frein OUVERT (desserré)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MATERIELS &amp; SIMULATION ===
+--&gt; [HW]   Retour contacteur frein (TRUE = relache/ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassContactorCheck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST]  Bypass controle contacteur (simu)</xhtml>
               </documentation>
             </variable>
             <variable name="DelayContactClose">
@@ -188,10 +195,8 @@
                 <simpleValue value="TIME#100ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-08-03 : même sens que BrakeCmd (TRUE = relâché)
-→ en marche normale les deux sont ÉGAUX ; c'est leur
-DIFFÉRENCE qui trahit un contacteur collé (voir §4).
-Temps de fermeture contacteur de puissance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS ET REGLAGES ===
+--&gt; [CFG]  Temps de fermeture contacteur de puissance</xhtml>
               </documentation>
             </variable>
             <variable name="DelayMagnetise">
@@ -202,7 +207,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#300ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai magnétisation moteur avant ouverture frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai magnetisation moteur avant ouverture frein</xhtml>
               </documentation>
             </variable>
             <variable name="DelayMotorDecel">
@@ -213,7 +218,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai décélération/ouverture contacteur avant collage frein</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai deceleration avant collage frein</xhtml>
               </documentation>
             </variable>
             <variable name="FeedbackTimeout">
@@ -224,15 +229,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <simpleValue value="TIME#1s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai max cohérence commande/retour frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassContactorCheck">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 TRUE = désactive StuckClosed/StuckOpen (axe simulé,</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai max coherence commande/retour frein</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -241,46 +238,66 @@ Temps de fermeture contacteur de puissance</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DERIVATION ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence temporisee en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Frein ouvert/relache confirme</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut actif sur le frein</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Défaut engagement frein" - incohérence commande/retour frein (collage ou non-relâche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de defauts (bit0: incoherence retour)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat operationnel courant</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat memorise lors du defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="BrakeCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande sortie bobine frein : TRUE = relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONFIRMATIONS ===
+&lt;-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCommandOpenConfirmed">
@@ -288,7 +305,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = frein ouvert = commande ouverture confirmée (même sens que ContactorFeedback)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Confirmation ouverture frein pour verrous</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorCheck">
@@ -296,7 +313,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="ST_ContactorCheck" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag détaillé (IHM / FB_Safety_Winch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostic detaille retour contacteur</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -305,18 +322,25 @@ Temps de fermeture contacteur de puissance</xhtml>
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TRIGGERS ET DETECTION FRONTS ===
+. [LOC]  Detecteur front acquittement</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Detecteur front apparition defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔑 REX 2026-07-24 : Front montant activation bypass pour réarmement immédiat</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Detecteur front activation bypass</xhtml>
               </documentation>
             </variable>
             <variable name="TonMagnetise">
@@ -324,7 +348,8 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation avant relâche</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
+. [LOC]  Temporisation avant relachement frein</xhtml>
               </documentation>
             </variable>
             <variable name="TonDecel">
@@ -332,7 +357,7 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temporisation avant collage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Temporisation avant collage frein</xhtml>
               </documentation>
             </variable>
             <variable name="TonFeedback">
@@ -340,41 +365,26 @@ Temps de fermeture contacteur de puissance</xhtml>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout cohérence commande/retour</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Timeout de coherence commande/retour</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛑 FB_Brake — Séquence frein à manque de courant (temps physiques)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🛡️ FB_Brake — Séquence frein à manque de courant (temps physiques)
    ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Gestion temporisée ouverture/fermeture frein à manque de courant
+   🔒 Polarité : Sécurité positive (BrakeCmd=FALSE = frein collé au repos)
+   🔌 Interface : Double vérification retour contacteur (ST_ContactorCheck)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §3
-                   (règles issues de DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §4)
-   🛠️ Frein à manque de courant : colle au repos (sécurité positive).
-   📥 MovementRequested : mouvement demandé par FB_Winch (sens+palier &gt; 0)
-   📤 BrakeCmd          : commande bobine frein — TRUE = relâché (alimenté)
-   ⏱️ Séquence démarrage : attend fermeture contacteur + magnétisation
-      moteur AVANT de relâcher (sinon charge retombe → à-coup).
-   ⏱️ Séquence arrêt     : attend décélération/ouverture contacteur AVANT
-      de coller (sinon usure/casse mécanique en plein mouvement).
-   🔍 Double vérification retour contacteur bobine (ST_ContactorCheck) :
-      incohérence commande/retour au-delà de FeedbackTimeout → ErrorId.
-   🆕 REX 2026-08-03 (révocation 2026-07-26) : le retour câblé est l'image du CONTACTEUR DE COMMANDE
-      (DI = 1 ⟺ frein ouvert). Plus d'inversion à la frontière : ce FB reçoit maintenant un
-      signal dans le MÊME sens que `BrakeCmd` en marche saine (TRUE = relâché = ouvert) → le test d'incohérence est `&lt;&gt;`, pas `=`.
-      ⚠️ Ce retour n'est PAS une mesure du frein : il détecte un contacteur/bobine défaillant, mais
-      pas un frein usé ou qui patine. Le patinage reste couvert par Méca A (dérive codeur,
-      FB_Safety_Winch bit7) — pas par ce bloc.
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_Brake) ===</xhtml>
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Brake) ===
-
+{region "§1 Gate"}
 // 🛑 1. GATE — pas d'Enable = frein collé (sécurité positive), aucune temporisation en cours
 IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
@@ -386,11 +396,15 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
+{endregion}
 
+{region "§2 Reset et fronts"}
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
 BypassEdge(CLK := BypassContactorCheck);
+{endregion}
 
+{region "§3 Séquence temporisée"}
 // 🛠️ 3. SÉQUENCE TEMPORISÉE (démarrage vs arrêt)
 IF MovementRequested THEN
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
@@ -403,7 +417,7 @@ IF MovementRequested THEN
         State := E_State.BUSY;
     END_IF;
 ELSE
-    // 🆕 REX 2026-07-08 : Sécurité positive - fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
+    // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
@@ -412,15 +426,16 @@ END_IF;
 
 Busy := (State = E_State.BUSY);
 Done := (State = E_State.DONE);
+{endregion}
 
+{region "§4 Double vérification contacteur"}
 // 🔍 4. DOUBLE VÉRIFICATION RETOUR CONTACTEUR (ST_ContactorCheck)
 ContactorCheck.Command := BrakeCmd;
 ContactorCheck.Feedback := ContactorFeedback;
 
-// 🆕 REX 2026-08-03 (révocation 2026-07-26) : `ContactorFeedback` est maintenant dans le MÊME sens
-// que `BrakeCmd` (TRUE = relâché = frein ouvert). En marche saine les deux sont ÉGAUX → c'est leur
-// DIFFÉRENCE qui signale l'incohérence (contacteur collé).
-// ⚠️ Le test repasse en `&lt;&gt;` (retour à la logique d'origine pré-2026-07-26).
+// ContactorFeedback est dans le MÊME sens que BrakeCmd (TRUE = relâché = frein ouvert).
+// En marche saine les deux sont ÉGAUX → c'est leur DIFFÉRENCE qui signale l'incohérence
+// (contacteur collé). Le test compare donc `&lt;&gt;`.
 TonFeedback(IN := (BrakeCmd &lt;&gt; ContactorFeedback), PT := FeedbackTimeout);
 IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
@@ -441,24 +456,32 @@ ELSE
     END_IF;
 END_IF;
 
+{endregion}
+
+{region "§5 Arbitrage error"}
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
 IF ErrorEdge.Q THEN
     StateAtError := State;
 END_IF;
+{endregion}
 
+{region "§6 Sortie sûre"}
 // 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
 IF Error THEN
     BrakeCmd := FALSE;
 END_IF;
+{endregion}
 
+{region "§7 Confirmation ouverture"}
 // 📤 7. CONFIRMATION OUVERTURE FREIN (même sens que ContactorFeedback, ou image de BrakeCmd si BypassContactorCheck=TRUE)
 IF BypassContactorCheck THEN
     BrakeCommandOpenConfirmed := BrakeCmd;
 ELSE
     BrakeCommandOpenConfirmed := ContactorFeedback;  (* TRUE = frein ouvert = desserrage confirmé *)
 END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>

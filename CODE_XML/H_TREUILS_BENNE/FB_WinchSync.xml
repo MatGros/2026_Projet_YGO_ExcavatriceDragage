@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.268688" />
-  <contentHeader name="v0.6.04_CycleSemiAuto.project" modificationDateTime="2026-08-17T05:53:47.268688">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:36:25.683983" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:36:25.683983">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -16,7 +16,7 @@
     <addData>
       <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
         <ProjectInformation>
-          <property name="Project" type="string">v0.6.04_CycleSemiAuto</property>
+          <property name="Project" type="string">Generated</property>
         </ProjectInformation>
       </data>
     </addData>
@@ -149,7 +149,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard — Partie5 §2 : FB_WinchSync.Enable := SyncEnable (câblage PRG_MAIN)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD] Validation surveillance globale</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -157,15 +158,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Acquittement défaut (front)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Standard</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -173,39 +166,7 @@
                 <derived name="E_Mode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Arbitre SyncActive (voir en-tête)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM1">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Scale M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM2">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Scale M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomedM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Homing M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomedM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie FB_Encoder_Homing M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant pour arbitrage SyncActive</xhtml>
               </documentation>
             </variable>
             <variable name="SyncEnable">
@@ -213,7 +174,49 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 REX 2026-07-08 : ex-OverrideSync inversé — Sortie FB_Modes, TRUE=synchro voulue</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation utilisateur synchro</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SECOURS ET HARDWARE ===
+--&gt; [SAFE] Puissance contacteur ligne engagee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM1">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET ETATS CODEURS ===
+--&gt; [HW] Position cable treuil M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position cable treuil M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuil M1 reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuil M2 reference</xhtml>
               </documentation>
             </variable>
             <variable name="CfgSyncToleranceM">
@@ -224,7 +227,8 @@
                 <simpleValue value="0.1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">RETAIN site (PRG_MAIN) — écart max toléré avant SyncWarn</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
+--&gt; [CFG] Ecart max tolere avant alerte (m)</xhtml>
               </documentation>
             </variable>
             <variable name="ActiveOffsetM">
@@ -235,7 +239,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 Offset cible appliqué (ex: benne fermé/ouvert)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Offset cible applique (ex: benne)</xhtml>
               </documentation>
             </variable>
             <variable name="RelayFwdM1">
@@ -243,63 +247,97 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Signaux de commande réels des treuils (pour contrôle de cohérence)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET FEEDBACKS ACTIONS ===
+--&gt; [HW] Feedback/Ordre montee M1</xhtml>
               </documentation>
             </variable>
             <variable name="RelayFwdM2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre montee M2</xhtml>
+              </documentation>
             </variable>
             <variable name="RelayRevM1">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre descente M1</xhtml>
+              </documentation>
             </variable>
             <variable name="RelayRevM2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre descente M2</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor1_M1">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 1 M1</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor1_M2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 1 M2</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor2_M1">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 2 M1</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor2_M2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 2 M2</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor3_M1">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 3 M1</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor3_M2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 3 M2</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor4_M1">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M1</xhtml>
+              </documentation>
             </variable>
             <variable name="Contactor4_M2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M2</xhtml>
+              </documentation>
             </variable>
             <variable name="BypassGlobal">
               <type>
@@ -309,7 +347,8 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global : force ErrorId = 0, ignore toute erreur de synchro</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASSES ET SIMULATION ===
+--&gt; [TST] Force ErrorId=0 global</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -318,46 +357,66 @@
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC ET SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
             </variable>
             <variable name="Busy">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement en cours</xhtml>
+              </documentation>
             </variable>
             <variable name="Done">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
+              </documentation>
             </variable>
             <variable name="Error">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit0: "Écart synchronisme trop important" - écart hors tolérance (SyncActive uniquement) ; bit1: "Incohérence commande synchro" - incohérence de commande (sens/paliers différents)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0: ecart, bit1: incoherence)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat FB</xhtml>
+              </documentation>
             </variable>
             <variable name="StateAtError">
               <type>
                 <derived name="E_State" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+              </documentation>
             </variable>
             <variable name="DeltaPosM">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">|CablePosM1 - CablePosM2|, 0.0 si pas les 2 homés</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET DIAGNOSTICS DE SYNCHRO ===
+&lt;-- [DIAG] Ecart absolu position |M1 - M2| (m)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedDeltaPosM">
@@ -365,7 +424,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (5) : signé, &gt; 0 = M1 plus haut que M2 — pour arbitrage directionnel PRG_06</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart signe position (M1 - M2) (m)</xhtml>
               </documentation>
             </variable>
             <variable name="SyncActive">
@@ -373,7 +432,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Surveillance imposée/activable selon Mode (voir en-tête)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut synchro active selon mode</xhtml>
               </documentation>
             </variable>
             <variable name="SyncWarn">
@@ -381,7 +440,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Avertissement IHM uniquement (Partie5 §6) — PAS de SafeStop</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Avertissement IHM ecart tolere depasse</xhtml>
               </documentation>
             </variable>
             <variable name="SyncDegradedStep1">
@@ -389,7 +448,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 2026-08-15 (T113) : Écart modéré actif -&gt; force le Palier 1 sur les 2 treuils</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Forcage palier 1 sur ecart modere</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -398,18 +457,17 @@
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
             </variable>
             <variable name="ErrorEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
-            </variable>
-            <variable name="MismatchActive">
-              <type>
-                <BOOL />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Indique une discordance active de commande</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Erreur</xhtml>
               </documentation>
             </variable>
             <variable name="MismatchTimer">
@@ -417,15 +475,7 @@
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 Filtre temporel pour éviter les faux déclenchements transitoires</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeviationActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (5) : écart hors tolérance actif (avant filtre)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo filtrage incoherence commande</xhtml>
               </documentation>
             </variable>
             <variable name="DeviationTimer">
@@ -433,46 +483,36 @@
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🆕 REX 2026-07-08 (5) : filtre temporel bit0, même pattern que MismatchTimer</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo filtrage transitoire ecart</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Discordance commande active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeviationActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart position hors tolerance actif</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚖️ FB_WinchSync — Surveillance d'écart M1/M2 (M1: moteur de retenue, M2: moteur Benne — squelette liaisons — pas de correction)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚖️ FB_WinchSync — Surveillance de synchro M1/M2 (sans correction)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md §9
-   🔌 FB STANDARD (Partie3 §1bis) : pas un FB de mouvement, pas de StartStop/SafeStop —
-      1 seule instance (surveille les 2 treuils, pas 1 par treuil comme FB_Safety_Winch).
-   🎯 PÉRIMÈTRE CE LOT (squelette de liaisons, décisions Partie9 §9 déjà actées) :
-      - Calcule `DeltaPosM = |CablePosM1 - CablePosM2|` (fiable seulement si les 2 treuils
-        sont homés — sinon 0.0, pas de comparaison).
-      - `SyncActive` selon `Mode` : MAINT_N1 = imposée (non désactivable, sécurité
-        maintenue) ; MAINT_N2 = activable/désactivable via `SyncEnable` (FB_Modes, 🔧 REX
-        2026-07-08 : ex-`OverrideSync` inversé) ; MANUEL/SEMI_AUTO = active par défaut.
-      - `SyncWarn` = AVERTISSEMENT IHM SEULEMENT (Partie5 §6, comme `SyncWarn`/
-        `ForceImbalance` cités en exemple) — **PAS de SafeStop** : aucune correction de
-        vitesse n'existe aujourd'hui côté FB_Winch (pas d'entrée dédiée), donc rien à
-        piloter automatiquement ce lot. Surveillance visuelle opérateur en attendant.
-   🔴 HORS PÉRIMÈTRE CE LOT : régulation/correction active de l'écart (nécessiterait une
-      entrée de correction sur FB_Winch, pas encore conçue) — squelette de surveillance
-      uniquement, comme demandé (« même s'il n'est pas complet à l'intérieur »).
-
-   🔧 REX 2026-07-08 (5) — incident terrain : écart mineur transitoire (0.24m, mécanique,
-      coast-down différentiel M1/M2 à l'arrêt réel — normal et inévitable) déclenchait bit0
-      et bloquait le mouvement dans les DEUX sens (régression, déblocage possible seulement
-      via Reset+MAINT_N2+SyncEnable=FALSE). Root cause : phénomène mécanique, pas un bug du
-      couplage croisé logiciel (bit1). Deux correctifs :
-      1) `SignedDeltaPosM` (nouvelle sortie, calculé AVANT le ABS() de `DeltaPosM`) : signe
-         positif = M1 "plus haut" que M2, négatif = M2 plus haut. Consommé par PRG_06 pour
-         arbitrer DIRECTIONNELLEMENT le blocage bit0 — seul le sens qui AGGRAVE l'écart reste
-         bloqué, l'autre sens (qui le réduit) reste autorisé. Méca E (FB_Safety_Winch, écart
-         critique 2.0m) et bit1 restent le filet réel si l'écart continue de dériver.
-      2) Filtre temporel `DeviationTimer` (même pattern que `MismatchTimer` bit1) sur bit0,
-         800ms 🔧 théorique à ajuster sur site — absorbe le transitoire mécanique normal
-         d'arrêt (~900ms de temporisations frein cumulées M1+M2).
-   ═══════════════════════════════════════════════════════════════
-=== DECLARATION (à coller dans la partie déclaration du POU FB_WinchSync) ===</xhtml>
+   🎯 Rôle : Calcul d'écart de position entre M1 et M2 et contrôle de cohérence
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : FB standard de surveillance transverse (1 instance)
+   🔒 Sécurité : Génération d'avertissement et détection de discordances
+   =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -481,7 +521,7 @@
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
@@ -497,7 +537,7 @@ END_IF;
 
 {endregion}
 
-{region "Initialisation et activation synchro"}
+{region "§2 Initialisation et activation synchro"}
 Ready := TRUE;
 State := E_State.READY;
 
@@ -509,19 +549,19 @@ IF BypassGlobal THEN
     ErrorId := 16#0000;
 END_IF;
 
-// 🎚️ 3. SyncActive SELON MODE (Partie9 §9, décisions actées 2026-07-02)
+// 🎚️ 3. SyncActive SELON MODE (Partie9 §9)
 CASE Mode OF
     E_Mode.MAINT_N1:
         SyncActive := TRUE;                  // Imposée, non désactivable (sécurité maintenue N1)
     E_Mode.MAINT_N2:
-        SyncActive := SyncEnable;             // 🔧 REX 2026-07-08 : ex-NOT OverrideSync, polarité déjà positive
+        SyncActive := SyncEnable;             // Polarité positive (TRUE = synchro active)
     ELSE
         SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
 END_CASE;
 
 {endregion}
 
-{region "Calcul ecart position"}
+{region "§3 Calcul ecart position"}
 // 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
 IF HomedM1 AND HomedM2 THEN
     SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
@@ -533,17 +573,16 @@ END_IF;
 
 {endregion}
 
-{region "Surveillance synchronisme"}
+{region "§4 Surveillance synchronisme"}
 // 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
 IF NOT BypassGlobal THEN
 
 // 🔍 5. DÉTECTION ÉCART HORS TOLÉRANCE — bit0
-// 🔧 REX 2026-07-08 (5) : filtre temporel (même pattern que MismatchTimer bit1) — absorbe le
-// transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2), évite le blocage
-// intempestif constaté sur incident terrain (0.24m transitoire).
-// 🆕 2026-08-15 (T113) : Si écart &gt; CfgSyncToleranceM -&gt; alarme d'écart (SyncWarn / bit0) et
-// dégradation en vitesse lente Palier 1 (SyncDegradedStep1). L'arrêt brutal SafeStop est
-// réservé à l'écart critique Méca E (&gt; CriticalSyncToleranceM).
+// Filtre temporel (même pattern que MismatchTimer bit1) — absorbe le transitoire mécanique
+// normal d'arrêt (coast-down différentiel M1/M2), évite le blocage intempestif.
+// Si écart &gt; CfgSyncToleranceM -&gt; alarme d'écart (SyncWarn / bit0) et dégradation en vitesse
+// lente Palier 1 (SyncDegradedStep1). L'arrêt brutal SafeStop est réservé à l'écart critique
+// Méca E (&gt; CriticalSyncToleranceM).
 DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM &gt; CfgSyncToleranceM);
 DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
 IF DeviationTimer.Q THEN
@@ -581,7 +620,7 @@ END_IF; // fin IF NOT BypassGlobal
 
 {endregion}
 
-{region "Etats et diagnostic"}
+{region "§5 Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
 Error := (ErrorId &lt;&gt; 16#0000);
 ErrorEdge(CLK := Error);
