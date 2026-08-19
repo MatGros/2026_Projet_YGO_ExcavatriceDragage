@@ -158,12 +158,12 @@
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode pilotage unitaire M2 "sécurisé" -- actif
 uniquement en SelJoystickWinch=2 (unitaire M2). Si TRUE : borne le déplacement entre les
 positions ouvert/fermé configurées (OffsetOpenM/OffsetCloseM relatif à M1, mêmes bornes que
 FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
 CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
-(18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
+Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -187,7 +187,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <derived name="ST_BucketState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...) — ex-champ "State", renommé pour éviter collision de nom avec ce sous-struct</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...)</xhtml>
               </documentation>
             </variable>
             <variable name="FBState">
@@ -383,8 +383,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>

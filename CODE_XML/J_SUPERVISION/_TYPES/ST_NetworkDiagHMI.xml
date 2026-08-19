@@ -201,8 +201,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>

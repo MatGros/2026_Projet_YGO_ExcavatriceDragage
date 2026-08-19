@@ -7,9 +7,7 @@
       du métier machine.
    🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
       réellement, à partir des relais de sens commandés et de la vitesse rampée
-      courante. Extraction PURE de la logique déjà en place dans
-      `PRG_02_Encoders.st` (bloc "SIMULATION SUR BANC DE TEST") — aucun
-      changement de comportement, juste la dissociation en FB dédié.
+      courante.
    📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
    📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
    📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
@@ -20,11 +18,10 @@
       d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
-   `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+   `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
       (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
       `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
-      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate) —
-      il fallait donc bien du PERSISTENT RETAIN réel, regroupé avec le reste dans GVL_PERSISTENT.
+      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate).
    ═══════════════════════════════════════════════════════════════ *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===

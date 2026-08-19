@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🌐 ST_CommunHMI — Données d'échange IHM COMMUNES (pas propres à un axe)
    ───────────────────────────────────────────────────────────────
-   (demande utilisateur) : regroupe les signaux qui ne concernent
+   Regroupe les signaux qui ne concernent
    PAS un axe/mécanisme en particulier (1 seul capteur/signal partagé par toute la
    machine) — évite de les dupliquer ou de les laisser en variables isolées
    directement dans GVL_IHM. Exemple : TopPositionSensorActive (capteur unique,
@@ -23,9 +23,7 @@ STRUCT
     (* Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)) *)
     Bypass : ST_BypassCommun;    (* : granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04 *)
 
-    (* 🩺 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
-       (etaient ecrits par erreur dans Bypass.SlackCable/TopPositionSensor avant ce lot, ce qui
-       empechait ces champs de servir de vrai bypass RETAIN operateur). *)
+    (* 🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur *)
     SimTopSensorBypassActive  : BOOL; (* 🩺 Capteur haut ignore car simulation active *)
     SimSlackCableBypassActive : BOOL; (* 🩺 Mou de cable ignore car simulation active *)
 
@@ -40,16 +38,16 @@ STRUCT
     BtnWinchBothUp     : BOOL; (* ⬆️ Monte les 2 treuils simultanément *)
     BtnWinchBothDown   : BOOL; (* ⬇️ Descend les 2 treuils simultanément *)
 
-    // FIX : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
+    // Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
     // struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
     // (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
     ConfigRestoredFromPersistent : BOOL; (* ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier *)
     BtnAckConfigRestored         : BOOL; (* 🔘 IHM→PLC : acquittement opérateur (front) *)
 
     Preflight : ST_PreflightHMI; (* 🩺 Verdict observateur à l'arrêt — jamais bloquant *)
-    WinchSymmetry : ST_WinchSymmetryHMI; (* ⚖️ MES-008 : mesures passives M1/M2 *)
+    WinchSymmetry : ST_WinchSymmetryHMI; (* ⚖️ Mesures passives M1/M2 *)
 
-    (* 🩺 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal) *)
+    (* 🩺 Diagnostic arrêt auto descente Kobold (pilotage normal) *)
     KoboldImmersionConfirmed : BOOL; (* Front Kobold confirmé dans la fenêtre d'immersion *)
     KoboldBottomTouchLatched : BOOL; (* Fond détecté, descente bloquée (DescendPermitM1/M2_Raw) *)
 END_STRUCT

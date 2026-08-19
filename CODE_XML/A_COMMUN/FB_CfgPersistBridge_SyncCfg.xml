@@ -45,7 +45,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot, ex-CfgInitialized renommé pour cohérence avec ST_WinchCfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (config restaurée depuis GVL_PERSISTENT)</xhtml>
               </documentation>
             </variable>
           </struct>

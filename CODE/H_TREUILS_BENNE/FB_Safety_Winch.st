@@ -133,8 +133,7 @@ IF NOT Enable THEN
     State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
-    // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement identique à l'ancien
-    // MecaA_Armed/MecaC_Armed := FALSE.
+    // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
     TonMecaB(IN := FALSE);
@@ -168,7 +167,7 @@ END_IF;
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
 
-// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+// 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
     ErrorId := 16#0000;
@@ -238,7 +237,7 @@ IF NOT BypassGlobal THEN
     END_IF;
 
 // 🔍 3bis. PERTE CODEUR DE CE TREUIL
-// 🔧 WINCH-CORE-01 : le fonctionnement sans codeur reste interdit par défaut.
+// Le fonctionnement sans codeur reste interdit par défaut.
 // Le bypass est individuel, maintenu consciemment depuis l'IHM et strictement limité à MAINT_N2.
 // Il ne masque aucun autre défaut du treuil et n'agit jamais sur l'autre instance.
 EncoderAvailableEffective := EncoderAvailable
@@ -296,9 +295,8 @@ END_IF;
 // 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR — bit8
 // Indépendant de FB_Winch (défense en profondeur). Perte CAN (bit0) OU joystick au neutre ;
 // si les contacteurs OU LE FREIN ne confirment pas être retombés/serrés dans PostRampTimeout, défaut.
-// BrakeFeedback ajouté — un frein qui ne confirme pas son engagement dans ce délai est tout
-// aussi dangereux qu'un contacteur qui ne retombe pas (risque de mouvement/roue libre non
-// détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
+// Un frein qui ne confirme pas son engagement dans ce délai est tout aussi dangereux qu'un
+// contacteur qui ne retombe pas (risque de mouvement/roue libre non détecté).
 MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
                        OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
 TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
@@ -313,7 +311,7 @@ END_IF;
 // Armé UNIQUEMENT pour l'instance M1 (BenneHoldStillActive câblé sur instBucket.Busy côté M1
 // seulement, toujours FALSE côté M2). Tolérance plus large que celle de FB_Bucket (1.0 m) —
 // n'intervient que si la couche Benne (SafeStop M1 seul) n'a pas suffi.
-// Dérive factorisée via FB_DriftGuard — comportement inchangé.
+// Dérive surveillée via FB_DriftGuard.
 DriftGuardC(
     Arm        := NOT (BypassSafety OR BypassMecaC) AND BenneHoldStillActive,
     PositionM  := CablePosM,
@@ -341,8 +339,8 @@ END_IF;
 // Complète le bit5 (AscentPermit immédiat) : arme la MÊME condition (capteur haut atteint, hors
 // homing) mais avec un délai de confirmation, comme Méca B. Si les contacteurs ET le frein ne
 // confirment pas être retombés/serrés dans PostRampTimeout après l'arrivée au capteur → défaut
-// → SafeStop ET PowerCutOff (la coupure AscentPermit seule n'a visiblement pas suffi à arrêter
-// réellement le treuil : roue libre ou contacteur/frein défaillant).
+// → SafeStop ET PowerCutOff (la coupure AscentPermit seule ne suffit pas à arrêter réellement
+// le treuil : roue libre ou contacteur/frein défaillant).
 TonMecaD(
     IN := NOT (BypassSafety OR BypassMecaD) AND ((((NOT TopPositionSensor AND NOT InReferencingMode) 
             OR (Homed AND NOT HomingSuspect AND (CablePosM >= (TopLimitM + 0.10))))
@@ -446,18 +444,17 @@ AscentPermit := NOT (
     OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM)) AND NOT BypassTopLimitSoftware)
 );
 
-// PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
+// PowerCutOff — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
 // SafeStop seul ne sert à rien dans ces 3 cas précis.
-// bit2 (surchauffe/perte thermique MOTEUR) et bit10 (surchauffe/perte thermique FREIN commun)
-// ajoutés — un frein à manque de courant peut coller instantanément sur perte de son retour
-// thermique : une rampe SafeStop seule ne protège pas la mécanique dans ce cas, coupure puissance
-// immédiate nécessaire. Même raisonnement appliqué au thermique moteur par cohérence/défense en
-// profondeur.
-// bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B : contacteurs/frein déjà
-// censés être coupés (AscentPermit immédiat sur capteur), une confirmation manquante après délai
-// signifie que la coupure locale n'a pas suffi.
-// bit13 (Méca E escalade) ajouté — PAS bit12 seul (détection immédiate = SafeStop uniquement ;
+// bit2 (surchauffe/perte thermique MOTEUR) et bit10 (surchauffe/perte thermique FREIN commun) :
+// un frein à manque de courant peut coller instantanément sur perte de son retour thermique ;
+// une rampe SafeStop seule ne protège pas la mécanique dans ce cas, coupure puissance immédiate
+// nécessaire. Même raisonnement appliqué au thermique moteur par cohérence/défense en profondeur.
+// bit11 (Méca D, capteur haut) : même raisonnement que Méca A/B — contacteurs/frein déjà censés
+// être coupés (AscentPermit immédiat sur capteur), une confirmation manquante après délai signifie
+// que la coupure locale n'a pas suffi.
+// bit13 (Méca E escalade) : PAS bit12 seul (détection immédiate = SafeStop uniquement ;
 // PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
 PowerCutOff := (ErrorId AND 16#2F84) <> 16#0000;
 

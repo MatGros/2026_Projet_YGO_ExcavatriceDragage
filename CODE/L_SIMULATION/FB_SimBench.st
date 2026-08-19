@@ -2,7 +2,6 @@
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
-   📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)
@@ -15,7 +14,7 @@
    
    🔴 RÈGLES SÉCURITÉ ET POLARITÉ :
       - Modèle frein M1/M2/M3 : M1_BrakeIsOpen_DI := M1_BrakeCmd (1 = OUVERT).
-        Ne JAMAIS faire NOT BrakeCmd ! (P1 Lot L6).
+        Ne JAMAIS faire NOT BrakeCmd !
       - Retours contacteurs M1/M2 : 1 = tous retombés (TRUE quand RelayFwd=0 et RelayRev=0).
    ═══════════════════════════════════════════════════════════════ *)
 
@@ -83,10 +82,8 @@ END_VAR
 
 VAR_OUTPUT
     (* Sorties d'état du profil AF_Partie-03 §2.
-       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung (confirmé par
-       l'oracle PRG_06 : `Ready` n'y porte jamais d'expression, les broches suivantes oui).
-       Sans elles, `Winch` tombait sur cette broche réservée et se retrouvait câblée à une
-       branche au lieu de sa variable. *)
+       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung :
+       `Ready` n'y porte jamais d'expression, les broches suivantes oui. *)
     Ready                      : BOOL;             (* <-- [STAT] TRUE = banc prêt (Enable actif, modèles à jour) *)
     Busy                       : BOOL;             (* <-- [STAT] TRUE = cycle de simulation en cours *)
     Done                       : BOOL;             (* <-- [STAT] TRUE = images de simulation publiées ce scan *)
@@ -192,7 +189,7 @@ instSimEncoderM2(
 );
 
 // Recopie structures Winch simulées :
-// 🛑 POLARITÉ DE FREIN SIMULÉ (P1 Lot L6) : 1 = contacteur commandé = frein OUVERT.
+// 🛑 POLARITÉ DE FREIN SIMULÉ : 1 = contacteur commandé = frein OUVERT.
 // Câblage réel : DI = 1 ⟺ frein OUVERT. Le modèle produit donc M1_BrakeIsOpen_DI := M1_BrakeCmd !
 Winch.M1_BrakeIsOpen_DI        := M1_BrakeCmd;
 // Retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
@@ -320,7 +317,7 @@ END_IF;
 // l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
 Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount > 0);
 
-Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
+Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
 Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 
 

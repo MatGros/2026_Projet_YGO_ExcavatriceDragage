@@ -18,7 +18,7 @@ VAR_OUTPUT
     WinchM2Safety : ST_SafetyWinch;
     SyncState : ST_SyncState;
     BucketState : ST_BucketHMIState;
-    Benne_IsRoughlyClosed : BOOL;  // TRUE = benne jugée fermée (tolérance matière 2 m) ; FALSE = ouverte/intermédiaire (revue SEMI_AUTO)
+    Benne_IsRoughlyClosed : BOOL;  // TRUE = benne jugée fermée (tolérance matière 2 m) ; FALSE = ouverte/intermédiaire
 END_VAR
 
 VAR
@@ -26,7 +26,7 @@ VAR
 
     instWinchSync : FB_WinchSync;
     instBucket   : FB_Bucket;
-    instSafetyWinchM1 : FB_Safety_Winch;   // M1/M2 avaient 0 mécanisme actif
+    instSafetyWinchM1 : FB_Safety_Winch;   // Sécurité treuil M1 (SafeStop / permits / PowerCutOff)
     instSafetyWinchM2 : FB_Safety_Winch;
     instWinchM1   : FB_Winch;
     instWinchM2   : FB_Winch;
@@ -45,14 +45,13 @@ VAR
     DumpAtTremieAssistActive       : BOOL; // Sous-condition Mode MAINT_N1/N2 (assist réellement active)
     DumpAtTremieBucketOpenArmed    : BOOL; // CmdOpen_IHM déclenché par ce mode (diagnostic)
 
-    // (Fiche 01, demande client) : séquencement automatique benne en pilotage
-    // couplé (both) normal — descente uniquement benne ouverte, montée uniquement benne
+    // Séquencement automatique benne en pilotage couplé (both) normal --
+    // descente uniquement benne ouverte, montée uniquement benne
     // fermée. Distinct de DumpAtTremie/DiveSearch/ExtractionSequence (fonctionnement normal,
     // pas une assistance MAINT_N1/N2 dédiée). Réutilise CoupledUserRequestActive/
     // CoupledUserRequestDirection (§1 ci-dessus) : déjà exactement "mouvement couplé (both)
     // demandé" dans les 2 modes (joystick Select=0, ou BtnWinchBothUp/Down) — mêmes variables
-    // déjà utilisées par instBucket/instDiveSearch/instExtractionSequence, aucune nouvelle
-    // détection à inventer.
+    // déjà utilisées par instBucket/instDiveSearch/instExtractionSequence.
     CoupledDiveBucketOpenArmed     : BOOL;  // CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)
     CoupledMotionBlockedByBucket   : BOOL;  // Garde-fou direct -- voir §3
     CoupledAscentBucketCloseArmed  : BOOL;  // CmdClose_IHM déclenché par ce mécanisme (diagnostic IHM)
@@ -96,23 +95,23 @@ VAR
 
     BenneBusyFallEdge     : F_TRIG;
 
-    // FICHE 05 — Arrêt auto descente sur détection fond Kobold (pilotage normal)
+    // Arrêt auto descente sur détection fond Kobold (pilotage normal)
     KoboldAutoStopRiseEdge  : R_TRIG;
     KoboldAutoStopFallEdge  : F_TRIG;
     KoboldImmersionConfirmed: BOOL;
     KoboldBottomTouchLatched: BOOL;
-    DescendPermitDiveBucketOpen : BOOL; // (10) / : mode Dive actif + benne ouverte = descente permise
-    // (18) : pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1
+    DescendPermitDiveBucketOpen : BOOL; // mode Dive actif + benne ouverte = descente permise
+    // pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1
     ManualBucketLimitsActive : BOOL;
-    SlackCableAscentStep1    : BOOL; // (T111) : mou de câble en récupération -- bride la montée au Palier 1
-    BucketNotClosedAscentStep1 : BOOL; // (T114) : benne non fermée à 100% à la montée -- bride la montée au Palier 1
+    SlackCableAscentStep1    : BOOL; // mou de câble en récupération -- bride la montée au Palier 1
+    BucketNotClosedAscentStep1 : BOOL; // benne non fermée à 100% à la montée -- bride la montée au Palier 1
 
-    // (9) : bypass simplifié séquence FB_DiveSearch (demande client) -- front montant
+    // Bypass simplifié séquence FB_DiveSearch -- front montant
     // Kobold pendant une descente couplée confirme directement le fond, sans passer par les
     // préconditions strictes de FB_DiveSearch (benne ouverte, DiveStartMin_M, fenêtre immersion).
-    // FB_DiveSearch continue de tourner en parallèle, inchangée (KoboldMeasureEnable toujours câblé
+    // FB_DiveSearch continue de tourner en parallèle (KoboldMeasureEnable toujours câblé
     // dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.
-    BypassKoboldFallEdge       : F_TRIG; // (26) : front descendant remplace montant
+    BypassKoboldFallEdge       : F_TRIG; // front descendant Kobold
     BypassKoboldBottomTouched  : BOOL;
 
     SyncMinorDeviation      : BOOL;
@@ -123,7 +122,7 @@ VAR
     EffectiveMaxStepAscent    : INT;
     EffectiveMaxStepDescente  : INT;
 
-    // (27) : mémoire scan précédent pour SpeedDelta_Mps (IHM)
+    // Mémoire scan précédent pour SpeedDelta_Mps (IHM)
     M1_PrevSpeed_Mps : REAL;
     M2_PrevSpeed_Mps : REAL;
 END_VAR
@@ -132,13 +131,7 @@ END_VAR
 // === 🪨 §1 INTENTION MAINTENANCE & ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    // : ancienne version
-    // affectait HwIn.Operator.JoyYRaw_ANA2 (valeur analogique BRUTE 0..10000, meme signal que
-    // RawY sur instJoystick) directement a CoupledUserRequestDirection, alors que
-    // FB_Bucket/FB_DiveSearch/FB_ExtractionSequence testent MotionDirection = 1/-1 EXACTEMENT.
-    // Consequence : en mode TglJoystickMaster, la benne/les sequenceurs assistes ne pouvaient
-    // JAMAIS demarrer via le joystick (seul le mode Boutons IHM, qui affecte bien 1/-1,
-    // fonctionnait). Corrige : direction deja mise a l'echelle (-1/0/+1) par instJoystick.
+    // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick.
     CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
     CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
@@ -155,7 +148,7 @@ ELSE
 
 END_IF;
 
-// mode "vidage à la trémie" (verrouillage, demande client). Périmètre identique
+// mode "vidage à la trémie" (verrouillage). Périmètre identique
 // à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.
 DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
 DumpAtTremieAssistActive := DumpAtTremieActive
@@ -164,10 +157,9 @@ GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
 
-// BUG CONFIRMÉ : "OR _BucketState.IsOpen" annulait le
-// forçage à CHAQUE scan, alors que confirmer "fond touché" se fait précisément PENDANT que la
-// benne est encore ouverte (avant que l'extraction ne la ferme) -- condition backwards, rendait
-// tout forçage manuel de TglBucketAtBottomConfirmed impossible en pratique. Retiré.
+// Confirmation manuelle "fond touché" effacée hors conditions de garde (MAINT_N1/N2,
+// sous tension, pas de défaut, pas de descente couplée) — la confirmation se fait
+// précisément PENDANT que la benne est encore ouverte (avant que l'extraction ne la ferme).
 IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
@@ -177,8 +169,7 @@ IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Aut
 END_IF;
 ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
 
-// demande client : REMPLACÉ front montant par front
-// DESCENDANT Kobold pendant une descente couplée = fond touché, directement (voir bandeau §1).
+// Front DESCENDANT Kobold pendant une descente couplée = fond touché, directement (voir bandeau §1).
 // Mêmes conditions de garde que la confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension,
 // pas de défaut, benne fermée -- réutilise le bloc de clear commun juste au-dessus).
 BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
@@ -207,24 +198,19 @@ instDiveSearch(
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
-    // (14) : même toggle que le bypass bottom-confirmation -- réglages seuils pas
-    // encore calibrés, saute WAIT_PRECONDITIONS entièrement le temps des essais.
+    // Même toggle que le bypass bottom-confirmation -- saute WAIT_PRECONDITIONS entièrement.
     BypassPreconditions := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
 );
 
-// publication IHM (était orpheline -- déclarée mais jamais écrite, voir
-// GVL_IHM.DredgingAssist.State) — consommée ensuite par FB_TroubleshootingView (debug).
+// Publication IHM — consommée ensuite par FB_TroubleshootingView (debug).
 GVL_IHM.DredgingAssist.State.DiveReady            := instDiveSearch.Ready;
 GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Busy;
 GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Done;
 GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Error;
 GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.ErrorId;
 GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
-// : affichage IHM ne reflétait que la détection Kobold
-// (instDiveSearch), pas la confirmation manuelle (TglBucketAtBottomConfirmed) ni le bypass --
-// alors que BottomPositionConfirmed (consommée par instExtractionSequence ci-dessous) fait bien
-// le OR des trois. L'opérateur voyait "non confirmé" à l'IHM alors que le séquenceur considérait
-// le fond confirmé -- affichage seul en cause, la logique de commande était correcte.
+// BottomPositionConfirmed = OR des trois : détection Kobold
+// (instDiveSearch), confirmation manuelle (TglBucketAtBottomConfirmed) et bypass.
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
 GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
 
@@ -262,8 +248,8 @@ GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.ErrorId
 GVL_IHM.DredgingAssist.State.ExtractionState   := instExtractionSequence.ExtractionState;
 
 // une seule consigne opérateur conduite à la fois (doc §OperatorActionId) —
-// aucun PRG_09 n'existe (jamais câblé), arbitrage fait ici : DiveSearch prioritaire si Busy,
-// sinon ExtractionSequence si Busy, sinon la dernière connue reste affichée à titre informatif.
+// arbitrage fait ici : DiveSearch prioritaire si Busy, sinon ExtractionSequence si Busy,
+// sinon la dernière connue reste affichée à titre informatif.
 IF instDiveSearch.Busy THEN
     GVL_IHM.DredgingAssist.State.OperatorActionId := instDiveSearch.OperatorActionId;
     GVL_IHM.DredgingAssist.State.OperatorAction   := instDiveSearch.OperatorAction;
@@ -275,7 +261,7 @@ ELSE
     GVL_IHM.DredgingAssist.State.OperatorAction   := '';
 END_IF;
 
-// (Fiche 01, demande client) : règle absolue en pilotage couplé (both) normal --
+// Règle absolue en pilotage couplé (both) normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée. Réutilise
 // CoupledUserRequestActive/CoupledUserRequestDirection (§1) : déjà "mouvement couplé
 // demandé" dans les 2 modes (joystick Select=0 exclut le pilotage unitaire M1/M2 seul,
@@ -285,8 +271,7 @@ END_IF;
 // M2_LimitShift). GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing (défaut FALSE) : si FALSE,
 // ces 2 flags restent FALSE en permanence -- CmdOpen_IHM/CmdClose_IHM ne sont plus jamais armés
 // par le mouvement couplé joystick, instBucket.Busy ne peut plus être déclenché QUE par action
-// manuelle benne/DumpAtTremie/ExtractionSequence (comportement strictement identique à avant
-// Fiche 01).
+// manuelle benne/DumpAtTremie/ExtractionSequence.
 CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
     AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.SEMI_AUTO)
     AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
@@ -297,7 +282,7 @@ CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequen
     AND NOT _BucketState.IsClosed;
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO (L3) : fermeture benne pilotée par le séquenceur de cycle.
+    // Pont SEMI_AUTO : fermeture benne pilotée par le séquenceur de cycle.
     CmdBucketCloseArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Close;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
     CmdBucketCloseArbitrated := TRUE;
@@ -309,11 +294,11 @@ END_IF;
 
 // urgence : instDiveSearch.KoboldMeasureEnable
 // n'est TRUE que dans SEARCHING_IMMERSION/SEARCHING_BOTTOM, atteignables uniquement après
-// WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M -- réglages pas encore
-// calibrés). Avec le bypass (TglBypassDiveSearchSequence), le contacteur doit être piloté
+// WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M). Avec le bypass
+// (TglBypassDiveSearchSequence), le contacteur doit être piloté
 // INDÉPENDAMMENT de ces préconditions dès qu'on descend réellement.
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO (L3) : contacteur Kobold piloté par le séquenceur de cycle.
+    // Pont SEMI_AUTO : contacteur Kobold piloté par le séquenceur de cycle.
     KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
 ELSE
     KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
@@ -331,7 +316,7 @@ END_IF;
 // la trémie arme l'ouverture benne au lieu de faire descendre M2 — le mouvement réel reste
 // gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
 // l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
-// l'arbitrage M2 normal (mécanisme déjà existant, voir §3bis plus bas).
+// l'arbitrage M2 normal (voir §3bis plus bas).
 DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.M3_AtTremieStable;
 GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed := DumpAtTremieBucketOpenArmed;
 
@@ -361,9 +346,9 @@ instBucket(
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
 
-// / (T114) : Auto-séquencement benne & Dégradation Palier 1
+// Auto-séquencement benne & Dégradation Palier 1
 // Si la benne est en cours de fermeture/ouverture (instBucket.Busy), le mouvement couplé attend.
-// T114 : Si la benne n'est pas fermée (NOT IsClosed) et que instBucket n'est plus occupé (Busy=FALSE),
+// Si la benne n'est pas fermée (NOT IsClosed) et que instBucket n'est plus occupé (Busy=FALSE),
 // toute demande de montée est automatiquement dégradée au Palier 1 (Vitesse lente, voir instWinchM1/M2),
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
@@ -371,7 +356,7 @@ instBucket(
 CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Busy;
 BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDirection = 1) AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
 
-// T111 : En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
+// En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
 // au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
@@ -404,7 +389,7 @@ END_IF;
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO (L3) : consomme les demandes du séquenceur de cycle.
+    // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
     // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
     M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
@@ -440,13 +425,8 @@ ELSE
                             AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
 END_IF;
 
-// (Fiche 01, demande client "jamais arrêter M2") : condition renforcée
-// "instBucket.Busy AND instBucket.M2_StartStop" au lieu de "instBucket.Busy" seul. Sans le 2e
-// terme, le scan où le benne atteint sa cible (M2_StartStop benne retombé à FALSE ce même
-// scan, AVANT que Busy ne retombe le scan SUIVANT) forçait un arrêt M2 d'1 scan avant que
-// l'arbitrage normal ne prenne le relais -- fenêtre de coupure dépendante du timing exact de
-// la bascule Busy, pas garantie structurellement. Avec le 2e terme, ce scan tombe directement
-// dans la branche ELSE (arbitrage normal) : si le mouvement couplé est toujours demandé, M2
+// Condition renforcée "instBucket.Busy AND instBucket.M2_StartStop" au lieu de
+// "instBucket.Busy" seul : si le mouvement couplé est toujours demandé, M2
 // reçoit sa commande de continuité le MÊME scan, sans dépendre d'un timing de bascule.
 IF instBucket.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestStartStop := instBucket.M2_StartStop;
@@ -454,7 +434,7 @@ IF instBucket.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestSpeedRef_Pct  := 15.0;
 ELSE
     IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-        // Pont SEMI_AUTO (L3) : consomme les demandes du séquenceur de cycle.
+        // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
         M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
         M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
         M2LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
@@ -490,13 +470,8 @@ ELSE
     END_IF;
 END_IF;
 
-// (Fiche 01, demande client "jamais arrêter M2") : 2e mécanisme de coupure trouvé
-// en plus de celui déjà corrigé §3 ci-dessus -- celui-ci forçait un arrêt INCONDITIONNEL de M1
-// ET M2 à CHAQUE fin d'action benne (Busy retombé), y compris pendant un enchaînement
-// ouverture/fermeture-puis-mouvement-couplé où le mouvement doit continuer sans coupure
-// (affecte aussi ExtractionSequence.CLOSING_BUCKET->CONTROL_ASCENT, pas seulement la Fiche 01).
-// Corrigé : ne force plus l'arrêt si un mouvement couplé est toujours activement demandé
-// (CoupledUserRequestActive), auquel cas l'arbitrage normal (§3, déjà corrigé) prend le
+// Ne force plus l'arrêt si un mouvement couplé est toujours activement demandé
+// (CoupledUserRequestActive), auquel cas l'arbitrage normal (§3) prend le
 // relais sans interruption. Comportement inchangé pour toute fin d'action benne SANS mouvement
 // couplé en cours (ouverture/fermeture manuelle isolée, bouton IHM) : l'arrêt reste forcé.
 BenneBusyFallEdge(CLK := instBucket.Busy);
@@ -505,10 +480,10 @@ IF BenneBusyFallEdge.Q AND NOT (CoupledUserRequestActive AND (CoupledUserRequest
     M2LogicRequestStartStop := FALSE;
 END_IF;
 
-// (Fiche 01, demande client) : après une fermeture benne armée PAR CE mécanisme
+// Après une fermeture benne armée PAR CE mécanisme
 // (pas ExtractionSequence, qui a déjà sa propre phase CONTROL_ASCENT), la montée couplée qui
-// enchaîne démarre en vitesse contrôlée (palier 1) sur ExtractionControlDistance_M (paramètre
-// existant, réutilisé -- pas de nouveau réglage) avant de repasser en paliers normaux.
+// enchaîne démarre en vitesse contrôlée (palier 1) sur ExtractionControlDistance_M avant de
+// repasser en paliers normaux.
 BucketBusyRiseEdge(CLK := instBucket.Busy);
 IF BucketBusyRiseEdge.Q THEN
     ControlAscentArmedForThisClose := CoupledAscentBucketCloseArmed;
@@ -593,9 +568,9 @@ END_IF;
 {region "§5 Couplage croise et securites"}
 // === 🛑 §5 COUPLAGE CROISÉ & SÉCURITÉS ===
 
-// (demande client) : la limite légale (profondeur min. autorisée) doit elle aussi
+// La limite légale (profondeur min. autorisée) doit elle aussi
 // bénéficier du ralentissement progressif avant arrêt (comme la limite câble physique), pas juste
-// un arrêt sec (DescendPermit, ajouté au lot précédent). Comme les 2 limites bornent la même
+// un arrêt sec (DescendPermit). Comme les 2 limites bornent la même
 // direction (descente), on alimente FB_Winch.BottomLimitM avec la PLUS RESTRICTIVE des deux
 // (MAX de 2 valeurs négatives = celle la moins profonde = atteinte en premier) : le ralentissement
 // (FB_Winch §"RALENTISSEMENT AUTOMATIQUE SUR BORDURES") s'enclenche alors sur la bonne limite,
@@ -614,10 +589,8 @@ END_IF;
 SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.InputModuleFault;
 SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR PRG_02_Acquisition.InputModuleFault;
 
-// FICHE 05 — Surveillance Kobold descente normale (hors FB_DiveSearch)
-// : "HwIn.Winch.M1M2_KoboldImmersed_DI" n'existe
-// pas (ST_HwWinch n'a pas ce membre) -- corrigé vers le meme signal deja utilise par
-// instDiveSearch ci-dessus (§1, ligne KoboldImmersed), HwIn.Machine.M1_M2_KoboldBottomTouch_DI.
+// Surveillance Kobold descente normale (hors FB_DiveSearch)
+// : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
 KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 
@@ -627,10 +600,9 @@ IF PRG_02_Acquisition.instJoystick.AtNeutral OR NOT GVL_IHM.Commun.Cfg.TglEnable
     KoboldBottomTouchLatched := FALSE;
 END_IF;
 
-// (revue Fiche 05) : CoupledUserRequestActive ajouté -- sans lui, cette
-// surveillance pouvait s'armer aussi en pilotage UNITAIRE M1 (Select=1), où CoupledUserRequestDirection
-// reflète quand même l'axe joystick brut (seul CoupledUserRequestActive exige Select=0).
-// Hors scope de la fiche ("pendant une descente COUPLÉE normale") -- corrigé.
+// CoupledUserRequestActive requis : cette surveillance ne s'arme qu'en pilotage
+// COUPLÉ (Select=0), pas en pilotage unitaire M1 (où CoupledUserRequestDirection reflète
+// quand même l'axe joystick brut).
 // Qualification immersion : front montant Kobold dans la fenêtre [ImmersionLower_M..ImmersionUpper_M]
 IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND CoupledUserRequestActive
@@ -651,20 +623,14 @@ IF KoboldAutoStopFallEdge.Q AND KoboldImmersionConfirmed THEN
     KoboldImmersionConfirmed := FALSE;
 END_IF;
 
-// GAP RÉEL CONFIRMÉ : instDiveSearch.DescendPermit
-// était calculé (FB_DiveSearch.st) mais JAMAIS consommé nulle part dans PRG_04/PRG_06 -- en
-// mode Dive actif, rien n'empêchait réellement de descendre benne fermée, malgré la précondition
-// FB_DiveSearch (BucketIsOpen requis pour READY_TO_DESCEND). Ajouté : autorisation directe et
-// explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif) -- indépendante du
-// timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
+// Autorisation directe et explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif)
+// -- indépendante du timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
 DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequestActive
     AND (CoupledUserRequestDirection = -1) AND NOT _BucketState.IsOpen);
 
-// : BypassKoboldBottomTouched confirmait le fond
-// (pour Extraction) mais ne bloquait pas la descente elle-même -- seul KoboldBottomTouchLatched
-// (mécanisme Fiche 05 séparé) le faisait. Ajouté : le bypass arrête aussi la descente
-// instantanément, même doctrine que le mécanisme Fiche 05.
-// demande client : mode "pilotage unitaire M2 sécurisé"
+// Le bypass arrête aussi la descente instantanément, même doctrine que le mécanisme
+// KoboldBottomTouchLatched.
+// Mode "pilotage unitaire M2 sécurisé"
 // (SelJoystickWinch=2 + toggle IHM). Ne passe PAS par instBucket (pas de CloseReq/OpenReq
 // mémorisé, jogging libre) -- bornes directes ouvert/fermé (mêmes offsets que FB_Bucket,
 // relatifs à la position réelle de M1) + palier 1 (voir instWinchM2 §6 plus bas).
@@ -672,10 +638,9 @@ ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimi
     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
 
 DescendPermitM1_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
-// (21bis) — DÉPASSEMENT CONFIRMÉ : ce chemin (pilotage
-// unitaire M2, hors instBucket) n'avait AUCUNE anticipation d'inertie, contrairement au CASE
-// BUSY de FB_Bucket -- même OpenAnticipationM/CloseAnticipationM réutilisé ici
-// pour couvrir aussi le jog unitaire.
+// Ce chemin (pilotage
+// unitaire M2, hors instBucket) applique l'anticipation d'inertie OpenAnticipationM/CloseAnticipationM
+// (mêmes que FB_Bucket) pour couvrir aussi le jog unitaire.
 DescendPermitM2_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 <= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
@@ -684,7 +649,7 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
                       (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _WinchM2CfgPersist.CfgCableLimitAscent_M);
 
-// : FB_Safety_Winch M1/M2 — 0 mécanisme actif avant ce lot.
+// FB_Safety_Winch M1/M2.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
 instSafetyWinchM1(
@@ -725,7 +690,7 @@ instSafetyWinchM1(
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
-    // (demande client) : OR avec le bypass commun (Commun.Bypass) -- leve la
+    // OR avec le bypass commun (Commun.Bypass) -- leve la
     // protection sur les 2 treuils simultanement pour le pilotage "both", sans retirer le
     // bypass individuel pour le pilotage a l'unite.
     // 🔒 SÉCURITÉ : GVL_Simulation.SimulationBypassActive n'agit QUE si SimulationModeActive=TRUE (strictement inopérant sur machine réelle).
@@ -810,7 +775,7 @@ SafeStopM2_Raw := SafeStopM2_Raw OR instSafetyWinchM2.SafeStop;
 DescendPermitM1_Raw := DescendPermitM1_Raw AND instSafetyWinchM1.DescendPermit;
 DescendPermitM2_Raw := DescendPermitM2_Raw AND instSafetyWinchM2.DescendPermit;
 
-// (mode "vidage à la trémie", demande client) : descente M1 ET M2 interdite tant
+// Mode "vidage à la trémie" : descente M1 ET M2 interdite tant
 // que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
 // descente-treuil / translation pour se rapprocher d'un enchaînement automatique sûr.
 GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked :=
@@ -850,7 +815,7 @@ instWinchM1(
     SpeedRefPct             := M1LogicRequestSpeedRef_Pct,
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
-    // (T111 / T113 / T114) : Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
+    // Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
     MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
@@ -880,15 +845,12 @@ instWinchM2(
     Direction               := M2LogicRequestDirection,
     SpeedRefPct             := M2LogicRequestSpeedRef_Pct,
     SpeedStepTable          := M2_SpeedStepTableActive,
-    // GAP CONFIRMÉ : instBucket.M2_ForceSlowSpeed
-    // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) n'était consommé que
-    // pour substituer M2_SpeedStepTableActive -- ne plafonnait PAS réellement le palier autorisé
-    // pendant CLOSING_BUCKET/ouverture benne. MaxStepAscent forçait déjà palier 1 pour
-    // CONTROL_ASCENT (ForceMinSpeedStep) mais pas pendant le mouvement benne lui-même ;
-    // CfgMaxStepDescente n'avait AUCUN plafond, jamais. Corrigé : les deux suivent maintenant
-    // instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
-    // (T113) : instWinchSync.SyncDegradedStep1 dégrade M2 au Palier 1 sur écart modéré.
-    // (T114 / T111) : BucketNotClosedAscentStep1 et SlackCableAscentStep1 dégradent la montée au Palier 1.
+    // instBucket.M2_ForceSlowSpeed
+    // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) plafonne le palier
+    // autorisé pendant CLOSING_BUCKET/ouverture benne : MaxStepAscent et CfgMaxStepDescente
+    // suivent instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
+    // instWinchSync.SyncDegradedStep1 dégrade M2 au Palier 1 sur écart modéré.
+    // BucketNotClosedAscentStep1 et SlackCableAscentStep1 dégradent la montée au Palier 1.
     CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
     MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
@@ -917,9 +879,9 @@ WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
 WinchM1FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
-// (retrait FB_Brake, demande client) : plus de BrakeReleaseRequest/
+// Plus de BrakeReleaseRequest/
 // BrakeCommandOpenConfirmed calcules par FB_Winch — la barriere finale
-// (FB_WinchOutputInterlock_LD) recoit desormais le retour PHYSIQUE brut directement,
+// (FB_WinchOutputInterlock_LD) recoit le retour PHYSIQUE brut directement,
 // et calcule elle-meme BrakeCmd := RelayFwd OR RelayRev (voir bandeau de ce FB).
 WinchM1FinalInterlockRequest.BrakeFeedback := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;
 WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;
@@ -951,11 +913,9 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
 {region "§8 Publication etats IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
-// : MeasuredSpeed_Mps jamais recopié, restait
-// à 0.0 en permanence à l'IHM. SpeedDelta_Mps corrigé par rapport à la proposition initiale de
-// l'agent (M1-M2, faux sens) -- le commentaire du type (ST_WinchState.st) dit explicitement
-// "variation de vitesse ENTRE DEUX SCANS", pas un écart M1/M2 (qui existe déjà ailleurs via
-// SyncStateHMI.DeltaPos_M/instWinchSync). Delta temporel via mémoire scan précédent.
+// SpeedDelta_Mps = variation de vitesse ENTRE DEUX SCANS (ST_WinchState.st),
+// pas un écart M1/M2 (qui existe via SyncStateHMI.DeltaPos_M/instWinchSync).
+// Delta temporel via mémoire scan précédent.
 WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
 WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.M1_Speed_Mps - M1_PrevSpeed_Mps;
 M1_PrevSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
@@ -1139,9 +1099,7 @@ BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
-// corrigé -- pointait sur DumpAtTremieBucketOpenArmed (mauvais signal, deviné
-// par l'agent Fiche 02 avant que la Fiche 01 ne soit committée). Reflète maintenant le vrai
-// séquencement auto Fiche 01 : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
+// Reflète le séquencement auto : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
 // vitesse contrôlée post-fermeture.
 BucketState.AutoBucketSeqActive := (instBucket.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
 BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
@@ -1151,7 +1109,7 @@ BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 
-// Tolérance matière benne (revue SEMI_AUTO) : « à peu près fermée » = fermée OU
+// Tolérance matière benne : « à peu près fermée » = fermée OU
 // intermédiaire proche de l'offset fermé (tolérance 2 m). Évite le blocage au fond sur
 // matière dense (galets) qui ne ferme jamais à 100% de la consigne fine.
 Benne_IsRoughlyClosed := _BucketState.IsClosed

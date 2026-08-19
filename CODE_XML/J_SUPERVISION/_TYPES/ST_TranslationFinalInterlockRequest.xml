@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.331351" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.331351">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:16:52.509971" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:16:52.509971">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -96,8 +96,8 @@
       FB_TranslationOutputInterlock_LD.
    🔒 Ne contient jamais une commande PDO autorisée.
    PowerCutOff : demande safety M3 (FB_Safety_Translation).
-      FIX : consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
-      d'Enable (barrière finale) — SafeStop n'y est plus lu, il reste géré en amont
+      Consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
+      d'Enable (barrière finale). SafeStop est géré en amont
       par FB_Translation (rampe rapide, Enable maintenu, AF06 §5).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>

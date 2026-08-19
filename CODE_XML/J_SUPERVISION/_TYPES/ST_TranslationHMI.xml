@@ -202,8 +202,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -421,9 +420,7 @@
    ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 : créé suite constat terrain — Translation n'avait pas de slot Cfg
-   (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
-   n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
+   📄 Vitesses de ralentissement d'approche réglables depuis l'IHM (RETAIN), même patron que ST_WinchCfg.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -475,8 +472,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
-GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Switch machine unique : GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
               </documentation>
             </variable>
@@ -805,7 +801,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenanceTargetEnable">

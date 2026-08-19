@@ -18,7 +18,7 @@
 VAR_GLOBAL
     BlinkClock                 : BOOL;          // Horloge clignotement système (IHM/diag), rythme réglable GVL_PERSISTENT
 
-    // ── [COMMANDES FINALES ET INTERLOCKS RECOPIÉS DE PRG_10_Outputs_LD] ──────────────────────────
+    // ── [COMMANDES FINALES ET INTERLOCKS] ──────────────────────────
     // Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERVISION_CFC et PRG_TROUBLESHOOTING_CFC
     M1RelayFwd                    : BOOL;
     M1RelayRev                    : BOOL;
@@ -39,8 +39,3 @@ VAR_GLOBAL
     EmergencyArmingLockoutActive: BOOL;
     ArmingSeqStep                : INT;
 END_VAR
-(* instWinchOutputInterlockM1_LD / M2_LD / instTranslationOutputInterlock_LD retirés d'ici —
-   c'étaient des instances FB déclarées mais JAMAIS appelées (orphelines, check_linkage L13-FB).
-   Les instances réelles vivent maintenant dans PRG_06_Outputs_LD (seul producteur), qui publie
-   déjà leurs sorties utiles (M1RelayFwd...) recopiées ci-dessus. Une deuxième instance ici aurait
-   dupliqué l'état sans jamais être appelée : source de confusion, pas de valeur ajoutée. *)

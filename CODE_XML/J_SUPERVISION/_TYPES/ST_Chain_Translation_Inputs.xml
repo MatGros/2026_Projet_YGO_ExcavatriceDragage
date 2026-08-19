@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.257137" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.257137">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:05:17.269776" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:05:17.269776">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -95,7 +95,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : TRUE = thermique moteur/variateur AC600 OK (diagnostic seul)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = thermique moteur/variateur AC600 OK (diagnostic seul)</xhtml>
               </documentation>
             </variable>
           </struct>

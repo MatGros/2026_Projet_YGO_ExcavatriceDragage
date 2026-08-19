@@ -683,12 +683,12 @@
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode pilotage unitaire M2 "sécurisé" -- actif
 uniquement en SelJoystickWinch=2 (unitaire M2). Si TRUE : borne le déplacement entre les
 positions ouvert/fermé configurées (OffsetOpenM/OffsetCloseM relatif à M1, mêmes bornes que
 FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
 CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
-(18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
+Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -858,7 +858,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <derived name="ST_BucketState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...) — ex-champ "State", renommé pour éviter collision de nom avec ce sous-struct</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...)</xhtml>
               </documentation>
             </variable>
             <variable name="FBState">
@@ -1137,8 +1137,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -1227,7 +1226,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
    ───────────────────────────────────────────────────────────────
-   🎨 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
+   🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
       GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
@@ -1236,9 +1235,6 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
       n'entraîne la désactivation de l'autre.
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
-   : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
-      était de toute façon inutilisé comme bypass réel jusqu'ici (PRG_07_Supervision y écrivait un
-      indicateur simulation par erreur, voir ST_CommunHMI.SimTopSensorBypassActive).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1306,8 +1302,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -1487,8 +1482,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -1667,8 +1661,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -1877,7 +1870,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(Fiche 05) : 1 = Toggle IHM arrêt auto descente actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Toggle IHM arrêt auto descente actif</xhtml>
               </documentation>
             </variable>
             <variable name="Idx304_KoboldImmersionConfirmed">
@@ -2442,7 +2435,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : 1 = Bypass séquence DiveSearch armé (IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bypass séquence DiveSearch armé (IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx602_BypassKoboldBottomTouched">
@@ -2450,7 +2443,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : 1 = Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2886,7 +2879,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : TRUE = thermique moteur/variateur AC600 OK (diagnostic seul)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = thermique moteur/variateur AC600 OK (diagnostic seul)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3522,8 +3515,8 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
-Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe-circuit d'urgence pour le séquencement auto benne.
+Défaut FALSE = mouvement M1/M2 synchro jamais
 gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
               </documentation>
             </variable>
@@ -3548,9 +3541,6 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CommunCfg — Configuration des paramètres communs machine
-   📄 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
-   WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
-   ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3619,9 +3609,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
-       (etaient ecrits par erreur dans Bypass.SlackCable/TopPositionSensor avant ce lot, ce qui
-       empechait ces champs de servir de vrai bypass RETAIN operateur).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur
 🩺 Capteur haut ignore car simulation active</xhtml>
               </documentation>
             </variable>
@@ -3696,7 +3684,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
 struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
 (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
 ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
@@ -3723,7 +3711,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <derived name="ST_WinchSymmetryHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ MES-008 : mesures passives M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ Mesures passives M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldImmersionConfirmed">
@@ -3731,7 +3719,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic arrêt auto descente Kobold (pilotage normal)
 Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </documentation>
             </variable>
@@ -3754,7 +3742,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🌐 ST_CommunHMI — Données d'échange IHM COMMUNES (pas propres à un axe)
    ───────────────────────────────────────────────────────────────
-   (demande utilisateur) : regroupe les signaux qui ne concernent
+   Regroupe les signaux qui ne concernent
    PAS un axe/mécanisme en particulier (1 seul capteur/signal partagé par toute la
    machine) — évite de les dupliquer ou de les laisser en variables isolées
    directement dans GVL_IHM. Exemple : TopPositionSensorActive (capteur unique,
@@ -3862,7 +3850,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
-   T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
+   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3944,9 +3932,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    🔄 ST_CycleHMI — Données d'échange IHM du cycle semi-automatique
    ───────────────────────────────────────────────────────────────
    📄 Structuration en Cmd / State / Cfg / Test , homogène avec ST_WinchHMI.
-   T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3) —
-   avant ce lot, SetDepth_M/SetOffset_M n'avaient AUCUN backing persistant (juste un défaut
-   compilé dans le DUT), contrairement à tous les autres domaines déjà traités.
+   Cfg protégé par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4070,7 +4056,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse mesuré (T43/T45)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse mesuré</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchActive">
@@ -4134,7 +4120,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="E_CycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Étape spécifique au moment du défaut (R9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Étape spécifique au moment du défaut</xhtml>
               </documentation>
             </variable>
             <variable name="SampleCount">
@@ -4374,7 +4360,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : bypass simplifié de la séquence FB_DiveSearch complète (préconditions
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simplifié de la séquence FB_DiveSearch complète (préconditions
 strictes -- benne ouverte, DiveStartMin_M, fenêtre immersion). Si TRUE, un front MONTANT
 Kobold pendant une descente confirme directement le fond, sans passer par l'état-machine
 FB_DiveSearch (qui continue de tourner en parallèle, inchangée -- utile pour
@@ -4567,7 +4553,7 @@ TglEnableDumpAtTremie (bit IHM brut)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : diagnostic bypass séquence DiveSearch
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic bypass séquence DiveSearch
 TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
               </documentation>
             </variable>
@@ -4664,7 +4650,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing — déplacés depuis ST_WinchState racine (2026-08, réorganisation ST_WinchHMI/Homing)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing — prise d'origine / référencement
 🎯 Prise d'origine (Homing) validée</xhtml>
               </documentation>
             </variable>
@@ -4983,7 +4969,6 @@ TRUE des qu'un referencement a reussi</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -5224,7 +5209,7 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_KoboldBottomTouch_DI">
@@ -5232,7 +5217,7 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -5270,7 +5255,6 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts communs à la machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -5329,7 +5313,6 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwOperator — Image matérielle brute des entrées Opérateur / Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts du joystick CANopen JOY1.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -5390,7 +5373,7 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour disjoncteur thermique moteur/variateur AC600 (1 = OK) — diagnostic seul, l'AC600 se protège lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="M3_StatusWord">
@@ -5428,7 +5411,6 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts de la translation M3 (AC600).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -5575,7 +5557,6 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -6039,7 +6020,7 @@ Valeur brute axe X (0..10000)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (, ex-MachineReset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — jamais Modes/Cycle</xhtml>
               </documentation>
             </variable>
             <variable name="BtnModeReset">
@@ -6075,8 +6056,7 @@ Valeur brute axe X (0..10000)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
-sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</xhtml>
               </documentation>
             </variable>
@@ -6091,11 +6071,8 @@ sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 un
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">— bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
 SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
 sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
-🔀 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
-(ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé, doublon). ⚠️ Le défaut TRUE
-(joystick) s'applique désormais à M3 aussi au boot — M3 démarrait avant en boutons IHM
-(FALSE) : changement de comportement au démarrage, assumé (décision ).
-🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 (comportement historique Winch, préservé au boot) ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
+🔀 Switch machine unique — pilote aussi Translation M3.
+🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -7642,7 +7619,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot, ex-CfgInitialized renommé pour cohérence avec ST_WinchCfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (config restaurée depuis GVL_PERSISTENT)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -7669,7 +7646,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -7787,7 +7764,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_WinchSync) — ex-"State", renommé pour éviter collision avec le sous-struct State</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_WinchSync)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -7863,9 +7840,7 @@ Seuils de changement de palier (0..100%)</xhtml>
    ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 : créé suite constat terrain — Translation n'avait pas de slot Cfg
-   (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
-   n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
+   📄 Vitesses de ralentissement d'approche réglables depuis l'IHM (RETAIN), même patron que ST_WinchCfg.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -7917,8 +7892,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
-GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Switch machine unique : GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
               </documentation>
             </variable>
@@ -8066,8 +8040,8 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
       FB_TranslationOutputInterlock_LD.
    🔒 Ne contient jamais une commande PDO autorisée.
    PowerCutOff : demande safety M3 (FB_Safety_Translation).
-      FIX : consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
-      d'Enable (barrière finale) — SafeStop n'y est plus lu, il reste géré en amont
+      Consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
+      d'Enable (barrière finale). SafeStop est géré en amont
       par FB_Translation (rampe rapide, Enable maintenu, AF06 §5).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -8421,7 +8395,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenanceTargetEnable">
@@ -8607,7 +8581,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="6.75" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m) -- (25), aligné sur GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -8618,8 +8592,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
-       métier dont le défaut peut valoir n'importe quoi) — PRG_SUPERVISION_CFC.st §2/§3
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot — défaut FALSE non ambigu
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
@@ -8635,9 +8608,6 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
    ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
-   📄 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
-   déplacés vers GVL_IHM.Commun.Cfg (WinchMaxStepDescente/etc.) — étaient partagés M1/M2 via
-   réconciliation ad-hoc, une seule instance dans Commun élimine le besoin de réconciliation.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -9312,7 +9282,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sécurités &amp; Diagnostics
-🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (déplacés 2026-08, voir ST_EncoderHMI)</xhtml>
+🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (voir ST_EncoderHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorsCheck">
@@ -11266,9 +11236,9 @@ CASE State OF
 
         // Condition d'arrêt automatique de la fermeture
         IF CloseReq THEN
-            // Inertie mécanique (M2 continue sur sa lancée après StartStop:=FALSE) faisait dépasser
-            // la cible réelle. Coupe la commande CloseAnticipationM avant OffsetCloseM -- le
-            // coast-down amène l'arrêt réel près du vrai offset au lieu de le dépasser.
+            // Compense l'inertie mécanique (coast-down) : coupe la commande
+            // CloseAnticipationM avant OffsetCloseM pour amener l'arrêt réel près du
+            // vrai offset au lieu de le dépasser.
             IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
@@ -11352,11 +11322,9 @@ DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
 // (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
-// Ajout de CloseReq/OpenReq (pas seulement IsClosed/IsOpen, qui sont FALSE pendant TOUT le trajet
-// depuis l'état transitoire) — sinon ActiveOffsetM restait figé sur OffsetOpenM (défaut) pendant
-// le trajet entier d'une fermeture, donc M2PositionCorrected = CablePosM2 brut tout du long, avec
-// un saut brutal uniquement à l'arrivée au lieu de converger progressivement vers M1 pendant
-// l'enroulage.
+// CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
+// TOUT le trajet depuis l'état transitoire) pour que la position corrigée de M2 converge
+// progressivement vers M1 pendant l'enroulage.
 IF State = E_State.BUSY THEN
     // Pendant le déplacement, l'offset actif suit la différence réelle de câble (M2 - M1) afin que
     // la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne) sans à-coup,
@@ -12516,10 +12484,10 @@ IF ErrorEdge.Q THEN
     CycleStepAtError := State;
 END_IF;
 
-// ⏱️ T36 — surveillance indépendante de la remontée lente
+// ⏱️ Surveillance indépendante de la remontée lente
 StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentTimeout);
 
-// 📏 T43 — comparaison vitesse réelle M1/M2
+// 📏 Comparaison vitesse réelle M1/M2
 SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
 SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
                        AND CycleMotionPermit
@@ -12558,7 +12526,7 @@ IF WinchSyncError AND State &lt;&gt; E_CycleStep.STABILIZING THEN
     State := E_CycleStep.STABILIZING;
 END_IF;
 
-// 🛡️ T43 — écart de vitesse confirmé : arrêt du cycle et STABILIZING.
+// 🛡️ Écart de vitesse confirmé : arrêt du cycle et STABILIZING.
 IF SpeedMismatchConfirmed AND State &lt;&gt; E_CycleStep.STABILIZING THEN
     Error := TRUE;
     ErrorId := ErrorId OR 16#0010;
@@ -16205,7 +16173,7 @@ END_IF;
 {endregion}
 
 {region "§3 Rebouclage TIME"}
-// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant (indépendant de T88).
+// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant.
 IF CurrentTimestamp &lt; LastTimestamp THEN
     Positions_M[0] := Position_M;
     Timestamps[0] := CurrentTimestamp;
@@ -21709,8 +21677,7 @@ IF NOT Enable THEN
     State := E_State.DISABLED;
     Error := FALSE;
     ErrorId := 16#0000;
-    // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard, comportement identique à l'ancien
-    // MecaA_Armed/MecaC_Armed := FALSE.
+    // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
     TonMecaB(IN := FALSE);
@@ -21744,7 +21711,7 @@ END_IF;
 // 🔑 2. RESET FRONT — efface le bit dont la cause a disparu
 ResetEdge(CLK := Reset);
 
-// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+// 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
     ErrorId := 16#0000;
@@ -21814,7 +21781,7 @@ IF NOT BypassGlobal THEN
     END_IF;
 
 // 🔍 3bis. PERTE CODEUR DE CE TREUIL
-// 🔧 WINCH-CORE-01 : le fonctionnement sans codeur reste interdit par défaut.
+// Le fonctionnement sans codeur reste interdit par défaut.
 // Le bypass est individuel, maintenu consciemment depuis l'IHM et strictement limité à MAINT_N2.
 // Il ne masque aucun autre défaut du treuil et n'agit jamais sur l'autre instance.
 EncoderAvailableEffective := EncoderAvailable
@@ -21872,9 +21839,8 @@ END_IF;
 // 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR — bit8
 // Indépendant de FB_Winch (défense en profondeur). Perte CAN (bit0) OU joystick au neutre ;
 // si les contacteurs OU LE FREIN ne confirment pas être retombés/serrés dans PostRampTimeout, défaut.
-// BrakeFeedback ajouté — un frein qui ne confirme pas son engagement dans ce délai est tout
-// aussi dangereux qu'un contacteur qui ne retombe pas (risque de mouvement/roue libre non
-// détecté). Auparavant seul FwdRevSpeedFeedbackOff était vérifié.
+// Un frein qui ne confirme pas son engagement dans ce délai est tout aussi dangereux qu'un
+// contacteur qui ne retombe pas (risque de mouvement/roue libre non détecté).
 MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
                        OR (NOT HeartbeatIhmOk) OR JoystickYNeutral;
 TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
@@ -21889,7 +21855,7 @@ END_IF;
 // Armé UNIQUEMENT pour l'instance M1 (BenneHoldStillActive câblé sur instBucket.Busy côté M1
 // seulement, toujours FALSE côté M2). Tolérance plus large que celle de FB_Bucket (1.0 m) —
 // n'intervient que si la couche Benne (SafeStop M1 seul) n'a pas suffi.
-// Dérive factorisée via FB_DriftGuard — comportement inchangé.
+// Dérive surveillée via FB_DriftGuard.
 DriftGuardC(
     Arm        := NOT (BypassSafety OR BypassMecaC) AND BenneHoldStillActive,
     PositionM  := CablePosM,
@@ -21917,8 +21883,8 @@ END_IF;
 // Complète le bit5 (AscentPermit immédiat) : arme la MÊME condition (capteur haut atteint, hors
 // homing) mais avec un délai de confirmation, comme Méca B. Si les contacteurs ET le frein ne
 // confirment pas être retombés/serrés dans PostRampTimeout après l'arrivée au capteur → défaut
-// → SafeStop ET PowerCutOff (la coupure AscentPermit seule n'a visiblement pas suffi à arrêter
-// réellement le treuil : roue libre ou contacteur/frein défaillant).
+// → SafeStop ET PowerCutOff (la coupure AscentPermit seule ne suffit pas à arrêter réellement
+// le treuil : roue libre ou contacteur/frein défaillant).
 TonMecaD(
     IN := NOT (BypassSafety OR BypassMecaD) AND ((((NOT TopPositionSensor AND NOT InReferencingMode) 
             OR (Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM + 0.10))))
@@ -22022,18 +21988,17 @@ AscentPermit := NOT (
     OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM)) AND NOT BypassTopLimitSoftware)
 );
 
-// PowerCutOff enfin réel — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
+// PowerCutOff — bits 7/8/9 (Méca A/B/C, voir bandeau en-tête).
 // Coupure puissance amont : les contacteurs locaux sont déjà confirmés coupés/insuffisants,
 // SafeStop seul ne sert à rien dans ces 3 cas précis.
-// bit2 (surchauffe/perte thermique MOTEUR) et bit10 (surchauffe/perte thermique FREIN commun)
-// ajoutés — un frein à manque de courant peut coller instantanément sur perte de son retour
-// thermique : une rampe SafeStop seule ne protège pas la mécanique dans ce cas, coupure puissance
-// immédiate nécessaire. Même raisonnement appliqué au thermique moteur par cohérence/défense en
-// profondeur.
-// bit11 (Méca D, capteur haut) ajouté — même raisonnement que Méca A/B : contacteurs/frein déjà
-// censés être coupés (AscentPermit immédiat sur capteur), une confirmation manquante après délai
-// signifie que la coupure locale n'a pas suffi.
-// bit13 (Méca E escalade) ajouté — PAS bit12 seul (détection immédiate = SafeStop uniquement ;
+// bit2 (surchauffe/perte thermique MOTEUR) et bit10 (surchauffe/perte thermique FREIN commun) :
+// un frein à manque de courant peut coller instantanément sur perte de son retour thermique ;
+// une rampe SafeStop seule ne protège pas la mécanique dans ce cas, coupure puissance immédiate
+// nécessaire. Même raisonnement appliqué au thermique moteur par cohérence/défense en profondeur.
+// bit11 (Méca D, capteur haut) : même raisonnement que Méca A/B — contacteurs/frein déjà censés
+// être coupés (AscentPermit immédiat sur capteur), une confirmation manquante après délai signifie
+// que la coupure locale n'a pas suffi.
+// bit13 (Méca E escalade) : PAS bit12 seul (détection immédiate = SafeStop uniquement ;
 // PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
 PowerCutOff := (ErrorId AND 16#2F84) &lt;&gt; 16#0000;
 
@@ -22457,10 +22422,8 @@ palier est encore engagé (fausse condition d'armement Méca A).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Sorties d'état du profil AF_Partie-03 §2.
-       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung (confirmé par
-       l'oracle PRG_06 : `Ready` n'y porte jamais d'expression, les broches suivantes oui).
-       Sans elles, `Winch` tombait sur cette broche réservée et se retrouvait câblée à une
-       branche au lieu de sa variable.
+       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung :
+       `Ready` n'y porte jamais d'expression, les broches suivantes oui.
 &lt;-- [STAT] TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
               </documentation>
             </variable>
@@ -22663,7 +22626,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
-   📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)
@@ -22676,7 +22638,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
    
    🔴 RÈGLES SÉCURITÉ ET POLARITÉ :
       - Modèle frein M1/M2/M3 : M1_BrakeIsOpen_DI := M1_BrakeCmd (1 = OUVERT).
-        Ne JAMAIS faire NOT BrakeCmd ! (P1 Lot L6).
+        Ne JAMAIS faire NOT BrakeCmd !
       - Retours contacteurs M1/M2 : 1 = tous retombés (TRUE quand RelayFwd=0 et RelayRev=0).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
@@ -22748,7 +22710,7 @@ instSimEncoderM2(
 );
 
 // Recopie structures Winch simulées :
-// 🛑 POLARITÉ DE FREIN SIMULÉ (P1 Lot L6) : 1 = contacteur commandé = frein OUVERT.
+// 🛑 POLARITÉ DE FREIN SIMULÉ : 1 = contacteur commandé = frein OUVERT.
 // Câblage réel : DI = 1 ⟺ frein OUVERT. Le modèle produit donc M1_BrakeIsOpen_DI := M1_BrakeCmd !
 Winch.M1_BrakeIsOpen_DI        := M1_BrakeCmd;
 // Retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
@@ -22876,7 +22838,7 @@ END_IF;
 // l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
 Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount &gt; 0);
 
-Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
+Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
 Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 
 
@@ -23044,9 +23006,7 @@ Done := TRUE;
       du métier machine.
    🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
       réellement, à partir des relais de sens commandés et de la vitesse rampée
-      courante. Extraction PURE de la logique déjà en place dans
-      `PRG_02_Encoders.st` (bloc "SIMULATION SUR BANC DE TEST") — aucun
-      changement de comportement, juste la dissociation en FB dédié.
+      courante.
    📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
    📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
    📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
@@ -23057,11 +23017,10 @@ Done := TRUE;
       d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
-   `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+   `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
       (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
       `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
-      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate) —
-      il fallait donc bien du PERSISTENT RETAIN réel, regroupé avec le reste dans GVL_PERSISTENT.
+      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate).
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===</xhtml>
           </documentation>
@@ -27770,7 +27729,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
-// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+// 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
     ErrorId := 16#0000;
@@ -27947,9 +27906,8 @@ END_IF;
 // ET Direction=1/-1 (demande OPÉRATEUR brute, pas CommandedDirection qui reste au dernier sens
 // jusqu'à la retombée de la rampe) — coupure instantanée du contacteur de sens dès le
 // relâchement du joystick, même sécurité que ci-dessus.
-// Plus de terme BrakeSafetyOk — le frein n'est plus une condition d'engagement des relais de
-// sens, c'est l'inverse (voir FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev,
-// calculé APRÈS ces relais).
+// Le frein n'est pas une condition d'engagement des relais de sens : c'est l'inverse
+// (voir FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
 RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep &gt; 0);
 RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep &gt; 0);
 
@@ -27961,7 +27919,7 @@ IF NOT AscentPermit THEN
     RelayFwd := FALSE;
 END_IF;
 
-// Vérification UNIQUEMENT à l'arrêt commandé (plus de détail par sens — voir bandeau en-tête).
+// Vérification UNIQUEMENT à l'arrêt commandé (voir bandeau en-tête).
 // AllContactorsCommandedOff = tout ce que FB_Winch commande est à FALSE.
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
@@ -27985,13 +27943,13 @@ IF BypassGlobal THEN
 END_IF;
 
 IF NOT BypassGlobal THEN
-// bit0 ErrorId libre — le frein n'est plus surveillé ici, sa cohérence commande/retour vit
-// désormais dans FB_WinchOutputInterlock_LD (BrakeFeedback).
+// bit0 ErrorId libre — la cohérence commande/retour du frein est surveillée dans
+// FB_WinchOutputInterlock_LD (BrakeFeedback).
 
 // 🧪 Simulation (GVL_Simulation.SensorMxContactorFeedbackIsReal, passé par l'appelant via
 // BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed
 // se déclenche à tort et bloque RelayFwd/RelayRev (voir Error plus bas).
-// bit2 (ex-RevContactorCheck) libre/inutilisé, fusionné dans bit1.
+// bit2 libre/inutilisé.
 IF NOT BypassContactorCheck THEN
     IF ContactorsCheck.StuckClosed THEN
         ErrorId := ErrorId OR 16#0002;
@@ -28002,7 +27960,7 @@ ELSE
     ErrorId := ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
 END_IF;
 
-// 🪜 WINCH-CORE-01 : remonte le défaut de configuration interne de FB_SpeedStep.
+// 🪜 Remonte le défaut de configuration interne de FB_SpeedStep.
 // Le bit reste mémorisé après correction de la table ; cause disparue + nouveau front Reset
 // sont obligatoires avant de rendre le treuil disponible, conformément à Partie 3 §5.
 IF SpeedStep.ConfigError THEN
@@ -28302,7 +28260,7 @@ Done := FALSE;
 State := E_State.READY;
 ResetEdge(CLK := Reset);
 Configured := LoadTable.IsConfigured;
-// 📈 WINCH-CORE-01 : l'estimation de charge n'a de sens qu'en montée.
+// 📈 L'estimation de charge n'a de sens qu'en montée.
 // La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
 // mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
 Ascending := (MeasuredSpeedSignedMps &gt; 0.0);
@@ -29435,7 +29393,7 @@ ELSIF ResetEdge.Q AND NOT DeviationActive THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// 🐢 T113 : Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
+// 🐢 Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
 SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM &gt; CfgSyncToleranceM) OR ((ErrorId AND 16#0001) &lt;&gt; 16#0000));
 
 // 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1
@@ -29835,7 +29793,7 @@ Done := FALSE;
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚖️ FB_Winch_Symmetry — Mesure passive MES-008 M1/M2
+   ⚖️ FB_Winch_Symmetry — Mesure passive M1/M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Observateur de symétrie et de synchronisme des treuils M1/M2
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
@@ -31034,7 +30992,7 @@ Auth := instModes.Auth;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = benne jugée fermée (tolérance matière 2 m) ; FALSE = ouverte/intermédiaire (revue SEMI_AUTO)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = benne jugée fermée (tolérance matière 2 m) ; FALSE = ouverte/intermédiaire</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -31062,7 +31020,7 @@ Auth := instModes.Auth;
                 <derived name="FB_Safety_Winch" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1/M2 avaient 0 mécanisme actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sécurité treuil M1 (SafeStop / permits / PowerCutOff)</xhtml>
               </documentation>
             </variable>
             <variable name="instSafetyWinchM2">
@@ -31146,14 +31104,13 @@ uniquement, même périmètre que instDiveSearch/instExtractionSequence).</xhtml
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(Fiche 01, demande client) : séquencement automatique benne en pilotage
-couplé (both) normal — descente uniquement benne ouverte, montée uniquement benne
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement automatique benne en pilotage couplé (both) normal --
+descente uniquement benne ouverte, montée uniquement benne
 fermée. Distinct de DumpAtTremie/DiveSearch/ExtractionSequence (fonctionnement normal,
 pas une assistance MAINT_N1/N2 dédiée). Réutilise CoupledUserRequestActive/
 CoupledUserRequestDirection (§1 ci-dessus) : déjà exactement "mouvement couplé (both)
 demandé" dans les 2 modes (joystick Select=0, ou BtnWinchBothUp/Down) — mêmes variables
-déjà utilisées par instBucket/instDiveSearch/instExtractionSequence, aucune nouvelle
-détection à inventer.
+déjà utilisées par instBucket/instDiveSearch/instExtractionSequence.
 CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               </documentation>
             </variable>
@@ -31356,7 +31313,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FICHE 05 — Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldAutoStopFallEdge">
@@ -31379,7 +31336,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(10) / : mode Dive actif + benne ouverte = descente permise</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">mode Dive actif + benne ouverte = descente permise</xhtml>
               </documentation>
             </variable>
             <variable name="ManualBucketLimitsActive">
@@ -31387,7 +31344,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(18) : pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1</xhtml>
               </documentation>
             </variable>
             <variable name="SlackCableAscentStep1">
@@ -31395,7 +31352,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(T111) : mou de câble en récupération -- bride la montée au Palier 1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">mou de câble en récupération -- bride la montée au Palier 1</xhtml>
               </documentation>
             </variable>
             <variable name="BucketNotClosedAscentStep1">
@@ -31403,7 +31360,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(T114) : benne non fermée à 100% à la montée -- bride la montée au Palier 1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">benne non fermée à 100% à la montée -- bride la montée au Palier 1</xhtml>
               </documentation>
             </variable>
             <variable name="BypassKoboldFallEdge">
@@ -31411,12 +31368,12 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <derived name="F_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : bypass simplifié séquence FB_DiveSearch (demande client) -- front montant
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simplifié séquence FB_DiveSearch -- front montant
 Kobold pendant une descente couplée confirme directement le fond, sans passer par les
 préconditions strictes de FB_DiveSearch (benne ouverte, DiveStartMin_M, fenêtre immersion).
-FB_DiveSearch continue de tourner en parallèle, inchangée (KoboldMeasureEnable toujours câblé
+FB_DiveSearch continue de tourner en parallèle (KoboldMeasureEnable toujours câblé
 dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.
-(26) : front descendant remplace montant</xhtml>
+front descendant Kobold</xhtml>
               </documentation>
             </variable>
             <variable name="BypassKoboldBottomTouched">
@@ -31459,7 +31416,7 @@ dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(27) : mémoire scan précédent pour SpeedDelta_Mps (IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire scan précédent pour SpeedDelta_Mps (IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_PrevSpeed_Mps">
@@ -31486,13 +31443,7 @@ dessus) -- ce bypass est un chemin ADDITIONNEL, pas un remplacement.
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    // : ancienne version
-    // affectait HwIn.Operator.JoyYRaw_ANA2 (valeur analogique BRUTE 0..10000, meme signal que
-    // RawY sur instJoystick) directement a CoupledUserRequestDirection, alors que
-    // FB_Bucket/FB_DiveSearch/FB_ExtractionSequence testent MotionDirection = 1/-1 EXACTEMENT.
-    // Consequence : en mode TglJoystickMaster, la benne/les sequenceurs assistes ne pouvaient
-    // JAMAIS demarrer via le joystick (seul le mode Boutons IHM, qui affecte bien 1/-1,
-    // fonctionnait). Corrige : direction deja mise a l'echelle (-1/0/+1) par instJoystick.
+    // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick.
     CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
     CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
@@ -31509,7 +31460,7 @@ ELSE
 
 END_IF;
 
-// mode "vidage à la trémie" (verrouillage, demande client). Périmètre identique
+// mode "vidage à la trémie" (verrouillage). Périmètre identique
 // à instDiveSearch/instExtractionSequence : MAINT_N1/MAINT_N2 uniquement.
 DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
 DumpAtTremieAssistActive := DumpAtTremieActive
@@ -31518,10 +31469,9 @@ GVL_IHM.DredgingAssist.State.DumpAtTremieArmed        := DumpAtTremieActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAssistActive := DumpAtTremieAssistActive;
 GVL_IHM.DredgingAssist.State.DumpAtTremieAtTremie     := PRG_05_Translation.M3_AtTremieStable;
 
-// BUG CONFIRMÉ : "OR _BucketState.IsOpen" annulait le
-// forçage à CHAQUE scan, alors que confirmer "fond touché" se fait précisément PENDANT que la
-// benne est encore ouverte (avant que l'extraction ne la ferme) -- condition backwards, rendait
-// tout forçage manuel de TglBucketAtBottomConfirmed impossible en pratique. Retiré.
+// Confirmation manuelle "fond touché" effacée hors conditions de garde (MAINT_N1/N2,
+// sous tension, pas de défaut, pas de descente couplée) — la confirmation se fait
+// précisément PENDANT que la benne est encore ouverte (avant que l'extraction ne la ferme).
 IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
@@ -31531,8 +31481,7 @@ IF NOT (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Aut
 END_IF;
 ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
 
-// demande client : REMPLACÉ front montant par front
-// DESCENDANT Kobold pendant une descente couplée = fond touché, directement (voir bandeau §1).
+// Front DESCENDANT Kobold pendant une descente couplée = fond touché, directement (voir bandeau §1).
 // Mêmes conditions de garde que la confirmation manuelle ci-dessus (MAINT_N1/N2, sous tension,
 // pas de défaut, benne fermée -- réutilise le bloc de clear commun juste au-dessus).
 BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
@@ -31561,24 +31510,19 @@ instDiveSearch(
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
-    // (14) : même toggle que le bypass bottom-confirmation -- réglages seuils pas
-    // encore calibrés, saute WAIT_PRECONDITIONS entièrement le temps des essais.
+    // Même toggle que le bypass bottom-confirmation -- saute WAIT_PRECONDITIONS entièrement.
     BypassPreconditions := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
 );
 
-// publication IHM (était orpheline -- déclarée mais jamais écrite, voir
-// GVL_IHM.DredgingAssist.State) — consommée ensuite par FB_TroubleshootingView (debug).
+// Publication IHM — consommée ensuite par FB_TroubleshootingView (debug).
 GVL_IHM.DredgingAssist.State.DiveReady            := instDiveSearch.Ready;
 GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Busy;
 GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Done;
 GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Error;
 GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.ErrorId;
 GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
-// : affichage IHM ne reflétait que la détection Kobold
-// (instDiveSearch), pas la confirmation manuelle (TglBucketAtBottomConfirmed) ni le bypass --
-// alors que BottomPositionConfirmed (consommée par instExtractionSequence ci-dessous) fait bien
-// le OR des trois. L'opérateur voyait "non confirmé" à l'IHM alors que le séquenceur considérait
-// le fond confirmé -- affichage seul en cause, la logique de commande était correcte.
+// BottomPositionConfirmed = OR des trois : détection Kobold
+// (instDiveSearch), confirmation manuelle (TglBucketAtBottomConfirmed) et bypass.
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
 GVL_IHM.DredgingAssist.State.BottomTouchConfirmed := BottomPositionConfirmed;
 
@@ -31616,8 +31560,8 @@ GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.ErrorId
 GVL_IHM.DredgingAssist.State.ExtractionState   := instExtractionSequence.ExtractionState;
 
 // une seule consigne opérateur conduite à la fois (doc §OperatorActionId) —
-// aucun PRG_09 n'existe (jamais câblé), arbitrage fait ici : DiveSearch prioritaire si Busy,
-// sinon ExtractionSequence si Busy, sinon la dernière connue reste affichée à titre informatif.
+// arbitrage fait ici : DiveSearch prioritaire si Busy, sinon ExtractionSequence si Busy,
+// sinon la dernière connue reste affichée à titre informatif.
 IF instDiveSearch.Busy THEN
     GVL_IHM.DredgingAssist.State.OperatorActionId := instDiveSearch.OperatorActionId;
     GVL_IHM.DredgingAssist.State.OperatorAction   := instDiveSearch.OperatorAction;
@@ -31629,7 +31573,7 @@ ELSE
     GVL_IHM.DredgingAssist.State.OperatorAction   := '';
 END_IF;
 
-// (Fiche 01, demande client) : règle absolue en pilotage couplé (both) normal --
+// Règle absolue en pilotage couplé (both) normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée. Réutilise
 // CoupledUserRequestActive/CoupledUserRequestDirection (§1) : déjà "mouvement couplé
 // demandé" dans les 2 modes (joystick Select=0 exclut le pilotage unitaire M1/M2 seul,
@@ -31639,8 +31583,7 @@ END_IF;
 // M2_LimitShift). GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing (défaut FALSE) : si FALSE,
 // ces 2 flags restent FALSE en permanence -- CmdOpen_IHM/CmdClose_IHM ne sont plus jamais armés
 // par le mouvement couplé joystick, instBucket.Busy ne peut plus être déclenché QUE par action
-// manuelle benne/DumpAtTremie/ExtractionSequence (comportement strictement identique à avant
-// Fiche 01).
+// manuelle benne/DumpAtTremie/ExtractionSequence.
 CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
     AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
     AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
@@ -31651,7 +31594,7 @@ CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequen
     AND NOT _BucketState.IsClosed;
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO (L3) : fermeture benne pilotée par le séquenceur de cycle.
+    // Pont SEMI_AUTO : fermeture benne pilotée par le séquenceur de cycle.
     CmdBucketCloseArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.Close;
 ELSIF instExtractionSequence.BucketCloseRequest THEN
     CmdBucketCloseArbitrated := TRUE;
@@ -31663,11 +31606,11 @@ END_IF;
 
 // urgence : instDiveSearch.KoboldMeasureEnable
 // n'est TRUE que dans SEARCHING_IMMERSION/SEARCHING_BOTTOM, atteignables uniquement après
-// WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M -- réglages pas encore
-// calibrés). Avec le bypass (TglBypassDiveSearchSequence), le contacteur doit être piloté
+// WAIT_PRECONDITIONS (DiveStartMin_M/ImmersionUpper_M/ImmersionLower_M). Avec le bypass
+// (TglBypassDiveSearchSequence), le contacteur doit être piloté
 // INDÉPENDAMMENT de ces préconditions dès qu'on descend réellement.
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO (L3) : contacteur Kobold piloté par le séquenceur de cycle.
+    // Pont SEMI_AUTO : contacteur Kobold piloté par le séquenceur de cycle.
     KoboldContactorCmdArbitrated := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
 ELSE
     KoboldContactorCmdArbitrated := instDiveSearch.KoboldMeasureEnable
@@ -31685,7 +31628,7 @@ END_IF;
 // la trémie arme l'ouverture benne au lieu de faire descendre M2 — le mouvement réel reste
 // gouverné par MotionRequestActive/MotionDirection ci-dessous (rien ne bouge tant que
 // l'opérateur ne pousse pas réellement DOWN) ; instBucket.Busy prend alors la main sur
-// l'arbitrage M2 normal (mécanisme déjà existant, voir §3bis plus bas).
+// l'arbitrage M2 normal (voir §3bis plus bas).
 DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.M3_AtTremieStable;
 GVL_IHM.DredgingAssist.State.DumpAtTremieBucketOpenArmed := DumpAtTremieBucketOpenArmed;
 
@@ -31715,9 +31658,9 @@ instBucket(
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
 
-// / (T114) : Auto-séquencement benne &amp; Dégradation Palier 1
+// Auto-séquencement benne &amp; Dégradation Palier 1
 // Si la benne est en cours de fermeture/ouverture (instBucket.Busy), le mouvement couplé attend.
-// T114 : Si la benne n'est pas fermée (NOT IsClosed) et que instBucket n'est plus occupé (Busy=FALSE),
+// Si la benne n'est pas fermée (NOT IsClosed) et que instBucket n'est plus occupé (Busy=FALSE),
 // toute demande de montée est automatiquement dégradée au Palier 1 (Vitesse lente, voir instWinchM1/M2),
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
@@ -31725,7 +31668,7 @@ instBucket(
 CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Busy;
 BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDirection = 1) AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
 
-// T111 : En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
+// En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
 // au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
@@ -31758,7 +31701,7 @@ END_IF;
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO (L3) : consomme les demandes du séquenceur de cycle.
+    // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
     // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M1LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction;
     M1LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.StartStop;
@@ -31794,13 +31737,8 @@ ELSE
                             AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
 END_IF;
 
-// (Fiche 01, demande client "jamais arrêter M2") : condition renforcée
-// "instBucket.Busy AND instBucket.M2_StartStop" au lieu de "instBucket.Busy" seul. Sans le 2e
-// terme, le scan où le benne atteint sa cible (M2_StartStop benne retombé à FALSE ce même
-// scan, AVANT que Busy ne retombe le scan SUIVANT) forçait un arrêt M2 d'1 scan avant que
-// l'arbitrage normal ne prenne le relais -- fenêtre de coupure dépendante du timing exact de
-// la bascule Busy, pas garantie structurellement. Avec le 2e terme, ce scan tombe directement
-// dans la branche ELSE (arbitrage normal) : si le mouvement couplé est toujours demandé, M2
+// Condition renforcée "instBucket.Busy AND instBucket.M2_StartStop" au lieu de
+// "instBucket.Busy" seul : si le mouvement couplé est toujours demandé, M2
 // reçoit sa commande de continuité le MÊME scan, sans dépendre d'un timing de bascule.
 IF instBucket.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestStartStop := instBucket.M2_StartStop;
@@ -31808,7 +31746,7 @@ IF instBucket.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestSpeedRef_Pct  := 15.0;
 ELSE
     IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-        // Pont SEMI_AUTO (L3) : consomme les demandes du séquenceur de cycle.
+        // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
         M2LogicRequestDirection := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.Direction;
         M2LogicRequestStartStop := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.StartStop;
         M2LogicRequestSpeedRef_Pct  := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM2Cmd.SpeedPct;
@@ -31844,13 +31782,8 @@ ELSE
     END_IF;
 END_IF;
 
-// (Fiche 01, demande client "jamais arrêter M2") : 2e mécanisme de coupure trouvé
-// en plus de celui déjà corrigé §3 ci-dessus -- celui-ci forçait un arrêt INCONDITIONNEL de M1
-// ET M2 à CHAQUE fin d'action benne (Busy retombé), y compris pendant un enchaînement
-// ouverture/fermeture-puis-mouvement-couplé où le mouvement doit continuer sans coupure
-// (affecte aussi ExtractionSequence.CLOSING_BUCKET-&gt;CONTROL_ASCENT, pas seulement la Fiche 01).
-// Corrigé : ne force plus l'arrêt si un mouvement couplé est toujours activement demandé
-// (CoupledUserRequestActive), auquel cas l'arbitrage normal (§3, déjà corrigé) prend le
+// Ne force plus l'arrêt si un mouvement couplé est toujours activement demandé
+// (CoupledUserRequestActive), auquel cas l'arbitrage normal (§3) prend le
 // relais sans interruption. Comportement inchangé pour toute fin d'action benne SANS mouvement
 // couplé en cours (ouverture/fermeture manuelle isolée, bouton IHM) : l'arrêt reste forcé.
 BenneBusyFallEdge(CLK := instBucket.Busy);
@@ -31859,10 +31792,10 @@ IF BenneBusyFallEdge.Q AND NOT (CoupledUserRequestActive AND (CoupledUserRequest
     M2LogicRequestStartStop := FALSE;
 END_IF;
 
-// (Fiche 01, demande client) : après une fermeture benne armée PAR CE mécanisme
+// Après une fermeture benne armée PAR CE mécanisme
 // (pas ExtractionSequence, qui a déjà sa propre phase CONTROL_ASCENT), la montée couplée qui
-// enchaîne démarre en vitesse contrôlée (palier 1) sur ExtractionControlDistance_M (paramètre
-// existant, réutilisé -- pas de nouveau réglage) avant de repasser en paliers normaux.
+// enchaîne démarre en vitesse contrôlée (palier 1) sur ExtractionControlDistance_M avant de
+// repasser en paliers normaux.
 BucketBusyRiseEdge(CLK := instBucket.Busy);
 IF BucketBusyRiseEdge.Q THEN
     ControlAscentArmedForThisClose := CoupledAscentBucketCloseArmed;
@@ -31947,9 +31880,9 @@ END_IF;
 {region "§5 Couplage croise et securites"}
 // === 🛑 §5 COUPLAGE CROISÉ &amp; SÉCURITÉS ===
 
-// (demande client) : la limite légale (profondeur min. autorisée) doit elle aussi
+// La limite légale (profondeur min. autorisée) doit elle aussi
 // bénéficier du ralentissement progressif avant arrêt (comme la limite câble physique), pas juste
-// un arrêt sec (DescendPermit, ajouté au lot précédent). Comme les 2 limites bornent la même
+// un arrêt sec (DescendPermit). Comme les 2 limites bornent la même
 // direction (descente), on alimente FB_Winch.BottomLimitM avec la PLUS RESTRICTIVE des deux
 // (MAX de 2 valeurs négatives = celle la moins profonde = atteinte en premier) : le ralentissement
 // (FB_Winch §"RALENTISSEMENT AUTOMATIQUE SUR BORDURES") s'enclenche alors sur la bonne limite,
@@ -31968,10 +31901,8 @@ END_IF;
 SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.InputModuleFault;
 SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.InputModuleFault;
 
-// FICHE 05 — Surveillance Kobold descente normale (hors FB_DiveSearch)
-// : "HwIn.Winch.M1M2_KoboldImmersed_DI" n'existe
-// pas (ST_HwWinch n'a pas ce membre) -- corrigé vers le meme signal deja utilise par
-// instDiveSearch ci-dessus (§1, ligne KoboldImmersed), HwIn.Machine.M1_M2_KoboldBottomTouch_DI.
+// Surveillance Kobold descente normale (hors FB_DiveSearch)
+// : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
 KoboldAutoStopRiseEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 KoboldAutoStopFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 
@@ -31981,10 +31912,9 @@ IF PRG_02_Acquisition.instJoystick.AtNeutral OR NOT GVL_IHM.Commun.Cfg.TglEnable
     KoboldBottomTouchLatched := FALSE;
 END_IF;
 
-// (revue Fiche 05) : CoupledUserRequestActive ajouté -- sans lui, cette
-// surveillance pouvait s'armer aussi en pilotage UNITAIRE M1 (Select=1), où CoupledUserRequestDirection
-// reflète quand même l'axe joystick brut (seul CoupledUserRequestActive exige Select=0).
-// Hors scope de la fiche ("pendant une descente COUPLÉE normale") -- corrigé.
+// CoupledUserRequestActive requis : cette surveillance ne s'arme qu'en pilotage
+// COUPLÉ (Select=0), pas en pilotage unitaire M1 (où CoupledUserRequestDirection reflète
+// quand même l'axe joystick brut).
 // Qualification immersion : front montant Kobold dans la fenêtre [ImmersionLower_M..ImmersionUpper_M]
 IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND CoupledUserRequestActive
@@ -32005,20 +31935,14 @@ IF KoboldAutoStopFallEdge.Q AND KoboldImmersionConfirmed THEN
     KoboldImmersionConfirmed := FALSE;
 END_IF;
 
-// GAP RÉEL CONFIRMÉ : instDiveSearch.DescendPermit
-// était calculé (FB_DiveSearch.st) mais JAMAIS consommé nulle part dans PRG_04/PRG_06 -- en
-// mode Dive actif, rien n'empêchait réellement de descendre benne fermée, malgré la précondition
-// FB_DiveSearch (BucketIsOpen requis pour READY_TO_DESCEND). Ajouté : autorisation directe et
-// explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif) -- indépendante du
-// timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
+// Autorisation directe et explicite, gardée par instDiveSearch.Enable (mode Dive réellement actif)
+// -- indépendante du timing interne DescendPermit. Bloque uniquement si benne PAS confirmée ouverte.
 DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequestActive
     AND (CoupledUserRequestDirection = -1) AND NOT _BucketState.IsOpen);
 
-// : BypassKoboldBottomTouched confirmait le fond
-// (pour Extraction) mais ne bloquait pas la descente elle-même -- seul KoboldBottomTouchLatched
-// (mécanisme Fiche 05 séparé) le faisait. Ajouté : le bypass arrête aussi la descente
-// instantanément, même doctrine que le mécanisme Fiche 05.
-// demande client : mode "pilotage unitaire M2 sécurisé"
+// Le bypass arrête aussi la descente instantanément, même doctrine que le mécanisme
+// KoboldBottomTouchLatched.
+// Mode "pilotage unitaire M2 sécurisé"
 // (SelJoystickWinch=2 + toggle IHM). Ne passe PAS par instBucket (pas de CloseReq/OpenReq
 // mémorisé, jogging libre) -- bornes directes ouvert/fermé (mêmes offsets que FB_Bucket,
 // relatifs à la position réelle de M1) + palier 1 (voir instWinchM2 §6 plus bas).
@@ -32026,10 +31950,9 @@ ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimi
     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
 
 DescendPermitM1_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
-// (21bis) — DÉPASSEMENT CONFIRMÉ : ce chemin (pilotage
-// unitaire M2, hors instBucket) n'avait AUCUNE anticipation d'inertie, contrairement au CASE
-// BUSY de FB_Bucket -- même OpenAnticipationM/CloseAnticipationM réutilisé ici
-// pour couvrir aussi le jog unitaire.
+// Ce chemin (pilotage
+// unitaire M2, hors instBucket) applique l'anticipation d'inertie OpenAnticipationM/CloseAnticipationM
+// (mêmes que FB_Bucket) pour couvrir aussi le jog unitaire.
 DescendPermitM2_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 &lt;= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
@@ -32038,7 +31961,7 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
                       (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _WinchM2CfgPersist.CfgCableLimitAscent_M);
 
-// : FB_Safety_Winch M1/M2 — 0 mécanisme actif avant ce lot.
+// FB_Safety_Winch M1/M2.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
 instSafetyWinchM1(
@@ -32079,7 +32002,7 @@ instSafetyWinchM1(
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
-    // (demande client) : OR avec le bypass commun (Commun.Bypass) -- leve la
+    // OR avec le bypass commun (Commun.Bypass) -- leve la
     // protection sur les 2 treuils simultanement pour le pilotage "both", sans retirer le
     // bypass individuel pour le pilotage a l'unite.
     // 🔒 SÉCURITÉ : GVL_Simulation.SimulationBypassActive n'agit QUE si SimulationModeActive=TRUE (strictement inopérant sur machine réelle).
@@ -32164,7 +32087,7 @@ SafeStopM2_Raw := SafeStopM2_Raw OR instSafetyWinchM2.SafeStop;
 DescendPermitM1_Raw := DescendPermitM1_Raw AND instSafetyWinchM1.DescendPermit;
 DescendPermitM2_Raw := DescendPermitM2_Raw AND instSafetyWinchM2.DescendPermit;
 
-// (mode "vidage à la trémie", demande client) : descente M1 ET M2 interdite tant
+// Mode "vidage à la trémie" : descente M1 ET M2 interdite tant
 // que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
 // descente-treuil / translation pour se rapprocher d'un enchaînement automatique sûr.
 GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked :=
@@ -32204,7 +32127,7 @@ instWinchM1(
     SpeedRefPct             := M1LogicRequestSpeedRef_Pct,
     SpeedStepTable          := _WinchSpeedStepTable,
     CfgMaxStepDescente      := SEL(instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
-    // (T111 / T113 / T114) : Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
+    // Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
     MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
@@ -32234,15 +32157,12 @@ instWinchM2(
     Direction               := M2LogicRequestDirection,
     SpeedRefPct             := M2LogicRequestSpeedRef_Pct,
     SpeedStepTable          := M2_SpeedStepTableActive,
-    // GAP CONFIRMÉ : instBucket.M2_ForceSlowSpeed
-    // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) n'était consommé que
-    // pour substituer M2_SpeedStepTableActive -- ne plafonnait PAS réellement le palier autorisé
-    // pendant CLOSING_BUCKET/ouverture benne. MaxStepAscent forçait déjà palier 1 pour
-    // CONTROL_ASCENT (ForceMinSpeedStep) mais pas pendant le mouvement benne lui-même ;
-    // CfgMaxStepDescente n'avait AUCUN plafond, jamais. Corrigé : les deux suivent maintenant
-    // instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
-    // (T113) : instWinchSync.SyncDegradedStep1 dégrade M2 au Palier 1 sur écart modéré.
-    // (T114 / T111) : BucketNotClosedAscentStep1 et SlackCableAscentStep1 dégradent la montée au Palier 1.
+    // instBucket.M2_ForceSlowSpeed
+    // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) plafonne le palier
+    // autorisé pendant CLOSING_BUCKET/ouverture benne : MaxStepAscent et CfgMaxStepDescente
+    // suivent instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
+    // instWinchSync.SyncDegradedStep1 dégrade M2 au Palier 1 sur écart modéré.
+    // BucketNotClosedAscentStep1 et SlackCableAscentStep1 dégradent la montée au Palier 1.
     CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
     MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
@@ -32271,9 +32191,9 @@ WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
 WinchM1FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
-// (retrait FB_Brake, demande client) : plus de BrakeReleaseRequest/
+// Plus de BrakeReleaseRequest/
 // BrakeCommandOpenConfirmed calcules par FB_Winch — la barriere finale
-// (FB_WinchOutputInterlock_LD) recoit desormais le retour PHYSIQUE brut directement,
+// (FB_WinchOutputInterlock_LD) recoit le retour PHYSIQUE brut directement,
 // et calcule elle-meme BrakeCmd := RelayFwd OR RelayRev (voir bandeau de ce FB).
 WinchM1FinalInterlockRequest.BrakeFeedback := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;
 WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;
@@ -32305,11 +32225,9 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
 {region "§8 Publication etats IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
-// : MeasuredSpeed_Mps jamais recopié, restait
-// à 0.0 en permanence à l'IHM. SpeedDelta_Mps corrigé par rapport à la proposition initiale de
-// l'agent (M1-M2, faux sens) -- le commentaire du type (ST_WinchState.st) dit explicitement
-// "variation de vitesse ENTRE DEUX SCANS", pas un écart M1/M2 (qui existe déjà ailleurs via
-// SyncStateHMI.DeltaPos_M/instWinchSync). Delta temporel via mémoire scan précédent.
+// SpeedDelta_Mps = variation de vitesse ENTRE DEUX SCANS (ST_WinchState.st),
+// pas un écart M1/M2 (qui existe via SyncStateHMI.DeltaPos_M/instWinchSync).
+// Delta temporel via mémoire scan précédent.
 WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
 WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.M1_Speed_Mps - M1_PrevSpeed_Mps;
 M1_PrevSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
@@ -32493,9 +32411,7 @@ BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
-// corrigé -- pointait sur DumpAtTremieBucketOpenArmed (mauvais signal, deviné
-// par l'agent Fiche 02 avant que la Fiche 01 ne soit committée). Reflète maintenant le vrai
-// séquencement auto Fiche 01 : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
+// Reflète le séquencement auto : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
 // vitesse contrôlée post-fermeture.
 BucketState.AutoBucketSeqActive := (instBucket.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
 BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
@@ -32505,7 +32421,7 @@ BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 
-// Tolérance matière benne (revue SEMI_AUTO) : « à peu près fermée » = fermée OU
+// Tolérance matière benne : « à peu près fermée » = fermée OU
 // intermédiaire proche de l'offset fermé (tolérance 2 m). Évite le blocage au fond sur
 // matière dense (galets) qui ne ferme jamais à 100% de la consigne fine.
 Benne_IsRoughlyClosed := _BucketState.IsClosed
@@ -32598,7 +32514,7 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause historique : InputModuleFault (AF06 §3bis)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop sur défaut module d'entrée (InputModuleFault, AF06 §3bis)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_SafeStop_Aggregate">
@@ -32782,17 +32698,14 @@ END_IF;
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO (L4) : consomme la demande du séquenceur de cycle.
+    // Pont SEMI_AUTO : consomme la demande du séquenceur de cycle.
     // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M3_PositioningActive  := TRUE;
     SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
     M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
 
-    // 🔒 Gating direction/vitesse sur Start : sans Start (cycle à X0),
-    // M3_Direction_Active/M3_SpeedRef_Active resteraient non-nuls (SelTarget≠1 → -1, vitesse 100),
-    // ce qui ferait « bouger » M3 en simulation (FB_Sim_Translation ignore Start) et déclencherait
-    // l'escalade fin de course (bit6) → PowerCutOff → éjection SEMI_AUTO. Direction/vitesse
-    // uniquement si le cycle commande réellement le mouvement.
+    // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
+    // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
     IF M3_StartStop_Active THEN
         M3_SpeedRef_Active := 100.0;
         // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
@@ -32822,8 +32735,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
 
     // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2
     // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
-    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd),
-    // plus de doublon par axe (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé).
+    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd).
     M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
                                 OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
@@ -32846,13 +32758,8 @@ ELSE
     M3_SpeedRef_Active   := 0.0;
 END_IF;
 
-// InvertDirection NE s'applique PLUS ici. Appliqué
-// en amont sur M3_Direction_Active, il désaccordait TOUTE la logique sécurité/ralentissement
-// appariée aux vrais capteurs physiques (LimitSwitchFwd/Rev, SlowdownSensorXxx, verrous §0quater)
-// dès que le câblage moteur réel l'exigeait à TRUE — seule la coupure dure indépendante du sens
-// (§0bis) arrêtait encore la machine, le verrou d'arrivée logiciel ne s'armait jamais. Compensation
-// déplacée dans FB_Translation (InvertDriveDirection), appliquée UNIQUEMENT au mot de commande
-// variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
+// InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
+// de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
 
 M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
 
@@ -32864,13 +32771,10 @@ END_IF;
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
 M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 
-// SelTarget reste à 0 en mode manuel
-// (MAINT_N1/N2, T106 — aucun séquenceur SEMI_AUTO ne le réarbitre à ce jour), donc la CASE
-// ci-dessous tombait toujours en ELSE=FALSE et le verrou anti-rebond §4ter de FB_Translation
-// (DirectionAtArrival) ne s'armait jamais en usage réel. Repli explicite hors sélection
-// SEMI_AUTO : n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance) arme le verrou.
-// Mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
-// franc à l'arrivée quel que soit le sens de venue (voir FB_Translation_PositionDecoder.st).
+// En mode manuel (SelTarget=0), n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance)
+// arme le verrou anti-rebond §4ter de FB_Translation (DirectionAtArrival). Mot EXACT
+// (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front franc à l'arrivée quel que
+// soit le sens de venue (voir FB_Translation_PositionDecoder.st).
 CASE SelTarget OF
     1: M3_PositionSensorTarget := M3_AtTremieStable;
     2: M3_PositionSensorTarget := M3_AtP2Stable;
@@ -32884,9 +32788,6 @@ ELSE
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -&gt; arrêt sur Maintenance
         // - Si Maintenance interdite -&gt; arrêt sur P1
-        // Réactivé — le retrait d'urgence précédent était dû à AtP1 armé sur le
-        // front du capteur P2 (zone d'approche) au lieu du capteur P1 lui-même (franchissement
-        // réel du point). Corrigé dans FB_Translation_PositionDecoder.st (front du capteur propre).
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
             M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
@@ -32903,11 +32804,9 @@ END_CASE;
 {region "§1bis Securite M3"}
 // === 🛡️ §1bis SÉCURITÉ M3 (FB_Safety_Translation, câblée en parallèle visible) ===
 // ⚠️ Ordre d'appel volontaire : la safety lit ici le BrakeReleaseRequest et le
-// BrakeCmd du SCAN PRÉCÉDENT d'instTranslationM3 (elle est appelée avant), exactement
-// le même retard d'un scan que documenté en AF_Partie-11 §5 alerte 4 pour l'ancien
-// code CFC — non éliminé par ce lot (nécessite la fusion CFC complète, lot M4 migration
-// 7 POU, hors périmètre). Bénin : BrakeReleaseRequest ne change pas plus vite qu'un
-// scan MainTask 10 ms sur une commande frein.
+// BrakeCmd du SCAN PRÉCÉDENT d'instTranslationM3 (elle est appelée avant), soit un retard
+// d'un scan. Bénin : BrakeReleaseRequest ne change pas plus vite qu'un scan MainTask 10 ms
+// sur une commande frein.
 instSafetyTranslationM3(
     Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE),
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -32941,8 +32840,8 @@ instSafetyTranslationM3(
     BypassProcess           := GVL_IHM.TranslationM3.Bypass.Process
 );
 
-// SafeStop réellement appliqué au mouvement = agrégat InputModuleFault (historique)
-// OR safety M3 (8 mécanismes) — aucune des deux causes ne doit être perdue.
+// SafeStop réellement appliqué au mouvement = agrégat InputModuleFault OR safety M3
+// (8 mécanismes) — aucune des deux causes ne doit être perdue.
 M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 
 {endregion}
@@ -33078,11 +32977,9 @@ TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM
 TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 
 // 🛡️ Producteur unique (CODE_QUALITY_STANDARDS §5) : la safety M3 (instSafetyTranslationM3)
-// est désormais la source de tous les diagnostics de sécurité — ErrorLimitSwitch/
-// ErrorSensorIncoherent ne sont plus recalculés ici (ancien calcul ignorait les bypass,
-// pouvait afficher un défaut alors qu'il était sciemment bypassé). Les erreurs propres au
-// mouvement (frein, variateur AC600) restent sur TranslationState.ErrorId ci-dessus,
-// bitfield différent, jamais mélangé.
+// est la source de tous les diagnostics de sécurité (ErrorLimitSwitch/ErrorSensorIncoherent).
+// Les erreurs propres au mouvement (frein, variateur AC600) restent sur TranslationState.ErrorId
+// ci-dessus, bitfield différent, jamais mélangé.
 TranslationSafety.SafeStop := M3_SafeStop_Aggregate;
 TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
 TranslationSafety.Error := instSafetyTranslationM3.Error;
@@ -33118,10 +33015,8 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">PowerKeepAlive_A_RQ/
-       PowerKeepAlive_B_RQ/EmergencyArming_RQ retirés d'ici — même collision de portée
-       que M1/M2/M3 (voir §2). Cibles renommées : PowerKeepAliveACmd/BCmd/
-       EmergencyArmingCmd, déclarées en VAR locale ci-dessous.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cibles de mapping : PowerKeepAliveACmd/BCmd/EmergencyArmingCmd,
+       déclarées en VAR locale ci-dessous (voir §2).</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyArmingLockoutActive">
@@ -33178,13 +33073,10 @@ TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable ne coupe plus que sur PowerCutOff (barrière
-finale, AF02 §2, AF06 §5 "SafeStop laisse la décélération métier se terminer"). SafeStop/
-Error retirés du calcul — SafeStop est une rampe rapide gérée en amont par FB_Winch/
-FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ; Error mirait tout ErrorId y
-compris les mécanismes SafeStop-only, donc coupait Enable pour la même mauvaise raison.
-Couper ici sur SafeStop/Error écrasait la rampe déjà calculée en amont en un arrêt
-brutal — contraire à la doctrine Enable&gt;SafeStop&gt;StartStop.
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable ne coupe que sur PowerCutOff (barrière finale, AF02 §2, AF06 §5
+"SafeStop laisse la décélération métier se terminer"). SafeStop est une rampe rapide
+gérée en amont par FB_Winch/FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ;
+Error reflète tout ErrorId y compris les mécanismes SafeStop-only.
 Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1FinalInterlockRequest.PowerCutOff</xhtml>
               </documentation>
             </variable>
@@ -33259,10 +33151,10 @@ bloque (PowerCutOff / SafeStop / Global), SANS influencer Enable — juste de l'
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Les noms Device bruts ( *_DQ / *_RQ ), ex. M1_RelayFwd_Up_DQ,
-       M3_BrakeRelease_RQ) NE SONT PLUS déclarés ici — les déclarer créait une collision
+       M3_BrakeRelease_RQ) ne sont pas déclarés ici : les déclarer créerait une collision
        de portée avec la variable GLOBALE homonyme créée par le mapping E/S CODESYS
-       (Device.export), qui masquait silencieusement le pilotage matériel réel (voir §2
-       plus bas pour le détail et la liste des chemins qualifiés à mapper).
+       (Device.export), qui masquerait le pilotage matériel réel (voir §2 plus bas
+       pour le détail et la liste des chemins qualifiés à mapper).
 Demande frein M3 arbitrée — cible du mapping E/S</xhtml>
               </documentation>
             </variable>
@@ -33424,23 +33316,18 @@ Demande frein M3 arbitrée — cible du mapping E/S</xhtml>
       dans le réseau Ladder, sans ouvrir un autre POU).
    🔒 SafetyStructureNotValidated reste TRUE : AUCUNE sortie physique
       moteur/frein n'est autorisée tant que ce garde-fou n'est pas retiré
-      dans un lot safety validé séparément (voir alerte ci-dessous).
-   ⚠️ Écart connu, HORS PÉRIMÈTRE de ce lot (signalé, pas corrigé ici) :
-      FB_Safety_Winch / FB_Safety_Translation (7 mécanismes Méca A→E,
-      PowerCutOff métier) ne sont appelés nulle part dans CODE/ à ce jour.
+      (voir alerte ci-dessous).
+   ⚠️ FB_Safety_Winch / FB_Safety_Translation (7 mécanismes Méca A→E,
+      PowerCutOff métier) ne sont pas appelés dans CODE/ : les demandes
       ST_WinchFinalInterlockRequest / ST_TranslationFinalInterlockRequest
-      ne portent donc que SafeStop (partiel) — voir PLAN_TASK lot "5
-      Reliquats safety" (T72-T74). Ce lot ne câble que ce qui existe déjà
-      en amont ; ne pas déduire que la safety métier complète est active.
-   🗑️ FB_Output retiré : inverseur pur (State := Command XOR
-      InvertLogic) jamais utilisé avec InvertLogic &lt;&gt; FALSE. Coils câblées directement sur
-      les sorties des interlocks finaux — élimine 15 blocs sans valeur
-      ajoutée et simplifie la lecture maintenance.
-   Sortie moteur AC600 M3 raccordée. DriveControlWord
-      (mot commande 0x3101) et DriveFreqRefWord (consigne fréquence WORD,
-      registre 0x3100, échelle ×100 — WORD 5000 = 50,00 Hz)
-      capturés en variables locales M3_DriveControlWord / M3_DriveFreqRefWord.
-      Mapping E/S CODESYS (Device.export) manuel restant — voir §2 ci-dessous.
+      ne portent donc que SafeStop (partiel). Ne pas déduire que la safety
+      métier complète est active.
+   Coils câblées directement sur les sorties des interlocks finaux —
+   simplifie la lecture maintenance.
+   DriveControlWord (mot commande 0x3101) et DriveFreqRefWord (consigne
+   fréquence WORD, registre 0x3100, échelle ×100 — WORD 5000 = 50,00 Hz)
+   capturés en variables locales M3_DriveControlWord / M3_DriveFreqRefWord.
+   Mapping E/S CODESYS (Device.export) manuel — voir §2 ci-dessous.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -34841,11 +34728,9 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
             <comment localId="237" height="0" width="0">
               <position x="0" y="0" />
               <content>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">// KoboldContactorCmd était déclaré (VAR ci-dessus) mais jamais écrit -- la chaîne
-// instDiveSearch.KoboldMeasureEnable -&gt; PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated
-// s'arrêtait net ici, sans erreur de compilation ni de gate pour le signaler. Mapping E/S
-// CODESYS à (re)faire côté utilisateur (voir §2 plus bas) :
-// M1_M2_KoboldMeasureEnable_DQ &lt;- PRG_06_Outputs_LD.KoboldContactorCmd.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">// KoboldContactorCmd est écrit depuis la commande arbitrée
+// PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated. Mapping E/S CODESYS
+// (voir §2 plus bas) : M1_M2_KoboldMeasureEnable_DQ &lt;- PRG_06_Outputs_LD.KoboldContactorCmd.</xhtml>
               </content>
             </comment>
             <vendorElement localId="238">
@@ -34880,8 +34765,7 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 // 🛡️ Déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
-// Ne coupe plus que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête
-// de fichier (SafeStop/Error écrasaient la rampe rapide gérée en amont par FB_Translation).</xhtml>
+// Ne coupe que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête de fichier.</xhtml>
               </content>
             </comment>
             <vendorElement localId="250">
@@ -36538,21 +36422,14 @@ lisibles directement sur ce réseau, sans ouvrir un autre POU.
               <position x="0" y="0" />
               <content>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">// === 🛡️ §3 SÉCURITÉ &amp; COUPURE PUISSANCE AMONT ===
-// PowerCutOffReq était figé à FALSE en dur —
-instSafetyTranslationM3.PowerCutOff (5 mécanismes/8 : thermique frein, Méca A/B, butées, incohérence
-capteurs) était donc calculé mais totalement inerte, sans aucune coupure amont réelle possible
-(seul le frein mécanique réagissait via SafeStop). Agrégation OU strict par procédé (M5, A-04) —
-M1/M2 (FB_Safety_Winch, pas encore instanciée) rejoindront ce OU dès leur safety câblée, aucune
-demande vraie ne doit jamais être masquée par l'absence d'une autre source.
-M1/M2 (FB_Safety_Winch) + M3 câblés — OU strict (M5, A-04).
-⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD est
-intégralement généré par l'oracle Python (gen_prg06_oracle.py), jamais par la conversion
-.st-&gt;LD générique (qui plante sur une variable réassignée en OU chaîné — bug pré-existant du
-générateur générique, hors périmètre de ce lot). Contrat réel, câblé dans l'oracle (3 contacts
-parallèles sur la même coil PowerCutOffReq, voir section PowerCutOffReq du script) :
+// PowerCutOffReq = agrégation OU strict des demandes de coupure des trois procédés (M5, A-04) :
 PowerCutOffReq = WinchM1FinalInterlockRequest.PowerCutOff
 OR WinchM2FinalInterlockRequest.PowerCutOff
-OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
+OR TranslationFinalInterlockRequest.PowerCutOff
+⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD est
+intégralement généré par l'oracle Python (gen_prg06_oracle.py). Contrat réel, câblé dans
+l'oracle (3 contacts parallèles sur la même coil PowerCutOffReq, voir section PowerCutOffReq
+du script).</xhtml>
               </content>
             </comment>
             <vendorElement localId="744">
@@ -36891,7 +36768,7 @@ OR TranslationFinalInterlockRequest.PowerCutOff</xhtml>
                 <derived name="FB_CfgPersistBridge_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation n'avait pas de slot Cfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pont de persistance config Translation</xhtml>
               </documentation>
             </variable>
             <variable name="instDiagCanOpen">
@@ -36971,9 +36848,8 @@ instDiagEthercat(
     NetworkBypassActive      := GVL_IHM.Network.Bypass.Global
 );
 
-// 💓 T83 (décision CK6) : tant que l'IHM n'implémente pas le toggle réel
-// (GVL_IHM.Network.Bypass.IhmHeartbeat := TRUE, défaut sécurisé), le front
-// est simulé par le clignotant PLC 1 Hz pour ne jamais latcher un timeout
+// 💓 Front heartbeat simulé par le clignotant PLC 1 Hz quand le bypass
+// IhmHeartbeat est actif (défaut sécurisé), pour ne jamais latcher un timeout
 // artificiel. Repasser le bypass à FALSE côté IHM active la vraie surveillance.
 instDiagIhmHeartbeat(
     Enable          := TRUE,
@@ -37043,9 +36919,6 @@ IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
     GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
-// Jusqu'ici _TranslationSetFreq_Hz
-// n'était JAMAIS réécrit après sa déclaration — la restauration au boot rejouait donc
-// toujours la valeur par défaut compilée (0.0), jamais le dernier réglage opérateur.
 // Recopie continue (après restauration) : toute consigne changée en session survit au
 // prochain boot/reset chaud, pas seulement le défaut d'usine.
 _TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
@@ -37076,11 +36949,7 @@ IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
 END_IF;
 
-// GVL_BypassRetain.BypassSyncGlobal (RETAIN) et
-// ST_BypassSync.Initialized existaient tous les deux, mais aucun bloc de
-// restauration boot ne les reliait (contrairement à Translation/M1/M2 ci-dessus)
-// — Initialized restait bloqué à FALSE indéfiniment, bypass synchro jamais
-// restauré après redémarrage. Ajouté ici, même pattern que les 3 autres domaines.
+// Restauration boot du bypass synchro (RETAIN), même pattern que les autres domaines.
 IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
     IF BypassSyncGlobal THEN
         GVL_IHM.M1M2Sync.Bypass.Global := TRUE;
@@ -37168,7 +37037,7 @@ instPreflight(
                                  AND (PRG_05_Translation.TranslationState.FBState = E_State.READY),
     M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
-    M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct sur ce lot
+    M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct
     M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     M1ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
@@ -37560,7 +37429,7 @@ instTroubleshootingView(
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">── [COMMANDES FINALES ET INTERLOCKS RECOPIÉS DE PRG_10_Outputs_LD] ──────────────────────────
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">── [COMMANDES FINALES ET INTERLOCKS] ──────────────────────────
 Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERVISION_CFC et PRG_TROUBLESHOOTING_CFC</xhtml>
           </documentation>
         </variable>
@@ -37693,7 +37562,7 @@ Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERV
             <derived name="ST_WinchBenneHMI" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛞️ Variables d'échange IHM Treuil Benne (M2) — type dédié avec Bucket (2026-08)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛞️ Variables d'échange IHM Treuil Benne (M2) — type dédié avec Bucket</xhtml>
           </documentation>
         </variable>
         <variable name="M1M2Sync">
@@ -37781,10 +37650,7 @@ Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERV
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire de mise en service
-urgence, remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
-Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
-🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -37796,7 +37662,7 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎛️ GVL_IHM — Variables globales d'échange pour l'IHM
    ───────────────────────────────────────────────────────────────
-   📄 Lot A : Mise en service et calibration de la machine de dragage.
+   📄 Mise en service et calibration de la machine de dragage.
    💾 Déclaré en RETAIN pour la persistance des configurations opérateur.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>

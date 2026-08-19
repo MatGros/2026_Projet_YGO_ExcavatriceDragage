@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-23T21:30:34.014397" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-23T21:30:34.014397">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:15:22.899514" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:15:22.899514">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -34,7 +34,7 @@
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2)</xhtml>
               </documentation>
             </variable>
           </struct>

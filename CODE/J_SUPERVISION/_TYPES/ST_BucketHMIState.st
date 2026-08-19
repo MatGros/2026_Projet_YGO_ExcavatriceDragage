@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_BucketHMIState :
 STRUCT
-    MechState           : ST_BucketState; (* 🚥 État mécanique mémorisé (IsOpen, IsClosed...) — ex-champ "State", renommé pour éviter collision de nom avec ce sous-struct *)
+    MechState           : ST_BucketState; (* 🚥 État mécanique mémorisé (IsOpen, IsClosed...) *)
     FBState             : E_State;          (* 🤖 État de l'automate interne (FB_Bucket) *)
     ActiveOffset_M        : REAL;             (* 📐 Offset actif injecté dans la synchro *)
     M2StartStop         : BOOL;             (* 🛗 Commande Start/Stop forcée vers M2 *)

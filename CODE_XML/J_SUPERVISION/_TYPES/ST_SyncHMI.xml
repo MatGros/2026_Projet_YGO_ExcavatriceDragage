@@ -123,7 +123,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot, ex-CfgInitialized renommé pour cohérence avec ST_WinchCfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (config restaurée depuis GVL_PERSISTENT)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -150,7 +150,7 @@
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -230,7 +230,7 @@
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_WinchSync) — ex-"State", renommé pour éviter collision avec le sous-struct State</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_WinchSync)</xhtml>
               </documentation>
             </variable>
           </struct>

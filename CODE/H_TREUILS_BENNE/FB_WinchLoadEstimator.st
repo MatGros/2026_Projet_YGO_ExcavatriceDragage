@@ -74,7 +74,7 @@ Done := FALSE;
 State := E_State.READY;
 ResetEdge(CLK := Reset);
 Configured := LoadTable.IsConfigured;
-// 📈 WINCH-CORE-01 : l'estimation de charge n'a de sens qu'en montée.
+// 📈 L'estimation de charge n'a de sens qu'en montée.
 // La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
 // mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
 Ascending := (MeasuredSpeedSignedMps > 0.0);

@@ -415,9 +415,9 @@ CASE State OF
 
         // Condition d'arrêt automatique de la fermeture
         IF CloseReq THEN
-            // Inertie mécanique (M2 continue sur sa lancée après StartStop:=FALSE) faisait dépasser
-            // la cible réelle. Coupe la commande CloseAnticipationM avant OffsetCloseM -- le
-            // coast-down amène l'arrêt réel près du vrai offset au lieu de le dépasser.
+            // Compense l'inertie mécanique (coast-down) : coupe la commande
+            // CloseAnticipationM avant OffsetCloseM pour amener l'arrêt réel près du
+            // vrai offset au lieu de le dépasser.
             IF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
                 M2_StartStop := FALSE;
                 M2_Direction := 0;
@@ -501,11 +501,9 @@ DeltaPosition_M := CablePosM2 - CablePosM1;
 
 // Détermination de l'offset actif pour le synchronisme de FB_WinchSync ET pour l'affichage IHM
 // (M2PositionCorrected, côté PRG_SUPERVISION_CFC).
-// Ajout de CloseReq/OpenReq (pas seulement IsClosed/IsOpen, qui sont FALSE pendant TOUT le trajet
-// depuis l'état transitoire) — sinon ActiveOffsetM restait figé sur OffsetOpenM (défaut) pendant
-// le trajet entier d'une fermeture, donc M2PositionCorrected = CablePosM2 brut tout du long, avec
-// un saut brutal uniquement à l'arrivée au lieu de converger progressivement vers M1 pendant
-// l'enroulage.
+// CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
+// TOUT le trajet depuis l'état transitoire) pour que la position corrigée de M2 converge
+// progressivement vers M1 pendant l'enroulage.
 IF State = E_State.BUSY THEN
     // Pendant le déplacement, l'offset actif suit la différence réelle de câble (M2 - M1) afin que
     // la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne) sans à-coup,

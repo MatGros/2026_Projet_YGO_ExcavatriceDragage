@@ -23,7 +23,7 @@ VAR
     instCfgPersistBridgeBucket : FB_CfgPersistBridge_BucketCfg;
     instCfgPersistBridgeWinchM1 : FB_CfgPersistBridge_WinchCfg;
     instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg;
-    instCfgPersistBridgeTranslation : FB_CfgPersistBridge_TranslationCfg; // Translation n'avait pas de slot Cfg
+    instCfgPersistBridgeTranslation : FB_CfgPersistBridge_TranslationCfg; // Pont de persistance config Translation
     instDiagCanOpen : FB_Diag_CanOpen;
     instDiagEthercat : FB_Diag_Ethercat;
     instDiagIhmHeartbeat : FB_Diag_IhmHeartbeat;
@@ -63,9 +63,8 @@ instDiagEthercat(
     NetworkBypassActive      := GVL_IHM.Network.Bypass.Global
 );
 
-// 💓 T83 (décision CK6) : tant que l'IHM n'implémente pas le toggle réel
-// (GVL_IHM.Network.Bypass.IhmHeartbeat := TRUE, défaut sécurisé), le front
-// est simulé par le clignotant PLC 1 Hz pour ne jamais latcher un timeout
+// 💓 Front heartbeat simulé par le clignotant PLC 1 Hz quand le bypass
+// IhmHeartbeat est actif (défaut sécurisé), pour ne jamais latcher un timeout
 // artificiel. Repasser le bypass à FALSE côté IHM active la vraie surveillance.
 instDiagIhmHeartbeat(
     Enable          := TRUE,
@@ -135,9 +134,6 @@ IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
     GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
-// Jusqu'ici _TranslationSetFreq_Hz
-// n'était JAMAIS réécrit après sa déclaration — la restauration au boot rejouait donc
-// toujours la valeur par défaut compilée (0.0), jamais le dernier réglage opérateur.
 // Recopie continue (après restauration) : toute consigne changée en session survit au
 // prochain boot/reset chaud, pas seulement le défaut d'usine.
 _TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
@@ -168,11 +164,7 @@ IF NOT GVL_IHM.M2TreuilBenne.Bypass.Initialized THEN
     GVL_IHM.M2TreuilBenne.Bypass.Initialized := TRUE;
 END_IF;
 
-// GVL_BypassRetain.BypassSyncGlobal (RETAIN) et
-// ST_BypassSync.Initialized existaient tous les deux, mais aucun bloc de
-// restauration boot ne les reliait (contrairement à Translation/M1/M2 ci-dessus)
-// — Initialized restait bloqué à FALSE indéfiniment, bypass synchro jamais
-// restauré après redémarrage. Ajouté ici, même pattern que les 3 autres domaines.
+// Restauration boot du bypass synchro (RETAIN), même pattern que les autres domaines.
 IF NOT GVL_IHM.M1M2Sync.Bypass.Initialized THEN
     IF BypassSyncGlobal THEN
         GVL_IHM.M1M2Sync.Bypass.Global := TRUE;
@@ -260,7 +252,7 @@ instPreflight(
                                  AND (PRG_05_Translation.TranslationState.FBState = E_State.READY),
     M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
-    M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct sur ce lot
+    M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct
     M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     M1ThermalOk               := PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,

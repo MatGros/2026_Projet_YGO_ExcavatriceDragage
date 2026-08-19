@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:57:58.099667" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:57:58.099667">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:04:57.448595" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:04:57.448595">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -69,7 +69,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -106,7 +105,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_KoboldBottomTouch_DI">
@@ -114,7 +113,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -152,7 +151,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts communs à la machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -211,7 +209,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwOperator — Image matérielle brute des entrées Opérateur / Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts du joystick CANopen JOY1.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -272,7 +269,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour disjoncteur thermique moteur/variateur AC600 (1 = OK) — diagnostic seul, l'AC600 se protège lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="M3_StatusWord">
@@ -310,7 +307,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts de la translation M3 (AC600).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -457,7 +453,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -870,10 +865,8 @@ palier est encore engagé (fausse condition d'armement Méca A).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Sorties d'état du profil AF_Partie-03 §2.
-       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung (confirmé par
-       l'oracle PRG_06 : `Ready` n'y porte jamais d'expression, les broches suivantes oui).
-       Sans elles, `Winch` tombait sur cette broche réservée et se retrouvait câblée à une
-       branche au lieu de sa variable.
+       En LD, CODESYS réserve la PREMIÈRE broche de sortie au flux du rung :
+       `Ready` n'y porte jamais d'expression, les broches suivantes oui.
 &lt;-- [STAT] TRUE = banc prêt (Enable actif, modèles à jour)</xhtml>
               </documentation>
             </variable>
@@ -1076,7 +1069,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.3.md
-   📄 Lot L6 (Rebranchement du banc de simulation derrière HwIn)
    
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)
@@ -1089,7 +1081,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
    
    🔴 RÈGLES SÉCURITÉ ET POLARITÉ :
       - Modèle frein M1/M2/M3 : M1_BrakeIsOpen_DI := M1_BrakeCmd (1 = OUVERT).
-        Ne JAMAIS faire NOT BrakeCmd ! (P1 Lot L6).
+        Ne JAMAIS faire NOT BrakeCmd !
       - Retours contacteurs M1/M2 : 1 = tous retombés (TRUE quand RelayFwd=0 et RelayRev=0).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
@@ -1161,7 +1153,7 @@ instSimEncoderM2(
 );
 
 // Recopie structures Winch simulées :
-// 🛑 POLARITÉ DE FREIN SIMULÉ (P1 Lot L6) : 1 = contacteur commandé = frein OUVERT.
+// 🛑 POLARITÉ DE FREIN SIMULÉ : 1 = contacteur commandé = frein OUVERT.
 // Câblage réel : DI = 1 ⟺ frein OUVERT. Le modèle produit donc M1_BrakeIsOpen_DI := M1_BrakeCmd !
 Winch.M1_BrakeIsOpen_DI        := M1_BrakeCmd;
 // Retour UNIQUE « tous contacteurs retombés » = sens ET vitesse.
@@ -1289,7 +1281,7 @@ END_IF;
 // l'appui homme-mort est automatiquement inclus pour faciliter les essais sur banc.
 Operator.JoyBtnRaw := SimJoystickRawButton OR (SimJoystickDirectionCount &gt; 0);
 
-Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE (confirmé terrain)
+Operator.CanBusState      := 2; // CANbusState 2 = ACTIVE
 Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 
 
@@ -1457,9 +1449,7 @@ Done := TRUE;
       du métier machine.
    🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
       réellement, à partir des relais de sens commandés et de la vitesse rampée
-      courante. Extraction PURE de la logique déjà en place dans
-      `PRG_02_Encoders.st` (bloc "SIMULATION SUR BANC DE TEST") — aucun
-      changement de comportement, juste la dissociation en FB dédié.
+      courante.
    📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
    📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
    📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
@@ -1470,11 +1460,10 @@ Done := TRUE;
       d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
-   `RawPos` déplacé en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
+   `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
       (même pattern que `Calib` dans `FB_Encoder_Homing`) — `PERSISTENT` n'est valide que sur du
       `VAR_GLOBAL` en CODESYS, pas sur une variable locale de FB. Un vrai codeur absolu physique
-      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate) —
-      il fallait donc bien du PERSISTENT RETAIN réel, regroupé avec le reste dans GVL_PERSISTENT.
+      conserve son comptage brut même à travers un reset FROID (indépendant de l'automate).
    ═══════════════════════════════════════════════════════════════
 === DECLARATION (à coller dans la partie déclaration du POU FB_Sim_Encoder) ===</xhtml>
           </documentation>

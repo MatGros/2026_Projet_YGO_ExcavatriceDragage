@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.291747" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.291747">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:15:05.457714" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:15:05.457714">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_KoboldBottomTouch_DI">
@@ -63,7 +63,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -101,7 +101,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts communs à la machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>

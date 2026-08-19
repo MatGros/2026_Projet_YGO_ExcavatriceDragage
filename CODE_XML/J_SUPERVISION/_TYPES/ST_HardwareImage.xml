@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-27T16:14:37.178831" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-27T16:14:37.178831">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:13:48.837778" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:13:48.837778">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -69,7 +69,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -106,7 +105,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK — : renommé depuis BrakeThermalOk_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
               </documentation>
             </variable>
             <variable name="M1_M2_KoboldBottomTouch_DI">
@@ -114,7 +113,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold — : renommé depuis M1_M2_KoboldContactFond_DI (Device_IO_20260812)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
               </documentation>
             </variable>
             <variable name="HydraulicThermalOk_DI">
@@ -152,7 +151,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts communs à la machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -211,7 +209,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwOperator — Image matérielle brute des entrées Opérateur / Joystick
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts du joystick CANopen JOY1.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -272,7 +269,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour disjoncteur thermique moteur/variateur AC600 (1 = OK) — diagnostic seul, l'AC600 se protège lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="M3_StatusWord">
@@ -310,7 +307,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts de la translation M3 (AC600).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -457,7 +453,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.297968" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.297968">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:16:34.095731" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:16:34.095731">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -42,7 +42,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (, ex-MachineReset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — jamais Modes/Cycle</xhtml>
               </documentation>
             </variable>
             <variable name="BtnModeReset">
@@ -78,8 +78,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
-sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</xhtml>
               </documentation>
             </variable>
@@ -94,11 +93,8 @@ sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 un
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">— bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
 SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
 sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
-🔀 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
-(ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé, doublon). ⚠️ Le défaut TRUE
-(joystick) s'applique désormais à M3 aussi au boot — M3 démarrait avant en boutons IHM
-(FALSE) : changement de comportement au démarrage, assumé (décision ).
-🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 (comportement historique Winch, préservé au boot) ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
+🔀 Switch machine unique — pilote aussi Translation M3.
+🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
               </documentation>
             </variable>
           </struct>

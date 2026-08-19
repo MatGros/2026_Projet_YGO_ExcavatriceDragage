@@ -6,7 +6,7 @@
     📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
 *)
 
-// {attribute 'qualified_only'} (removed to allow direct access via prefix _) // Force l'accès via GVL_PERSISTENT.Variable (évite les conflits)
+// {attribute 'qualified_only'} — Force l'accès via GVL_PERSISTENT.Variable (évite les conflits)
 VAR_GLOBAL PERSISTENT RETAIN
 
     // 🏗️ TREUILS (M1, M2)
@@ -29,15 +29,14 @@ VAR_GLOBAL PERSISTENT RETAIN
     );
     _WinchLoadEstimateTable : ST_WinchLoadEstimateTable;
     _WinchSymmetryCfgPersist : ST_Winch_SymmetryCfg; // Seuils initiaux à confirmer sur site
-    _WinchSymmetryDataPersist : ST_Winch_SymmetryData; // Dernières/max mesures MES-008
+    _WinchSymmetryDataPersist : ST_Winch_SymmetryData; // Dernières/max mesures de symétrie
 
-    // 📐 Valeurs alignées sur les relevés terrain (REGISTRE_Suivi_MiseEnService) :
-    //   • CfgTopSensorPos_M 8.5 → 8.0  (MES-009 : déclenchement physique du capteur haut mesuré à 8,0 m).
-    //     ⚠️ Ce n'est PAS un simple réglage : c'est la position que le homing inscrit au déclenchement
-    //     du capteur. Un écart ici décale TOUTES les positions machine (limites câble, légale, synchro).
-    //   • CfgCableLimitAscent_M 8.0 → 7.5 (MES-009 : arrêt réel observé ≈ 7,5 m — la limite logicielle
-    //     doit rester SOUS le capteur physique, qui reste le garde-fou ultime).
-    //   • CfgRampAccelRate 50.0 → 10.0 (MES-007 / T78 : adoucir le démarrage des treuils).
+    // 📐 Configuration treuil M1 — positions et rampes :
+    //   • CfgTopSensorPos_M : position que le homing inscrit au déclenchement du capteur haut.
+    //     Un écart ici décale TOUTES les positions machine (limites câble, légale, synchro).
+    //   • CfgCableLimitAscent_M : limite logicielle de montée, maintenue SOUS le capteur physique
+    //     (garde-fou ultime).
+    //   • CfgRampAccelRate : rampe d'accélération des treuils (démarrage adouci).
     _WinchM1CfgPersist : ST_WinchCfg := (
         CfgTopSensorPos_M := 8.5, // Capteur physique réel à 8.5m
         CfgHomingTarget_M := 0.0,
@@ -45,7 +44,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
         CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 6.75 // 7.5 -> 7.0 -> 6.75 (demande client)
+        CfgCableLimitAscent_M := 6.75 // Limite logicielle de montée (m)
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M1)
     _WinchM2CfgPersist : ST_WinchCfg := (
         CfgTopSensorPos_M := 8.5, // Capteur physique réel à 8.5m
@@ -54,7 +53,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
         CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 6.75 // 7.5 -> 7.0 -> 6.75 (demande client)
+        CfgCableLimitAscent_M := 6.75 // Limite logicielle de montée (m)
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
@@ -63,15 +62,13 @@ VAR_GLOBAL PERSISTENT RETAIN
     _SyncSoftStopEnable : BOOL := FALSE; // Rattrapage directionnel (Défaut: OFF)
 
     // 🪣 BENNE
-    // OffsetCloseM 10.0 → 15.0 : offset M1/M2 en fermeture benne mesuré à ≈ 15 m sur site (MES-010).
-    // ⚠️ Le registre note la mesure comme "non encore analysée" : valeur à reconfirmer au premier
-    // essai benne en charge.
+    // Offset M1/M2 en fermeture benne (m) — valeur à reconfirmer au premier essai benne en charge.
     _BucketCfgPersist : ST_BucketCfg := (
         Config := (
             OffsetOpenM      := 0.0,
             OffsetCloseM     := 15.0,
-            // 0.05 -> 0.5 -> 1.0 -- avec l'anticipation inertie, un écart
-            // résiduel après arrêt est normal, l'ancien seuil ne matchait quasiment plus jamais.
+            // Avec l'anticipation inertie, un écart résiduel après arrêt est normal :
+            // le seuil de cohérence tolère cet écart résiduel.
             CoherenceLimitM  := 1.0
         ),
         CfgTimeoutDuration := T#60s
@@ -80,9 +77,8 @@ VAR_GLOBAL PERSISTENT RETAIN
 
     // ↔️ TRANSLATION (M3)
     _TranslationMaxFreq_Hz          : REAL := 50.0; // Fréquence max absolue M3 (Hz) — source unique
-    // ST_TranslationCfg — Translation n'avait pas de slot Cfg (contrairement à ST_WinchHMI), les
-    // 3 vitesses de ralentissement n'étaient réglables qu'en dur ici. Pont
-    // FB_CfgPersistBridge_TranslationCfg (Hmi := GVL_IHM.TranslationM3.Cfg).
+    // ST_TranslationCfg — configuration des 3 vitesses de ralentissement de la translation,
+    // pontée vers l'IHM (FB_CfgPersistBridge_TranslationCfg).
     _TranslationCfgPersist : ST_TranslationCfg; // 🌉 Pont FB_CfgPersistBridge_TranslationCfg
     // Hauteur mini M1/M2 requise pour autoriser la translation — actuellement 6,0 m
     // (≈ CfgTopSensorPos_M 8,0 m - 2,0 m de marge), réglage indépendant de la calibration homing :
@@ -101,8 +97,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _TranslationPosPV_M             : REAL := 21.0;  // Position PV (Pré-ralentissement)
     _TranslationPosTremie_M         : REAL := 25.0;  // Position Trémie (Extrême gauche)
     _TranslationGainMetersPerHzSec  : REAL := 0.008333; // Ratio m/s par Hz (ex: 50 Hz = 0.416 m/s)
-    // Reprise odométrie après reboot — recopie continue (PRG_05_Translation),
-    // pas de bridge dédié (même doctrine que _TranslationSetFreq_Hz ci-dessus).
+    // Reprise odométrie après reboot — recopie continue (PRG_05_Translation).
     _TranslationPosEstimated_M          : REAL := 0.0;   // Dernière position estimée connue (m)
     _TranslationPosEstimatedInitialized : BOOL := FALSE;  // TRUE dès la première calibration sur capteur
 
@@ -110,16 +105,16 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)
     _JoystickNeutralY : INT := 5000; // Point neutre axe Y (0..10000)
     _JoystickDeadbandRaw : INT := 300; // Zone morte joystick, compte brut ADC (0..10000) — bruit neutre observé ±200 → réglage direct en compte brut, 300 (marge ~1.5x le bruit mesuré)
-    _JoystickFilterTime : TIME := T#0ms; // Constante de temps filtre PT1 — filtrage supprimé (0ms = pass-through exact, voir FB_Filter_PT1.st "Si TimeConst=0, sortie=entrée")
+    _JoystickFilterTime : TIME := T#0ms; // Constante de temps filtre PT1 — 0ms = pass-through exact (voir FB_Filter_PT1.st "Si TimeConst=0, sortie=entrée")
     _JoystickAccelRate_Pct : REAL := 50.0; // Accélération rampe (%/s)
     _JoystickDecelRate_Pct : REAL := 150.0; // Décélération rampe (%/s)
     _JoystickInvertX : BOOL := FALSE; // Inversion axe X
     _JoystickInvertY : BOOL := FALSE; // Inversion axe Y
 
     // 🔄 CYCLE (dragage semi-automatique)
-    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5); // 🌉 Pont FB_CfgPersistBridge_CycleCfg (T66)
+    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
 
-    // 🪨 ASSISTANCE PRÉLÈVEMENT MAINTENANCE — T81/T82
+    // 🪨 ASSISTANCE PRÉLÈVEMENT MAINTENANCE
     _DredgingAssistCfgPersist : ST_DredgingAssistCfg := (
         DiveStartMin_M := 1.0,
         ImmersionUpper_M := 0.5,
@@ -139,14 +134,14 @@ VAR_GLOBAL PERSISTENT RETAIN
         WinchMaxStepAscent := 5,
         WinchSlowdownDistance_M := 1.0,
         WinchSlowdownMaxStep := 1
-    ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg (+ champs Winch communs M1/M2 rapatriés)
+    ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
 
     // 🚦 SYSTÈME / IHM
     _BlinkTimeOn  : TIME := T#1s;    // Durée allumé horloge clignotement système (voyants IHM/diag)
     _BlinkTimeOff : TIME := T#800ms; // Durée éteint — asymétrique par défaut
 
     // 🔄 CYCLE SEMI-AUTO
-    _CycleSampleCount : INT := 0;    // Compteur de prélèvements (Q3bis) — RETAIN, survit à la coupure ; reset MAINT only
+    _CycleSampleCount : INT := 0;    // Compteur de prélèvements — RETAIN, survit à la coupure ; reset MAINT only
 
     // 🧪 SIMULATION (Banc de test uniquement)
     _SimEncoderRawPosM1 : UDINT := 1000000; // Simulation : survit au reset froid

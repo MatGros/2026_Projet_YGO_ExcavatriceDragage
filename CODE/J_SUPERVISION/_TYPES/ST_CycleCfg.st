@@ -1,6 +1,6 @@
 (* ═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
-   T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
+   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_CycleCfg :
 STRUCT

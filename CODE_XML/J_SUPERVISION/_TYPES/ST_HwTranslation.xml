@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.292748" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.292748">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:14:00.772592" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:14:00.772592">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -79,7 +79,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 (1 = OK, même polarité que BrakeThermalFeedback/M1/M2ThermalFeedback) — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour disjoncteur thermique moteur/variateur AC600 (1 = OK) — diagnostic seul, l'AC600 se protège lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="M3_StatusWord">
@@ -117,7 +117,6 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts de la translation M3 (AC600).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>

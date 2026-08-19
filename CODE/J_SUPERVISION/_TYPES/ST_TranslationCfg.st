@@ -2,9 +2,7 @@
    ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 : créé suite constat terrain — Translation n'avait pas de slot Cfg
-   (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
-   n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
+   📄 Vitesses de ralentissement d'approche réglables depuis l'IHM (RETAIN), même patron que ST_WinchCfg.
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_TranslationCfg :
 STRUCT

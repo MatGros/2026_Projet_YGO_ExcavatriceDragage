@@ -123,8 +123,8 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
-Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe-circuit d'urgence pour le séquencement auto benne.
+Défaut FALSE = mouvement M1/M2 synchro jamais
 gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
               </documentation>
             </variable>
@@ -149,9 +149,6 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CommunCfg — Configuration des paramètres communs machine
-   📄 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
-   WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
-   ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>

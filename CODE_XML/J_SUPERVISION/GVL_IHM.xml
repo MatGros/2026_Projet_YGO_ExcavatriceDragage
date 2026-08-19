@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:41:30.281597" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:41:30.281597">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:04:28.523420" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:04:28.523420">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -88,9 +88,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 : indicateurs diagnostic simulation — PLC→IHM, PAS des bypass operateur
-       (etaient ecrits par erreur dans Bypass.SlackCable/TopPositionSensor avant ce lot, ce qui
-       empechait ces champs de servir de vrai bypass RETAIN operateur).
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur
 🩺 Capteur haut ignore car simulation active</xhtml>
               </documentation>
             </variable>
@@ -165,7 +163,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
 struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
 (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
 ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
@@ -192,7 +190,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <derived name="ST_WinchSymmetryHMI" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ MES-008 : mesures passives M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚖️ Mesures passives M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldImmersionConfirmed">
@@ -200,7 +198,7 @@ struct ST_*HMI) — visible et acquittable, jamais de disparition automatique si
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 (Fiche 05) : diagnostic arrêt auto descente Kobold (pilotage normal)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic arrêt auto descente Kobold (pilotage normal)
 Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </documentation>
             </variable>
@@ -223,7 +221,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🌐 ST_CommunHMI — Données d'échange IHM COMMUNES (pas propres à un axe)
    ───────────────────────────────────────────────────────────────
-   (demande utilisateur) : regroupe les signaux qui ne concernent
+   Regroupe les signaux qui ne concernent
    PAS un axe/mécanisme en particulier (1 seul capteur/signal partagé par toute la
    machine) — évite de les dupliquer ou de les laisser en variables isolées
    directement dans GVL_IHM. Exemple : TopPositionSensorActive (capteur unique,
@@ -263,9 +261,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    🔄 ST_CycleHMI — Données d'échange IHM du cycle semi-automatique
    ───────────────────────────────────────────────────────────────
    📄 Structuration en Cmd / State / Cfg / Test , homogène avec ST_WinchHMI.
-   T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3) —
-   avant ce lot, SetDepth_M/SetOffset_M n'avaient AUCUN backing persistant (juste un défaut
-   compilé dans le DUT), contrairement à tous les autres domaines déjà traités.
+   Cfg protégé par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -858,7 +854,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_BypassCommun — Bypass maintenance GRANULAIRE, applicable aux 2 treuils à la fois
    ───────────────────────────────────────────────────────────────
-   🎨 (demande client) : distinct des bypass individuels M1/M2 (ST_BypassWinch) —
+   🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
       GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
@@ -867,9 +863,6 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
       n'entraîne la désactivation de l'autre.
    🔒 Doctrine : actionnable UNIQUEMENT en MAINT_N2, RETAIN, jamais masque
       les autres défauts du même bloc (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)).
-   : `TopPositionSensor` renommé `TopLimitSwitch` (cohérence avec ST_BypassWinch) —
-      était de toute façon inutilisé comme bypass réel jusqu'ici (PRG_07_Supervision y écrivait un
-      indicateur simulation par erreur, voir ST_CommunHMI.SimTopSensorBypassActive).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -973,8 +966,8 @@ pas une vitesse continue.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
-Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe-circuit d'urgence pour le séquencement auto benne.
+Défaut FALSE = mouvement M1/M2 synchro jamais
 gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
               </documentation>
             </variable>
@@ -999,9 +992,6 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CommunCfg — Configuration des paramètres communs machine
-   📄 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
-   WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
-   ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1143,7 +1133,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
-   T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
+   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1315,7 +1305,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse mesuré (T43/T45)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse mesuré</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchActive">
@@ -1379,7 +1369,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <derived name="E_CycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Étape spécifique au moment du défaut (R9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Étape spécifique au moment du défaut</xhtml>
               </documentation>
             </variable>
             <variable name="SampleCount">
@@ -1552,7 +1542,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : bypass simplifié de la séquence FB_DiveSearch complète (préconditions
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simplifié de la séquence FB_DiveSearch complète (préconditions
 strictes -- benne ouverte, DiveStartMin_M, fenêtre immersion). Si TRUE, un front MONTANT
 Kobold pendant une descente confirme directement le fond, sans passer par l'état-machine
 FB_DiveSearch (qui continue de tourner en parallèle, inchangée -- utile pour
@@ -1714,7 +1704,7 @@ TglEnableDumpAtTremie (bit IHM brut)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : diagnostic bypass séquence DiveSearch
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic bypass séquence DiveSearch
 TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
               </documentation>
             </variable>
@@ -1902,7 +1892,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — JAMAIS Modes/Cycle (, ex-MachineReset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔔 Acquittement défauts/alarmes domaine sécurité/métier — jamais Modes/Cycle</xhtml>
               </documentation>
             </variable>
             <variable name="BtnModeReset">
@@ -1938,8 +1928,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rapatrié depuis GVL_IHM.IHM_MANU (suppression IHM_MANU) — TASK-0001,
-sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</xhtml>
               </documentation>
             </variable>
@@ -1954,11 +1943,8 @@ sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 un
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">— bascule UNIQUEMENT la SOURCE du signal StartStop/Direction/
 SpeedRefPct (joystick vs boutons IHM) — SelJoystickWinch ci-dessus reste l'unique autorité de
 sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la source.
-🔀 : consolidé en switch UNIQUE machine — pilote aussi Translation M3
-(ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé, doublon). ⚠️ Le défaut TRUE
-(joystick) s'applique désormais à M3 aussi au boot — M3 démarrait avant en boutons IHM
-(FALSE) : changement de comportement au démarrage, assumé (décision ).
-🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 (comportement historique Winch, préservé au boot) ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
+🔀 Switch machine unique — pilote aussi Translation M3.
+🕹️ TRUE (défaut) = joystick pilote Winch M1/M2 ET Translation M3 ; FALSE = boutons IHM (BtnUp/BtnDown, BtnFwd/BtnRev)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2134,8 +2120,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -2339,7 +2324,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot, ex-CfgInitialized renommé pour cohérence avec ST_WinchCfg</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (config restaurée depuis GVL_PERSISTENT)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2366,7 +2351,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2), ex-OverrideSync inversé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">☑️ coché = synchro voulue (MAINT_N1/N2)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2446,7 +2431,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_WinchSync) — ex-"State", renommé pour éviter collision avec le sous-struct State</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_WinchSync)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -2581,8 +2566,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -2800,9 +2784,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
-   📄 : créé suite constat terrain — Translation n'avait pas de slot Cfg
-   (contrairement à ST_WinchHMI), les 3 vitesses de ralentissement d'approche
-   n'étaient donc réglables qu'en dur dans GVL_PERSISTENT (recompilation requise).
+   📄 Vitesses de ralentissement d'approche réglables depuis l'IHM (RETAIN), même patron que ST_WinchCfg.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -2854,8 +2836,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 : TglJoystickMaster PAR AXE supprimé (doublon) — un seul switch machine :
-GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Switch machine unique : GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
               </documentation>
             </variable>
@@ -3184,7 +3165,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T96 : retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège déjà lui-même</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège lui-même</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenanceTargetEnable">
@@ -3420,8 +3401,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -3774,7 +3754,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="6.75" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m) -- (25), aligné sur GVL_PERSISTENT</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -3785,8 +3765,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX : flag restauration boot (défaut FALSE non ambigu, contrairement à un champ
-       métier dont le défaut peut valoir n'importe quoi) — PRG_SUPERVISION_CFC.st §2/§3
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot — défaut FALSE non ambigu
 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
@@ -3802,9 +3781,6 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
    ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
-   📄 : CfgMaxStepDescente/CfgMaxStepAscent/CfgSlowdownDistance_M/CfgSlowSpeed_Pct
-   déplacés vers GVL_IHM.Commun.Cfg (WinchMaxStepDescente/etc.) — étaient partagés M1/M2 via
-   réconciliation ad-hoc, une seule instance dans Commun élimine le besoin de réconciliation.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4181,7 +4157,7 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sécurités &amp; Diagnostics
-🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (déplacés 2026-08, voir ST_EncoderHMI)</xhtml>
+🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (voir ST_EncoderHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorsCheck">
@@ -4878,12 +4854,12 @@ GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(18) : mode pilotage unitaire M2 "sécurisé" (demande client) -- actif
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode pilotage unitaire M2 "sécurisé" -- actif
 uniquement en SelJoystickWinch=2 (unitaire M2). Si TRUE : borne le déplacement entre les
 positions ouvert/fermé configurées (OffsetOpenM/OffsetCloseM relatif à M1, mêmes bornes que
 FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
 CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
-(18bis) : défaut TRUE (demande client) -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
+Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4907,7 +4883,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <derived name="ST_BucketState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...) — ex-champ "State", renommé pour éviter collision de nom avec ce sous-struct</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚥 État mécanique mémorisé (IsOpen, IsClosed...)</xhtml>
               </documentation>
             </variable>
             <variable name="FBState">
@@ -5103,8 +5079,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-(défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot</xhtml>
               </documentation>
             </variable>
@@ -5356,7 +5331,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing — déplacés depuis ST_WinchState racine (2026-08, réorganisation ST_WinchHMI/Homing)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing — prise d'origine / référencement
 🎯 Prise d'origine (Homing) validée</xhtml>
               </documentation>
             </variable>
@@ -5609,7 +5584,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
             <derived name="ST_WinchBenneHMI" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛞️ Variables d'échange IHM Treuil Benne (M2) — type dédié avec Bucket (2026-08)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛞️ Variables d'échange IHM Treuil Benne (M2) — type dédié avec Bucket</xhtml>
           </documentation>
         </variable>
         <variable name="M1M2Sync">
@@ -5697,10 +5672,7 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM_MANU (ST_IHM_MANU) supprimé définitivement — dispositif dérogatoire de mise en service
-urgence, remplacé par MAINT_N1/MAINT_N2 + joystick homme-mort.
-Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
-🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -5712,7 +5684,7 @@ Historique complet : ARCHIVES/Doc/IHM_MANU_Journal_Modifications.md.
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎛️ GVL_IHM — Variables globales d'échange pour l'IHM
    ───────────────────────────────────────────────────────────────
-   📄 Lot A : Mise en service et calibration de la machine de dragage.
+   📄 Mise en service et calibration de la machine de dragage.
    💾 Déclaré en RETAIN pour la persistance des configurations opérateur.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>

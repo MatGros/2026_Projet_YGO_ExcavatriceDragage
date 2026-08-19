@@ -2,6 +2,7 @@
 
 > 📅 Date : 2026-08-18 · 🔍 Méthode : audit exhaustif des 170 fichiers `CODE/*.st` (fan-out 10 sous-agents) + scan complémentaire ciblé.
 > 📏 Référentiel : `DOC/STDS/CODE_QUALITY_STANDARDS.md` **§2ter** (Zéro « Journal Intime / REX » dans le Code) + §2 (cartouche ≤ 15 lignes) + §2ter.3 (régions concises).
+> ✅ **Statut : CORRECTIONS APPLIQUÉES 2026-08-18** — 98 violations dures + 46 warnings mous corrigés (commentaires uniquement, logique intacte). Gate **G430** créé et intégré. **19/19 gates PASS.**
 
 ---
 
@@ -10,14 +11,26 @@
 | Métrique | Valeur |
 |---|---|
 | Fichiers audités | **170** |
-| Fichiers avec violations | **~55** |
-| Violations totales | **~120** |
+| Fichiers avec violations (avant) | **~55** |
+| Violations totales (avant) | **~120** |
 | — type `REX` (journal intime / lot / date / correctif) | **~70** |
 | — type `verbose` (récit de développement / refactor) | **~45** |
 | — type `header_too_long` (cartouche > 15 lignes) | **2** |
 | — type `region_rex` | 0 |
+| **Violations restantes (après correction)** | **0 dure · 1 warning (faux positif)** |
 
-> ⚠️ Le code est **globalement non conforme** au §2ter : la majorité des commentaires de développement (REX, lots, dates, récits de correctif) ont été laissés dans le code au lieu d'être déplacés dans `DOC/`.
+> ⚠️ Le code était **globalement non conforme** au §2ter : la majorité des commentaires de développement (REX, lots, dates, récits de correctif) avaient été laissés dans le code au lieu d'être déplacés dans `DOC/`. **Corrigé.**
+
+---
+
+## ✅ Actions réalisées (2026-08-18)
+
+1. **Gate `G430_check_comments_rex.py` créé** — détecte les patterns REX (lots `T\d+`/`L\d`/`Fiche`, `MES-\d+`, dates, `demande client`, `correctif`, `WINCH-CORE`, `TASK-\d+`) + patterns mous (`ajouté`/`supprimé`/`renommé`/`déplacé`/`ex-`/`FIX:`). Intégré dans `run_all_gates.py` (palier C).
+2. **98 violations dures corrigées** (5 lots via workflow + corrections manuelles) — commentaires uniquement, logique intacte.
+3. **46 warnings mous corrigés** (sauf 1 faux positif légitime : `Trémie(1), P1(3), Maintenance(4)` = IDs de cible).
+4. **Bundle régénéré** + **19/19 gates PASS** (G200 liaison, G400 syntaxe, G420 pytest, G430 REX).
+
+> ⚠️ **Note** : le workflow fan-out a eu un bug de closure (agents ont édité des fichiers hors de leur lot). Les violations restantes ont été corrigées manuellement. Le résultat final est correct (vérifié par diff commentaires-only + gates).
 
 ---
 

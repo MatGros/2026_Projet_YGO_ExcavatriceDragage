@@ -30,7 +30,7 @@ VAR
     SelTarget       : INT;
     FreqPct                 : REAL;
 
-    M3_SafeStop_Active      : BOOL; // Cause historique : InputModuleFault (AF06 §3bis)
+    M3_SafeStop_Active      : BOOL; // SafeStop sur défaut module d'entrée (InputModuleFault, AF06 §3bis)
     M3_SafeStop_Aggregate   : BOOL; // 🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)
 
     M3_HeightInterlockOk    : BOOL; // TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)
@@ -133,17 +133,14 @@ END_IF;
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
 IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO (L4) : consomme la demande du séquenceur de cycle.
+    // Pont SEMI_AUTO : consomme la demande du séquenceur de cycle.
     // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
     M3_PositioningActive  := TRUE;
     SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
     M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
 
-    // 🔒 Gating direction/vitesse sur Start : sans Start (cycle à X0),
-    // M3_Direction_Active/M3_SpeedRef_Active resteraient non-nuls (SelTarget≠1 → -1, vitesse 100),
-    // ce qui ferait « bouger » M3 en simulation (FB_Sim_Translation ignore Start) et déclencherait
-    // l'escalade fin de course (bit6) → PowerCutOff → éjection SEMI_AUTO. Direction/vitesse
-    // uniquement si le cycle commande réellement le mouvement.
+    // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
+    // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
     IF M3_StartStop_Active THEN
         M3_SpeedRef_Active := 100.0;
         // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
@@ -173,8 +170,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
 
     // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2
     // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
-    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd),
-    // plus de doublon par axe (ex GVL_IHM.TranslationM3.Cmd.TglJoystickMaster, supprimé).
+    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd).
     M3_StartStop_Active := (M3_Direction_Active <> 0)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
                                 OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
@@ -197,13 +193,8 @@ ELSE
     M3_SpeedRef_Active   := 0.0;
 END_IF;
 
-// InvertDirection NE s'applique PLUS ici. Appliqué
-// en amont sur M3_Direction_Active, il désaccordait TOUTE la logique sécurité/ralentissement
-// appariée aux vrais capteurs physiques (LimitSwitchFwd/Rev, SlowdownSensorXxx, verrous §0quater)
-// dès que le câblage moteur réel l'exigeait à TRUE — seule la coupure dure indépendante du sens
-// (§0bis) arrêtait encore la machine, le verrou d'arrivée logiciel ne s'armait jamais. Compensation
-// déplacée dans FB_Translation (InvertDriveDirection), appliquée UNIQUEMENT au mot de commande
-// variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
+// InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
+// de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
 
 M3_SpeedRef_Active := LIMIT(0.0, ABS(M3_SpeedRef_Active), 100.0);
 
@@ -215,13 +206,10 @@ END_IF;
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
 M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
 
-// SelTarget reste à 0 en mode manuel
-// (MAINT_N1/N2, T106 — aucun séquenceur SEMI_AUTO ne le réarbitre à ce jour), donc la CASE
-// ci-dessous tombait toujours en ELSE=FALSE et le verrou anti-rebond §4ter de FB_Translation
-// (DirectionAtArrival) ne s'armait jamais en usage réel. Repli explicite hors sélection
-// SEMI_AUTO : n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance) arme le verrou.
-// Mot EXACT (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front
-// franc à l'arrivée quel que soit le sens de venue (voir FB_Translation_PositionDecoder.st).
+// En mode manuel (SelTarget=0), n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance)
+// arme le verrou anti-rebond §4ter de FB_Translation (DirectionAtArrival). Mot EXACT
+// (TranslationAtXxx), pas le cumulatif (TranslationPosXxx) — front franc à l'arrivée quel que
+// soit le sens de venue (voir FB_Translation_PositionDecoder.st).
 CASE SelTarget OF
     1: M3_PositionSensorTarget := M3_AtTremieStable;
     2: M3_PositionSensorTarget := M3_AtP2Stable;
@@ -235,9 +223,6 @@ ELSE
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -> arrêt sur Maintenance
         // - Si Maintenance interdite -> arrêt sur P1
-        // Réactivé — le retrait d'urgence précédent était dû à AtP1 armé sur le
-        // front du capteur P2 (zone d'approche) au lieu du capteur P1 lui-même (franchissement
-        // réel du point). Corrigé dans FB_Translation_PositionDecoder.st (front du capteur propre).
         IF PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable THEN
             M3_PositionSensorTarget := M3_AtMaintenanceStable;
         ELSE
@@ -254,11 +239,9 @@ END_CASE;
 {region "§1bis Securite M3"}
 // === 🛡️ §1bis SÉCURITÉ M3 (FB_Safety_Translation, câblée en parallèle visible) ===
 // ⚠️ Ordre d'appel volontaire : la safety lit ici le BrakeReleaseRequest et le
-// BrakeCmd du SCAN PRÉCÉDENT d'instTranslationM3 (elle est appelée avant), exactement
-// le même retard d'un scan que documenté en AF_Partie-11 §5 alerte 4 pour l'ancien
-// code CFC — non éliminé par ce lot (nécessite la fusion CFC complète, lot M4 migration
-// 7 POU, hors périmètre). Bénin : BrakeReleaseRequest ne change pas plus vite qu'un
-// scan MainTask 10 ms sur une commande frein.
+// BrakeCmd du SCAN PRÉCÉDENT d'instTranslationM3 (elle est appelée avant), soit un retard
+// d'un scan. Bénin : BrakeReleaseRequest ne change pas plus vite qu'un scan MainTask 10 ms
+// sur une commande frein.
 instSafetyTranslationM3(
     Enable                  := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE),
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -292,8 +275,8 @@ instSafetyTranslationM3(
     BypassProcess           := GVL_IHM.TranslationM3.Bypass.Process
 );
 
-// SafeStop réellement appliqué au mouvement = agrégat InputModuleFault (historique)
-// OR safety M3 (8 mécanismes) — aucune des deux causes ne doit être perdue.
+// SafeStop réellement appliqué au mouvement = agrégat InputModuleFault OR safety M3
+// (8 mécanismes) — aucune des deux causes ne doit être perdue.
 M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 
 {endregion}
@@ -429,11 +412,9 @@ TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM
 TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 
 // 🛡️ Producteur unique (CODE_QUALITY_STANDARDS §5) : la safety M3 (instSafetyTranslationM3)
-// est désormais la source de tous les diagnostics de sécurité — ErrorLimitSwitch/
-// ErrorSensorIncoherent ne sont plus recalculés ici (ancien calcul ignorait les bypass,
-// pouvait afficher un défaut alors qu'il était sciemment bypassé). Les erreurs propres au
-// mouvement (frein, variateur AC600) restent sur TranslationState.ErrorId ci-dessus,
-// bitfield différent, jamais mélangé.
+// est la source de tous les diagnostics de sécurité (ErrorLimitSwitch/ErrorSensorIncoherent).
+// Les erreurs propres au mouvement (frein, variateur AC600) restent sur TranslationState.ErrorId
+// ci-dessus, bitfield différent, jamais mélangé.
 TranslationSafety.SafeStop := M3_SafeStop_Aggregate;
 TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
 TranslationSafety.Error := instSafetyTranslationM3.Error;
