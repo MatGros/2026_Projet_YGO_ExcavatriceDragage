@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:05:31.346734" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:05:31.346734">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:58:04.119909" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:58:04.119909">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5666,6 +5666,10 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚨 ACQUITTEMENT GLOBAL MACHINE ===
+&lt;-- [CMD] Impulsion d'acquittement defaut globale machine</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>

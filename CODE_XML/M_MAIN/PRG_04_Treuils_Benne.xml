@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:14:06.173498" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:14:06.173498">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:57:56.844543" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:57:56.844543">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1951,53 +1951,82 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               <type>
                 <derived name="ST_WinchFinalInterlockRequest" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ DEMANDES DE SORTIES FINALES &amp; INTERLOCKS ===
+&lt;-- [ACT] Demande finale et interlocks treuil M1</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchM2FinalInterlockRequest">
               <type>
                 <derived name="ST_WinchFinalInterlockRequest" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande finale et interlocks treuil M2</xhtml>
+              </documentation>
             </variable>
             <variable name="KoboldContactorCmdArbitrated">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur capteur fond Kobold (1=Alimenter)</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchM1State">
               <type>
                 <derived name="ST_WinchState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 ÉTATS PUBLICS &amp; SYNOPTIQUES DES TREUILS ===
+&lt;-- [STAT] Etat public treuil Retenue M1</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchM2State">
               <type>
                 <derived name="ST_WinchState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat public treuil Benne M2</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchM1Safety">
               <type>
                 <derived name="ST_SafetyWinch" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites treuil M1</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchM2Safety">
               <type>
                 <derived name="ST_SafetyWinch" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites treuil M2</xhtml>
+              </documentation>
             </variable>
             <variable name="SyncState">
               <type>
                 <derived name="ST_SyncState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat synchronisation treuils M1/M2</xhtml>
+              </documentation>
             </variable>
             <variable name="BucketState">
               <type>
                 <derived name="ST_BucketHMIState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat de fonctionnement benne</xhtml>
+              </documentation>
             </variable>
             <variable name="Benne_IsRoughlyClosed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = benne jugée fermée (tolérance matière 2 m) ; FALSE = ouverte/intermédiaire</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Benne consideree fermee (1=Fermee)</xhtml>
               </documentation>
             </variable>
           </outputVars>

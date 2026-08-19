@@ -10,117 +10,112 @@
 
 PROGRAM PRG_02_Acquisition
 
-VAR_OUTPUT
-    HwReal                   : ST_HardwareImage;  (* Image brute réelle ; TRUE = état physique lu *)
-    HwSim                    : ST_HardwareImage;  (* Image simulée ; TRUE = état modèle normalisé *)
-    HwIn                     : ST_HardwareImage;  (* Image utilisée ; TRUE = état logique métier *)
-    WinchInputSourceChanged  : BOOL;              (* TRUE pendant 1 cycle si source Winch change *)
-    SimulationBypassActive   : BOOL;              (* TRUE = bypass simulation treuils actif (SimulationModeActive AND SimWinchActive AND SimulationBypassActive) *)
-
-    JoystickDeadmanArmed      : BOOL;   (* TRUE = geste homme-mort joystick armé (FB_Joystick.DeadmanArmed, AF08 §4/§6) *)
-    JoystickYNeutral          : BOOL;   (* TRUE = axe Y joystick au neutre — armement Méca B (FB_Safety_Winch) *)
-    JoystickDirectionX        : INT;    (* -1 = Gauche/Rev, 0 = Neutre, +1 = Droite/Fwd *)
-    JoystickSpeedPctX         : REAL;   (* Magnitude déviation axe X en % (0..100) *)
-    JoystickXNeutral          : BOOL;   (* TRUE = axe X joystick au neutre *)
-
-    TranslationPosTremie      : BOOL;   (* TRUE = translation en position Trémie — CUMULATIF, ralentissement uniquement *)
-    TranslationPosPV          : BOOL;   (* TRUE = translation en zone pré-ralentissement PV — CUMULATIF *)
-    TranslationPosP2          : BOOL;   (* TRUE = translation en position P2 — CUMULATIF *)
-    TranslationPosP1          : BOOL;   (* TRUE = translation en position P1 — CUMULATIF *)
-    TranslationPosMaintenance : BOOL;   (* TRUE = translation en position Maintenance — CUMULATIF *)
-
-    (* Mot EXACT — détection d'arrivée/cible et coupure dure UNIQUEMENT,
-       jamais le ralentissement (zone trop étroite). Voir FB_Translation_PositionDecoder.st *)
-    TranslationAtTremie      : BOOL;
-    TranslationAtPV          : BOOL;
-    TranslationAtP2          : BOOL;
-    TranslationAtP1          : BOOL;
-    TranslationAtMaintenance : BOOL;
-
-    M3_StatusWord_Filtered        : UINT; (* WORD/UINT d'état variateur filtré *)
-    M3_ActualFrequencyHz_Filtered : UINT; (* UINT fréquence M3 filtrée, unité : 0,01 Hz *)
-
-    M3_LimitSwitchFwd          : BOOL; (* TRUE = limite avant active *)
-    M3_LimitSwitchRev          : BOOL; (* TRUE = limite arrière active *)
-    M3_SensorWordIncoherent    : BOOL; (* TRUE = mot capteurs incohérent *)
-    M3_SensorsWord             : BYTE; (* BYTE mot capteurs M3 *)
-
-    (* 🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (§1bis).
-       Granularité MODULE, pas canal : GetDeviceState() est un état de carte. *)
-    LocalDigitalIoOk           : BOOL;   (* TRUE = module Local_Digital_IO opérationnel *)
-    Vh0800EndOk                : BOOL;   (* TRUE = module VH_0800END opérationnel (freins/thermiques/AU) *)
-    Vh0808EtpOk                : BOOL;   (* TRUE = module VH_0808ETP opérationnel (positions M3/hydraulique/crible) *)
-    InputModuleFault           : BOOL;   (* TRUE = au moins un des 3 modules DI hors service *)
-    (* 🧲 Positions câbles calculées en mètres (mises à l'échelle après homing, bornées et
-       gelées sur doute par FB_Encoder_Safety — CablePosM1/M2 ne sont PLUS la sortie brute
-       FB_Encoder_Scale, voir §4bis) *)
-    CablePosM1                 : REAL;   (* Position câble M1 en mètres *)
-    CablePosM2                 : REAL;   (* Position câble M2 en mètres *)
-    M1_EncoderIncoherent       : BOOL;   (* TRUE = position hors plage ±99m OU homing suspect (FB_Encoder_Safety) *)
-    M2_EncoderIncoherent       : BOOL;
-    (* Vitesse câble mesurée (FB_Encoder_SpeedMeasure), prérequis FB_Safety_Winch Méca A/F/G *)
-    M1_Speed_Mps               : REAL;   (* Vitesse absolue M1, m/s *)
-    M1_SignedSpeed_Mps         : REAL;   (* Vitesse signée M1 (+ montée / - descente), m/s *)
-    M1_SpeedValid              : BOOL;   (* TRUE après 6 échantillons couvrant ≥50ms, position saine *)
-    M2_Speed_Mps               : REAL;
-    M2_SignedSpeed_Mps         : REAL;
-    M2_SpeedValid              : BOOL;
+VAR_INPUT
+    // === 🔌 BUS DE TERRAIN & ENTRÉES MATÉRIELLES ===
+    M3_StatusWord              : WORD; // --> [HW] Mot d'etat variateur EtherCAT M3 (0x3102)
+    M3_ActualFrequencyHz       : UINT; // --> [HW] Frequence reelle variateur M3 (0x3103, 0.01 Hz)
 END_VAR
 
-VAR_INPUT
-    (* 🔌 Entrées variateur AC600 EtherCAT M3 *)
-    M3_StatusWord              : WORD;  (* Status Word 0x3102 (%IW8) *)
-    M3_ActualFrequencyHz       : UINT;  (* Actual Frequency 0x3103 (%IW9, x100) *)
+VAR_OUTPUT
+    // === 🖼️ IMAGES PROCESS MATÉRIEL / SIMULATION ===
+    HwReal                   : ST_HardwareImage; // <-- [STAT] Image brute reelle physique
+    HwSim                    : ST_HardwareImage; // <-- [STAT] Image simulee banc
+    HwIn                     : ST_HardwareImage; // <-- [STAT] Image utilisee par le metier (arbitree)
+    WinchInputSourceChanged  : BOOL;             // <-- [STAT] Impulsion 1 cycle si source Winch bascule
+    SimulationBypassActive   : BOOL;             // <-- [STAT] Bypass simulation treuils actif
+
+    // === 🕹️ ÉTATS JOYSTICK QUALIFIÉS ===
+    JoystickDeadmanArmed      : BOOL; // <-- [SAFE] Homme-mort joystick arme (1=Arme)
+    JoystickYNeutral          : BOOL; // <-- [STAT] Axe Y joystick au neutre (1=Neutre)
+    JoystickDirectionX        : INT;  // <-- [CMD]  Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
+    JoystickSpeedPctX         : REAL; // <-- [CMD]  Magnitude deviation axe X en % (0..100)
+    JoystickXNeutral          : BOOL; // <-- [STAT] Axe X joystick au neutre (1=Neutre)
+
+    // === 📍 POSITIONS TRANSLATION (ZONES CUMULATIVES) ===
+    TranslationPosTremie      : BOOL; // <-- [STAT] Zone Tremie (1=Present)
+    TranslationPosPV          : BOOL; // <-- [STAT] Zone pre-ralentissement PV (1=Present)
+    TranslationPosP2          : BOOL; // <-- [STAT] Zone P2 (1=Present)
+    TranslationPosP1          : BOOL; // <-- [STAT] Zone P1 (1=Present)
+    TranslationPosMaintenance : BOOL; // <-- [STAT] Zone Maintenance (1=Present)
+
+    // === 🎯 POSITIONS TRANSLATION (POINTS EXACTS ARBITRÉS) ===
+    TranslationAtTremie      : BOOL; // <-- [STAT] Position exacte Tremie (1=Atteint)
+    TranslationAtPV          : BOOL; // <-- [STAT] Position exacte PV (1=Atteint)
+    TranslationAtP2          : BOOL; // <-- [STAT] Position exacte P2 (1=Atteint)
+    TranslationAtP1          : BOOL; // <-- [STAT] Position exacte P1 (1=Atteint)
+    TranslationAtMaintenance : BOOL; // <-- [STAT] Position exacte Maintenance (1=Atteint)
+
+    // === ⚡ ÉTATS VARIATEUR M3 FILTRÉS ===
+    M3_StatusWord_Filtered        : UINT; // <-- [STAT] Mot d'etat variateur M3 filtre
+    M3_ActualFrequencyHz_Filtered : UINT; // <-- [STAT] Frequence reelle M3 filt黨e (0.01 Hz)
+    M3_LimitSwitchFwd          : BOOL; // <-- [SAFE] Fin de course avant M3 (1=Actionne)
+    M3_LimitSwitchRev          : BOOL; // <-- [SAFE] Fin de course arriere M3 (1=Actionne)
+    M3_SensorWordIncoherent    : BOOL; // <-- [DIAG] Incoherence detectee mot capteurs M3
+    M3_SensorsWord             : BYTE; // <-- [STAT] Mot d'etat capteurs M3
+
+    // === 🩺 DIAGNOSTIC CARTES E/S DÉPORTÉES ===
+    LocalDigitalIoOk           : BOOL; // <-- [DIAG] Module Local_Digital_IO OK (1=OK)
+    Vh0800EndOk                : BOOL; // <-- [DIAG] Module VH_0800END OK (1=OK)
+    Vh0808EtpOk                : BOOL; // <-- [DIAG] Module VH_0808ETP OK (1=OK)
+    InputModuleFault           : BOOL; // <-- [DIAG] Defaut sur au moins un module DI (1=Defaut)
+
+    // === 🧲 MESURES POSITIONS & VITESSES TREUILS ===
+    CablePosM1                 : REAL; // <-- [STAT] Position cable M1 calibree (metres)
+    CablePosM2                 : REAL; // <-- [STAT] Position cable M2 calibree (metres)
+    M1_EncoderIncoherent       : BOOL; // <-- [DIAG] Mesure codeur M1 incoherente (1=Defaut)
+    M2_EncoderIncoherent       : BOOL; // <-- [DIAG] Mesure codeur M2 incoherente (1=Defaut)
+    M1_Speed_Mps               : REAL; // <-- [STAT] Vitesse absolue M1 (m/s)
+    M1_SignedSpeed_Mps         : REAL; // <-- [STAT] Vitesse signee M1 (+:Montee, -:Descente) (m/s)
+    M1_SpeedValid              : BOOL; // <-- [STAT] Validite mesure vitesse M1 (1=Valide)
+    M2_Speed_Mps               : REAL; // <-- [STAT] Vitesse absolue M2 (m/s)
+    M2_SignedSpeed_Mps         : REAL; // <-- [STAT] Vitesse signee M2 (+:Montee, -:Descente) (m/s)
+    M2_SpeedValid              : BOOL; // <-- [STAT] Validite mesure vitesse M2 (1=Valide)
 END_VAR
 
 VAR
-    (* ── Blocs complexes ── *)
-    instSimBench             : FB_SimBench;
-    instJoystick             : FB_Joystick;
-    instEncoderAbsM1         : FB_Encoder_Abs;
-    instEncoderScaleM1       : FB_Encoder_Scale;
-    instHomingM1             : FB_Encoder_Homing;
-    instEncoderSafetyM1      : FB_Encoder_Safety;
-    instEncoderSpeedMeasureM1: FB_Encoder_SpeedMeasure;
-    instEncoderAbsM2         : FB_Encoder_Abs;
-    instEncoderScaleM2       : FB_Encoder_Scale;
-    instHomingM2             : FB_Encoder_Homing;
-    // BtnConfirmOpenPos/ClosePos (benne) référencent aussi le codeur M2,
-    // comme BtnHome -- voir bandeau instHomingM2 plus bas.
-    M2BucketRefOpenEdge      : R_TRIG;
-    M2BucketRefCloseEdge     : R_TRIG;
-    M2BucketRefRequested     : BOOL;
-    M2BucketRefTargetM       : REAL;
-    instEncoderSafetyM2      : FB_Encoder_Safety;
-    instEncoderSpeedMeasureM2: FB_Encoder_SpeedMeasure;
-    instPosDecoderM3         : FB_Translation_PositionDecoder;
+    // === 🧩 SOUS-INSTANCES FB ===
+    instSimBench             : FB_SimBench;                   // * [INST] Banc de simulation integré
+    instJoystick             : FB_Joystick;                   // * [INST] Traitement et filtrage joystick
+    instEncoderAbsM1         : FB_Encoder_Abs;                // * [INST] Acquisition brute codeur M1
+    instEncoderScaleM1       : FB_Encoder_Scale;              // * [INST] Mise a l'echelle codeur M1
+    instHomingM1             : FB_Encoder_Homing;             // * [INST] Prise d'origine M1
+    instEncoderSafetyM1      : FB_Encoder_Safety;             // * [INST] Surveillance integrite mesure M1
+    instEncoderSpeedMeasureM1: FB_Encoder_SpeedMeasure;        // * [INST] Calcul vitesse M1
+    instEncoderAbsM2         : FB_Encoder_Abs;                // * [INST] Acquisition brute codeur M2
+    instEncoderScaleM2       : FB_Encoder_Scale;              // * [INST] Mise a l'echelle codeur M2
+    instHomingM2             : FB_Encoder_Homing;             // * [INST] Prise d'origine M2
+    instEncoderSafetyM2      : FB_Encoder_Safety;             // * [INST] Surveillance integrite mesure M2
+    instEncoderSpeedMeasureM2: FB_Encoder_SpeedMeasure;        // * [INST] Calcul vitesse M2
+    instPosDecoderM3         : FB_Translation_PositionDecoder;// * [INST] Decodage position translation M3
 
-    (* ── Sélection de source par domaine ── *)
-    WinchInputSourceSimulated         : BOOL;
-    TranslationInputSourceSimulated   : BOOL;
-    OperatorInputSourceSimulated      : BOOL;
-    MachineInputSourceSimulated       : BOOL;
+    // === 🎛️ VARIABLES LOCALES & DÉTECTEURS ===
+    M2BucketRefOpenEdge      : R_TRIG; // . [LOC] Front demande reference benne ouverte
+    M2BucketRefCloseEdge     : R_TRIG; // . [LOC] Front demande reference benne fermee
+    M2BucketRefRequested     : BOOL;   // . [LOC] Demande d'etalonnage M2 active
+    M2BucketRefTargetM       : REAL;   // . [LOC] Cible metrique etalonnage M2
 
-    (* ── Mémoire de détection de changement Winch ── *)
-    PreviousWinchInputSourceSimulated : BOOL;
-    WinchInputSourceInitialized       : BOOL;
+    WinchInputSourceSimulated         : BOOL; // . [LOC] Source Winch simulee active
+    TranslationInputSourceSimulated   : BOOL; // . [LOC] Source Translation simulee active
+    OperatorInputSourceSimulated      : BOOL; // . [LOC] Source Pupitre simulee active
+    MachineInputSourceSimulated       : BOOL; // . [LOC] Source Machine simulee active
 
-    (* ── Fronts session simulation ── *)
-    SimulationModeRise                : R_TRIG;
-    SimulationModeFall                : F_TRIG;
+    PreviousWinchInputSourceSimulated : BOOL; // . [LOC] Memoire cycle precedent source Winch
+    WinchInputSourceInitialized       : BOOL; // . [LOC] Indicateur initialisation source Winch
+
+    SimulationModeRise                : R_TRIG; // . [LOC] Front montant activation simulation
+    SimulationModeFall                : F_TRIG; // . [LOC] Front descendant desactivation simulation
 END_VAR
 
 VAR CONSTANT
-    // ⚙️ Constantes mécaniques & électriques chaîne codeurs treuils (DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §2)
+    // === ⚙️ CONSTANTES MÉCANIQUES (AF09 §2) ===
     ENCODER_POINTS_PER_REV     : UDINT := 8192; // 13 bits single-turn (8192 pts/tour)
     ENCODER_MULTITURN_REVS_MAX : UDINT := 4096; // 12 bits multi-turn (4096 tours max)
-    WINCH_CABLE_M_PER_REV      : REAL  := 2.0;  // 2.0 mètres de câble par tour de tambour treuil
+    WINCH_CABLE_M_PER_REV      : REAL  := 2.0;  // 2.0 metres de cable par tour tambour
 END_VAR
 
 {region "§0 Session simulation & aiguillage"}
 // === 🧪 §0 SIMULATION & SÉLECTION DE SOURCE ===
-// 🎯 Producteur unique des aiguillages Réel/Simu par domaine (HwReal vs HwSim -> HwIn).
-// ⚡ Fronts maître : initialisent/nettoient les stimuli banc sans état résiduel.
+// 🎯 Producteur unique des aiguillages Reel/Simu par domaine (HwReal vs HwSim -> HwIn).
 
 SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
@@ -130,11 +125,6 @@ IF SimulationModeRise.Q THEN
     GVL_Simulation.SimTranslationActive := TRUE;
     GVL_Simulation.SimOperatorActive := TRUE;
     GVL_Simulation.SimSafetyActive := TRUE;
-    // Plus d'auto-arm `SimJoystickRawButton := TRUE` — il masquait le vrai
-    // homme-mort (DeadmanArmed restait armé en permanence → rien de testé en sim). Le bouton
-    // suit désormais le stimulus directionnel (FB_SimBench : JoyBtnRaw := SimJoystickRawButton
-    // OR DirectionCount>0), ce qui rejoue fidèlement l'armement au commandement, la grâce 3 s
-    // et la retombée au neutre. SimJoystickRawButton reste un appui manuel (défaut FALSE).
 END_IF;
 
 IF SimulationModeFall.Q THEN
@@ -243,29 +233,29 @@ InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
 
 instSimBench(
     Enable                   := GVL_Simulation.SimulationModeActive,
-    M1_RelayFwd              := GVL_Global.M1RelayFwd,
-    M1_RelayRev              := GVL_Global.M1RelayRev,
-    M1_SpeedContactor_1      := GVL_Global.M1SpeedContactor1,
-    M1_SpeedContactor_2      := GVL_Global.M1SpeedContactor2,
-    M1_SpeedContactor_3      := GVL_Global.M1SpeedContactor3,
-    M1_SpeedContactor_4      := GVL_Global.M1SpeedContactor4,
+    M1_RelayFwd              := PRG_06_Outputs_LD.M1RelayFwd,
+    M1_RelayRev              := PRG_06_Outputs_LD.M1RelayRev,
+    M1_SpeedContactor_1      := PRG_06_Outputs_LD.M1SpeedContactor1,
+    M1_SpeedContactor_2      := PRG_06_Outputs_LD.M1SpeedContactor2,
+    M1_SpeedContactor_3      := PRG_06_Outputs_LD.M1SpeedContactor3,
+    M1_SpeedContactor_4      := PRG_06_Outputs_LD.M1SpeedContactor4,
     M1_SpeedRefPct           := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
     M1_PresetTriggerCmd      := instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderAbsM1.PresetValueOut,
-    M1_BrakeCmd              := GVL_Global.M1BrakeCmd,
-    M2_RelayFwd              := GVL_Global.M2RelayFwd,
-    M2_RelayRev              := GVL_Global.M2RelayRev,
-    M2_SpeedContactor_1      := GVL_Global.M2SpeedContactor1,
-    M2_SpeedContactor_2      := GVL_Global.M2SpeedContactor2,
-    M2_SpeedContactor_3      := GVL_Global.M2SpeedContactor3,
-    M2_SpeedContactor_4      := GVL_Global.M2SpeedContactor4,
+    M1_BrakeCmd              := PRG_06_Outputs_LD.M1BrakeCmd,
+    M2_RelayFwd              := PRG_06_Outputs_LD.M2RelayFwd,
+    M2_RelayRev              := PRG_06_Outputs_LD.M2RelayRev,
+    M2_SpeedContactor_1      := PRG_06_Outputs_LD.M2SpeedContactor1,
+    M2_SpeedContactor_2      := PRG_06_Outputs_LD.M2SpeedContactor2,
+    M2_SpeedContactor_3      := PRG_06_Outputs_LD.M2SpeedContactor3,
+    M2_SpeedContactor_4      := PRG_06_Outputs_LD.M2SpeedContactor4,
     M2_SpeedRefPct           := PRG_04_Treuils_Benne.M2LogicRequestSpeedRef_Pct,
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
-    M2_BrakeCmd              := GVL_Global.M2BrakeCmd,
+    M2_BrakeCmd              := PRG_06_Outputs_LD.M2BrakeCmd,
     M3_Direction             := PRG_05_Translation.M3_Direction_Active,
     M3_SpeedRefPct           := PRG_05_Translation.M3_SpeedRef_Active,
-    M3_BrakeCmd              := GVL_Global.TranslationBrakeCmd,
+    M3_BrakeCmd              := PRG_06_Outputs_LD.TranslationBrakeCmd,
     PowerKeepAlive_A         := PRG_06_Outputs_LD.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie

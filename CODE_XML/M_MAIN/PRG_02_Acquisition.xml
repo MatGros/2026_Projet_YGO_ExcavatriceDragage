@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:25:01.228032" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:25:01.228032">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:49:47.056924" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:49:47.056924">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -834,8 +834,8 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Entrées variateur AC600 EtherCAT M3
-Status Word 0x3102 (%IW8)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🔌 BUS DE TERRAIN &amp; ENTRÉES MATÉRIELLES ===
+--&gt; [HW] Mot d'etat variateur EtherCAT M3 (0x3102)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_ActualFrequencyHz">
@@ -843,7 +843,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <UINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Actual Frequency 0x3103 (%IW9, x100)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Frequence reelle variateur M3 (0x3103, 0.01 Hz)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -853,7 +853,8 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <derived name="ST_HardwareImage" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image brute réelle ; TRUE = état physique lu</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🖼️ IMAGES PROCESS MATÉRIEL / SIMULATION ===
+&lt;-- [STAT] Image brute reelle physique</xhtml>
               </documentation>
             </variable>
             <variable name="HwSim">
@@ -861,7 +862,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <derived name="ST_HardwareImage" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image simulée ; TRUE = état modèle normalisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Image simulee banc</xhtml>
               </documentation>
             </variable>
             <variable name="HwIn">
@@ -869,7 +870,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <derived name="ST_HardwareImage" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image utilisée ; TRUE = état logique métier</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Image utilisee par le metier (arbitree)</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
@@ -877,7 +878,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE pendant 1 cycle si source Winch change</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Impulsion 1 cycle si source Winch bascule</xhtml>
               </documentation>
             </variable>
             <variable name="SimulationBypassActive">
@@ -885,7 +886,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bypass simulation treuils actif (SimulationModeActive AND SimWinchActive AND SimulationBypassActive)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bypass simulation treuils actif</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickDeadmanArmed">
@@ -893,7 +894,8 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = geste homme-mort joystick armé (FB_Joystick.DeadmanArmed, AF08 §4/§6)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🕹️ ÉTATS JOYSTICK QUALIFIÉS ===
+&lt;-- [SAFE] Homme-mort joystick arme (1=Arme)</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickYNeutral">
@@ -901,7 +903,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = axe Y joystick au neutre — armement Méca B (FB_Safety_Winch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Axe Y joystick au neutre (1=Neutre)</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickDirectionX">
@@ -909,7 +911,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1 = Gauche/Rev, 0 = Neutre, +1 = Droite/Fwd</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD]  Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickSpeedPctX">
@@ -917,7 +919,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Magnitude déviation axe X en % (0..100)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD]  Magnitude deviation axe X en % (0..100)</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickXNeutral">
@@ -925,7 +927,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = axe X joystick au neutre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Axe X joystick au neutre (1=Neutre)</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosTremie">
@@ -933,7 +935,8 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en position Trémie — CUMULATIF, ralentissement uniquement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📍 POSITIONS TRANSLATION (ZONES CUMULATIVES) ===
+&lt;-- [STAT] Zone Tremie (1=Present)</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosPV">
@@ -941,7 +944,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en zone pré-ralentissement PV — CUMULATIF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Zone pre-ralentissement PV (1=Present)</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosP2">
@@ -949,7 +952,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en position P2 — CUMULATIF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Zone P2 (1=Present)</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosP1">
@@ -957,7 +960,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en position P1 — CUMULATIF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Zone P1 (1=Present)</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationPosMaintenance">
@@ -965,7 +968,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation en position Maintenance — CUMULATIF</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Zone Maintenance (1=Present)</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtTremie">
@@ -973,36 +976,49 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mot EXACT — détection d'arrivée/cible et coupure dure UNIQUEMENT,
-       jamais le ralentissement (zone trop étroite). Voir FB_Translation_PositionDecoder.st</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 POSITIONS TRANSLATION (POINTS EXACTS ARBITRÉS) ===
+&lt;-- [STAT] Position exacte Tremie (1=Atteint)</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationAtPV">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Position exacte PV (1=Atteint)</xhtml>
+              </documentation>
             </variable>
             <variable name="TranslationAtP2">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Position exacte P2 (1=Atteint)</xhtml>
+              </documentation>
             </variable>
             <variable name="TranslationAtP1">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Position exacte P1 (1=Atteint)</xhtml>
+              </documentation>
             </variable>
             <variable name="TranslationAtMaintenance">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Position exacte Maintenance (1=Atteint)</xhtml>
+              </documentation>
             </variable>
             <variable name="M3_StatusWord_Filtered">
               <type>
                 <UINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">WORD/UINT d'état variateur filtré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ ÉTATS VARIATEUR M3 FILTRÉS ===
+&lt;-- [STAT] Mot d'etat variateur M3 filtre</xhtml>
               </documentation>
             </variable>
             <variable name="M3_ActualFrequencyHz_Filtered">
@@ -1010,7 +1026,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <UINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">UINT fréquence M3 filtrée, unité : 0,01 Hz</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Frequence reelle M3 filt黨e (0.01 Hz)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_LimitSwitchFwd">
@@ -1018,7 +1034,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = limite avant active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Fin de course avant M3 (1=Actionne)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_LimitSwitchRev">
@@ -1026,7 +1042,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = limite arrière active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Fin de course arriere M3 (1=Actionne)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_SensorWordIncoherent">
@@ -1034,7 +1050,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = mot capteurs incohérent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incoherence detectee mot capteurs M3</xhtml>
               </documentation>
             </variable>
             <variable name="M3_SensorsWord">
@@ -1042,7 +1058,7 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BYTE />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">BYTE mot capteurs M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Mot d'etat capteurs M3</xhtml>
               </documentation>
             </variable>
             <variable name="LocalDigitalIoOk">
@@ -1050,9 +1066,8 @@ Status Word 0x3102 (%IW8)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic carte des 3 modules DI portant les 22 TOR réelles (§1bis).
-       Granularité MODULE, pas canal : GetDeviceState() est un état de carte.
-TRUE = module Local_Digital_IO opérationnel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 DIAGNOSTIC CARTES E/S DÉPORTÉES ===
+&lt;-- [DIAG] Module Local_Digital_IO OK (1=OK)</xhtml>
               </documentation>
             </variable>
             <variable name="Vh0800EndOk">
@@ -1060,7 +1075,7 @@ TRUE = module Local_Digital_IO opérationnel</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0800END opérationnel (freins/thermiques/AU)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Module VH_0800END OK (1=OK)</xhtml>
               </documentation>
             </variable>
             <variable name="Vh0808EtpOk">
@@ -1068,7 +1083,7 @@ TRUE = module Local_Digital_IO opérationnel</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = module VH_0808ETP opérationnel (positions M3/hydraulique/crible)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Module VH_0808ETP OK (1=OK)</xhtml>
               </documentation>
             </variable>
             <variable name="InputModuleFault">
@@ -1076,7 +1091,7 @@ TRUE = module Local_Digital_IO opérationnel</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un des 3 modules DI hors service</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut sur au moins un module DI (1=Defaut)</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosM1">
@@ -1084,10 +1099,8 @@ TRUE = module Local_Digital_IO opérationnel</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Positions câbles calculées en mètres (mises à l'échelle après homing, bornées et
-       gelées sur doute par FB_Encoder_Safety — CablePosM1/M2 ne sont PLUS la sortie brute
-       FB_Encoder_Scale, voir §4bis)
-Position câble M1 en mètres</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 MESURES POSITIONS &amp; VITESSES TREUILS ===
+&lt;-- [STAT] Position cable M1 calibree (metres)</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosM2">
@@ -1095,7 +1108,7 @@ Position câble M1 en mètres</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position câble M2 en mètres</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Position cable M2 calibree (metres)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_EncoderIncoherent">
@@ -1103,21 +1116,23 @@ Position câble M1 en mètres</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = position hors plage ±99m OU homing suspect (FB_Encoder_Safety)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mesure codeur M1 incoherente (1=Defaut)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_EncoderIncoherent">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Mesure codeur M2 incoherente (1=Defaut)</xhtml>
+              </documentation>
             </variable>
             <variable name="M1_Speed_Mps">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse câble mesurée (FB_Encoder_SpeedMeasure), prérequis FB_Safety_Winch Méca A/F/G
-Vitesse absolue M1, m/s</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse absolue M1 (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_SignedSpeed_Mps">
@@ -1125,7 +1140,7 @@ Vitesse absolue M1, m/s</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signée M1 (+ montée / - descente), m/s</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse signee M1 (+:Montee, -:Descente) (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_SpeedValid">
@@ -1133,23 +1148,32 @@ Vitesse absolue M1, m/s</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE après 6 échantillons couvrant ≥50ms, position saine</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Validite mesure vitesse M1 (1=Valide)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_Speed_Mps">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse absolue M2 (m/s)</xhtml>
+              </documentation>
             </variable>
             <variable name="M2_SignedSpeed_Mps">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse signee M2 (+:Montee, -:Descente) (m/s)</xhtml>
+              </documentation>
             </variable>
             <variable name="M2_SpeedValid">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Validite mesure vitesse M2 (1=Valide)</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>
@@ -1158,141 +1182,202 @@ Vitesse absolue M1, m/s</xhtml>
                 <derived name="FB_SimBench" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Blocs complexes ──</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧩 SOUS-INSTANCES FB ===
+* [INST] Banc de simulation integré</xhtml>
               </documentation>
             </variable>
             <variable name="instJoystick">
               <type>
                 <derived name="FB_Joystick" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Traitement et filtrage joystick</xhtml>
+              </documentation>
             </variable>
             <variable name="instEncoderAbsM1">
               <type>
                 <derived name="FB_Encoder_Abs" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Acquisition brute codeur M1</xhtml>
+              </documentation>
             </variable>
             <variable name="instEncoderScaleM1">
               <type>
                 <derived name="FB_Encoder_Scale" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mise a l'echelle codeur M1</xhtml>
+              </documentation>
             </variable>
             <variable name="instHomingM1">
               <type>
                 <derived name="FB_Encoder_Homing" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Prise d'origine M1</xhtml>
+              </documentation>
             </variable>
             <variable name="instEncoderSafetyM1">
               <type>
                 <derived name="FB_Encoder_Safety" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Surveillance integrite mesure M1</xhtml>
+              </documentation>
             </variable>
             <variable name="instEncoderSpeedMeasureM1">
               <type>
                 <derived name="FB_Encoder_SpeedMeasure" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Calcul vitesse M1</xhtml>
+              </documentation>
             </variable>
             <variable name="instEncoderAbsM2">
               <type>
                 <derived name="FB_Encoder_Abs" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Acquisition brute codeur M2</xhtml>
+              </documentation>
             </variable>
             <variable name="instEncoderScaleM2">
               <type>
                 <derived name="FB_Encoder_Scale" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mise a l'echelle codeur M2</xhtml>
+              </documentation>
             </variable>
             <variable name="instHomingM2">
               <type>
                 <derived name="FB_Encoder_Homing" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Prise d'origine M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEncoderSafetyM2">
+              <type>
+                <derived name="FB_Encoder_Safety" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Surveillance integrite mesure M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instEncoderSpeedMeasureM2">
+              <type>
+                <derived name="FB_Encoder_SpeedMeasure" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Calcul vitesse M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instPosDecoderM3">
+              <type>
+                <derived name="FB_Translation_PositionDecoder" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Decodage position translation M3</xhtml>
+              </documentation>
             </variable>
             <variable name="M2BucketRefOpenEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">BtnConfirmOpenPos/ClosePos (benne) référencent aussi le codeur M2,
-comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎛️ VARIABLES LOCALES &amp; DÉTECTEURS ===
+. [LOC] Front demande reference benne ouverte</xhtml>
               </documentation>
             </variable>
             <variable name="M2BucketRefCloseEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front demande reference benne fermee</xhtml>
+              </documentation>
             </variable>
             <variable name="M2BucketRefRequested">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande d'etalonnage M2 active</xhtml>
+              </documentation>
             </variable>
             <variable name="M2BucketRefTargetM">
               <type>
                 <REAL />
               </type>
-            </variable>
-            <variable name="instEncoderSafetyM2">
-              <type>
-                <derived name="FB_Encoder_Safety" />
-              </type>
-            </variable>
-            <variable name="instEncoderSpeedMeasureM2">
-              <type>
-                <derived name="FB_Encoder_SpeedMeasure" />
-              </type>
-            </variable>
-            <variable name="instPosDecoderM3">
-              <type>
-                <derived name="FB_Translation_PositionDecoder" />
-              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible metrique etalonnage M2</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchInputSourceSimulated">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Sélection de source par domaine ──</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Source Winch simulee active</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationInputSourceSimulated">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Source Translation simulee active</xhtml>
+              </documentation>
             </variable>
             <variable name="OperatorInputSourceSimulated">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Source Pupitre simulee active</xhtml>
+              </documentation>
             </variable>
             <variable name="MachineInputSourceSimulated">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Source Machine simulee active</xhtml>
+              </documentation>
             </variable>
             <variable name="PreviousWinchInputSourceSimulated">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Mémoire de détection de changement Winch ──</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire cycle precedent source Winch</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceInitialized">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur initialisation source Winch</xhtml>
+              </documentation>
             </variable>
             <variable name="SimulationModeRise">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Fronts session simulation ──</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant activation simulation</xhtml>
               </documentation>
             </variable>
             <variable name="SimulationModeFall">
               <type>
                 <derived name="F_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant desactivation simulation</xhtml>
+              </documentation>
             </variable>
             <variable name="ENCODER_POINTS_PER_REV">
               <type>
@@ -1302,7 +1387,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
                 <simpleValue value="8192" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Constantes mécaniques &amp; électriques chaîne codeurs treuils (DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md §2)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚙️ CONSTANTES MÉCANIQUES (AF09 §2) ===
 13 bits single-turn (8192 pts/tour)</xhtml>
               </documentation>
             </variable>
@@ -1325,7 +1410,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">2.0 mètres de câble par tour de tambour treuil</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2.0 metres de cable par tour tambour</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -1347,8 +1432,7 @@ comme BtnHome -- voir bandeau instHomingM2 plus bas.</xhtml>
 
 {region "§0 Session simulation &amp; aiguillage"}
 // === 🧪 §0 SIMULATION &amp; SÉLECTION DE SOURCE ===
-// 🎯 Producteur unique des aiguillages Réel/Simu par domaine (HwReal vs HwSim -&gt; HwIn).
-// ⚡ Fronts maître : initialisent/nettoient les stimuli banc sans état résiduel.
+// 🎯 Producteur unique des aiguillages Reel/Simu par domaine (HwReal vs HwSim -&gt; HwIn).
 
 SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
@@ -1358,11 +1442,6 @@ IF SimulationModeRise.Q THEN
     GVL_Simulation.SimTranslationActive := TRUE;
     GVL_Simulation.SimOperatorActive := TRUE;
     GVL_Simulation.SimSafetyActive := TRUE;
-    // Plus d'auto-arm `SimJoystickRawButton := TRUE` — il masquait le vrai
-    // homme-mort (DeadmanArmed restait armé en permanence → rien de testé en sim). Le bouton
-    // suit désormais le stimulus directionnel (FB_SimBench : JoyBtnRaw := SimJoystickRawButton
-    // OR DirectionCount&gt;0), ce qui rejoue fidèlement l'armement au commandement, la grâce 3 s
-    // et la retombée au neutre. SimJoystickRawButton reste un appui manuel (défaut FALSE).
 END_IF;
 
 IF SimulationModeFall.Q THEN
@@ -1471,29 +1550,29 @@ InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
 
 instSimBench(
     Enable                   := GVL_Simulation.SimulationModeActive,
-    M1_RelayFwd              := GVL_Global.M1RelayFwd,
-    M1_RelayRev              := GVL_Global.M1RelayRev,
-    M1_SpeedContactor_1      := GVL_Global.M1SpeedContactor1,
-    M1_SpeedContactor_2      := GVL_Global.M1SpeedContactor2,
-    M1_SpeedContactor_3      := GVL_Global.M1SpeedContactor3,
-    M1_SpeedContactor_4      := GVL_Global.M1SpeedContactor4,
+    M1_RelayFwd              := PRG_06_Outputs_LD.M1RelayFwd,
+    M1_RelayRev              := PRG_06_Outputs_LD.M1RelayRev,
+    M1_SpeedContactor_1      := PRG_06_Outputs_LD.M1SpeedContactor1,
+    M1_SpeedContactor_2      := PRG_06_Outputs_LD.M1SpeedContactor2,
+    M1_SpeedContactor_3      := PRG_06_Outputs_LD.M1SpeedContactor3,
+    M1_SpeedContactor_4      := PRG_06_Outputs_LD.M1SpeedContactor4,
     M1_SpeedRefPct           := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
     M1_PresetTriggerCmd      := instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderAbsM1.PresetValueOut,
-    M1_BrakeCmd              := GVL_Global.M1BrakeCmd,
-    M2_RelayFwd              := GVL_Global.M2RelayFwd,
-    M2_RelayRev              := GVL_Global.M2RelayRev,
-    M2_SpeedContactor_1      := GVL_Global.M2SpeedContactor1,
-    M2_SpeedContactor_2      := GVL_Global.M2SpeedContactor2,
-    M2_SpeedContactor_3      := GVL_Global.M2SpeedContactor3,
-    M2_SpeedContactor_4      := GVL_Global.M2SpeedContactor4,
+    M1_BrakeCmd              := PRG_06_Outputs_LD.M1BrakeCmd,
+    M2_RelayFwd              := PRG_06_Outputs_LD.M2RelayFwd,
+    M2_RelayRev              := PRG_06_Outputs_LD.M2RelayRev,
+    M2_SpeedContactor_1      := PRG_06_Outputs_LD.M2SpeedContactor1,
+    M2_SpeedContactor_2      := PRG_06_Outputs_LD.M2SpeedContactor2,
+    M2_SpeedContactor_3      := PRG_06_Outputs_LD.M2SpeedContactor3,
+    M2_SpeedContactor_4      := PRG_06_Outputs_LD.M2SpeedContactor4,
     M2_SpeedRefPct           := PRG_04_Treuils_Benne.M2LogicRequestSpeedRef_Pct,
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
-    M2_BrakeCmd              := GVL_Global.M2BrakeCmd,
+    M2_BrakeCmd              := PRG_06_Outputs_LD.M2BrakeCmd,
     M3_Direction             := PRG_05_Translation.M3_Direction_Active,
     M3_SpeedRefPct           := PRG_05_Translation.M3_SpeedRef_Active,
-    M3_BrakeCmd              := GVL_Global.TranslationBrakeCmd,
+    M3_BrakeCmd              := PRG_06_Outputs_LD.TranslationBrakeCmd,
     PowerKeepAlive_A         := PRG_06_Outputs_LD.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie

@@ -10,10 +10,17 @@
 
 PROGRAM PRG_05_Translation
 
+VAR_INPUT
+    // === 📥 ENTRÉES PROGRAMME (AUCUNE - PILOTÉ VIA PRG_02, PRG_03 & PRG_04) ===
+END_VAR
+
 VAR_OUTPUT
-    TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest;
-    TranslationState : ST_TranslationState;
-    TranslationSafety : ST_SafetyTranslation;
+    // === ⚡ DEMANDES DE SORTIES FINALES & INTERLOCKS ===
+    TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // <-- [ACT] Demande finale et interlocks translation M3
+
+    // === 📊 ÉTATS PUBLICS & SÉCURITÉS TRANSLATION ===
+    TranslationState                 : ST_TranslationState;                 // <-- [STAT] Etat public translation M3
+    TranslationSafety                : ST_SafetyTranslation;                // <-- [SAFE] Diagnostic et securites translation M3
 END_VAR
 
 VAR

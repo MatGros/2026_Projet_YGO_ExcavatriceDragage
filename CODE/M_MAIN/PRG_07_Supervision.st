@@ -9,8 +9,13 @@
 
 PROGRAM PRG_07_Supervision
 
+VAR_INPUT
+    // === 📥 ENTRÉES PROGRAMME (AUCUNE - LECTURE DES DONNÉES VIA PRG_02 À 06) ===
+END_VAR
+
 VAR_OUTPUT
-    FaultMachineReset_IHM : BOOL;
+    // === 🚨 ACQUITTEMENT GLOBAL MACHINE ===
+    FaultMachineReset_IHM : BOOL; // <-- [CMD] Impulsion d'acquittement defaut globale machine
 END_VAR
 
 VAR

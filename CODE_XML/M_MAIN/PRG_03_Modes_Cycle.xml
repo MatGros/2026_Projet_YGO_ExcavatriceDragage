@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T15:51:04.155159" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T15:51:04.155159">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:57:54.168652" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:57:54.168652">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -470,7 +470,8 @@
                 <derived name="ST_Modes_Autorisations" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bus d'autorisations (producteur unique)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎚️ BUS D'AUTORISATIONS &amp; DEMANDES DE CYCLE ===
+&lt;-- [STAT] Bus d'autorisations machine (producteur unique)</xhtml>
               </documentation>
             </variable>
             <variable name="instCycleSemiAuto">
@@ -478,10 +479,7 @@
                 <derived name="FB_Cycle" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquenceur de cycle semi-automatique.
-⚠️ VAR_OUTPUT (pas VAR) : PRG_04/05 y accèdent via PRG_03_Modes_Cycle.instCycleSemiAuto
-(une variable locale d'un PROGRAM n'est pas accessible depuis un autre PROGRAM).
-utilisé en SEMI_AUTO</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">*   [INST] Sequenceur de cycle semi-automatique public</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -491,7 +489,8 @@ utilisé en SEMI_AUTO</xhtml>
                 <derived name="FB_Modes" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Arbitrage mode + bus autorisations</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧩 SOUS-INSTANCES FB INTERNES ===
+* [INST] Arbitrage des modes machine et calcul autorisations</xhtml>
               </documentation>
             </variable>
           </localVars>
