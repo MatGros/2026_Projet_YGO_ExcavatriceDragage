@@ -11,8 +11,8 @@ STRUCT
 
     (* 1bis. Entrées physiques directes HwIn *)
     HwIn_JoyBtnRaw_DI            : BOOL; (* Bouton brut homme-mort issu de HwIn.Operator *)
-    NeutralXAct                  : BOOL; (* TRUE = Axe X au neutre (PRG_02_Acquisition.JoystickXNeutral) *)
-    NeutralYAct                  : BOOL; (* TRUE = Axe Y au neutre (PRG_02_Acquisition.JoystickYNeutral) *)
+    NeutralXAct                  : BOOL; (* TRUE = Axe X au neutre (PRG_02_Acquisition.Data.JoystickXNeutral) *)
+    NeutralYAct                  : BOOL; (* TRUE = Axe Y au neutre (PRG_02_Acquisition.Data.JoystickYNeutral) *)
 
     (* 2. Prise en main & Sécurité *)
     Step3_DeadmanPressed         : BOOL; (* TRUE = Bouton Homme-Mort appuyé *)

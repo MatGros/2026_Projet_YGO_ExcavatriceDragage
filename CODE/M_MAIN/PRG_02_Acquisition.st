@@ -17,6 +17,9 @@ VAR_INPUT
 END_VAR
 
 VAR_OUTPUT
+    // === 🔌 BUS D'ÉCHANGE INTER-PRG ===
+    Data                      : ST_AcquisitionInterPrg; // <-- [BUS] Mesures/joystick/positions M3/diag DI publiés
+
     // === 🖼️ IMAGES PROCESS MATÉRIEL / SIMULATION ===
     HwReal                   : ST_HardwareImage; // <-- [STAT] Image brute reelle physique
     HwSim                    : ST_HardwareImage; // <-- [STAT] Image simulee banc
@@ -24,52 +27,9 @@ VAR_OUTPUT
     WinchInputSourceChanged  : BOOL;             // <-- [STAT] Impulsion 1 cycle si source Winch bascule
     SimulationBypassActive   : BOOL;             // <-- [STAT] Bypass simulation treuils actif
 
-    // === 🕹️ ÉTATS JOYSTICK QUALIFIÉS ===
-    JoystickDeadmanArmed      : BOOL; // <-- [SAFE] Homme-mort joystick arme (1=Arme)
-    JoystickYNeutral          : BOOL; // <-- [STAT] Axe Y joystick au neutre (1=Neutre)
-    JoystickDirectionX        : INT;  // <-- [CMD]  Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
-    JoystickSpeedPctX         : REAL; // <-- [CMD]  Magnitude deviation axe X en % (0..100)
-    JoystickXNeutral          : BOOL; // <-- [STAT] Axe X joystick au neutre (1=Neutre)
-
-    // === 📍 POSITIONS TRANSLATION (ZONES CUMULATIVES) ===
-    TranslationPosTremie      : BOOL; // <-- [STAT] Zone Tremie (1=Present)
-    TranslationPosPV          : BOOL; // <-- [STAT] Zone pre-ralentissement PV (1=Present)
-    TranslationPosP2          : BOOL; // <-- [STAT] Zone P2 (1=Present)
-    TranslationPosP1          : BOOL; // <-- [STAT] Zone P1 (1=Present)
-    TranslationPosMaintenance : BOOL; // <-- [STAT] Zone Maintenance (1=Present)
-
-    // === 🎯 POSITIONS TRANSLATION (POINTS EXACTS ARBITRÉS) ===
-    TranslationAtTremie      : BOOL; // <-- [STAT] Position exacte Tremie (1=Atteint)
-    TranslationAtPV          : BOOL; // <-- [STAT] Position exacte PV (1=Atteint)
-    TranslationAtP2          : BOOL; // <-- [STAT] Position exacte P2 (1=Atteint)
-    TranslationAtP1          : BOOL; // <-- [STAT] Position exacte P1 (1=Atteint)
-    TranslationAtMaintenance : BOOL; // <-- [STAT] Position exacte Maintenance (1=Atteint)
-
-    // === ⚡ ÉTATS VARIATEUR M3 FILTRÉS ===
+    // === ⚡ ÉTATS VARIATEUR M3 FILTRÉS (hors bus — hors perimetre AC1) ===
     M3_StatusWord_Filtered        : UINT; // <-- [STAT] Mot d'etat variateur M3 filtre
     M3_ActualFrequencyHz_Filtered : UINT; // <-- [STAT] Frequence reelle M3 filt黨e (0.01 Hz)
-    M3_LimitSwitchFwd          : BOOL; // <-- [SAFE] Fin de course avant M3 (1=Actionne)
-    M3_LimitSwitchRev          : BOOL; // <-- [SAFE] Fin de course arriere M3 (1=Actionne)
-    M3_SensorWordIncoherent    : BOOL; // <-- [DIAG] Incoherence detectee mot capteurs M3
-    M3_SensorsWord             : BYTE; // <-- [STAT] Mot d'etat capteurs M3
-
-    // === 🩺 DIAGNOSTIC CARTES E/S DÉPORTÉES ===
-    LocalDigitalIoOk           : BOOL; // <-- [DIAG] Module Local_Digital_IO OK (1=OK)
-    Vh0800EndOk                : BOOL; // <-- [DIAG] Module VH_0800END OK (1=OK)
-    Vh0808EtpOk                : BOOL; // <-- [DIAG] Module VH_0808ETP OK (1=OK)
-    InputModuleFault           : BOOL; // <-- [DIAG] Defaut sur au moins un module DI (1=Defaut)
-
-    // === 🧲 MESURES POSITIONS & VITESSES TREUILS ===
-    CablePosM1                 : REAL; // <-- [STAT] Position cable M1 calibree (metres)
-    CablePosM2                 : REAL; // <-- [STAT] Position cable M2 calibree (metres)
-    M1_EncoderIncoherent       : BOOL; // <-- [DIAG] Mesure codeur M1 incoherente (1=Defaut)
-    M2_EncoderIncoherent       : BOOL; // <-- [DIAG] Mesure codeur M2 incoherente (1=Defaut)
-    M1_Speed_Mps               : REAL; // <-- [STAT] Vitesse absolue M1 (m/s)
-    M1_SignedSpeed_Mps         : REAL; // <-- [STAT] Vitesse signee M1 (+:Montee, -:Descente) (m/s)
-    M1_SpeedValid              : BOOL; // <-- [STAT] Validite mesure vitesse M1 (1=Valide)
-    M2_Speed_Mps               : REAL; // <-- [STAT] Vitesse absolue M2 (m/s)
-    M2_SignedSpeed_Mps         : REAL; // <-- [STAT] Vitesse signee M2 (+:Montee, -:Descente) (m/s)
-    M2_SpeedValid              : BOOL; // <-- [STAT] Validite mesure vitesse M2 (1=Valide)
 END_VAR
 
 VAR
@@ -217,15 +177,15 @@ HwReal.Machine.HopperFull_OR_GateRaised_DI := HopperFull_OR_GateRaised_DI; // D�
 // GetDeviceState() = RUNNING => module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
 IF MachineInputSourceSimulated THEN
-    LocalDigitalIoOk := TRUE;
-    Vh0800EndOk      := TRUE;
-    Vh0808EtpOk      := TRUE;
+    Data.LocalDigitalIoOk := TRUE;
+    Data.Vh0800EndOk      := TRUE;
+    Data.Vh0808EtpOk      := TRUE;
 ELSE
-    LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
-InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
+Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Data.Vh0808EtpOk);
 {endregion}
 
 {region "§2 Simulation et aiguillage — HwIn"}
@@ -233,34 +193,34 @@ InputModuleFault := NOT (LocalDigitalIoOk AND Vh0800EndOk AND Vh0808EtpOk);
 
 instSimBench(
     Enable                   := GVL_Simulation.SimulationModeActive,
-    M1_RelayFwd              := PRG_06_Outputs_LD.M1RelayFwd,
-    M1_RelayRev              := PRG_06_Outputs_LD.M1RelayRev,
-    M1_SpeedContactor_1      := PRG_06_Outputs_LD.M1SpeedContactor1,
-    M1_SpeedContactor_2      := PRG_06_Outputs_LD.M1SpeedContactor2,
-    M1_SpeedContactor_3      := PRG_06_Outputs_LD.M1SpeedContactor3,
-    M1_SpeedContactor_4      := PRG_06_Outputs_LD.M1SpeedContactor4,
-    M1_SpeedRefPct           := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
+    M1_RelayFwd              := PRG_06_Outputs_LD.Data.M1RelayFwd,
+    M1_RelayRev              := PRG_06_Outputs_LD.Data.M1RelayRev,
+    M1_SpeedContactor_1      := PRG_06_Outputs_LD.Data.M1SpeedContactor1,
+    M1_SpeedContactor_2      := PRG_06_Outputs_LD.Data.M1SpeedContactor2,
+    M1_SpeedContactor_3      := PRG_06_Outputs_LD.Data.M1SpeedContactor3,
+    M1_SpeedContactor_4      := PRG_06_Outputs_LD.Data.M1SpeedContactor4,
+    M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
     M1_PresetTriggerCmd      := instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderAbsM1.PresetValueOut,
-    M1_BrakeCmd              := PRG_06_Outputs_LD.M1BrakeCmd,
-    M2_RelayFwd              := PRG_06_Outputs_LD.M2RelayFwd,
-    M2_RelayRev              := PRG_06_Outputs_LD.M2RelayRev,
-    M2_SpeedContactor_1      := PRG_06_Outputs_LD.M2SpeedContactor1,
-    M2_SpeedContactor_2      := PRG_06_Outputs_LD.M2SpeedContactor2,
-    M2_SpeedContactor_3      := PRG_06_Outputs_LD.M2SpeedContactor3,
-    M2_SpeedContactor_4      := PRG_06_Outputs_LD.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_04_Treuils_Benne.M2LogicRequestSpeedRef_Pct,
+    M1_BrakeCmd              := PRG_06_Outputs_LD.Data.M1BrakeCmd,
+    M2_RelayFwd              := PRG_06_Outputs_LD.Data.M2RelayFwd,
+    M2_RelayRev              := PRG_06_Outputs_LD.Data.M2RelayRev,
+    M2_SpeedContactor_1      := PRG_06_Outputs_LD.Data.M2SpeedContactor1,
+    M2_SpeedContactor_2      := PRG_06_Outputs_LD.Data.M2SpeedContactor2,
+    M2_SpeedContactor_3      := PRG_06_Outputs_LD.Data.M2SpeedContactor3,
+    M2_SpeedContactor_4      := PRG_06_Outputs_LD.Data.M2SpeedContactor4,
+    M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
-    M2_BrakeCmd              := PRG_06_Outputs_LD.M2BrakeCmd,
+    M2_BrakeCmd              := PRG_06_Outputs_LD.Data.M2BrakeCmd,
     M3_Direction             := PRG_05_Translation.M3_Direction_Active,
     M3_SpeedRefPct           := PRG_05_Translation.M3_SpeedRef_Active,
-    M3_BrakeCmd              := PRG_06_Outputs_LD.TranslationBrakeCmd,
-    PowerKeepAlive_A         := PRG_06_Outputs_LD.PowerKeepAliveACmd,
-    PowerKeepAlive_B         := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
+    M3_BrakeCmd              := PRG_06_Outputs_LD.Data.TranslationBrakeCmd,
+    PowerKeepAlive_A         := PRG_06_Outputs_LD.Data.PowerKeepAliveACmd,
+    PowerKeepAlive_B         := PRG_06_Outputs_LD.Data.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
     // inter-POU ArmPulse est observée avec un cycle de retard dans la tâche.
-    EmergencyArming_RQ       := PRG_06_Outputs_LD.EmergencyArmingCmd
+    EmergencyArming_RQ       := PRG_06_Outputs_LD.Data.EmergencyArmingCmd
                                  OR (PRG_06_Outputs_LD.ArmingSeqStep = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
@@ -337,11 +297,11 @@ instJoystick(
 );
 
 // 📤 Publication des états et axes joystick
-JoystickDeadmanArmed := instJoystick.DeadmanArmed;
-JoystickYNeutral     := (instJoystick.DirectionY = 0);
-JoystickDirectionX   := instJoystick.DirectionX;
-JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);
-JoystickXNeutral     := (instJoystick.DirectionX = 0);
+Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
+Data.JoystickYNeutral     := (instJoystick.DirectionY = 0);
+Data.JoystickDirectionX   := instJoystick.DirectionX;
+Data.JoystickSpeedPctX    := ABS(instJoystick.SpeedXPct);
+Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
 {endregion}
 
 {region "§4 Codeurs et homing — M1/M2"}
@@ -403,8 +363,8 @@ instEncoderSafetyM1(
     HomingSuspect         := instHomingM1.HomingSuspect,
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
-CablePosM1           := instEncoderSafetyM1.CablePosMSafe;
-M1_EncoderIncoherent := instEncoderSafetyM1.EncoderIncoherent;
+Data.CablePosM1           := instEncoderSafetyM1.CablePosMSafe;
+Data.M1_EncoderIncoherent := instEncoderSafetyM1.EncoderIncoherent;
 
 instEncoderSpeedMeasureM1(
     Enable        := TRUE,
@@ -412,9 +372,9 @@ instEncoderSpeedMeasureM1(
     Position_M    := instEncoderSafetyM1.CablePosMSafe,
     PositionValid := instEncoderAbsM1.EncoderAvailable AND NOT instEncoderSafetyM1.EncoderIncoherent
 );
-M1_Speed_Mps       := instEncoderSpeedMeasureM1.Speed_Mps;
-M1_SignedSpeed_Mps := instEncoderSpeedMeasureM1.SignedSpeed_Mps;
-M1_SpeedValid      := instEncoderSpeedMeasureM1.Valid;
+Data.M1_Speed_Mps       := instEncoderSpeedMeasureM1.Speed_Mps;
+Data.M1_SignedSpeed_Mps := instEncoderSpeedMeasureM1.SignedSpeed_Mps;
+Data.M1_SpeedValid      := instEncoderSpeedMeasureM1.Valid;
 
 // ── TREUIL M2 (Benne) ──
 instEncoderAbsM2(
@@ -437,9 +397,9 @@ M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
     AND NOT PRG_04_Treuils_Benne.instWinchM1.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Busy;
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
-    M2BucketRefTargetM := CablePosM1;
+    M2BucketRefTargetM := Data.CablePosM1;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
-    M2BucketRefTargetM := CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM;
+    M2BucketRefTargetM := Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
 instHomingM2(
@@ -486,8 +446,8 @@ instEncoderSafetyM2(
     HomingSuspect         := instHomingM2.HomingSuspect,
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
-CablePosM2           := instEncoderSafetyM2.CablePosMSafe;
-M2_EncoderIncoherent := instEncoderSafetyM2.EncoderIncoherent;
+Data.CablePosM2           := instEncoderSafetyM2.CablePosMSafe;
+Data.M2_EncoderIncoherent := instEncoderSafetyM2.EncoderIncoherent;
 
 instEncoderSpeedMeasureM2(
     Enable        := TRUE,
@@ -495,9 +455,9 @@ instEncoderSpeedMeasureM2(
     Position_M    := instEncoderSafetyM2.CablePosMSafe,
     PositionValid := instEncoderAbsM2.EncoderAvailable AND NOT instEncoderSafetyM2.EncoderIncoherent
 );
-M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
-M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
-M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
+Data.M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
+Data.M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
+Data.M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
 {endregion}
 
 {region "§5 Décodage position translation — M3"}
@@ -511,19 +471,20 @@ instPosDecoderM3(
     SensorMaintenance := HwIn.Translation.M3_PosMaintenance_DI
 );
 
-TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
-TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
-TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
-TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
-TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
-TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
-TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
-TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
-TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
-TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
-M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
-M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
-M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
+Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
+Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
+Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
+Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
+Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
+Data.TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
+Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
+Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
+Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
+Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
+Data.M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
+Data.M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
+Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
+// Data.M3_SensorsWord : declare dans ST_AcquisitionInterPrg, jamais assigne ici (gap preexistant, hors perimetre isometrique de ce lot).
 {endregion}
 
 {region "§6 Retours variateur — M3"}

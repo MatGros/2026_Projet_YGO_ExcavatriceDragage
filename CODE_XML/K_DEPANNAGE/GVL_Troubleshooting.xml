@@ -1230,7 +1230,7 @@ Bouton brut homme-mort issu de HwIn.Operator</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe X au neutre (PRG_02_Acquisition.JoystickXNeutral)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe X au neutre (PRG_02_Acquisition.Data.JoystickXNeutral)</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralYAct">
@@ -1238,7 +1238,7 @@ Bouton brut homme-mort issu de HwIn.Operator</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe Y au neutre (PRG_02_Acquisition.JoystickYNeutral)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe Y au neutre (PRG_02_Acquisition.Data.JoystickYNeutral)</xhtml>
               </documentation>
             </variable>
             <variable name="Step3_DeadmanPressed">
