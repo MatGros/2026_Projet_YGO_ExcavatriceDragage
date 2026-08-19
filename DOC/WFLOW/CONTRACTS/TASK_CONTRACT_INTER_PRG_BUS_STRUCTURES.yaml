@@ -118,23 +118,14 @@ contract:
 status: PENDING
 
 execution:
-  executed_by: "AGY-01"
-  completed_at: "2026-08-19T04:37:00+02:00"
-  status: COMPLETED
-  summary: >
-    Exécution complète de T139 :
-    - 77 fichiers DUT déplacés proprement par git mv dans 8 sous-dossiers thématiques (AC1).
-    - G380 adapté pour scan récursif (rglob) et validé PASS (AC2).
-    - naming_baseline.json mis à jour et validé (AC3).
-    - Bundle PLCopenXML régénéré fresh sans erreur (AC4).
-    - G200_check_linkage.py PASS (0 erreur, 1160 instances vérifiées) (AC5).
-    - run_all_gates.py --palier C PASS (15/15 gates au vert, 0 erreur) (AC6).
-  evidence_submitted:
-    - bundle_freshness: "PASS: CODE_XML/CODE_Bundle.xml is fresh"
-    - linkage_report: "Linkage check: PASS (0 erreur(s), 1160 instance(s) verifiee(s))"
-    - all_gates_pass: "ALL GATES PASSED [OK] (PALIER C - 15/15)"
+  executed_by: "non demarre"
+  completed_at: "non demarre"
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
 
 validation:
   status: PENDING
   validated_by: "non demarre"
   validated_at: "non demarre"
+  notes: ""
