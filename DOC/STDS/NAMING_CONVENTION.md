@@ -137,11 +137,24 @@ producteur unique a tout instant, et une preuve de liaison. La renumérotation 7
 (`PRG_02`→`PRG_07`) est **soldée** ; la conversion CFC natif est **abandonnée** (code en ST +
 PLCopenXML). Historique : `ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`.
 
-### Instances FB
-- Préfixe **`inst`** + rôle PascalCase : `instJoystick`, `instSafetyWinchM1`.
-- ❌ Pas `FB_Joystick_0`, pas le nom du type seul, pas de suffixe `_0` d'export.
-- Multi-équipement : suffixe métier `M1`/`M2`/`M3` ou rôle (`instDiagCanOpen`).
-- Device IHM peut rester `JOY1…` (nœud) ; l'instance PLC reste `instJoystick`.
+### Instances FB — Règle d'Ingénierie & Hiérarchie
+
+Le nommage des instances privilégie la **sémantique métier** et la lisibilité sans alourdissement dogmatique :
+
+1. **Primitives système & IEC (`TON`, `TOF`, `R_TRIG`, `F_TRIG`, `HYSTERESIS`)** :
+   - 🚫 **Jamais de préfixe `inst`**.
+   - ✅ Rôle sémantique + suffixe standard : `ResetEdge : R_TRIG;`, `BrakeTimeout : TON;`, `Hyst1 : HYSTERESIS;`.
+
+2. **Composition interne dans un FB (Micro-composants POO)** :
+   - 🚫 **Pas de préfixe `inst`** (évite le bruit visuel dans le corps du bloc).
+   - ✅ Rôle fonctionnel direct : `ScaleX : FB_AxisScale;`, `FilterY : FB_Filter_PT1;`, `OutputLogic : FB_Safety_EmergencyManagementOutput;`.
+
+3. **Organes répliqués / Multi-instances métier** :
+   - ✅ Nom explicite de l'organe physique : `WinchM1 : FB_Winch;`, `WinchM2 : FB_Winch;`, `HomingM1 : FB_Encoder_Homing;`.
+
+4. **Singletons au niveau `PROGRAM` (`PRG_02` à `PRG_07`)** :
+   - ✅ Préfixe **`inst`** + rôle PascalCase pour isoler la portée et éviter toute collision de nom avec les GVL/DUT : `instJoystick : FB_Joystick;`, `instModes : FB_Modes;`, `instCycleSemiAuto : FB_Cycle;`, `instTranslationM3 : FB_Translation;`.
+   - ❌ Pas `FB_Joystick_0`, pas le nom du type seul, pas de suffixe `_0` d'export.
   
 ---
  
