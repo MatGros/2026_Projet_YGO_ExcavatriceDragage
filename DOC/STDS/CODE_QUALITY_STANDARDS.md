@@ -204,7 +204,7 @@ Contrôle : la numérotation des régions est vérifiée par revue (pas de gate 
 
 ---
 
-## 2bis. Lisibilité des conditions booléennes (REX 2026-08-12)
+## 2quater. Lisibilité des conditions booléennes (REX 2026-08-12)
 
 > 🚨 Cas vécu (`PRG_04_Treuils_Benne.st`) : `M1_StartStop_Active` combine 7 termes
 > (`AND`/`OR`/`NOT` imbriqués) sur une seule condition. Impossible en Watch CODESYS de voir
@@ -245,6 +245,43 @@ nommage `NAMING_CONVENTION.md` : l'écart déjà présent dans le code (noms lon
 qu'abréviations anglaises courtes) n'est **pas** corrigé maintenant — mais toute variable créée
 ou renommée à l'occasion d'un refactor ou d'une nouvelle fonctionnalité **doit** appliquer la
 convention de façon cohérente avec le reste du projet, pas seulement localement.
+
+---
+
+## 2quinquies. 🔌 Interfaces Socle des Blocs Fonctionnels (Contrats Light & Standard)
+
+Tout bloc fonctionnel (`FB_*`) relève de l'un des deux contrats d'interface socle formalisés à partir du code existant :
+
+### 1. Contrat `light` (Calculateurs, filtres, utilitaires)
+Destiné aux blocs sans cycle de vie complexe (filtres, mises à l'échelle, convertisseurs, utilitaires purs).
+- **`VAR_INPUT`** : `Enable : BOOL;` (en `BOOL` nu hors structure).
+- **`VAR_OUTPUT`** : `Ready : BOOL;` (en `BOOL` nu hors structure).
+- **Principe** : Si `Enable = FALSE`, les sorties retombent en état neutre/sûr et `Ready := FALSE`. Aucune machine d'état ni acquittement requis.
+
+### 2. Contrat `standard` (Composants métier, séquenceurs, organes)
+Destiné aux blocs procédant à une action, portant des états d'erreur ou orchestrant un équipement.
+- **`VAR_INPUT`** :
+  - `Enable : BOOL;` (en `BOOL` nu : autorisation générale).
+  - `Reset : BOOL;` (en `BOOL` nu : acquittement sur front).
+  - `PowerContactorEngaged : BOOL;` (en `BOOL` nu : chaîne de sécurité et puissance OK).
+- **`VAR_OUTPUT`** :
+  - `Ready : BOOL;` (en `BOOL` nu).
+  - `Status : ST_FbStatus;` (ou membres équivalents intégrés au DUT d'état métier).
+
+### 3. Structure `ST_FbStatus` (Socle transverse de statut)
+La structure `ST_FbStatus` regroupe **exactement les six membres** nécessaires au suivi synoptique et diagnostic :
+```pascal
+TYPE ST_FbStatus :
+STRUCT
+    Busy         : BOOL;    // 1 = Bloc en cours d'exécution
+    Done         : BOOL;    // 1 = Action terminée avec succès
+    Error        : BOOL;    // 1 = Défaut actif présent
+    ErrorId      : WORD;    // Code d'erreur bitfield / enum diagnostic
+    State        : E_State; // État courant de la machine d'état
+    StateAtError : E_State; // État mémorisé lors de l'apparition du défaut
+END_STRUCT
+END_TYPE
+```
 
 ---
 

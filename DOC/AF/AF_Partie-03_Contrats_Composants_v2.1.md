@@ -123,22 +123,9 @@ est soldée. Historique de la migration : `ARCHIVES/Doc/AUDITS/Architecture_Migr
 
 ## 📐 6. Règles de génération Ladder (`_LD.st` → `<LD>`)
 
-> 🚩 REX 2026-08 : trois bugs d'import CODESYS sur `PRG_01_Inputs_LD` ont nécessité
-> la formalisation des règles de génération LD. Référentiel complet :
-> `DOC/STDS/CODE_QUALITY_STANDARDS.md §11`.
+> 🚩 Référentiel complet & règles de génération : voir [`DOC/STDS/CODE_QUALITY_STANDARDS.md §11`](../STDS/CODE_QUALITY_STANDARDS.md).
 
-Un programme suffixe `_LD` est une **source ST** convertie en `<LD>` dans le
-bundle PLCopenXML par `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`.
-
-### Rung complet obligatoire
-
-Chaque rung doit contenir la chaîne complète :
-
-```text
-leftPowerRail → contact → block(FB) → coil → rightPowerRail
-```
-
-CODESYS rejette les rungs incomplets (sans coil ou sans rightPowerRail).
+Un programme suffixé `_LD` est une **source ST** convertie en `<LD>` dans le bundle PLCopenXML par `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`.
 
 ### Câblage `FB_Output` et retrait de `FB_Input`
 
@@ -151,19 +138,6 @@ Les entrées sont désormais observées et publiées par `PRG_02_Acquisition` en
 `HwSim` et `HwIn`. La conversion automatique d'un `GetDeviceState()` en `BOOL` dans une page LD
 est interdite : `GetDeviceState()` retourne un `DEVICE_STATE` et le diagnostic module reste
 centralisé dans l'acquisition.
-
-Les règles de rung ci-dessous restent applicables à `FB_Output` et aux éventuels anciens rungs
-jusqu'à leur retrait contrôlé.
-
-### Expressions BOOL — pas d'inVariable/outVariable
-
-- `NOT var` → contact `negated="true"` (jamais d'`inVariable`).
-- `var1 AND var2` → série de contacts.
-- `var1 OR var2` → parallèle de contacts.
-- Une page `_LD` BOOL pure ne contient **aucun** `inVariable`/`outVariable` —
-  uniquement `contact`, `coil`, `block` et `comment`.
-- Les `inVariable`/`outVariable` sont réservés aux expressions typées non-BOOL
-  (TIME, INT, WORD, REAL) dans la section multi-paramètres du générateur.
 
 ### Tests de régression
 
