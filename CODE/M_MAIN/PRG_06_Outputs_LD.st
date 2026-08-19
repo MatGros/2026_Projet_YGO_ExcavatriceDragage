@@ -37,7 +37,7 @@ VAR_OUTPUT
        déclarées en VAR locale ci-dessous (voir §2). *)
     EmergencyArmingPulseActive   : BOOL;
     EmergencyArmingLockoutActive : BOOL;
-    ArmingSeqStep                : INT; // (* hors bus Data — champ INT non-BOOL, page LD stricte *)
+    ArmingSeqStep                : INT;
     RedundancyTestFailed         : BOOL;
     EmergencyArmingFailed        : BOOL;
     EmergencyState               : ST_Safety_Emergency_State;
@@ -49,9 +49,9 @@ VAR_OUTPUT
     // "SafeStop laisse la décélération métier se terminer"). SafeStop est une rampe rapide
     // gérée en amont par FB_Winch/FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ;
     // Error reflète tout ErrorId y compris les mécanismes SafeStop-only.
-    M1InterlockEnable            : BOOL; (* Gate finale M1 : Data.WinchM1FinalInterlockRequest.Enable AND NOT Data.WinchM1FinalInterlockRequest.PowerCutOff *)
-    M2InterlockEnable            : BOOL; (* Gate finale M2 : Data.WinchM2FinalInterlockRequest.Enable AND NOT Data.WinchM2FinalInterlockRequest.PowerCutOff *)
-    M3InterlockEnable            : BOOL; (* Gate finale M3 : Data.TranslationFinalInterlockRequest.Enable AND NOT Data.TranslationFinalInterlockRequest.PowerCutOff *)
+    M1InterlockEnable            : BOOL; (* Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1FinalInterlockRequest.PowerCutOff *)
+    M2InterlockEnable            : BOOL; (* Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2FinalInterlockRequest.PowerCutOff *)
+    M3InterlockEnable            : BOOL; (* Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationFinalInterlockRequest.PowerCutOff *)
     // Réseau informatif séparé : visibilité maintenance de ce qui
     // bloque (PowerCutOff / SafeStop / Global), SANS influencer Enable — juste de l'information en Watch/Ladder.
     M1PowerCutOffSafetyInfo      : BOOL;
@@ -71,14 +71,29 @@ VAR_OUTPUT
        de portée avec la variable GLOBALE homonyme créée par le mapping E/S CODESYS
        (Device.export), qui masquerait le pilotage matériel réel (voir §2 plus bas
        pour le détail et la liste des chemins qualifiés à mapper). *)
+    TranslationBrakeCmd          : BOOL; // <-- [ACT] Demande frein M3 arbitree — cible du mapping E/S
     M3_DriveControlWord          : WORD; // <-- [ACT] Mot de commande variateur M3 (0x3101) — cible du mapping E/S
     M3_DriveFreqRefWord          : WORD; // <-- [ACT] Consigne frequence variateur M3 (0x3100, x100) — cible du mapping E/S
 
-    // === 🔌 BUS D'ÉCHANGE INTER-PRG — bouclage FB_SimBench ===
-    Data                          : ST_OutputsInterPrg; // <-- [BUS] Ordres actionneurs finaux consommes par FB_SimBench
-
-    // === ⚡ ORDRES ACTIONNEURS HORS BUS (ACCESSIBLES SIMULATION / PROCESS) ===
+    // === ⚡ ORDRES ACTIONNEURS (ACCESSIBLES SIMULATION / PROCESS) ===
+    M1RelayFwd                   : BOOL; // <-- [ACT] Ordre contacteur montee treuil M1
+    M1RelayRev                   : BOOL; // <-- [ACT] Ordre contacteur descente treuil M1
+    M1SpeedContactor1            : BOOL; // <-- [ACT] Ordre contacteur palier 1 treuil M1
+    M1SpeedContactor2            : BOOL; // <-- [ACT] Ordre contacteur palier 2 treuil M1
+    M1SpeedContactor3            : BOOL; // <-- [ACT] Ordre contacteur palier 3 treuil M1
+    M1SpeedContactor4            : BOOL; // <-- [ACT] Ordre contacteur palier 4 treuil M1
+    M1BrakeCmd                   : BOOL; // <-- [ACT] Ordre desserrage frein M1 (1=Desserrer)
+    M2RelayFwd                   : BOOL; // <-- [ACT] Ordre contacteur montee/fermeture treuil M2
+    M2RelayRev                   : BOOL; // <-- [ACT] Ordre contacteur descente/ouverture treuil M2
+    M2SpeedContactor1            : BOOL; // <-- [ACT] Ordre contacteur palier 1 treuil M2
+    M2SpeedContactor2            : BOOL; // <-- [ACT] Ordre contacteur palier 2 treuil M2
+    M2SpeedContactor3            : BOOL; // <-- [ACT] Ordre contacteur palier 3 treuil M2
+    M2SpeedContactor4            : BOOL; // <-- [ACT] Ordre contacteur palier 4 treuil M2
+    M2BrakeCmd                   : BOOL; // <-- [ACT] Ordre desserrage frein M2 (1=Desserrer)
     KoboldContactorCmd           : BOOL; // <-- [ACT] Ordre alimentation contacteur capteur fond Kobold
+    PowerKeepAliveACmd           : BOOL; // <-- [SAFE] Maintien puissance voie A (1=Maintenu)
+    PowerKeepAliveBCmd           : BOOL; // <-- [SAFE] Maintien puissance voie B (1=Maintenu)
+    EmergencyArmingCmd           : BOOL; // <-- [CMD] Impulsion rearmement puissance AU
 END_VAR
 
 VAR
@@ -99,30 +114,30 @@ END_VAR
 // lisibles directement sur ce réseau, sans ouvrir un autre POU.
 
 // ── Interlock final M1 (Treuil Retenue) ──────────────────────────────────
-M1InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff;
+M1InterlockEnable := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable
+                      AND NOT PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff;
 
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
 // 🧨 Bloc 1 : Sécurités entraînant un PowerCutOff (coupure puissance)
 M1PowerCutOffSafetyInfo := OR(
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.PowerCutOff,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaA,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaB,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaC,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaD,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaE,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ThermalFault
+    PRG_04_Treuils_Benne.WinchM1Safety.PowerCutOff,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaA,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaB,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaC,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaD,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaE,
+    PRG_04_Treuils_Benne.WinchM1Safety.ThermalFault
 );
 
 // 🛡️ Bloc 2 : Défauts sécurité entraînant un SafeStop / Rampe rapide
 M1SafeStopSafetyInfo := OR(
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.SafeStop,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.Error,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorOperatorComm,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorEncoder,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorPhaseRotation,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorOppositeDir,
-    PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorNoMovement
+    PRG_04_Treuils_Benne.WinchM1Safety.SafeStop,
+    PRG_04_Treuils_Benne.WinchM1Safety.Error,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorOperatorComm,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorEncoder,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorPhaseRotation,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorOppositeDir,
+    PRG_04_Treuils_Benne.WinchM1Safety.ErrorNoMovement
 );
 
 // 🚫 Bloc 3 : Synthèse globale du blocage sécurité (PowerCutOff OU SafeStop)
@@ -134,58 +149,58 @@ M1BlockedBySafetyInfo := OR(
 instWinchOutputInterlockM1(
     Enable                     := M1InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.SafeStop,
-    BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.BrakeFeedback,
-    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
-    RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd,
-    RequestedRelayRev          := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayRev,
-    RequestedContactor1        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor1,
-    RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2,
-    RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3,
-    RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep
+    PowerContactorEngaged      := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop,
+    BrakeFeedback              := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeFeedback,
+    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd          := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev          := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor4,
+    RequestedStep               := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedStep
 );
 
-Data.M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
-Data.M1RelayRev        := instWinchOutputInterlockM1.RelayRev;
-Data.M1SpeedContactor1 := instWinchOutputInterlockM1.Contactor1;
-Data.M1SpeedContactor2 := instWinchOutputInterlockM1.Contactor2;
-Data.M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
-Data.M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
+M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
+M1RelayRev        := instWinchOutputInterlockM1.RelayRev;
+M1SpeedContactor1 := instWinchOutputInterlockM1.Contactor1;
+M1SpeedContactor2 := instWinchOutputInterlockM1.Contactor2;
+M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
+M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 // Recalcul INDEPENDANT sur les DQ
 // finaux (pas une simple recopie de instWinchOutputInterlockM1.BrakeCmd) -- visible ici
 // sans ouvrir FB_WinchOutputInterlock_LD, meme doctrine que le reste de ce POU.
-Data.M1BrakeCmd        := Data.M1RelayFwd OR Data.M1RelayRev;
+M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
 // ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
-M2InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff;
+M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
+                      AND NOT PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff;
 
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
 // 🧨 Bloc 1 : Sécurités entraînant un PowerCutOff (coupure puissance)
 M2PowerCutOffSafetyInfo := OR(
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.PowerCutOff,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaA,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaB,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaC,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaD,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaE,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ThermalFault
+    PRG_04_Treuils_Benne.WinchM2Safety.PowerCutOff,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaA,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaB,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaC,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaD,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaE,
+    PRG_04_Treuils_Benne.WinchM2Safety.ThermalFault
 );
 
 // 🛡️ Bloc 2 : Défauts sécurité entraînant un SafeStop / Rampe rapide / Verrous Benne
 M2SafeStopSafetyInfo := OR(
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.SafeStop,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.Error,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorOperatorComm,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorEncoder,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorPhaseRotation,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorOppositeDir,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorNoMovement,
-    PRG_04_Treuils_Benne.Data.WinchM2Safety.SlackCable,
-    PRG_04_Treuils_Benne.Data.BucketState.Error,
-    PRG_04_Treuils_Benne.Data.BucketState.CoupledMotionBlockedByBucket
+    PRG_04_Treuils_Benne.WinchM2Safety.SafeStop,
+    PRG_04_Treuils_Benne.WinchM2Safety.Error,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorOperatorComm,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorEncoder,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorPhaseRotation,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorOppositeDir,
+    PRG_04_Treuils_Benne.WinchM2Safety.ErrorNoMovement,
+    PRG_04_Treuils_Benne.WinchM2Safety.SlackCable,
+    PRG_04_Treuils_Benne.BucketState.Error,
+    PRG_04_Treuils_Benne.BucketState.CoupledMotionBlockedByBucket
 );
 
 // 🚫 Bloc 3 : Synthèse globale du blocage sécurité (PowerCutOff OU SafeStop)
@@ -197,27 +212,27 @@ M2BlockedBySafetyInfo := OR(
 instWinchOutputInterlockM2(
     Enable                     := M2InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.SafeStop,
-    BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.BrakeFeedback,
-    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
-    RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayFwd,
-    RequestedRelayRev          := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayRev,
-    RequestedContactor1        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor1,
-    RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor2,
-    RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor3,
-    RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep
+    PowerContactorEngaged      := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop,
+    BrakeFeedback              := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeFeedback,
+    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd          := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev          := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor4,
+    RequestedStep               := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedStep
 );
 
-Data.M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;
-Data.M2RelayRev        := instWinchOutputInterlockM2.RelayRev;
-Data.M2SpeedContactor1 := instWinchOutputInterlockM2.Contactor1;
-Data.M2SpeedContactor2 := instWinchOutputInterlockM2.Contactor2;
-Data.M2SpeedContactor3 := instWinchOutputInterlockM2.Contactor3;
-Data.M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
+M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;
+M2RelayRev        := instWinchOutputInterlockM2.RelayRev;
+M2SpeedContactor1 := instWinchOutputInterlockM2.Contactor1;
+M2SpeedContactor2 := instWinchOutputInterlockM2.Contactor2;
+M2SpeedContactor3 := instWinchOutputInterlockM2.Contactor3;
+M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 // Recalcul INDEPENDANT, voir M1 ci-dessus.
-Data.M2BrakeCmd        := Data.M2RelayFwd OR Data.M2RelayRev;
+M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
 // KoboldContactorCmd est écrit depuis la commande arbitrée
 // PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated. Mapping E/S CODESYS
@@ -227,27 +242,27 @@ KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 // 🛡️ Déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
 // Ne coupe que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête de fichier.
-M3InterlockEnable := PRG_05_Translation.Data.TranslationFinalInterlockRequest.Enable
-                      AND NOT PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
+M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
+                      AND NOT PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
 // Info diagnostic seule (Watch/Ladder) — ne participe PAS au calcul ci-dessus.
 // 🧨 Bloc 1 : Sécurités entraînant un PowerCutOff (coupure puissance)
 M3PowerCutOffSafetyInfo := OR(
-    PRG_05_Translation.Data.TranslationSafety.PowerCutOff,
-    PRG_05_Translation.Data.TranslationSafety.ErrorMecaA,
-    PRG_05_Translation.Data.TranslationSafety.ErrorMecaB,
-    PRG_05_Translation.Data.TranslationSafety.ErrorBrakeThermal
+    PRG_05_Translation.TranslationSafety.PowerCutOff,
+    PRG_05_Translation.TranslationSafety.ErrorMecaA,
+    PRG_05_Translation.TranslationSafety.ErrorMecaB,
+    PRG_05_Translation.TranslationSafety.ErrorBrakeThermal
 );
 
 // 🛡️ Bloc 2 : Défauts sécurité entraînant un SafeStop / Rampe rapide
 M3SafeStopSafetyInfo := OR(
-    PRG_05_Translation.Data.TranslationSafety.SafeStop,
-    PRG_05_Translation.Data.TranslationSafety.Error,
-    PRG_05_Translation.Data.TranslationSafety.ErrorOperatorComm,
-    PRG_05_Translation.Data.TranslationSafety.ErrorDriveComm,
-    PRG_05_Translation.Data.TranslationSafety.ErrorPhaseRotation,
-    PRG_05_Translation.Data.TranslationSafety.ErrorLimitSwitch,
-    PRG_05_Translation.Data.TranslationSafety.ErrorSensorIncoherent
+    PRG_05_Translation.TranslationSafety.SafeStop,
+    PRG_05_Translation.TranslationSafety.Error,
+    PRG_05_Translation.TranslationSafety.ErrorOperatorComm,
+    PRG_05_Translation.TranslationSafety.ErrorDriveComm,
+    PRG_05_Translation.TranslationSafety.ErrorPhaseRotation,
+    PRG_05_Translation.TranslationSafety.ErrorLimitSwitch,
+    PRG_05_Translation.TranslationSafety.ErrorSensorIncoherent
 );
 
 // 🚫 Bloc 3 : Synthèse globale du blocage sécurité (PowerCutOff OU SafeStop)
@@ -259,43 +274,43 @@ M3BlockedBySafetyInfo := OR(
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop,
-    BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest,
-    BrakeCommandOpenConfirmed  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
-    RequestedDriveControlWord  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
-    RequestedDriveFreqHz       := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+    PowerContactorEngaged      := PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop,
+    BrakeReleaseRequest        := PRG_05_Translation.TranslationFinalInterlockRequest.BrakeReleaseRequest,
+    BrakeCommandOpenConfirmed  := PRG_05_Translation.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
+    RequestedDriveControlWord  := PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveControlWord,
+    RequestedDriveFreqHz       := PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveFreqHz
 );
 
-Data.TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
+TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
 M3_CommandWord := instTranslationOutputInterlockM3.DriveControlWord;
 M3_SetpointFrequencyHz := instTranslationOutputInterlockM3.DriveFreqRefWord;
 
 // === ⚡ §2 SORTIES PHYSIQUES DIRECTES (M1 / M2 / M3 / AU / KOBOLD) — COILS HW ===
 // Pilotage direct des variables de mapping E/S matérielles :
-M1_RelayFwd_Up_DQ            := Data.M1RelayFwd;
-M1_RelayRev_Down_DQ          := Data.M1RelayRev;
-M1_SpeedContactor_1_DQ       := Data.M1SpeedContactor1;
-M1_SpeedContactor_2_DQ       := Data.M1SpeedContactor2;
-M1_SpeedContactor_3_DQ       := Data.M1SpeedContactor3;
-M1_SpeedContactor_4_DQ       := Data.M1SpeedContactor4;
-M1_BrakeRelease_RQ           := Data.M1BrakeCmd;
+M1_RelayFwd_Up_DQ            := M1RelayFwd;
+M1_RelayRev_Down_DQ          := M1RelayRev;
+M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
+M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
+M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
+M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
+M1_BrakeRelease_RQ           := M1BrakeCmd;
 
-M2_RelayFwd_Up_Close_DQ      := Data.M2RelayFwd;
-M2_RelayRev_Down_Open_DQ     := Data.M2RelayRev;
-M2_SpeedContactor_1_DQ       := Data.M2SpeedContactor1;
-M2_SpeedContactor_2_DQ       := Data.M2SpeedContactor2;
-M2_SpeedContactor_3_DQ       := Data.M2SpeedContactor3;
-M2_SpeedContactor_4_DQ       := Data.M2SpeedContactor4;
-M2_BrakeRelease_RQ           := Data.M2BrakeCmd;
+M2_RelayFwd_Up_Close_DQ      := M2RelayFwd;
+M2_RelayRev_Down_Open_DQ     := M2RelayRev;
+M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
+M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
+M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
+M2_SpeedContactor_4_DQ       := M2SpeedContactor4;
+M2_BrakeRelease_RQ           := M2BrakeCmd;
 
-M3_BrakeRelease_RQ           := Data.TranslationBrakeCmd;
+M3_BrakeRelease_RQ           := TranslationBrakeCmd;
 
 M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd;
 
-PowerKeepAlive_A_RQ          := Data.PowerKeepAliveACmd;
-PowerKeepAlive_B_RQ          := Data.PowerKeepAliveBCmd;
-EmergencyArming_RQ           := Data.EmergencyArmingCmd;
+PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
+PowerKeepAlive_B_RQ          := PowerKeepAliveBCmd;
+EmergencyArming_RQ           := EmergencyArmingCmd;
 
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
@@ -304,11 +319,11 @@ EmergencyArming_RQ           := Data.EmergencyArmingCmd;
 //   PowerCutOffReq = WinchM1FinalInterlockRequest.PowerCutOff
 //                  OR WinchM2FinalInterlockRequest.PowerCutOff
 //                  OR TranslationFinalInterlockRequest.PowerCutOff
-// ⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD passe
-// par le pipeline standard ST→LD (TOOLS/ST_PLCOPENXML_GENERATOR/scripts/st_to_ld.py), comme les
-// autres pages _LD.st. Contrat réel câblé en Ladder (3 contacts parallèles sur la même coil
-// PowerCutOffReq).
-PowerCutOffReq := PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
+// ⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD est
+// intégralement généré par l'oracle Python (gen_prg06_oracle.py). Contrat réel, câblé dans
+// l'oracle (3 contacts parallèles sur la même coil PowerCutOffReq, voir section PowerCutOffReq
+// du script).
+PowerCutOffReq := PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
 instSafetyEmergencyManagement(
     Enable := TRUE,
@@ -320,9 +335,9 @@ instSafetyEmergencyManagement(
     BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
 );
 
-Data.PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;
-Data.PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;
-Data.EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;
+PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;
+PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;
+EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;
 
 EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
 ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
