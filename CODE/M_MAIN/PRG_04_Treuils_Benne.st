@@ -8,17 +8,24 @@
 
 PROGRAM PRG_04_Treuils_Benne
 
+VAR_INPUT
+    // === 📥 ENTRÉES PROGRAMME (AUCUNE - PILOTÉ VIA PRG_02 & PRG_03) ===
+END_VAR
+
 VAR_OUTPUT
-    WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest;
-    WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest;
-    KoboldContactorCmdArbitrated : BOOL;
-    WinchM1State : ST_WinchState;
-    WinchM2State : ST_WinchState;
-    WinchM1Safety : ST_SafetyWinch;
-    WinchM2Safety : ST_SafetyWinch;
-    SyncState : ST_SyncState;
-    BucketState : ST_BucketHMIState;
-    Benne_IsRoughlyClosed : BOOL;  // TRUE = benne jugée fermée (tolérance matière 2 m) ; FALSE = ouverte/intermédiaire
+    // === ⚡ DEMANDES DE SORTIES FINALES & INTERLOCKS ===
+    WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // <-- [ACT] Demande finale et interlocks treuil M1
+    WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // <-- [ACT] Demande finale et interlocks treuil M2
+    KoboldContactorCmdArbitrated : BOOL;                         // <-- [ACT] Ordre contacteur capteur fond Kobold (1=Alimenter)
+
+    // === 📊 ÉTATS PUBLICS & SYNOPTIQUES DES TREUILS ===
+    WinchM1State                 : ST_WinchState;                // <-- [STAT] Etat public treuil Retenue M1
+    WinchM2State                 : ST_WinchState;                // <-- [STAT] Etat public treuil Benne M2
+    WinchM1Safety                : ST_SafetyWinch;               // <-- [SAFE] Diagnostic et securites treuil M1
+    WinchM2Safety                : ST_SafetyWinch;               // <-- [SAFE] Diagnostic et securites treuil M2
+    SyncState                    : ST_SyncState;                 // <-- [STAT] Etat synchronisation treuils M1/M2
+    BucketState                  : ST_BucketHMIState;            // <-- [STAT] Etat de fonctionnement benne
+    Benne_IsRoughlyClosed        : BOOL;                         // <-- [STAT] Benne consideree fermee (1=Fermee)
 END_VAR
 
 VAR

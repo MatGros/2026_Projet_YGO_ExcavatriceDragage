@@ -14,16 +14,19 @@
 
 PROGRAM PRG_03_Modes_Cycle
 
-VAR
-    instModes : FB_Modes;  // Arbitrage mode + bus autorisations
+VAR_INPUT
+    // === 📥 ENTRÉES PROGRAMME (AUCUNE - PILOTÉ VIA GVL_IHM & PRG_02) ===
 END_VAR
 
 VAR_OUTPUT
-    Auth : ST_Modes_Autorisations;  // Bus d'autorisations (producteur unique)
-    // Séquenceur de cycle semi-automatique.
-    // ⚠️ VAR_OUTPUT (pas VAR) : PRG_04/05 y accèdent via PRG_03_Modes_Cycle.instCycleSemiAuto
-    // (une variable locale d'un PROGRAM n'est pas accessible depuis un autre PROGRAM).
-    instCycleSemiAuto    : FB_Cycle;  // utilisé en SEMI_AUTO
+    // === 🎚️ BUS D'AUTORISATIONS & DEMANDES DE CYCLE ===
+    Auth              : ST_Modes_Autorisations; // <-- [STAT] Bus d'autorisations machine (producteur unique)
+    instCycleSemiAuto : FB_Cycle;               // *   [INST] Sequenceur de cycle semi-automatique public
+END_VAR
+
+VAR
+    // === 🧩 SOUS-INSTANCES FB INTERNES ===
+    instModes : FB_Modes; // * [INST] Arbitrage des modes machine et calcul autorisations
 END_VAR
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE ===

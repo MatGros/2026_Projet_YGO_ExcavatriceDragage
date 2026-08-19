@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:27:54.940671" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:27:54.940671">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:57:59.948461" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:57:59.948461">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -768,16 +768,27 @@
               <type>
                 <derived name="ST_TranslationFinalInterlockRequest" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ DEMANDES DE SORTIES FINALES &amp; INTERLOCKS ===
+&lt;-- [ACT] Demande finale et interlocks translation M3</xhtml>
+              </documentation>
             </variable>
             <variable name="TranslationState">
               <type>
                 <derived name="ST_TranslationState" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 ÉTATS PUBLICS &amp; SÉCURITÉS TRANSLATION ===
+&lt;-- [STAT] Etat public translation M3</xhtml>
+              </documentation>
             </variable>
             <variable name="TranslationSafety">
               <type>
                 <derived name="ST_SafetyTranslation" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites translation M3</xhtml>
+              </documentation>
             </variable>
           </outputVars>
           <localVars>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:04:43.803411" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:04:43.803411">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:49:33.368655" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:49:33.368655">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -39,100 +39,6 @@
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Horloge clignotement système (IHM/diag), rythme réglable GVL_PERSISTENT</xhtml>
           </documentation>
         </variable>
-        <variable name="M1RelayFwd">
-          <type>
-            <BOOL />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">── [COMMANDES FINALES ET INTERLOCKS] ──────────────────────────
-Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERVISION_CFC et PRG_TROUBLESHOOTING_CFC</xhtml>
-          </documentation>
-        </variable>
-        <variable name="M1RelayRev">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M1SpeedContactor1">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M1SpeedContactor2">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M1SpeedContactor3">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M1SpeedContactor4">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M1BrakeCmd">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M2RelayFwd">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M2RelayRev">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M2SpeedContactor1">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M2SpeedContactor2">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M2SpeedContactor3">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M2SpeedContactor4">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="M2BrakeCmd">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="TranslationBrakeCmd">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="EmergencyArmingPulseActive">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="EmergencyArmingLockoutActive">
-          <type>
-            <BOOL />
-          </type>
-        </variable>
-        <variable name="ArmingSeqStep">
-          <type>
-            <INT />
-          </type>
-        </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
             <Attributes>
@@ -147,18 +53,9 @@ Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERV
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🌐 GVL_Global — Variables globales d'utilité générale
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regrouper les signaux et horloges système partagés qui
-      ne sont pas spécifiques à la logique de simulation ni raccordés
-      à des calibrations persistantes.
-   BlinkClock alimenté via Util.BLINK
-      (asymétrique, durées réglables GVL_PERSISTENT._BlinkTimeOn/_BlinkTimeOff,
-      câblage dans PRG_SUPERVISION_CFC §0). Le nom "1Hz" n'a plus de sens dès que
-      le rythme n'est pas symétrique 500ms/500ms.
-   💡 Besoin d'un AUTRE rythme pour un voyant particulier (pas celui-ci) ?
-      Instancier son propre `BLINK` (lib Util) localement plutôt que de détourner
-      ce bit partagé — voir Partie3 §0 (réutilisation obligatoire des libs).
-   ═══════════════════════════════════════════════════════════════
-    📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md</xhtml>
+   🎯 Rôle : Horloges et signaux système partagés non persistants.
+   📄 Docs : DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </globalVars>
     </data>

@@ -28,6 +28,10 @@
 
 PROGRAM PRG_06_Outputs_LD
 
+VAR_INPUT
+    // === 📥 ENTRÉES PROGRAMME (AUCUNE - REÇOIT LES ORDRES VIA PRG_04 & PRG_05) ===
+END_VAR
+
 VAR_OUTPUT
     (* Cibles de mapping : PowerKeepAliveACmd/BCmd/EmergencyArmingCmd,
        déclarées en VAR locale ci-dessous (voir §2). *)
@@ -67,38 +71,40 @@ VAR_OUTPUT
        de portée avec la variable GLOBALE homonyme créée par le mapping E/S CODESYS
        (Device.export), qui masquerait le pilotage matériel réel (voir §2 plus bas
        pour le détail et la liste des chemins qualifiés à mapper). *)
-    TranslationBrakeCmd          : BOOL; (* Demande frein M3 arbitrée — cible du mapping E/S *)
-    M3_DriveControlWord          : WORD; (* Mot de commande variateur M3 (0x3101) — cible du mapping E/S *)
-    M3_DriveFreqRefWord          : WORD; (* Consigne fréquence variateur M3 (0x3100, x100) — cible du mapping E/S *)
+    TranslationBrakeCmd          : BOOL; // <-- [ACT] Demande frein M3 arbitree — cible du mapping E/S
+    M3_DriveControlWord          : WORD; // <-- [ACT] Mot de commande variateur M3 (0x3101) — cible du mapping E/S
+    M3_DriveFreqRefWord          : WORD; // <-- [ACT] Consigne frequence variateur M3 (0x3100, x100) — cible du mapping E/S
+
+    // === ⚡ ORDRES ACTIONNEURS (ACCESSIBLES SIMULATION / PROCESS) ===
+    M1RelayFwd                   : BOOL; // <-- [ACT] Ordre contacteur montee treuil M1
+    M1RelayRev                   : BOOL; // <-- [ACT] Ordre contacteur descente treuil M1
+    M1SpeedContactor1            : BOOL; // <-- [ACT] Ordre contacteur palier 1 treuil M1
+    M1SpeedContactor2            : BOOL; // <-- [ACT] Ordre contacteur palier 2 treuil M1
+    M1SpeedContactor3            : BOOL; // <-- [ACT] Ordre contacteur palier 3 treuil M1
+    M1SpeedContactor4            : BOOL; // <-- [ACT] Ordre contacteur palier 4 treuil M1
+    M1BrakeCmd                   : BOOL; // <-- [ACT] Ordre desserrage frein M1 (1=Desserrer)
+    M2RelayFwd                   : BOOL; // <-- [ACT] Ordre contacteur montee/fermeture treuil M2
+    M2RelayRev                   : BOOL; // <-- [ACT] Ordre contacteur descente/ouverture treuil M2
+    M2SpeedContactor1            : BOOL; // <-- [ACT] Ordre contacteur palier 1 treuil M2
+    M2SpeedContactor2            : BOOL; // <-- [ACT] Ordre contacteur palier 2 treuil M2
+    M2SpeedContactor3            : BOOL; // <-- [ACT] Ordre contacteur palier 3 treuil M2
+    M2SpeedContactor4            : BOOL; // <-- [ACT] Ordre contacteur palier 4 treuil M2
+    M2BrakeCmd                   : BOOL; // <-- [ACT] Ordre desserrage frein M2 (1=Desserrer)
+    KoboldContactorCmd           : BOOL; // <-- [ACT] Ordre alimentation contacteur capteur fond Kobold
+    PowerKeepAliveACmd           : BOOL; // <-- [SAFE] Maintien puissance voie A (1=Maintenu)
+    PowerKeepAliveBCmd           : BOOL; // <-- [SAFE] Maintien puissance voie B (1=Maintenu)
+    EmergencyArmingCmd           : BOOL; // <-- [CMD] Impulsion rearmement puissance AU
 END_VAR
 
 VAR
-    instWinchOutputInterlockM1       : FB_WinchOutputInterlock_LD;
-    instWinchOutputInterlockM2       : FB_WinchOutputInterlock_LD;
-    instTranslationOutputInterlockM3 : FB_TranslationOutputInterlock_LD;
+    // === 🛡️ SOUS-INSTANCES FB INTERLOCKS SORTIES ===
+    instWinchOutputInterlockM1       : FB_WinchOutputInterlock_LD;       // * [INST] Barriere finale treuil M1
+    instWinchOutputInterlockM2       : FB_WinchOutputInterlock_LD;       // * [INST] Barriere finale treuil M2
+    instTranslationOutputInterlockM3 : FB_TranslationOutputInterlock_LD; // * [INST] Barriere finale translation M3
+    instSafetyEmergencyManagement    : FB_Safety_EmergencyManagement;    // * [INST] Gestionnaire de rearmement AU
 
-    M1RelayFwd          : BOOL;
-    M1RelayRev          : BOOL;
-    M1SpeedContactor1   : BOOL;
-    M1SpeedContactor2   : BOOL;
-    M1SpeedContactor3   : BOOL;
-    M1SpeedContactor4   : BOOL;
-    M1BrakeCmd          : BOOL;
-    M2RelayFwd          : BOOL;
-    M2RelayRev          : BOOL;
-    M2SpeedContactor1   : BOOL;
-    M2SpeedContactor2   : BOOL;
-    M2SpeedContactor3   : BOOL;
-    M2SpeedContactor4   : BOOL;
-    M2BrakeCmd          : BOOL;
-    KoboldContactorCmd  : BOOL;
-    PowerCutOffReq      : BOOL;
-
-    PowerKeepAliveACmd  : BOOL; (* Maintien puissance voie A — cible du mapping E/S *)
-    PowerKeepAliveBCmd  : BOOL; (* Maintien puissance voie B — cible du mapping E/S *)
-    EmergencyArmingCmd  : BOOL; (* Impulsion réarmement — cible du mapping E/S *)
-
-    instSafetyEmergencyManagement : FB_Safety_EmergencyManagement;
+    // === ⚙️ VARIABLES LOCALES INTERNES ===
+    PowerCutOffReq                   : BOOL; // . [LOC] Demande agregative coupure puissance
 END_VAR
 
 // === 🛡️ §1 BARRIÈRES FINALES M1 / M2 / M3 — INTERLOCKS VISIBLES ===
@@ -305,25 +311,6 @@ M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd;
 PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
 PowerKeepAlive_B_RQ          := PowerKeepAliveBCmd;
 EmergencyArming_RQ           := EmergencyArmingCmd;
-
-// === 🌐 Recopie GVL_Global (lecture publique diagnostic/simulation) ===
-// GVL_Global.M1RelayFwd..TranslationBrakeCmd sont consommés par FB_SimBench
-// (PRG_02_Acquisition) pour rejouer les commandes finales en simulation banc.
-GVL_Global.M1RelayFwd        := M1RelayFwd;
-GVL_Global.M1RelayRev        := M1RelayRev;
-GVL_Global.M1SpeedContactor1 := M1SpeedContactor1;
-GVL_Global.M1SpeedContactor2 := M1SpeedContactor2;
-GVL_Global.M1SpeedContactor3 := M1SpeedContactor3;
-GVL_Global.M1SpeedContactor4 := M1SpeedContactor4;
-GVL_Global.M1BrakeCmd        := M1BrakeCmd;
-GVL_Global.M2RelayFwd        := M2RelayFwd;
-GVL_Global.M2RelayRev        := M2RelayRev;
-GVL_Global.M2SpeedContactor1 := M2SpeedContactor1;
-GVL_Global.M2SpeedContactor2 := M2SpeedContactor2;
-GVL_Global.M2SpeedContactor3 := M2SpeedContactor3;
-GVL_Global.M2SpeedContactor4 := M2SpeedContactor4;
-GVL_Global.M2BrakeCmd        := M2BrakeCmd;
-GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
 
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
