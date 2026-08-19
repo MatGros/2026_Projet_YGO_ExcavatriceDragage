@@ -1244,13 +1244,23 @@ Seuils de changement de palier (0..100%)</xhtml>
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
-            <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
-            <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
-            <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
-            <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
-            <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
-            <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
+              <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
+            </Folder>
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+              <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
+            </Folder>
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+            </Folder>
+            <Folder Name="5_ASSISTANCE_DRAGAGE">
+              <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
+            </Folder>
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
+            </Folder>
           </Folder>
         </Folder>
         <Folder Name="H_TREUILS_BENNE">

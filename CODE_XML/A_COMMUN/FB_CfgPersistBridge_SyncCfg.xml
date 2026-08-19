@@ -140,7 +140,9 @@ END_IF;
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>

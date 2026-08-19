@@ -3877,9 +3877,11 @@ Current := LIMIT(-100.0, Current, 100.0);
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
-            <Object Name="ST_TranslationFinalInterlockRequest" ObjectId="3d90836c-bd65-54ca-b2e2-f3d1ef3a1bd3" />
-            <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
+              <Object Name="ST_TranslationFinalInterlockRequest" ObjectId="3d90836c-bd65-54ca-b2e2-f3d1ef3a1bd3" />
+              <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
+            </Folder>
           </Folder>
         </Folder>
         <Folder Name="F_MODES">

@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:16:44.481979" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:16:44.481979">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_TranslationCmd">
+        <baseType>
+          <struct>
+            <variable name="SelPositioning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 TRUE = positionneur sur SelTarget ; FALSE = jog libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelTarget">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Numéro de la cible de position sélectionnée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs_LD</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InvertDirection">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Switch machine unique : GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
+🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglMaintenanceZoneAccess">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 TRUE = SetFreq_Hz restauré depuis GVL_PERSISTENT ce boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9ba58c6e-bb66-5815-b28d-8fed6fa33365</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_TranslationCmd — Commandes IHM pour la Translation M3
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
+   📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
+      sans pont générique pour ne jamais persister BtnFwd/BtnRev.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:13:48.847843" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:13:48.847843">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_HwWinch">
+        <baseType>
+          <struct>
+            <variable name="M1_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M1 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M1 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M2 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M2 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1M2_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun M1/M2 libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_TensionedCable_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur mou de câble M2 (câble tendu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD2 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>72c8e04d-71ee-5733-9392-791d275a6b49</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
+   ───────────────────────────────────────────────────────────────
+   🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

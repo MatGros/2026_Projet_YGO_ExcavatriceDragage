@@ -209,7 +209,9 @@ END_IF;
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>

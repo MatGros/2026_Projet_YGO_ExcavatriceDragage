@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.518977" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.518977">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_Chain_Translation_Safety">
+        <baseType>
+          <struct>
+            <variable name="Idx301_EmergencyChainClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Boucle Urgence OK | 0 = Arrêt d'Urgence Appuyé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx302_SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain (Autorisé) | 1 = Arrêt Rapide Translation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx303_PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx304_LimitSwitchFwdActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Avance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx305_LimitSwitchRevActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Recul</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx306_BypassLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Fins de course actives | 1 = Shuntés IHM ⚠️</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_PositionDecoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Décodage 5 Capteurs OK | 1 = Incohérence Position</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx308_HeightInterlockBlocking">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 0 = M1 ET M2 ≥ hauteur mini (ou bypass) | 1 = Translation bloquée (risque collision)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>82dcbfd2-2633-5250-924d-68e882d3d0cb</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_Chain_Translation_Safety" ObjectId="82dcbfd2-2633-5250-924d-68e882d3d0cb" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

@@ -207,7 +207,9 @@ END_IF;
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
+            <Folder Name="5_ASSISTANCE_DRAGAGE">
+              <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>

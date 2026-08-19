@@ -6589,51 +6589,67 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
-            <Object Name="ST_DredgingAssistHMI" ObjectId="2165844b-2b77-5f87-808e-1dbe0ee8505b" />
-            <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
-            <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
-            <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
-            <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
-            <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
-            <Object Name="ST_TranslationHMI" ObjectId="d6558eac-730d-54eb-ad2f-d618dc359506" />
-            <Object Name="ST_WinchBenneHMI" ObjectId="734a14b6-6b4b-50b8-8bce-737b6c3fa07b" />
-            <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
-            <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
-            <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
-            <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
-            <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
-            <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
-            <Object Name="ST_DredgingAssistCmd" ObjectId="582697cf-4ebf-5168-aca8-afd5b4dc75f9" />
-            <Object Name="ST_DredgingAssistState" ObjectId="4230b7ec-508c-5fc4-9124-31b8ff9632ea" />
-            <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
-            <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
-            <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
-            <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
-            <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
-            <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
-            <Object Name="ST_BypassNetwork" ObjectId="b983f7fc-8c50-586b-bda1-7708d152c981" />
-            <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
-            <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
-            <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
-            <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
-            <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
-            <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
-            <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
-            <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
-            <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
-            <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
-            <Object Name="ST_BucketHMI" ObjectId="e003b81c-fc6d-5cd1-ad20-f66aa3e150a5" />
-            <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
-            <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
-            <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
-            <Object Name="ST_WinchCmd" ObjectId="c71b5360-d47d-51c7-a74c-66d1cdd622f0" />
-            <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
-            <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
-            <Object Name="ST_BucketCmd" ObjectId="758915ca-bb53-5f1a-ae3f-b495527bc5f4" />
-            <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
-            <Object Name="ST_BypassBucket" ObjectId="77e7b77e-4a14-5220-93aa-7bb27ede6733" />
-            <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
+              <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
+              <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
+              <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+              <Object Name="ST_BypassNetwork" ObjectId="b983f7fc-8c50-586b-bda1-7708d152c981" />
+              <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
+              <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
+              <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
+              <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
+            </Folder>
+            <Folder Name="5_ASSISTANCE_DRAGAGE">
+              <Object Name="ST_DredgingAssistHMI" ObjectId="2165844b-2b77-5f87-808e-1dbe0ee8505b" />
+              <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
+              <Object Name="ST_DredgingAssistCmd" ObjectId="582697cf-4ebf-5168-aca8-afd5b4dc75f9" />
+              <Object Name="ST_DredgingAssistState" ObjectId="4230b7ec-508c-5fc4-9124-31b8ff9632ea" />
+            </Folder>
+            <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
+              <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
+              <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
+              <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
+              <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
+              <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
+              <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
+            </Folder>
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+            </Folder>
+            <Folder Name="6_DIAG_ET_CHAINES">
+              <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
+              <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
+            </Folder>
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_TranslationHMI" ObjectId="d6558eac-730d-54eb-ad2f-d618dc359506" />
+              <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
+              <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
+              <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
+              <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
+              <Object Name="ST_TranslationCmd" ObjectId="9ba58c6e-bb66-5815-b28d-8fed6fa33365" />
+              <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
+            </Folder>
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_WinchBenneHMI" ObjectId="734a14b6-6b4b-50b8-8bce-737b6c3fa07b" />
+              <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
+              <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
+              <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+              <Object Name="ST_BucketHMI" ObjectId="e003b81c-fc6d-5cd1-ad20-f66aa3e150a5" />
+              <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
+              <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
+              <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
+              <Object Name="ST_WinchCmd" ObjectId="c71b5360-d47d-51c7-a74c-66d1cdd622f0" />
+              <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
+              <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
+              <Object Name="ST_BucketCmd" ObjectId="758915ca-bb53-5f1a-ae3f-b495527bc5f4" />
+              <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
+              <Object Name="ST_BypassBucket" ObjectId="77e7b77e-4a14-5220-93aa-7bb27ede6733" />
+            </Folder>
+            <Folder Name="8_BANDEAU_ET_IHM">
+              <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
+            </Folder>
           </Folder>
         </Folder>
         <Folder Name="B_AU_SECURITE">

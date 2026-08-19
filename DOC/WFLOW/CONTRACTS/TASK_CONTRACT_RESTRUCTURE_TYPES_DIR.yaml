@@ -1,0 +1,127 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — Structuration thématique de CODE/J_SUPERVISION/_TYPES/
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Contexte : session 2026-08-19. CODE/J_SUPERVISION/_TYPES/ contient 77 DUT
+# à plat, ce qui nuit à la lisibilité et à la navigation dans le code.
+# Cette tâche les classe dans 8 sous-dossiers thématiques naturels.
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_RESTRUCTURE_TYPES_DIR.yaml
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T139_RESTRUCTURE_TYPES_DIR
+  criticality: C2
+  strategy: patch
+
+  # ── 1. Objectif ───────────────────────────────────────────────────────────
+  objective: >
+    Classer les 77 structures DUT du dossier CODE/J_SUPERVISION/_TYPES/ en 8
+    sous-dossiers thématiques (1_TREUILS_BENNE, 2_TRANSLATION, 3_CYCLE_ET_MODES,
+    4_JOYSTICK_ACQUISITION, 5_ASSISTANCE_DRAGAGE, 6_DIAG_ET_CHAINES,
+    7_COMMUN_CONFIG, 8_BANDEAU_ET_IHM). Adapter les scripts Python concernés
+    (G380) et la baseline de nommage (naming_baseline.json) sans altérer
+    aucune ligne de code fonctionnel automate.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Les 77 fichiers .st de _TYPES sont répartis dans les 8 sous-dossiers thématiques,
+        et aucun fichier .st ne subsiste à la racine immédiate de CODE/J_SUPERVISION/_TYPES/.
+      verified_by: >
+        find CODE/J_SUPERVISION/_TYPES/ -maxdepth 1 -name "*.st" retourne 0 fichier.
+
+    - id: AC2
+      statement: >
+        Le script TOOLS/AGENT_WORKFLOW/scripts/G380_check_config_persistence.py scanne récursivement
+        les sous-dossiers de _TYPES et sort avec code 0 (PASS).
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G380_check_config_persistence.py sort en PASS.
+
+    - id: AC3
+      statement: >
+        La baseline de nommage naming_baseline.json est mise à jour avec les nouveaux chemins,
+        et G110_check_naming_style.py valide 100% de conformité sans régression.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G110_check_naming_style.py sort en PASS.
+
+    - id: AC4
+      statement: >
+        Le générateur PLCopenXML produit un bundle fresh sans erreur.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . sort en PASS.
+
+    - id: AC5
+      statement: >
+        La vérification mécanique de liaison globale sort en PASS.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py sort en PASS.
+
+    - id: AC6
+      statement: >
+        Tous les gates du projet (A, B, C) restent 100% au vert.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C sort en code 0.
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/
+      - TOOLS/AGENT_WORKFLOW/scripts/G380_check_config_persistence.py
+      - TOOLS/AGENT_WORKFLOW/config/naming_baseline.json
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_RESTRUCTURE_TYPES_DIR.yaml
+      - DOC/WFLOW/PLAN_TASK.md
+    forbidden:
+      - CODE/MAIN/
+      - ARCHIVES/
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Les 77 DUT conservent leur contenu exact, nom de fichier et déclaration TYPE ST_* à l'identique."
+      - "Aucune modification de syntaxe ST ni de logique automate."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - bundle_freshness
+    - linkage_report
+    - all_gates_pass
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "inherit"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Si un fichier DUT ne rentre dans aucune des 8 catégories ou si un script
+    externe non identifié dépendait d'un chemin fixe de DUT, remonter
+    immédiatement.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "AGY-01"
+  completed_at: "2026-08-19T04:37:00+02:00"
+  status: COMPLETED
+  summary: >
+    Exécution complète de T139 :
+    - 77 fichiers DUT déplacés proprement par git mv dans 8 sous-dossiers thématiques (AC1).
+    - G380 adapté pour scan récursif (rglob) et validé PASS (AC2).
+    - naming_baseline.json mis à jour et validé (AC3).
+    - Bundle PLCopenXML régénéré fresh sans erreur (AC4).
+    - G200_check_linkage.py PASS (0 erreur, 1160 instances vérifiées) (AC5).
+    - run_all_gates.py --palier C PASS (15/15 gates au vert, 0 erreur) (AC6).
+  evidence_submitted:
+    - bundle_freshness: "PASS: CODE_XML/CODE_Bundle.xml is fresh"
+    - linkage_report: "Linkage check: PASS (0 erreur(s), 1160 instance(s) verifiee(s))"
+    - all_gates_pass: "ALL GATES PASSED [OK] (PALIER C - 15/15)"
+
+validation:
+  status: PENDING
+  validated_by: "non demarre"
+  validated_at: "non demarre"
