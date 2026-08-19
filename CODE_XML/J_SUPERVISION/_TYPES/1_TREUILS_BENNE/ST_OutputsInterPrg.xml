@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T03:36:45.932286" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T03:36:45.932286">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T03:37:14.350949" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T03:37:14.350949">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,162 +23,174 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_JoystickChecklist">
+      <dataType name="ST_OutputsInterPrg">
         <baseType>
           <struct>
-            <variable name="Step1_CanBusActive">
+            <variable name="M1RelayFwd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Bus &amp; Matériel
-TRUE = Bus CANopen en état ACTIVE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪝 Ordres actionneurs finaux treuil M1 ===
+🛗 Ordre contacteur montee treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="Step2_JoystickOperational">
+            <variable name="M1RelayRev">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Esclave JOY1 en état RUNNING</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Ordre contacteur descente treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="HwIn_JoyBtnRaw_DI">
+            <variable name="M1SpeedContactor1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1bis. Entrées physiques directes HwIn
-Bouton brut homme-mort issu de HwIn.Operator</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 1 treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="NeutralXAct">
+            <variable name="M1SpeedContactor2">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe X au neutre (PRG_02_Acquisition.Data.JoystickXNeutral)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 2 treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="NeutralYAct">
+            <variable name="M1SpeedContactor3">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe Y au neutre (PRG_02_Acquisition.Data.JoystickYNeutral)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 3 treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="Step3_DeadmanPressed">
+            <variable name="M1SpeedContactor4">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Prise en main &amp; Sécurité
-TRUE = Bouton Homme-Mort appuyé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 4 treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="Step4_NeutralAcquired">
+            <variable name="M1BrakeCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Repassé par le neutre (autorisation mouvement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M1 (1=Desserrer)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeadmanArmed">
+            <variable name="M2RelayFwd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Homme-Mort armé avec passage au neutre validé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪝 Ordres actionneurs finaux treuil M2 ===
+🛗 Ordre contacteur montee/fermeture treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="AllConditionsMet">
+            <variable name="M2RelayRev">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Éligibilité globale
-TRUE = Joystick prêt pour piloter un axe</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Ordre contacteur descente/ouverture treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="JoystickSelected">
+            <variable name="M2SpeedContactor1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Joystick maître sélectionné IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 1 treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="SelJoystickWinch">
+            <variable name="M2SpeedContactor2">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection Treuil (0=Couplé M1+M2, 1=M1 seul, 2=M2 seul)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 2 treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="RawX">
+            <variable name="M2SpeedContactor3">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Mesures brutes &amp; Filtrées
-Valeur brute axe X (0..10000)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 3 treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="RawY">
+            <variable name="M2SpeedContactor4">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute axe Y (0..10000)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 4 treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="DeflectionX_Pct">
+            <variable name="M2BrakeCmd">
               <type>
-                <REAL />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée X (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M2 (1=Desserrer)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeflectionY_Pct">
+            <variable name="TranslationBrakeCmd">
               <type>
-                <REAL />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée Y (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ↔️ Ordre actionneur final translation M3 ===
+🔓 Demande frein M3 arbitree</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionX">
+            <variable name="PowerKeepAliveACmd">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée X (-1 / 0 / +1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚨 Chaîne réarmement puissance AU ===
+🔒 Maintien puissance voie A (1=Maintenu)</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionY">
+            <variable name="PowerKeepAliveBCmd">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée Y (-1 / 0 / +1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Maintien puissance voie B (1=Maintenu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Impulsion rearmement puissance AU</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>8b2fb21c-dcd0-5811-a8c3-9d96f9130525</ObjectId>
+            <ObjectId>ad92990b-f67b-5e7c-903a-3396ec929922</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🕹️ ST_JoystickChecklist — Diagnostic chronologique communication &amp; prise en main Joystick
+   📤 ST_OutputsInterPrg — Bus d'échange inter-PRG produit par PRG_06_Outputs_LD
    ───────────────────────────────────────────────────────────────
-   🎨 Permet de vérifier la chaîne Joystick (CANopen, Homme-mort, Neutre, Calibration).
+   🎯 Rôle : Encapsuler les ordres actionneurs finaux (M1/M2/M3, AU) produits
+      par PRG_06_Outputs_LD et rebouclés par FB_SimBench (instancié dans
+      PRG_02_Acquisition) pour le banc de simulation intégré.
+   📤 Producteur unique : PRG_06_Outputs_LD (VAR_OUTPUT Data : ST_OutputsInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -193,8 +205,8 @@ Valeur brute axe X (0..10000)</xhtml>
       <ProjectStructure>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Folder Name="4_JOYSTICK_ACQUISITION">
-              <Object Name="ST_JoystickChecklist" ObjectId="8b2fb21c-dcd0-5811-a8c3-9d96f9130525" />
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_OutputsInterPrg" ObjectId="ad92990b-f67b-5e7c-903a-3396ec929922" />
             </Folder>
           </Folder>
         </Folder>

@@ -48,6 +48,35 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 
 ---
 
+## 🎛️ Agent chat principal / Orchestrateur
+
+> 🎯 **Rôle** : l'agent qui dialogue avec l'humain (chat principal) **et** qui orchestre
+> les workflows/subagents. Ce n'est **pas un modèle séparé** : l'orchestrateur = l'agent principal.
+> Le modèle est **sélectionnable à la volée** dans la GUI DSH (settings → modèles), pas déclaré
+> dans un fichier de config.
+
+| Rôle | Modèle (ID) | Commentaire |
+|---|---|---|
+| **Agent chat principal** | `deepseek-v4-flash:cloud` | Modèle courant de session (validé 2026-08-19). |
+| **Orchestrateur** | = agent principal | Même agent, coordonne workflows/subagents. |
+
+### 📌 Liste des agents principaux efficaces (à maintenir)
+
+> ⚠️ **Cette liste est évolutive** : on y ajoute les modèles **testés et efficaces** en tant
+> qu'agent principal. Tout ajout doit être **validé** (test réel en session) avant d'être noté ici.
+
+| ID (à utiliser) | Statut | Validé le |
+|---|---|---|
+| `deepseek-v4-flash:cloud` | ✅ efficace (agent principal courant) | 2026-08-18 |
+| `claude/claude-opus-5-medium` | 🕐 candidat agent principal — ~100 tok/s | à valider |
+| `claude/Claude Sonnet 5` | 🕐 candidat agent principal — ~103 tok/s | à valider |
+| `agy/Claude Sonnet 4.6 (Thinking)` | 🕐 candidat agent principal — ~98 tok/s | à valider |
+| `gemini-3.7-flash-tiered` | 🕐 candidat agent principal — ~119 tok/s | à valider |
+
+> 🔄 **À compléter** : les prochains modèles validés en agent principal seront ajoutés ici.
+
+---
+
 ## 🚀 Méthode : lancer un agent sur un autre modèle
 
 ### Outil `workflow` (recommandé — override `provider`/`model` natif)

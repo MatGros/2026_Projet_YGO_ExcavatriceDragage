@@ -115,14 +115,41 @@ contract:
 # ═══════════════════════════════════════════════════════════════════════════
 # 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
 # ═══════════════════════════════════════════════════════════════════════════
-status: PENDING
+status: EXECUTED
 
 execution:
-  executed_by: "non demarre"
-  completed_at: "non demarre"
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: "claude/claude-sonnet-5 (sous-agent T142)"
+  completed_at: "2026-08-19"
+  status: COMPLETED
+  summary: >
+    4 DUT créées (ST_AcquisitionInterPrg, ST_WinchInterPrg, ST_TranslationInterPrg,
+    ST_OutputsInterPrg). PRG_02/04/05/06 exposent Data : ST_xxxInterPrg en VAR_OUTPUT.
+    Remap mécanique (regex word-boundary) de tous les consommateurs identifiés
+    (PRG_02/03/04/05/06/07, ST_JoystickChecklist.st) vers <PRG>.Data.<champ>, limité
+    strictement aux champs nommés dans AC1-AC4 (pas de remap en masse des HwIn/instXxx
+    non concernés). 2 promotions VAR interne -> Data explicitement mandatées par
+    l'orchestrateur (M1/M2LogicRequestSpeedRef_Pct, PRG_04) pour ne pas casser
+    instSimBench. ArmingSeqStep (INT, PRG_06) exclu du bus Data et laissé en VAR_OUTPUT
+    plat : sa mise en struct cassait G410 (invariant page LD stricte BOOL — outVariable
+    interdit sur PRG_06_Outputs_LD), régression détectée et corrigée avant restitution.
+    Commentaire périmé "généré par l'oracle Python" corrigé dans PRG_06_Outputs_LD.st.
+    Bundle régénéré, G200 linkage PASS (0 erreur), G310 PASS, run_all_gates.py (palier C
+    et suite complète) 100% PASS après correction de 2 régressions découvertes en cours
+    de lot (G410 outVariable, G430 tag "(T142)" dans les commentaires — retiré).
+    Hors périmètre signalé, non corrigé : M3_SensorsWord (PRG_02) déclaré dans le bus
+    mais jamais assigné (bug préexistant, antérieur à ce lot) ; plusieurs couplages
+    cachés supplémentaires identifiés (M1/M2LogicRequestDirection, CoupledUserRequestDirection/
+    Active consommés par PRG_07 depuis un VAR interne PRG_04 ; M3_Direction_Active/
+    M3_SpeedRef_Active consommés par PRG_02 depuis un VAR interne PRG_05 ; M3_AtTremieStable/
+    M3_AtP1Stable/M3_AtMaintenanceStable consommés par PRG_03/04 depuis un VAR interne
+    PRG_05) — laissés hors bus car non nommés explicitement dans AC1-AC4, à trancher par
+    l'orchestrateur pour un lot dédié.
+  evidence_submitted:
+    - "generate_codesys_bundle.py . -> PASS: CODE_XML/CODE_Bundle.xml is fresh"
+    - "G200_check_linkage.py --report -> PASS (0 erreur(s), 976 avertissement(s), 1154 instance(s))"
+    - "G310_check_code_structure.py -> PASS (0 erreur(s))"
+    - "run_all_gates.py --palier C -> ALL GATES PASSED (15/15)"
+    - "run_all_gates.py -> ALL GATES PASSED (TOUT)"
 
 validation:
   status: PENDING
