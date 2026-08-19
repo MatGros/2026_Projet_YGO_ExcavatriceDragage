@@ -266,7 +266,15 @@ Destiné aux blocs procédant à une action, portant des états d'erreur ou orch
   - `PowerContactorEngaged : BOOL;` (en `BOOL` nu : chaîne de sécurité et puissance OK).
 - **`VAR_OUTPUT`** :
   - `Ready : BOOL;` (en `BOOL` nu).
-  - `Status : ST_FbStatus;` (ou membres équivalents intégrés au DUT d'état métier).
+  - `Status : ST_FbStatus;` — **forme cible**.
+
+> ⏳ **Tolérance transitoire (levée à la clôture de T137)** — les FB antérieurs exposent encore ces
+> six membres **à plat** (`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` déclarés
+> individuellement en `VAR_OUTPUT`). Cette forme reste acceptée **le temps de la migration T137**,
+> et **uniquement** pour les FB existants : tout FB **nouveau** porte `Status : ST_FbStatus`.
+> Ce n'est pas une seconde forme de conformité permanente — arbitrage du 2026-08-19.
+> Le guard `G315_check_fb_interface.py` reconnaît les deux formes et publie leur décompte, ce qui
+> mesure l'avancement de T137.
 
 ### 3. Structure `ST_FbStatus` (Socle transverse de statut)
 La structure `ST_FbStatus` regroupe **exactement les six membres** nécessaires au suivi synoptique et diagnostic :
