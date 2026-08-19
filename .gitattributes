@@ -1,0 +1,23 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Attributs Git — normalisation des fins de ligne
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# REX 2026-08-19 : le hook partagé TOOLS/AGENT_WORKFLOW/hooks/pre-push, écrit
+# sous Windows, portait un BOM UTF-8 et des fins de ligne CRLF. Résultat :
+#
+#   error: cannot spawn TOOLS/AGENT_WORKFLOW/hooks/pre-push: No such file or directory
+#   error: failed to push some refs
+#
+# Le BOM se glisse AVANT le `#!`, et le CRLF transforme l'interpréteur en
+# `/bin/sh\r`. Dans les deux cas le shebang devient invalide et TOUT push est
+# bloqué net — alors que ce hook est conçu pour être informatif et non bloquant.
+#
+# Les scripts exécutés par un interpréteur POSIX doivent donc rester en LF,
+# quelle que soit la plateforme de l'auteur.
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Hooks git partagés — LF obligatoire (shebang)
+TOOLS/AGENT_WORKFLOW/hooks/*  text eol=lf
+
+# Scripts shell — LF obligatoire
+*.sh                          text eol=lf
