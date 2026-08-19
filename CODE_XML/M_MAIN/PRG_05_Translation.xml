@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T15:57:40.622433" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T15:57:40.622433">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T18:13:58.248433" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T18:13:58.248433">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1026,9 +1026,9 @@ IF PRG_03_Modes_Cycle.Auth.Mode = E_Mode.SEMI_AUTO THEN
     SelTarget    := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Target;
     M3_StartStop_Active  := PRG_03_Modes_Cycle.instCycleSemiAuto.TranslationCmd.Start;
 
-    // 🔒 Gating direction/vitesse sur Start (REX 2026-08-18) : sans Start (cycle à X0),
-    // M3_Direction_Active/M3_SpeedRef_Active restaient non-nuls (SelTarget≠1 → -1, vitesse 100),
-    // ce qui faisait « bouger » M3 en simulation (FB_Sim_Translation ignore Start) et déclenchait
+    // 🔒 Gating direction/vitesse sur Start : sans Start (cycle à X0),
+    // M3_Direction_Active/M3_SpeedRef_Active resteraient non-nuls (SelTarget≠1 → -1, vitesse 100),
+    // ce qui ferait « bouger » M3 en simulation (FB_Sim_Translation ignore Start) et déclencherait
     // l'escalade fin de course (bit6) → PowerCutOff → éjection SEMI_AUTO. Direction/vitesse
     // uniquement si le cycle commande réellement le mouvement.
     IF M3_StartStop_Active THEN
