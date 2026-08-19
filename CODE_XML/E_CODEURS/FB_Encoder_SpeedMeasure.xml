@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:34:05.347311" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:34:05.347311">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:05:00.920427" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:05:00.920427">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -255,7 +255,7 @@ END_IF;
 {endregion}
 
 {region "§3 Rebouclage TIME"}
-// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant (indépendant de T88).
+// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant.
 IF CurrentTimestamp &lt; LastTimestamp THEN
     Positions_M[0] := Position_M;
     Timestamps[0] := CurrentTimestamp;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.516466" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.516466">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:15:59.443614" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:15:59.443614">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -215,7 +215,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : 1 = Bypass séquence DiveSearch armé (IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bypass séquence DiveSearch armé (IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx602_BypassKoboldBottomTouched">
@@ -223,7 +223,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(9) : 1 = Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
               </documentation>
             </variable>
           </struct>

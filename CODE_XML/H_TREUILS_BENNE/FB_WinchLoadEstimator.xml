@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:35:34.694883" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:35:34.694883">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:05:00.888345" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:05:00.888345">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -487,7 +487,7 @@ Done := FALSE;
 State := E_State.READY;
 ResetEdge(CLK := Reset);
 Configured := LoadTable.IsConfigured;
-// 📈 WINCH-CORE-01 : l'estimation de charge n'a de sens qu'en montée.
+// 📈 L'estimation de charge n'a de sens qu'en montée.
 // La bande de vitesse reste calculée pour le diagnostic et le garde-fou de palier,
 // mais EstimatedLoadPct est forcée à zéro à l'arrêt et en descente.
 Ascending := (MeasuredSpeedSignedMps &gt; 0.0);

@@ -76,7 +76,7 @@ END_IF;
 {endregion}
 
 {region "§3 Rebouclage TIME"}
-// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant (indépendant de T88).
+// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant.
 IF CurrentTimestamp < LastTimestamp THEN
     Positions_M[0] := Position_M;
     Timestamps[0] := CurrentTimestamp;

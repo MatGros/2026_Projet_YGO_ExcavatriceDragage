@@ -123,7 +123,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RETURN;
 END_IF;
 
-// 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
+// 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
     ErrorId := 16#0000;
@@ -300,9 +300,8 @@ END_IF;
 // ET Direction=1/-1 (demande OPÉRATEUR brute, pas CommandedDirection qui reste au dernier sens
 // jusqu'à la retombée de la rampe) — coupure instantanée du contacteur de sens dès le
 // relâchement du joystick, même sécurité que ci-dessus.
-// Plus de terme BrakeSafetyOk — le frein n'est plus une condition d'engagement des relais de
-// sens, c'est l'inverse (voir FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev,
-// calculé APRÈS ces relais).
+// Le frein n'est pas une condition d'engagement des relais de sens : c'est l'inverse
+// (voir FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
 RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep > 0);
 RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep > 0);
 
@@ -314,7 +313,7 @@ IF NOT AscentPermit THEN
     RelayFwd := FALSE;
 END_IF;
 
-// Vérification UNIQUEMENT à l'arrêt commandé (plus de détail par sens — voir bandeau en-tête).
+// Vérification UNIQUEMENT à l'arrêt commandé (voir bandeau en-tête).
 // AllContactorsCommandedOff = tout ce que FB_Winch commande est à FALSE.
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
@@ -338,13 +337,13 @@ IF BypassGlobal THEN
 END_IF;
 
 IF NOT BypassGlobal THEN
-// bit0 ErrorId libre — le frein n'est plus surveillé ici, sa cohérence commande/retour vit
-// désormais dans FB_WinchOutputInterlock_LD (BrakeFeedback).
+// bit0 ErrorId libre — la cohérence commande/retour du frein est surveillée dans
+// FB_WinchOutputInterlock_LD (BrakeFeedback).
 
 // 🧪 Simulation (GVL_Simulation.SensorMxContactorFeedbackIsReal, passé par l'appelant via
 // BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed
 // se déclenche à tort et bloque RelayFwd/RelayRev (voir Error plus bas).
-// bit2 (ex-RevContactorCheck) libre/inutilisé, fusionné dans bit1.
+// bit2 libre/inutilisé.
 IF NOT BypassContactorCheck THEN
     IF ContactorsCheck.StuckClosed THEN
         ErrorId := ErrorId OR 16#0002;
@@ -355,7 +354,7 @@ ELSE
     ErrorId := ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
 END_IF;
 
-// 🪜 WINCH-CORE-01 : remonte le défaut de configuration interne de FB_SpeedStep.
+// 🪜 Remonte le défaut de configuration interne de FB_SpeedStep.
 // Le bit reste mémorisé après correction de la table ; cause disparue + nouveau front Reset
 // sont obligatoires avant de rendre le treuil disponible, conformément à Partie 3 §5.
 IF SpeedStep.ConfigError THEN

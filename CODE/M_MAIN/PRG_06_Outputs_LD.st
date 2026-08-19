@@ -12,32 +12,25 @@
       dans le réseau Ladder, sans ouvrir un autre POU).
    🔒 SafetyStructureNotValidated reste TRUE : AUCUNE sortie physique
       moteur/frein n'est autorisée tant que ce garde-fou n'est pas retiré
-      dans un lot safety validé séparément (voir alerte ci-dessous).
-   ⚠️ Écart connu, HORS PÉRIMÈTRE de ce lot (signalé, pas corrigé ici) :
-      FB_Safety_Winch / FB_Safety_Translation (7 mécanismes Méca A→E,
-      PowerCutOff métier) ne sont appelés nulle part dans CODE/ à ce jour.
+      (voir alerte ci-dessous).
+   ⚠️ FB_Safety_Winch / FB_Safety_Translation (7 mécanismes Méca A→E,
+      PowerCutOff métier) ne sont pas appelés dans CODE/ : les demandes
       ST_WinchFinalInterlockRequest / ST_TranslationFinalInterlockRequest
-      ne portent donc que SafeStop (partiel) — voir PLAN_TASK lot "5
-      Reliquats safety" (T72-T74). Ce lot ne câble que ce qui existe déjà
-      en amont ; ne pas déduire que la safety métier complète est active.
-   🗑️ FB_Output retiré : inverseur pur (State := Command XOR
-      InvertLogic) jamais utilisé avec InvertLogic <> FALSE. Coils câblées directement sur
-      les sorties des interlocks finaux — élimine 15 blocs sans valeur
-      ajoutée et simplifie la lecture maintenance.
-   Sortie moteur AC600 M3 raccordée. DriveControlWord
-      (mot commande 0x3101) et DriveFreqRefWord (consigne fréquence WORD,
-      registre 0x3100, échelle ×100 — WORD 5000 = 50,00 Hz)
-      capturés en variables locales M3_DriveControlWord / M3_DriveFreqRefWord.
-      Mapping E/S CODESYS (Device.export) manuel restant — voir §2 ci-dessous.
+      ne portent donc que SafeStop (partiel). Ne pas déduire que la safety
+      métier complète est active.
+   Coils câblées directement sur les sorties des interlocks finaux —
+   simplifie la lecture maintenance.
+   DriveControlWord (mot commande 0x3101) et DriveFreqRefWord (consigne
+   fréquence WORD, registre 0x3100, échelle ×100 — WORD 5000 = 50,00 Hz)
+   capturés en variables locales M3_DriveControlWord / M3_DriveFreqRefWord.
+   Mapping E/S CODESYS (Device.export) manuel — voir §2 ci-dessous.
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_06_Outputs_LD
 
 VAR_OUTPUT
-    (* PowerKeepAlive_A_RQ/
-       PowerKeepAlive_B_RQ/EmergencyArming_RQ retirés d'ici — même collision de portée
-       que M1/M2/M3 (voir §2). Cibles renommées : PowerKeepAliveACmd/BCmd/
-       EmergencyArmingCmd, déclarées en VAR locale ci-dessous. *)
+    (* Cibles de mapping : PowerKeepAliveACmd/BCmd/EmergencyArmingCmd,
+       déclarées en VAR locale ci-dessous (voir §2). *)
     EmergencyArmingPulseActive   : BOOL;
     EmergencyArmingLockoutActive : BOOL;
     ArmingSeqStep                : INT;
@@ -48,13 +41,10 @@ VAR_OUTPUT
     PowerCutOffActive            : BOOL; (* TRUE = demande de coupure finale active *)
 
     SafetyStructureNotValidated  : BOOL := FALSE; (* 🔓 Garde-fou désactivé : les autorisations M1/M2/M3 sont liées dynamiquement à leurs sécurités *)
-    // Enable ne coupe plus que sur PowerCutOff (barrière
-    // finale, AF02 §2, AF06 §5 "SafeStop laisse la décélération métier se terminer"). SafeStop/
-    // Error retirés du calcul — SafeStop est une rampe rapide gérée en amont par FB_Winch/
-    // FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ; Error mirait tout ErrorId y
-    // compris les mécanismes SafeStop-only, donc coupait Enable pour la même mauvaise raison.
-    // Couper ici sur SafeStop/Error écrasait la rampe déjà calculée en amont en un arrêt
-    // brutal — contraire à la doctrine Enable>SafeStop>StartStop.
+    // Enable ne coupe que sur PowerCutOff (barrière finale, AF02 §2, AF06 §5
+    // "SafeStop laisse la décélération métier se terminer"). SafeStop est une rampe rapide
+    // gérée en amont par FB_Winch/FB_Translation (Enable maintenu, AGENTS.md, TC-P03-001) ;
+    // Error reflète tout ErrorId y compris les mécanismes SafeStop-only.
     M1InterlockEnable            : BOOL; (* Gate finale M1 : WinchM1FinalInterlockRequest.Enable AND NOT WinchM1FinalInterlockRequest.PowerCutOff *)
     M2InterlockEnable            : BOOL; (* Gate finale M2 : WinchM2FinalInterlockRequest.Enable AND NOT WinchM2FinalInterlockRequest.PowerCutOff *)
     M3InterlockEnable            : BOOL; (* Gate finale M3 : TranslationFinalInterlockRequest.Enable AND NOT TranslationFinalInterlockRequest.PowerCutOff *)
@@ -73,10 +63,10 @@ VAR_OUTPUT
     M3BlockedBySafetyInfo        : BOOL;
 
     (* Les noms Device bruts ( *_DQ / *_RQ ), ex. M1_RelayFwd_Up_DQ,
-       M3_BrakeRelease_RQ) NE SONT PLUS déclarés ici — les déclarer créait une collision
+       M3_BrakeRelease_RQ) ne sont pas déclarés ici : les déclarer créerait une collision
        de portée avec la variable GLOBALE homonyme créée par le mapping E/S CODESYS
-       (Device.export), qui masquait silencieusement le pilotage matériel réel (voir §2
-       plus bas pour le détail et la liste des chemins qualifiés à mapper). *)
+       (Device.export), qui masquerait le pilotage matériel réel (voir §2 plus bas
+       pour le détail et la liste des chemins qualifiés à mapper). *)
     TranslationBrakeCmd          : BOOL; (* Demande frein M3 arbitrée — cible du mapping E/S *)
     M3_DriveControlWord          : WORD; (* Mot de commande variateur M3 (0x3101) — cible du mapping E/S *)
     M3_DriveFreqRefWord          : WORD; (* Consigne fréquence variateur M3 (0x3100, x100) — cible du mapping E/S *)
@@ -238,17 +228,14 @@ M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 // Recalcul INDEPENDANT, voir M1 ci-dessus.
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
-// KoboldContactorCmd était déclaré (VAR ci-dessus) mais jamais écrit -- la chaîne
-// instDiveSearch.KoboldMeasureEnable -> PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated
-// s'arrêtait net ici, sans erreur de compilation ni de gate pour le signaler. Mapping E/S
-// CODESYS à (re)faire côté utilisateur (voir §2 plus bas) :
-// M1_M2_KoboldMeasureEnable_DQ <- PRG_06_Outputs_LD.KoboldContactorCmd.
+// KoboldContactorCmd est écrit depuis la commande arbitrée
+// PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated. Mapping E/S CODESYS
+// (voir §2 plus bas) : M1_M2_KoboldMeasureEnable_DQ <- PRG_06_Outputs_LD.KoboldContactorCmd.
 KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 // 🛡️ Déblocage M3 sans forçage manuel de SafetyStructureNotValidated.
-// Ne coupe plus que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête
-// de fichier (SafeStop/Error écrasaient la rampe rapide gérée en amont par FB_Translation).
+// Ne coupe que sur PowerCutOff — voir commentaire VAR_OUTPUT en tête de fichier.
 M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
                       AND NOT PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
@@ -341,21 +328,14 @@ GVL_Global.TranslationBrakeCmd := TranslationBrakeCmd;
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
 
-// PowerCutOffReq était figé à FALSE en dur —
-// instSafetyTranslationM3.PowerCutOff (5 mécanismes/8 : thermique frein, Méca A/B, butées, incohérence
-// capteurs) était donc calculé mais totalement inerte, sans aucune coupure amont réelle possible
-// (seul le frein mécanique réagissait via SafeStop). Agrégation OU strict par procédé (M5, A-04) —
-// M1/M2 (FB_Safety_Winch, pas encore instanciée) rejoindront ce OU dès leur safety câblée, aucune
-// demande vraie ne doit jamais être masquée par l'absence d'une autre source.
-// M1/M2 (FB_Safety_Winch) + M3 câblés — OU strict (M5, A-04).
-// ⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD est
-// intégralement généré par l'oracle Python (gen_prg06_oracle.py), jamais par la conversion
-// .st->LD générique (qui plante sur une variable réassignée en OU chaîné — bug pré-existant du
-// générateur générique, hors périmètre de ce lot). Contrat réel, câblé dans l'oracle (3 contacts
-// parallèles sur la même coil PowerCutOffReq, voir section PowerCutOffReq du script) :
+// PowerCutOffReq = agrégation OU strict des demandes de coupure des trois procédés (M5, A-04) :
 //   PowerCutOffReq = WinchM1FinalInterlockRequest.PowerCutOff
 //                  OR WinchM2FinalInterlockRequest.PowerCutOff
 //                  OR TranslationFinalInterlockRequest.PowerCutOff
+// ⚠️ Cette ligne ST est UNIQUEMENT documentaire (contrat fonctionnel) : PRG_06_Outputs_LD est
+// intégralement généré par l'oracle Python (gen_prg06_oracle.py). Contrat réel, câblé dans
+// l'oracle (3 contacts parallèles sur la même coil PowerCutOffReq, voir section PowerCutOffReq
+// du script).
 PowerCutOffReq := PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
 instSafetyEmergencyManagement(

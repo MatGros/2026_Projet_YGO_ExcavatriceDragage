@@ -17,7 +17,7 @@ STRUCT
     LimitLegalDepth_M      : REAL;        (* 📐 Miroir de GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M *)
     WinchSyncError         : BOOL;        (* ⚖️ Miroir de l'erreur synchro M1/M2 *)
     WinchSyncDelta_M       : REAL;        (* ⚖️ Miroir de l'écart synchro M1/M2 *)
-    SpeedMismatch_Mps      : REAL;        (* 🐢 Écart de vitesse mesuré (T43/T45) *)
+    SpeedMismatch_Mps      : REAL;        (* 🐢 Écart de vitesse mesuré  *)
     SpeedMismatchActive    : BOOL;        (* 🐢 Écart de vitesse détecté *)
     SpeedMismatchConfirmed : BOOL;        (* 🐢 Écart de vitesse confirmé *)
     M1Position_M           : REAL;        (* 📊 Position câble M1 *)
@@ -25,7 +25,7 @@ STRUCT
     DeadmanArmed           : BOOL;        (* 🔫 Homme-mort joystick armé *)
     JoystickMotionActive   : BOOL;        (* 🕹️ Mouvement joystick actif *)
     MotionPermit           : BOOL;        (* 🟢 Homme-mort + axe Y actif (CycleMotionPermit) *)
-    CycleStepAtError       : E_CycleStep; (* 🧊 Étape spécifique au moment du défaut (R9) *)
+    CycleStepAtError       : E_CycleStep; (* 🧊 Étape spécifique au moment du défaut  *)
     SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
 END_STRUCT
 END_TYPE

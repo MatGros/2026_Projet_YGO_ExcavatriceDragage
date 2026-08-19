@@ -1283,10 +1283,10 @@ IF ErrorEdge.Q THEN
     CycleStepAtError := State;
 END_IF;
 
-// ⏱️ T36 — surveillance indépendante de la remontée lente
+// ⏱️ Surveillance indépendante de la remontée lente
 StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentTimeout);
 
-// 📏 T43 — comparaison vitesse réelle M1/M2
+// 📏 Comparaison vitesse réelle M1/M2
 SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
 SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
                        AND CycleMotionPermit
@@ -1325,7 +1325,7 @@ IF WinchSyncError AND State &lt;&gt; E_CycleStep.STABILIZING THEN
     State := E_CycleStep.STABILIZING;
 END_IF;
 
-// 🛡️ T43 — écart de vitesse confirmé : arrêt du cycle et STABILIZING.
+// 🛡️ Écart de vitesse confirmé : arrêt du cycle et STABILIZING.
 IF SpeedMismatchConfirmed AND State &lt;&gt; E_CycleStep.STABILIZING THEN
     Error := TRUE;
     ErrorId := ErrorId OR 16#0010;

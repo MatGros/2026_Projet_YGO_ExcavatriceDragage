@@ -24,7 +24,7 @@ STRUCT
 
     Idx301_EmergencyChainClosed  : BOOL; // 1 = Boucle Urgence OK | 0 = AU Appuyé
     Idx302_BucketFaultActive     : BOOL; // 0 = Sain | 1 = Défaut Mouvement Benne
-    Idx303_KoboldAutoStopEnabled       : BOOL; // (Fiche 05) : 1 = Toggle IHM arrêt auto descente actif
+    Idx303_KoboldAutoStopEnabled       : BOOL; // 1 = Toggle IHM arrêt auto descente actif
     Idx304_KoboldImmersionConfirmed    : BOOL; // : 1 = Immersion confirmée (front Kobold dans la fenêtre)
     Idx305_KoboldBottomTouchLatched    : BOOL; // : 1 = Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)
     Idx306_ErrorIdRaw             : WORD; // : bitfield brut FB_Bucket (bit0 timeout, bit1 incohérence, bit2 limites, bit3 codeur non référencé, bit4 glissement M1)

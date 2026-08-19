@@ -1,7 +1,6 @@
 (* ═══════════════════════════════════════════════════════════════
    🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_HwWinch :

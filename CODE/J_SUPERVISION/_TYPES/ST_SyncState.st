@@ -10,6 +10,6 @@ STRUCT
     Ready      : BOOL;    (* 🟢 Bloc de synchro prêt *)
     Error      : BOOL;    (* Alarme synchro active *)
     ErrorId    : WORD;    (* ❌ Code défaut synchro *)
-    FBState    : E_State; (* 🤖 État de l'automate interne (FB_WinchSync) — ex-"State", renommé pour éviter collision avec le sous-struct State *)
+    FBState    : E_State; (* 🤖 État de l'automate interne (FB_WinchSync) *)
 END_STRUCT
 END_TYPE

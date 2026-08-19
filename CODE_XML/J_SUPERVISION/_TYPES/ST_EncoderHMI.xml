@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.289749" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.289749">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:15:05.455712" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:15:05.455712">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -95,7 +95,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing — déplacés depuis ST_WinchState racine (2026-08, réorganisation ST_WinchHMI/Homing)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing — prise d'origine / référencement
 🎯 Prise d'origine (Homing) validée</xhtml>
               </documentation>
             </variable>

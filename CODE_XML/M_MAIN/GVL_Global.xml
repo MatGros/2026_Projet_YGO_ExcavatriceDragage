@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:58:30.960999" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:58:30.960999">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:04:43.803411" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:04:43.803411">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -44,7 +44,7 @@
             <BOOL />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">── [COMMANDES FINALES ET INTERLOCKS RECOPIÉS DE PRG_10_Outputs_LD] ──────────────────────────
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">── [COMMANDES FINALES ET INTERLOCKS] ──────────────────────────
 Permet la lecture publique globale par PRG_00_Inputs, PRG_SAFETY_CFC, PRG_SUPERVISION_CFC et PRG_TROUBLESHOOTING_CFC</xhtml>
           </documentation>
         </variable>

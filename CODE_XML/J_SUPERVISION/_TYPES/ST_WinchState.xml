@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:54.030372" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:54.030372">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:15:44.225651" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:15:44.225651">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -322,7 +322,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sécurités &amp; Diagnostics
-🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (déplacés 2026-08, voir ST_EncoderHMI)</xhtml>
+🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (voir ST_EncoderHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="ContactorsCheck">
@@ -713,7 +713,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing — déplacés depuis ST_WinchState racine (2026-08, réorganisation ST_WinchHMI/Homing)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Homing — prise d'origine / référencement
 🎯 Prise d'origine (Homing) validée</xhtml>
               </documentation>
             </variable>

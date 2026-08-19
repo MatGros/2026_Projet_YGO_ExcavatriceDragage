@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:53:23.514951" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:53:23.514951">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:12:54.825411" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:12:54.825411">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -207,7 +207,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(Fiche 05) : 1 = Toggle IHM arrêt auto descente actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Toggle IHM arrêt auto descente actif</xhtml>
               </documentation>
             </variable>
             <variable name="Idx304_KoboldImmersionConfirmed">

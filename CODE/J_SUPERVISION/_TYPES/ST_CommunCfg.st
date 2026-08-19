@@ -1,8 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
    ST_CommunCfg — Configuration des paramètres communs machine
-   📄 : WinchMaxStepDescente/WinchMaxStepAscent/WinchSlowdownDistance_M/
-   WinchSlowSpeed_Pct rapatriés depuis ST_WinchCfg (étaient partagés M1/M2 par réconciliation
-   ad-hoc dans PRG_SUPERVISION_CFC.st, une seule instance ici l'élimine).
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_CommunCfg :
 STRUCT
@@ -21,8 +18,8 @@ STRUCT
     // pas une vitesse continue.
     WinchSlowdownMaxStep        : INT := 1;     (* : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)
     TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
-    // (4) — coupe-circuit d'urgence pour le séquencement auto benne (Fiche 01).
-    // Défaut FALSE = comportement IDENTIQUE à avant Fiche 01 (déplacement M1/M2 synchro jamais
+    // Coupe-circuit d'urgence pour le séquencement auto benne.
+    // Défaut FALSE = mouvement M1/M2 synchro jamais
     // gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).
     TglEnableCoupledBucketSequencing : BOOL := FALSE;
     Initialized                 : BOOL := FALSE; (* 🚦 flag restauration boot *)

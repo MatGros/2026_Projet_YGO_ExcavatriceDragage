@@ -8,6 +8,6 @@ STRUCT
     Idx106_DriveActualFreq_Hz    : REAL; // [Hz] Fréquence Réelle Mesurée Variateur
     Idx107_DriveStatusWord       : WORD; // Mot d'état Brut Variateur AC600
     Idx108_BrakeApplied          : BOOL; // TRUE = frein SERRÉ (NOT BrakeFeedback — IHM garde le sens serré)
-    Idx109_DriveThermalOk        : BOOL; // T96 : TRUE = thermique moteur/variateur AC600 OK (diagnostic seul)
+    Idx109_DriveThermalOk        : BOOL; // TRUE = thermique moteur/variateur AC600 OK (diagnostic seul)
 END_STRUCT
 END_TYPE

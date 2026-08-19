@@ -146,7 +146,7 @@ ELSIF ResetEdge.Q AND NOT DeviationActive THEN
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
 
-// 🐢 T113 : Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
+// 🐢 Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
 SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM > CfgSyncToleranceM) OR ((ErrorId AND 16#0001) <> 16#0000));
 
 // 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1

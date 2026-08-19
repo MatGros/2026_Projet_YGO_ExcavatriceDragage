@@ -14,7 +14,7 @@ STRUCT
     Error            : BOOL;  (* Codeur en défaut (liaison EtherCAT ou preset) *)
     ErrorId          : WORD;  (* ❌ Code défaut codeur *)
 
-    (* 🎯 Homing — déplacés depuis ST_WinchState racine (2026-08, réorganisation ST_WinchHMI/Homing) *)
+    (* 🎯 Homing — prise d'origine / référencement *)
     Homed                   : BOOL;             (* 🎯 Prise d'origine (Homing) validée *)
     HomingBusy              : BOOL;             (* ⏳ Référencement en cours *)
     HomingDone              : BOOL;             (* ✅ Pulse de référencement réussi *)

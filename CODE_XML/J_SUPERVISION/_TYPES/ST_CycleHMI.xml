@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.270651" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.270651">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:13:33.918837" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:13:33.918837">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -53,9 +53,7 @@
    🔄 ST_CycleHMI — Données d'échange IHM du cycle semi-automatique
    ───────────────────────────────────────────────────────────────
    📄 Structuration en Cmd / State / Cfg / Test , homogène avec ST_WinchHMI.
-   T66 : Cfg protégé par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3) —
-   avant ce lot, SetDepth_M/SetOffset_M n'avaient AUCUN backing persistant (juste un défaut
-   compilé dans le DUT), contrairement à tous les autres domaines déjà traités.
+   Cfg protégé par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -105,7 +103,7 @@
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
-   T66 : SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT (voir PRG_SUPERVISION_CFC.st §2/§3)
+   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -277,7 +275,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse mesuré (T43/T45)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Écart de vitesse mesuré</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchActive">
@@ -341,7 +339,7 @@
                 <derived name="E_CycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Étape spécifique au moment du défaut (R9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧊 Étape spécifique au moment du défaut</xhtml>
               </documentation>
             </variable>
             <variable name="SampleCount">

@@ -7,8 +7,7 @@ TYPE ST_BypassBucket :
 STRUCT
     (* 🛡️ 1. Hiérarchie & Restauration *)
     Global      : BOOL; (* 🌐 Bypass Global : ignore toute surveillance du mécanisme benne *)
-    // FIX persistance (voir DOC/AUDITS/ConfigPersistence/) : flag restauration boot dédié
-    // (défaut FALSE non ambigu, contrairement à une valeur métier) — PRG_SUPERVISION_CFC.st
+    // Flag restauration boot dédié (défaut FALSE non ambigu, contrairement à une valeur métier)
     Initialized : BOOL := FALSE; (* 🚦 TRUE = bypass restauré depuis GVL_BypassRetain ce boot *)
 END_STRUCT
 END_TYPE

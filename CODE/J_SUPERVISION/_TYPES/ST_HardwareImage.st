@@ -1,7 +1,6 @@
 (* ═══════════════════════════════════════════════════════════════
    🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
    ───────────────────────────────────────────────────────────────
-   📄 Lot L5 (Frontière unique HwIn)
    🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_HardwareImage :

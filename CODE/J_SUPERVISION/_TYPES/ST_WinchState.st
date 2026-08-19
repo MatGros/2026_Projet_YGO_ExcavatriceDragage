@@ -46,7 +46,7 @@ STRUCT
     FinalStepDelayElapsed    : TIME;            (* ⏱️ Écoulé entre paliers 1s250 *)
 
     (* 🛡️ Sécurités & Diagnostics *)
-    Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (déplacés 2026-08, voir ST_EncoderHMI) *)
+    Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (voir ST_EncoderHMI) *)
 
     (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
     ContactorsCheck         : ST_ContactorCheck; (* 🔌 Coherence contacteurs sens+vitesse *)
