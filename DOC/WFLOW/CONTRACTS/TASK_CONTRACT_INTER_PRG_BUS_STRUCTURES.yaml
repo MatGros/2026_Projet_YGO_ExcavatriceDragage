@@ -1,0 +1,140 @@
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: LOT_T142_INTER_PRG_BUS_STRUCTURES
+  criticality: C2            # C2 : Modification d'interface inter-programmes PLC
+  strategy: patch            # patch isométrique sans régression logique
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Encapsuler les flux de données échangés entre les 6 PROGRAMs (PRG_02 à PRG_07) dans des structures
+    DUT dédiées et typées (ST_AcquisitionInterPrg, ST_WinchInterPrg, ST_TranslationInterPrg, ST_OutputsInterPrg)
+    au lieu de variables éparpillées en VAR_OUTPUT, garantissant un échange par bus propre, testable et sans régression logique.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        La structure ST_AcquisitionInterPrg est créée dans CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
+        et regroupe l'ensemble des mesures (câbles, vitesses), états joystick qualifiés, positions M3 et diagnostics DI.
+      verified_by: >
+        python -c "import os; assert os.path.exists('CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st')"
+
+    - id: AC2
+      statement: >
+        La structure ST_WinchInterPrg est créée dans CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st
+        et regroupe les demandes finales M1/M2, états publics WinchM1/M2State, sécurités WinchM1/M2Safety, états synchro et benne.
+      verified_by: >
+        python -c "import os; assert os.path.exists('CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st')"
+
+    - id: AC3
+      statement: >
+        La structure ST_TranslationInterPrg est créée dans CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
+        et regroupe la demande finale M3, l'état public TranslationState et le diagnostic TranslationSafety.
+      verified_by: >
+        python -c "import os; assert os.path.exists('CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st')"
+
+    - id: AC4
+      statement: >
+        La structure ST_OutputsInterPrg est créée dans CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st
+        et regroupe les ordres actionneurs finaux produits par PRG_06_Outputs_LD pour le bouclage FB_SimBench.
+      verified_by: >
+        python -c "import os; assert os.path.exists('CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st')"
+
+    - id: AC5
+      statement: >
+        Les PROGRAMs PRG_02, PRG_04, PRG_05, PRG_06 exposent leurs bus respectifs en VAR_OUTPUT
+        et l'ensemble des consommateurs (PRG_03, PRG_04, PRG_05, PRG_06, PRG_07, FB_SimBench, FB_TroubleshootingView)
+        sont remappés sans rupture de chaîne logique.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
+
+    - id: AC6
+      statement: >
+        Le bundle PLCopenXML est régénéré et synchronisé.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
+
+    - id: AC7
+      statement: >
+        L'ensemble de la suite des 15 gates du projet sort à 100% au vert.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C
+
+    - id: AC8
+      statement: >
+        Pour tout fichier dans CODE/M_MAIN/, le nom de fichier correspond exactement au nom du POU
+        et le suffixe correspond au langage généré dans le bundle.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs_LD.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/K_DEPANNAGE/FB_TroubleshootingView.st
+      - CODE_XML/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_INTER_PRG_BUS_STRUCTURES.yaml
+      - DOC/WFLOW/PLAN_TASK.md
+    forbidden:
+      - ARCHIVES/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  # ── 4. Contrat de conservation ────────────────────────────────────
+  conservation:
+    must_survive:
+      - "L'intégralité de la logique automate, des calculs et des sécurités physiques reste strictement isométrique."
+      - "Zéro modification des conditions d'activation, de temporisations ou de seuils métier."
+      - "Les structures IHM GVL_IHM et de persistance GVL_PERSISTENT restent strictement inchangées."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - bundle_freshness
+    - linkage_report
+    - all_gates_pass
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "claude/claude-sonnet-5"
+    - "codex/gpt-5.6-terra"
+    - "ollamacloud/glm-5.2"
+    - "inherit"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Si une variable exposée était consommée en dehors des 6 PRG (ex: dans un FB autonome sans passer
+    par son interface), remonter immédiatement.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "AGY-01"
+  completed_at: "2026-08-19T04:37:00+02:00"
+  status: COMPLETED
+  summary: >
+    Exécution complète de T139 :
+    - 77 fichiers DUT déplacés proprement par git mv dans 8 sous-dossiers thématiques (AC1).
+    - G380 adapté pour scan récursif (rglob) et validé PASS (AC2).
+    - naming_baseline.json mis à jour et validé (AC3).
+    - Bundle PLCopenXML régénéré fresh sans erreur (AC4).
+    - G200_check_linkage.py PASS (0 erreur, 1160 instances vérifiées) (AC5).
+    - run_all_gates.py --palier C PASS (15/15 gates au vert, 0 erreur) (AC6).
+  evidence_submitted:
+    - bundle_freshness: "PASS: CODE_XML/CODE_Bundle.xml is fresh"
+    - linkage_report: "Linkage check: PASS (0 erreur(s), 1160 instance(s) verifiee(s))"
+    - all_gates_pass: "ALL GATES PASSED [OK] (PALIER C - 15/15)"
+
+validation:
+  status: PENDING
+  validated_by: "non demarre"
+  validated_at: "non demarre"
