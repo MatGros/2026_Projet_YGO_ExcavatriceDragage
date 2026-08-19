@@ -231,7 +231,9 @@ END_IF;
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>

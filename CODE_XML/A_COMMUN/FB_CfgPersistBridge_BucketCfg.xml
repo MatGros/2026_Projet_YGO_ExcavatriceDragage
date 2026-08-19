@@ -213,7 +213,9 @@ END_IF;
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
+            </Folder>
           </Folder>
         </Folder>
         <Folder Name="H_TREUILS_BENNE">

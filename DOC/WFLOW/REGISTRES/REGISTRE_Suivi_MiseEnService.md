@@ -68,7 +68,7 @@
 - 🎯 **Périmètre** : M2 — pilotage unitaire joystick (`SelJoystickWinch=2`)
 - 🚦 **Statut** : 🟢 **Implémenté** — défaut `TRUE` (demande client)
 - 🔍 **Constat** : besoin d'un jog libre M2 borné dans les limites benne (0 → `OffsetCloseM`, config) à vitesse bridée, sans passer par `instBucket` (pas de mémorisation `CloseReq`/`OpenReq`).
-- 🛠️ **Solution** : `GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits` (défaut `TRUE`) — actif uniquement en pilotage unitaire M2, borne `ForbidDescentM2`/`ForbidAscentM2` sur `CablePosM1 + OffsetOpenM/OffsetCloseM`, plafonne palier 1. Preuve : `CODE/J_SUPERVISION/_TYPES/ST_BucketCmd.st`, `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (§5-6).
+- 🛠️ **Solution** : `GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits` (défaut `TRUE`) — actif uniquement en pilotage unitaire M2, borne `ForbidDescentM2`/`ForbidAscentM2` sur `CablePosM1 + OffsetOpenM/OffsetCloseM`, plafonne palier 1. Preuve : `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st`, `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (§5-6).
 - 📌 **Action** : valider bornes réelles sur site (0 → 15m config actuelle).
 
 ### MES-026 — 🟡 Bypass séquence DiveSearch (réglages seuils pas encore calibrés)

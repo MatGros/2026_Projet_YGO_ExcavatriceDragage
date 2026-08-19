@@ -48,7 +48,7 @@ L'implémentation suit `DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md` et
 | **L2** | 2 instances `FB_Cycle` dans `PRG_03_Modes_Cycle` | `CODE/M_MAIN/PRG_03_Modes_Cycle.st` |
 | **L3** | Pont SEMI_AUTO treuils/benne (M1/M2, benne, Kobold) | `CODE/M_MAIN/PRG_04_Treuils_Benne.st` |
 | **L4** | Pont SEMI_AUTO translation M3 | `CODE/M_MAIN/PRG_05_Translation.st` |
-| **L5** | GVL_IHM + banner + compteur + troubleshooting | `CODE/J_SUPERVISION/_TYPES/ST_CycleState.st`, `CODE/M_MAIN/PRG_07_Supervision.st`, `CODE/GVL_PERSISTENT.st` |
+| **L5** | GVL_IHM + banner + compteur + troubleshooting | `CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st`, `CODE/M_MAIN/PRG_07_Supervision.st`, `CODE/GVL_PERSISTENT.st` |
 
 ---
 
@@ -61,7 +61,7 @@ L'implémentation suit `DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md` et
 | `CODE/M_MAIN/PRG_03_Modes_Cycle.st` | Modifié | 2 instances `instCycleMaintenance`/`instCycleSemiAuto` câblées. **v1.1** : SpeedMismatch 1.5 m/s / 500 ms, `Benne_IsRoughlyClosed` câblé |
 | `CODE/M_MAIN/PRG_04_Treuils_Benne.st` | Modifié | Pont SEMI_AUTO : M1/M2 consomment `instCycleSemiAuto.WinchM1Cmd/WinchM2Cmd` ; benne `CmdBucketCloseArbitrated`/`CmdOpen_IHM` ; Kobold `KoboldContactorCmdArbitrated`. **v1.1** : sortie `Benne_IsRoughlyClosed` (tolérance 2 m) |
 | `CODE/M_MAIN/PRG_05_Translation.st` | Modifié | Pont SEMI_AUTO : `SelTarget`/`M3_StartStop_Active` consomment `instCycleSemiAuto.TranslationCmd` |
-| `CODE/J_SUPERVISION/_TYPES/ST_CycleState.st` | Modifié | + `CycleStepAtError`, `SampleCount` |
+| `CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st` | Modifié | + `CycleStepAtError`, `SampleCount` |
 | `CODE/M_MAIN/PRG_07_Supervision.st` | Modifié | Publication `GVL_IHM.Cycle.State.*` (débloque T115) |
 | `CODE/GVL_PERSISTENT.st` | Modifié | + `_CycleSampleCount` (RETAIN) |
 

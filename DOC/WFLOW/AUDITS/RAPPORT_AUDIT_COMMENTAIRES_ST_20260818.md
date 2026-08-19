@@ -54,30 +54,30 @@
 | Fichier | Violations | Exemples |
 |---|---|---|
 | `CODE/J_SUPERVISION/GVL_IHM.st` | 3 | `(2026-08)`, bloc `IHM_MANU supprimé`, bloc `NOTE procédure banc retirée (L2→L4d, L5→L8)` |
-| `CODE/J_SUPERVISION/_TYPES/ST_CommunHMI.st` | 5 | `(demande utilisateur)`, `etaient ecrits par erreur`, `FIX :`, `MES-008`, `(Fiche 05)` |
-| `CODE/J_SUPERVISION/_TYPES/ST_ModesCmd.st` | 4 | `ex-MachineReset`, `TASK-0001`, `consolidé en switch UNIQUE`, `comportement historique` |
-| `CODE/J_SUPERVISION/_TYPES/ST_HwMachine.st` | 4 | `Lot L5`, `renommé depuis... (Device_IO_20260812)` (x2), `pas encore câblé` |
-| `CODE/J_SUPERVISION/_TYPES/ST_HwTranslation.st` | 2 | `Lot L5`, `T96` |
-| `CODE/J_SUPERVISION/_TYPES/ST_CommunCfg.st` | 4 | `rapatriés depuis ST_WinchCfg`, `Blocage instantané à 0m`, `retiré`, `(4) — Fiche 01` |
+| `CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st` | 5 | `(demande utilisateur)`, `etaient ecrits par erreur`, `FIX :`, `MES-008`, `(Fiche 05)` |
+| `CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st` | 4 | `ex-MachineReset`, `TASK-0001`, `consolidé en switch UNIQUE`, `comportement historique` |
+| `CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st` | 4 | `Lot L5`, `renommé depuis... (Device_IO_20260812)` (x2), `pas encore câblé` |
+| `CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st` | 2 | `Lot L5`, `T96` |
+| `CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st` | 4 | `rapatriés depuis ST_WinchCfg`, `Blocage instantané à 0m`, `retiré`, `(4) — Fiche 01` |
 | `CODE/J_SUPERVISION/_TYPES/ST_Bypass*.st` (Bucket/Network/Translation/Winch) | 6 | `FIX persistance` (x4), `PRG_SUPERVISION_CFC.st` |
-| `CODE/J_SUPERVISION/_TYPES/ST_CycleState.st` | 3 | `(T43/T45)`, `(R9)`, `(Q3bis)` |
-| `CODE/J_SUPERVISION/_TYPES/ST_WinchCfg.st` | 2 | `déplacés vers...`, `FIX : flag restauration` |
-| `CODE/J_SUPERVISION/_TYPES/ST_BucketCmd.st` | 2 | `(18)`, `(18bis)` |
-| `CODE/J_SUPERVISION/_TYPES/ST_ChainDredgingAssist.st` | 2 | `(9)` (x2) |
-| `CODE/J_SUPERVISION/_TYPES/ST_ChainBucket.st` | 1 | `(Fiche 05)` |
-| `CODE/J_SUPERVISION/_TYPES/ST_Chain_Translation_Inputs.st` | 1 | `T96` |
-| `CODE/J_SUPERVISION/_TYPES/ST_CycleCfg.st` / `ST_CycleHMI.st` | 2 | `T66` |
-| `CODE/J_SUPERVISION/_TYPES/ST_EncoderHMI.st` | 1 | `(2026-08, réorganisation)` |
-| `CODE/J_SUPERVISION/_TYPES/ST_WinchState.st` | 1 | `(déplacés 2026-08)` |
-| `CODE/J_SUPERVISION/_TYPES/ST_HwOperator.st` / `ST_HardwareImage.st` / `ST_HwWinch.st` | 3 | `Lot L5` |
-| `CODE/J_SUPERVISION/_TYPES/ST_BypassCommun.st` | 2 | cartouche 16 lignes + `(demande client)` + `renommé` |
-| `CODE/J_SUPERVISION/_TYPES/ST_SyncCmd.st` | 1 | `ex-OverrideSync inversé` |
-| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | 1 | `ex-champ "State", renommé` |
-| `CODE/J_SUPERVISION/_TYPES/ST_SyncCfg.st` / `ST_SyncState.st` | 2 | `ex-CfgInitialized renommé`, `ex-"State", renommé` |
-| `CODE/J_SUPERVISION/_TYPES/ST_TranslationCfg.st` / `ST_TranslationCmd.st` / `ST_TranslationHMI.st` / `ST_TranslationFinalInterlockRequest.st` | 4 | `créé suite constat terrain`, `PAR AXE supprimé`, `manquait`, `FIX :` |
-| `CODE/J_SUPERVISION/_TYPES/ST_WinchBenneHMI.st` / `ST_WinchFinalInterlockRequest.st` | 2 | `IEC 61131-3 n'offre pas d'héritage`, `(retrait FB_Brake)` |
-| `CODE/J_SUPERVISION/_TYPES/ST_SafetyChecklist.st` | 1 | `Absent jusqu'ici : diagnostiquer...` |
-| `CODE/J_SUPERVISION/_TYPES/ST_DredgingAssistCmd.st` / `ST_DredgingAssistState.st` | 2 | `(9)` |
+| `CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st` | 3 | `(T43/T45)`, `(R9)`, `(Q3bis)` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st` | 2 | `déplacés vers...`, `FIX : flag restauration` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st` | 2 | `(18)`, `(18bis)` |
+| `CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st` | 2 | `(9)` (x2) |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st` | 1 | `(Fiche 05)` |
+| `CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st` | 1 | `T96` |
+| `CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st` / `ST_CycleHMI.st` | 2 | `T66` |
+| `CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st` | 1 | `(2026-08, réorganisation)` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st` | 1 | `(déplacés 2026-08)` |
+| `CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st` / `ST_HardwareImage.st` / `ST_HwWinch.st` | 3 | `Lot L5` |
+| `CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st` | 2 | cartouche 16 lignes + `(demande client)` + `renommé` |
+| `CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st` | 1 | `ex-OverrideSync inversé` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st` | 1 | `ex-champ "State", renommé` |
+| `CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st` / `ST_SyncState.st` | 2 | `ex-CfgInitialized renommé`, `ex-"State", renommé` |
+| `CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st` / `ST_TranslationCmd.st` / `ST_TranslationHMI.st` / `ST_TranslationFinalInterlockRequest.st` | 4 | `créé suite constat terrain`, `PAR AXE supprimé`, `manquait`, `FIX :` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st` / `ST_WinchFinalInterlockRequest.st` | 2 | `IEC 61131-3 n'offre pas d'héritage`, `(retrait FB_Brake)` |
+| `CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st` | 1 | `Absent jusqu'ici : diagnostiquer...` |
+| `CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCmd.st` / `ST_DredgingAssistState.st` | 2 | `(9)` |
 
 ### 🟡 Priorité basse — simulation & divers
 | Fichier | Violations | Exemples |

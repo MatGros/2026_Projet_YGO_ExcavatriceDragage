@@ -1168,7 +1168,9 @@ END_IF;
           <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
           <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
           <Folder Name="_TYPES">
-            <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
+            <Folder Name="8_BANDEAU_ET_IHM">
+              <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
+            </Folder>
           </Folder>
         </Folder>
         <Folder Name="G_CYCLE">

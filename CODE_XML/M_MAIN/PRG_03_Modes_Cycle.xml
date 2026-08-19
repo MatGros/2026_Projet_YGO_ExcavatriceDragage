@@ -2026,7 +2026,9 @@ Done := FALSE;
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+            </Folder>
           </Folder>
         </Folder>
         <Folder Name="H_TREUILS_BENNE">

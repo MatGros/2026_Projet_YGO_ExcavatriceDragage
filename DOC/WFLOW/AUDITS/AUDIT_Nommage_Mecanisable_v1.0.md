@@ -396,14 +396,14 @@ La convention d'exemption stipule :
 
 | Fichier relatif | Ligne | Extrait de code concerné | Nom détecté | Correction préconisée (futur refactor) |
 |---|---|---|---|---|
-| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L8 | `ActiveOffset_M : REAL;` | `ActiveOffset_M` | `SetOffset_M` ou champ mesure |
-| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L9 | `M2StartStop : BOOL;` | `M2StartStop` | `BtnM2StartStop` ou `TglM2StartStop` |
-| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L10 | `M2Direction : INT;` | `M2Direction` | `SelM2Direction` |
-| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L11 | `M2ForceSlowSpeed : BOOL;` | `M2ForceSlowSpeed` | `TglM2ForceSlowSpeed` |
-| `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` | L17 | `RemainingTravel_M : REAL;` | `RemainingTravel_M` | Champ mesure / diagnostic |
-| `CODE/J_SUPERVISION/_TYPES/ST_EncoderHMI.st` | L12 | `PresetTriggerCmd : WORD;` | `PresetTriggerCmd` | `SetPresetTrigger` / `BtnPresetTrigger` |
-| `CODE/J_SUPERVISION/_TYPES/ST_WinchSymmetryHMI.st` | L9 | `DeltaStopDistance_M : REAL;` | `DeltaStopDistance_M` | `SetDeltaStopDistance_M` / `Cfg...` |
-| `CODE/J_SUPERVISION/_TYPES/ST_WinchSymmetryHMI.st` | L11 | `MaxSyncDeviation_M : REAL;` | `MaxSyncDeviation_M` | `CfgMaxSyncDeviation_M` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st` | L8 | `ActiveOffset_M : REAL;` | `ActiveOffset_M` | `SetOffset_M` ou champ mesure |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st` | L9 | `M2StartStop : BOOL;` | `M2StartStop` | `BtnM2StartStop` ou `TglM2StartStop` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st` | L10 | `M2Direction : INT;` | `M2Direction` | `SelM2Direction` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st` | L11 | `M2ForceSlowSpeed : BOOL;` | `M2ForceSlowSpeed` | `TglM2ForceSlowSpeed` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st` | L17 | `RemainingTravel_M : REAL;` | `RemainingTravel_M` | Champ mesure / diagnostic |
+| `CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st` | L12 | `PresetTriggerCmd : WORD;` | `PresetTriggerCmd` | `SetPresetTrigger` / `BtnPresetTrigger` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st` | L9 | `DeltaStopDistance_M : REAL;` | `DeltaStopDistance_M` | `SetDeltaStopDistance_M` / `Cfg...` |
+| `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st` | L11 | `MaxSyncDeviation_M : REAL;` | `MaxSyncDeviation_M` | `CfgMaxSyncDeviation_M` |
 
 ---
 
@@ -434,7 +434,7 @@ Au-delà des règles initialement recensées (NC-010 à NC-070), 6 nouveaux méc
 | **`NC-090`** | **Une notion = un seul nom dans tout le projet (Anti-synonymes parallèles)**<br> *Ref : `NAMING_CONVENTION.md §1` & `CODE_QUALITY_STANDARDS.md §1`* | 🟡 **Moyenne** (Dictionnaire de paires interdites) | Coexistence parallèle de `Pos` (158 occurrences) vs `Position` (132 occurrences), et `Speed` vs `Velocity` across `CODE/`. |
 | **`NC-100`** | **Chaîne à 4 maillons : Paramètre → Mesure → Reached → Active**<br> *Ref : `NAMING_CONVENTION.md §Paramètre -> Mesure -> État atteint -> État actif`* | 🟢 **Élevée** (Pattern matching sur décl. booléennes) | Alignement dans `CODE/G_CYCLE/FB_Cycle.st` :<br>`LimitLegalDepthM` (Param) → `Position_M` (Mesure) → `LimitLegalReached` (Reached) → `ForbidDescentActive` (Active). |
 | **`NC-110`** | **Format hiérarchique DUT : `ST_<Domaine>_[<SousDomaine>_]<Rôle>`**<br> *Ref : `NAMING_CONVENTION.md §Structures de données (DUT)`* | 🟢 **Élevée** (Regex sur `TYPE ST_*`) | Non-conformités de structuration DUT dans `CODE/TREUILS/` :<br>`ST_BucketConfig` *(devrait être `ST_Winch_Bucket_Config`)*,<br>`ST_SpeedStepTable` *(devrait être `ST_Winch_SpeedStepTable`)*. |
-| **`NC-120`** | **Construction 2 niveaux : Pas de répétition de l'instance/axe dans le champ**<br> *Ref : `NAMING_CONVENTION.md §Construction d'un nom : instance -> champ`* | 🟢 **Élevée** (Parsing struct & nom de champ) | Répétition d'axe dans `CODE/J_SUPERVISION/_TYPES/ST_BucketHMIState.st` :<br>Le champ `M2PositionCorrected` répète l'axe `M2` à l'intérieur de la structure du benne M2. |
+| **`NC-120`** | **Construction 2 niveaux : Pas de répétition de l'instance/axe dans le champ**<br> *Ref : `NAMING_CONVENTION.md §Construction d'un nom : instance -> champ`* | 🟢 **Élevée** (Parsing struct & nom de champ) | Répétition d'axe dans `CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st` :<br>Le champ `M2PositionCorrected` répète l'axe `M2` à l'intérieur de la structure du benne M2. |
 | **`NC-130`** | **Initialisation explicite à `:= TRUE` des booléens de sécurité capteur**<br> *Ref : `NAMING_CONVENTION.md §Polarité des booléens I/O`* | 🟢 **Élevée** (Regex sur décl. `VAR_INPUT` / `BOOL`) | Omission d'initialisation fail-safe `:= TRUE` dans `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` (L17) :<br>`PowerContactorEngaged : BOOL;` *(doit être `:= TRUE` pour éviter un défaut immédiat au boot)*. |
 
 ---

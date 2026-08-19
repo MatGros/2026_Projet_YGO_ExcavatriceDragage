@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.253609" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-17T05:53:47.253609">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_JoystickChecklist">
+        <baseType>
+          <struct>
+            <variable name="Step1_CanBusActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Bus &amp; Matériel
+TRUE = Bus CANopen en état ACTIVE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2_JoystickOperational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Esclave JOY1 en état RUNNING</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwIn_JoyBtnRaw_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1bis. Entrées physiques directes HwIn
+Bouton brut homme-mort issu de HwIn.Operator</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXAct">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe X au neutre (PRG_02_Acquisition.JoystickXNeutral)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralYAct">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Axe Y au neutre (PRG_02_Acquisition.JoystickYNeutral)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3_DeadmanPressed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Prise en main &amp; Sécurité
+TRUE = Bouton Homme-Mort appuyé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4_NeutralAcquired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Repassé par le neutre (autorisation mouvement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Homme-Mort armé avec passage au neutre validé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllConditionsMet">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Éligibilité globale
+TRUE = Joystick prêt pour piloter un axe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickSelected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Joystick maître sélectionné IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelJoystickWinch">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection Treuil (0=Couplé M1+M2, 1=M1 seul, 2=M2 seul)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Mesures brutes &amp; Filtrées
+Valeur brute axe X (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute axe Y (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeflectionX_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée X (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeflectionY_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Déflexion signée Y (%)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée X (-1 / 0 / +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Direction filtrée Y (-1 / 0 / +1)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8b2fb21c-dcd0-5811-a8c3-9d96f9130525</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_JoystickChecklist — Diagnostic chronologique communication &amp; prise en main Joystick
+   ───────────────────────────────────────────────────────────────
+   🎨 Permet de vérifier la chaîne Joystick (CANopen, Homme-mort, Neutre, Calibration).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_JoystickChecklist" ObjectId="8b2fb21c-dcd0-5811-a8c3-9d96f9130525" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

@@ -81,7 +81,7 @@ def check_cfg_persistent_mirror(root: Path, errors: list[str]) -> None:
     persistent_source = strip_comments(read(root / PERSISTENT_FILE))
     declared_types = {m.group(2) for m in PERSISTENT_VAR_RE.finditer(persistent_source)}
 
-    for cfg_file in sorted((root / TYPES_DIR).glob("ST_*Cfg.st")):
+    for cfg_file in sorted((root / TYPES_DIR).rglob("ST_*Cfg.st")):
         type_match = TYPE_DECL_RE.search(strip_comments(read(cfg_file)))
         if not type_match:
             errors.append(f"{cfg_file.name}: no TYPE declaration found")
@@ -95,11 +95,11 @@ def check_cfg_persistent_mirror(root: Path, errors: list[str]) -> None:
 
 
 def check_initialized_guard(root: Path, errors: list[str]) -> None:
-    for cfg_file in sorted((root / TYPES_DIR).glob("ST_*Cfg.st")):
+    for cfg_file in sorted((root / TYPES_DIR).rglob("ST_*Cfg.st")):
         if "initialized" not in struct_fields(read(cfg_file)):
             errors.append(f"{cfg_file.name}: missing Initialized : BOOL field")
 
-    for bypass_file in sorted((root / TYPES_DIR).glob("ST_Bypass*.st")):
+    for bypass_file in sorted((root / TYPES_DIR).rglob("ST_Bypass*.st")):
         fields = struct_fields(read(bypass_file))
         if "global" not in fields:
             continue  # not GVL_BypassRetain-backed (e.g. ST_BypassCommun) - see module docstring

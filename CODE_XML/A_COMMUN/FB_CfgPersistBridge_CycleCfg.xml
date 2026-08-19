@@ -152,7 +152,9 @@ END_IF;
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
-            <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>
