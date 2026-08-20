@@ -102,7 +102,6 @@ WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_S
 TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
 MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
-Data.SimulationBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive;
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}
