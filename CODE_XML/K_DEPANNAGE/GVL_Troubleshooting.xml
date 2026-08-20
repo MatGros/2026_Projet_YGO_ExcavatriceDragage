@@ -1652,6 +1652,14 @@ TRUE = Contacteur relâché ; précondition AF01 avant réarmement</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande de coupure safety active</xhtml>
               </documentation>
             </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande de coupure AU (entrée instSafetyEmergencyManagement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="MaintainAActive">
               <type>
                 <BOOL />

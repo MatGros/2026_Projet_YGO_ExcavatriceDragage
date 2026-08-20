@@ -435,6 +435,7 @@ GVL_Troubleshooting.Safety.ArmingBusy           := EmergencyState.ArmingBusy;
 GVL_Troubleshooting.Safety.LockoutActive        := EmergencyDiag.LockoutActive;
 GVL_Troubleshooting.Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.Safety.PowerCutOffActive    := PowerCutOffActive;
+GVL_Troubleshooting.Safety.PowerCutOffRequest   := PowerCutOffActive;
 GVL_Troubleshooting.Safety.MaintainAActive      := MaintainAActive;
 GVL_Troubleshooting.Safety.MaintainBActive      := MaintainBActive;
 

@@ -32,6 +32,7 @@ STRUCT
     LockoutActive                : BOOL; (* TRUE = verrouillage temporel entre tentatives *)
     PowerContactorEngaged        : BOOL; (* TRUE = Contacteur principal sous tension (PowerContactorEngaged_DI) *)
     PowerCutOffActive            : BOOL; (* TRUE = demande de coupure safety active *)
+    PowerCutOffRequest           : BOOL; (* TRUE = demande de coupure AU (entrée instSafetyEmergencyManagement) *)
     MaintainAActive              : BOOL; (* TRUE = maintien voie A demandé *)
     MaintainBActive              : BOOL; (* TRUE = maintien voie B demandé *)
     AllConditionsMet             : BOOL; (* TRUE = état final : chaîne OK et puissance engagée *)
