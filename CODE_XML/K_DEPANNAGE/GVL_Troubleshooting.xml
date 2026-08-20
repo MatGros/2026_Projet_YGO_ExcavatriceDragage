@@ -2434,6 +2434,71 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: 0 = M1 ET M2 ≥ hauteur mini (ou bypass) | 1 = Translation bloquée (risque collision)</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx309_ErrorOperatorComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défauts safety déchiffrés (bits ErrorId) — visibles individuellement à l'IHM
+bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx310_ErrorDriveComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit1 Perte communication EtherCAT variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx311_ErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit2 Mauvaise rotation de phases</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx312_ErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit3 Surchauffe thermique frein commun</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx313_ErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit4 Absence confirmation arrêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx314_ErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit5 Mouvement non commandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx315_ErrorLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit6 Limite extrême atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx316_ErrorSensorIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit7 Mot capteurs position incohérent</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2841,12 +2906,93 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx310_MecaFaultMask">
+            <variable name="Idx310_ErrorOperatorComm">
               <type>
-                <WORD />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Pas de Défaut | &gt;0 = Bitfield Défauts Méca A-E</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défauts safety déchiffrés (bits ErrorId) — visibles individuellement à l'IHM
+bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx311_ErrorEncoder">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit1 Perte codeur de ce treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx312_ErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit4 Mauvaise rotation de phases</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx313_ErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit7 Mouvement non commandé / roue libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx314_ErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit8 Absence confirmation arrêt sans commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx315_ErrorMecaC">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit9 Glissement M1 pendant cycle benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx316_ErrorMecaD">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit11 Non-arrêt sur capteur haut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx317_ErrorMecaE">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit12/13 Écart synchro critique M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx318_ErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit10 Surchauffe thermique frein commun</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx319_ErrorOppositeDir">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit14 Sens réel opposé au sens commandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx320_ErrorNoMovement">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit15 Absence de mouvement malgré commande</xhtml>
               </documentation>
             </variable>
           </struct>

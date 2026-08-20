@@ -18,8 +18,6 @@ VAR_OUTPUT
 END_VAR
 
 VAR
-    StubMachineEnableN1 : BOOL := TRUE;
-
     instWinchSync : FB_WinchSync;
     instBucket   : FB_Bucket;
     instSafetyWinchM1 : FB_Safety_Winch;   // Sécurité treuil M1 (SafeStop / permits / PowerCutOff)
@@ -661,7 +659,7 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
 instSafetyWinchM1(
-    Enable                 := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
@@ -717,7 +715,7 @@ instSafetyWinchM1(
 );
 
 instSafetyWinchM2(
-    Enable                 := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
@@ -803,7 +801,7 @@ AscentPermitM2_Active  := AscentPermitM2_Raw  AND (NOT instWinchSync.SyncActive 
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 & M2) ===
 
 instWinchM1(
-    Enable                  := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
@@ -834,7 +832,7 @@ instWinchM1(
 );
 
 instWinchM2(
-    Enable                  := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
@@ -875,7 +873,7 @@ instWinchM2(
 {region "§7 Publication demandes brutes"}
 // === 📤 §7 PUBLICATION DEMANDES BRUTES (WinchM1/M2FinalInterlockRequest) ===
 
-WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
+WinchM1FinalInterlockRequest.Enable := TRUE;
 WinchM1FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
@@ -894,7 +892,7 @@ WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
 
-WinchM2FinalInterlockRequest.Enable := StubMachineEnableN1;
+WinchM2FinalInterlockRequest.Enable := TRUE;
 WinchM2FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;

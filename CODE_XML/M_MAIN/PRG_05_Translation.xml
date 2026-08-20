@@ -1936,8 +1936,9 @@ Data.TranslationSafety                := TranslationSafety;
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
-    Error := FALSE;
-    ErrorId := 16#0000;
+    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
+    Error := (ErrorId &lt;&gt; 16#0000);
     SafeStop := FALSE;
     PowerCutOff := FALSE;
     ErrorOperatorComm := FALSE;
