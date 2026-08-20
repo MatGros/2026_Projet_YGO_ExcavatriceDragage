@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:16:20.611377" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:16:20.611377">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T23:24:44.588763" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T23:24:44.588763">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -102,6 +102,17 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
 pas une vitesse continue.
 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="7.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableKoboldAutoStopDescent">

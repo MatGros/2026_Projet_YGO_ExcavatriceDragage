@@ -17,6 +17,7 @@ STRUCT
     // : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
     // pas une vitesse continue.
     WinchSlowdownMaxStep        : INT := 1;     (* : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)
+    CfgCableLimitAscent_M       : REAL := 7.5;  (* 📐 Limite haute d'exploitation NORMALE (m), commun M1/M2 *)
     TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
     // Coupe-circuit d'urgence pour le séquencement auto benne.
     // Défaut FALSE = mouvement M1/M2 synchro jamais

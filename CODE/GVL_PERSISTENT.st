@@ -43,8 +43,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         CfgRampAccelRate := 10.0,
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
-        CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 7.5 // Limite logicielle de montée (m)
+        CfgCableLimitDescent_M := -20.0
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M1)
     _WinchM2CfgPersist : ST_WinchCfg := (
         CfgTopSensorPos_M := 8.5, // Capteur physique réel à 8.5m
@@ -52,8 +51,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         CfgRampAccelRate := 10.0,
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
-        CfgCableLimitDescent_M := -20.0,
-        CfgCableLimitAscent_M := 7.5 // Limite logicielle de montée (m)
+        CfgCableLimitDescent_M := -20.0
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
@@ -133,7 +131,8 @@ VAR_GLOBAL PERSISTENT RETAIN
         WinchMaxStepDescente := 3,
         WinchMaxStepAscent := 5,
         WinchSlowdownDistance_M := 1.0,
-        WinchSlowdownMaxStep := 1
+        WinchSlowdownMaxStep := 1,
+        CfgCableLimitAscent_M := 7.5
     ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
 
     // 🚦 SYSTÈME / IHM

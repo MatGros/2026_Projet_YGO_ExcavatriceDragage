@@ -251,11 +251,11 @@ Questions ouvertes à instruire, avec preuve de code à l'appui :
 
 ## 5. Procédure terrain
 
-**Cotes réelles (RETAIN, MES-009)** — ⚠️ différentes du défaut déclaré :
-| Paramètre | Défaut déclaré | Réel (RETAIN) |
+**Cotes réelles (RETAIN)** — ⚠️ **re-référencées 2026-08-21** (défaut code rétabli) :
+| Paramètre | Défaut | Valeur |
 |---|---|---|
-| `CfgTopSensorPos_M` | 8.5 m | **8.0 m** |
-| `CfgCableLimitAscent_M` | 8.0 m | **7.5 m** |
+| `CfgTopSensorPos_M` | 8.5 m | **8.5 m** |
+| `CfgCableLimitAscent_M` | 7.5 m | **7.5 m** |
 
 **Nominal** :
 1. **Confirmation visuelle benne ouverte** (opérateur, avant tout mouvement) — tant que M1/M2 ne

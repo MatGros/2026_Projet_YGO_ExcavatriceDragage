@@ -11,7 +11,6 @@ STRUCT
     CfgRampDecelNormalRate  : REAL := 150.0;    (* 📉 Rampe de décélération normale (%/s) *)
     CfgRampDecelFastRate    : REAL := 400.0;    (* ⚡ Rampe de décélération rapide / SafeStop (%/s) *)
     CfgCableLimitDescent_M  : REAL := -20.0;    (* 📐 Limite basse physique de descente (m, négatif) *)
-    CfgCableLimitAscent_M   : REAL := 7.5;      (* 📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT *)
 
     (* 🚦 Flag restauration boot — défaut FALSE non ambigu *)
     Initialized              : BOOL := FALSE;    (* 🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot *)
