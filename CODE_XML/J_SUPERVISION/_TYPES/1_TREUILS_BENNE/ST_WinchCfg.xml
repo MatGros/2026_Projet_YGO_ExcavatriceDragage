@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T23:16:25.654787" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T23:16:25.654787">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T23:24:51.132261" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T23:24:51.132261">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -90,17 +90,6 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgCableLimitAscent_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="7.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

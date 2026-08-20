@@ -92,17 +92,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgCableLimitAscent_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="7.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT</xhtml>
-              </documentation>
-            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />

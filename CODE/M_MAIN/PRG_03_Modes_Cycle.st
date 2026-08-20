@@ -77,7 +77,7 @@ instCycleSemiAuto(
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M2_Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
-    CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
+    CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,

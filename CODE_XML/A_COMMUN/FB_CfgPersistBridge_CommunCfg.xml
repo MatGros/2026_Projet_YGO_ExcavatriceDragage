@@ -104,6 +104,17 @@ pas une vitesse continue.
 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgCableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="7.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
               <type>
                 <BOOL />

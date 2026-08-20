@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:09:08.931614" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:09:08.931614">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T23:26:29.113982" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T23:26:29.113982">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -637,7 +637,7 @@ instCycleSemiAuto(
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M2_Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
-    CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
+    CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,

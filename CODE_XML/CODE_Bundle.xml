@@ -4010,6 +4010,17 @@ pas une vitesse continue.
 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgCableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="7.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
               <type>
                 <BOOL />
@@ -4093,14 +4104,6 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite légale de profondeur de dragage atteinte (globale)</xhtml>
               </documentation>
             </variable>
-            <variable name="Cfg">
-              <type>
-                <derived name="ST_CommunCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configuration des paramètres communs machine</xhtml>
-              </documentation>
-            </variable>
             <variable name="HydraulicThermalFault">
               <type>
                 <BOOL />
@@ -4109,22 +4112,13 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
-            <variable name="Bypass">
-              <type>
-                <derived name="ST_BypassCommun" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-: granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
-              </documentation>
-            </variable>
             <variable name="SimTopSensorBypassActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur
-🩺 Capteur haut ignore car simulation active</xhtml>
+🩺 Capteur haut ignoré car simulation active</xhtml>
               </documentation>
             </variable>
             <variable name="SimSlackCableBypassActive">
@@ -4132,7 +4126,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Mou de cable ignore car simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Mou de câble ignoré car simulation active</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
@@ -4140,7 +4134,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 PLC→IHM : source Winch a bascule (reel/simu) ce cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 PLC→IHM : source Winch a basculé (réel/simu) ce cycle</xhtml>
               </documentation>
             </variable>
             <variable name="TglHeartbeatIhm">
@@ -4253,6 +4247,23 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)</xhtml>
               </documentation>
             </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_CommunCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Configuration des paramètres communs machine (au-dessus des bypass)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Bypass">
+              <type>
+                <derived name="ST_BypassCommun" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
+: granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -4271,6 +4282,8 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    commun M1+M2), BrakeThermalFault (retour unique, commun M1+M2+M3).
    ⚠️ Ne pas y mettre HmiInitDone (indicateur interne de séquencement boot, pas une
    information machine destinée à l'opérateur) — reste seul dans GVL_IHM.
+   🧭 Structuration homogène : états → Cfg → Bypass (Cfg au-dessus de Bypass,
+   Bypass en bas), cohérent avec ST_WinchHMI / ST_SyncHMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -9405,17 +9418,6 @@ Seuils de changement de palier (0..100%)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgCableLimitAscent_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="7.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -31442,7 +31444,7 @@ instCycleSemiAuto(
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M2_Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
-    CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
+    CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,
@@ -32523,7 +32525,7 @@ DescendPermitM2_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouche
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
                       (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
-                      - _WinchM2CfgPersist.CfgCableLimitAscent_M);
+                      - _CommunCfgPersist.CfgCableLimitAscent_M);
 
 // FB_Safety_Winch M1/M2.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
@@ -32552,7 +32554,7 @@ instSafetyWinchM1(
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
     Homed                  := PRG_02_Acquisition.instHomingM1.Homed,
     HomingSuspect          := PRG_02_Acquisition.instHomingM1.HomingSuspect,
-    TopLimitM              := _WinchM1CfgPersist.CfgCableLimitAscent_M,
+    TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
@@ -32608,7 +32610,7 @@ instSafetyWinchM2(
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
     Homed                  := PRG_02_Acquisition.instHomingM2.Homed,
     HomingSuspect          := PRG_02_Acquisition.instHomingM2.HomingSuspect,
-    TopLimitM              := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+    TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
@@ -32694,7 +32696,7 @@ instWinchM1(
     Homed                   := PRG_02_Acquisition.instHomingM1.Homed,
     HomingSuspect           := PRG_02_Acquisition.instHomingM1.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.CablePosM1,
-    TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
+    TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
     CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
@@ -32730,7 +32732,7 @@ instWinchM2(
     Homed                   := PRG_02_Acquisition.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Acquisition.instHomingM2.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.CablePosM2,
-    TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+    TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
     CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,

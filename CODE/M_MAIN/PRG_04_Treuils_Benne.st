@@ -653,7 +653,7 @@ DescendPermitM2_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouche
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
                       (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
-                      - _WinchM2CfgPersist.CfgCableLimitAscent_M);
+                      - _CommunCfgPersist.CfgCableLimitAscent_M);
 
 // FB_Safety_Winch M1/M2.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
@@ -682,7 +682,7 @@ instSafetyWinchM1(
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
     Homed                  := PRG_02_Acquisition.instHomingM1.Homed,
     HomingSuspect          := PRG_02_Acquisition.instHomingM1.HomingSuspect,
-    TopLimitM              := _WinchM1CfgPersist.CfgCableLimitAscent_M,
+    TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
@@ -738,7 +738,7 @@ instSafetyWinchM2(
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
     Homed                  := PRG_02_Acquisition.instHomingM2.Homed,
     HomingSuspect          := PRG_02_Acquisition.instHomingM2.HomingSuspect,
-    TopLimitM              := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+    TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
@@ -824,7 +824,7 @@ instWinchM1(
     Homed                   := PRG_02_Acquisition.instHomingM1.Homed,
     HomingSuspect           := PRG_02_Acquisition.instHomingM1.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.CablePosM1,
-    TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
+    TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
     CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
@@ -860,7 +860,7 @@ instWinchM2(
     Homed                   := PRG_02_Acquisition.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Acquisition.instHomingM2.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.CablePosM2,
-    TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+    TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
     CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,

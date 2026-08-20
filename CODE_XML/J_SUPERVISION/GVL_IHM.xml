@@ -58,14 +58,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite légale de profondeur de dragage atteinte (globale)</xhtml>
               </documentation>
             </variable>
-            <variable name="Cfg">
-              <type>
-                <derived name="ST_CommunCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configuration des paramètres communs machine</xhtml>
-              </documentation>
-            </variable>
             <variable name="HydraulicThermalFault">
               <type>
                 <BOOL />
@@ -74,22 +66,13 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
-            <variable name="Bypass">
-              <type>
-                <derived name="ST_BypassCommun" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-: granulaire, applique le bypass aux 2 treuils simultanement (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
-              </documentation>
-            </variable>
             <variable name="SimTopSensorBypassActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur
-🩺 Capteur haut ignore car simulation active</xhtml>
+🩺 Capteur haut ignoré car simulation active</xhtml>
               </documentation>
             </variable>
             <variable name="SimSlackCableBypassActive">
@@ -97,7 +80,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Mou de cable ignore car simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Mou de câble ignoré car simulation active</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
@@ -105,7 +88,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 PLC→IHM : source Winch a bascule (reel/simu) ce cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 PLC→IHM : source Winch a basculé (réel/simu) ce cycle</xhtml>
               </documentation>
             </variable>
             <variable name="TglHeartbeatIhm">
@@ -218,6 +201,23 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)</xhtml>
               </documentation>
             </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_CommunCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Configuration des paramètres communs machine (au-dessus des bypass)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Bypass">
+              <type>
+                <derived name="ST_BypassCommun" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
+: granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -236,6 +236,8 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    commun M1+M2), BrakeThermalFault (retour unique, commun M1+M2+M3).
    ⚠️ Ne pas y mettre HmiInitDone (indicateur interne de séquencement boot, pas une
    information machine destinée à l'opérateur) — reste seul dans GVL_IHM.
+   🧭 Structuration homogène : états → Cfg → Bypass (Cfg au-dessus de Bypass,
+   Bypass en bas), cohérent avec ST_WinchHMI / ST_SyncHMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -961,6 +963,17 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
 pas une vitesse continue.
 : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="7.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
@@ -3812,17 +3825,6 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgCableLimitAscent_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="7.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
