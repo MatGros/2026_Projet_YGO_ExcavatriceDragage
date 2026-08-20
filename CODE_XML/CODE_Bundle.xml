@@ -3308,6 +3308,71 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: 0 = M1 ET M2 ≥ hauteur mini (ou bypass) | 1 = Translation bloquée (risque collision)</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx309_ErrorOperatorComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défauts safety déchiffrés (bits ErrorId) — visibles individuellement à l'IHM
+bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx310_ErrorDriveComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit1 Perte communication EtherCAT variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx311_ErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit2 Mauvaise rotation de phases</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx312_ErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit3 Surchauffe thermique frein commun</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx313_ErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit4 Absence confirmation arrêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx314_ErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit5 Mouvement non commandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx315_ErrorLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit6 Limite extrême atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx316_ErrorSensorIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit7 Mot capteurs position incohérent</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -3715,12 +3780,93 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx310_MecaFaultMask">
+            <variable name="Idx310_ErrorOperatorComm">
               <type>
-                <WORD />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Pas de Défaut | &gt;0 = Bitfield Défauts Méca A-E</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défauts safety déchiffrés (bits ErrorId) — visibles individuellement à l'IHM
+bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx311_ErrorEncoder">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit1 Perte codeur de ce treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx312_ErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit4 Mauvaise rotation de phases</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx313_ErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit7 Mouvement non commandé / roue libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx314_ErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit8 Absence confirmation arrêt sans commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx315_ErrorMecaC">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit9 Glissement M1 pendant cycle benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx316_ErrorMecaD">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit11 Non-arrêt sur capteur haut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx317_ErrorMecaE">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit12/13 Écart synchro critique M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx318_ErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit10 Surchauffe thermique frein commun</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx319_ErrorOppositeDir">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit14 Sens réel opposé au sens commandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx320_ErrorNoMovement">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">bit15 Absence de mouvement malgré commande</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -21340,8 +21486,9 @@ Diag.LockoutActive        := LockoutActive;
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
-    Error := FALSE;
-    ErrorId := 16#0000;
+    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
+    Error := (ErrorId &lt;&gt; 16#0000);
     SafeStop := FALSE;
     PowerCutOff := FALSE;
     ErrorOperatorComm := FALSE;
@@ -22353,8 +22500,9 @@ IF NOT Enable THEN
     AscentPermit := FALSE;  // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
-    Error := FALSE;
-    ErrorId := 16#0000;
+    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessus).
+    Error := (ErrorId &lt;&gt; 16#0000);
     // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
@@ -27316,7 +27464,17 @@ GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx306_AscentPermitEffective := 
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx307_SlackCablePhysical_DI := FALSE; // TBD non câblé - voir fiche §6 (capteur mou de câble présent uniquement côté M2 dans ST_HwWinch)
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx309_DescendPermitEffective := WinchM1.Safety.DescendPermit;
-GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx310_MecaFaultMask := WinchM1.Safety.ErrorId;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx310_ErrorOperatorComm := WinchM1.Safety.ErrorOperatorComm;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx311_ErrorEncoder      := WinchM1.Safety.ErrorEncoder;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx312_ErrorPhaseRotation:= WinchM1.Safety.ErrorPhaseRotation;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx313_ErrorMecaA        := WinchM1.Safety.ErrorMecaA;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx314_ErrorMecaB        := WinchM1.Safety.ErrorMecaB;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx315_ErrorMecaC        := WinchM1.Safety.ErrorMecaC;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx316_ErrorMecaD        := WinchM1.Safety.ErrorMecaD;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx317_ErrorMecaE        := WinchM1.Safety.ErrorMecaE;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx318_ErrorBrakeThermal := WinchM1.Safety.ErrorBrakeThermal;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx319_ErrorOppositeDir  := WinchM1.Safety.ErrorOppositeDir;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx320_ErrorNoMovement   := WinchM1.Safety.ErrorNoMovement;
 
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx401_MotionAllowed := WinchM1.State.Ready;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated := WinchM1.State.StepNumber;
@@ -27367,7 +27525,17 @@ GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx306_AscentPermitEffective := 
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := HwIn.Winch.M2_TensionedCable_DI;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx309_DescendPermitEffective := WinchM2.Safety.DescendPermit;
-GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx310_MecaFaultMask := WinchM2.Safety.ErrorId;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx310_ErrorOperatorComm := WinchM2.Safety.ErrorOperatorComm;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx311_ErrorEncoder      := WinchM2.Safety.ErrorEncoder;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx312_ErrorPhaseRotation:= WinchM2.Safety.ErrorPhaseRotation;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx313_ErrorMecaA        := WinchM2.Safety.ErrorMecaA;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx314_ErrorMecaB        := WinchM2.Safety.ErrorMecaB;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx315_ErrorMecaC        := WinchM2.Safety.ErrorMecaC;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx316_ErrorMecaD        := WinchM2.Safety.ErrorMecaD;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx317_ErrorMecaE        := WinchM2.Safety.ErrorMecaE;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx318_ErrorBrakeThermal := WinchM2.Safety.ErrorBrakeThermal;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx319_ErrorOppositeDir  := WinchM2.Safety.ErrorOppositeDir;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx320_ErrorNoMovement   := WinchM2.Safety.ErrorNoMovement;
 
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx401_MotionAllowed := WinchM2.State.Ready;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated := WinchM2.State.StepNumber;
@@ -27492,6 +27660,14 @@ GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx305_LimitSwitchRevActive := 
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch := Translation.Bypass.LimitSwitch;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent := Translation.State.SensorWordIncoherent;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx308_HeightInterlockBlocking := Translation.State.HeightInterlockBlocking;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx309_ErrorOperatorComm := Translation.Safety.ErrorOperatorComm;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx310_ErrorDriveComm    := Translation.Safety.ErrorDriveComm;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx311_ErrorPhaseRotation:= Translation.Safety.ErrorPhaseRotation;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx312_ErrorBrakeThermal := Translation.Safety.ErrorBrakeThermal;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx313_ErrorMecaB        := Translation.Safety.ErrorMecaB;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx314_ErrorMecaA        := Translation.Safety.ErrorMecaA;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Translation.Safety.ErrorLimitSwitch;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
 
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqRef_Hz;
@@ -31398,14 +31574,6 @@ Auth := instModes.Auth;
             </variable>
           </outputVars>
           <localVars>
-            <variable name="StubMachineEnableN1">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-            </variable>
             <variable name="instWinchSync">
               <type>
                 <derived name="FB_WinchSync" />
@@ -32447,7 +32615,7 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
 instSafetyWinchM1(
-    Enable                 := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
@@ -32503,7 +32671,7 @@ instSafetyWinchM1(
 );
 
 instSafetyWinchM2(
-    Enable                 := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
@@ -32589,7 +32757,7 @@ AscentPermitM2_Active  := AscentPermitM2_Raw  AND (NOT instWinchSync.SyncActive 
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) ===
 
 instWinchM1(
-    Enable                  := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
@@ -32620,7 +32788,7 @@ instWinchM1(
 );
 
 instWinchM2(
-    Enable                  := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
@@ -32661,7 +32829,7 @@ instWinchM2(
 {region "§7 Publication demandes brutes"}
 // === 📤 §7 PUBLICATION DEMANDES BRUTES (WinchM1/M2FinalInterlockRequest) ===
 
-WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
+WinchM1FinalInterlockRequest.Enable := TRUE;
 WinchM1FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
@@ -32680,7 +32848,7 @@ WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
 
-WinchM2FinalInterlockRequest.Enable := StubMachineEnableN1;
+WinchM2FinalInterlockRequest.Enable := TRUE;
 WinchM2FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;

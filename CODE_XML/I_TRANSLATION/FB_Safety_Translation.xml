@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:22:56.007846" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:22:56.007846">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T19:19:37.416758" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T19:19:37.416758">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -674,8 +674,9 @@
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
-    Error := FALSE;
-    ErrorId := 16#0000;
+    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
+    Error := (ErrorId &lt;&gt; 16#0000);
     SafeStop := FALSE;
     PowerCutOff := FALSE;
     ErrorOperatorComm := FALSE;

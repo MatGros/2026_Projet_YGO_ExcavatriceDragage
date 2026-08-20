@@ -131,8 +131,9 @@ IF NOT Enable THEN
     AscentPermit := FALSE;  // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
-    Error := FALSE;
-    ErrorId := 16#0000;
+    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessus).
+    Error := (ErrorId <> 16#0000);
     // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);

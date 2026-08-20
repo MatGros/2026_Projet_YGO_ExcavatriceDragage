@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T18:05:35.891695" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T18:05:35.891695">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T19:18:31.627163" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T19:18:31.627163">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2083,14 +2083,6 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="StubMachineEnableN1">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-            </variable>
             <variable name="instWinchSync">
               <type>
                 <derived name="FB_WinchSync" />
@@ -3132,7 +3124,7 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
 instSafetyWinchM1(
-    Enable                 := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
@@ -3188,7 +3180,7 @@ instSafetyWinchM1(
 );
 
 instSafetyWinchM2(
-    Enable                 := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                 := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
@@ -3274,7 +3266,7 @@ AscentPermitM2_Active  := AscentPermitM2_Raw  AND (NOT instWinchSync.SyncActive 
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 &amp; M2) ===
 
 instWinchM1(
-    Enable                  := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
+    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
@@ -3305,7 +3297,7 @@ instWinchM1(
 );
 
 instWinchM2(
-    Enable                  := StubMachineEnableN1 AND (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
+    Enable                  := (PRG_03_Modes_Cycle.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
@@ -3346,7 +3338,7 @@ instWinchM2(
 {region "§7 Publication demandes brutes"}
 // === 📤 §7 PUBLICATION DEMANDES BRUTES (WinchM1/M2FinalInterlockRequest) ===
 
-WinchM1FinalInterlockRequest.Enable := StubMachineEnableN1;
+WinchM1FinalInterlockRequest.Enable := TRUE;
 WinchM1FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
@@ -3365,7 +3357,7 @@ WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
 
-WinchM2FinalInterlockRequest.Enable := StubMachineEnableN1;
+WinchM2FinalInterlockRequest.Enable := TRUE;
 WinchM2FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM2FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM2FinalInterlockRequest.SafeStop := SafeStopM2_Active;
@@ -6189,8 +6181,9 @@ IF NOT Enable THEN
     AscentPermit := FALSE;  // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     PowerCutOff := FALSE;
     State := E_State.DISABLED;
-    Error := FALSE;
-    ErrorId := 16#0000;
+    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessus).
+    Error := (ErrorId &lt;&gt; 16#0000);
     // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
