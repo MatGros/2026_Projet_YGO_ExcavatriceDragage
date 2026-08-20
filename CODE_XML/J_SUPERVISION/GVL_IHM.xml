@@ -1453,7 +1453,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance plongée mémorisé</xhtml>
@@ -1464,7 +1464,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance extraction mémorisé</xhtml>
@@ -1475,7 +1475,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance vidage trémie mémorisé</xhtml>
@@ -1514,7 +1514,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée active</xhtml>
@@ -1525,7 +1525,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction active</xhtml>
@@ -1563,7 +1563,7 @@ seule source de confirmation).</xhtml>
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: mode vidage à la trémie —</xhtml>

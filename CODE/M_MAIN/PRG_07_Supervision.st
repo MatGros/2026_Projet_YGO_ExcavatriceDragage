@@ -35,6 +35,22 @@ VAR
     instPreflight        : FB_Acquisition_Preflight;
     instHmiBannerFormatter : FB_Hmi_BannerFormatter;
     instTroubleshootingView : FB_TroubleshootingView;
+
+    // === 🚦 MÉMOIRE SYNC BYPASS BIDIRECTIONNEL (RETAIN ↔ IHM) ===
+    PrevTranslationBypass   : BOOL; // . [LOC] Memoire bypass Translation (sync bidirectionnel)
+    PrevM1Bypass            : BOOL; // . [LOC] Memoire bypass M1 (sync bidirectionnel)
+    PrevM2Bypass            : BOOL; // . [LOC] Memoire bypass M2 (sync bidirectionnel)
+    PrevSyncBypass          : BOOL; // . [LOC] Memoire bypass synchro (sync bidirectionnel)
+    PrevCommunBypass        : BOOL; // . [LOC] Memoire bypass commun global (sync bidirectionnel)
+    PrevLimitLegal          : BOOL; // . [LOC] Memoire bypass limite legale (sync bidirectionnel)
+    PrevTopLimitSwitch      : BOOL; // . [LOC] Memoire bypass fin de course haut (sync bidirectionnel)
+    PrevTopLimitSoftware    : BOOL; // . [LOC] Memoire bypass fin de course haut logiciel (sync bidirectionnel)
+    PrevCableLimitSwitch    : BOOL; // . [LOC] Memoire bypass limite cable (sync bidirectionnel)
+    PrevSlackCable          : BOOL; // . [LOC] Memoire bypass mou de cable (sync bidirectionnel)
+
+    // === 🧪 DÉTECTEURS FRONT SIMULATION BYPASS (pilotage bypass IHM) ===
+    SimBypassRise           : R_TRIG; // . [LOC] Front montant SimulationBypassActive
+    SimBypassFall           : F_TRIG; // . [LOC] Front descendant SimulationBypassActive
 END_VAR
 
 {region "§1 Horloge et reset machine"}
@@ -199,35 +215,92 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
     GVL_IHM.Commun.Bypass.Initialized := TRUE;
 END_IF;
 
-IF GVL_IHM.TranslationM3.Bypass.Global <> BypassTranslationGlobal THEN
+// 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
+IF GVL_IHM.TranslationM3.Bypass.Global <> PrevTranslationBypass THEN
     BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
+ELSE
+    GVL_IHM.TranslationM3.Bypass.Global := BypassTranslationGlobal;
 END_IF;
-IF GVL_IHM.M1TreuilRetenue.Bypass.Global <> BypassWinchM1Global THEN
+PrevTranslationBypass := GVL_IHM.TranslationM3.Bypass.Global;
+
+IF GVL_IHM.M1TreuilRetenue.Bypass.Global <> PrevM1Bypass THEN
     BypassWinchM1Global := GVL_IHM.M1TreuilRetenue.Bypass.Global;
+ELSE
+    GVL_IHM.M1TreuilRetenue.Bypass.Global := BypassWinchM1Global;
 END_IF;
-IF GVL_IHM.M2TreuilBenne.Bypass.Global <> BypassWinchM2Global THEN
+PrevM1Bypass := GVL_IHM.M1TreuilRetenue.Bypass.Global;
+
+IF GVL_IHM.M2TreuilBenne.Bypass.Global <> PrevM2Bypass THEN
     BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
+ELSE
+    GVL_IHM.M2TreuilBenne.Bypass.Global := BypassWinchM2Global;
 END_IF;
-IF GVL_IHM.M1M2Sync.Bypass.Global <> BypassSyncGlobal THEN
+PrevM2Bypass := GVL_IHM.M2TreuilBenne.Bypass.Global;
+
+IF GVL_IHM.M1M2Sync.Bypass.Global <> PrevSyncBypass THEN
     BypassSyncGlobal := GVL_IHM.M1M2Sync.Bypass.Global;
+ELSE
+    GVL_IHM.M1M2Sync.Bypass.Global := BypassSyncGlobal;
 END_IF;
-IF GVL_IHM.Commun.Bypass.Global <> BypassCommunGlobal THEN
+PrevSyncBypass := GVL_IHM.M1M2Sync.Bypass.Global;
+
+IF GVL_IHM.Commun.Bypass.Global <> PrevCommunBypass THEN
     BypassCommunGlobal := GVL_IHM.Commun.Bypass.Global;
+ELSE
+    GVL_IHM.Commun.Bypass.Global := BypassCommunGlobal;
 END_IF;
-IF GVL_IHM.Commun.Bypass.LimitLegal <> BypassLimitLegal THEN
+PrevCommunBypass := GVL_IHM.Commun.Bypass.Global;
+
+IF GVL_IHM.Commun.Bypass.LimitLegal <> PrevLimitLegal THEN
     BypassLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
+ELSE
+    GVL_IHM.Commun.Bypass.LimitLegal := BypassLimitLegal;
 END_IF;
-IF GVL_IHM.Commun.Bypass.TopLimitSwitch <> BypassTopLimitSwitch THEN
+PrevLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
+
+IF GVL_IHM.Commun.Bypass.TopLimitSwitch <> PrevTopLimitSwitch THEN
     BypassTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
+ELSE
+    GVL_IHM.Commun.Bypass.TopLimitSwitch := BypassTopLimitSwitch;
 END_IF;
-IF GVL_IHM.Commun.Bypass.TopLimitSoftware <> BypassTopLimitSoftware THEN
+PrevTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
+
+IF GVL_IHM.Commun.Bypass.TopLimitSoftware <> PrevTopLimitSoftware THEN
     BypassTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
+ELSE
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := BypassTopLimitSoftware;
 END_IF;
-IF GVL_IHM.Commun.Bypass.CableLimitSwitch <> BypassCableLimitSwitch THEN
+PrevTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
+
+IF GVL_IHM.Commun.Bypass.CableLimitSwitch <> PrevCableLimitSwitch THEN
     BypassCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
+ELSE
+    GVL_IHM.Commun.Bypass.CableLimitSwitch := BypassCableLimitSwitch;
 END_IF;
-IF GVL_IHM.Commun.Bypass.SlackCable <> BypassSlackCable THEN
+PrevCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
+
+IF GVL_IHM.Commun.Bypass.SlackCable <> PrevSlackCable THEN
     BypassSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+ELSE
+    GVL_IHM.Commun.Bypass.SlackCable := BypassSlackCable;
+END_IF;
+PrevSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+
+// 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
+// La simulation emprunte le chemin IHM : SimulationBypassActive set/reset les bypass IHM
+// (TopLimitSwitch / TopLimitSoftware / LimitLegal) au lieu d'un OR direct dans le code.
+SimBypassRise(CLK := GVL_Simulation.SimulationBypassActive);
+SimBypassFall(CLK := GVL_Simulation.SimulationBypassActive);
+
+IF SimBypassRise.Q THEN
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
+    GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
+END_IF;
+IF SimBypassFall.Q THEN
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
+    GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
 END_IF;
 
 {endregion}

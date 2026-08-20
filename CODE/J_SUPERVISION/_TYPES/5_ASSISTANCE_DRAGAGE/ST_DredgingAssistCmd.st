@@ -3,8 +3,8 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_DredgingAssistCmd :
 STRUCT
-    TglEnableDiveSearch         : BOOL := TRUE;  (* Assistance plongée active *)
-    TglEnableExtractionSequence : BOOL := TRUE;  (* Assistance extraction active *)
+    TglEnableDiveSearch         : BOOL := FALSE; (* Assistance plongée active *)
+    TglEnableExtractionSequence : BOOL := FALSE; (* Assistance extraction active *)
     TglBucketAtBottomConfirmed  : BOOL := FALSE; (* Attestation manuelle temporaire du fond *)
     // Bypass simplifié de la séquence FB_DiveSearch complète (préconditions
     // strictes -- benne ouverte, DiveStartMin_M, fenêtre immersion). Si TRUE, un front MONTANT
@@ -13,7 +13,7 @@ STRUCT
     // KoboldMeasureEnable). Défaut FALSE : comportement identique à avant (séquence complète
     // seule source de confirmation).
     TglBypassDiveSearchSequence : BOOL := FALSE;
-    TglEnableDumpAtTremie       : BOOL := TRUE;  (* : mode vidage à la trémie —
+    TglEnableDumpAtTremie       : BOOL := FALSE; (* : mode vidage à la trémie —
                                                      verrouille descente treuils (P1/Maintenance
                                                      uniquement) + translation M3 (proche du haut
                                                      uniquement) ; TRUE par défaut —
