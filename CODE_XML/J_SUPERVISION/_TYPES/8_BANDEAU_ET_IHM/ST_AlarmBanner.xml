@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T19:57:46.644397" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T19:57:46.644397">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T19:52:49.150270" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T19:52:49.150270">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,66 +23,6 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_HmiBanner">
-        <baseType>
-          <struct>
-            <variable name="GlobalContextText">
-              <type>
-                <string length="80" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Macro : [RÉEL/SIMU] [MODE] [COUPLAGE]</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SequenceProgressText">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">2. Micro : Cycle Maître &gt; Sous-cycle / Étape active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpecialConditionText">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">3. Dérogations : Bypass, bridages, butées inactives</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorActionText">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AlarmBanner">
-              <type>
-                <derived name="ST_AlarmBanner" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Défauts actifs en carrousel (index n/N)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b1f57cf5-2e15-510f-acf6-8dd4b570c447</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
-   ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
-   🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
-      IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_AlarmBanner">
         <baseType>
           <struct>
@@ -147,7 +87,6 @@
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Folder Name="8_BANDEAU_ET_IHM">
-              <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
               <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
             </Folder>
           </Folder>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T16:57:55.288968" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T16:57:55.288968">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T20:14:58.544637" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T20:14:58.544637">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -360,6 +360,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
               </documentation>
             </variable>
+            <variable name="AlarmBanner">
+              <type>
+                <derived name="ST_AlarmBanner" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Défauts actifs en carrousel (index n/N)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -371,9 +379,450 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
    🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
       IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SafetyTranslation">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bloc sécurité (Safety) en défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorOperatorComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorDriveComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Perte communication EtherCAT variateur (bit1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Mauvaise rotation de phases électriques (bit2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Surchauffe thermique frein commun (bit3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Absence confirmation arrêt (Méca B - bit4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Mouvement non commandé (Méca A - bit5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Limite extrême Translation atteinte (bit6)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorSensorIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Mot capteurs M3 incohérent (bit7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Décélération de sécurité demandée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockedBySafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚫 Synthèse globale : translation bloquée par la sécurité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Synthèse sécurités critiques entraînant une coupure puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d56fcc6a-fbab-543a-8ea6-51fdbe24ae09</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ ST_SafetyTranslation — Diagnostics de sécurité pour la Translation M3
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à l'affichage des défauts de sécurité du translation.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SafetyWinch">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Bloc sécurité (Safety) en défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 Arrêt rapide activé par la sécurité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Descente autorisée (TRUE = OK | FALSE = mou de câble / limite basse)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Montée autorisée (TRUE = OK | FALSE = fin de course haut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlackCable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Mou de câble physiquement détecté</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ThermalFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔥 Surchauffe thermique moteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Perte de liaison ou incohérence codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass codeur effectivement accepté, uniquement MAINT_N2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitDescent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Longueur max de câble atteinte (limite basse physique)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Limite haute d'exploitation normale atteinte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MecaADrift_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Dérive mesurée Méca A (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MecaCDrift_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Dérive mesurée Méca C (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MecaBElapsedTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Temps écoulé confirmation contacteurs/frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont activée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockedBySafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚫 Synthèse globale : actionneur bloqué par la sécurité (PowerCutOff OU SafeStop/Error)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Synthèse sécurités critiques entraînant une coupure puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorOperatorComm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔍 Décomposition individuelle des défauts de sécurité (bits ErrorId)
+🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorEncoder">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Perte de liaison ou incohérence codeur (bit1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorPhaseRotation">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Mauvaise rotation de phases électriques (bit4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorBrakeThermal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Surchauffe thermique frein commun M1/M2/M3 (bit10)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Mouvement non commandé / roue libre (Méca A - bit7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Absence confirmation arrêt sans commande (Méca B - bit8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaC">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏋️ Glissement M1 pendant cycle benne (Méca C - bit9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaD">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Non-arrêt sur capteur haut (Méca D - bit11)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorMecaE">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Écart de synchronisation critique M1/M2 (Méca E - bit12/13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorOppositeDir">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Sens réel opposé au sens commandé (bit14)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorNoMovement">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Absence de mouvement malgré commande (bit15)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3a43f912-4348-5c66-b0c2-9405e5e3ae59</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ ST_SafetyWinch — Diagnostics de sécurité pour un treuil
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à l'affichage des défauts de sécurité d'un treuil.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_AlarmBanner">
+        <baseType>
+          <struct>
+            <variable name="HasAlarm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un defaut/warning actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Text">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte du message courant : [ORGANE] raison breve</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Index">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position courante (1-based, 0 si aucun defaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Count">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total de messages actifs</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>51a442bb-120a-5a1f-856e-eba247651394</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚨 ST_AlarmBanner — Bandeau d'alarme defilant (carrousel n/N)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : liste les defauts/warnings actifs de toute la machine,
+      affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md S4bis
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -684,6 +1133,82 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle auto actif</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchM1Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Bandeau d'alarme défilant (§5) — diagnostics safety et ErrorId machine entière
+--&gt; [SAFE] Diagnostic sécurité treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Diagnostic sécurité treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationSafety">
+              <type>
+                <derived name="ST_SafetyTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Diagnostic sécurité translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut benne (FB_Bucket.ErrorId)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut synchro M1/M2 (FB_WinchSync.ErrorId)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut plongée (FB_DiveSearch.ErrorId)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut extraction (FB_ExtractionSequence.ErrorId)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut chaîne AU (FB_Safety_EmergencyManagement.Diag.ErrorId)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Durée d'affichage par message du carrousel</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Banner">
@@ -792,6 +1317,43 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] §4 Action opérateur (critique → direct, warning → maintenu)</xhtml>
               </documentation>
             </variable>
+            <variable name="TonAlarmBanner">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Tempo de maintien par message du carrousel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmArray">
+              <type>
+                <array>
+                  <dimension lower="0" upper="31" />
+                  <baseType>
+                    <string length="120" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Messages actifs collectés ce scan</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmCount">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Nombre de messages actifs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmIndex">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Index courant du carrousel (0-based)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BannerHoldTime">
               <type>
                 <TIME />
@@ -803,14 +1365,26 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-clignotement warnings/états (AF-07 §4.3)</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_NbMaxAlarmes">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="32" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Taille du carrousel d'alarmes (AF-07 §4bis)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧠 FB_Hmi_BannerFormatter — Formateur du bandeau d'information IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
-   🎯 Responsabilité : assemble les 4 textes du bandeau et expose
-      la cause observable du blocage courant, sans piloter la machine.
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
+   🎯 Responsabilité : assemble les 4 textes du bandeau + le carrousel
+      d'alarmes, expose la cause observable du blocage courant, sans
+      piloter la machine.
    🛡️ Sécurité : priorité AU/puissance, SafeStop, puis interlocks métier.
       L'anti-clignotement est délégué à FB_AntiFlickerText (AF-07 §4.3).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -825,6 +1399,11 @@ IF NOT Enable THEN
     Banner.SequenceProgressText  := '';
     Banner.SpecialConditionText  := '';
     Banner.OperatorActionText    := '';
+    Banner.AlarmBanner.HasAlarm  := FALSE;
+    Banner.AlarmBanner.Text      := '';
+    Banner.AlarmBanner.Index     := 0;
+    Banner.AlarmBanner.Count     := 0;
+    TonAlarmBanner(IN := FALSE);
     RETURN;
 END_IF;
 
@@ -1055,6 +1634,248 @@ CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
 {endregion}
+
+{region "§5 Bandeau alarme"}
+// ═══════════════════════════════════════════════════════════════
+// 5. BANDEAU D'ALARME — carrousel des défauts actifs (index n/N)
+// Format (AF-07 §4bis) : [ORGANE] raison_brève. Un défaut à la fois,
+// rotation 1→2→…→N→1, maintien AlarmHoldTime par message.
+// 🧊 Distinct des 4 champs ci-dessus (AF-07 §4.2) : ce carrousel est
+//    le SEUL endroit du bandeau qui publie Error/ErrorId (alarmes).
+// ═══════════════════════════════════════════════════════════════
+AlarmCount := 0;
+
+// 5a. Collecte — treuil M1 (ST_SafetyWinch, bits ErrorId décodés)
+IF WinchM1Safety.ErrorOperatorComm AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] perte com operateur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorEncoder AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] perte codeur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ThermalFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] surchauffe moteur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.SlackCable AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] mou de cable'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorPhaseRotation AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] rotation phases'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.CableLimitDescent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] limite basse cable'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.CableLimitAscent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] butee haute'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] surchauffe frein'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorMecaA AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorMecaB AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorMecaC AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorMecaD AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorMecaE AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorOppositeDir AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] sens oppose'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.ErrorNoMovement AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] absence mouvement'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5b. Collecte — treuil M2 (mêmes bits que M1)
+IF WinchM2Safety.ErrorOperatorComm AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] perte com operateur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorEncoder AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] perte codeur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ThermalFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] surchauffe moteur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.SlackCable AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] mou de cable'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorPhaseRotation AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] rotation phases'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.CableLimitDescent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] limite basse cable'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.CableLimitAscent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] butee haute'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] surchauffe frein'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorMecaA AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorMecaB AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorMecaC AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorMecaD AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorMecaE AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorOppositeDir AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] sens oppose'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorNoMovement AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] absence mouvement'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5c. Collecte — translation M3 (ST_SafetyTranslation)
+IF TranslationSafety.ErrorOperatorComm AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] perte com operateur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorDriveComm AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] perte EtherCAT'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorPhaseRotation AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] rotation phases'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorBrakeThermal AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] surchauffe frein'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorMecaB AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorMecaA AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorLimitSwitch AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] butee extreme'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TranslationSafety.ErrorSensorIncoherent AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5d. Collecte — benne (FB_Bucket.ErrorId, bits vérifiés à la lecture du FB source :
+// diffèrent du brouillon initial du plan, corrigés ici bit à bit)
+IF ((BucketErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((BucketErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] incoherence etat'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((BucketErrorId AND 16#0004) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] limites depassees'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((BucketErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] codeurs non references'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((BucketErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] glissement M1'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)
+IF ((SyncErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[SYNC] ecart M1/M2'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((SyncErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[SYNC] incoherence commande'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionSequence)
+IF ((DiveErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[DIVE] preconditions'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((DiveErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[DIVE] sequence'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((DiveErrorId AND 16#0004) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[DIVE] config'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((ExtractionErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[EXTRACTION] fond'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((ExtractionErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[EXTRACTION] fermeture'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((ExtractionErrorId AND 16#0004) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[EXTRACTION] controle'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((ExtractionErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[EXTRACTION] config'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId, bit3
+// "Startup" absent du brouillon initial du plan, ajouté ici après lecture du FB source)
+IF ((EmergencyErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[AU] redondance contacteurs'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((EmergencyErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[AU] echec confirmation armement'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((EmergencyErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[AU] echec autotest demarrage'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId, dictionnaire absent du plan,
+// construit ici après lecture complète du FB source)
+IF ((CycleErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] defaut synchro treuils'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ecart codeurs remontee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] ecart vitesse confirme'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0020) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] perte communication IHM'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((CycleErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CYCLE] timeout etape'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5i. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
+IF AlarmCount = 0 THEN
+    AlarmIndex := 0;
+    Banner.AlarmBanner.HasAlarm := FALSE;
+    Banner.AlarmBanner.Text  := '';
+    Banner.AlarmBanner.Index := 0;
+    Banner.AlarmBanner.Count := 0;
+    TonAlarmBanner(IN := FALSE);
+ELSE
+    // Index reborné si le nombre de messages a diminué depuis le dernier scan.
+    IF AlarmIndex &gt;= AlarmCount THEN
+        AlarmIndex := 0;
+    END_IF;
+    Banner.AlarmBanner.HasAlarm := TRUE;
+    TonAlarmBanner(IN := TRUE, PT := AlarmHoldTime);
+    IF TonAlarmBanner.Q THEN
+        AlarmIndex := (AlarmIndex + 1) MOD AlarmCount;
+        TonAlarmBanner(IN := FALSE);
+    END_IF;
+    // Index n/N prefixe directement dans le texte (ex. '1/2 [M1] perte codeur'),
+    // en plus des champs Index/Count numeriques pour un usage IHM programmatique.
+    Banner.AlarmBanner.Text := CONCAT(INT_TO_STRING(AlarmIndex + 1),
+                                CONCAT('/',
+                                CONCAT(INT_TO_STRING(AlarmCount),
+                                CONCAT(' ', AlarmArray[AlarmIndex]))));
+    Banner.AlarmBanner.Index := AlarmIndex + 1;
+    Banner.AlarmBanner.Count := AlarmCount;
+END_IF;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -1119,7 +1940,7 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4.3
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4.3
    🎯 Responsabilité : maintient un texte warning/état un temps minimum
       avant de laisser le contenu changer, et laisse passer en direct
       (sans maintien) les messages critiques (défauts AU/puissance).
@@ -1170,6 +1991,13 @@ END_IF;
           <Folder Name="_TYPES">
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
+              <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
+            </Folder>
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
+            </Folder>
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
             </Folder>
           </Folder>
         </Folder>

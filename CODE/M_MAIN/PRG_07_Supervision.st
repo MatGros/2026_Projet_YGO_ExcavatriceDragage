@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Regroupe tout le mapping bidirectionnel GVL_IHM / GVL_PERSISTENT.
    ✅ Expose FaultMachineReset_IHM pour tous les programmes du domaine sécurité/métier.
-   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md
+   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_07_Supervision
@@ -474,7 +474,16 @@ instHmiBannerFormatter(
     CycleRequestDirection       := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction,
     DeadmanArmed                := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.instJoystick.AtNeutral,
-    CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy
+    CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy,
+    WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
+    WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
+    TranslationSafety           := GVL_IHM.TranslationM3.Safety,
+    BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
+    SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
+    DiveErrorId                 := GVL_IHM.DredgingAssist.State.DiveErrorId,
+    ExtractionErrorId           := GVL_IHM.DredgingAssist.State.ExtractionErrorId,
+    EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
+    AlarmHoldTime               := T#1s
 );
 GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 
