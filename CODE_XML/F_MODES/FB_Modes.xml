@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:49:30.411512" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:49:30.411512">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:01:22.694773" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:01:22.694773">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -74,70 +74,80 @@
           </data>
         </addData>
       </dataType>
-      <dataType name="E_State">
+      <dataType name="ST_FbStatus">
         <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="INIT" value="1" />
-              <value name="READY" value="2" />
-              <value name="BUSY" value="3" />
-              <value name="DONE" value="4" />
-              <value name="STOPPING" value="5" />
-            </values>
-          </enum>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bloc en cours d'exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut actif présent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
+              </documentation>
+            </variable>
+          </struct>
         </baseType>
         <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BUSY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>DONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STOPPING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
           </data>
         </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier (forme cible)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe exactement les six membres nécessaires au suivi
+      synoptique et diagnostic d'un FB standard (contrat §2quinquies).
+   🧬 Forme cible : les FB standard passent de la forme « à plat »
+      (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers
+      `Status : ST_FbStatus`, migré par lot dédié, gradué (pilote d'abord).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
       <dataType name="ST_Modes_Autorisations">
         <baseType>
@@ -216,6 +226,71 @@
    🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="E_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="INIT" value="1" />
+              <value name="READY" value="2" />
+              <value name="BUSY" value="3" />
+              <value name="DONE" value="4" />
+              <value name="STOPPING" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STOPPING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+          </data>
+        </addData>
       </dataType>
     </dataTypes>
     <pous>
@@ -324,52 +399,13 @@
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB en traitement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement termine</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut present</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0=Semi-Auto refuse)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat au moment du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Semi-Auto refusé (défaut codeur)".</xhtml>
               </documentation>
             </variable>
             <variable name="Auth">
@@ -446,15 +482,15 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.HomingApproachEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
     Auth.MaintenanceM3TargetEnable := FALSE;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
     PrevInhibitM1 := FALSE;
     PrevInhibitM2 := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 
 {endregion}
 
@@ -462,14 +498,14 @@ State := E_State.READY;
 // 2. RESET FRONT (bit0 = défaut codeur)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
 END_IF;
 
 // 3. GARDE-FOU — refus SEMI_AUTO si défaut codeur
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    ErrorId := ErrorId OR 16#0001;  // bit0 : défaut codeur
+    Status.ErrorId := Status.ErrorId OR 16#0001;  // bit0 : défaut codeur
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // 4. ARBITRAGE DU MODE
@@ -564,14 +600,14 @@ END_IF;
 
 {region "§4 Etats et defauts"}
 // 6. SORTIES ÉTAT
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-Busy := FALSE;
-Done := FALSE;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}
 </xhtml>
@@ -596,6 +632,7 @@ Done := FALSE;
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
+          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
         <Folder Name="J_SUPERVISION">

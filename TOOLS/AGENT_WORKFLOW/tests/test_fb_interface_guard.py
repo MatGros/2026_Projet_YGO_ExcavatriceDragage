@@ -54,12 +54,12 @@ class TestFbInterfaceGuard(unittest.TestCase):
         standard, _, _, _ = analyze_fb_files(REPO_ROOT)
         cible, heritee = split_standard_by_form(standard)
         self.assertEqual(
-            len(heritee), 15,
-            "Apres pilote FB_Translation : 15 FB standard encore en forme a plat",
+            len(heritee), 0,
+            "Cloture T137 : tous les FB standard sont migres en forme cible (plus de forme a plat)",
         )
         self.assertEqual(
-            len(cible), 1,
-            "Apres pilote FB_Translation : 1 FB standard migre en forme cible (Status : ST_FbStatus)",
+            len(cible), 16,
+            "Cloture T137 : les 16 FB standard sont en forme cible (Status : ST_FbStatus)",
         )
 
 
@@ -135,12 +135,12 @@ END_FUNCTION_BLOCK
         standard, _, _, _ = analyze_fb_files(REPO_ROOT)
         cible, heritee = split_standard_by_form(standard)
         self.assertEqual(
-            len(heritee), 15,
-            "Apres pilote FB_Translation : 15 FB standard encore en forme a plat",
+            len(heritee), 0,
+            "Cloture T137 : tous les FB standard sont migres en forme cible (plus de forme a plat)",
         )
         self.assertEqual(
-            len(cible), 1,
-            "Apres pilote FB_Translation : 1 FB standard migre en forme cible (Status : ST_FbStatus)",
+            len(cible), 16,
+            "Cloture T137 : les 16 FB standard sont en forme cible (Status : ST_FbStatus)",
         )
 
 

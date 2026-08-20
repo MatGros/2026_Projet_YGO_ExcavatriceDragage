@@ -30,12 +30,9 @@ END_VAR
 VAR_OUTPUT
     // === ETATS & DIAGNOSTICS IEC ===
     Ready                   : BOOL;   // <-- [STAT] FB pret a fonctionner
-    Busy                    : BOOL;   // <-- [STAT] FB en traitement
-    Done                    : BOOL;   // <-- [STAT] Traitement termine
-    Error                   : BOOL;   // <-- [DIAG] Defaut present
-    ErrorId                 : WORD;   // <-- [DIAG] Code erreur (bit0=Semi-Auto refuse)
-    State                   : E_State;// <-- [STAT] Etat courant du FB
-    StateAtError            : E_State;// <-- [DIAG] Etat au moment du dernier defaut
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: "Semi-Auto refusé (défaut codeur)".
+    Status                  : ST_FbStatus;
 
     // === BUS D'AUTORISATIONS ARBITREES ===
     Auth                    : ST_Modes_Autorisations; // <-- [STAT] Bus d'autorisations typees machine
@@ -62,15 +59,15 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.HomingApproachEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
     Auth.MaintenanceM3TargetEnable := FALSE;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
     PrevInhibitM1 := FALSE;
     PrevInhibitM2 := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 
 {endregion}
 
@@ -78,14 +75,14 @@ State := E_State.READY;
 // 2. RESET FRONT (bit0 = défaut codeur)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
 END_IF;
 
 // 3. GARDE-FOU — refus SEMI_AUTO si défaut codeur
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    ErrorId := ErrorId OR 16#0001;  // bit0 : défaut codeur
+    Status.ErrorId := Status.ErrorId OR 16#0001;  // bit0 : défaut codeur
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // 4. ARBITRAGE DU MODE
@@ -180,14 +177,14 @@ END_IF;
 
 {region "§4 Etats et defauts"}
 // 6. SORTIES ÉTAT
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-Busy := FALSE;
-Done := FALSE;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}
 

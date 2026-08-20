@@ -35,12 +35,9 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
     Ready               : BOOL;        // <-- [STAT] FB pret a fonctionner
-    Busy                : BOOL;        // <-- [STAT] Sequence de preset en cours
-    Done                : BOOL;        // <-- [STAT] Preset effectue avec succes
-    Error               : BOOL;        // <-- [STAT] Synthese defaut (ErrorId <> 0)
-    ErrorId             : WORD;        // <-- [DIAG] Code defaut (bit0: Com, bit1: Preset Timeout)
-    State               : E_State;     // <-- [STAT] Etat courant du FB
-    StateAtError        : E_State;     // <-- [DIAG] Etat courant lors du dernier defaut
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: "Com", bit1: "Preset Timeout".
+    Status              : ST_FbStatus;
 
     // === MESURES & DONNEES CODEUR ===
     RawPos              : UDINT;       // <-- [DIAG] Position brute gelee si non disponible
@@ -76,8 +73,8 @@ END_VAR
 // 🛑 1. GATE
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -86,7 +83,7 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Reset front"}
@@ -97,11 +94,11 @@ ResetEdge(CLK := Reset);
 {region "§3 Diagnostic bus et alarme"}
 // 🔍 3. DIAGNOSTIC BUS / ALARME
 IF (AlarmsIn <> 0) OR NOT SlaveOperational THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSE
-    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
+    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
 END_IF;
-EncoderAvailable := (ErrorId AND 16#0001) = 0;
+EncoderAvailable := (Status.ErrorId AND 16#0001) = 0;
 {endregion}
 
 {region "§4 Lecture position"}
@@ -146,25 +143,25 @@ CASE PresetSeqStep OF
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
             PresetNak := TRUE;
-            ErrorId := ErrorId OR 16#0002;
+            Status.ErrorId := Status.ErrorId OR 16#0002;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
             PresetTimerVisual(IN := FALSE, PT := T#500MS);
         END_IF;
 END_CASE;
 IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
-    ErrorId := ErrorId AND 16#FFFD;
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;
 END_IF;
 {endregion}
 
 {region "§6 Error et StateAtError"}
 // 🧾 6. ERROR / STATEATERROR
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-Busy := (PresetSeqStep <> 0);
-Done := PresetAck;
+Status.Busy := (PresetSeqStep <> 0);
+Status.Done := PresetAck;
 {endregion}

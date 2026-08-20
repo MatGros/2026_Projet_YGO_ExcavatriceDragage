@@ -11147,52 +11147,13 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence temporisee en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Frein ouvert/relache confirme</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut actif sur le frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de defauts (bit0: incoherence retour)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat operationnel courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat memorise lors du defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "incoherence retour contacteur".</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCmd">
@@ -11294,8 +11255,8 @@ IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     RETURN;
 END_IF;
 
@@ -11315,21 +11276,21 @@ IF MovementRequested THEN
     TonMagnetise(IN := TRUE, PT := DelayMagnetise + DelayContactClose);
     IF TonMagnetise.Q THEN
         BrakeCmd := TRUE;              // ✅ Contacteur + magnétisation acquis → relâche
-        State := E_State.DONE;
+        Status.State := E_State.DONE;
     ELSE
         BrakeCmd := FALSE;             // ⏳ Encore collé pendant la magnétisation
-        State := E_State.BUSY;
+        Status.State := E_State.BUSY;
     END_IF;
 ELSE
     // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY);
-Done := (State = E_State.DONE);
+Status.Busy := (Status.State = E_State.BUSY);
+Status.Done := (Status.State = E_State.DONE);
 {endregion}
 
 {region "§4 Double vérification contacteur"}
@@ -11345,18 +11306,18 @@ IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
         ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);            // relâche commandée (BrakeCmd=TRUE), frein reste serré (ContactorFeedback=FALSE)
         ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);             // serrage commandé (BrakeCmd=FALSE), frein reste ouvert (ContactorFeedback=TRUE)
-        ErrorId := ErrorId OR 16#0001;
+        Status.ErrorId := Status.ErrorId OR 16#0001;
     ELSIF ResetEdge.Q THEN
         ContactorCheck.StuckClosed := FALSE;
         ContactorCheck.StuckOpen   := FALSE;
-        ErrorId := ErrorId AND 16#FFFE;
+        Status.ErrorId := Status.ErrorId AND 16#FFFE;
     END_IF;
 ELSE
     ContactorCheck.StuckClosed := FALSE;
     ContactorCheck.StuckOpen   := FALSE;
-    ErrorId := ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
     IF BypassEdge.Q THEN
-        StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
+        Status.StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
     END_IF;
 END_IF;
 
@@ -11364,16 +11325,16 @@ END_IF;
 
 {region "§5 Arbitrage error"}
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 {endregion}
 
 {region "§6 Sortie sûre"}
 // 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
-IF Error THEN
+IF Status.Error THEN
     BrakeCmd := FALSE;
 END_IF;
 {endregion}
@@ -11598,52 +11559,12 @@ END_IF;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Mouvement benne en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Mouvement termine avec succes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0..4)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat operationnel du FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat lors de l'apparition du defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [FB] Statut complet (Busy/Done/Error/ErrorId/State/StateAtError)</xhtml>
               </documentation>
             </variable>
             <variable name="CloseReq">
@@ -11869,16 +11790,16 @@ END_IF;
 {region "§1 Gate securite"}
 // 🛑 1. GATE DE SÉCURITÉ
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
+    IF (Status.State = E_State.BUSY) OR CloseReq OR OpenReq THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
     Ready := FALSE;
-    Busy := FALSE;
-    Done := FALSE;
+    Status.Busy := FALSE;
+    Status.Done := FALSE;
     M2_StartStop := FALSE;
     M2_Direction := 0;
     M2_ForceSlowSpeed := FALSE;
-    State := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
     M1SlipDetected := FALSE;
     // Les requêtes internes sont réinitialisées
     CloseReq := FALSE;
@@ -11887,8 +11808,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 // 🟢 ÉTAT INITIAL READY SI DISABLED PRÉCÉDEMMENT
-IF State = E_State.DISABLED THEN
-    State := E_State.READY;
+IF Status.State = E_State.DISABLED THEN
+    Status.State := E_State.READY;
 END_IF;
 
 {endregion}
@@ -11899,11 +11820,11 @@ ResetEdge(CLK := Reset);
 
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 (ignore toutes les erreurs benne)
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
 END_IF;
 
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
+    Status.ErrorId := Status.ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
 END_IF;
 
 {endregion}
@@ -11933,21 +11854,21 @@ END_IF;
 
 // Met à jour le bit1 d'erreur si incohérence détectée
 IF BucketState.StateIncoherent THEN
-    ErrorId := ErrorId OR 16#0002;
+    Status.ErrorId := Status.ErrorId OR 16#0002;
     // Force l'état inconnu (ni ouvert ni fermé) si incohérence active
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := FALSE;
 ELSE
-    ErrorId := ErrorId AND 16#FFFD;
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;
 END_IF;
 
 // 🧲 3bis. GARDE-FOU CODEURS NON RÉFÉRENCÉS (bit 3)
 // CablePosM1/CablePosM2 ne sont fiables que si le homing (Partie10) a été fait sur les 2 treuils.
 // Continu (pas de front Reset) : se lève/efface tout seul selon l'état réel du homing.
 IF NOT HomedM1 OR NOT HomedM2 THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 ELSE
-    ErrorId := ErrorId AND 16#FFF7;
+    Status.ErrorId := Status.ErrorId AND 16#FFF7;
 END_IF;
 
 // 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE — voir bandeau
@@ -11959,7 +11880,7 @@ IF ConfirmOpenEdge.Q
    AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM;
-    ErrorId := 16#0000;             // Réinitialisation complète des défauts benne lors du référencement manuel
+    Status.ErrorId := 16#0000;      // Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
@@ -11972,7 +11893,7 @@ IF ConfirmCloseEdge.Q
    AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.LastPosM2Close := CablePosM2;
     BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM;
-    ErrorId := 16#0000;             // Réinitialisation complète des défauts benne lors du référencement manuel
+    Status.ErrorId := 16#0000;      // Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
@@ -11981,7 +11902,7 @@ END_IF;
 // Recalcule IsOpen, IsClosed, TooOpen, TooClosed, IsIntermediate en PERMANENCE à partir de
 // l'écart réel Delta = CablePosM2 - CablePosM1 et de la tolérance Config.CoherenceLimitM.
 // Actif à l'arrêt (NOT M1_Busy/M2_Busy), hors séquence active (State &lt;&gt; BUSY), codeurs référencés.
-IF (State &lt;&gt; E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND HomedM2
+IF (Status.State &lt;&gt; E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND HomedM2
    AND (Config.CoherenceLimitM &gt; 0.01) THEN
 
     // 1. Zone Benne Ouverte (Delta proche de OffsetOpenM)
@@ -12035,7 +11956,7 @@ END_IF;
 
 // 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4)
 // M1 doit rester immobile pendant que M2 bouge seul. Référence prise à l'entrée en Busy.
-BusyEdge(CLK := (State = E_State.BUSY));
+BusyEdge(CLK := (Status.State = E_State.BUSY));
 IF BusyEdge.Q THEN
     M1RefPosM := CablePosM1;
     M2StartPosM := CablePosM2;   // Borne le recul autorisé (voir §6 CASE BUSY)
@@ -12049,12 +11970,12 @@ IF BusyEdge.Q THEN
     BucketState.IsClosed := FALSE;
 END_IF;
 
-IF (State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) &gt; M1SlipToleranceM) AND NOT InhibitM1 THEN
-    ErrorId := ErrorId OR 16#0010;
+IF (Status.State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) &gt; M1SlipToleranceM) AND NOT InhibitM1 THEN
+    Status.ErrorId := Status.ErrorId OR 16#0010;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFEF;
+    Status.ErrorId := Status.ErrorId AND 16#FFEF;
 END_IF;
-M1SlipDetected := (ErrorId AND 16#0010) &lt;&gt; 16#0000;
+M1SlipDetected := (Status.ErrorId AND 16#0010) &lt;&gt; 16#0000;
 
 {endregion}
 
@@ -12063,23 +11984,23 @@ M1SlipDetected := (ErrorId AND 16#0010) &lt;&gt; 16#0000;
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
 IF (ABS(CablePosM1 - CablePosM2) &gt; MaxAllowedOffset) AND NOT InhibitM1 AND NOT InhibitM2 THEN
-    ErrorId := ErrorId OR 16#0004;
+    Status.ErrorId := Status.ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    Status.ErrorId := Status.ErrorId AND 16#FFFB;
 END_IF;
 
 // ⏲️ 5. SURVEILLANCE TIMEOUT MOUVEMENT (bit 0)
 // Déclenche si le mouvement actif (M2_StartStop = TRUE) dure plus longtemps que le timeout
-TonTimeout(IN := (State = E_State.BUSY AND M2_StartStop), PT := CfgTimeoutDuration);
+TonTimeout(IN := (Status.State = E_State.BUSY AND M2_StartStop), PT := CfgTimeoutDuration);
 IF TonTimeout.Q THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 END_IF;
 
 // ❌ Évaluation des erreurs graves (Timeout, Limites dépassées, Codeur(s) non référencé(s), ou Glissement M1)
-SevereError := (ErrorId AND 16#001D) &lt;&gt; 16#0000;
+SevereError := (Status.ErrorId AND 16#001D) &lt;&gt; 16#0000;
 
 IF SevereError THEN
-    IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
+    IF (Status.State = E_State.BUSY) OR CloseReq OR OpenReq THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
     M2_StartStop := FALSE;
@@ -12088,18 +12009,18 @@ IF SevereError THEN
     CloseReq := FALSE;
     OpenReq := FALSE;
     // On repasse en READY et attend un Reset
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
 {endregion}
 
 {region "§5 Machine etat commande"}
 // 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
-CASE State OF
+CASE Status.State OF
     E_State.READY:
         Ready := TRUE;
-        Busy := FALSE;
-        Done := FALSE;
+        Status.Busy := FALSE;
+        Status.Done := FALSE;
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
@@ -12122,16 +12043,16 @@ CASE State OF
             // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
             // Sens inversés (enroulage ferme, déroulage ouvre)
             IF CloseReq AND MotionRequestActive AND (MotionDirection = 1) THEN
-                State := E_State.BUSY;
+                Status.State := E_State.BUSY;
             ELSIF OpenReq AND MotionRequestActive AND (MotionDirection = -1) THEN
-                State := E_State.BUSY;
+                Status.State := E_State.BUSY;
             END_IF;
         END_IF;
 
     E_State.BUSY:
         Ready := TRUE;
-        Busy := TRUE;
-        Done := FALSE;
+        Status.Busy := TRUE;
+        Status.Done := FALSE;
         M2_ForceSlowSpeed := TRUE; // Vitesse lente forcée sans contacteurs
 
         // Distance restante avant cible, pour affichage IHM (aiguille/jauge)
@@ -12209,7 +12130,7 @@ CASE State OF
                 BucketState.StateIncoherent := FALSE; // recalage réussi
 
                 CloseReq := FALSE;
-                State := E_State.DONE;
+                Status.State := E_State.DONE;
             // Recul complet jusqu'à la position de départ — restaure l'état d'origine
             // (physiquement, on est revenu là où on a commencé)
             ELSIF LeftStartSinceArm AND (CablePosM2 &lt;= M2StartPosM) THEN
@@ -12220,7 +12141,7 @@ CASE State OF
                 BucketState.IsClosed := WasClosedAtStart;
 
                 CloseReq := FALSE;
-                State := E_State.DONE;
+                Status.State := E_State.DONE;
             END_IF;
         END_IF;
 
@@ -12239,7 +12160,7 @@ CASE State OF
                 BucketState.StateIncoherent := FALSE; // recalage réussi
 
                 OpenReq := FALSE;
-                State := E_State.DONE;
+                Status.State := E_State.DONE;
             // Recul complet jusqu'à la position de départ — restaure l'état d'origine
             // (physiquement, on est revenu là où on a commencé)
             ELSIF LeftStartSinceArm AND (CablePosM2 &gt;= M2StartPosM) THEN
@@ -12250,14 +12171,14 @@ CASE State OF
                 BucketState.IsClosed := WasClosedAtStart;
 
                 OpenReq := FALSE;
-                State := E_State.DONE;
+                Status.State := E_State.DONE;
             END_IF;
         END_IF;
 
     E_State.DONE:
         Ready := TRUE;
-        Busy := FALSE;
-        Done := TRUE;
+        Status.Busy := FALSE;
+        Status.Done := TRUE;
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
@@ -12265,15 +12186,15 @@ CASE State OF
 
         // Attente du relâchement de la validation joystick pour repasser à READY
         IF NOT MotionRequestActive THEN
-            State := E_State.READY;
+            Status.State := E_State.READY;
         END_IF;
 END_CASE;
 
 // 📤 7. GESTION DES SORTIES D'ÉTAT GLOBALES
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // Calcul continu de l'écart réel signé M2 - M1 pour l'affichage IHM et l'aide au pilotage
@@ -12284,7 +12205,7 @@ DeltaPosition_M := CablePosM2 - CablePosM1;
 // CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
 // TOUT le trajet depuis l'état transitoire) pour que la position corrigée de M2 converge
 // progressivement vers M1 pendant l'enroulage.
-IF State = E_State.BUSY THEN
+IF Status.State = E_State.BUSY THEN
     // Pendant le déplacement, l'offset actif suit la différence réelle de câble (M2 - M1) afin que
     // la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne) sans à-coup,
     // tandis que le câble brut de M2 montre son enroulement.
@@ -15046,52 +14967,13 @@ END_IF;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Recherche de fond en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fond detecte et confirme</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut sequence plongee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0:precond, bit1:seq, bit2:cfg)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat IEC standard</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat IEC au moment du defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Status.ErrorId : bit0 precond, bit1 seq, bit2 cfg
+&lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)</xhtml>
               </documentation>
             </variable>
             <variable name="DiveState">
@@ -15206,11 +15088,11 @@ END_IF;
 
 {region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
     BottomTouchConfirmed := FALSE;
-    State := E_State.DISABLED;
-    StateAtError := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
+    Status.StateAtError := E_State.DISABLED;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
     OperatorActionId := 0; OperatorAction := '';
     ImmersionConfirmed := FALSE;
@@ -15227,34 +15109,34 @@ KoboldFallEdge(CLK := KoboldImmersed);
 ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
                   OR (ImmersionUpper_M &lt;= ImmersionLower_M));
 IF ErrorCausePresent THEN
-    ErrorId := ErrorId OR 16#0004;
+    Status.ErrorId := Status.ErrorId OR 16#0004;
 END_IF;
 
 (* Reset = front + causes disparues ; aucun redémarrage automatique. *)
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     ImmersionConfirmed := FALSE;
     BottomTouchConfirmed := FALSE;
-    StateAtError := E_State.DISABLED;
+    Status.StateAtError := E_State.DISABLED;
     DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 
 DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
-Ready := FALSE; Busy := FALSE; Done := FALSE;
+Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
 OperatorActionId := 0; OperatorAction := '';
 
 {endregion}
 
 {region "§3 Machine etat plongee recherche fond"}
-IF ErrorId &lt;&gt; 16#0000 THEN
-    State := E_State.READY;
+IF Status.ErrorId &lt;&gt; 16#0000 THEN
+    Status.State := E_State.READY;
     DiveState := E_DiveSearchState.ERROR_HOLD;
     OperatorActionId := 16#0180;
     OperatorAction := 'Vérifier les conditions puis réarmer avant une nouvelle plongée.';
 ELSE
     CASE DiveState OF
         E_DiveSearchState.WAIT_PRECONDITIONS:
-            State := E_State.INIT;
+            Status.State := E_State.INIT;
             IF NOT BypassPreconditions
                AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
                     OR (M1Position_M &lt; DiveStartMin_M) OR (M2Position_M &lt; DiveStartMin_M)) THEN
@@ -15265,7 +15147,7 @@ ELSE
             END_IF;
 
         E_DiveSearchState.READY_TO_DESCEND:
-            State := E_State.READY;
+            Status.State := E_State.READY;
             Ready := TRUE;
             OperatorActionId := 16#0101;
             OperatorAction := 'Demander une descente pour rechercher le fond.';
@@ -15274,8 +15156,8 @@ ELSE
             END_IF;
 
         E_DiveSearchState.SEARCHING_IMMERSION:
-            State := E_State.BUSY;
-            Busy := TRUE;
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
             DescendPermit := MotionRequestActive AND (MotionDirection = -1);
             KoboldMeasureEnable := TRUE;
             OperatorActionId := 16#0102;
@@ -15286,17 +15168,17 @@ ELSE
                     ImmersionConfirmed := TRUE;
                     DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
                 ELSE
-                    ErrorId := ErrorId OR 16#0002;
-                    StateAtError := State;
+                    Status.ErrorId := Status.ErrorId OR 16#0002;
+                    Status.StateAtError := Status.State;
                 END_IF;
             ELSIF (M1Position_M &lt; ImmersionLower_M) OR (M2Position_M &lt; ImmersionLower_M) THEN
-                ErrorId := ErrorId OR 16#0002;
-                StateAtError := State;
+                Status.ErrorId := Status.ErrorId OR 16#0002;
+                Status.StateAtError := Status.State;
             END_IF;
 
         E_DiveSearchState.SEARCHING_BOTTOM:
-            State := E_State.BUSY;
-            Busy := TRUE;
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
             DescendPermit := MotionRequestActive AND (MotionDirection = -1);
             KoboldMeasureEnable := TRUE;
             OperatorActionId := 16#0103;
@@ -15308,17 +15190,17 @@ ELSE
             END_IF;
 
         E_DiveSearchState.BOTTOM_CONFIRMED:
-            State := E_State.DONE;
-            Done := TRUE;
+            Status.State := E_State.DONE;
+            Status.Done := TRUE;
             OperatorActionId := 16#0104;
             OperatorAction := 'Fond détecté : demander la fermeture ou l extraction.';
 
         E_DiveSearchState.ERROR_HOLD:
-            State := E_State.READY;
+            Status.State := E_State.READY;
     END_CASE;
 END_IF;
 
-Error := (ErrorId &lt;&gt; 16#0000);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
 
 {endregion}
 </xhtml>
@@ -15566,52 +15448,13 @@ END_IF;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence de preset en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Preset effectue avec succes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut (ErrorId &lt;&gt; 0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut (bit0: Com, bit1: Preset Timeout)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat courant lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Com", bit1: "Preset Timeout".</xhtml>
               </documentation>
             </variable>
             <variable name="RawPos">
@@ -15772,8 +15615,8 @@ END_IF;
 // 🛑 1. GATE
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -15782,7 +15625,7 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Reset front"}
@@ -15793,11 +15636,11 @@ ResetEdge(CLK := Reset);
 {region "§3 Diagnostic bus et alarme"}
 // 🔍 3. DIAGNOSTIC BUS / ALARME
 IF (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSE
-    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
+    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
 END_IF;
-EncoderAvailable := (ErrorId AND 16#0001) = 0;
+EncoderAvailable := (Status.ErrorId AND 16#0001) = 0;
 {endregion}
 
 {region "§4 Lecture position"}
@@ -15842,27 +15685,27 @@ CASE PresetSeqStep OF
         ELSIF PresetTimer.Q THEN
             PresetTriggerCmd := 0;
             PresetNak := TRUE;
-            ErrorId := ErrorId OR 16#0002;
+            Status.ErrorId := Status.ErrorId OR 16#0002;
             PresetSeqStep := 0;
             PresetTimer(IN := FALSE, PT := PresetTimeout);
             PresetTimerVisual(IN := FALSE, PT := T#500MS);
         END_IF;
 END_CASE;
 IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
-    ErrorId := ErrorId AND 16#FFFD;
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;
 END_IF;
 {endregion}
 
 {region "§6 Error et StateAtError"}
 // 🧾 6. ERROR / STATEATERROR
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-Busy := (PresetSeqStep &lt;&gt; 0);
-Done := PresetAck;
+Status.Busy := (PresetSeqStep &lt;&gt; 0);
+Status.Done := PresetAck;
 {endregion}
 </xhtml>
           </ST>
@@ -16099,52 +15942,13 @@ Done := PresetAck;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence SDO preset en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Referencement effectue avec succes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut (ErrorId &lt;&gt; 0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de bits de defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat courant lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5: preset, bit9: incoherence boot).</xhtml>
               </documentation>
             </variable>
             <variable name="PresetRequest">
@@ -16367,8 +16171,8 @@ Done := PresetAck;
 IF NOT Enable THEN
     PresetRequest := FALSE;
     PresetValue := 0;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     InitDone := FALSE;   // Force un nouveau contrôle §3.7 à la prochaine activation
     Homed := Calib.Homed;
     HomingSuspect := Calib.HomingSuspect;
@@ -16388,17 +16192,17 @@ ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
 
 // 🔍 3. COHÉRENCE AU REDÉMARRAGE (§3.7) — une fois par session Enable, dès que le codeur répond
 IF NOT InitDone THEN
-    State := E_State.INIT;
+    Status.State := E_State.INIT;
     IF EncoderAvailable THEN
         RawDiffRestart := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Calib.LastKnownRawPos);
         IF Calib.Homed AND (ABS(RawDiffRestart) &gt; UDINT_TO_DINT(Calib.RestartCoherenceTolerancePts)) THEN
             Calib.HomingSuspect := TRUE;
-            ErrorId := ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
+            Status.ErrorId := Status.ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
         END_IF;
         InitDone := TRUE;
     END_IF;
 ELSE
-    IF State = E_State.INIT THEN State := E_State.READY; END_IF;
+    IF Status.State = E_State.INIT THEN Status.State := E_State.READY; END_IF;
 END_IF;
 
 {endregion}
@@ -16407,7 +16211,7 @@ END_IF;
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
 IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
     Calib.HomingSuspect := FALSE;
-    ErrorId := ErrorId AND 16#FDFF;   // efface bit9
+    Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
 END_IF;
 
 PresetRequest := FALSE;
@@ -16416,15 +16220,15 @@ DynamicTargetEdge(CLK := UseDynamicTarget);
 
 // Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
-ErrorId := ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
+Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
 HomingModeOk := (Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2);
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    ErrorId := ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
+    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
 END_IF;
 IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
-    ErrorId := ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
+    Status.ErrorId := Status.ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
 END_IF;
 
 // Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
@@ -16457,7 +16261,7 @@ IF HomingTrigger THEN
     // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
     // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
     IF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
-        ErrorId := ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+        Status.ErrorId := Status.ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
     ELSE
         TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
         Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
@@ -16467,9 +16271,9 @@ IF HomingTrigger THEN
         HomingRefRaw := Calib.HomingRefRaw;
         Homed := TRUE;
         HomingSuspect := FALSE;
-        Done := TRUE;
-        ErrorId := 16#0000;
-        State := E_State.READY;
+        Status.Done := TRUE;
+        Status.ErrorId := 16#0000;
+        Status.State := E_State.READY;
 
         // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
@@ -16482,37 +16286,37 @@ END_IF;
 
 {region "§4 Suivi SDO reset et sorties etat"}
 // ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
-IF State = E_State.BUSY THEN
+IF Status.State = E_State.BUSY THEN
     IF PresetAck THEN
-        Done := TRUE;
-        State := E_State.READY;
+        Status.Done := TRUE;
+        Status.State := E_State.READY;
         // Un homing réussi efface l'intégralité de ErrorId
-        ErrorId := 16#0000;
+        Status.ErrorId := 16#0000;
     ELSIF PresetNak THEN
-        ErrorId := ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
-        State := E_State.READY;
+        Status.ErrorId := Status.ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
+        Status.State := E_State.READY;
     END_IF;
 END_IF;
 
 // 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
 // à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
+    Status.ErrorId := Status.ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
 END_IF;
 
 // 📤 8. SORTIES ÉTAT
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // Mise à jour continue du point brut valide connu (hors séquence de homing elle-même)
-IF EncoderAvailable AND (State &lt;&gt; E_State.BUSY) THEN
+IF EncoderAvailable AND (Status.State &lt;&gt; E_State.BUSY) THEN
     Calib.LastKnownRawPos := RawPos;
 END_IF;
 
-Busy := (State = E_State.BUSY);
+Status.Busy := (Status.State = E_State.BUSY);
 Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;
@@ -16627,52 +16431,13 @@ HomingRefRaw := Calib.HomingRefRaw;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB en cours de traitement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement termine</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut (ErrorId &lt;&gt; 0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut (bit0: Bornes, bit1: Boot suspect)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat courant lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Bornes", bit1: "Boot suspect".</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosMSafe">
@@ -16730,15 +16495,15 @@ HomingRefRaw := Calib.HomingRefRaw;
 {region "§1 Gate"}
 // 🛑 1. GATE
 IF NOT Enable THEN
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
     CablePosMSafe := CablePosM;
     EncoderIncoherent := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Reset front"}
@@ -16749,16 +16514,16 @@ ResetEdge(CLK := Reset);
 {region "§3 Bypass global"}
 // 🌐 3. BYPASS GLOBAL
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
 END_IF;
 {endregion}
 
 {region "§4 Surveillance bornage"}
 // 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
 IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSE
-    ErrorId := ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
+    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
 END_IF;
 {endregion}
 
@@ -16766,9 +16531,9 @@ END_IF;
 // 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
 IF NOT BypassGlobal THEN
     IF HomingSuspect THEN
-        ErrorId := ErrorId OR 16#0002;
+        Status.ErrorId := Status.ErrorId OR 16#0002;
     ELSE
-        ErrorId := ErrorId AND 16#FFFD;
+        Status.ErrorId := Status.ErrorId AND 16#FFFD;
     END_IF;
 END_IF;
 {endregion}
@@ -16780,15 +16545,15 @@ CablePosMSafe := CablePosM;
 
 {region "§7 Sorties état et sécurité"}
 // 📤 7. SORTIES ÉTAT &amp; SÉCURITÉ
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-EncoderIncoherent := Error;
-Busy := FALSE;
-Done := FALSE;
+EncoderIncoherent := Status.Error;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 {endregion}
 </xhtml>
           </ST>
@@ -17286,52 +17051,13 @@ END_IF;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB en cours de traitement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement termine</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut (ErrorId &lt;&gt; 0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code defaut (bit0: variation vitesse confirmee)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat courant lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "variation vitesse confirmée".</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedDeltaMps">
@@ -17448,11 +17174,11 @@ END_IF;
 // 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
-    Busy := FALSE;
-    Done := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
-    State := E_State.DISABLED;
+    Status.Busy := FALSE;
+    Status.Done := FALSE;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
+    Status.State := E_State.DISABLED;
     SpeedDeltaMps := 0.0;
     SpeedVariationDetected := FALSE;
     SpeedVariationConfirmed := FALSE;
@@ -17465,9 +17191,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 Ready := TRUE;
-Busy := FALSE;
-Done := FALSE;
-State := E_State.READY;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Reset front"}
@@ -17501,18 +17227,18 @@ StabilityTimer(IN := HasPreviousSpeed AND NOT VariationActive AND (SpeedStabilit
 SpeedStable := StabilityTimer.Q;
 
 IF SpeedVariationConfirmed THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q AND NOT VariationActive THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 {endregion}
 
 {region "§5 Sorties état"}
 // 📤 5. SORTIES D'ÉTAT — diagnostic standard, aucune commande mouvement.
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 {endregion}
 </xhtml>
@@ -17674,55 +17400,17 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
-&lt;-- [STAT] FB pret a fonctionner</xhtml>
+&lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extraction en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Remontee nominale atteinte</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut sequence extraction</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0:fond, bit1:ferme, bit2:ctrl, bit3:cfg)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat IEC standard</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat IEC au moment du defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
+&lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)</xhtml>
               </documentation>
             </variable>
             <variable name="ExtractionState">
@@ -17837,11 +17525,11 @@ END_IF;
 
 {region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
     BottomConfirmationConsumed := FALSE;
-    State := E_State.DISABLED;
-    StateAtError := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
+    Status.StateAtError := E_State.DISABLED;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
     OperatorActionId := 0; OperatorAction := '';
     RETURN;
@@ -17853,15 +17541,15 @@ END_IF;
 ResetEdge(CLK := Reset);
 ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
 IF ErrorCausePresent THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 END_IF;
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    ErrorId := 16#0000;
-    StateAtError := E_State.DISABLED;
+    Status.ErrorId := 16#0000;
+    Status.StateAtError := E_State.DISABLED;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
 END_IF;
 
-Ready := FALSE; Busy := FALSE; Done := FALSE;
+Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
 BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
 BottomConfirmationConsumed := FALSE;
 OperatorActionId := 0; OperatorAction := '';
@@ -17869,15 +17557,15 @@ OperatorActionId := 0; OperatorAction := '';
 {endregion}
 
 {region "§3 Machine etat fermeture remontee"}
-IF ErrorId &lt;&gt; 16#0000 THEN
-    State := E_State.READY;
+IF Status.ErrorId &lt;&gt; 16#0000 THEN
+    Status.State := E_State.READY;
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
     OperatorActionId := 16#0280;
     OperatorAction := 'Vérifier la benne et les treuils puis réarmer avant de reprendre.';
 ELSE
     CASE ExtractionState OF
         E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION:
-            State := E_State.INIT;
+            Status.State := E_State.INIT;
             IF BottomPositionConfirmed THEN
                 ExtractionState := E_ExtractionSequenceState.READY_TO_CLOSE;
             ELSE
@@ -17886,7 +17574,7 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.READY_TO_CLOSE:
-            State := E_State.READY;
+            Status.State := E_State.READY;
             Ready := TRUE;
             OperatorActionId := 16#0201;
             OperatorAction := 'Demander la montée pour fermer la benne.';
@@ -17896,14 +17584,14 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.CLOSING_BUCKET:
-            State := E_State.BUSY;
-            Busy := TRUE;
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
             BucketCloseRequest := MotionRequestActive AND (MotionDirection = 1);
             OperatorActionId := 16#0202;
             OperatorAction := 'Maintenir la montée : fermeture de la benne en cours.';
             IF BucketError THEN
-                ErrorId := ErrorId OR 16#0002;
-                StateAtError := State;
+                Status.ErrorId := Status.ErrorId OR 16#0002;
+                Status.StateAtError := Status.State;
             ELSIF BucketIsClosed AND NOT BucketBusy THEN
                 ControlStartM1Position_M := M1Position_M;
                 ControlStartM2Position_M := M2Position_M;
@@ -17911,37 +17599,37 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.CONTROL_ASCENT:
-            State := E_State.BUSY;
-            Busy := TRUE;
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
             AscentPermit := MotionRequestActive AND (MotionDirection = 1);
             ForceMinSpeedStep := TRUE;
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
             IF WinchSyncError OR NOT PositionsValid OR NOT M1MeasuredSpeedValid OR NOT M2MeasuredSpeedValid THEN
-                ErrorId := ErrorId OR 16#0004;
-                StateAtError := State;
+                Status.ErrorId := Status.ErrorId OR 16#0004;
+                Status.StateAtError := Status.State;
             ELSIF (M1Position_M &gt;= (ControlStartM1Position_M + ControlAscentDistance_M))
                AND (M2Position_M &gt;= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
                 ExtractionState := E_ExtractionSequenceState.NOMINAL_ASCENT;
             END_IF;
 
         E_ExtractionSequenceState.NOMINAL_ASCENT:
-            State := E_State.BUSY;
-            Busy := TRUE;
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
             AscentPermit := MotionRequestActive AND (MotionDirection = 1);
             OperatorActionId := 16#0204;
             OperatorAction := 'Maintenir la montée : extraction en cours.';
             IF WinchSyncError OR NOT PositionsValid THEN
-                ErrorId := ErrorId OR 16#0004;
-                StateAtError := State;
+                Status.ErrorId := Status.ErrorId OR 16#0004;
+                Status.StateAtError := Status.State;
             END_IF;
 
         E_ExtractionSequenceState.ERROR_HOLD:
-            State := E_State.READY;
+            Status.State := E_State.READY;
     END_CASE;
 END_IF;
 
-Error := (ErrorId &lt;&gt; 16#0000);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
 
 {endregion}
 </xhtml>
@@ -19880,52 +19568,13 @@ Done := NOT Error;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB en traitement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement termine</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut present</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0=Semi-Auto refuse)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant du FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat au moment du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Semi-Auto refusé (défaut codeur)".</xhtml>
               </documentation>
             </variable>
             <variable name="Auth">
@@ -20002,15 +19651,15 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.HomingApproachEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
     Auth.MaintenanceM3TargetEnable := FALSE;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
     PrevInhibitM1 := FALSE;
     PrevInhibitM2 := FALSE;
     RETURN;
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 
 {endregion}
 
@@ -20018,14 +19667,14 @@ State := E_State.READY;
 // 2. RESET FRONT (bit0 = défaut codeur)
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
 END_IF;
 
 // 3. GARDE-FOU — refus SEMI_AUTO si défaut codeur
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    ErrorId := ErrorId OR 16#0001;  // bit0 : défaut codeur
+    Status.ErrorId := Status.ErrorId OR 16#0001;  // bit0 : défaut codeur
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // 4. ARBITRAGE DU MODE
@@ -20120,14 +19769,14 @@ END_IF;
 
 {region "§4 Etats et defauts"}
 // 6. SORTIES ÉTAT
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-Busy := FALSE;
-Done := FALSE;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}
 </xhtml>
@@ -21745,55 +21394,16 @@ Diag.LockoutActive        := LockoutActive;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt (sortie libre, hors ST_FbStatus)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB occupé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthèse défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat mémorisé au dernier défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -21993,9 +21603,9 @@ Diag.LockoutActive        := LockoutActive;
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
-    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
-    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
-    Error := (ErrorId &lt;&gt; 16#0000);
+    // 🛡️ Status.ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Status.Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
+    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
     SafeStop := FALSE;
     PowerCutOff := FALSE;
     ErrorOperatorComm := FALSE;
@@ -22010,8 +21620,8 @@ IF NOT Enable THEN
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
-    State := E_State.DISABLED;
-    Busy := FALSE; Done := FALSE; Ready := FALSE;
+    Status.State := E_State.DISABLED;
+    Status.Busy := FALSE; Status.Done := FALSE; Ready := FALSE;
     RETURN;
 END_IF;
 
@@ -22024,14 +21634,14 @@ ResetEdge(CLK := Reset);
 // 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
-// 🌐 BYPASS GLOBAL : si actif → force ErrorId = 0 et saute toutes les vérifications
+// 🌐 BYPASS GLOBAL : si actif → force Status.ErrorId = 0 et saute toutes les vérifications
 // (les bits d'erreur resteraient coincés si on ne les nettoie pas)
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
 END_IF;
@@ -22048,42 +21658,42 @@ IF NOT BypassGlobal THEN
     // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
         IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-            ErrorId := ErrorId OR 16#0001;
+            Status.ErrorId := Status.ErrorId OR 16#0001;
         ELSE
-            ErrorId := ErrorId AND 16#FFFE; (* Effacement auto si la com repasse saine *)
+            Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Effacement auto si la com repasse saine *)
         END_IF;
     ELSIF NOT TonStartupWarmup.Q THEN
-        ErrorId := ErrorId AND 16#FFFE; (* Inhibition pendant l'initialisation boot *)
+        Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Inhibition pendant l'initialisation boot *)
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFE; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFE; END_IF;
 
     // 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassDriveComm) THEN
         IF (NOT DriveOnline OR NOT DriveOperational) THEN
-            ErrorId := ErrorId OR 16#0002;
+            Status.ErrorId := Status.ErrorId OR 16#0002;
         ELSE
-            ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si l'EtherCAT variateur M3 repasse sain *)
+            Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Effacement auto si l'EtherCAT variateur M3 repasse sain *)
         END_IF;
     ELSIF NOT TonStartupWarmup.Q THEN
-        ErrorId := ErrorId AND 16#FFFD; (* Inhibition pendant l'initialisation boot *)
+        Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Inhibition pendant l'initialisation boot *)
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFD; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFD; END_IF;
 
     // 🔍 3. MAUVAISE ROTATION DE PHASE (bit2)
     IF NOT (BypassProcess OR BypassPhaseRotation) THEN
         IF NOT PhaseRotationOk THEN
-            ErrorId := ErrorId OR 16#0004;
+            Status.ErrorId := Status.ErrorId OR 16#0004;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFB; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFB; END_IF;
 
     // 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (bit3)
     IF NOT (BypassSafety OR BypassBrakeThermal) THEN
         IF BrakeThermalFeedback THEN
-            ErrorId := ErrorId OR 16#0008;
+            Status.ErrorId := Status.ErrorId OR 16#0008;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFF7; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFF7; END_IF;
 
     // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
     IF NOT (BypassSafety OR BypassMecaB) THEN
@@ -22095,11 +21705,11 @@ IF NOT BypassGlobal THEN
             UncommandedActiveB := FALSE;
         END_IF;
         TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
-        IF TonMecaB.Q THEN ErrorId := ErrorId OR 16#0010; END_IF;
+        IF TonMecaB.Q THEN Status.ErrorId := Status.ErrorId OR 16#0010; END_IF;
     ELSE
         TonMecaB(IN := FALSE);
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFEF; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFEF; END_IF;
 
     // 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
     IF NOT (BypassSafety OR BypassMecaA) THEN
@@ -22109,16 +21719,16 @@ IF NOT BypassGlobal THEN
             UncommandedActiveA := FALSE;
         END_IF;
         TonMecaA(IN := UncommandedActiveA, PT := T#1S);
-        IF TonMecaA.Q THEN ErrorId := ErrorId OR 16#0020; END_IF;
+        IF TonMecaA.Q THEN Status.ErrorId := Status.ErrorId OR 16#0020; END_IF;
     ELSE
         TonMecaA(IN := FALSE);
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFDF; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFDF; END_IF;
 
     // 🔍 3sexies. SURVEILLANCE ESCALADE FIN DE COURSE (bit6)
     IF (BypassSafety OR BypassLimitSwitch) THEN
         // Nettoie le bit 6 résiduel (posé avant activation du bypass)
-        ErrorId := ErrorId AND 16#FFBF;
+        Status.ErrorId := Status.ErrorId AND 16#FFBF;
         TonLimitSwitchOverrun(IN := FALSE);
     ELSE
         // 🧱 L'erreur 64 (escalade / poussée anormale en butée) ne s'active QUE SI :
@@ -22130,23 +21740,23 @@ IF NOT BypassGlobal THEN
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
 
         IF TonLimitSwitchOverrun.Q THEN
-            ErrorId := ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
+            Status.ErrorId := Status.ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
         ELSE
             // Si la poussée dans le mauvais sens cesse (ou si on repart en arrière), le défaut s'auto-efface
-            ErrorId := ErrorId AND 16#FFBF;
+            Status.ErrorId := Status.ErrorId AND 16#FFBF;
         END_IF;
     END_IF;
 
     // 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
     IF (BypassSafety OR BypassSensorIncoherent) THEN
         // Nettoye le bit 7 résiduel
-        ErrorId := ErrorId AND 16#FF7F;
+        Status.ErrorId := Status.ErrorId AND 16#FF7F;
     ELSE
         IF SensorWordIncoherent THEN
-            ErrorId := ErrorId OR 16#0080;
+            Status.ErrorId := Status.ErrorId OR 16#0080;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FF7F; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FF7F; END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
@@ -22154,34 +21764,34 @@ END_IF; // fin IF NOT BypassGlobal
 
 {region "§4 Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-SafeStop := Error OR NOT PowerContactorEngaged;
+SafeStop := Status.Error OR NOT PowerContactorEngaged;
 
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
 // mouvement non commandé (bit5), dépassement de fin de course (bit6),
 // ou incohérence mot capteurs position (bit7)
-PowerCutOff := (ErrorId AND 16#00F8) &lt;&gt; 16#0000;
+PowerCutOff := (Status.ErrorId AND 16#00F8) &lt;&gt; 16#0000;
 
-// Décapsulage du bitfield ErrorId pour l'IHM
-ErrorOperatorComm   := (ErrorId AND 16#0001) &lt;&gt; 16#0000;
-ErrorDriveComm      := (ErrorId AND 16#0002) &lt;&gt; 16#0000;
-ErrorPhaseRotation  := (ErrorId AND 16#0004) &lt;&gt; 16#0000;
-ErrorBrakeThermal   := (ErrorId AND 16#0008) &lt;&gt; 16#0000;
-ErrorMecaB          := (ErrorId AND 16#0010) &lt;&gt; 16#0000;
-ErrorMecaA          := (ErrorId AND 16#0020) &lt;&gt; 16#0000;
-ErrorLimitSwitch    := (ErrorId AND 16#0040) &lt;&gt; 16#0000;
-ErrorSensorIncoherent := (ErrorId AND 16#0080) &lt;&gt; 16#0000;
+// Décapsulage du bitfield Status.ErrorId pour l'IHM
+ErrorOperatorComm   := (Status.ErrorId AND 16#0001) &lt;&gt; 16#0000;
+ErrorDriveComm      := (Status.ErrorId AND 16#0002) &lt;&gt; 16#0000;
+ErrorPhaseRotation  := (Status.ErrorId AND 16#0004) &lt;&gt; 16#0000;
+ErrorBrakeThermal   := (Status.ErrorId AND 16#0008) &lt;&gt; 16#0000;
+ErrorMecaB          := (Status.ErrorId AND 16#0010) &lt;&gt; 16#0000;
+ErrorMecaA          := (Status.ErrorId AND 16#0020) &lt;&gt; 16#0000;
+ErrorLimitSwitch    := (Status.ErrorId AND 16#0040) &lt;&gt; 16#0000;
+ErrorSensorIncoherent := (Status.ErrorId AND 16#0080) &lt;&gt; 16#0000;
 
-Busy := FALSE;
-Done := FALSE;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 // 🚦 5. STATE MACHINE (phase diagnostic)
-State := E_State.READY;
+Status.State := E_State.READY;
 
 
 {endregion}
@@ -22748,52 +22358,16 @@ State := E_State.READY;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement securite en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (0..15)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bitmask: bit0: "Perte comms opérateur" ; bit1: "Perte codeur" ; bit2: "Surchauffe moteur" ;
+bit3: "Mou de câble" ; bit4: "Rotation phases" ; bit5: "Fin de course haut capteur" ;
+bit6: "Limite max câble" ; bit7: "Méca A" ; bit8: "Méca B" ; bit9: "Méca C" ; bit10: "Thermique frein" ;
+bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; bit15: "Absence mouvement".</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -23000,16 +22574,16 @@ State := E_State.READY;
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
-    Busy := FALSE;
-    Done := FALSE;
+    Status.Busy := FALSE;
+    Status.Done := FALSE;
     SafeStop := TRUE;
     DescendPermit := FALSE; // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     AscentPermit := FALSE;  // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     PowerCutOff := FALSE;
-    State := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
     // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
     // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessus).
-    Error := (ErrorId &lt;&gt; 16#0000);
+    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
     // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
@@ -23023,7 +22597,7 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 
 {endregion}
 
@@ -23047,13 +22621,13 @@ ResetEdge(CLK := Reset);
 // 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
 // 🌐 BYPASS GLOBAL : si TRUE, on force ErrorId = 0 ET on saute toute la logique de sécurité
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
@@ -23076,9 +22650,9 @@ END_IF;
 // précise, jamais via le bypass global qui vise le reste du domaine : Méca A-E, thermique, phase,
 // comm, sync, codeur).
 IF NOT (BypassProcess OR BypassTopLimitSwitch) AND NOT TopPositionSensor AND NOT InReferencingMode AND (Direction &gt; 0) THEN
-    ErrorId := ErrorId OR 16#0020;
+    Status.ErrorId := Status.ErrorId OR 16#0020;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFDF;
+    Status.ErrorId := Status.ErrorId AND 16#FFDF;
 END_IF;
 
 // 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
@@ -23086,9 +22660,9 @@ END_IF;
 // physique (CablePosM &lt;= CfgCableLimitDescentM), alors on interdit uniquement la descente.
 // SORTI du bloc "IF NOT BypassGlobal" — même doctrine que bit5 ci-dessus.
 IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
-    ErrorId := ErrorId OR 16#0040;
+    Status.ErrorId := Status.ErrorId OR 16#0040;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFBF;
+    Status.ErrorId := Status.ErrorId AND 16#FFBF;
 END_IF;
 
 {endregion}
@@ -23102,15 +22676,15 @@ IF NOT BypassGlobal THEN
 
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
         IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-            ErrorId := ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
+            Status.ErrorId := Status.ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
         ELSE
-            ErrorId := ErrorId AND 16#FFFE;      // Effacement auto si la com repasse saine
+            Status.ErrorId := Status.ErrorId AND 16#FFFE;      // Effacement auto si la com repasse saine
         END_IF;
     ELSIF NOT TonStartupWarmup.Q THEN
-        ErrorId := ErrorId AND 16#FFFE;          // Inhibition pendant l'initialisation boot
+        Status.ErrorId := Status.ErrorId AND 16#FFFE;          // Inhibition pendant l'initialisation boot
     END_IF;
     IF ResetEdge.Q THEN
-        ErrorId := ErrorId AND 16#FFFE;
+        Status.ErrorId := Status.ErrorId AND 16#FFFE;
     END_IF;
 
 // 🔍 3bis. PERTE CODEUR DE CE TREUIL
@@ -23121,35 +22695,35 @@ EncoderAvailableEffective := EncoderAvailable
                              OR BypassGlobal
                              OR ((EncoderFaultBypass OR BypassProcess) AND (Mode = E_Mode.MAINT_N2));
 IF NOT EncoderAvailableEffective THEN
-    ErrorId := ErrorId OR 16#0002;
+    Status.ErrorId := Status.ErrorId OR 16#0002;
 ELSE
-    ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
+    Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
 END_IF;
 
 // 🔍 3ter. SURCHAUFFE MOTEUR — bit2, participe au SafeStop total
 // ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
 // bypass dédié plutôt que de dépendre uniquement du bypass groupé BypassSafety.
 IF NOT (BypassSafety OR BypassMotorThermal) AND ThermalFeedback THEN
-    ErrorId := ErrorId OR 16#0004;
+    Status.ErrorId := Status.ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    Status.ErrorId := Status.ErrorId AND 16#FFFB;
 END_IF;
 
 // 🔍 3quater. MOU DE CÂBLE (physiquement sur tambour M2, câblé sur les 2 instances Safety)
 // Mode NORMAL (SyncEnable=TRUE) → SafeStop M1+M2 (bit3 inclus dans SafeStop)
 // Mode RÉCUPÉRATION (SyncEnable=FALSE) → DescendPermit uniquement (descente interdite pour ne pas dérouler, montée OK pour retendre/fermer)
 IF NOT BypassProcess AND SlackCableDetected THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
-    ErrorId := ErrorId AND 16#FFF7;
+    Status.ErrorId := Status.ErrorId AND 16#FFF7;
 END_IF;
 
 // 🔍 3quinquies. ROTATION DE PHASE —
 // bit4, participe au SafeStop total (sens moteur potentiellement inversé, danger 2 sens).
 IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN
-    ErrorId := ErrorId OR 16#0010;
+    Status.ErrorId := Status.ErrorId OR 16#0010;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFEF;
+    Status.ErrorId := Status.ErrorId AND 16#FFEF;
 END_IF;
 
 // 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL — bit7
@@ -23164,9 +22738,9 @@ DriftGuardA(
 MecaADriftM := DriftGuardA.DriftM;   // Diagnostic IHM
 
 IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
-    ErrorId := ErrorId OR 16#0080;
+    Status.ErrorId := Status.ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FF7F;
+    Status.ErrorId := Status.ErrorId AND 16#FF7F;
 END_IF;
 
 // 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR — bit8
@@ -23179,9 +22753,9 @@ MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
 TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
 MecaBElapsedTime := TonMecaB.ET;   // Diagnostic IHM
 IF TonMecaB.Q THEN
-    ErrorId := ErrorId OR 16#0100;
+    Status.ErrorId := Status.ErrorId OR 16#0100;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FEFF;
+    Status.ErrorId := Status.ErrorId AND 16#FEFF;
 END_IF;
 
 // 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT BENNE, ESCALADE — bit9
@@ -23197,9 +22771,9 @@ DriftGuardC(
 MecaCDriftM := DriftGuardC.DriftM;   // Diagnostic IHM
 
 IF DriftGuardC.Violation THEN
-    ErrorId := ErrorId OR 16#0200;
+    Status.ErrorId := Status.ErrorId OR 16#0200;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FDFF;
+    Status.ErrorId := Status.ErrorId AND 16#FDFF;
 END_IF;
 
 // 🔍 3undecies. THERMIQUE FREIN COMMUN M1/M2/M3 — bit10
@@ -23207,9 +22781,9 @@ END_IF;
 // signifier qu'un frein colle instantanément (frein à manque de courant) → SafeStop ET
 // PowerCutOff (voir bandeau en-tête).
 IF NOT (BypassSafety OR BypassBrakeThermal) AND BrakeThermalFeedback THEN
-    ErrorId := ErrorId OR 16#0400;
+    Status.ErrorId := Status.ErrorId OR 16#0400;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FBFF;
+    Status.ErrorId := Status.ErrorId AND 16#FBFF;
 END_IF;
 
 // 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT — bit11
@@ -23226,9 +22800,9 @@ TonMecaD(
     PT := PostRampTimeout
 );
 IF TonMecaD.Q THEN
-    ErrorId := ErrorId OR 16#0800;
+    Status.ErrorId := Status.ErrorId OR 16#0800;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#F7FF;
+    Status.ErrorId := Status.ErrorId AND 16#F7FF;
 END_IF;
 
 // 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE — bits 12/13
@@ -23241,17 +22815,17 @@ END_IF;
 // Bit12 : détection → SafeStop immédiat. Bit13 : escalade si pas confirmé arrêté → PowerCutOff.
 IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
    AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
-    ErrorId := ErrorId OR 16#1000;
+    Status.ErrorId := Status.ErrorId OR 16#1000;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#EFFF;
+    Status.ErrorId := Status.ErrorId AND 16#EFFF;
 END_IF;
 
-TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((ErrorId AND 16#1000) &lt;&gt; 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)),
+TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((Status.ErrorId AND 16#1000) &lt;&gt; 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)),
          PT := PostRampTimeout);
 IF TonMecaE.Q THEN
-    ErrorId := ErrorId OR 16#2000;
+    Status.ErrorId := Status.ErrorId OR 16#2000;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#DFFF;
+    Status.ErrorId := Status.ErrorId AND 16#DFFF;
 END_IF;
 
 // 🔍 3quaterdecies — SENS RÉEL OPPOSÉ À LA COMMANDE (bit14)
@@ -23262,9 +22836,9 @@ OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (Movemen
       OR ((Direction &lt; 0) AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
 TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
 IF TonOppositeDirection.Q THEN
-    ErrorId := ErrorId OR 16#4000;
+    Status.ErrorId := Status.ErrorId OR 16#4000;
 ELSIF ResetEdge.Q AND NOT OppositeDirectionActive THEN
-    ErrorId := ErrorId AND 16#BFFF;
+    Status.ErrorId := Status.ErrorId AND 16#BFFF;
 END_IF;
 
 // ⏱️ 3quindecies — ABSENCE DE MOUVEMENT MALGRÉ COMMANDE (bit15)
@@ -23276,9 +22850,9 @@ TonNoMovement(
     PT := NoMovementTimeout
 );
 IF TonNoMovement.Q THEN
-    ErrorId := ErrorId OR 16#8000;
+    Status.ErrorId := Status.ErrorId OR 16#8000;
 ELSIF ResetEdge.Q AND (NOT MeasuredSpeedValid OR NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) &gt;= MovementSpeedThresholdMps)) THEN
-    ErrorId := ErrorId AND 16#7FFF;
+    Status.ErrorId := Status.ErrorId AND 16#7FFF;
 END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
@@ -23287,10 +22861,10 @@ END_IF; // fin IF NOT BypassGlobal
 
 {region "§5 Arbitrage sorties securite"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Error := (ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
@@ -23298,24 +22872,24 @@ END_IF;
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
-    SafeStop := (ErrorId AND 16#FF97) &lt;&gt; 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+    SafeStop := (Status.ErrorId AND 16#FF97) &lt;&gt; 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
-    SafeStop := (ErrorId AND 16#FF9F) &lt;&gt; 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+    SafeStop := (Status.ErrorId AND 16#FF9F) &lt;&gt; 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
 // ⬇️ DescendPermit : TRUE = descente autorisée (pas de limite basse, pas de mou câble en mode récup, contacteur engagé)
 // Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 DescendPermit := NOT (
-    (((ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
+    (((Status.ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
     OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
-    OR (((ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
+    OR (((Status.ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
 );
 
 // ⬆️ AscentPermit : TRUE = montée autorisée (pas de fin course haut, pas de dépassement position)
 // Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 AscentPermit := NOT (
-    (((ErrorId AND 16#0020) &lt;&gt; 16#0000
+    (((Status.ErrorId AND 16#0020) &lt;&gt; 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
     OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM)) AND NOT BypassTopLimitSoftware)
@@ -23333,11 +22907,11 @@ AscentPermit := NOT (
 // que la coupure locale n'a pas suffi.
 // bit13 (Méca E escalade) : PAS bit12 seul (détection immédiate = SafeStop uniquement ;
 // PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
-PowerCutOff := (ErrorId AND 16#2F84) &lt;&gt; 16#0000;
+PowerCutOff := (Status.ErrorId AND 16#2F84) &lt;&gt; 16#0000;
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
-Busy := FALSE;
-Done := FALSE;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}
 </xhtml>
@@ -26177,7 +25751,7 @@ BrakeContactorCheck := Brake.ContactorCheck;
 
 {region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
-IF Brake.Error THEN
+IF Brake.Status.Error THEN
     Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     Status.ErrorId := Status.ErrorId AND 16#FFFE;
@@ -26313,55 +25887,16 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
-&lt;-- [STAT] FB pret a fonctionner</xhtml>
+&lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Interlock actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0: timeout desserrage frein)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "timeout desserrage frein".</xhtml>
               </documentation>
             </variable>
             <variable name="Reason">
@@ -26555,11 +26090,11 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DriveFreqRefWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     // ErrorId reste publiquement visible même hors Enable/AU : une retombée de gate
     // ne doit jamais masquer un timeout mémorisé ni remplacer l'acquittement conscient.
-    Error := (ErrorId &lt;&gt; 16#0000);
-    State := E_State.DISABLED;
+    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+    Status.State := E_State.DISABLED;
     Reason := E_TranslationFinalInterlockReason.NONE;
     RETURN;
 END_IF;
@@ -26595,22 +26130,22 @@ IF ResetEdge.Q THEN
     ResetRequired := FALSE;
 END_IF;
 IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSE
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
 // Le mot 7 est un reset AC600, pas un neutre opérateur : il reste autorisé avec
 // fréquence nulle mais ne solde pas RestartInhibit. Seul le mot 0, vu APRÈS
 // disparition de la cause et front Reset, autorise ensuite une nouvelle demande.
-IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
+IF RestartInhibit AND NOT Status.Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     IF RequestedDriveControlWord = 0 THEN
         NeutralRequestSeen := TRUE;
     ELSIF NeutralRequestSeen AND MovementRequested THEN
@@ -26626,21 +26161,21 @@ DriveFreqRefWord := 0;
 // SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
 // maintenu. La commande/frein suivent cette rampe jusqu'à demande nulle ; seul
 // un gate dur, timeout ou défaut final impose ici la coupure immédiate.
-BrakeCmd := BrakeReleaseRequest AND NOT Error AND NOT RestartInhibit;
-Ready := NOT Error AND NOT RestartInhibit;
-Busy := FALSE;
-Done := FALSE;
-State := E_State.READY;
+BrakeCmd := BrakeReleaseRequest AND NOT Status.Error AND NOT RestartInhibit;
+Ready := NOT Status.Error AND NOT RestartInhibit;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+Status.State := E_State.READY;
 
-IF Error THEN
+IF Status.Error THEN
     BrakeCmd := FALSE;
-    State := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
 ELSIF RequestedDriveControlWord = 7 THEN
     // Reset AC600 préservé, toujours sans consigne fréquence ni couple utile.
     DriveControlWord := 7;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
-    State := E_State.INIT;
+    Status.State := E_State.INIT;
 ELSIF MovementRequested THEN
     // Double condition obligatoire : ordre effectif de desserrage ET confirmation
     // contacteur/bobine. Une confirmation résiduelle seule ne peut jamais autoriser
@@ -26648,11 +26183,11 @@ ELSIF MovementRequested THEN
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
         DriveFreqRefHz := MAX(0.0, RequestedDriveFreqHz);
-        Busy := TRUE;
-        State := E_State.BUSY;
+        Status.Busy := TRUE;
+        Status.State := E_State.BUSY;
     ELSE
-        Busy := TRUE;
-        State := E_State.INIT;
+        Status.Busy := TRUE;
+        Status.State := E_State.INIT;
     END_IF;
 END_IF;
 
@@ -28720,52 +28255,13 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Mouvement en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+Code erreur bitmask.</xhtml>
               </documentation>
             </variable>
             <variable name="RelayFwd">
@@ -29045,17 +28541,17 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DirectionChangeDelayElapsed := T#0ms;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
 // 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     StepNumber := 0;
     RequestedStep := 0;
     BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
@@ -29262,7 +28758,7 @@ ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de con
 {region "§5 Diagnostic contacteurs et configuration"}
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d'erreur
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
 END_IF;
 
 IF NOT BypassGlobal THEN
@@ -29275,21 +28771,21 @@ IF NOT BypassGlobal THEN
 // bit2 libre/inutilisé.
 IF NOT BypassContactorCheck THEN
     IF ContactorsCheck.StuckClosed THEN
-        ErrorId := ErrorId OR 16#0002;
+        Status.ErrorId := Status.ErrorId OR 16#0002;
     ELSIF ResetEdge.Q THEN
-        ErrorId := ErrorId AND 16#FFFD;
+        Status.ErrorId := Status.ErrorId AND 16#FFFD;
     END_IF;
 ELSE
-    ErrorId := ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
 END_IF;
 
 // 🪜 Remonte le défaut de configuration interne de FB_SpeedStep.
 // Le bit reste mémorisé après correction de la table ; cause disparue + nouveau front Reset
 // sont obligatoires avant de rendre le treuil disponible, conformément à Partie 3 §5.
 IF SpeedStep.ConfigError THEN
-    ErrorId := ErrorId OR 16#0004;    // bit2 = table/plafond/hystérésis invalide
+    Status.ErrorId := Status.ErrorId OR 16#0004;    // bit2 = table/plafond/hystérésis invalide
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    Status.ErrorId := Status.ErrorId AND 16#FFFB;
 END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
@@ -29297,24 +28793,24 @@ END_IF; // fin IF NOT BypassGlobal
 {endregion}
 
 {region "§6 Etats et repli defaut"}
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 IF (NOT StartStop OR EffectiveSafeStop OR DirectionChangePending) AND StepNumber &gt; 0 THEN
-    State := E_State.STOPPING;
+    Status.State := E_State.STOPPING;
 ELSIF StepNumber &gt; 0 THEN
-    State := E_State.BUSY;
+    Status.State := E_State.BUSY;
 ELSE
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
-Done := FALSE;
+Status.Busy := (Status.State = E_State.BUSY) OR (Status.State = E_State.STOPPING);
+Status.Done := FALSE;
 
-IF Error THEN
+IF Status.Error THEN
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -29419,52 +28915,13 @@ END_IF;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0: entree/table invalide)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "entrée/table invalide".</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedBand">
@@ -29564,11 +29021,11 @@ END_IF;
 // 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
-    Busy := FALSE;
-    Done := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
-    State := E_State.DISABLED;
+    Status.Busy := FALSE;
+    Status.Done := FALSE;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
+    Status.State := E_State.DISABLED;
     SpeedBand := 0;
     EstimatedLoadPct := 0.0;
     Configured := FALSE;
@@ -29578,9 +29035,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 Ready := TRUE;
-Busy := FALSE;
-Done := FALSE;
-State := E_State.READY;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+Status.State := E_State.READY;
 ResetEdge(CLK := Reset);
 Configured := LoadTable.IsConfigured;
 // 📈 L'estimation de charge n'a de sens qu'en montée.
@@ -29592,7 +29049,7 @@ Ascending := (MeasuredSpeedSignedMps &gt; 0.0);
 {region "§2 Classement vitesse"}
 // 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
 IF (MeasuredSpeedMps &lt; 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps &lt;= 0.0) THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
     SpeedBand := 0;
 ELSIF NOT HasPreviousBand THEN
     IF MeasuredSpeedMps &lt;= SpeedConfig.SpeedBandMaxMps[1] THEN
@@ -29612,7 +29069,7 @@ ELSE
     // 🔒 Valider l'état mémorisé avant toute indexation dynamique.
     IF PreviousSpeedBand &lt; 1 OR PreviousSpeedBand &gt; 5 THEN
         PreviousSpeedBand := 1;
-        ErrorId := ErrorId OR 16#0001;
+        Status.ErrorId := Status.ErrorId OR 16#0001;
     END_IF;
 
     // CODESYS ne garantit pas le court-circuit des expressions AND :
@@ -29644,7 +29101,7 @@ IF Configured THEN
                     IF SpeedBand &lt;= 5 THEN
                         SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
                         IF (SelectedLoadPct &lt; 0.0) OR (SelectedLoadPct &gt; 100.0) THEN
-                            ErrorId := ErrorId OR 16#0001;
+                            Status.ErrorId := Status.ErrorId OR 16#0001;
                         ELSE
                             EstimatedLoadPct := SelectedLoadPct;
                         END_IF;
@@ -29658,13 +29115,13 @@ END_IF;
 
 {region "§4 Sorties et acquittement"}
 // 📤 4. SORTIES D'ÉTAT ET ACQUITTEMENT.
-IF ResetEdge.Q AND (ErrorId &lt;&gt; 16#0000) AND (MeasuredSpeedMps &gt;= 0.0) THEN
-    ErrorId := 16#0000;
+IF ResetEdge.Q AND (Status.ErrorId &lt;&gt; 16#0000) AND (MeasuredSpeedMps &gt;= 0.0) THEN
+    Status.ErrorId := 16#0000;
 END_IF;
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 {endregion}
 </xhtml>
@@ -30487,52 +29944,13 @@ END_IF;
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0: ecart, bit1: incoherence)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ErrorId : &lt;-- [DIAG] bitmask (bit0: ecart, bit1: incoherence)
+&lt;-- [STAT] Statut FB groupe (Busy/Done/Error/State/StateAtError)</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaPosM">
@@ -30649,14 +30067,14 @@ END_IF;
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
     DeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE;
     SyncDegradedStep1 := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -30664,14 +30082,14 @@ END_IF;
 
 {region "§2 Initialisation et activation synchro"}
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et ignore toute la surveillance synchro
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
 END_IF;
 
 // 🎚️ 3. SyncActive SELON MODE (Partie9 §9)
@@ -30711,13 +30129,13 @@ IF NOT BypassGlobal THEN
 DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM &gt; CfgSyncToleranceM);
 DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
 IF DeviationTimer.Q THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q AND NOT DeviationActive THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // 🐢 Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
-SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM &gt; CfgSyncToleranceM) OR ((ErrorId AND 16#0001) &lt;&gt; 16#0000));
+SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM &gt; CfgSyncToleranceM) OR ((Status.ErrorId AND 16#0001) &lt;&gt; 16#0000));
 
 // 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1
 // Vérifie que les commandes envoyées aux deux treuils sont identiques (sens et contacteurs)
@@ -30734,9 +30152,9 @@ MismatchActive := SyncActive AND (
 MismatchTimer(IN := MismatchActive, PT := T#500ms);
 
 IF MismatchTimer.Q THEN
-    ErrorId := ErrorId OR 16#0002;
+    Status.ErrorId := Status.ErrorId OR 16#0002;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;
 END_IF; // fin du IF MismatchActive
 
 ELSE
@@ -30747,15 +30165,15 @@ END_IF; // fin IF NOT BypassGlobal
 
 {region "§5 Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-SyncWarn := Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
-Busy := FALSE;
-Done := FALSE;
+SyncWarn := Status.Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}
 </xhtml>
@@ -31678,8 +31096,8 @@ instJoystick(
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                      := PRG_03_Modes_Cycle.Auth.Mode,
-    BenneBusy                 := PRG_04_Treuils_Benne.instBucket.Busy,
-    PreserveArmingAfterBucket := PRG_04_Treuils_Benne.instExtractionSequence.Busy
+    BenneBusy                 := PRG_04_Treuils_Benne.instBucket.Status.Busy,
+    PreserveArmingAfterBucket := PRG_04_Treuils_Benne.instExtractionSequence.Status.Busy
                                  AND (PRG_04_Treuils_Benne.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
     BusCanOpenOP              := PRG_07_Supervision.instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick,
@@ -31797,7 +31215,7 @@ M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-    AND NOT PRG_04_Treuils_Benne.instWinchM1.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Busy;
+    AND NOT PRG_04_Treuils_Benne.instWinchM1.Status.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Status.Busy;
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.CablePosM1;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
@@ -31995,7 +31413,7 @@ instCycleSemiAuto(
     KoboldContactFond       := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
-    WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Error,
+    WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
     WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
     M1_CablePosM            := PRG_02_Acquisition.Data.CablePosM1,
     M2_CablePosM            := PRG_02_Acquisition.Data.CablePosM2,
@@ -32009,8 +31427,8 @@ instCycleSemiAuto(
     Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,
     Translation_Busy        := PRG_05_Translation.instTranslationM3.Status.Busy,
     Translation_Done        := PRG_05_Translation.instTranslationM3.Status.Done,
-    Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Busy,
-    Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
+    Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Status.Busy,
+    Benne_Done              := PRG_04_Treuils_Benne.instBucket.Status.Done,
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
@@ -32641,10 +32059,10 @@ instDiveSearch(
 
 // Publication IHM — consommée ensuite par FB_TroubleshootingView (debug).
 GVL_IHM.DredgingAssist.State.DiveReady            := instDiveSearch.Ready;
-GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Busy;
-GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Done;
-GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Error;
-GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.ErrorId;
+GVL_IHM.DredgingAssist.State.DiveBusy             := instDiveSearch.Status.Busy;
+GVL_IHM.DredgingAssist.State.DiveDone             := instDiveSearch.Status.Done;
+GVL_IHM.DredgingAssist.State.DiveError            := instDiveSearch.Status.Error;
+GVL_IHM.DredgingAssist.State.DiveErrorId          := instDiveSearch.Status.ErrorId;
 GVL_IHM.DredgingAssist.State.DiveState            := instDiveSearch.DiveState;
 // BottomPositionConfirmed = OR des trois : détection Kobold
 // (instDiveSearch), confirmation manuelle (TglBucketAtBottomConfirmed) et bypass.
@@ -32661,9 +32079,9 @@ instExtractionSequence(
     MotionDirection := CoupledUserRequestDirection,
     BottomPositionConfirmed := BottomPositionConfirmed,
     BucketIsClosed := _BucketState.IsClosed,
-    BucketBusy := instBucket.Busy,
-    BucketError := instBucket.Error,
-    WinchSyncError := instWinchSync.Error,
+    BucketBusy := instBucket.Status.Busy,
+    BucketError := instBucket.Status.Error,
+    WinchSyncError := instWinchSync.Status.Error,
     M1Position_M := PRG_02_Acquisition.Data.CablePosM1,
     M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
     M1MeasuredSpeedValid := PRG_02_Acquisition.Data.M1_SpeedValid,
@@ -32678,19 +32096,19 @@ END_IF;
 
 // Publication IHM (voir DiveSearch ci-dessus).
 GVL_IHM.DredgingAssist.State.ExtractionReady   := instExtractionSequence.Ready;
-GVL_IHM.DredgingAssist.State.ExtractionBusy    := instExtractionSequence.Busy;
-GVL_IHM.DredgingAssist.State.ExtractionDone    := instExtractionSequence.Done;
-GVL_IHM.DredgingAssist.State.ExtractionError   := instExtractionSequence.Error;
-GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.ErrorId;
+GVL_IHM.DredgingAssist.State.ExtractionBusy    := instExtractionSequence.Status.Busy;
+GVL_IHM.DredgingAssist.State.ExtractionDone    := instExtractionSequence.Status.Done;
+GVL_IHM.DredgingAssist.State.ExtractionError   := instExtractionSequence.Status.Error;
+GVL_IHM.DredgingAssist.State.ExtractionErrorId := instExtractionSequence.Status.ErrorId;
 GVL_IHM.DredgingAssist.State.ExtractionState   := instExtractionSequence.ExtractionState;
 
 // une seule consigne opérateur conduite à la fois (doc §OperatorActionId) —
 // arbitrage fait ici : DiveSearch prioritaire si Busy, sinon ExtractionSequence si Busy,
 // sinon la dernière connue reste affichée à titre informatif.
-IF instDiveSearch.Busy THEN
+IF instDiveSearch.Status.Busy THEN
     GVL_IHM.DredgingAssist.State.OperatorActionId := instDiveSearch.OperatorActionId;
     GVL_IHM.DredgingAssist.State.OperatorAction   := instDiveSearch.OperatorAction;
-ELSIF instExtractionSequence.Busy THEN
+ELSIF instExtractionSequence.Status.Busy THEN
     GVL_IHM.DredgingAssist.State.OperatorActionId := instExtractionSequence.OperatorActionId;
     GVL_IHM.DredgingAssist.State.OperatorAction   := instExtractionSequence.OperatorAction;
 ELSE
@@ -32771,8 +32189,8 @@ instBucket(
     CablePosM2          := PRG_02_Acquisition.Data.CablePosM2,
     HomedM1             := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2             := PRG_02_Acquisition.instHomingM2.Homed,
-    M1_Busy             := instWinchM1.Busy,
-    M2_Busy             := instWinchM2.Busy,
+    M1_Busy             := instWinchM1.Status.Busy,
+    M2_Busy             := instWinchM2.Status.Busy,
     ConfirmOpenPosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
     ConfirmClosePosition:= GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
     Config              := _BucketCfgPersist.Config,
@@ -32790,20 +32208,20 @@ instBucket(
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
-CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Busy;
-BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDirection = 1) AND NOT instBucket.Busy AND NOT _BucketState.IsClosed;
+CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Status.Busy;
+BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDirection = 1) AND NOT instBucket.Status.Busy AND NOT _BucketState.IsClosed;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
 // au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
 SlackCableAscentStep1 := NOT PRG_03_Modes_Cycle.Auth.SyncEnable AND (
-    ((instSafetyWinchM1.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
-    ((instSafetyWinchM2.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
+    ((instSafetyWinchM1.Status.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
+    ((instSafetyWinchM2.Status.ErrorId AND 16#0008) &lt;&gt; 16#0000) OR
     (NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI)
 );
 
-SyncMinorDeviation := (instWinchSync.ErrorId AND 16#0001) &lt;&gt; 16#0000;
+SyncMinorDeviation := (instWinchSync.Status.ErrorId AND 16#0001) &lt;&gt; 16#0000;
 SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &gt; 0.0);
 SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM &lt; 0.0);
 
@@ -32855,7 +32273,7 @@ ELSE
         END_IF;
     END_IF;
 
-    M1LogicRequestStartStop := (M1LogicRequestDirection &lt;&gt; 0) AND NOT instBucket.Busy
+    M1LogicRequestStartStop := (M1LogicRequestDirection &lt;&gt; 0) AND NOT instBucket.Status.Busy
                             AND NOT CoupledMotionBlockedByBucket
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1LogicRequestDirection = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1LogicRequestDirection = -1)))
@@ -32865,7 +32283,7 @@ END_IF;
 // Condition renforcée "instBucket.Busy AND instBucket.M2_StartStop" au lieu de
 // "instBucket.Busy" seul : si le mouvement couplé est toujours demandé, M2
 // reçoit sa commande de continuité le MÊME scan, sans dépendre d'un timing de bascule.
-IF instBucket.Busy AND instBucket.M2_StartStop THEN
+IF instBucket.Status.Busy AND instBucket.M2_StartStop THEN
     M2LogicRequestStartStop := instBucket.M2_StartStop;
     M2LogicRequestDirection := instBucket.M2_Direction;
     M2LogicRequestSpeedRef_Pct  := 15.0;
@@ -32911,7 +32329,7 @@ END_IF;
 // (CoupledUserRequestActive), auquel cas l'arbitrage normal (§3) prend le
 // relais sans interruption. Comportement inchangé pour toute fin d'action benne SANS mouvement
 // couplé en cours (ouverture/fermeture manuelle isolée, bouton IHM) : l'arrêt reste forcé.
-BenneBusyFallEdge(CLK := instBucket.Busy);
+BenneBusyFallEdge(CLK := instBucket.Status.Busy);
 IF BenneBusyFallEdge.Q AND NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection &lt;&gt; 0)) THEN
     M1LogicRequestStartStop := FALSE;
     M2LogicRequestStartStop := FALSE;
@@ -32921,7 +32339,7 @@ END_IF;
 // (pas ExtractionSequence, qui a déjà sa propre phase CONTROL_ASCENT), la montée couplée qui
 // enchaîne démarre en vitesse contrôlée (palier 1) sur ExtractionControlDistance_M avant de
 // repasser en paliers normaux.
-BucketBusyRiseEdge(CLK := instBucket.Busy);
+BucketBusyRiseEdge(CLK := instBucket.Status.Busy);
 IF BucketBusyRiseEdge.Q THEN
     ControlAscentArmedForThisClose := CoupledAscentBucketCloseArmed;
 END_IF;
@@ -32946,7 +32364,7 @@ END_IF;
 // === 🔄 §4 SYNCHRONISATION M1 / M2 ===
 
 instWinchSync(
-    Enable          := PRG_03_Modes_Cycle.Auth.SyncEnable AND NOT instBucket.Busy
+    Enable          := PRG_03_Modes_Cycle.Auth.SyncEnable AND NOT instBucket.Status.Busy
                         AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
@@ -33023,8 +32441,8 @@ END_IF;
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/contacteurs/fin de course des DEUX treuils (VH_0800END,
 // Local_Digital_IO) — pas de granularité par treuil possible, donc SafeStop des DEUX.
-SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault;
-SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault;
+SafeStopM1_Raw      := ((instWinchSync.Status.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault;
+SafeStopM2_Raw      := ((instWinchSync.Status.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
 // : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
@@ -33105,7 +32523,7 @@ instSafetyWinchM1(
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.instHomingM1.Busy,
+    InReferencingMode      := PRG_02_Acquisition.instHomingM1.Status.Busy,
     CablePosM              := PRG_02_Acquisition.Data.CablePosM1,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
@@ -33117,9 +32535,9 @@ instSafetyWinchM1(
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
-    BenneHoldStillActive   := instBucket.Busy,
+    BenneHoldStillActive   := instBucket.Status.Busy,
     ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.CablePosM2 - instBucket.ActiveOffsetM,
-    BenneBusy              := instBucket.Busy,
+    BenneBusy              := instBucket.Status.Busy,
     OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM2,
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.M1_Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.M1_SignedSpeed_Mps,
@@ -33161,7 +32579,7 @@ instSafetyWinchM2(
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.instHomingM2.Busy,
+    InReferencingMode      := PRG_02_Acquisition.instHomingM2.Status.Busy,
     CablePosM              := PRG_02_Acquisition.Data.CablePosM2,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
@@ -33175,7 +32593,7 @@ instSafetyWinchM2(
     JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
     BenneHoldStillActive   := FALSE,
     ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.CablePosM1 + instBucket.ActiveOffsetM,
-    BenneBusy              := instBucket.Busy,
+    BenneBusy              := instBucket.Status.Busy,
     OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM1,
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.M2_Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.M2_SignedSpeed_Mps,
@@ -33248,7 +32666,7 @@ instWinchM1(
     MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
-    SpeedGuardReady         := NOT instWinchSync.Error,
+    SpeedGuardReady         := NOT instWinchSync.Status.Error,
     HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
@@ -33284,7 +32702,7 @@ instWinchM2(
     MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
-    SpeedGuardReady         := NOT instWinchSync.Error,
+    SpeedGuardReady         := NOT instWinchSync.Status.Error,
     HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
@@ -33352,12 +32770,12 @@ M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
 WinchM1State.Position_M := PRG_02_Acquisition.Data.CablePosM1;
 WinchM1State.SpeedRef_Pct := M1LogicRequestSpeedRef_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
-WinchM1State.FBState := instWinchM1.State;
+WinchM1State.FBState := instWinchM1.Status.State;
 WinchM1State.Ready := instWinchM1.Ready;
-WinchM1State.Busy := instWinchM1.Busy;
-WinchM1State.Done := instWinchM1.Done;
-WinchM1State.Error := instWinchM1.Error;
-WinchM1State.ErrorId := instWinchM1.ErrorId;
+WinchM1State.Busy := instWinchM1.Status.Busy;
+WinchM1State.Done := instWinchM1.Status.Done;
+WinchM1State.Error := instWinchM1.Status.Error;
+WinchM1State.ErrorId := instWinchM1.Status.ErrorId;
 WinchM1State.RelayFwd := instWinchM1.RelayFwd;
 WinchM1State.RelayRev := instWinchM1.RelayRev;
 WinchM1State.Contactor1 := instWinchM1.Contactor1;
@@ -33382,15 +32800,15 @@ WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
 WinchM1State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
 WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderAbsM1.PresetTriggerCmd;
 WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderAbsM1.PresetValueOut;
-WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM1.Error;
-WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM1.ErrorId;
+WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM1.Status.Error;
+WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM1.Status.ErrorId;
 WinchM1State.Encoder.Homed := PRG_02_Acquisition.instHomingM1.Homed;
-WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM1.Busy;
-WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM1.Done;
-WinchM1State.Encoder.HomingError := PRG_02_Acquisition.instHomingM1.Error;
-WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM1.ErrorId;
-WinchM1State.Encoder.HomingState := PRG_02_Acquisition.instHomingM1.State;
-WinchM1State.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM1.StateAtError;
+WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM1.Status.Busy;
+WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM1.Status.Done;
+WinchM1State.Encoder.HomingError := PRG_02_Acquisition.instHomingM1.Status.Error;
+WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM1.Status.ErrorId;
+WinchM1State.Encoder.HomingState := PRG_02_Acquisition.instHomingM1.Status.State;
+WinchM1State.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM1.Status.StateAtError;
 WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM1.HomingSuspect;
 WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM1.HomingRefRaw;
 WinchM1State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
@@ -33409,12 +32827,12 @@ M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
 WinchM2State.Position_M := PRG_02_Acquisition.Data.CablePosM2;
 WinchM2State.SpeedRef_Pct := M2LogicRequestSpeedRef_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
-WinchM2State.FBState := instWinchM2.State;
+WinchM2State.FBState := instWinchM2.Status.State;
 WinchM2State.Ready := instWinchM2.Ready;
-WinchM2State.Busy := instWinchM2.Busy;
-WinchM2State.Done := instWinchM2.Done;
-WinchM2State.Error := instWinchM2.Error;
-WinchM2State.ErrorId := instWinchM2.ErrorId;
+WinchM2State.Busy := instWinchM2.Status.Busy;
+WinchM2State.Done := instWinchM2.Status.Done;
+WinchM2State.Error := instWinchM2.Status.Error;
+WinchM2State.ErrorId := instWinchM2.Status.ErrorId;
 WinchM2State.RelayFwd := instWinchM2.RelayFwd;
 WinchM2State.RelayRev := instWinchM2.RelayRev;
 WinchM2State.Contactor1 := instWinchM2.Contactor1;
@@ -33439,15 +32857,15 @@ WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
 WinchM2State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
 WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderAbsM2.PresetTriggerCmd;
 WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderAbsM2.PresetValueOut;
-WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM2.Error;
-WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM2.ErrorId;
+WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM2.Status.Error;
+WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM2.Status.ErrorId;
 WinchM2State.Encoder.Homed := PRG_02_Acquisition.instHomingM2.Homed;
-WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM2.Busy;
-WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM2.Done;
-WinchM2State.Encoder.HomingError := PRG_02_Acquisition.instHomingM2.Error;
-WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM2.ErrorId;
-WinchM2State.Encoder.HomingState := PRG_02_Acquisition.instHomingM2.State;
-WinchM2State.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM2.StateAtError;
+WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM2.Status.Busy;
+WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM2.Status.Done;
+WinchM2State.Encoder.HomingError := PRG_02_Acquisition.instHomingM2.Status.Error;
+WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM2.Status.ErrorId;
+WinchM2State.Encoder.HomingState := PRG_02_Acquisition.instHomingM2.Status.State;
+WinchM2State.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM2.Status.StateAtError;
 WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM2.HomingSuspect;
 WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM2.HomingRefRaw;
 WinchM2State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
@@ -33463,19 +32881,19 @@ WinchM1Safety.AscentPermit := AscentPermitM1_Active;
 WinchM1Safety.DescendPermit := DescendPermitM1_Active;
 WinchM1Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
 WinchM1Safety.PowerCutOff := instSafetyWinchM1.PowerCutOff;
-WinchM1Safety.Error := instWinchM1.Error OR instSafetyWinchM1.Error;
-WinchM1Safety.ErrorId := instSafetyWinchM1.ErrorId;
-WinchM1Safety.ErrorOperatorComm  := (instSafetyWinchM1.ErrorId AND 16#0001) &lt;&gt; 0;
-WinchM1Safety.ErrorEncoder       := (instSafetyWinchM1.ErrorId AND 16#0002) &lt;&gt; 0;
-WinchM1Safety.ErrorPhaseRotation := (instSafetyWinchM1.ErrorId AND 16#0010) &lt;&gt; 0;
-WinchM1Safety.ErrorBrakeThermal  := (instSafetyWinchM1.ErrorId AND 16#0400) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaA         := (instSafetyWinchM1.ErrorId AND 16#0080) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaB         := (instSafetyWinchM1.ErrorId AND 16#0100) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaC         := (instSafetyWinchM1.ErrorId AND 16#0200) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaD         := (instSafetyWinchM1.ErrorId AND 16#0800) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaE         := (instSafetyWinchM1.ErrorId AND 16#3000) &lt;&gt; 0;
-WinchM1Safety.ErrorOppositeDir   := (instSafetyWinchM1.ErrorId AND 16#4000) &lt;&gt; 0;
-WinchM1Safety.ErrorNoMovement    := (instSafetyWinchM1.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM1Safety.Error := instWinchM1.Status.Error OR instSafetyWinchM1.Status.Error;
+WinchM1Safety.ErrorId := instSafetyWinchM1.Status.ErrorId;
+WinchM1Safety.ErrorOperatorComm  := (instSafetyWinchM1.Status.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM1Safety.ErrorEncoder       := (instSafetyWinchM1.Status.ErrorId AND 16#0002) &lt;&gt; 0;
+WinchM1Safety.ErrorPhaseRotation := (instSafetyWinchM1.Status.ErrorId AND 16#0010) &lt;&gt; 0;
+WinchM1Safety.ErrorBrakeThermal  := (instSafetyWinchM1.Status.ErrorId AND 16#0400) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaA         := (instSafetyWinchM1.Status.ErrorId AND 16#0080) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaB         := (instSafetyWinchM1.Status.ErrorId AND 16#0100) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaC         := (instSafetyWinchM1.Status.ErrorId AND 16#0200) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaD         := (instSafetyWinchM1.Status.ErrorId AND 16#0800) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaE         := (instSafetyWinchM1.Status.ErrorId AND 16#3000) &lt;&gt; 0;
+WinchM1Safety.ErrorOppositeDir   := (instSafetyWinchM1.Status.ErrorId AND 16#4000) &lt;&gt; 0;
+WinchM1Safety.ErrorNoMovement    := (instSafetyWinchM1.Status.ErrorId AND 16#8000) &lt;&gt; 0;
 WinchM1Safety.PowerCutOffSafety  := PRG_06_Outputs.M1PowerCutOffSafetyInfo;
 WinchM1Safety.SafeStopSafety     := PRG_06_Outputs.M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := PRG_06_Outputs.M1BlockedBySafetyInfo;
@@ -33486,19 +32904,19 @@ WinchM2Safety.DescendPermit := DescendPermitM2_Active;
 WinchM2Safety.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
 WinchM2Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
 WinchM2Safety.PowerCutOff := instSafetyWinchM2.PowerCutOff;
-WinchM2Safety.Error := instWinchM2.Error OR instSafetyWinchM2.Error;
-WinchM2Safety.ErrorId := instSafetyWinchM2.ErrorId;
-WinchM2Safety.ErrorOperatorComm  := (instSafetyWinchM2.ErrorId AND 16#0001) &lt;&gt; 0;
-WinchM2Safety.ErrorEncoder       := (instSafetyWinchM2.ErrorId AND 16#0002) &lt;&gt; 0;
-WinchM2Safety.ErrorPhaseRotation := (instSafetyWinchM2.ErrorId AND 16#0010) &lt;&gt; 0;
-WinchM2Safety.ErrorBrakeThermal  := (instSafetyWinchM2.ErrorId AND 16#0400) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaA         := (instSafetyWinchM2.ErrorId AND 16#0080) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaB         := (instSafetyWinchM2.ErrorId AND 16#0100) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaC         := (instSafetyWinchM2.ErrorId AND 16#0200) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaD         := (instSafetyWinchM2.ErrorId AND 16#0800) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaE         := (instSafetyWinchM2.ErrorId AND 16#3000) &lt;&gt; 0;
-WinchM2Safety.ErrorOppositeDir   := (instSafetyWinchM2.ErrorId AND 16#4000) &lt;&gt; 0;
-WinchM2Safety.ErrorNoMovement    := (instSafetyWinchM2.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM2Safety.Error := instWinchM2.Status.Error OR instSafetyWinchM2.Status.Error;
+WinchM2Safety.ErrorId := instSafetyWinchM2.Status.ErrorId;
+WinchM2Safety.ErrorOperatorComm  := (instSafetyWinchM2.Status.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM2Safety.ErrorEncoder       := (instSafetyWinchM2.Status.ErrorId AND 16#0002) &lt;&gt; 0;
+WinchM2Safety.ErrorPhaseRotation := (instSafetyWinchM2.Status.ErrorId AND 16#0010) &lt;&gt; 0;
+WinchM2Safety.ErrorBrakeThermal  := (instSafetyWinchM2.Status.ErrorId AND 16#0400) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaA         := (instSafetyWinchM2.Status.ErrorId AND 16#0080) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaB         := (instSafetyWinchM2.Status.ErrorId AND 16#0100) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaC         := (instSafetyWinchM2.Status.ErrorId AND 16#0200) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaD         := (instSafetyWinchM2.Status.ErrorId AND 16#0800) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaE         := (instSafetyWinchM2.Status.ErrorId AND 16#3000) &lt;&gt; 0;
+WinchM2Safety.ErrorOppositeDir   := (instSafetyWinchM2.Status.ErrorId AND 16#4000) &lt;&gt; 0;
+WinchM2Safety.ErrorNoMovement    := (instSafetyWinchM2.Status.ErrorId AND 16#8000) &lt;&gt; 0;
 WinchM2Safety.PowerCutOffSafety  := PRG_06_Outputs.M2PowerCutOffSafetyInfo;
 WinchM2Safety.SafeStopSafety     := PRG_06_Outputs.M2SafeStopSafetyInfo;
 WinchM2Safety.BlockedBySafety    := PRG_06_Outputs.M2BlockedBySafetyInfo;
@@ -33508,29 +32926,29 @@ SyncState.SyncActive := instWinchSync.SyncActive;
 SyncState.SyncWarn := instWinchSync.SyncWarn;
 SyncState.SyncDegradedStep1 := instWinchSync.SyncDegradedStep1;
 SyncState.Ready := instWinchSync.Ready;
-SyncState.Error := instWinchSync.Error;
-SyncState.ErrorId := instWinchSync.ErrorId;
-SyncState.FBState := instWinchSync.State;
+SyncState.Error := instWinchSync.Status.Error;
+SyncState.ErrorId := instWinchSync.Status.ErrorId;
+SyncState.FBState := instWinchSync.Status.State;
 
 BucketState.MechState := _BucketState;
-BucketState.FBState := instBucket.State;
+BucketState.FBState := instBucket.Status.State;
 BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;
 BucketState.M2Direction := instBucket.M2_Direction;
 BucketState.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.CablePosM2 - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
-BucketState.Busy := instBucket.Busy;
-BucketState.Done := instBucket.Done;
-BucketState.Error := instBucket.Error;
-BucketState.ErrorId := instBucket.ErrorId;
+BucketState.Busy := instBucket.Status.Busy;
+BucketState.Done := instBucket.Status.Done;
+BucketState.Error := instBucket.Status.Error;
+BucketState.ErrorId := instBucket.Status.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
 // Reflète le séquencement auto : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
 // vitesse contrôlée post-fermeture.
-BucketState.AutoBucketSeqActive := (instBucket.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
+BucketState.AutoBucketSeqActive := (instBucket.Status.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
 BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
 BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
 BucketState.ControlAscentActive := ControlAscentActive;
@@ -34117,10 +33535,10 @@ TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationState.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
-TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.State;
+TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.State;
 TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
-TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Error;
-TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.ErrorId;
+TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.Error;
+TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.ErrorId;
 TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
 TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) &lt;&gt; 0;
 TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) &lt;&gt; 0;
@@ -34133,8 +33551,8 @@ TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // ci-dessus, bitfield différent, jamais mélangé.
 TranslationSafety.SafeStop := M3_SafeStop_Aggregate;
 TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
-TranslationSafety.Error := instSafetyTranslationM3.Error;
-TranslationSafety.ErrorId := instSafetyTranslationM3.ErrorId;
+TranslationSafety.Error := instSafetyTranslationM3.Status.Error;
+TranslationSafety.ErrorId := instSafetyTranslationM3.Status.ErrorId;
 TranslationSafety.ErrorOperatorComm := instSafetyTranslationM3.ErrorOperatorComm;
 TranslationSafety.ErrorDriveComm := instSafetyTranslationM3.ErrorDriveComm;
 TranslationSafety.ErrorPhaseRotation := instSafetyTranslationM3.ErrorPhaseRotation;
@@ -35387,7 +34805,7 @@ GVL_IHM.Cycle.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1
 GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
 GVL_IHM.Cycle.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.Cycle.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
-GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.instWinchSync.Error;
+GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.instWinchSync.Status.Error;
 GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM;
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive;
@@ -35411,8 +34829,8 @@ instHmiBannerFormatter(
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
     HomingActive          := (NOT PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed),
-    HomingStepM1          := SEL(PRG_02_Acquisition.instHomingM1.Busy, 0, 1),
-    HomingStepM2          := SEL(PRG_02_Acquisition.instHomingM2.Busy, 0, 1),
+    HomingStepM1          := SEL(PRG_02_Acquisition.instHomingM1.Status.Busy, 0, 1),
+    HomingStepM2          := SEL(PRG_02_Acquisition.instHomingM2.Status.Busy, 0, 1),
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
@@ -35505,7 +34923,7 @@ instTroubleshootingView(
     CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     CycleSpeedMismatchActive := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
-    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Error,
+    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
     HomedM1              := PRG_02_Acquisition.instHomingM1.Homed,

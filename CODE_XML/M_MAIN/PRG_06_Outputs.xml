@@ -314,71 +314,6 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="E_State">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="INIT" value="1" />
-              <value name="READY" value="2" />
-              <value name="BUSY" value="3" />
-              <value name="DONE" value="4" />
-              <value name="STOPPING" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BUSY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>DONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STOPPING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="E_TranslationFinalInterlockReason">
         <baseType>
           <enum>
@@ -400,6 +335,81 @@
             <ObjectId>5edc74ff-df78-5968-b824-933c1970008c</ObjectId>
           </data>
         </addData>
+      </dataType>
+      <dataType name="ST_FbStatus">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bloc en cours d'exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut actif présent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier (forme cible)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe exactement les six membres nécessaires au suivi
+      synoptique et diagnostic d'un FB standard (contrat §2quinquies).
+   🧬 Forme cible : les FB standard passent de la forme « à plat »
+      (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers
+      `Status : ST_FbStatus`, migré par lot dédié, gradué (pilote d'abord).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
       <dataType name="E_WinchFinalInterlockReason">
         <baseType>
@@ -553,6 +563,71 @@
    📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
    =======================================================================</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="E_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="INIT" value="1" />
+              <value name="READY" value="2" />
+              <value name="BUSY" value="3" />
+              <value name="DONE" value="4" />
+              <value name="STOPPING" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STOPPING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+          </data>
+        </addData>
       </dataType>
     </dataTypes>
     <pous>
@@ -1551,55 +1626,16 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
-&lt;-- [STAT] FB pret a fonctionner</xhtml>
+&lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Interlock actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur (bit0: timeout desserrage frein)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "timeout desserrage frein".</xhtml>
               </documentation>
             </variable>
             <variable name="Reason">
@@ -1793,11 +1829,11 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DriveFreqRefWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     // ErrorId reste publiquement visible même hors Enable/AU : une retombée de gate
     // ne doit jamais masquer un timeout mémorisé ni remplacer l'acquittement conscient.
-    Error := (ErrorId &lt;&gt; 16#0000);
-    State := E_State.DISABLED;
+    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+    Status.State := E_State.DISABLED;
     Reason := E_TranslationFinalInterlockReason.NONE;
     RETURN;
 END_IF;
@@ -1833,22 +1869,22 @@ IF ResetEdge.Q THEN
     ResetRequired := FALSE;
 END_IF;
 IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSE
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
 // Le mot 7 est un reset AC600, pas un neutre opérateur : il reste autorisé avec
 // fréquence nulle mais ne solde pas RestartInhibit. Seul le mot 0, vu APRÈS
 // disparition de la cause et front Reset, autorise ensuite une nouvelle demande.
-IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
+IF RestartInhibit AND NOT Status.Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     IF RequestedDriveControlWord = 0 THEN
         NeutralRequestSeen := TRUE;
     ELSIF NeutralRequestSeen AND MovementRequested THEN
@@ -1864,21 +1900,21 @@ DriveFreqRefWord := 0;
 // SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
 // maintenu. La commande/frein suivent cette rampe jusqu'à demande nulle ; seul
 // un gate dur, timeout ou défaut final impose ici la coupure immédiate.
-BrakeCmd := BrakeReleaseRequest AND NOT Error AND NOT RestartInhibit;
-Ready := NOT Error AND NOT RestartInhibit;
-Busy := FALSE;
-Done := FALSE;
-State := E_State.READY;
+BrakeCmd := BrakeReleaseRequest AND NOT Status.Error AND NOT RestartInhibit;
+Ready := NOT Status.Error AND NOT RestartInhibit;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+Status.State := E_State.READY;
 
-IF Error THEN
+IF Status.Error THEN
     BrakeCmd := FALSE;
-    State := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
 ELSIF RequestedDriveControlWord = 7 THEN
     // Reset AC600 préservé, toujours sans consigne fréquence ni couple utile.
     DriveControlWord := 7;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
-    State := E_State.INIT;
+    Status.State := E_State.INIT;
 ELSIF MovementRequested THEN
     // Double condition obligatoire : ordre effectif de desserrage ET confirmation
     // contacteur/bobine. Une confirmation résiduelle seule ne peut jamais autoriser
@@ -1886,11 +1922,11 @@ ELSIF MovementRequested THEN
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
         DriveFreqRefHz := MAX(0.0, RequestedDriveFreqHz);
-        Busy := TRUE;
-        State := E_State.BUSY;
+        Status.Busy := TRUE;
+        Status.State := E_State.BUSY;
     ELSE
-        Busy := TRUE;
-        State := E_State.INIT;
+        Status.Busy := TRUE;
+        Status.State := E_State.INIT;
     END_IF;
 END_IF;
 
@@ -3405,6 +3441,7 @@ Diag.LockoutActive        := LockoutActive;
           </Folder>
         </Folder>
         <Folder Name="A_COMMUN">
+          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
       </ProjectStructure>

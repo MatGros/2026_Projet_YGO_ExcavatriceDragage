@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:51:55.433856" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:51:55.433856">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:05:58.976604" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:05:58.976604">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -138,6 +138,81 @@
             <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
           </data>
         </addData>
+      </dataType>
+      <dataType name="ST_FbStatus">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bloc en cours d'exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut actif présent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier (forme cible)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe exactement les six membres nécessaires au suivi
+      synoptique et diagnostic d'un FB standard (contrat §2quinquies).
+   🧬 Forme cible : les FB standard passent de la forme « à plat »
+      (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers
+      `Status : ST_FbStatus`, migré par lot dédié, gradué (pilote d'abord).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
       <dataType name="E_State">
         <baseType>
@@ -356,55 +431,17 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
-&lt;-- [STAT] FB pret a fonctionner</xhtml>
+&lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extraction en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Remontee nominale atteinte</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut sequence extraction</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0:fond, bit1:ferme, bit2:ctrl, bit3:cfg)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat IEC standard</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat IEC au moment du defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
+&lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)</xhtml>
               </documentation>
             </variable>
             <variable name="ExtractionState">
@@ -519,11 +556,11 @@
 
 {region "§1 Gate desactivation"}
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
     BottomConfirmationConsumed := FALSE;
-    State := E_State.DISABLED;
-    StateAtError := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
+    Status.StateAtError := E_State.DISABLED;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
     OperatorActionId := 0; OperatorAction := '';
     RETURN;
@@ -535,15 +572,15 @@ END_IF;
 ResetEdge(CLK := Reset);
 ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
 IF ErrorCausePresent THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 END_IF;
 IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    ErrorId := 16#0000;
-    StateAtError := E_State.DISABLED;
+    Status.ErrorId := 16#0000;
+    Status.StateAtError := E_State.DISABLED;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
 END_IF;
 
-Ready := FALSE; Busy := FALSE; Done := FALSE;
+Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
 BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
 BottomConfirmationConsumed := FALSE;
 OperatorActionId := 0; OperatorAction := '';
@@ -551,15 +588,15 @@ OperatorActionId := 0; OperatorAction := '';
 {endregion}
 
 {region "§3 Machine etat fermeture remontee"}
-IF ErrorId &lt;&gt; 16#0000 THEN
-    State := E_State.READY;
+IF Status.ErrorId &lt;&gt; 16#0000 THEN
+    Status.State := E_State.READY;
     ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
     OperatorActionId := 16#0280;
     OperatorAction := 'Vérifier la benne et les treuils puis réarmer avant de reprendre.';
 ELSE
     CASE ExtractionState OF
         E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION:
-            State := E_State.INIT;
+            Status.State := E_State.INIT;
             IF BottomPositionConfirmed THEN
                 ExtractionState := E_ExtractionSequenceState.READY_TO_CLOSE;
             ELSE
@@ -568,7 +605,7 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.READY_TO_CLOSE:
-            State := E_State.READY;
+            Status.State := E_State.READY;
             Ready := TRUE;
             OperatorActionId := 16#0201;
             OperatorAction := 'Demander la montée pour fermer la benne.';
@@ -578,14 +615,14 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.CLOSING_BUCKET:
-            State := E_State.BUSY;
-            Busy := TRUE;
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
             BucketCloseRequest := MotionRequestActive AND (MotionDirection = 1);
             OperatorActionId := 16#0202;
             OperatorAction := 'Maintenir la montée : fermeture de la benne en cours.';
             IF BucketError THEN
-                ErrorId := ErrorId OR 16#0002;
-                StateAtError := State;
+                Status.ErrorId := Status.ErrorId OR 16#0002;
+                Status.StateAtError := Status.State;
             ELSIF BucketIsClosed AND NOT BucketBusy THEN
                 ControlStartM1Position_M := M1Position_M;
                 ControlStartM2Position_M := M2Position_M;
@@ -593,37 +630,37 @@ ELSE
             END_IF;
 
         E_ExtractionSequenceState.CONTROL_ASCENT:
-            State := E_State.BUSY;
-            Busy := TRUE;
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
             AscentPermit := MotionRequestActive AND (MotionDirection = 1);
             ForceMinSpeedStep := TRUE;
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
             IF WinchSyncError OR NOT PositionsValid OR NOT M1MeasuredSpeedValid OR NOT M2MeasuredSpeedValid THEN
-                ErrorId := ErrorId OR 16#0004;
-                StateAtError := State;
+                Status.ErrorId := Status.ErrorId OR 16#0004;
+                Status.StateAtError := Status.State;
             ELSIF (M1Position_M &gt;= (ControlStartM1Position_M + ControlAscentDistance_M))
                AND (M2Position_M &gt;= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
                 ExtractionState := E_ExtractionSequenceState.NOMINAL_ASCENT;
             END_IF;
 
         E_ExtractionSequenceState.NOMINAL_ASCENT:
-            State := E_State.BUSY;
-            Busy := TRUE;
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
             AscentPermit := MotionRequestActive AND (MotionDirection = 1);
             OperatorActionId := 16#0204;
             OperatorAction := 'Maintenir la montée : extraction en cours.';
             IF WinchSyncError OR NOT PositionsValid THEN
-                ErrorId := ErrorId OR 16#0004;
-                StateAtError := State;
+                Status.ErrorId := Status.ErrorId OR 16#0004;
+                Status.StateAtError := Status.State;
             END_IF;
 
         E_ExtractionSequenceState.ERROR_HOLD:
-            State := E_State.READY;
+            Status.State := E_State.READY;
     END_CASE;
 END_IF;
 
-Error := (ErrorId &lt;&gt; 16#0000);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
 
 {endregion}
 </xhtml>
@@ -651,6 +688,7 @@ Error := (ErrorId &lt;&gt; 16#0000);
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
+          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
       </ProjectStructure>

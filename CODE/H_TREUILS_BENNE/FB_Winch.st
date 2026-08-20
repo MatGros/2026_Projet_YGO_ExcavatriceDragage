@@ -53,12 +53,9 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
-    Busy                            : BOOL;                           // <-- [STAT] Mouvement en cours
-    Done                            : BOOL;                           // <-- [STAT] Action terminee
-    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
-    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur bitmask
-    State                           : E_State;                        // <-- [STAT] Etat courant machine d'etat FB
-    StateAtError                    : E_State;                        // <-- [DIAG] Etat memorise lors du dernier defaut
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // Code erreur bitmask.
+    Status                          : ST_FbStatus;
 
     // === ORDRES ACTIONNEURS (CONTACTEURS) ===
     RelayFwd                        : BOOL;                           // <-- [ACT] Ordre contacteur sens montee
@@ -116,17 +113,17 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DirectionChangeDelayElapsed := T#0ms;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
 // 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     StepNumber := 0;
     RequestedStep := 0;
     BusinessStepDelay(IN := FALSE, PT := T#1s500ms);
@@ -333,7 +330,7 @@ ContactorsCheck.StuckOpen := FALSE; // Non applicable avec ce retour (pas de con
 {region "§5 Diagnostic contacteurs et configuration"}
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et saute toute la logique d'erreur
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
 END_IF;
 
 IF NOT BypassGlobal THEN
@@ -346,21 +343,21 @@ IF NOT BypassGlobal THEN
 // bit2 libre/inutilisé.
 IF NOT BypassContactorCheck THEN
     IF ContactorsCheck.StuckClosed THEN
-        ErrorId := ErrorId OR 16#0002;
+        Status.ErrorId := Status.ErrorId OR 16#0002;
     ELSIF ResetEdge.Q THEN
-        ErrorId := ErrorId AND 16#FFFD;
+        Status.ErrorId := Status.ErrorId AND 16#FFFD;
     END_IF;
 ELSE
-    ErrorId := ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;   // Bypass actif : efface/maintient à 0 le bit1
 END_IF;
 
 // 🪜 Remonte le défaut de configuration interne de FB_SpeedStep.
 // Le bit reste mémorisé après correction de la table ; cause disparue + nouveau front Reset
 // sont obligatoires avant de rendre le treuil disponible, conformément à Partie 3 §5.
 IF SpeedStep.ConfigError THEN
-    ErrorId := ErrorId OR 16#0004;    // bit2 = table/plafond/hystérésis invalide
+    Status.ErrorId := Status.ErrorId OR 16#0004;    // bit2 = table/plafond/hystérésis invalide
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    Status.ErrorId := Status.ErrorId AND 16#FFFB;
 END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
@@ -368,24 +365,24 @@ END_IF; // fin IF NOT BypassGlobal
 {endregion}
 
 {region "§6 Etats et repli defaut"}
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 IF (NOT StartStop OR EffectiveSafeStop OR DirectionChangePending) AND StepNumber > 0 THEN
-    State := E_State.STOPPING;
+    Status.State := E_State.STOPPING;
 ELSIF StepNumber > 0 THEN
-    State := E_State.BUSY;
+    Status.State := E_State.BUSY;
 ELSE
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
-Done := FALSE;
+Status.Busy := (Status.State = E_State.BUSY) OR (Status.State = E_State.STOPPING);
+Status.Done := FALSE;
 
-IF Error THEN
+IF Status.Error THEN
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;

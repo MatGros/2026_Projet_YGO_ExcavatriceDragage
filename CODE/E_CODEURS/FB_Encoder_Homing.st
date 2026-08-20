@@ -51,12 +51,9 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
     Ready                  : BOOL;        // <-- [STAT] FB pret a fonctionner
-    Busy                   : BOOL;        // <-- [STAT] Sequence SDO preset en cours
-    Done                   : BOOL;        // <-- [STAT] Referencement effectue avec succes
-    Error                  : BOOL;        // <-- [STAT] Synthese defaut (ErrorId <> 0)
-    ErrorId                : WORD;        // <-- [DIAG] Masque de bits de defaut
-    State                  : E_State;     // <-- [STAT] Etat courant du FB
-    StateAtError           : E_State;     // <-- [DIAG] Etat courant lors du dernier defaut
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5: preset, bit9: incoherence boot).
+    Status                 : ST_FbStatus;
 
     // === COMMANDES VERS FB_ENCODER_ABS ===
     PresetRequest          : BOOL;        // <-- [ACT]  Pulse demande d'ecriture preset SDO
@@ -105,8 +102,8 @@ END_VAR
 IF NOT Enable THEN
     PresetRequest := FALSE;
     PresetValue := 0;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     InitDone := FALSE;   // Force un nouveau contrôle §3.7 à la prochaine activation
     Homed := Calib.Homed;
     HomingSuspect := Calib.HomingSuspect;
@@ -126,17 +123,17 @@ ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
 
 // 🔍 3. COHÉRENCE AU REDÉMARRAGE (§3.7) — une fois par session Enable, dès que le codeur répond
 IF NOT InitDone THEN
-    State := E_State.INIT;
+    Status.State := E_State.INIT;
     IF EncoderAvailable THEN
         RawDiffRestart := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Calib.LastKnownRawPos);
         IF Calib.Homed AND (ABS(RawDiffRestart) > UDINT_TO_DINT(Calib.RestartCoherenceTolerancePts)) THEN
             Calib.HomingSuspect := TRUE;
-            ErrorId := ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
+            Status.ErrorId := Status.ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
         END_IF;
         InitDone := TRUE;
     END_IF;
 ELSE
-    IF State = E_State.INIT THEN State := E_State.READY; END_IF;
+    IF Status.State = E_State.INIT THEN Status.State := E_State.READY; END_IF;
 END_IF;
 
 {endregion}
@@ -145,7 +142,7 @@ END_IF;
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
 IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
     Calib.HomingSuspect := FALSE;
-    ErrorId := ErrorId AND 16#FDFF;   // efface bit9
+    Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
 END_IF;
 
 PresetRequest := FALSE;
@@ -154,15 +151,15 @@ DynamicTargetEdge(CLK := UseDynamicTarget);
 
 // Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
-ErrorId := ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
+Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
 HomingModeOk := (Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2);
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    ErrorId := ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
+    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
 END_IF;
 IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
-    ErrorId := ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
+    Status.ErrorId := Status.ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
 END_IF;
 
 // Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
@@ -195,7 +192,7 @@ IF HomingTrigger THEN
     // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
     // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
     IF (TargetPositionM < -99.0) OR (TargetPositionM > 99.0) THEN
-        ErrorId := ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+        Status.ErrorId := Status.ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
     ELSE
         TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
         Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
@@ -205,9 +202,9 @@ IF HomingTrigger THEN
         HomingRefRaw := Calib.HomingRefRaw;
         Homed := TRUE;
         HomingSuspect := FALSE;
-        Done := TRUE;
-        ErrorId := 16#0000;
-        State := E_State.READY;
+        Status.Done := TRUE;
+        Status.ErrorId := 16#0000;
+        Status.State := E_State.READY;
 
         // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
         PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
@@ -220,37 +217,37 @@ END_IF;
 
 {region "§4 Suivi SDO reset et sorties etat"}
 // ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
-IF State = E_State.BUSY THEN
+IF Status.State = E_State.BUSY THEN
     IF PresetAck THEN
-        Done := TRUE;
-        State := E_State.READY;
+        Status.Done := TRUE;
+        Status.State := E_State.READY;
         // Un homing réussi efface l'intégralité de ErrorId
-        ErrorId := 16#0000;
+        Status.ErrorId := 16#0000;
     ELSIF PresetNak THEN
-        ErrorId := ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
-        State := E_State.READY;
+        Status.ErrorId := Status.ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
+        Status.State := E_State.READY;
     END_IF;
 END_IF;
 
 // 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
 // à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
+    Status.ErrorId := Status.ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
 END_IF;
 
 // 📤 8. SORTIES ÉTAT
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // Mise à jour continue du point brut valide connu (hors séquence de homing elle-même)
-IF EncoderAvailable AND (State <> E_State.BUSY) THEN
+IF EncoderAvailable AND (Status.State <> E_State.BUSY) THEN
     Calib.LastKnownRawPos := RawPos;
 END_IF;
 
-Busy := (State = E_State.BUSY);
+Status.Busy := (Status.State = E_State.BUSY);
 Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
 HomingSuspect := Calib.HomingSuspect;
 HomingRefRaw := Calib.HomingRefRaw;

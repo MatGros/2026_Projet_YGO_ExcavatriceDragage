@@ -1,0 +1,78 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T137 : Migration des FB standard vers ST_FbStatus (forme cible)
+# Projet Excavatrice Dragage — 2026-08-20
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T137_MIGRATION_ST_FBSTATUS
+  criticality: C3            # refactor mécanique, PAS de changement de logique
+  strategy: patch
+
+  objective: >
+    Migrer les 15 FB standard restants de l'interface « à plat »
+    (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers la
+    forme cible unique `Status : ST_FbStatus`, STRICTEMENT MÉCANIQUE
+    (logique identique), en suivant le pilote FB_Translation déjà validé.
+
+  acceptance:
+    - id: AC1
+      statement: "Chacun des 15 FB migrés expose `Status : ST_FbStatus` en VAR_OUTPUT et ne déclare plus Busy/Done/Error/ErrorId/State/StateAtError à plat (Ready reste sortie libre hors ST_FbStatus)."
+      verified_by: "G315_check_fb_interface.py --report : forme cible = 16, forme héritée = 0"
+    - id: AC2
+      statement: "Chaque assignation interne d'un membre de statut est renommée en Status.X (State→Status.State, Error→Status.Error, ErrorId→Status.ErrorId, Busy/Done/StateAtError pareil), sans changer la logique (seuils, fronts, TON, états)."
+      verified_by: "revue du diff (aucun changement de seuil/tempo/front/état)"
+    - id: AC3
+      statement: "Tous les consommateurs de chaque FB (PRG_04/05/07, PRG_03, structs IHM) lisent les membres sous Status.* ; aucune référence plate résiduelle."
+      verified_by: "G200_check_linkage.py (PASS) + grep des instances"
+    - id: AC4
+      statement: "GVL_IHM et le pupitre sont intacts (ils lisent les structs métier, pas les membres de FB)."
+      verified_by: "aucune modif hors périmètre + G200"
+    - id: AC5
+      statement: "Le bundle est régénéré, les gates palier C passent, G200 est PASS."
+      verified_by: "run_all_gates.py --palier C, G200_check_linkage.py --report"
+    - id: AC6
+      statement: "Le nom de POU de chaque programme modifié est identique au nom de fichier (.st), et le suffixe de langage est identique au langage generé dans le bundle (ST pur, ni _LD ni _CFC)."
+      verified_by: "nom de fichier + déclaration POU + bundle (sans suffixe de langage)"
+
+  scope:
+    allowed:
+      - CODE/**/FB_*.st            # les 15 FB à migrer (pas les exceptions)
+      - CODE/M_MAIN/*.st           # consommateurs PRG
+      - CODE_XML/**                # sorties régénérées
+      - TOOLS/AGENT_WORKFLOW/tests/test_fb_interface_guard.py
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Les 9 FB exception (FB_Diag_*, FB_Cycle, FB_WinchOutputInterlock, FB_Safety_EmergencyManagement*), FB_Joystick, FB_SimBench, FB_Output
+      - Toute logique safety/mouvement (ne PAS toucher au comportement)
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - g315_track            # forme cible=16, héritée=0
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout problème constaté (sémantique de bit, référence oubliée, FB non migrable inattendu,
+    risque hors scope) est remonté IMMÉDIATEMENT à l'orchestrateur. L'agent doit suivre le
+    pattern du pilote FB_Translation déjà validé et NE PAS modifier la logique. Signaler
+    n'est pas élargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: ""

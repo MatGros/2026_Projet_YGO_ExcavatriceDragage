@@ -270,8 +270,8 @@ instJoystick(
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                      := PRG_03_Modes_Cycle.Auth.Mode,
-    BenneBusy                 := PRG_04_Treuils_Benne.instBucket.Busy,
-    PreserveArmingAfterBucket := PRG_04_Treuils_Benne.instExtractionSequence.Busy
+    BenneBusy                 := PRG_04_Treuils_Benne.instBucket.Status.Busy,
+    PreserveArmingAfterBucket := PRG_04_Treuils_Benne.instExtractionSequence.Status.Busy
                                  AND (PRG_04_Treuils_Benne.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
     BusCanOpenOP              := PRG_07_Supervision.instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick,
@@ -389,7 +389,7 @@ M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 M2BucketRefCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 M2BucketRefRequested := (M2BucketRefOpenEdge.Q OR M2BucketRefCloseEdge.Q)
     AND (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-    AND NOT PRG_04_Treuils_Benne.instWinchM1.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Busy;
+    AND NOT PRG_04_Treuils_Benne.instWinchM1.Status.Busy AND NOT PRG_04_Treuils_Benne.instWinchM2.Status.Busy;
 IF M2BucketRefRequested AND M2BucketRefOpenEdge.Q THEN
     M2BucketRefTargetM := Data.CablePosM1;
 ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN

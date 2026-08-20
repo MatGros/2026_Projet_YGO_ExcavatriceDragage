@@ -27,12 +27,9 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
-    Busy                            : BOOL;                           // <-- [STAT] Traitement en cours
-    Done                            : BOOL;                           // <-- [STAT] Action terminee
-    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
-    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur (bit0: entree/table invalide)
-    State                           : E_State;                        // <-- [STAT] Etat courant machine d'etat FB
-    StateAtError                    : E_State;                        // <-- [DIAG] Etat memorise lors du dernier defaut
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: "entrée/table invalide".
+    Status                          : ST_FbStatus;
 
     // === DIAGNOSTICS ET ESTIMATIONS ===
     SpeedBand                       : INT;                            // <-- [DIAG] Bande de vitesse courante (0..5)
@@ -55,11 +52,11 @@ END_VAR
 // 🛑 1. GATE — aucune estimation lorsque le bloc est désactivé ou l'AU absent.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
-    Busy := FALSE;
-    Done := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
-    State := E_State.DISABLED;
+    Status.Busy := FALSE;
+    Status.Done := FALSE;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
+    Status.State := E_State.DISABLED;
     SpeedBand := 0;
     EstimatedLoadPct := 0.0;
     Configured := FALSE;
@@ -69,9 +66,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 Ready := TRUE;
-Busy := FALSE;
-Done := FALSE;
-State := E_State.READY;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+Status.State := E_State.READY;
 ResetEdge(CLK := Reset);
 Configured := LoadTable.IsConfigured;
 // 📈 L'estimation de charge n'a de sens qu'en montée.
@@ -83,7 +80,7 @@ Ascending := (MeasuredSpeedSignedMps > 0.0);
 {region "§2 Classement vitesse"}
 // 📏 2. CLASSEMENT DE LA VITESSE — hystérésis autour des 4 frontières.
 IF (MeasuredSpeedMps < 0.0) OR (SpeedConfig.MaxMeasuredSpeedMps <= 0.0) THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
     SpeedBand := 0;
 ELSIF NOT HasPreviousBand THEN
     IF MeasuredSpeedMps <= SpeedConfig.SpeedBandMaxMps[1] THEN
@@ -103,7 +100,7 @@ ELSE
     // 🔒 Valider l'état mémorisé avant toute indexation dynamique.
     IF PreviousSpeedBand < 1 OR PreviousSpeedBand > 5 THEN
         PreviousSpeedBand := 1;
-        ErrorId := ErrorId OR 16#0001;
+        Status.ErrorId := Status.ErrorId OR 16#0001;
     END_IF;
 
     // CODESYS ne garantit pas le court-circuit des expressions AND :
@@ -135,7 +132,7 @@ IF Configured THEN
                     IF SpeedBand <= 5 THEN
                         SelectedLoadPct := LoadTable.LoadPctByStepAndSpeedBand[ActiveSpeedStep][SpeedBand];
                         IF (SelectedLoadPct < 0.0) OR (SelectedLoadPct > 100.0) THEN
-                            ErrorId := ErrorId OR 16#0001;
+                            Status.ErrorId := Status.ErrorId OR 16#0001;
                         ELSE
                             EstimatedLoadPct := SelectedLoadPct;
                         END_IF;
@@ -149,12 +146,12 @@ END_IF;
 
 {region "§4 Sorties et acquittement"}
 // 📤 4. SORTIES D'ÉTAT ET ACQUITTEMENT.
-IF ResetEdge.Q AND (ErrorId <> 16#0000) AND (MeasuredSpeedMps >= 0.0) THEN
-    ErrorId := 16#0000;
+IF ResetEdge.Q AND (Status.ErrorId <> 16#0000) AND (MeasuredSpeedMps >= 0.0) THEN
+    Status.ErrorId := 16#0000;
 END_IF;
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 {endregion}

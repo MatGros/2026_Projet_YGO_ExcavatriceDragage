@@ -42,12 +42,7 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
-    Busy                            : BOOL;                           // <-- [STAT] Mouvement benne en cours
-    Done                            : BOOL;                           // <-- [STAT] Mouvement termine avec succes
-    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
-    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur bitmask (bit0..4)
-    State                           : E_State;                        // <-- [STAT] Etat operationnel du FB
-    StateAtError                    : E_State;                        // <-- [DIAG] Etat lors de l'apparition du defaut
+    Status                          : ST_FbStatus;                    // <-- [FB] Statut complet (Busy/Done/Error/ErrorId/State/StateAtError)
 
     // === DEMANDES ET ORDRES ACTIONNEURS ===
     CloseReq                        : BOOL;                           // <-- [STAT] Demande de fermeture memorisee
@@ -89,16 +84,16 @@ END_VAR
 {region "§1 Gate securite"}
 // 🛑 1. GATE DE SÉCURITÉ
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
+    IF (Status.State = E_State.BUSY) OR CloseReq OR OpenReq THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
     Ready := FALSE;
-    Busy := FALSE;
-    Done := FALSE;
+    Status.Busy := FALSE;
+    Status.Done := FALSE;
     M2_StartStop := FALSE;
     M2_Direction := 0;
     M2_ForceSlowSpeed := FALSE;
-    State := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
     M1SlipDetected := FALSE;
     // Les requêtes internes sont réinitialisées
     CloseReq := FALSE;
@@ -107,8 +102,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 // 🟢 ÉTAT INITIAL READY SI DISABLED PRÉCÉDEMMENT
-IF State = E_State.DISABLED THEN
-    State := E_State.READY;
+IF Status.State = E_State.DISABLED THEN
+    Status.State := E_State.READY;
 END_IF;
 
 {endregion}
@@ -119,11 +114,11 @@ ResetEdge(CLK := Reset);
 
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 (ignore toutes les erreurs benne)
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
 END_IF;
 
 IF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
+    Status.ErrorId := Status.ErrorId AND 16#FFFA; // Efface les bits 0 et 2 (Timeout, Limites)
 END_IF;
 
 {endregion}
@@ -153,21 +148,21 @@ END_IF;
 
 // Met à jour le bit1 d'erreur si incohérence détectée
 IF BucketState.StateIncoherent THEN
-    ErrorId := ErrorId OR 16#0002;
+    Status.ErrorId := Status.ErrorId OR 16#0002;
     // Force l'état inconnu (ni ouvert ni fermé) si incohérence active
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := FALSE;
 ELSE
-    ErrorId := ErrorId AND 16#FFFD;
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;
 END_IF;
 
 // 🧲 3bis. GARDE-FOU CODEURS NON RÉFÉRENCÉS (bit 3)
 // CablePosM1/CablePosM2 ne sont fiables que si le homing (Partie10) a été fait sur les 2 treuils.
 // Continu (pas de front Reset) : se lève/efface tout seul selon l'état réel du homing.
 IF NOT HomedM1 OR NOT HomedM2 THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 ELSE
-    ErrorId := ErrorId AND 16#FFF7;
+    Status.ErrorId := Status.ErrorId AND 16#FFF7;
 END_IF;
 
 // 3bis-bis. CONFIRMATION MANUELLE POSITION OUVERTE — voir bandeau
@@ -179,7 +174,7 @@ IF ConfirmOpenEdge.Q
    AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.LastPosM2Close := CablePosM2 - Config.OffsetOpenM + Config.OffsetCloseM;
-    ErrorId := 16#0000;             // Réinitialisation complète des défauts benne lors du référencement manuel
+    Status.ErrorId := 16#0000;      // Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
@@ -192,7 +187,7 @@ IF ConfirmCloseEdge.Q
    AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.LastPosM2Close := CablePosM2;
     BucketState.LastPosM2Open := CablePosM2 - Config.OffsetCloseM + Config.OffsetOpenM;
-    ErrorId := 16#0000;             // Réinitialisation complète des défauts benne lors du référencement manuel
+    Status.ErrorId := 16#0000;      // Réinitialisation complète des défauts benne lors du référencement manuel
     CloseReq := FALSE;              // Reset des demandes en attente pour éviter les démarrages intempestifs
     OpenReq := FALSE;
 END_IF;
@@ -201,7 +196,7 @@ END_IF;
 // Recalcule IsOpen, IsClosed, TooOpen, TooClosed, IsIntermediate en PERMANENCE à partir de
 // l'écart réel Delta = CablePosM2 - CablePosM1 et de la tolérance Config.CoherenceLimitM.
 // Actif à l'arrêt (NOT M1_Busy/M2_Busy), hors séquence active (State <> BUSY), codeurs référencés.
-IF (State <> E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND HomedM2
+IF (Status.State <> E_State.BUSY) AND NOT M1_Busy AND NOT M2_Busy AND HomedM1 AND HomedM2
    AND (Config.CoherenceLimitM > 0.01) THEN
 
     // 1. Zone Benne Ouverte (Delta proche de OffsetOpenM)
@@ -255,7 +250,7 @@ END_IF;
 
 // 🔍 3ter. MÉCA C COUCHE 1 — GLISSEMENT M1 PENDANT BUSY (bit4)
 // M1 doit rester immobile pendant que M2 bouge seul. Référence prise à l'entrée en Busy.
-BusyEdge(CLK := (State = E_State.BUSY));
+BusyEdge(CLK := (Status.State = E_State.BUSY));
 IF BusyEdge.Q THEN
     M1RefPosM := CablePosM1;
     M2StartPosM := CablePosM2;   // Borne le recul autorisé (voir §6 CASE BUSY)
@@ -269,12 +264,12 @@ IF BusyEdge.Q THEN
     BucketState.IsClosed := FALSE;
 END_IF;
 
-IF (State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) > M1SlipToleranceM) AND NOT InhibitM1 THEN
-    ErrorId := ErrorId OR 16#0010;
+IF (Status.State = E_State.BUSY) AND (ABS(CablePosM1 - M1RefPosM) > M1SlipToleranceM) AND NOT InhibitM1 THEN
+    Status.ErrorId := Status.ErrorId OR 16#0010;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFEF;
+    Status.ErrorId := Status.ErrorId AND 16#FFEF;
 END_IF;
-M1SlipDetected := (ErrorId AND 16#0010) <> 16#0000;
+M1SlipDetected := (Status.ErrorId AND 16#0010) <> 16#0000;
 
 {endregion}
 
@@ -283,23 +278,23 @@ M1SlipDetected := (ErrorId AND 16#0010) <> 16#0000;
 // On s'assure que l'écart réel M1/M2 ne dépasse pas les offsets de configuration + marge de sécurité de 1m
 MaxAllowedOffset := MAX(ABS(Config.OffsetOpenM), ABS(Config.OffsetCloseM)) + 1.0;
 IF (ABS(CablePosM1 - CablePosM2) > MaxAllowedOffset) AND NOT InhibitM1 AND NOT InhibitM2 THEN
-    ErrorId := ErrorId OR 16#0004;
+    Status.ErrorId := Status.ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    Status.ErrorId := Status.ErrorId AND 16#FFFB;
 END_IF;
 
 // ⏲️ 5. SURVEILLANCE TIMEOUT MOUVEMENT (bit 0)
 // Déclenche si le mouvement actif (M2_StartStop = TRUE) dure plus longtemps que le timeout
-TonTimeout(IN := (State = E_State.BUSY AND M2_StartStop), PT := CfgTimeoutDuration);
+TonTimeout(IN := (Status.State = E_State.BUSY AND M2_StartStop), PT := CfgTimeoutDuration);
 IF TonTimeout.Q THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 END_IF;
 
 // ❌ Évaluation des erreurs graves (Timeout, Limites dépassées, Codeur(s) non référencé(s), ou Glissement M1)
-SevereError := (ErrorId AND 16#001D) <> 16#0000;
+SevereError := (Status.ErrorId AND 16#001D) <> 16#0000;
 
 IF SevereError THEN
-    IF (State = E_State.BUSY) OR CloseReq OR OpenReq THEN
+    IF (Status.State = E_State.BUSY) OR CloseReq OR OpenReq THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
     M2_StartStop := FALSE;
@@ -308,18 +303,18 @@ IF SevereError THEN
     CloseReq := FALSE;
     OpenReq := FALSE;
     // On repasse en READY et attend un Reset
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
 {endregion}
 
 {region "§5 Machine etat commande"}
 // 🎛️ 6. MACHINE À ÉTATS DE COMMANDE
-CASE State OF
+CASE Status.State OF
     E_State.READY:
         Ready := TRUE;
-        Busy := FALSE;
-        Done := FALSE;
+        Status.Busy := FALSE;
+        Status.Done := FALSE;
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
@@ -342,16 +337,16 @@ CASE State OF
             // Condition d'activation du mouvement (Requête IHM + Validation Joystick dans le bon sens)
             // Sens inversés (enroulage ferme, déroulage ouvre)
             IF CloseReq AND MotionRequestActive AND (MotionDirection = 1) THEN
-                State := E_State.BUSY;
+                Status.State := E_State.BUSY;
             ELSIF OpenReq AND MotionRequestActive AND (MotionDirection = -1) THEN
-                State := E_State.BUSY;
+                Status.State := E_State.BUSY;
             END_IF;
         END_IF;
 
     E_State.BUSY:
         Ready := TRUE;
-        Busy := TRUE;
-        Done := FALSE;
+        Status.Busy := TRUE;
+        Status.Done := FALSE;
         M2_ForceSlowSpeed := TRUE; // Vitesse lente forcée sans contacteurs
 
         // Distance restante avant cible, pour affichage IHM (aiguille/jauge)
@@ -429,7 +424,7 @@ CASE State OF
                 BucketState.StateIncoherent := FALSE; // recalage réussi
 
                 CloseReq := FALSE;
-                State := E_State.DONE;
+                Status.State := E_State.DONE;
             // Recul complet jusqu'à la position de départ — restaure l'état d'origine
             // (physiquement, on est revenu là où on a commencé)
             ELSIF LeftStartSinceArm AND (CablePosM2 <= M2StartPosM) THEN
@@ -440,7 +435,7 @@ CASE State OF
                 BucketState.IsClosed := WasClosedAtStart;
 
                 CloseReq := FALSE;
-                State := E_State.DONE;
+                Status.State := E_State.DONE;
             END_IF;
         END_IF;
 
@@ -459,7 +454,7 @@ CASE State OF
                 BucketState.StateIncoherent := FALSE; // recalage réussi
 
                 OpenReq := FALSE;
-                State := E_State.DONE;
+                Status.State := E_State.DONE;
             // Recul complet jusqu'à la position de départ — restaure l'état d'origine
             // (physiquement, on est revenu là où on a commencé)
             ELSIF LeftStartSinceArm AND (CablePosM2 >= M2StartPosM) THEN
@@ -470,14 +465,14 @@ CASE State OF
                 BucketState.IsClosed := WasClosedAtStart;
 
                 OpenReq := FALSE;
-                State := E_State.DONE;
+                Status.State := E_State.DONE;
             END_IF;
         END_IF;
 
     E_State.DONE:
         Ready := TRUE;
-        Busy := FALSE;
-        Done := TRUE;
+        Status.Busy := FALSE;
+        Status.Done := TRUE;
         M2_StartStop := FALSE;
         M2_Direction := 0;
         M2_ForceSlowSpeed := FALSE;
@@ -485,15 +480,15 @@ CASE State OF
 
         // Attente du relâchement de la validation joystick pour repasser à READY
         IF NOT MotionRequestActive THEN
-            State := E_State.READY;
+            Status.State := E_State.READY;
         END_IF;
 END_CASE;
 
 // 📤 7. GESTION DES SORTIES D'ÉTAT GLOBALES
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // Calcul continu de l'écart réel signé M2 - M1 pour l'affichage IHM et l'aide au pilotage
@@ -504,7 +499,7 @@ DeltaPosition_M := CablePosM2 - CablePosM1;
 // CloseReq/OpenReq sont pris en compte (pas seulement IsClosed/IsOpen, qui sont FALSE pendant
 // TOUT le trajet depuis l'état transitoire) pour que la position corrigée de M2 converge
 // progressivement vers M1 pendant l'enroulage.
-IF State = E_State.BUSY THEN
+IF Status.State = E_State.BUSY THEN
     // Pendant le déplacement, l'offset actif suit la différence réelle de câble (M2 - M1) afin que
     // la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne) sans à-coup,
     // tandis que le câble brut de M2 montre son enroulement.
