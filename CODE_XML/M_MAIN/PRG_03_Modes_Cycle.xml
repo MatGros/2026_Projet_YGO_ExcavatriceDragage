@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T12:27:43.522035" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T12:27:43.522035">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:57:18.952402" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:57:18.952402">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -570,9 +570,9 @@ instCycleSemiAuto(
     Translation_Done        := PRG_05_Translation.instTranslationM3.Done,
     Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Busy,
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
-    Benne_IsOpen            := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
-    Benne_IsClosed          := PRG_04_Treuils_Benne.BucketState.MechState.IsClosed,
-    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // Tolérance matière 2m
+    Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
+    Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
+    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,

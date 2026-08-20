@@ -17,6 +17,7 @@ STRUCT
     WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M2
     M1LogicRequestSpeedRef_Pct   : REAL; // 📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)
     M2LogicRequestSpeedRef_Pct   : REAL; // 📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)
+    KoboldContactorCmdArbitrated : BOOL; // 🪝 Ordre contacteur capteur fond Kobold (consommé PRG_06)
 
     // === 📊 États publics des treuils ===
     WinchM1State                 : ST_WinchState; // 🚦 Etat public treuil Retenue M1

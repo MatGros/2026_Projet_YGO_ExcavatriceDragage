@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:32:23.672507" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:32:23.672507">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:57:18.861477" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:57:18.861477">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1569,7 +1569,7 @@ instSimBench(
     M1_SpeedContactor_2      := PRG_06_Outputs.M1SpeedContactor2,
     M1_SpeedContactor_3      := PRG_06_Outputs.M1SpeedContactor3,
     M1_SpeedContactor_4      := PRG_06_Outputs.M1SpeedContactor4,
-    M1_SpeedRefPct           := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
+    M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
     M1_PresetTriggerCmd      := instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderAbsM1.PresetValueOut,
     M1_BrakeCmd              := PRG_06_Outputs.M1BrakeCmd,
@@ -1579,7 +1579,7 @@ instSimBench(
     M2_SpeedContactor_2      := PRG_06_Outputs.M2SpeedContactor2,
     M2_SpeedContactor_3      := PRG_06_Outputs.M2SpeedContactor3,
     M2_SpeedContactor_4      := PRG_06_Outputs.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_04_Treuils_Benne.M2LogicRequestSpeedRef_Pct,
+    M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
     M2_BrakeCmd              := PRG_06_Outputs.M2BrakeCmd,

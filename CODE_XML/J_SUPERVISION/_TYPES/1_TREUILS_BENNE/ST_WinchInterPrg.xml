@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T03:37:14.350949" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T03:37:14.350949">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:55:55.873185" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:55:55.873185">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -57,6 +57,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmdArbitrated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Ordre contacteur capteur fond Kobold (consommé PRG_06)</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM1State">
