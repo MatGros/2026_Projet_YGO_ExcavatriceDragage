@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T21:07:42.947125" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T21:07:42.947125">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T12:27:43.522035" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T12:27:43.522035">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -544,7 +544,7 @@ instCycleSemiAuto(
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := Auth.Mode,
     CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutral,
-    DeadmanArmed            := PRG_02_Acquisition.JoystickDeadmanArmed,
+    DeadmanArmed            := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
     AbortCycle              := GVL_IHM.Cycle.Cmd.BtnAbort,
@@ -556,10 +556,10 @@ instCycleSemiAuto(
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Error,
     WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
-    M1_CablePosM            := PRG_02_Acquisition.CablePosM1,
-    M2_CablePosM            := PRG_02_Acquisition.CablePosM2,
-    M1_MeasuredSpeedMps     := PRG_02_Acquisition.M1_Speed_Mps,
-    M2_MeasuredSpeedMps     := PRG_02_Acquisition.M2_Speed_Mps,
+    M1_CablePosM            := PRG_02_Acquisition.Data.CablePosM1,
+    M2_CablePosM            := PRG_02_Acquisition.Data.CablePosM2,
+    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M1_Speed_Mps,
+    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M2_Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,

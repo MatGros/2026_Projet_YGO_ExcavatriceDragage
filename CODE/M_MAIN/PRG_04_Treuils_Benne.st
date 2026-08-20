@@ -198,10 +198,10 @@ instDiveSearch(
     MotionDirection := CoupledUserRequestDirection,
     BucketIsOpen := _BucketState.IsOpen,
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
-    M1Position_M := PRG_02_Acquisition.CablePosM1,
-    M2Position_M := PRG_02_Acquisition.CablePosM2,
-    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.M1_EncoderIncoherent
-                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.M2_EncoderIncoherent,
+    M1Position_M := PRG_02_Acquisition.Data.CablePosM1,
+    M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
+    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
+                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
@@ -234,12 +234,12 @@ instExtractionSequence(
     BucketBusy := instBucket.Busy,
     BucketError := instBucket.Error,
     WinchSyncError := instWinchSync.Error,
-    M1Position_M := PRG_02_Acquisition.CablePosM1,
-    M2Position_M := PRG_02_Acquisition.CablePosM2,
-    M1MeasuredSpeedValid := PRG_02_Acquisition.M1_SpeedValid,
-    M2MeasuredSpeedValid := PRG_02_Acquisition.M2_SpeedValid,
-    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.M1_EncoderIncoherent
-                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.M2_EncoderIncoherent,
+    M1Position_M := PRG_02_Acquisition.Data.CablePosM1,
+    M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
+    M1MeasuredSpeedValid := PRG_02_Acquisition.Data.M1_SpeedValid,
+    M2MeasuredSpeedValid := PRG_02_Acquisition.Data.M2_SpeedValid,
+    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
+                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent,
     ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M
 );
 IF instExtractionSequence.BottomConfirmationConsumed THEN
@@ -337,8 +337,8 @@ instBucket(
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection     := CoupledUserRequestDirection,
-    CablePosM1          := PRG_02_Acquisition.CablePosM1,
-    CablePosM2          := PRG_02_Acquisition.CablePosM2,
+    CablePosM1          := PRG_02_Acquisition.Data.CablePosM1,
+    CablePosM2          := PRG_02_Acquisition.Data.CablePosM2,
     HomedM1             := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2             := PRG_02_Acquisition.instHomingM2.Homed,
     M1_Busy             := instWinchM1.Busy,
@@ -429,7 +429,7 @@ ELSE
                             AND NOT CoupledMotionBlockedByBucket
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1LogicRequestDirection = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1LogicRequestDirection = -1)))
-                            AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
+                            AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.Data.JoystickDeadmanArmed);
 END_IF;
 
 // Condition renforcée "instBucket.Busy AND instBucket.M2_StartStop" au lieu de
@@ -473,7 +473,7 @@ ELSE
                                 AND NOT CoupledMotionBlockedByBucket
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2LogicRequestDirection = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2LogicRequestDirection = 1)))
-                                AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
+                                AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.Data.JoystickDeadmanArmed);
     END_IF;
 END_IF;
 
@@ -497,12 +497,12 @@ IF BucketBusyRiseEdge.Q THEN
 END_IF;
 IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
     ControlAscentActive := TRUE;
-    ControlAscentStartM1PosM := PRG_02_Acquisition.CablePosM1;
-    ControlAscentStartM2PosM := PRG_02_Acquisition.CablePosM2;
+    ControlAscentStartM1PosM := PRG_02_Acquisition.Data.CablePosM1;
+    ControlAscentStartM2PosM := PRG_02_Acquisition.Data.CablePosM2;
 END_IF;
 IF ControlAscentActive THEN
-    IF (ABS(PRG_02_Acquisition.CablePosM1 - ControlAscentStartM1PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
-       AND (ABS(PRG_02_Acquisition.CablePosM2 - ControlAscentStartM2PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
+    IF (ABS(PRG_02_Acquisition.Data.CablePosM1 - ControlAscentStartM1PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
+       AND (ABS(PRG_02_Acquisition.Data.CablePosM2 - ControlAscentStartM2PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
         ControlAscentActive := FALSE;             // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)) THEN
         ControlAscentActive := FALSE;             // Montée relâchée/interrompue : annule la phase
@@ -521,8 +521,8 @@ instWinchSync(
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode            := PRG_03_Modes_Cycle.Auth.Mode,
-    CablePosM1      := PRG_02_Acquisition.CablePosM1,
-    CablePosM2      := PRG_02_Acquisition.CablePosM2,
+    CablePosM1      := PRG_02_Acquisition.Data.CablePosM1,
+    CablePosM2      := PRG_02_Acquisition.Data.CablePosM2,
     HomedM1         := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2         := PRG_02_Acquisition.instHomingM2.Homed,
     SyncEnable      := PRG_03_Modes_Cycle.Auth.SyncEnable,
@@ -593,8 +593,8 @@ END_IF;
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/contacteurs/fin de course des DEUX treuils (VH_0800END,
 // Local_Digital_IO) — pas de granularité par treuil possible, donc SafeStop des DEUX.
-SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.InputModuleFault;
-SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR PRG_02_Acquisition.InputModuleFault;
+SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault;
+SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) <> 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
 // : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
@@ -616,10 +616,10 @@ IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND (CoupledUserRequestDirection = -1)
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
-    IF (PRG_02_Acquisition.CablePosM1 <= _DredgingAssistCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.CablePosM1 >= _DredgingAssistCfgPersist.ImmersionLower_M)
-       AND (PRG_02_Acquisition.CablePosM2 <= _DredgingAssistCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.CablePosM2 >= _DredgingAssistCfgPersist.ImmersionLower_M) THEN
+    IF (PRG_02_Acquisition.Data.CablePosM1 <= _DredgingAssistCfgPersist.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.CablePosM1 >= _DredgingAssistCfgPersist.ImmersionLower_M)
+       AND (PRG_02_Acquisition.Data.CablePosM2 <= _DredgingAssistCfgPersist.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.CablePosM2 >= _DredgingAssistCfgPersist.ImmersionLower_M) THEN
         KoboldImmersionConfirmed := TRUE;
     END_IF;
 END_IF;
@@ -649,11 +649,11 @@ DescendPermitM1_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouche
 // unitaire M2, hors instBucket) applique l'anticipation d'inertie OpenAnticipationM/CloseAnticipationM
 // (mêmes que FB_Bucket) pour couvrir aussi le jog unitaire.
 DescendPermitM2_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 <= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.CablePosM2 <= (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
-                      (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
+                      (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _WinchM2CfgPersist.CfgCableLimitAscent_M);
 
 // FB_Safety_Winch M1/M2.
@@ -676,7 +676,7 @@ instSafetyWinchM1(
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.instHomingM1.Busy,
-    CablePosM              := PRG_02_Acquisition.CablePosM1,
+    CablePosM              := PRG_02_Acquisition.Data.CablePosM1,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M1LogicRequestDirection,
@@ -686,14 +686,14 @@ instSafetyWinchM1(
     TopLimitM              := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
-    JoystickYNeutral       := PRG_02_Acquisition.JoystickYNeutral,
+    JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
     BenneHoldStillActive   := instBucket.Busy,
-    ExpectedOtherWinchPosM := PRG_02_Acquisition.CablePosM2 - instBucket.ActiveOffsetM,
+    ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.CablePosM2 - instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Busy,
     OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM2,
-    MeasuredSpeedMps       := PRG_02_Acquisition.M1_Speed_Mps,
-    MeasuredSpeedSignedMps := PRG_02_Acquisition.M1_SignedSpeed_Mps,
-    MeasuredSpeedValid     := PRG_02_Acquisition.M1_SpeedValid,
+    MeasuredSpeedMps       := PRG_02_Acquisition.Data.M1_Speed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.M1_SignedSpeed_Mps,
+    MeasuredSpeedValid     := PRG_02_Acquisition.Data.M1_SpeedValid,
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
@@ -736,7 +736,7 @@ instSafetyWinchM2(
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.instHomingM2.Busy,
-    CablePosM              := PRG_02_Acquisition.CablePosM2,
+    CablePosM              := PRG_02_Acquisition.Data.CablePosM2,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M2LogicRequestDirection,
@@ -746,14 +746,14 @@ instSafetyWinchM2(
     TopLimitM              := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
-    JoystickYNeutral       := PRG_02_Acquisition.JoystickYNeutral,
+    JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
     BenneHoldStillActive   := FALSE,
-    ExpectedOtherWinchPosM := PRG_02_Acquisition.CablePosM1 + instBucket.ActiveOffsetM,
+    ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.CablePosM1 + instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Busy,
     OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM1,
-    MeasuredSpeedMps       := PRG_02_Acquisition.M2_Speed_Mps,
-    MeasuredSpeedSignedMps := PRG_02_Acquisition.M2_SignedSpeed_Mps,
-    MeasuredSpeedValid     := PRG_02_Acquisition.M2_SpeedValid,
+    MeasuredSpeedMps       := PRG_02_Acquisition.Data.M2_Speed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.M2_SignedSpeed_Mps,
+    MeasuredSpeedValid     := PRG_02_Acquisition.Data.M2_SpeedValid,
     BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
     BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
@@ -794,7 +794,7 @@ END_IF;
 AscentPermitM1_Raw  := instSafetyWinchM1.AscentPermit;
 AscentPermitM2_Raw  := instSafetyWinchM2.AscentPermit
     // Même anticipation que DescendPermitM2_Raw ci-dessus.
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 >= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.CablePosM2 >= (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -832,7 +832,7 @@ instWinchM1(
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
     Homed                   := PRG_02_Acquisition.instHomingM1.Homed,
     HomingSuspect           := PRG_02_Acquisition.instHomingM1.HomingSuspect,
-    CablePosM               := PRG_02_Acquisition.CablePosM1,
+    CablePosM               := PRG_02_Acquisition.Data.CablePosM1,
     TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -868,7 +868,7 @@ instWinchM2(
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
     Homed                   := PRG_02_Acquisition.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Acquisition.instHomingM2.HomingSuspect,
-    CablePosM               := PRG_02_Acquisition.CablePosM2,
+    CablePosM               := PRG_02_Acquisition.Data.CablePosM2,
     TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -923,11 +923,11 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 // SpeedDelta_Mps = variation de vitesse ENTRE DEUX SCANS (ST_WinchState.st),
 // pas un écart M1/M2 (qui existe via SyncStateHMI.DeltaPos_M/instWinchSync).
 // Delta temporel via mémoire scan précédent.
-WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
-WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.M1_Speed_Mps - M1_PrevSpeed_Mps;
-M1_PrevSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
+WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
+WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M1_Speed_Mps - M1_PrevSpeed_Mps;
+M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
 
-WinchM1State.Position_M := PRG_02_Acquisition.CablePosM1;
+WinchM1State.Position_M := PRG_02_Acquisition.Data.CablePosM1;
 WinchM1State.SpeedRef_Pct := M1LogicRequestSpeedRef_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
 WinchM1State.FBState := instWinchM1.State;
@@ -980,11 +980,11 @@ WinchM1State.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElap
 WinchM1State.DirectionChangePending := instWinchM1.DirectionChangePending;
 
 // Voir bandeau M1 ci-dessus.
-WinchM2State.MeasuredSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
-WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.M2_Speed_Mps - M2_PrevSpeed_Mps;
-M2_PrevSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
+WinchM2State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
+WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M2_Speed_Mps - M2_PrevSpeed_Mps;
+M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
 
-WinchM2State.Position_M := PRG_02_Acquisition.CablePosM2;
+WinchM2State.Position_M := PRG_02_Acquisition.Data.CablePosM2;
 WinchM2State.SpeedRef_Pct := M2LogicRequestSpeedRef_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
 WinchM2State.FBState := instWinchM2.State;
@@ -1096,7 +1096,7 @@ BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;
 BucketState.M2Direction := instBucket.M2_Direction;
 BucketState.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
-BucketState.M2PositionCorrected := PRG_02_Acquisition.CablePosM2 - instBucket.ActiveOffsetM;
+BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.CablePosM2 - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Busy;
 BucketState.Done := instBucket.Done;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T21:07:42.946595" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T21:07:42.946595">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T11:59:49.254598" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T11:59:49.254598">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,6 +23,297 @@
   </contentHeader>
   <types>
     <dataTypes>
+      <dataType name="ST_AcquisitionInterPrg">
+        <baseType>
+          <struct>
+            <variable name="CablePosM1">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧲 Mesures câbles &amp; vitesses treuils M1/M2 ===
+📏 Position cable M1 calibree (metres)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Position cable M2 calibree (metres)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse absolue M1 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse signee M1 (+:Montee, -:Descente) (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Validite mesure vitesse M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse absolue M2 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Vitesse signee M2 (+:Montee, -:Descente) (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Validite mesure vitesse M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickDeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🕹️ États joystick qualifiés ===
+🔒 Homme-mort joystick arme (1=Arme)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickYNeutral">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Axe Y joystick au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickDirectionX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickSpeedPctX">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Magnitude deviation axe X en % (0..100)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickXNeutral">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Axe X joystick au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 Positions translation M3 (zones cumulatives + points exacts) ===
+📍 Zone Tremie (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone pre-ralentissement PV (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P2 (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P1 (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationPosMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone Maintenance (1=Present)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Tremie (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtPV">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte PV (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtP2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P2 (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P1 (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationAtMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Maintenance (1=Atteint)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_LimitSwitchFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course avant M3 (1=Actionne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_LimitSwitchRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course arriere M3 (1=Actionne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SensorWordIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Incoherence detectee mot capteurs M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SensorsWord">
+              <type>
+                <BYTE />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules DI &amp; codeurs ===
+🟢 Module Local_Digital_IO OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0800END OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0808ETP OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModuleFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur au moins un module DI</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M1 incoherente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M2 incoherente</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ee4214b6-c9e0-5d00-aa74-b2d385e1b08d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧲 ST_AcquisitionInterPrg — Bus d'échange inter-PRG produit par PRG_02_Acquisition
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les mesures câbles/vitesses, les états joystick qualifiés,
+      les positions M3 et les diagnostics DI publiés par PRG_02_Acquisition vers
+      les consommateurs (PRG_03/04/05/07, FB_TroubleshootingView).
+   📤 Producteur unique : PRG_02_Acquisition (VAR_OUTPUT Data : ST_AcquisitionInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_HardwareImage">
         <baseType>
           <struct>
@@ -848,6 +1139,15 @@ TRUE des qu'un referencement a reussi</xhtml>
             </variable>
           </inputVars>
           <outputVars>
+            <variable name="Data">
+              <type>
+                <derived name="ST_AcquisitionInterPrg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚌 BUS INTER-PRG (producteur unique) ===
+&lt;-- [BUS] Mesures/joystick/positions M3/diag DI publiés</xhtml>
+              </documentation>
+            </variable>
             <variable name="HwReal">
               <type>
                 <derived name="ST_HardwareImage" />
@@ -1847,6 +2147,45 @@ M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 // === 📊 §6 RETOURS VARIATEUR (M3) CONDITIONNÉS ===
 M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
 M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
+{endregion}
+
+{region "§7 Encapsulation bus inter-PRG (Data)"}
+// === 🔌 §7 PUBLICATION BUS INTER-PRG (Data : ST_AcquisitionInterPrg) ===
+// 🎯 Sortie publique unique vers les consommateurs PRG_03/04/05/07.
+// Isométrique : chaque champ reproduit la sortie plate homonyme, valeurs identiques.
+Data.CablePosM1              := CablePosM1;
+Data.CablePosM2              := CablePosM2;
+Data.M1_Speed_Mps            := M1_Speed_Mps;
+Data.M1_SignedSpeed_Mps      := M1_SignedSpeed_Mps;
+Data.M1_SpeedValid           := M1_SpeedValid;
+Data.M2_Speed_Mps            := M2_Speed_Mps;
+Data.M2_SignedSpeed_Mps      := M2_SignedSpeed_Mps;
+Data.M2_SpeedValid           := M2_SpeedValid;
+Data.JoystickDeadmanArmed    := JoystickDeadmanArmed;
+Data.JoystickYNeutral        := JoystickYNeutral;
+Data.JoystickDirectionX      := JoystickDirectionX;
+Data.JoystickSpeedPctX       := JoystickSpeedPctX;
+Data.JoystickXNeutral        := JoystickXNeutral;
+Data.TranslationPosTremie      := TranslationPosTremie;
+Data.TranslationPosPV          := TranslationPosPV;
+Data.TranslationPosP2          := TranslationPosP2;
+Data.TranslationPosP1          := TranslationPosP1;
+Data.TranslationPosMaintenance := TranslationPosMaintenance;
+Data.TranslationAtTremie       := TranslationAtTremie;
+Data.TranslationAtPV           := TranslationAtPV;
+Data.TranslationAtP2           := TranslationAtP2;
+Data.TranslationAtP1           := TranslationAtP1;
+Data.TranslationAtMaintenance  := TranslationAtMaintenance;
+Data.M3_LimitSwitchFwd         := M3_LimitSwitchFwd;
+Data.M3_LimitSwitchRev         := M3_LimitSwitchRev;
+Data.M3_SensorWordIncoherent   := M3_SensorWordIncoherent;
+Data.M3_SensorsWord            := M3_SensorsWord;
+Data.LocalDigitalIoOk          := LocalDigitalIoOk;
+Data.Vh0800EndOk               := Vh0800EndOk;
+Data.Vh0808EtpOk               := Vh0808EtpOk;
+Data.InputModuleFault          := InputModuleFault;
+Data.M1_EncoderIncoherent      := M1_EncoderIncoherent;
+Data.M2_EncoderIncoherent      := M2_EncoderIncoherent;
 {endregion}
 </xhtml>
           </ST>
@@ -6593,6 +6932,7 @@ END_IF;
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
             <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_AcquisitionInterPrg" ObjectId="ee4214b6-c9e0-5d00-aa74-b2d385e1b08d" />
               <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
               <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
               <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />

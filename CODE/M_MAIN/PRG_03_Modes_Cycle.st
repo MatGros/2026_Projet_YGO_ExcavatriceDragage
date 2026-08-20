@@ -59,7 +59,7 @@ instCycleSemiAuto(
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := Auth.Mode,
     CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutral,
-    DeadmanArmed            := PRG_02_Acquisition.JoystickDeadmanArmed,
+    DeadmanArmed            := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
     AbortCycle              := GVL_IHM.Cycle.Cmd.BtnAbort,
@@ -71,10 +71,10 @@ instCycleSemiAuto(
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Error,
     WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
-    M1_CablePosM            := PRG_02_Acquisition.CablePosM1,
-    M2_CablePosM            := PRG_02_Acquisition.CablePosM2,
-    M1_MeasuredSpeedMps     := PRG_02_Acquisition.M1_Speed_Mps,
-    M2_MeasuredSpeedMps     := PRG_02_Acquisition.M2_Speed_Mps,
+    M1_CablePosM            := PRG_02_Acquisition.Data.CablePosM1,
+    M2_CablePosM            := PRG_02_Acquisition.Data.CablePosM2,
+    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M1_Speed_Mps,
+    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M2_Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
