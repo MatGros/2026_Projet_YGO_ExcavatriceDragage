@@ -184,33 +184,33 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
-M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
-                      AND NOT PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
+M3InterlockEnable := PRG_05_Translation.Data.TranslationFinalInterlockRequest.Enable
+                      AND NOT PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
 
-M3PowerCutOffSafetyInfo := PRG_05_Translation.TranslationSafety.PowerCutOff
-                        OR PRG_05_Translation.TranslationSafety.ErrorMecaA
-                        OR PRG_05_Translation.TranslationSafety.ErrorMecaB
-                        OR PRG_05_Translation.TranslationSafety.ErrorBrakeThermal;
+M3PowerCutOffSafetyInfo := PRG_05_Translation.Data.TranslationSafety.PowerCutOff
+                        OR PRG_05_Translation.Data.TranslationSafety.ErrorMecaA
+                        OR PRG_05_Translation.Data.TranslationSafety.ErrorMecaB
+                        OR PRG_05_Translation.Data.TranslationSafety.ErrorBrakeThermal;
 
-M3SafeStopSafetyInfo := PRG_05_Translation.TranslationSafety.SafeStop
-                     OR PRG_05_Translation.TranslationSafety.Error
-                     OR PRG_05_Translation.TranslationSafety.ErrorOperatorComm
-                     OR PRG_05_Translation.TranslationSafety.ErrorDriveComm
-                     OR PRG_05_Translation.TranslationSafety.ErrorPhaseRotation
-                     OR PRG_05_Translation.TranslationSafety.ErrorLimitSwitch
-                     OR PRG_05_Translation.TranslationSafety.ErrorSensorIncoherent;
+M3SafeStopSafetyInfo := PRG_05_Translation.Data.TranslationSafety.SafeStop
+                     OR PRG_05_Translation.Data.TranslationSafety.Error
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorOperatorComm
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorDriveComm
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorPhaseRotation
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorLimitSwitch
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorSensorIncoherent;
 
 M3BlockedBySafetyInfo := M3PowerCutOffSafetyInfo OR M3SafeStopSafetyInfo;
 
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop,
-    BrakeReleaseRequest        := PRG_05_Translation.TranslationFinalInterlockRequest.BrakeReleaseRequest,
-    BrakeCommandOpenConfirmed  := PRG_05_Translation.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
-    RequestedDriveControlWord  := PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveControlWord,
-    RequestedDriveFreqHz       := PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+    PowerContactorEngaged      := PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop,
+    BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest,
+    BrakeCommandOpenConfirmed  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
+    RequestedDriveControlWord  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
+    RequestedDriveFreqHz       := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz
 );
 
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
@@ -247,7 +247,7 @@ EmergencyArming_RQ           := EmergencyArmingCmd;
 // PowerCutOffReq = agrégation OU strict des demandes de coupure des trois procédés (M5, A-04).
 PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff
                OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff
-               OR PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
+               OR PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
 
 instSafetyEmergencyManagement(
     Enable := TRUE,

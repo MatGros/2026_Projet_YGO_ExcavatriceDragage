@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:32:23.716712" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:32:23.716712">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T15:00:04.819606" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T15:00:04.819606">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -237,6 +237,56 @@
       Consommée par PRG_06_Outputs comme SEULE cause de coupure
       d'Enable (barrière finale). SafeStop est géré en amont
       par FB_Translation (rampe rapide, Enable maintenu, AF06 §5).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_TranslationInterPrg">
+        <baseType>
+          <struct>
+            <variable name="TranslationFinalInterlockRequest">
+              <type>
+                <derived name="ST_TranslationFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ Demande finale M3 ===
+↔️ Demande finale et interlocks translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationState">
+              <type>
+                <derived name="ST_TranslationState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 État public translation ===
+🚦 Etat public translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationSafety">
+              <type>
+                <derived name="ST_SafetyTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Sécurité translation ===
+🛡️ Diagnostic et securites translation M3</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>0d838c96-5f80-5add-9102-b8f7b35a3c53</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ↔️ ST_TranslationInterPrg — Bus d'échange inter-PRG produit par PRG_05_Translation
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler la demande finale M3, l'état public TranslationState
+      et le diagnostic TranslationSafety publiés par PRG_05_Translation vers
+      les consommateurs (PRG_03/06/07).
+   📤 Producteur unique : PRG_05_Translation (VAR_OUTPUT Data : ST_TranslationInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -764,30 +814,13 @@
         <interface>
           <inputVars />
           <outputVars>
-            <variable name="TranslationFinalInterlockRequest">
+            <variable name="Data">
               <type>
-                <derived name="ST_TranslationFinalInterlockRequest" />
+                <derived name="ST_TranslationInterPrg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ DEMANDES DE SORTIES FINALES &amp; INTERLOCKS ===
-&lt;-- [ACT] Demande finale et interlocks translation M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationState">
-              <type>
-                <derived name="ST_TranslationState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 ÉTATS PUBLICS &amp; SÉCURITÉS TRANSLATION ===
-&lt;-- [STAT] Etat public translation M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationSafety">
-              <type>
-                <derived name="ST_SafetyTranslation" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites translation M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚌 BUS INTER-PRG (producteur unique) ===
+&lt;-- [BUS] Demande finale, état public, sécurité translation M3</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -806,6 +839,31 @@
               <type>
                 <derived name="FB_Translation_PositionEstimator" />
               </type>
+            </variable>
+            <variable name="TranslationFinalInterlockRequest">
+              <type>
+                <derived name="ST_TranslationFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 STRUCTS INTERNES (publiés via Data) ===
+. [LOC] Demande finale et interlocks translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationState">
+              <type>
+                <derived name="ST_TranslationState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat public translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationSafety">
+              <type>
+                <derived name="ST_SafetyTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diagnostic et securites translation M3</xhtml>
+              </documentation>
             </variable>
             <variable name="M3_StartStop_Active">
               <type>
@@ -1328,6 +1386,12 @@ TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIn
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
+
+// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_TranslationInterPrg) ===
+// Copie des structs internes vers le bus de sortie (producteur unique).
+Data.TranslationFinalInterlockRequest := TranslationFinalInterlockRequest;
+Data.TranslationState                 := TranslationState;
+Data.TranslationSafety                := TranslationSafety;
 
 {endregion}
 </xhtml>
@@ -3891,6 +3955,7 @@ Current := LIMIT(-100.0, Current, 100.0);
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
               <Object Name="ST_TranslationFinalInterlockRequest" ObjectId="3d90836c-bd65-54ca-b2e2-f3d1ef3a1bd3" />
+              <Object Name="ST_TranslationInterPrg" ObjectId="0d838c96-5f80-5add-9102-b8f7b35a3c53" />
               <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
             </Folder>
           </Folder>

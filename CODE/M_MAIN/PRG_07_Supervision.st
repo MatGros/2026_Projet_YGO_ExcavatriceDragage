@@ -254,7 +254,7 @@ instPreflight(
     Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
     MachineIsStill            := (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber = 0)
                                  AND (PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber = 0)
-                                 AND (PRG_05_Translation.TranslationState.FBState = E_State.READY),
+                                 AND (PRG_05_Translation.Data.TranslationState.FBState = E_State.READY),
     M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct
@@ -293,8 +293,8 @@ GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
 GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
 GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
 GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
-GVL_IHM.TranslationM3.State := PRG_05_Translation.TranslationState;
-GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafety;
+GVL_IHM.TranslationM3.State := PRG_05_Translation.Data.TranslationState;
+GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
 GVL_IHM.Modes.State.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
