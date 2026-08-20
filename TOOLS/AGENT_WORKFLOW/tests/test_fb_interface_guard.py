@@ -50,14 +50,17 @@ class TestFbInterfaceGuard(unittest.TestCase):
     def test_dut_st_fbstatus_existe(self):
         self.assertTrue(dut_exists(REPO_ROOT), "Le DUT ST_FbStatus doit exister dans CODE/A_COMMUN/")
 
-    def test_les_16_standard_sont_tous_en_forme_heritee_avant_t137(self):
+    def test_les_16_standard_formes_apres_pilote(self):
         standard, _, _, _ = analyze_fb_files(REPO_ROOT)
         cible, heritee = split_standard_by_form(standard)
         self.assertEqual(
-            len(heritee), 16,
-            "T137 non demarree : les 16 FB standard sont encore en forme a plat",
+            len(heritee), 15,
+            "Apres pilote FB_Translation : 15 FB standard encore en forme a plat",
         )
-        self.assertEqual(len(cible), 0, "Aucun FB migre tant que T137 n'a pas demarre")
+        self.assertEqual(
+            len(cible), 1,
+            "Apres pilote FB_Translation : 1 FB standard migre en forme cible (Status : ST_FbStatus)",
+        )
 
 
 class TestStFbStatusRecognition(unittest.TestCase):
@@ -128,14 +131,17 @@ END_FUNCTION_BLOCK
         self.assertEqual(len(cible), 1, "Le FB migre compte dans la forme cible")
         self.assertEqual(len(heritee), 0)
 
-    def test_les_16_standard_sont_tous_en_forme_heritee_avant_t137(self):
+    def test_les_16_standard_formes_apres_pilote(self):
         standard, _, _, _ = analyze_fb_files(REPO_ROOT)
         cible, heritee = split_standard_by_form(standard)
         self.assertEqual(
-            len(heritee), 16,
-            "T137 non demarree : les 16 FB standard sont encore en forme a plat",
+            len(heritee), 15,
+            "Apres pilote FB_Translation : 15 FB standard encore en forme a plat",
         )
-        self.assertEqual(len(cible), 0, "Aucun FB migre tant que T137 n'a pas demarre")
+        self.assertEqual(
+            len(cible), 1,
+            "Apres pilote FB_Translation : 1 FB standard migre en forme cible (Status : ST_FbStatus)",
+        )
 
 
 class TestStateAwareGuard(unittest.TestCase):

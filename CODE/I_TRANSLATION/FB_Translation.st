@@ -63,13 +63,10 @@ VAR_INPUT
     BrakeFeedbackTimeout          : TIME := T#300ms; // --> [CFG] Strictement sous watchdog final 500 ms
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;   // <-- [STAT] FB prêt
-    Busy                : BOOL;   // <-- [STAT] FB occupé
-    Done                : BOOL;   // <-- [STAT] Action terminée
-    Error               : BOOL;   // <-- [STAT] Synthèse défaut
-    ErrorId             : WORD;        // <-- [DIAG] bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint
-    State               : E_State;   // <-- [STAT] Etat courant
-    StateAtError        : E_State;   // <-- [DIAG] Etat mémorisé au dernier défaut
+    Ready               : BOOL;   // <-- [STAT] FB prêt (sortie libre, hors ST_FbStatus)
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: "Défaut frein Translation" ; bit3: "Défaut variateur AC600" ; bit6: "Limite extrême".
+    Status              : ST_FbStatus;
     TargetReached        : BOOL;       // <-- [STAT] Capteur position cible
     RequestedDriveControlWord : WORD; // <-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock
     RequestedDriveFreqHz      : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock
@@ -122,15 +119,15 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 
     ArrivalLock := FALSE;
 
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     RETURN;
 END_IF;
 
 // 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -270,7 +267,7 @@ PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, Commande
 // 0: None, 1: Forward, 2: Reverse, 7: Reset
 IF Reset THEN
     RequestedDriveControlWord := 7; // Reset défaut variateur
-ELSIF Error THEN
+ELSIF Status.Error THEN
     RequestedDriveControlWord := 0; // Arrêt sur défaut
 ELSIF MovementRequested THEN
     IF PhysicalDriveDirection = 1 THEN
@@ -315,50 +312,50 @@ BrakeContactorCheck := Brake.ContactorCheck;
 {region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // Défaut variateur (bit3) : lu via EtherCAT (DriveStatusWord.4)
 IF DriveStatusWord.4 THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFF7;
+    Status.ErrorId := Status.ErrorId AND 16#FFF7;
 END_IF;
 
 // 🚧 Défaut fin de course extrême (bit6) — si bypassé, on NETTOIE le bit résiduel
 IF BypassLimitSwitch THEN
-    ErrorId := ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
+    Status.ErrorId := Status.ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
 ELSE
-    // Activé UNIQUEMENT en cas de tentative d'avancer DANS la butée active (libéré si dégagement en sens inverse)
+    // Activé UNIQUEMENT en cas de tentative d'avancer vers la butée active (libéré si dégagement en sens inverse)
     IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
-        ErrorId := ErrorId OR 16#0040;
+        Status.ErrorId := Status.ErrorId OR 16#0040;
     ELSE
-        ErrorId := ErrorId AND 16#FFBF;
+        Status.ErrorId := Status.ErrorId AND 16#FFBF;
     END_IF;
 END_IF;
 
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // 🚦 8. STATE MACHINE (phase)
 IF (NOT StartStop OR SafeStop) AND ABS(SpeedRamp.Current) > 0.1 THEN
-    State := E_State.STOPPING;
+    Status.State := E_State.STOPPING;
 ELSIF ABS(SpeedRamp.Current) > 0.1 THEN
-    State := E_State.BUSY;
+    Status.State := E_State.BUSY;
 ELSE
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
-Done := FALSE;
+Status.Busy := (Status.State = E_State.BUSY) OR (Status.State = E_State.STOPPING);
+Status.Done := FALSE;
 
 // 🛡️ 9. SORTIE SÛRE SUR DÉFAUT
-IF Error THEN
+IF Status.Error THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
