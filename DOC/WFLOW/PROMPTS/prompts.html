@@ -137,7 +137,7 @@
           <td>Cadrage Court & Direct</td>
           <td>Expert Senior, court, challenge les idées, validation préalable.</td>
           <td style="text-align: center;">
-            <button class="btn-copy" onclick="copyPrompt('p1', this)">📋 Copier</button>
+            <button class="btn-copy" onclick="copyFromTextarea('ta-p1', this)">📋 Copier</button>
           </td>
         </tr>
         <tr>
@@ -145,7 +145,7 @@
           <td>Cadrage Complet & Inventaire</td>
           <td>Suivi strict AGENTS.md, esprit critique + test inventaire.</td>
           <td style="text-align: center;">
-            <button class="btn-copy" onclick="copyPrompt('p2', this)">📋 Copier</button>
+            <button class="btn-copy" onclick="copyFromTextarea('ta-p2', this)">📋 Copier</button>
           </td>
         </tr>
       </tbody>
@@ -156,9 +156,9 @@
     <div class="card" id="card-p1">
       <div class="card-header">
         <div class="card-title">🔹 1.1 Cadrage Expert Senior & Anti-Yes-Man (Court & Direct)</div>
-        <button class="btn-copy" onclick="copyPrompt('p1', this)">📋 Copier</button>
+        <button class="btn-copy" onclick="copyFromTextarea('ta-p1', this)">📋 Copier</button>
       </div>
-      <pre id="p1">À partir de maintenant :
+      <textarea id="ta-p1" readonly style="width: 100%; height: 260px; background: var(--code-bg); color: #e6edf3; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: Consolas, monospace; font-size: 0.95rem; resize: vertical;" onclick="this.select()">À partir de maintenant :
 
 🎯 Rôle & Posture
 - Expert Senior Automatisme Industriel (CODESYS 3.5, Safety ISO 13849, IHM, POO/FB, Normes & R&D).
@@ -174,15 +174,15 @@
 
 🔒 Règle d'Or
 - Consulte systématiquement les standards, conventions et l'AF avant d'agir.
-- Demande une confirmation explicite avant toute implémentation ou modification.</pre>
+- Demande une confirmation explicite avant toute implémentation ou modification.</textarea>
     </div>
 
     <div class="card" id="card-p2">
       <div class="card-header">
         <div class="card-title">🔹 1.2 Cadrage Complet avec Test d'Alignement & Inventaire Projet</div>
-        <button class="btn-copy" onclick="copyPrompt('p2', this)">📋 Copier</button>
+        <button class="btn-copy" onclick="copyFromTextarea('ta-p2', this)">📋 Copier</button>
       </div>
-      <pre id="p2">À partir de maintenant :
+      <textarea id="ta-p2" readonly style="width: 100%; height: 360px; background: var(--code-bg); color: #e6edf3; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: Consolas, monospace; font-size: 0.95rem; resize: vertical;" onclick="this.select()">À partir de maintenant :
 
 🎯 Rôle & Contexte
 - Suis strictement AGENTS.md, les standards du projet et le workflow établi.
@@ -205,23 +205,49 @@
 🔍 Test d'Alignement Obligatoire (Réponds à ceci pour démarrer) :
 1. Liste exhaustive des documents de programmation (AF / Architecture).
 2. Liste des documents de standards et conventions du projet.
-3. Liste des outils (scripts/gates) et workflows que tu maîtrises sur ce repo.</pre>
+3. Liste des outils (scripts/gates) et workflows que tu maîtrises sur ce repo.</textarea>
     </div>
 
   </div>
 
   <script>
-    function copyPrompt(id, btn) {
-      const text = document.getElementById(id).innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '✅ Copié !';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.classList.remove('copied');
-        }, 1500);
-      });
+    function triggerBtnSuccess(btn) {
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '✅ Copié !';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('copied');
+      }, 1500);
+    }
+
+    function copyFromTextarea(textareaId, btn) {
+      const ta = document.getElementById(textareaId);
+      if (!ta) return;
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, 99999);
+
+      let success = false;
+      try {
+        success = document.execCommand('copy');
+      } catch (e) {
+        success = false;
+      }
+
+      if (success) {
+        triggerBtnSuccess(btn);
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value)
+          .then(() => triggerBtnSuccess(btn))
+          .catch(() => {
+            btn.innerHTML = '⚠️ Fais Ctrl+C !';
+            setTimeout(() => { btn.innerHTML = '📋 Copier'; }, 2000);
+          });
+      } else {
+        btn.innerHTML = '⚠️ Fais Ctrl+C !';
+        setTimeout(() => { btn.innerHTML = '📋 Copier'; }, 2000);
+      }
     }
   </script>
 </body>
