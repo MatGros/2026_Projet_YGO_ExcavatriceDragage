@@ -71,9 +71,9 @@ complet. Seuls les gates applicables à un bloc isolé s'exécutent :
 | <small><code>210</code>-<code>420</code></small> | ❌ globaux (bundle/dépôt) → signalés `[--]` non applicables, s'exécuteront au palier C |
 
 ```
-python run_all_gates.py --files CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st
+python run_all_gates.py --files CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
 python run_all_gates.py --palier A --files CODE/M_MAIN/PRG_02_Acquisition.st
-python run_all_gates.py --files CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st   # multi-fichiers
+python run_all_gates.py --files CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st   # multi-fichiers
 ```
 
 Les gates globaux sont listés comme **non applicables** (sans bloquer) : le mode fichier
@@ -123,7 +123,7 @@ C4" repose désormais sur `human_validation_required` + double revue A/B (`SAFET
 | <nobr><code>380</code></nobr> | <small><code>G380_check_config_persistence.py</code></small> | Persistance config (RETAIN/PERSISTENT) |
 | <nobr><code>390</code></nobr> | <small><code>G390_check_bundle_freshness.py</code></small> | Fraîcheur du bundle vs. sources |
 | <nobr><code>400</code></nobr> | <small><code>G400_check_bundle_st_syntax.py</code></small> | Syntaxe ST du bundle (no terminator) |
-| <nobr><code>410</code></nobr> | <small><code>G410_check_ld_invariants.py</code></small> | Invariants LD — tous les POU `_LD` du bundle (`PRG_06_Outputs_LD`, `PRG_02_Acquisition_LD`, …) |
+| <nobr><code>410</code></nobr> | <small><code>G410_check_ld_invariants.py</code></small> | Invariants LD — tous les POU `_LD` du bundle (`PRG_06_Outputs`, `PRG_02_Acquisition_LD`, …) |
 | <nobr><code>420</code></nobr> | <small><code>pytest</code></small> | Tests gates (`AGENT_WORKFLOW/tests/`) + convertisseur ST→XML (`ST_PLCOPENXML_GENERATOR/tests/`) |
 
 ### Palier D — `500`-`510`

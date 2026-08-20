@@ -35,11 +35,11 @@
 | ✍️ Producteur unique | Toute donnée, commande ou sortie physique a un seul écrivain identifié. |
 | 🔗 Contrat par bus DUT | Tout flux inter-domaine passe par une structure DUT publique (`ST_*`), documentée et orientée rôle (`Auth`, `Qualified`, `Measurements`). |
 | 🛡️ Safety visible | Les sorties safety et leurs consommateurs sont nommés et explicites ; aucun arbitrage safety anonyme n'est admis. |
-| ⚡ Sortie finale | Une barrière finale (`PRG_06_Outputs_LD`) est l'unique productrice de chaque commande physique. |
+| ⚡ Sortie finale | Une barrière finale (`PRG_06_Outputs`) est l'unique productrice de chaque commande physique. |
 | 🧪 Simulation | Le choix réel/simulé est réalisé une fois à la frontière acquisition, par domaine. |
 | 🖥️ IHM | Les structures `Cmd/State/Cfg/Bypass` restent le contrat PLC-IHM, distinct des flux internes. |
 
-Un programme d'orchestration ST contient des déclarations d'instances, des constantes nommées et le câblage des entrées/sorties de FB par structures DUT. Il ne contient ni `IF` complexe, ni calcul, ni fusion de commandes, ni écriture de sortie physique hors `PRG_06_Outputs_LD`.
+Un programme d'orchestration ST contient des déclarations d'instances, des constantes nommées et le câblage des entrées/sorties de FB par structures DUT. Il ne contient ni `IF` complexe, ni calcul, ni fusion de commandes, ni écriture de sortie physique hors `PRG_06_Outputs`.
 
 ---
 
@@ -56,14 +56,14 @@ safety et le bloc metier commande doit etre visible sur le meme schema, sans ouv
 | 03 | 🎚️ `PRG_03_Modes_Cycle` | ST pur (`.st`) | Modes, droits, autorisations, sélections de sources et **séquenceur de cycle** (`FB_Cycle`). Produit des demandes ; ne commande aucune sortie. |
 | 04 | 🪝 `PRG_04_Treuils_Benne` | ST pur (`.st`) | **Ensemble levage indissociable** : M1 (retenue) + M2 (benne) + synchronisation + benne + `FB_DiveSearch`/`FB_ExtractionSequence`, avec la safety M1/M2 appelée de manière explicite. |
 | 05 | ↔️ `PRG_05_Translation` | ST pur (`.st`) | Positionnement M3 et arbitrage final translation, avec la safety M3 appelée de manière explicite. |
-| 06 | ⚡ `PRG_06_Outputs_LD` | Ladder | Barrières finales, commandes physiques, **agrégation finale des demandes `PowerCutOff`** et réarmement. |
+| 06 | ⚡ `PRG_06_Outputs` | Ladder | Barrières finales, commandes physiques, **agrégation finale des demandes `PowerCutOff`** et réarmement. |
 | 07 | 🔎 `PRG_07_Supervision` | ST pur (`.st`) | Agrégation IHM, troubleshooting et bypass. Lecture seule stricte : n'écrit ni commande, ni configuration, ni interlock. |
 
 | Element transverse | Rattachement | Regle |
 |---|---|---|
 | 🖥️ Frontiere IHM | DUT `Cmd/State/Cfg/Bypass` | Chaque fonction porte son interface IHM dediee. Mapping et persistance restent **TBD**. |
 | 🛑 Chaine AU physique | `PRG_02_Acquisition` | L'etat AU est un **fait d'entree qualifie** acquis avec les autres entrees : visible des l'acquisition pour la maintenance. Le FB agit ensuite sur les sorties via la barriere finale. La chaine materielle reste independante et proprietaire de la Partie 01. |
-| ⚡ `PowerCutOff` | `PRG_06_Outputs_LD` | Chaque procede publie **sa demande** ; la barriere finale, seule au plus pres des sorties, realise l'agregation et coupe. |
+| ⚡ `PowerCutOff` | `PRG_06_Outputs` | Chaque procede publie **sa demande** ; la barriere finale, seule au plus pres des sorties, realise l'agregation et coupe. |
 | 🔀 Securites croisees | Procede qui **subit** l'interdiction | Une interdiction est portee par le domaine qui la subit (ex. interdire M3 selon un etat benne = dans `PRG_05_Translation`). Les Modes distribuent des **autorisations**, ils ne portent pas la responsabilite de l'interdiction metier. |
 
 `FB_Cycle` reste une machine d'etat ST encapsulee : sa logique est plus lisible et testable sous cette
@@ -117,7 +117,7 @@ MainTask 10 ms — ordre d'appel cible après retrait de la couche historique
   02. PRG_03_Modes_Cycle           (source .st en ST pur d'orchestration)
   03. PRG_04_Treuils_Benne         (source .st en ST pur — safety M1/M2 intégrée)
   04. PRG_05_Translation           (source .st en ST pur — safety M3 intégrée)
-  05. PRG_06_Outputs_LD            (source .st convertie en Ladder)
+  05. PRG_06_Outputs            (source .st convertie en Ladder)
   06. PRG_07_Supervision           (source .st en ST pur — lecture seule)
 
 > Phase transitoire : tant que le remappage n'est pas appliqué dans CODESYS, l'ancien
@@ -144,7 +144,7 @@ creait les cycles Safety <-> Treuils et Safety <-> Translation. Correspondance d
 | `PRG_MODES_CFC` + `PRG_05_Cycle` | `PRG_03_Modes_Cycle` | Autorisations et séquences de conduite au même endroit (ST pur). |
 | `PRG_TREUILS_CFC` + partie M1/M2/benne de `PRG_SAFETY_CFC` | `PRG_04_Treuils_Benne` | M1 et M2 sont mécaniquement indissociables (benne suspendue) ; leur safety est appelée au même endroit (ST pur). |
 | `PRG_TRANSLATION_CFC` + partie M3 de `PRG_SAFETY_CFC` | `PRG_05_Translation` | Idem pour la translation (ST pur). |
-| `PRG_OUTPUTS_LD` | `PRG_06_Outputs_LD` | Devient aussi l'agrégateur `PowerCutOff` (Ladder). |
+| `PRG_OUTPUTS_LD` | `PRG_06_Outputs` | Devient aussi l'agrégateur `PowerCutOff` (Ladder). |
 | `PRG_SUPERVISION_CFC` + `PRG_TROUBLESHOOTING_CFC` | `PRG_07_Supervision` | Observation et diagnostic, lecture seule stricte (ST pur). |
 
 📌 Décision d'architecture (7 POU par procédé) reportée dans `AF_Partie-02` §2/§4 ; historique de migration archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).

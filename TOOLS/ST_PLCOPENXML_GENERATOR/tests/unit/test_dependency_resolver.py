@@ -91,7 +91,7 @@ def test_real_fb_winch_dependency_closure_excludes_standard_blocks_includes_expe
     assert "FB_SpeedStep" in result
     # 🆕 2026-08-06 (retrait FB_Brake, demande client) : FB_Winch ne compose plus FB_Brake --
     # le frein est desormais un couplage direct RelayFwd/RelayRev calcule dans
-    # FB_WinchOutputInterlock_LD, cable au grand jour dans PRG_06_Outputs_LD.
+    # FB_WinchOutputInterlock, cable au grand jour dans PRG_06_Outputs.
     assert "FB_Brake" not in result
     assert "ST_ContactorCheck" in result
     assert "E_State" in result

@@ -78,7 +78,7 @@ def _extract_comment_blocks(body_text: str) -> dict[int, str]:
     both captured here, classification (title vs plain) happens in ld_xml_writer.py:
       1. `// === §N TITLE ===` box comment -> CODESYS network title
          (confirmed pattern: <comment> + <vendorElement ElementType=networktitle>,
-         PRG_06_Outputs_LD oracle export).
+         PRG_06_Outputs oracle export).
       2. A plain `// explanatory text` line -> ordinary <comment>, no vendorElement.
     Only a comment on its OWN line, directly preceding a statement (blank lines
     tolerated in between) is captured -- a comment embedded inside a multi-line

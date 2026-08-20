@@ -261,7 +261,7 @@ def _build_pou(
         # Résoudre les chemins nested (struct → membre BOOL) en ajoutant les membres
         # BOOL des structs à la carte des types d'outputs. Ex. instSafety.Diag : struct
         # → instSafety.Diag.LockoutActive : BOOL (membre de ST_Safety_Emergency_Diag).
-        # REX 2026-08-04 (PRG_06_Outputs_LD) : recopies BOOL nested étaient rendues en
+        # REX 2026-08-04 (PRG_06_Outputs) : recopies BOOL nested étaient rendues en
         # inVariable → outVariable (IndexOutOfRangeException à l'import CODESYS).
         for inst_name, out_map in list(instance_output_type_map.items()):
             for out_name, out_type in list(out_map.items()):

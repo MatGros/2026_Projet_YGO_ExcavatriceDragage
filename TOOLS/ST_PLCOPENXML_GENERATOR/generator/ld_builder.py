@@ -436,7 +436,7 @@ def build_ld_body(
             p_var_el.text = p_value
 
         # Le type du bloc doit correspondre à sa déclaration VAR réelle.
-        # REX 2026-08-04 (oracle PRG_06_Outputs_LD.xml) : TOUTES les sources
+        # REX 2026-08-04 (oracle PRG_06_Outputs.xml) : TOUTES les sources
         # (contacts ET inVariable pour inputs non connectes) doivent etre creees
         # AVANT le bloc. Les inVariable apres le bloc -> IndexOutOfRangeException.
         unconnected_sources: dict[str, int] = {}

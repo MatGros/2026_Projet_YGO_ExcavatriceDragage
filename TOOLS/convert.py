@@ -3,7 +3,7 @@
 
 Usage:
     python TOOLS/convert.py st2xml CODE/MAIN/PRG_02_Acquisition.st -o CODE_XML/MAIN/PRG_02_Acquisition_LD.xml
-    python TOOLS/convert.py xml2st CODE_XML/MAIN/PRG_06_Outputs_LD.xml -o CODE/MAIN/PRG_06_Outputs_LD.st
+    python TOOLS/convert.py xml2st CODE_XML/MAIN/PRG_06_Outputs.xml -o CODE/MAIN/PRG_06_Outputs.st
     python TOOLS/convert.py bundle . -o CODE/CODE_Bundle.xml
 """
 

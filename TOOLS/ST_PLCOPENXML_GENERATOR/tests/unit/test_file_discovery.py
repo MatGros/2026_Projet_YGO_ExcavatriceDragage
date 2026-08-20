@@ -87,7 +87,7 @@ def test_bundle_prefixed_xml_is_excluded(tmp_path):
     ne doit JAMAIS être découvert comme POU XML natif : il contient un POU
     FB_Safety_EmergencyManagement homonyme qui écraserait le vrai FB dans
     objects_by_name → outputVariables vide → IndexOutOfRangeException CODESYS
-    à l'import (PRG_06_Outputs_LD, REX 2026-08-04)."""
+    à l'import (PRG_06_Outputs, REX 2026-08-04)."""
     _write(
         tmp_path / "Bundle_HB_ArmSeqStep.xml",
         '<project><pou name="FB_Safety_EmergencyManagement" pouType="functionBlock">'

@@ -2,7 +2,7 @@
    🪝 ST_WinchFinalInterlockRequest — Demande brute vers frontière Q M1/M2
    ───────────────────────────────────────────────────────────────
    📤 Producteur unique : PRG_TREUILS_CFC (VAR_OUTPUT).
-   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock_LD.
+   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock.
    🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
       demandes exactes de FB_Winch / ST_SpeedStepTable.
    ═══════════════════════════════════════════════════════════════ *)

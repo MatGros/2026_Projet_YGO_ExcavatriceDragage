@@ -321,7 +321,7 @@ Une restitution sans ce bloc est incomplète, quel que soit l'agent qui l'écrit
 
 ## 3bis. Collision de nom avec une variable matérielle (REX 2026-08-05)
 
-> 🚨 **Incident vécu** : `PRG_06_Outputs_LD` déclarait `M3_BrakeRelease_RQ` (et l'équivalent
+> 🚨 **Incident vécu** : `PRG_06_Outputs` déclarait `M3_BrakeRelease_RQ` (et l'équivalent
 > M1/M2) en `VAR_OUTPUT` **avec le même nom exact** que la variable globale que CODESYS crée
 > lors du mapping E/S physique du device. Un identificateur **local masque toujours un global
 > homonyme** (IEC 61131-3) : toute écriture dans ce POU résolvait vers la sortie locale, jamais
@@ -341,7 +341,7 @@ Un `FUNCTION_BLOCK` n'est pas concerné : ses paramètres sont toujours référe
 instance (`instXxx.Param`), jamais par un nom nu — pas le même risque de collision de portée.
 
 **Raccordement physique correct** : le mapping E/S CODESYS cible le **chemin qualifié**
-(`PRG_06_Outputs_LD.TranslationBrakeCmd`, `PRG_06_Outputs_LD.M1RelayFwd`...), jamais un nom nu
+(`PRG_06_Outputs.TranslationBrakeCmd`, `PRG_06_Outputs.M1RelayFwd`...), jamais un nom nu
 qui recréerait la collision.
 
 🤖 **Vérification automatique** :
@@ -547,7 +547,7 @@ Règles obligatoires pour tout programme d'orchestration ST :
 2. **Aucune logique métier inline** : Le POU ST ne contient aucun `IF` complexe ni calcul métier — uniquement des instanciations et des appels de FB avec liaison par structures DUT publiques (`ST_*`).
 3. **Producteur unique par bus DUT** : Les échanges inter-programmes passent par des structures typées dédiées (`Auth`, `Qualified`, `Measurements`).
 4. **Conservation du Ladder Diagram (`_LD.st`)** : La barrière finale des sorties physiques TOR
-   (`PRG_06_Outputs_LD.st`) reste exclusivement en Ladder Diagram (`<LD>`). `PRG_01_Inputs_LD`
+   (`PRG_06_Outputs.st`) reste exclusivement en Ladder Diagram (`<LD>`). `PRG_01_Inputs_LD`
    et `FB_Input` sont des composants historiques en retrait ; aucune nouvelle page Ladder d'entrée
    ne doit être créée.
 
@@ -556,7 +556,7 @@ Règles obligatoires pour tout programme d'orchestration ST :
 > 🚩 Trois bugs d'import CODESYS sur l'ancien `PRG_01_Inputs_LD` ont révélé que le générateur
 > ST→LD (`TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`) produisait du
 > PLCopenXML invalide. Les règles ci-dessous restent obligatoires pour toute
-> source `_LD.st` active, notamment `PRG_06_Outputs_LD`, et sont vérifiées par `test_ld_import_guard.py`.
+> source `_LD.st` active, notamment `PRG_06_Outputs`, et sont vérifiées par `test_ld_import_guard.py`.
 
 ### Structure d'un rung LD complet
 
@@ -597,7 +597,7 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 
 - **`NOT var` ne produit jamais d'`inVariable`/`outVariable`** pour un signal
   BOOL. Un `inVariable` en page LD BOOL pure est un bug d'import.
-- Une page `_LD` de type BOOL pur (notamment `PRG_06_Outputs_LD`) ne doit contenir
+- Une page `_LD` de type BOOL pur (notamment `PRG_06_Outputs`) ne doit contenir
   **aucun** `inVariable` ni `outVariable` — uniquement des `contact`, `coil`,
   `block` et `comment`.
 

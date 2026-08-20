@@ -34,7 +34,7 @@ conditionnée par :
 | Sélection réel/simulé | `PRG_02_Acquisition.HwIn` |
 | Santé carte | `GetDeviceState()` + `InputModuleFault` |
 | Filtrage signal | Filtre matériel prouvé ou `PRG_02_Acquisition` |
-| Barrière finale sorties | `PRG_06_Outputs_LD` |
+| Barrière finale sorties | `PRG_06_Outputs` |
 
 `GetDeviceState()` renseigne l'état d'une carte ou d'un device. Il ne constitue pas un filtre
 anti-rebond et ne fournit pas un diagnostic individuel de canal.

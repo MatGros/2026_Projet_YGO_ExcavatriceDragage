@@ -55,13 +55,13 @@ L'objectif de cette session de travail était de fournir une solution complète,
 * **Principe** : Automatise l'exécution du compilateur natif CODESYS 3.5 en tâche de fond (sans IHM) pour tester l'intégrité d'un POU ou PRG granulaire.
 * **Déroulement de l'exécution** :
   1. **Autodétection** : Détecte l'exécutable CODESYS (`C:\Program Files\CODESYS 3.5.19.10\CODESYS\Common\CODESYS.exe`) et le profil d'environnement (`CODESYS V3.5 SP19 Patch 1`).
-  2. **Génération granulaire** : Génère le XML temporaire pour l'objet demandé (ex: `PRG_06_Outputs_LD_Provisoire`) avec ses dépendances (`CODE/AU/`).
+  2. **Génération granulaire** : Génère le XML temporaire pour l'objet demandé (ex: `PRG_06_Outputs_Provisoire`) avec ses dépendances (`CODE/AU/`).
   3. **Isolation** : Copie un projet `.project` de référence (`PRJ_CODESYS/v0.6.00_RepriseApres20260807.project`) dans le dossier Temp système afin de ne **jamais** modifier ni verrouiller le projet principal.
   4. **Exécution CLI sans conflit** : Lance CODESYS avec les paramètres CLI stricts `--profile="..." --noUI --multipleinstances` afin d'éviter tout conflit avec l'IHM CODESYS déjà ouverte sur la machine de l'utilisateur.
   5. **Import & Syntax Check** : Exécute un script IronPython interne qui importe le XML et déclenche `proj.check_syntax()`.
 * **Utilisation** :
   ```powershell
-  python TOOLS/AGENT_WORKFLOW/scripts/test_codesys_compile.py PRG_06_Outputs_LD_Provisoire
+  python TOOLS/AGENT_WORKFLOW/scripts/test_codesys_compile.py PRG_06_Outputs_Provisoire
   ```
 
 ---
@@ -70,7 +70,7 @@ L'objectif de cette session de travail était de fournir une solution complète,
 
 | Fonctionnalité | Statut | Résultat des tests |
 |---|---|---|
-| **Génération granulaire XML** | ✅ VALIDÉ | Testé sur `PRG_06_Outputs_LD_Provisoire`. Le XML inclut automatiquement `FB_Safety_EmergencyManagement*` et toutes les structures `ST_Safety_Emergency_*`. |
+| **Génération granulaire XML** | ✅ VALIDÉ | Testé sur `PRG_06_Outputs_Provisoire`. Le XML inclut automatiquement `FB_Safety_EmergencyManagement*` et toutes les structures `ST_Safety_Emergency_*`. |
 | **Création du miroir `CODE_XML/`** | ✅ VALIDÉ | Arborescence miroir générée avec succès (13 sous-dossiers, tous les fichiers XML miroirs créés). |
 | **Parsing & Traduction des erreurs C0xxx** | ✅ VALIDÉ | Validé sur les erreurs `C0037` (variable non définie), `C0013` (type mismatch), `C0009` (jeton inattendu), etc. |
 | **Autodétection Profil CODESYS CLI** | ✅ VALIDÉ | Profile `CODESYS V3.5 SP19 Patch 1` détecté et formaté correctement. |

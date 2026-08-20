@@ -3,7 +3,7 @@
 > Rôle : mouvement treuils M1 (Retenue) / M2 (Benne), safety métier, synchro, benne, barrière finale.
 > **Détail technique par FB** : voir les 9 fiches dédiées (§1). Ce chapô reste au niveau machine
 > + intégration programme + TBD Lot 4 — il ne recopie pas les interfaces/`TC-` des fiches.
-> Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_04_Treuils_Benne.st` (ST), `PRG_06_Outputs_LD.st` (Ladder généré). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : le code reste en **ST + PLCopenXML**, aucune page CFC native cible.
+> Source code actuel : `CODE/TREUILS/*.st` · instances dans `PRG_04_Treuils_Benne.st` (ST), `PRG_06_Outputs.st` (Ladder généré). 🚩 La conversion CFC natif est **abandonnée** (2026-08-16) : le code reste en **ST + PLCopenXML**, aucune page CFC native cible.
 > 🗺️ Architecture cible faisant foi : `DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md` §2 et §4.
 > v1.14 archivée : `ARCHIVES/Doc/AF_Partie-09_Fonction_Winch_v1.14.md`.
 
@@ -27,7 +27,7 @@ dupliqué ici) :
 | [`FB_Winch`](AF_Partie-10_FB_Winch_v1.0.md) | <nobr><code>TC-P10-011</code></nobr>, 017, 018, 019 |
 | [`FB_Safety_Winch`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | <nobr><code>TC-P10-001</code></nobr> à 010 |
 | [`FB_WinchSync`](AF_Partie-10_FB_WinchSync_v1.0.md) | <nobr><code>TC-P10-014</code></nobr>, 015, 016 |
-| [`FB_WinchOutputInterlock_LD`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | <nobr><code>TC-P10-012</code></nobr>, 013, 020, 021, 022 |
+| [`FB_WinchOutputInterlock`](AF_Partie-10_FB_WinchOutputInterlock_v1.0.md) | <nobr><code>TC-P10-012</code></nobr>, 013, 020, 021, 022 |
 | [`FB_Bucket`](AF_Partie-10_FB_Bucket_v1.0.md) | <nobr><code>TC-P10-023</code></nobr> à 034 |
 | [`FB_Winch_Symmetry`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md) | Diagnostic MES-008, symétrie |
 | [`FB_SpeedStep`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | Décodage paliers 1..5 & garde-fou |
@@ -43,7 +43,7 @@ dupliqué ici) :
 | [`AF_Partie-10_FB_Winch_v1.0.md`](AF_Partie-10_FB_Winch_v1.0.md) | `FB_Winch` | Mouvement, palier, sens (🔧 2026-08-06 : frein retiré, voir §1bis) |
 | [`AF_Partie-10_FB_Safety_Winch_v1.0.md`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | `FB_Safety_Winch` | 7 mécanismes A-G, masques, bypass |
 | [`AF_Partie-10_FB_WinchSync_v1.0.md`](AF_Partie-10_FB_WinchSync_v1.0.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
-| [`AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md`](AF_Partie-10_FB_WinchOutputInterlock_LD_v1.0.md) | `FB_WinchOutputInterlock_LD` | Barrière finale, watchdog frein, anti-redémarrage |
+| [`AF_Partie-10_FB_WinchOutputInterlock_v1.0.md`](AF_Partie-10_FB_WinchOutputInterlock_v1.0.md) | `FB_WinchOutputInterlock` | Barrière finale, watchdog frein, anti-redémarrage |
 | [`AF_Partie-10_FB_Bucket_v1.0.md`](AF_Partie-10_FB_Bucket_v1.0.md) | `FB_Bucket` (+ `FB_DiveSearch`, `FB_ExtractionSequence`) | Benne, désynchronisation M1/M2, glissement, assistants |
 | [`AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md) | `FB_Winch_Symmetry` | Diagnostic passif symétrie & décalages M1/M2 |
 | [`AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_SpeedStep_v1.0.md) | `FB_SpeedStep` | Décodeur consigne % -> contacteurs & garde-fou |
@@ -79,7 +79,7 @@ dupliqué ici) :
   </div>
 
   <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
-    🔒 &nbsp;<b>FB_WinchOutputInterlock_LD (×2)</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Barrière finale matérielle outputs & BrakeCmd</span>
+    🔒 &nbsp;<b>FB_WinchOutputInterlock (×2)</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Barrière finale matérielle outputs & BrakeCmd</span>
   </div>
 </div>
 
@@ -95,16 +95,16 @@ intermédiaire avec sa propre temporisation/état — couplage structurel direct
 Nouvelle architecture :
 - `FB_Winch` ne produit plus aucune sortie frein (`BrakeCmd`/`BrakeCommandOpenConfirmed`/
   `BrakeContactorCheck` retirés de son interface).
-- `FB_WinchOutputInterlock_LD` calcule `BrakeCmd := RelayFwd OR RelayRev` **après** avoir
+- `FB_WinchOutputInterlock` calcule `BrakeCmd := RelayFwd OR RelayRev` **après** avoir
   finalisé ces deux sorties (§5 de sa logique) — hérite automatiquement de toutes leurs
   conditions de sécurité (Error, RestartInhibit, RestartRequired, MotorRequest) sans les
   répéter. Watchdog conservé : `BrakeFeedback` (retour physique brut, ex-DI
   `Mx_BrakeIsOpen_DI`, câblé directement depuis `PRG_04`) comparé à `BrakeCmd`, timeout
   500 ms → `ErrorId` bit0 → coupe le mouvement (mécanisme `Error` déjà existant).
-- `PRG_06_Outputs_LD` recalcule **la même expression** indépendamment sur les DQ finaux
+- `PRG_06_Outputs` recalcule **la même expression** indépendamment sur les DQ finaux
   (`M1BrakeCmd := M1RelayFwd OR M1RelayRev`) pour piloter la bobine physique — visible
-  directement dans le réseau Ladder, sans ouvrir `FB_WinchOutputInterlock_LD` (même doctrine
-  de visibilité que les autres barrières finales, voir en-tête `PRG_06_Outputs_LD.st`).
+  directement dans le réseau Ladder, sans ouvrir `FB_WinchOutputInterlock` (même doctrine
+  de visibilité que les autres barrières finales, voir en-tête `PRG_06_Outputs.st`).
 
 ⚠️ Contrepartie assumée (décision client, pas une omission) : le frein n'attend plus de
 confirmation physique du contacteur de sens avant de s'ouvrir (l'ancien `ContactorEngaged`,
@@ -149,7 +149,7 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 
 | DUT | Producteur | Consommateur |
 |---|---|---|
-| `ST_WinchFinalInterlockRequest` | `PRG_TREUILS_CFC.st` actuel ; cible `PRG_04_Treuils_Benne.xml` absente | `PRG_OUTPUTS_LD.st` actuel ; cible `PRG_06_Outputs_LD` |
+| `ST_WinchFinalInterlockRequest` | `PRG_TREUILS_CFC.st` actuel ; cible `PRG_04_Treuils_Benne.xml` absente | `PRG_OUTPUTS_LD.st` actuel ; cible `PRG_06_Outputs` |
 | `ST_SpeedStepTable` | config IHM/RETAIN | `FB_Winch`/`FB_SpeedStep` |
 | `ST_SafetyWinch` | `Supervision` (agrège) | IHM |
 | `ST_BypassWinch` | IHM RETAIN | `FB_Safety_Winch` |
@@ -196,7 +196,7 @@ Seule **l'affectation POU** change : la safety devient visible en parallèle des
 la même page, ce qui supprime par construction le cycle prouvé `Safety ↔ Treuils`.
 
 `PowerCutOff` : cette page publie **sa demande** M1/M2. L'agrégation et la coupure restent la
-responsabilité exclusive de la barrière finale `PRG_06_Outputs_LD` (AF02 §2). Aucun POU « safety
+responsabilité exclusive de la barrière finale `PRG_06_Outputs` (AF02 §2). Aucun POU « safety
 machine globale » n'existe dans la cible.
 
 📌 Lot de migration : **M3** (C4, rebuild) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
@@ -237,7 +237,7 @@ persistant) : voir la fiche FB concernée (§7 de chaque fiche) et §6 ci-dessou
 | Garde-fou vitesse mesurée | Existe, désactivé, non persistant | Inchangé par ce lot |
 | Bandes de vitesse par palier | Théoriques, jamais mesurées | Voir §6.3, non traité par ce lot |
 
-### 6.2 Doctrine anti-retombée associée (`FB_WinchOutputInterlock_LD.st`, commit 2026-08-06)
+### 6.2 Doctrine anti-retombée associée (`FB_WinchOutputInterlock.st`, commit 2026-08-06)
 
 ⚠️ **Révisée le même jour (§1bis)** : la doctrine ci-dessous (contacteur confirmé physiquement
 AVANT ouverture frein, via `ContactorEngaged := NOT FwdRevSpeedFeedbackOff`) a été implémentée

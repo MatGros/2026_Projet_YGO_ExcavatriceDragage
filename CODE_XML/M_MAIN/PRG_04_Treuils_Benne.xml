@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T13:18:03.288723" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T13:18:03.288723">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:43:34.307035" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:43:34.307035">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -833,7 +833,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    🪝 ST_WinchFinalInterlockRequest — Demande brute vers frontière Q M1/M2
    ───────────────────────────────────────────────────────────────
    📤 Producteur unique : PRG_TREUILS_CFC (VAR_OUTPUT).
-   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock_LD.
+   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock.
    🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
       demandes exactes de FB_Winch / ST_SpeedStepTable.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -3227,7 +3227,7 @@ WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Ma
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
 // Plus de BrakeReleaseRequest/
 // BrakeCommandOpenConfirmed calcules par FB_Winch — la barriere finale
-// (FB_WinchOutputInterlock_LD) recoit le retour PHYSIQUE brut directement,
+// (FB_WinchOutputInterlock) recoit le retour PHYSIQUE brut directement,
 // et calcule elle-meme BrakeCmd := RelayFwd OR RelayRev (voir bandeau de ce FB).
 WinchM1FinalInterlockRequest.BrakeFeedback := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;
 WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;
@@ -3281,18 +3281,18 @@ WinchM1State.Contactor1 := instWinchM1.Contactor1;
 WinchM1State.Contactor2 := instWinchM1.Contactor2;
 WinchM1State.Contactor3 := instWinchM1.Contactor3;
 WinchM1State.Contactor4 := instWinchM1.Contactor4;
-WinchM1State.BrakeCmd := PRG_06_Outputs_LD.instWinchOutputInterlockM1.BrakeCmd;
+WinchM1State.BrakeCmd := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeCmd;
 WinchM1State.BrakeCommandOpenConfirmed := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;
 WinchM1State.FinalAuthorizedStep := instWinchM1.RequestedStep;
 WinchM1State.ContactorsCheck := instWinchM1.ContactorsCheck;
-WinchM1State.FinalInterlockState := PRG_06_Outputs_LD.instWinchOutputInterlockM1.State;
-WinchM1State.FinalInterlockReason := PRG_06_Outputs_LD.instWinchOutputInterlockM1.Reason;
-WinchM1State.FinalInterlockError := PRG_06_Outputs_LD.instWinchOutputInterlockM1.Error;
-WinchM1State.FinalInterlockErrorId := PRG_06_Outputs_LD.instWinchOutputInterlockM1.ErrorId;
-WinchM1State.FinalRestartInhibit := PRG_06_Outputs_LD.instWinchOutputInterlockM1.RestartInhibit;
-WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
-WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.RestartDelayElapsed;
-WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM1.StepDelayElapsed;
+WinchM1State.FinalInterlockState := PRG_06_Outputs.instWinchOutputInterlockM1.State;
+WinchM1State.FinalInterlockReason := PRG_06_Outputs.instWinchOutputInterlockM1.Reason;
+WinchM1State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM1.Error;
+WinchM1State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM1.ErrorId;
+WinchM1State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM1.RestartInhibit;
+WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
+WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.RestartDelayElapsed;
+WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.StepDelayElapsed;
 WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderAbsM1.RawPos;
 WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
 WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
@@ -3338,18 +3338,18 @@ WinchM2State.Contactor1 := instWinchM2.Contactor1;
 WinchM2State.Contactor2 := instWinchM2.Contactor2;
 WinchM2State.Contactor3 := instWinchM2.Contactor3;
 WinchM2State.Contactor4 := instWinchM2.Contactor4;
-WinchM2State.BrakeCmd := PRG_06_Outputs_LD.instWinchOutputInterlockM2.BrakeCmd;
+WinchM2State.BrakeCmd := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeCmd;
 WinchM2State.BrakeCommandOpenConfirmed := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;
 WinchM2State.FinalAuthorizedStep := instWinchM2.RequestedStep;
 WinchM2State.ContactorsCheck := instWinchM2.ContactorsCheck;
-WinchM2State.FinalInterlockState := PRG_06_Outputs_LD.instWinchOutputInterlockM2.State;
-WinchM2State.FinalInterlockReason := PRG_06_Outputs_LD.instWinchOutputInterlockM2.Reason;
-WinchM2State.FinalInterlockError := PRG_06_Outputs_LD.instWinchOutputInterlockM2.Error;
-WinchM2State.FinalInterlockErrorId := PRG_06_Outputs_LD.instWinchOutputInterlockM2.ErrorId;
-WinchM2State.FinalRestartInhibit := PRG_06_Outputs_LD.instWinchOutputInterlockM2.RestartInhibit;
-WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
-WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.RestartDelayElapsed;
-WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs_LD.instWinchOutputInterlockM2.StepDelayElapsed;
+WinchM2State.FinalInterlockState := PRG_06_Outputs.instWinchOutputInterlockM2.State;
+WinchM2State.FinalInterlockReason := PRG_06_Outputs.instWinchOutputInterlockM2.Reason;
+WinchM2State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM2.Error;
+WinchM2State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM2.ErrorId;
+WinchM2State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM2.RestartInhibit;
+WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
+WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.RestartDelayElapsed;
+WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.StepDelayElapsed;
 WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderAbsM2.RawPos;
 WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
 WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
@@ -3393,9 +3393,9 @@ WinchM1Safety.ErrorMecaD         := (instSafetyWinchM1.ErrorId AND 16#0800) &lt;
 WinchM1Safety.ErrorMecaE         := (instSafetyWinchM1.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM1Safety.ErrorOppositeDir   := (instSafetyWinchM1.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM1Safety.ErrorNoMovement    := (instSafetyWinchM1.ErrorId AND 16#8000) &lt;&gt; 0;
-WinchM1Safety.PowerCutOffSafety  := PRG_06_Outputs_LD.M1PowerCutOffSafetyInfo;
-WinchM1Safety.SafeStopSafety     := PRG_06_Outputs_LD.M1SafeStopSafetyInfo;
-WinchM1Safety.BlockedBySafety    := PRG_06_Outputs_LD.M1BlockedBySafetyInfo;
+WinchM1Safety.PowerCutOffSafety  := PRG_06_Outputs.M1PowerCutOffSafetyInfo;
+WinchM1Safety.SafeStopSafety     := PRG_06_Outputs.M1SafeStopSafetyInfo;
+WinchM1Safety.BlockedBySafety    := PRG_06_Outputs.M1BlockedBySafetyInfo;
 
 WinchM2Safety.SafeStop := SafeStopM2_Active;
 WinchM2Safety.AscentPermit := AscentPermitM2_Active;
@@ -3416,9 +3416,9 @@ WinchM2Safety.ErrorMecaD         := (instSafetyWinchM2.ErrorId AND 16#0800) &lt;
 WinchM2Safety.ErrorMecaE         := (instSafetyWinchM2.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM2Safety.ErrorOppositeDir   := (instSafetyWinchM2.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM2Safety.ErrorNoMovement    := (instSafetyWinchM2.ErrorId AND 16#8000) &lt;&gt; 0;
-WinchM2Safety.PowerCutOffSafety  := PRG_06_Outputs_LD.M2PowerCutOffSafetyInfo;
-WinchM2Safety.SafeStopSafety     := PRG_06_Outputs_LD.M2SafeStopSafetyInfo;
-WinchM2Safety.BlockedBySafety    := PRG_06_Outputs_LD.M2BlockedBySafetyInfo;
+WinchM2Safety.PowerCutOffSafety  := PRG_06_Outputs.M2PowerCutOffSafetyInfo;
+WinchM2Safety.SafeStopSafety     := PRG_06_Outputs.M2SafeStopSafetyInfo;
+WinchM2Safety.BlockedBySafety    := PRG_06_Outputs.M2BlockedBySafetyInfo;
 
 SyncState.DeltaPos_M := instWinchSync.SignedDeltaPosM;
 SyncState.SyncActive := instWinchSync.SyncActive;
@@ -7177,7 +7177,7 @@ SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
 {region "§4 Commandes contacteurs et sens"}
 // Les sorties métier suivent le palier temporisé. FB_Winch/SpeedStepTable reste
 // propriétaire unique des combinaisons, y compris les mappings M2 Benne dynamiques.
-// FB_WinchOutputInterlock_LD ne fait qu'autoriser ou masquer ces quatre demandes.
+// FB_WinchOutputInterlock ne fait qu'autoriser ou masquer ces quatre demandes.
 CASE StepNumber OF
     1:
         Contactor1 := SpeedStepTable.P1R1; Contactor2 := SpeedStepTable.P1R2;
@@ -7212,7 +7212,7 @@ END_IF;
 // jusqu'à la retombée de la rampe) — coupure instantanée du contacteur de sens dès le
 // relâchement du joystick, même sécurité que ci-dessus.
 // Le frein n'est pas une condition d'engagement des relais de sens : c'est l'inverse
-// (voir FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
+// (voir FB_WinchOutputInterlock §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
 RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep &gt; 0);
 RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep &gt; 0);
 
@@ -7249,7 +7249,7 @@ END_IF;
 
 IF NOT BypassGlobal THEN
 // bit0 ErrorId libre — la cohérence commande/retour du frein est surveillée dans
-// FB_WinchOutputInterlock_LD (BrakeFeedback).
+// FB_WinchOutputInterlock (BrakeFeedback).
 
 // 🧪 Simulation (GVL_Simulation.SensorMxContactorFeedbackIsReal, passé par l'appelant via
 // BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed

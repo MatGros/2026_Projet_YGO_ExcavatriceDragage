@@ -12,14 +12,14 @@
 contract:
   # ── Identification ────────────────────────────────────────────────────────
   task_id: LOT_T140_PURGE_GVL_GLOBAL_OUTPUTS
-  criticality: C2            # C2 : Modification d'interface PRG_06_Outputs_LD / GVL_Global / PRG_02_Acquisition
+  criticality: C2            # C2 : Modification d'interface PRG_06_Outputs / GVL_Global / PRG_02_Acquisition
   strategy: patch            # patch
 
   # ── 1. Objectif metier ────────────────────────────────────────────────────
   objective: >
-    Supprimer la double ecriture obsolete dans GVL_Global et aligner PRG_06_Outputs_LD
+    Supprimer la double ecriture obsolete dans GVL_Global et aligner PRG_06_Outputs
     sur son role strict de barriere materielle unique, en branchant FB_SimBench directement
-    sur PRG_06_Outputs_LD avec conformite stricte des commentaires CQS §2 (tags et fleches ASCII).
+    sur PRG_06_Outputs avec conformite stricte des commentaires CQS §2 (tags et fleches ASCII).
 
   # ── 2. Criteres testables ─────────────────────────────────────────────────
   acceptance:
@@ -32,17 +32,17 @@ contract:
 
     - id: AC2
       statement: >
-        PRG_06_Outputs_LD expose ses commandes d'actionneurs en VAR_OUTPUT avec les bannieres ASCII,
+        PRG_06_Outputs expose ses commandes d'actionneurs en VAR_OUTPUT avec les bannieres ASCII,
         les tags [ACT], [SAFE], [CMD] et les fleches ASCII <-- conformement a CODE_QUALITY_STANDARDS §2.
       verified_by: >
-        python -c "content = open('CODE/M_MAIN/PRG_06_Outputs_LD.st').read(); assert '[ACT]' in content and '<--' in content"
+        python -c "content = open('CODE/M_MAIN/PRG_06_Outputs.st').read(); assert '[ACT]' in content and '<--' in content"
 
     - id: AC3
       statement: >
-        FB_SimBench dans PRG_02_Acquisition lit directement les sorties publiques de PRG_06_Outputs_LD
+        FB_SimBench dans PRG_02_Acquisition lit directement les sorties publiques de PRG_06_Outputs
         sans aucun passage par GVL_Global.
       verified_by: >
-        python -c "content = open('CODE/M_MAIN/PRG_02_Acquisition.st').read(); assert 'PRG_06_Outputs_LD.M1RelayFwd' in content and 'GVL_Global.M1RelayFwd' not in content"
+        python -c "content = open('CODE/M_MAIN/PRG_02_Acquisition.st').read(); assert 'PRG_06_Outputs.M1RelayFwd' in content and 'GVL_Global.M1RelayFwd' not in content"
 
     - id: AC4
       statement: >
@@ -73,7 +73,7 @@ contract:
   scope:
     allowed:
       - CODE/M_MAIN/GVL_Global.st
-      - CODE/M_MAIN/PRG_06_Outputs_LD.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
       - CODE/M_MAIN/PRG_02_Acquisition.st
       - CODE_XML/
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_PURGE_GVL_GLOBAL_OUTPUTS.yaml
@@ -86,7 +86,7 @@ contract:
   conservation:
     must_survive:
       - "Les stimulations et retours de simulation banc FB_SimBench restent fonctionnellement identiques."
-      - "Le pilotage physique direct des sorties materielles dans PRG_06_Outputs_LD reste intact."
+      - "Le pilotage physique direct des sorties materielles dans PRG_06_Outputs reste intact."
 
   # ── 5. Preuves attendues en restitution ───────────────────────────────────
   evidence_required:

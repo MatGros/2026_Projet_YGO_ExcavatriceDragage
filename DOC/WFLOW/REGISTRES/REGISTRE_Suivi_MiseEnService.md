@@ -29,7 +29,7 @@
 ### 🎯 Objectif de séance — 2026-08-07
 - **Cible** : réaliser un **cycle complet** (descente → contact Kobold → remontée → vidage trémie) **sans sécurité particulière, ou à sécurité limitée** — validation mécanique/mouvement avant la mise en place des protections finales.
 - ⚠️ **Risque noté (devoir d'alerte)** : cycle réel sur machine sans les sécurités complètes → **uniquement avec bypass explicites** (`Bypass.Global`/ciblés), **homme-mort** maintenu, vigilance opérateur, **aucun redémarrage auto après défaut**, personnes écartées de la zone.
-- 📌 **Point à clarifier** : la barrière `SafetyStructureNotValidated := TRUE` (`PRG_06_Outputs_LD.st:50`) coupe toutes les sorties → confirmer le moyen d'autoriser le mouvement pour cet essai (retrait ponctuel vs bypass).
+- 📌 **Point à clarifier** : la barrière `SafetyStructureNotValidated := TRUE` (`PRG_06_Outputs.st:50`) coupe toutes les sorties → confirmer le moyen d'autoriser le mouvement pour cet essai (retrait ponctuel vs bypass).
 
 ---
 
@@ -100,8 +100,8 @@
 - 🟦 **Date** : 2026-08-07 | 🟧 **Lieu** : Terrain | 🏷️ **Version** : `aa4219c`
 - 🎯 **Périmètre** : Capteur Kobold — activation contacteur mesure (`M1_M2_KoboldMeasureEnable_DQ`)
 - 🚦 **Statut** : 🟢 **Corrigé**
-- 🔍 **Constat** : `KoboldContactorCmd` (`PRG_06_Outputs_LD`) déclaré mais **jamais assigné** — chaîne `instDiveSearch.KoboldMeasureEnable → KoboldContactorCmdArbitrated` s'arrêtait net, aucune erreur de compilation/gate pour le signaler. Même classe de bug que le fix frein M3 du 2026-08-05.
-- 🛠️ **Solution** : `KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;` + coil directe sur `M1_M2_KoboldMeasureEnable_DQ` (même pattern validé M1/M2/M3). Preuve : `CODE/M_MAIN/PRG_06_Outputs_LD.st` | Générateur PLCopenXML ST→LD | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | 🟢 Généralisé (Ladder standard) | `DIRECT_HW_COILS`.
+- 🔍 **Constat** : `KoboldContactorCmd` (`PRG_06_Outputs`) déclaré mais **jamais assigné** — chaîne `instDiveSearch.KoboldMeasureEnable → KoboldContactorCmdArbitrated` s'arrêtait net, aucune erreur de compilation/gate pour le signaler. Même classe de bug que le fix frein M3 du 2026-08-05.
+- 🛠️ **Solution** : `KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;` + coil directe sur `M1_M2_KoboldMeasureEnable_DQ` (même pattern validé M1/M2/M3). Preuve : `CODE/M_MAIN/PRG_06_Outputs.st` | Générateur PLCopenXML ST→LD | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | 🟢 Généralisé (Ladder standard) | `DIRECT_HW_COILS`.
 - 📌 **Action** : confirmer import CODESYS propre (risque connu, REX 2026-08-04, validé sur M1/M2/M3).
 
 ### MES-022 — 🔴 Coupe-circuit séquencement auto benne (Fiche 01) après blocages répétés terrain
@@ -127,7 +127,7 @@
 - 🎯 **Périmètre** : Treuils M1/M2 — commande frein vs contacteurs de sens
 - 🚦 **Statut** : 🟢 **Implémenté (déjà dans le repo, daté 08/06)**
 - 🔍 **Constat / Décision** : Simplification : le frein est commandé **directement** par la commande des **contacteurs de sens** (`BrakeCmd := RelayFwd OR RelayRev`). Aucun écart frein/mouvement possible.
-- 🛠️ **Preuve code** : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st:244` (`BrakeCmd := RelayFwd OR RelayRev`), `FB_WinchOutputInterlock_LD.st:13-15`, `FB_Winch.st:9` (+ câblage `PRG_06_Outputs_LD`).
+- 🛠️ **Preuve code** : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st:244` (`BrakeCmd := RelayFwd OR RelayRev`), `FB_WinchOutputInterlock.st:13-15`, `FB_Winch.st:9` (+ câblage `PRG_06_Outputs`).
 - 📌 **Action** : À tester au chargement `v0.5.9_IOTest` (séquence frein+sens).
 
 ---
@@ -175,12 +175,12 @@
 
 ### MES-016 — ⚠️ PRG_06 : variables output déclarées **même nom que les sorties HW** → chevauchement/écrasement
 - 📅 **Date** : 2026-08-05 | 📍 **Lieu** : Terrain | 🏷️ **Version** : `v0.4.27_ConfigPersistence_TranslationSupervisionSuite`
-- 🎯 **Périmètre** : `PRG_06_Outputs_LD` — sorties HW M1/M2/M3 (`*_DQ`/`*_RQ`), mapping E/S device
+- 🎯 **Périmètre** : `PRG_06_Outputs` — sorties HW M1/M2/M3 (`*_DQ`/`*_RQ`), mapping E/S device
 - 🚦 **Statut** : 🟠 **Gros problème — traitement à confirmer**
 - 🔍 **Constat** : Des `VAR_OUTPUT` de `PRG_06` étaient déclarées **avec le même nom que les sorties hardware** (`M1/M2/M3_BrakeRelease_RQ`, `*_DQ`…). → **chevauchement / écrasement** → les sorties **n'étaient pas pilotées correctement**.
 - 💡 **Mécanisme (vérifié)** : le mapping E/S (`Device.export` l.42842-42844, `CreateVariable=True`) auto-crée des **variables globales device** nommées `M3_BrakeRelease_RQ`, etc. Le POU déclare le **même symbole** en `VAR_OUTPUT` → la portée locale gagne : l'affectation du programme écrit la **copie POU**, la sortie physique (reliée à la globale) ne reçoit **rien**.
-- 🛠️ **Traitement** : *(à confirmer — désambiguïsation noms VS variables locales de mapping, cf. note `PRG_06_Outputs_LD.st` l.190-201 : le raccordement physique doit pointer les **variables locales** (ex. `M1BrakeCmd`), pas les `*_DQ/*_RQ`)*
-- ⚠️ **Repo `v0.5.9` à contrôler** : `CODE/M_MAIN/PRG_06_Outputs_LD.st:64,72,74` garde les `VAR_OUTPUT` homonymes ET `Device.export` garde le mapping sur ces noms → risque identique si le mapping n'est pas déplacé sur les variables locales. **Réauditer au chargement `v0.5.9_IOTest`.**
+- 🛠️ **Traitement** : *(à confirmer — désambiguïsation noms VS variables locales de mapping, cf. note `PRG_06_Outputs.st` l.190-201 : le raccordement physique doit pointer les **variables locales** (ex. `M1BrakeCmd`), pas les `*_DQ/*_RQ`)*
+- ⚠️ **Repo `v0.5.9` à contrôler** : `CODE/M_MAIN/PRG_06_Outputs.st:64,72,74` garde les `VAR_OUTPUT` homonymes ET `Device.export` garde le mapping sur ces noms → risque identique si le mapping n'est pas déplacé sur les variables locales. **Réauditer au chargement `v0.5.9_IOTest`.**
 
 ---
 
@@ -214,10 +214,10 @@
 
 ### MES-013 — 🔌 `M3_BrakeRelease_RQ` : Sorties HW non mappées / GVL sans lien
 - 📅 **Date** : 2026-08-05 | 📍 **Lieu** : Terrain | 🏷️ **Version** : `v0.4.27_ConfigPersistence_TranslationSupervisionSuite`
-- 🎯 **Périmètre** : Sorties automate HW (`PRG_06_Outputs_LD`, `M3_BrakeRelease_RQ`), mapping E/S devices
+- 🎯 **Périmètre** : Sorties automate HW (`PRG_06_Outputs`, `M3_BrakeRelease_RQ`), mapping E/S devices
 - 🚦 **Statut** : 🟢 **Problème traité — noté** (revoir au chargement `v0.5.9_IOTest`)
 - 🔍 **Constat** : Sorties HW **non mappées** physiquement dans le programme chargé ; **GVL utilisés sans lien** vers le matériel (pas d'adresse device).
-- 🛠️ **Traitement** : Raccordement via **mapping E/S manuel CODESYS** (`Device.export`) — geste documenté `CODE/M_MAIN/PRG_06_Outputs_LD.st` §2 (l. 190-201, 221-225) : les `*_DQ/*_RQ` sont auto-créées par le mapping, absentes du bundle isolé.
+- 🛠️ **Traitement** : Raccordement via **mapping E/S manuel CODESYS** (`Device.export`) — geste documenté `CODE/M_MAIN/PRG_06_Outputs.st` §2 (l. 190-201, 221-225) : les `*_DQ/*_RQ` sont auto-créées par le mapping, absentes du bundle isolé.
 - 📌 **Action** : Réauditer le mapping de **toutes** les sorties HW (M1/M2/M3) pendant `v0.5.9_IOTest`.
 
 ---

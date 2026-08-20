@@ -11,11 +11,11 @@ de compilation ni d'import ne signale ce piège : la sortie physique ne bouge
 simplement jamais.
 
 Confirmé en test terrain (2026-08-05) : forcer M3_BrakeRelease_RQ depuis un AUTRE POU
-pilotait bien le relais ; PRG_06_Outputs_LD écrivant sur le même nom ne pilotait rien.
+pilotait bien le relais ; PRG_06_Outputs écrivant sur le même nom ne pilotait rien.
 Fix appliqué (M1/M2/M3 relais/contacteurs/frein ET chaîne AU PowerKeepAlive_A_RQ/
 PowerKeepAlive_B_RQ/EmergencyArming_RQ, confirmées câblées réel par l'utilisateur) :
 TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py (plus de coil ni de
-VAR_OUTPUT sur les noms Device bruts, renommage *Cmd) + CODE/MAIN/PRG_06_Outputs_LD.st
+VAR_OUTPUT sur les noms Device bruts, renommage *Cmd) + CODE/MAIN/PRG_06_Outputs.st
 + CODE/MAIN/PRG_02_Acquisition.st (références qualifiées mises à jour).
 
 PRG_02_Acquisition (frontière acquisition, AF_Partie-06) référence ces noms bruts en

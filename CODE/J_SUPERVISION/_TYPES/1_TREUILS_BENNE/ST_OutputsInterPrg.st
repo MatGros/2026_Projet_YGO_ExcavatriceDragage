@@ -1,10 +1,10 @@
 (* ═══════════════════════════════════════════════════════════════
-   📤 ST_OutputsInterPrg — Bus d'échange inter-PRG produit par PRG_06_Outputs_LD
+   📤 ST_OutputsInterPrg — Bus d'échange inter-PRG produit par PRG_06_Outputs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Encapsuler les ordres actionneurs finaux (M1/M2/M3, AU) produits
-      par PRG_06_Outputs_LD et rebouclés par FB_SimBench (instancié dans
+      par PRG_06_Outputs et rebouclés par FB_SimBench (instancié dans
       PRG_02_Acquisition) pour le banc de simulation intégré.
-   📤 Producteur unique : PRG_06_Outputs_LD (VAR_OUTPUT Data : ST_OutputsInterPrg).
+   📤 Producteur unique : PRG_06_Outputs (VAR_OUTPUT Data : ST_OutputsInterPrg).
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════ *)

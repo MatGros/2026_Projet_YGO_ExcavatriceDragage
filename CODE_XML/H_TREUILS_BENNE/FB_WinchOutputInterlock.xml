@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:40:47.422904" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:40:47.422904">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:43:34.279645" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:43:34.279645">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -134,7 +134,7 @@
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_WinchOutputInterlock_LD" pouType="functionBlock">
+      <pou name="FB_WinchOutputInterlock" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -531,11 +531,11 @@
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🛡️ FB_WinchOutputInterlock_LD — Barrière finale frein / puissance M1 ou M2
+   🛡️ FB_WinchOutputInterlock — Barrière finale frein / puissance M1 ou M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Barrière de sécurité finale pour frein et contacteurs M1/M2
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs_LD)
+   🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs)
    🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
    =======================================================================</xhtml>
           </documentation>
@@ -679,7 +679,7 @@ END_IF;
 // conditions de sécurité (Error, RestartInhibit, RestartRequired, MotorRequest)
 // sans avoir à les répéter. Aucun risque d'écart frein/mouvement possible : le
 // frein ne PEUT pas être commandé ouvert sans qu'un des deux relais de sens le
-// soit aussi, puisque c'est la même expression. PRG_06_Outputs_LD recalcule la
+// soit aussi, puisque c'est la même expression. PRG_06_Outputs recalcule la
 // MÊME expression indépendamment sur les DQ finaux (M1RelayFwd OR M1RelayRev)
 // pour piloter physiquement la bobine — ce BrakeCmd ici sert de miroir/diagnostic
 // (State, IHM) mais n'est plus câblé sur la sortie physique (voir PRG_06 §2).
@@ -720,7 +720,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6c70acfd-cdf9-59b8-85a9-5f9e69ddb4af</ObjectId>
+            <ObjectId>2a1928e0-077f-59ff-bf93-fa875e0de69c</ObjectId>
           </data>
         </addData>
       </pou>
@@ -733,7 +733,7 @@ END_IF;
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
-          <Object Name="FB_WinchOutputInterlock_LD" ObjectId="6c70acfd-cdf9-59b8-85a9-5f9e69ddb4af" />
+          <Object Name="FB_WinchOutputInterlock" ObjectId="2a1928e0-077f-59ff-bf93-fa875e0de69c" />
           <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
           <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
         </Folder>

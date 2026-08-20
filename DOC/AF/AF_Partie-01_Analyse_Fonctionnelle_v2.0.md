@@ -57,7 +57,7 @@ Cette partie ne duplique pas le tableau.
   </div>
 
   <div style="background:#1e293b; color:#f8fafc; border-left:4px solid #4ade80; padding:6px 10px; border-radius:4px; font-size:12px;">
-    🔒 &nbsp;<b>PRG_06_Outputs_LD</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Barrière finale des sorties matérielles</span>
+    🔒 &nbsp;<b>PRG_06_Outputs</b> &nbsp;—&nbsp; <span style="color:#cbd5e1;">Barrière finale des sorties matérielles</span>
   </div>
 </div>
 

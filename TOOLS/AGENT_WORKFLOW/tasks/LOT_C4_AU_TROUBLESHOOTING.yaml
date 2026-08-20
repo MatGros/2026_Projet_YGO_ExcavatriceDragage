@@ -26,7 +26,7 @@ contract:
       statement: "AllConditionsMet décrit uniquement l'état final puissance engagée ; il n'est pas présenté comme une précondition d'armement."
       verified_by: "Revue ST_SafetyChecklist.st, FB_TroubleshootingView.st et AF14."
     - id: AC6
-      statement: "FB_TroubleshootingView reste lecture seule : il ne modifie ni logique AU, ni PRG_06_Outputs_LD, ni une commande IHM, ni une safety métier."
+      statement: "FB_TroubleshootingView reste lecture seule : il ne modifie ni logique AU, ni PRG_06_Outputs, ni une commande IHM, ni une safety métier."
       verified_by: "git diff ciblé et revue indépendante C4."
     - id: AC7
       statement: "Un garde-fou automatique échoue si ST_SafetyChecklist omet les observables publics obligatoires de réarmement AU ou conserve Step4_ContactorRedundancyOk."
@@ -54,7 +54,7 @@ contract:
       - CODE_XML/**/*.xml
     forbidden:
       - CODE/AU/**
-      - CODE/MAIN/PRG_06_Outputs_LD.st
+      - CODE/MAIN/PRG_06_Outputs.st
       - PRJ_CODESYS/**
       - Device.export
       - ARCHIVES/**
@@ -65,7 +65,7 @@ contract:
       - "La logique de réarmement AU, ses temporisations, ses latches et ses sorties A/B restent strictement inchangés."
       - "Le diagnostic reste une projection lecture seule, producteur unique dans PRG_07_Supervision."
       - "Aucun réarmement automatique, aucun bypass, aucune commande d'AU ne peut être introduit par Troubleshooting."
-      - "Les sources State, Diag et PowerCutOffActive restent les sorties publiques existantes de PRG_06_Outputs_LD."
+      - "Les sources State, Diag et PowerCutOffActive restent les sorties publiques existantes de PRG_06_Outputs."
     dropped_on_purpose:
       - "Le libellé Step4_ContactorRedundancyOk, faux car il recopie le retour contacteur, est abandonné."
       - "Le texte Step5 indiquant BtnFaultReset comme action de réarmement est abandonné."

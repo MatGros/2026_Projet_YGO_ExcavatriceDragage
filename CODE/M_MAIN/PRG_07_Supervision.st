@@ -298,14 +298,14 @@ GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
 GVL_IHM.Modes.State.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
-GVL_IHM.Modes.State.PowerContactorOk := PRG_06_Outputs_LD.EmergencyState.ContactorOk;
-GVL_IHM.Modes.State.EmergencyChainOk := PRG_06_Outputs_LD.EmergencyState.ChainOk;
-GVL_IHM.Modes.State.EmergencyArmable := PRG_06_Outputs_LD.EmergencyState.Armable;
-GVL_IHM.Modes.State.EmergencyArmingBusy := PRG_06_Outputs_LD.EmergencyState.ArmingBusy;
-GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs_LD.EmergencyDiag.RedundancyTestFailed;
-GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs_LD.EmergencyDiag.ArmFailed;
-GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs_LD.EmergencyDiag.Error OR PRG_02_Acquisition.Data.InputModuleFault;
-GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs_LD.PowerCutOffActive;
+GVL_IHM.Modes.State.PowerContactorOk := PRG_06_Outputs.EmergencyState.ContactorOk;
+GVL_IHM.Modes.State.EmergencyChainOk := PRG_06_Outputs.EmergencyState.ChainOk;
+GVL_IHM.Modes.State.EmergencyArmable := PRG_06_Outputs.EmergencyState.Armable;
+GVL_IHM.Modes.State.EmergencyArmingBusy := PRG_06_Outputs.EmergencyState.ArmingBusy;
+GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed;
+GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs.EmergencyDiag.ArmFailed;
+GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error OR PRG_02_Acquisition.Data.InputModuleFault;
+GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
 
 // 🕹️ Publication état Joystick IHM (GVL_IHM.JOY1Joystick.State)
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;
@@ -388,7 +388,7 @@ instHmiBannerFormatter(
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    PowerCutOffActiveAny        := PRG_06_Outputs_LD.PowerCutOffActive,
+    PowerCutOffActiveAny        := PRG_06_Outputs.PowerCutOffActive,
     SafeStopActive              := GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop,
     DescendPermit               := GVL_IHM.M1TreuilRetenue.Safety.DescendPermit AND GVL_IHM.M2TreuilBenne.Safety.DescendPermit,
     AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
@@ -443,12 +443,12 @@ instTroubleshootingView(
     Network              := GVL_IHM.Network,
     DredgingAssist       := GVL_IHM.DredgingAssist,
     JoystickHMI          := GVL_IHM.JOY1Joystick,
-    EmergencyState       := PRG_06_Outputs_LD.EmergencyState,
-    EmergencyDiag        := PRG_06_Outputs_LD.EmergencyDiag,
-    PowerCutOffActive    := PRG_06_Outputs_LD.PowerCutOffActive,
-    ArmingPulseActive    := PRG_06_Outputs_LD.EmergencyArmingPulseActive,
-    MaintainAActive      := PRG_06_Outputs_LD.PowerKeepAliveACmd,
-    MaintainBActive      := PRG_06_Outputs_LD.PowerKeepAliveBCmd,
+    EmergencyState       := PRG_06_Outputs.EmergencyState,
+    EmergencyDiag        := PRG_06_Outputs.EmergencyDiag,
+    PowerCutOffActive    := PRG_06_Outputs.PowerCutOffActive,
+    ArmingPulseActive    := PRG_06_Outputs.EmergencyArmingPulseActive,
+    MaintainAActive      := PRG_06_Outputs.PowerKeepAliveACmd,
+    MaintainBActive      := PRG_06_Outputs.PowerKeepAliveBCmd,
     CycleReady           := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready,
     CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Done,
     CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Error,

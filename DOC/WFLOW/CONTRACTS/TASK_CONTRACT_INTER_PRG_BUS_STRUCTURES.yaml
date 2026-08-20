@@ -36,7 +36,7 @@ contract:
     - id: AC4
       statement: >
         La structure ST_OutputsInterPrg est créée dans CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st
-        et regroupe les ordres actionneurs finaux produits par PRG_06_Outputs_LD pour le bouclage FB_SimBench.
+        et regroupe les ordres actionneurs finaux produits par PRG_06_Outputs pour le bouclage FB_SimBench.
       verified_by: >
         python -c "import os; assert os.path.exists('CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st')"
 
@@ -77,7 +77,7 @@ contract:
       - CODE/M_MAIN/PRG_03_Modes_Cycle.st
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
       - CODE/M_MAIN/PRG_05_Translation.st
-      - CODE/M_MAIN/PRG_06_Outputs_LD.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
       - CODE/M_MAIN/PRG_07_Supervision.st
       - CODE/K_DEPANNAGE/FB_TroubleshootingView.st
       - CODE_XML/
@@ -131,8 +131,8 @@ execution:
     l'orchestrateur (M1/M2LogicRequestSpeedRef_Pct, PRG_04) pour ne pas casser
     instSimBench. ArmingSeqStep (INT, PRG_06) exclu du bus Data et laissé en VAR_OUTPUT
     plat : sa mise en struct cassait G410 (invariant page LD stricte BOOL — outVariable
-    interdit sur PRG_06_Outputs_LD), régression détectée et corrigée avant restitution.
-    Commentaire périmé "généré par l'oracle Python" corrigé dans PRG_06_Outputs_LD.st.
+    interdit sur PRG_06_Outputs), régression détectée et corrigée avant restitution.
+    Commentaire périmé "généré par l'oracle Python" corrigé dans PRG_06_Outputs.st.
     Bundle régénéré, G200 linkage PASS (0 erreur), G310 PASS, run_all_gates.py (palier C
     et suite complète) 100% PASS après correction de 2 régressions découvertes en cours
     de lot (G410 outVariable, G430 tag "(T142)" dans les commentaires — retiré).

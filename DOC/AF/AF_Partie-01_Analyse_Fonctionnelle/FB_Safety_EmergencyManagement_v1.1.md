@@ -499,7 +499,7 @@ Fichiers code de référence :
 - `ARCHIVES/Code/SUPERVISION/ST_Safety_Emergency_HmiState.st` (bus état IHM, test archivé T99)
 - `ARCHIVES/Code/SUPERVISION/GVL_IHM_AU.st` (interface IHM archivée T99)
 - `CODE/M_MAIN/PRG_02_Acquisition.st` (ST pur)
-- `CODE/M_MAIN/PRG_06_Outputs_LD.st` (sorties)
+- `CODE/M_MAIN/PRG_06_Outputs.st` (sorties)
 - `ARCHIVES/Code/TESTS/PRG_AU_TestBench.st` (banc de test manuel, archivé 2026-08-01 — voir `DOC/WFLOW/PLAN_TASK.md`)
 - `CODE/MAIN/Outputs (Ladder).st` (cible)
 - Cible de migration : `PRG_02_Acquisition.st` (ST pur, dans `CODE/MAIN`)

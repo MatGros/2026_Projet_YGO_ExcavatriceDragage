@@ -52,8 +52,8 @@ def test_declaration_dans_prg_non_acquisition_est_une_erreur(tmp_path, monkeypat
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv").write_text(
         "//header\nM3_BrakeRelease_RQ;Bit;;desc;%QX0.0;Device\n", encoding="utf-8"
     )
-    (main_dir / "PRG_06_Outputs_LD.st").write_text(
-        "PROGRAM PRG_06_Outputs_LD\nVAR_OUTPUT\n    M3_BrakeRelease_RQ : BOOL;\nEND_VAR\n",
+    (main_dir / "PRG_06_Outputs.st").write_text(
+        "PROGRAM PRG_06_Outputs\nVAR_OUTPUT\n    M3_BrakeRelease_RQ : BOOL;\nEND_VAR\n",
         encoding="utf-8",
     )
 
@@ -95,8 +95,8 @@ def test_pending_field_verification_est_warn_pas_error(tmp_path, monkeypatch) ->
     (root / "TOOLS" / "AGENT_WORKFLOW" / "config" / "Device_IO_20260806.csv").write_text(
         "//header\nTestPendingVar_RQ;Bit;;desc;%QX0.0;Device\n", encoding="utf-8"
     )
-    (main_dir / "PRG_06_Outputs_LD.st").write_text(
-        "PROGRAM PRG_06_Outputs_LD\nVAR_OUTPUT\n    TestPendingVar_RQ : BOOL;\nEND_VAR\n",
+    (main_dir / "PRG_06_Outputs.st").write_text(
+        "PROGRAM PRG_06_Outputs\nVAR_OUTPUT\n    TestPendingVar_RQ : BOOL;\nEND_VAR\n",
         encoding="utf-8",
     )
 

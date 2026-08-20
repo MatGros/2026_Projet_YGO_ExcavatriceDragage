@@ -1,7 +1,7 @@
 """Garde-fou (REX 2026-08-13) : G410 s'applique à TOUS les POU `_LD`, pas juste PRG_06.
 
 Un POU `_LD` nouveau (ex. `PRG_02_Acquisition_LD`) doit être couvert par les mêmes
-invariants LD que `PRG_06_Outputs_LD` — c'est le trou qui a laissé passer un XML
+invariants LD que `PRG_06_Outputs` — c'est le trou qui a laissé passer un XML
 scratch avec 11 `outVariable` (IndexOutOfRangeException à l'import CODESYS).
 """
 
@@ -87,20 +87,21 @@ def test_g410_applies_invariants_to_non_prg06_ld_pou():
 def test_g410_ignores_fb_types_named_ld():
     """Les FB types nommés `*_LD` (sans corps LD, pouType=functionBlock) sont ignorés :
     aucune violation « sans corps LD » ni invariant LD ne doit les viser."""
-    pou = ET.Element(_q("pou"), {"name": "FB_WinchOutputInterlock_LD", "pouType": "functionBlock"})
+    pou = ET.Element(_q("pou"), {"name": "FB_WinchOutputInterlock", "pouType": "functionBlock"})
     body = ET.SubElement(pou, _q("body"))
     ET.SubElement(body, _q("ST"))
     bundle = _write_bundle([pou])
 
     errors, warnings = g410.check_bundle(bundle)
 
-    assert not any("FB_WinchOutputInterlock_LD" in e for e in errors), (
+    assert not any("FB_WinchOutputInterlock" in e for e in errors), (
         f"Le FB type `*_LD` ne doit pas déclencher les invariants LD : {errors}"
     )
 
 
-def test_g410_missing_ld_pou_reports_error():
-    """Un bundle sans aucun POU programme `_LD` doit échouer (signalement explicite)."""
+def test_g410_missing_ld_pou_passe():
+    """Un bundle sans aucun POU programme `_LD` doit passer (PRG_06 migré en ST
+    le 2026-08-20 : plus de barrière Ladder programme, rien à vérifier)."""
     pou = ET.Element(_q("pou"), {"name": "PRG_02_Acquisition", "pouType": "program"})
     body = ET.SubElement(pou, _q("body"))
     ET.SubElement(body, _q("ST"))
@@ -108,4 +109,4 @@ def test_g410_missing_ld_pou_reports_error():
 
     errors, warnings = g410.check_bundle(bundle)
 
-    assert errors and "Aucun POU `_LD`" in errors[0]
+    assert not errors, f"Un bundle sans POU `_LD` programme doit passer : {errors}"

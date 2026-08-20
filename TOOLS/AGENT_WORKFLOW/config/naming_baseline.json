@@ -858,7 +858,7 @@
         "line": 75,
         "name": "RequestedDriveFreqHz",
         "unit": "Hz",
-        "snippet": "RequestedDriveFreqHz      : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD"
+        "snippet": "RequestedDriveFreqHz      : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock"
       },
       {
         "file": "CODE/I_TRANSLATION/FB_Translation.st",
@@ -931,21 +931,21 @@
         "snippet": "PositionEstimatedM   : REAL;   (* <-- [STAT] Position continue estimée en mètres *)"
       },
       {
-        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st",
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
         "line": 22,
         "name": "RequestedDriveFreqHz",
         "unit": "Hz",
         "snippet": "RequestedDriveFreqHz         : REAL;   // --> [CMD] Frequence de consigne variateur (Hz)"
       },
       {
-        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st",
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
         "line": 37,
         "name": "DriveFreqRefHz",
         "unit": "Hz",
         "snippet": "DriveFreqRefHz               : REAL;   // <-- [ACT] Frequence de consigne variateur valide (Hz)"
       },
       {
-        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st",
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
         "line": 64,
         "name": "DriveFreqWordMaxHz",
         "unit": "Hz",
@@ -1078,7 +1078,7 @@
         "snippet": "FreqPct                 : REAL;"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 281,
         "name": "M3_SetpointFrequencyHz",
         "unit": "Hz",
@@ -1257,49 +1257,49 @@
         "snippet": "MecaB_NoOperatorCmd             : BOOL;                           // . [LOC] Absence commande operateur"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st",
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
         "line": 68,
         "name": "RestartRequired",
         "snippet": "RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st",
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
         "line": 69,
         "name": "ResetRequired",
         "snippet": "ResetRequired                   : BOOL;                           // . [LOC] Exigence d'acquittement Reset conscient"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st",
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
         "line": 70,
         "name": "NeutralRequestSeen",
         "snippet": "NeutralRequestSeen              : BOOL;                           // . [LOC] Observation passage consigne au neutre"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st",
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
         "line": 73,
         "name": "MotorRequest",
         "snippet": "MotorRequest                    : BOOL;                           // . [LOC] Demande mouvement moteur active"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st",
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
         "line": 235,
         "name": "ResetRequired",
         "snippet": "ResetRequired := TRUE;"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st",
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
         "line": 236,
         "name": "NeutralRequestSeen",
         "snippet": "NeutralRequestSeen := FALSE;"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st",
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
         "line": 237,
         "name": "RestartRequired",
         "snippet": "RestartRequired := TRUE;"
       },
       {
-        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st",
+        "file": "CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st",
         "line": 242,
         "name": "ResetRequired",
         "snippet": "ResetRequired := FALSE;"
@@ -1317,25 +1317,25 @@
         "snippet": "MovementRequested      : BOOL;         // . [LOC] Pilote FB_Brake"
       },
       {
-        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st",
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
         "line": 19,
         "name": "BrakeReleaseRequest",
         "snippet": "BrakeReleaseRequest          : BOOL;   // --> [CMD] Demande de desserrage frein"
       },
       {
-        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st",
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
         "line": 55,
         "name": "MovementRequested",
         "snippet": "MovementRequested            : BOOL;   // . [LOC] Demande de mouvement active"
       },
       {
-        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st",
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
         "line": 56,
         "name": "NeutralRequestSeen",
         "snippet": "NeutralRequestSeen           : BOOL;   // . [LOC] Demande neutre (mot 0) observee"
       },
       {
-        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock_LD.st",
+        "file": "CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st",
         "line": 57,
         "name": "ResetRequired",
         "snippet": "ResetRequired                : BOOL;   // . [LOC] Front Reset obligatoire avant nouvelle marche"
@@ -1647,49 +1647,49 @@
         "snippet": "TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest;"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 95,
         "name": "PowerCutOffReq",
         "snippet": "PowerCutOffReq      : BOOL;"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 97,
         "name": "PowerKeepAliveACmd",
         "snippet": "PowerKeepAliveACmd  : BOOL; (* Maintien puissance voie A — cible du mapping E/S *)"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 98,
         "name": "PowerKeepAliveBCmd",
         "snippet": "PowerKeepAliveBCmd  : BOOL; (* Maintien puissance voie B — cible du mapping E/S *)"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 99,
         "name": "EmergencyArmingCmd",
         "snippet": "EmergencyArmingCmd  : BOOL; (* Impulsion réarmement — cible du mapping E/S *)"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 339,
         "name": "PowerCutOffReq",
         "snippet": "PowerCutOffReq := PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 351,
         "name": "PowerKeepAliveACmd",
         "snippet": "PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 352,
         "name": "PowerKeepAliveBCmd",
         "snippet": "PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;"
       },
       {
-        "file": "CODE/M_MAIN/PRG_06_Outputs_LD.st",
+        "file": "CODE/M_MAIN/PRG_06_Outputs.st",
         "line": 353,
         "name": "EmergencyArmingCmd",
         "snippet": "EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;"

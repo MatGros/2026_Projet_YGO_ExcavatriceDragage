@@ -64,7 +64,7 @@ def test_only_prg_ld_is_converted_to_ladder():
         body_text="M1_RelayFwd_Up_DQ := M1RelayFwd;"
     )
     function_block = _fb(
-        "FB_WinchOutputInterlock_LD", body_text="IF Enable THEN\n    Ready := TRUE;\nEND_IF;"
+        "FB_WinchOutputInterlock", body_text="IF Enable THEN\n    Ready := TRUE;\nEND_IF;"
     )
     diag = DiagnosticCollector()
     root = build_project_xml(
@@ -79,7 +79,7 @@ def test_only_prg_ld_is_converted_to_ladder():
     assert pou.find("body/LD/coil/variable").text == "M1_RelayFwd_Up_DQ"
 
     root = build_project_xml(
-        "FB_WinchOutputInterlock_LD",
+        "FB_WinchOutputInterlock",
         {program.name: program, function_block.name: function_block},
         diag,
         include_deps=False,
@@ -96,9 +96,9 @@ def test_prg_ld_block_type_name_matches_declared_instance_type():
         folder="MAIN",
         file_path="x",
         local_vars=[
-            VariableDecl("instWinchOutputInterlockM1_LD", DerivedType("FB_WinchOutputInterlock_LD")),
-            VariableDecl("instWinchOutputInterlockM2_LD", DerivedType("FB_WinchOutputInterlock_LD")),
-            VariableDecl("instTranslationOutputInterlock_LD", DerivedType("FB_TranslationOutputInterlock_LD")),
+            VariableDecl("instWinchOutputInterlockM1_LD", DerivedType("FB_WinchOutputInterlock")),
+            VariableDecl("instWinchOutputInterlockM2_LD", DerivedType("FB_WinchOutputInterlock")),
+            VariableDecl("instTranslationOutputInterlock_LD", DerivedType("FB_TranslationOutputInterlock")),
         ],
         body_text=(
             "instWinchOutputInterlockM1_LD(Enable := M1Enable, RequestedStep := M1Step);\n"
@@ -113,9 +113,9 @@ def test_prg_ld_block_type_name_matches_declared_instance_type():
         for block in root.findall("types/pous/pou/body/LD/block")
     }
     assert blocks == {
-        "instWinchOutputInterlockM1_LD": "FB_WinchOutputInterlock_LD",
-        "instWinchOutputInterlockM2_LD": "FB_WinchOutputInterlock_LD",
-        "instTranslationOutputInterlock_LD": "FB_TranslationOutputInterlock_LD",
+        "instWinchOutputInterlockM1_LD": "FB_WinchOutputInterlock",
+        "instWinchOutputInterlockM2_LD": "FB_WinchOutputInterlock",
+        "instTranslationOutputInterlock_LD": "FB_TranslationOutputInterlock",
     }
 
 

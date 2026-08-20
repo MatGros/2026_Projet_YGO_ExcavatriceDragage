@@ -5,7 +5,7 @@
 > §5 (`TranslationPontM3`) avec le détail spécifique M3 : chaque cause de blocage, dans l'ordre où
 > la rencontrer, avec la variable exacte à observer en Watch CODESYS.
 > 📄 Sources : `CODE/TRANSLATION/*.st`, `CODE/M_MAIN/PRG_02_Acquisition.st`, `PRG_05_Translation.st`,
-> `PRG_06_Outputs_LD.st`. Spec métier : `DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md`.
+> `PRG_06_Outputs.st`. Spec métier : `DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md`.
 > ⚠️ **Lecture seule stricte** — ce document n'est pas une procédure d'action machine, c'est une
 > aide à l'observation. Toute action reste sous la responsabilité de l'opérateur/automaticien.
 
@@ -19,10 +19,10 @@ réels** qui bloquent ou dégradent un essai M3 — à ne pas confondre avec un 
 
 | # | Trou | État | Effet sur l'essai | Réf. |
 |---|---|---|---|---|
-| 1 | `SafetyStructureNotValidated := TRUE` (garde-fou global, `PRG_06_Outputs_LD.st`) | 🔴 **Toujours bloquant, non touché par ces lots** | **Aucune sortie moteur/frein M1/M2/M3 n'est autorisée**, quoi que fasse l'opérateur — c'est une seule variable partagée par M1/M2/M3 : la lever pour tester M3 arme aussi M1/M2 | `PRG_06_Outputs_LD.st:45` |
+| 1 | `SafetyStructureNotValidated := TRUE` (garde-fou global, `PRG_06_Outputs.st`) | 🔴 **Toujours bloquant, non touché par ces lots** | **Aucune sortie moteur/frein M1/M2/M3 n'est autorisée**, quoi que fasse l'opérateur — c'est une seule variable partagée par M1/M2/M3 : la lever pour tester M3 arme aussi M1/M2 | `PRG_06_Outputs.st:45` |
 | 2 | `FB_Safety_Translation` jamais instancié | ✅ **Résolu (lot M4)** | `SafeStop` M3 réagit désormais aux 8 mécanismes (perte comm, rotation phase, thermique frein, Méca A/B, butées, incohérence capteurs), plus `InputModuleFault` | AF_Partie-11 v2.1 §5 alerte 5 (résolue), PLAN_TASK T104 |
-| 3 | Commande AC600 (`DriveControlWord`/`DriveFreqRefHz`) jamais écrite en sortie physique | ✅ **Résolu côté ST (lot LOT2)** — ⚠️ **mapping E/S CODESYS manuel restant** | `DriveControlWord`/`DriveFreqRefWord` calculés et capturés dans `PRG_06_Outputs_LD` (`M3_DriveControlWord`/`M3_DriveFreqRefWord`), mais le raccordement final aux registres PDO (`M3_CommandWord` %QW6, `M3_SetpointFrequencyHz` %QW7) est un geste **manuel CODESYS** (I/O mapping dialog) — tant qu'il n'est pas fait, le moteur ne tourne toujours pas | AF_Partie-11 v2.1 §5 alerte 6 (résolue), PLAN_TASK T105, `PRG_06_Outputs_LD.st` §2 |
-| 4 | 🆕 `PowerCutOff` M3 est une impasse (`PRG_06_Outputs_LD.st:229`, `PowerCutOffReq := FALSE` figé) | 🔴 **Trouvé par l'audit sécurité 2026-08-05, non résolu** | `instSafetyTranslationM3.PowerCutOff` (5 mécanismes/8 : thermique frein, Méca A/B, butées, incohérence capteurs) est calculé mais **rien ne le transmet à la coupure amont réelle** — seul `SafeStop` (rampe + frein) réagit concrètement. Le seul actuateur de coupure puissance existant est la chaîne AU/sécurité mécanique (`instSafetyEmergencyManagement`) | Audit sécurité 2026-08-05, `TASK_CONTEXT_M5_OUTPUTS_POWERCUTOFF.yaml` |
+| 3 | Commande AC600 (`DriveControlWord`/`DriveFreqRefHz`) jamais écrite en sortie physique | ✅ **Résolu côté ST (lot LOT2)** — ⚠️ **mapping E/S CODESYS manuel restant** | `DriveControlWord`/`DriveFreqRefWord` calculés et capturés dans `PRG_06_Outputs` (`M3_DriveControlWord`/`M3_DriveFreqRefWord`), mais le raccordement final aux registres PDO (`M3_CommandWord` %QW6, `M3_SetpointFrequencyHz` %QW7) est un geste **manuel CODESYS** (I/O mapping dialog) — tant qu'il n'est pas fait, le moteur ne tourne toujours pas | AF_Partie-11 v2.1 §5 alerte 6 (résolue), PLAN_TASK T105, `PRG_06_Outputs.st` §2 |
+| 4 | 🆕 `PowerCutOff` M3 est une impasse (`PRG_06_Outputs.st:229`, `PowerCutOffReq := FALSE` figé) | 🔴 **Trouvé par l'audit sécurité 2026-08-05, non résolu** | `instSafetyTranslationM3.PowerCutOff` (5 mécanismes/8 : thermique frein, Méca A/B, butées, incohérence capteurs) est calculé mais **rien ne le transmet à la coupure amont réelle** — seul `SafeStop` (rampe + frein) réagit concrètement. Le seul actuateur de coupure puissance existant est la chaîne AU/sécurité mécanique (`instSafetyEmergencyManagement`) | Audit sécurité 2026-08-05, `TASK_CONTEXT_M5_OUTPUTS_POWERCUTOFF.yaml` |
 | 5 | 🆕 Homme-mort (`DeadmanArmed`) exigé sur M3 seul | ✅ **Résolu (lot LOT3)**, ⚠️ écart M1/M2 non traité | `M3_StartStop_Active` exige `JoystickDeadmanArmed` en MAINT_N1/N2. **M1/M2 (treuils) n'ont pas cette exigence** — écart entre domaines, hors périmètre de ce document | PLAN_TASK T106 |
 
 ➡️ Un essai M3 réel (moteur qui tourne) reste **bloqué** tant que #1 (garde-fou global) et le
@@ -147,9 +147,9 @@ en entier avant un essai (voir aussi §10).
 | Observable | Nominal | Si défaut | Action |
 |---|---|---|---|
 | `PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI` | Suit la commande avec délai | Incohérent | Vérifier contacteur/bobine frein, ou activer `Bypass.ContactorFeedback` en essai contrôlé |
-| `PRG_06_Outputs_LD.instTranslationOutputInterlockM3.BrakeTimeoutElapsed` | `T#0ms` au repos | Proche de `T#500ms` | Watchdog sur le point de déclencher `BRAKE_COMMAND_NOT_CONFIRMED` |
-| `PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason` | `NONE` | `BRAKE_COMMAND_NOT_CONFIRMED` | Confirmation contacteur desserrage jamais reçue sous 500 ms — **Reset (front) + demande neutre (mot 0) + nouvelle demande obligatoires** (anti-redémarrage auto) |
-| `PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason` | `NONE` | `RESTART_INHIBITED` | Séquence de réarmement pas encore complète — revoir §"Réarmement anti-redémarrage" ci-dessous |
+| `PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed` | `T#0ms` au repos | Proche de `T#500ms` | Watchdog sur le point de déclencher `BRAKE_COMMAND_NOT_CONFIRMED` |
+| `PRG_06_Outputs.instTranslationOutputInterlockM3.Reason` | `NONE` | `BRAKE_COMMAND_NOT_CONFIRMED` | Confirmation contacteur desserrage jamais reçue sous 500 ms — **Reset (front) + demande neutre (mot 0) + nouvelle demande obligatoires** (anti-redémarrage auto) |
+| `PRG_06_Outputs.instTranslationOutputInterlockM3.Reason` | `NONE` | `RESTART_INHIBITED` | Séquence de réarmement pas encore complète — revoir §"Réarmement anti-redémarrage" ci-dessous |
 
 **Réarmement après timeout frein (chronologie exacte, ne pas sauter d'étape)** :
 1. Cause physique corrigée (frein confirme bien l'ouverture)
@@ -164,7 +164,7 @@ automatique après défaut, règle non négociable du projet).
 
 ## 8. Commande moteur AC600
 
-✅ **Calculée et câblée côté ST jusqu'à `PRG_06_Outputs_LD` (lot LOT2).** ⚠️ **Mapping E/S CODESYS
+✅ **Calculée et câblée côté ST jusqu'à `PRG_06_Outputs` (lot LOT2).** ⚠️ **Mapping E/S CODESYS
 manuel restant** (prérequis #3) : `M3_CommandWord` (%QW6) et `M3_SetpointFrequencyHz` (%QW7) ne
 sont PAS automatiquement reliés à `M3_DriveControlWord`/`M3_DriveFreqRefWord` — ce sont des noms
 auto-créés par le mapping E/S `Device.export`, jamais touchés par le bundle. **Tant que ce mapping
@@ -174,10 +174,10 @@ reçoit aucune consigne réelle, quel que soit l'état du reste de la chaîne.**
 | Observable | Nominal en mouvement | Interprétation |
 |---|---|---|
 | `PRG_05_Translation.TranslationStateHMI.DriveControlWord` | `1`=Fwd, `2`=Rev, `7`=Reset, `0`=arrêt | Mot demandé par `FB_Translation`, **avant** barrière finale |
-| `PRG_06_Outputs_LD.instTranslationOutputInterlockM3.DriveControlWord` | Idem, **après** barrière finale | Mot réellement autorisé (zéro si frein non confirmé, `RestartInhibit`, ou `Error`) |
-| `PRG_06_Outputs_LD.M3_DriveControlWord` | Copie locale du mot ci-dessus | **À vérifier lié à `M3_CommandWord` dans le mapping E/S CODESYS** — sinon aucun effet variateur |
-| `PRG_06_Outputs_LD.instTranslationOutputInterlockM3.DriveFreqRefWord` | Échelle ×100 : `5000`=50,00 Hz | Consigne fréquence après barrière finale, format registre PDO 0x3100 |
-| `PRG_06_Outputs_LD.M3_DriveFreqRefWord` | Copie locale de la consigne ci-dessus | **À vérifier lié à `M3_SetpointFrequencyHz` dans le mapping E/S CODESYS** — sinon aucun effet variateur |
+| `PRG_06_Outputs.instTranslationOutputInterlockM3.DriveControlWord` | Idem, **après** barrière finale | Mot réellement autorisé (zéro si frein non confirmé, `RestartInhibit`, ou `Error`) |
+| `PRG_06_Outputs.M3_DriveControlWord` | Copie locale du mot ci-dessus | **À vérifier lié à `M3_CommandWord` dans le mapping E/S CODESYS** — sinon aucun effet variateur |
+| `PRG_06_Outputs.instTranslationOutputInterlockM3.DriveFreqRefWord` | Échelle ×100 : `5000`=50,00 Hz | Consigne fréquence après barrière finale, format registre PDO 0x3100 |
+| `PRG_06_Outputs.M3_DriveFreqRefWord` | Copie locale de la consigne ci-dessus | **À vérifier lié à `M3_SetpointFrequencyHz` dans le mapping E/S CODESYS** — sinon aucun effet variateur |
 | `PRG_02_Acquisition.M3_StatusWord_Filtered` | Bit variable selon état AC600 | Mot d'état retourné par le variateur (protocole constructeur AC600, `0x3102` côté retour) |
 | `PRG_05_Translation.TranslationStateHMI.DriveActualFreq_Hz` | Proportionnel à la consigne | Vitesse réelle mesurée — comparer à `DriveFreqRef_Hz` pour détecter un décrochage |
 | `PRG_02_Acquisition.HwIn.Translation.M3_ThermalFeedback_DI` | `TRUE` (OK) | Diagnostic seul (T96, résolu) — l'AC600 se protège lui-même, aucune réaction PLC |
@@ -187,13 +187,13 @@ nominal) avant de monter en fréquence, une fois le mapping E/S fait et vérifi�
 
 ---
 
-## 9. Barrière finale / interlock (`FB_TranslationOutputInterlock_LD`)
+## 9. Barrière finale / interlock (`FB_TranslationOutputInterlock`)
 
 | Observable | Nominal | Si défaut | Cause |
 |---|---|---|---|
-| `PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State` | `READY` au repos, `BUSY` en mouvement | `DISABLED`/`INIT` prolongé | Voir `Reason` ci-dessus |
-| `PRG_06_Outputs_LD.M3InterlockEnable` | `TRUE` si mode ≠ DISABLE **et** `SafetyStructureNotValidated=FALSE` | `FALSE` | Vérifier `SafetyStructureNotValidated` en premier (prérequis #1) — c'est la cause la plus fréquente de "rien ne bouge" |
-| `PRG_06_Outputs_LD.SafetyStructureNotValidated` | `FALSE` (une fois le lot safety validé retiré) | `TRUE` | **État actuel normal** — aucune sortie M1/M2/M3 n'est autorisée, ce n'est pas un défaut terrain |
+| `PRG_06_Outputs.instTranslationOutputInterlockM3.State` | `READY` au repos, `BUSY` en mouvement | `DISABLED`/`INIT` prolongé | Voir `Reason` ci-dessus |
+| `PRG_06_Outputs.M3InterlockEnable` | `TRUE` si mode ≠ DISABLE **et** `SafetyStructureNotValidated=FALSE` | `FALSE` | Vérifier `SafetyStructureNotValidated` en premier (prérequis #1) — c'est la cause la plus fréquente de "rien ne bouge" |
+| `PRG_06_Outputs.SafetyStructureNotValidated` | `FALSE` (une fois le lot safety validé retiré) | `TRUE` | **État actuel normal** — aucune sortie M1/M2/M3 n'est autorisée, ce n'est pas un défaut terrain |
 
 ---
 

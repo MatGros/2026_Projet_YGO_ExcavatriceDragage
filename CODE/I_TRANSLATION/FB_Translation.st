@@ -71,8 +71,8 @@ VAR_OUTPUT
     State               : E_State;   // <-- [STAT] Etat courant
     StateAtError        : E_State;   // <-- [DIAG] Etat mémorisé au dernier défaut
     TargetReached        : BOOL;       // <-- [STAT] Capteur position cible
-    RequestedDriveControlWord : WORD; // <-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD
-    RequestedDriveFreqHz      : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD
+    RequestedDriveControlWord : WORD; // <-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock
+    RequestedDriveFreqHz      : REAL; // <-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock
     BrakeReleaseRequest       : BOOL; // <-- [ACT] Demande métier desserrage, issue de FB_Brake
     BrakeCommandOpenConfirmed : BOOL; // <-- [STAT] TRUE = frein ouvert = commande ouverture confirmée (depuis FB_Brake)
     BrakeContactorCheck  : ST_ContactorCheck; // <-- [DIAG] Diag contacteur frein
@@ -251,7 +251,7 @@ END_IF;
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
 // Borné par un garde-fou 2s — DriveActualFreqHz n'a aucun contrôle de fraîcheur EtherCAT ; si la
 // communication se fige sur une valeur ≥1.0 Hz (perte réseau en mouvement), rien d'autre en aval
-// ne referme le frein (FB_TranslationOutputInterlock_LD ignore volontairement SafeStop par
+// ne referme le frein (FB_TranslationOutputInterlock ignore volontairement SafeStop par
 // conception). Le garde-fou force la fermeture du frein 2s après la fin de la rampe THÉORIQUE, quoi
 // que dise la mesure réelle — combine attente réelle (évite un serrage sur arbre encore tournant)
 // et certitude de fermeture (n'attend jamais indéfiniment).
@@ -308,7 +308,7 @@ BrakeContactorCheck := Brake.ContactorCheck;
 // 🛡️ FB_Translation ne décide plus la frontière finale : il expose uniquement
 // ses demandes métier. SafeStop est déjà appliqué dans la rampe rapide §4 : tant que
 // la vitesse ne vaut pas zéro, la demande et le desserrage suivent la décélération.
-// FB_TranslationOutputInterlock_LD ne doit jamais transformer SafeStop en coupure sèche.
+// FB_TranslationOutputInterlock ne doit jamais transformer SafeStop en coupure sèche.
 
 {endregion}
 
