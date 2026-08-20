@@ -1,4 +1,4 @@
-# Analyse Fonctionnelle - Partie 7 : Interface IHM (v2.0)
+# Analyse Fonctionnelle - Partie 7 : Interface IHM (v2.1)
 
 > Role : definir le contrat structurel PLC ↔ IHM.
 > Le detail des champs vit dans le code `CODE/SUPERVISION/_TYPES/`.
@@ -9,6 +9,7 @@
 2. Frontiere `GVL_IHM`
 3. Structures par domaine
 4. Messages operateur
+4bis. Bandeau d'alarme défilant
 5. Troubleshooting
 6. TBD
 
@@ -23,6 +24,8 @@
 | <nobr><code>TC-P07-005</code></nobr> | Page Troubleshooting en lecture seule | Zéro écriture de commande/config/bypass | `💻 AUTO` | <small>§5</small> |
 | <nobr><code>TC-P07-006</code></nobr> | Séparation messages action vs état | 2 familles distinctes, alarmes sur `ErrorId` | `⚡ SITE+AUTO` | <small>§4</small> |
 | <nobr><code>TC-P07-007</code></nobr> | Warning auto-effaçable vs Fault sur Reset | Warning s'efface seul, Fault exige `Ack` | `⚡ SITE+AUTO` | <small>§4</small> |
+| <nobr><code>TC-P07-008</code></nobr> | Carrousel d'alarmes un message à la fois, index n/N | `Banner.AlarmBanner.Index/Count` cohérents | `💻 AUTO` | <small>§4bis</small> |
+| <nobr><code>TC-P07-009</code></nobr> | Aucun défaut actif → bandeau d'alarme vide | `HasAlarm=FALSE`, `Text=''`, `Index=0`, `Count=0` | `💻 AUTO` | <small>§4bis</small> |
 
 ---
 

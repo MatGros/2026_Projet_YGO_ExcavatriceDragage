@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-17T05:53:47.251611" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-17T05:53:47.251611">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T19:57:46.644397" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T19:57:46.644397">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -58,6 +58,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
               </documentation>
             </variable>
+            <variable name="AlarmBanner">
+              <type>
+                <derived name="ST_AlarmBanner" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Défauts actifs en carrousel (index n/N)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -69,9 +77,61 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
    🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
       IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_AlarmBanner">
+        <baseType>
+          <struct>
+            <variable name="HasAlarm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un defaut/warning actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Text">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte du message courant : [ORGANE] raison breve</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Index">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position courante (1-based, 0 si aucun defaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Count">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total de messages actifs</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>51a442bb-120a-5a1f-856e-eba247651394</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚨 ST_AlarmBanner — Bandeau d'alarme defilant (carrousel n/N)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : liste les defauts/warnings actifs de toute la machine,
+      affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md S4bis
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -88,6 +148,7 @@
           <Folder Name="_TYPES">
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
+              <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
             </Folder>
           </Folder>
         </Folder>

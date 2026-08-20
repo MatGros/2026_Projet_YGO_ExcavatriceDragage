@@ -1,0 +1,113 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — Bandeau d'alarme défilant (FB_Hmi_BannerFormatter)
+# Projet Excavatrice Dragage — 2026-08-20
+# Référence plan : DOC/WFLOW/PLAN_AlarmBanner_20260820.md
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T144_ALARM_BANNER
+  criticality: C3            # affichage IHM seul, aucune action de sécurité directe
+  strategy: patch
+
+  objective: >
+    Étendre FB_Hmi_BannerFormatter d'un bandeau d'alarme textuel (champ
+    supplémentaire Banner.AlarmBanner) qui liste les défauts/warnings actifs de
+    toute la machine, affichés un à la fois en rotation (carrousel) avec un
+    indicateur de position n/N, en textes courts "organe + raison".
+
+  acceptance:
+    - id: AC1
+      statement: "La structure ST_AlarmBanner existe avec les champs HasAlarm, Text, Index, Count, et ST_HmiBanner porte un champ AlarmBanner : ST_AlarmBanner."
+      verified_by: "lecture des .st + présence dans le bundle régénéré"
+    - id: AC2
+      statement: "FB_Hmi_BannerFormatter remplit Banner.AlarmBanner à partir des 3 structs safety (WinchM1Safety, WinchM2Safety, TranslationSafety) et des ErrorId WORD (Bucket, Sync, Dive, Extraction, Emergency, Cycle)."
+      verified_by: "G200_check_linkage.py (liaison inputs) + relecture du §5"
+    - id: AC3
+      statement: "Le carrousel affiche un seul défaut actif à la fois, avec Index (1-based) dans [1..Count] et rotation circulaire."
+      verified_by: "revue de la logique carrousel (TON + MOD) et tests si écrits"
+    - id: AC4
+      statement: "La durée d'affichage par message est paramétrable via l'input AlarmHoldTime, avec une valeur par défaut de T#1s."
+      verified_by: "lecture de la déclaration input et de l'usage TON"
+    - id: AC5
+      statement: "Aucun défaut actif → HasAlarm=FALSE, Text='', Index=0, Count=0."
+      verified_by: "revue du chemin Count=0"
+    - id: AC6
+      statement: "Le bundle est régénéré, les gates palier C passent, G200 liaison est PASS, et la liste de variables du live reader est régénérée."
+      verified_by: "run_all_gates.py --palier C, G200_check_linkage.py --report, generate_variable_list_from_code.py"
+    - id: AC7
+      statement: "Le nom de POU PRG_07_Supervision est identique au nom de fichier (PRG_07_Supervision.st), et le suffixe de langage est identique au langage genere dans le bundle (ST, ni _LD ni _CFC)."
+      verified_by: "nom de fichier + déclaration POU + bundle (sans suffixe de langage)"
+
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/J_SUPERVISION/_TYPES/.../ST_AlarmBanner.st   # nouveau
+      - CODE/J_SUPERVISION/_TYPES/.../ST_HmiBanner.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE_XML/**                                          # sorties régénérées du bundle
+      - TOOLS/PLC_LIVE_READER/variable_lists/troubleshooting_variables.txt
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - Toute logique safety, mouvement ou Enable existant
+
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison"
+    - run_all_gates          # palier C
+    - bundle                 # CODE_XML/CODE_Bundle.xml régénéré
+    - variable_list          # troubleshooting_variables.txt régénéré
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, sémantique de bit
+    différente de celle du plan, risque hors scope) est remonté IMMÉDIATEMENT à
+    l'orchestrateur, pas à la fin et jamais silencieusement. L'agent doit vérifier
+    chaque bit du dictionnaire (§6 du plan) à la lecture du FB source avant de figer
+    un texte. Signaler n'est pas élargir le scope.
+
+status: VALIDATED
+
+execution:
+  executed_by: "omni/cc/claude-sonnet-5"
+  completed_at: "2026-08-20"
+  status: DONE
+  summary: >
+    ST_AlarmBanner cree + champ ST_HmiBanner.AlarmBanner. FB_Hmi_BannerFormatter S5
+    carrousel implemente (10 nouveaux VAR_INPUT, AlarmArray[0..31], rotation TON+MOD).
+    Cablage PRG_07_Supervision.instHmiBannerFormatter complete (lecture seule stricte).
+    Dictionnaire S6 verifie bit a bit contre le code source reel (alert_duty) : 3 ecarts
+    trouves et corriges vs le plan initial -- FB_Bucket.ErrorId bit0/1/3 inverses (le
+    plan disait bit0=defaut benne/bit1=timeout/bit3=defaut sequence, le code reel est
+    bit0=timeout/bit1=incoherence/bit3=codeurs non references), EmergencyDiag bit3
+    "Startup" absent du plan (ajoute), FB_Cycle.ErrorId non mappe par le plan (dictionnaire
+    complet des 6 bits construit par lecture FB_Cycle.st). AF-07 versionnee v2.0->v2.1
+    (S4bis), 4 fichiers hors perimetre corriges pour une seule ligne (reference doc perimee
+    suite au versionnement, requis par G340 bloquant) : FB_AntiFlickerText.st,
+    ST_OperatorAction.st + les 2 fichiers du perimetre.
+  evidence_submitted:
+    - "G200_check_linkage.py --report : PASS (0 erreur, 1165 instances verifiees)"
+    - "generate_codesys_bundle.py : PASS (bundle frais)"
+    - "run_all_gates.py --palier C : 15/15 PASS"
+    - "generate_variable_list_from_code.py : 419 variables (aucun changement, AlarmBanner hors GVL_Troubleshooting)"
+
+validation:
+  status: VALIDATED
+  validated_by: "Mathieu Gros (utilisateur)"
+  validated_at: "2026-08-20"
+  notes: >
+    Valide en simulation banc (2 defauts actifs observes, carrousel bascule 1/2 <-> 2/2
+    confirme). Deux ajustements demandes en cours de validation et livres avant cloture :
+    (1) index n/N integre directement dans Banner.AlarmBanner.Text, (2) textes des 7 bits
+    Meca A-E (M1/M2/M3) enrichis avec le code technique (MecaA..MecaE) + raison precise
+    verifiee sur FB_Safety_Winch.st, pour la tracabilite maintenance. Suite possible :
+    "on ajustera" -- ajustements ulterieurs de formulation attendus, pas de reouverture
+    de perimetre a ce stade. Aucun commit effectue (regle projet : validation humaine
+    explicite avant tout commit, jamais par l'agent).

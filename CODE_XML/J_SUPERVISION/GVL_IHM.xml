@@ -339,6 +339,14 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
               </documentation>
             </variable>
+            <variable name="AlarmBanner">
+              <type>
+                <derived name="ST_AlarmBanner" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚨 Défauts actifs en carrousel (index n/N)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -350,7 +358,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
    🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
       IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -559,7 +567,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎮 ST_OperatorAction — Consigne unique de conduite opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md
    🎯 Les alarmes restent dans Error/ErrorId : cette struct répond seulement
       à « quelle action attend-on maintenant de l'opérateur ? ».
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1734,6 +1742,58 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_DredgingAssistState — États publics assistance prélèvement
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_AlarmBanner">
+        <baseType>
+          <struct>
+            <variable name="HasAlarm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = au moins un defaut/warning actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Text">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte du message courant : [ORGANE] raison breve</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Index">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position courante (1-based, 0 si aucun defaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Count">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total de messages actifs</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>51a442bb-120a-5a1f-856e-eba247651394</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚨 ST_AlarmBanner — Bandeau d'alarme defilant (carrousel n/N)
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : liste les defauts/warnings actifs de toute la machine,
+      affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md S4bis
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -5733,6 +5793,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
               <Object Name="ST_OperatorAction" ObjectId="6e6d9b5d-226e-566e-908c-f3aa313a7e26" />
               <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
+              <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
             </Folder>
             <Folder Name="4_JOYSTICK_ACQUISITION">
               <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />

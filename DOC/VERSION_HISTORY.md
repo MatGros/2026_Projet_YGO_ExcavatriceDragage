@@ -4,6 +4,11 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `T144_ALARM_BANNER` — 2026-08-20 — bandeau d'alarme défilant (carrousel n/N)
+- **`ST_AlarmBanner`** (nouveau) + champ `ST_HmiBanner.AlarmBanner` : carrousel des défauts actifs machine entière (M1/M2/M3, benne, sync, dive/extraction, AU, cycle), 1 message à la fois, `AlarmHoldTime` paramétrable (défaut `T#1s`).
+- **`FB_Hmi_BannerFormatter` §5** : dictionnaire organe+raison vérifié bit à bit contre le code source réel — corrige les bits `FB_Bucket.ErrorId` du plan initial (bit0/1/3 inversés), ajoute le bit3 "Startup" manquant d'`EmergencyDiag`, construit le dictionnaire `FB_Cycle.ErrorId` (absent du plan).
+- Gates palier C 15/15 PASS, G200 liaison PASS, AF-07 versionnée `v2.0`→`v2.1` (§4bis).
+
 ### `T123_Standardisation_Complete` — 2026-08-18 — standardisation commentaires/tags/régions sur tout CODE/
 - **Passage exhaustif A→M (169 fichiers ST)** : cartouches ≤15L, flèches ASCII + tags de rôle sur les déclarations, régions `{region "§N ..."}` sur les FB/PRG conséquents, purge des REX/dates/lots des commentaires avec reformulation des invariants liés aux AF.
 - **Preuve de non-impact logique** : 103 fichiers modifiés vérifiés — code exécutable identique à HEAD (comparaison hors commentaires), `git diff --check` PASS.

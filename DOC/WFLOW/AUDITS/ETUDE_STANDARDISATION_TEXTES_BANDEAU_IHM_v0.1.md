@@ -1,7 +1,7 @@
 # 🖥️ Plan Détaillé & Standardisation des Textes Bandeau IHM (v1.0)
 
 > **Document de cadrage & conception** : Architecture de génération des messages opérateur et progression système.  
-> **Référence documentaire** : [`DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md) §4  
+> **Référence documentaire** : [`ARCHIVES/Doc/AF/AF_Partie-07_Interface_IHM_v2.0.md`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/ARCHIVES/Doc/AF/AF_Partie-07_Interface_IHM_v2.0.md) §4  
 > **POU concernés** : `FB_Hmi_BannerFormatter`, `FB_Cycle`, `FB_DiveSearch`, `FB_ExtractionSequence`, `PRG_07_Supervision`.
 
 ---

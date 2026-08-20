@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.0.md §4
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md §4, §4bis
    🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
       IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
    ═══════════════════════════════════════════════════════════════ *)
@@ -11,5 +11,6 @@ STRUCT
     SequenceProgressText : STRING(120); (* 2. Micro : Cycle Maître > Sous-cycle / Étape active *)
     SpecialConditionText : STRING(120); (* 3. Dérogations : Bypass, bridages, butées inactives *)
     OperatorActionText   : STRING(120); (* 4. Action attendue : [ORGANE] Action physique > Fin *)
+    AlarmBanner          : ST_AlarmBanner; (* 🚨 Défauts actifs en carrousel (index n/N) *)
 END_STRUCT
 END_TYPE
