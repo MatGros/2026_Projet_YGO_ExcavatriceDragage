@@ -25743,55 +25743,16 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt (sortie libre, hors ST_FbStatus)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB occupé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthèse défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat mémorisé au dernier défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Défaut frein Translation" ; bit3: "Défaut variateur AC600" ; bit6: "Limite extrême".</xhtml>
               </documentation>
             </variable>
             <variable name="TargetReached">
@@ -26024,15 +25985,15 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 
     ArrivalLock := FALSE;
 
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     RETURN;
 END_IF;
 
 // 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -26172,7 +26133,7 @@ PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, Commande
 // 0: None, 1: Forward, 2: Reverse, 7: Reset
 IF Reset THEN
     RequestedDriveControlWord := 7; // Reset défaut variateur
-ELSIF Error THEN
+ELSIF Status.Error THEN
     RequestedDriveControlWord := 0; // Arrêt sur défaut
 ELSIF MovementRequested THEN
     IF PhysicalDriveDirection = 1 THEN
@@ -26217,50 +26178,50 @@ BrakeContactorCheck := Brake.ContactorCheck;
 {region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // Défaut variateur (bit3) : lu via EtherCAT (DriveStatusWord.4)
 IF DriveStatusWord.4 THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFF7;
+    Status.ErrorId := Status.ErrorId AND 16#FFF7;
 END_IF;
 
 // 🚧 Défaut fin de course extrême (bit6) — si bypassé, on NETTOIE le bit résiduel
 IF BypassLimitSwitch THEN
-    ErrorId := ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
+    Status.ErrorId := Status.ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
 ELSE
-    // Activé UNIQUEMENT en cas de tentative d'avancer DANS la butée active (libéré si dégagement en sens inverse)
+    // Activé UNIQUEMENT en cas de tentative d'avancer vers la butée active (libéré si dégagement en sens inverse)
     IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
-        ErrorId := ErrorId OR 16#0040;
+        Status.ErrorId := Status.ErrorId OR 16#0040;
     ELSE
-        ErrorId := ErrorId AND 16#FFBF;
+        Status.ErrorId := Status.ErrorId AND 16#FFBF;
     END_IF;
 END_IF;
 
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // 🚦 8. STATE MACHINE (phase)
 IF (NOT StartStop OR SafeStop) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    State := E_State.STOPPING;
+    Status.State := E_State.STOPPING;
 ELSIF ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    State := E_State.BUSY;
+    Status.State := E_State.BUSY;
 ELSE
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
-Done := FALSE;
+Status.Busy := (Status.State = E_State.BUSY) OR (Status.State = E_State.STOPPING);
+Status.Done := FALSE;
 
 // 🛡️ 9. SORTIE SÛRE SUR DÉFAUT
-IF Error THEN
+IF Status.Error THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
@@ -31647,8 +31608,15 @@ instSimBench(
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
     M2_BrakeCmd              := PRG_06_Outputs.Data.M2BrakeCmd,
-    M3_Direction             := PRG_05_Translation.M3_Direction_Active,
-    M3_SpeedRefPct           := PRG_05_Translation.M3_SpeedRef_Active,
+    // 🧪 Simulation M3 — FIDÉLITÉ : le modèle ne doit progresser QUE quand la
+    // vraie machine commande réellement (sortie FB_Translation, post-interlock), pas sur la
+    // commande brute (sinon il outrepasse butées/limites). Même principe que les treuils M1/M2
+    // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
+    M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord &lt;&gt; 0,
+                                    PRG_05_Translation.M3_Direction_Active, 0),
+    M3_SpeedRefPct           := LIMIT(0.0,
+                                      PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
+                                      100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
     PowerKeepAlive_A         := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
@@ -32039,8 +32007,8 @@ instCycleSemiAuto(
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,
-    Translation_Busy        := PRG_05_Translation.instTranslationM3.Busy,
-    Translation_Done        := PRG_05_Translation.instTranslationM3.Done,
+    Translation_Busy        := PRG_05_Translation.instTranslationM3.Status.Busy,
+    Translation_Done        := PRG_05_Translation.instTranslationM3.Status.Done,
     Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Busy,
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
@@ -34115,12 +34083,12 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
 
 {region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
-TranslationState.FBState := instTranslationM3.State;
+TranslationState.FBState := instTranslationM3.Status.State;
 TranslationState.Ready := instTranslationM3.Ready;
-TranslationState.Busy := instTranslationM3.Busy;
-TranslationState.Done := instTranslationM3.Done;
-TranslationState.Error := instTranslationM3.Error;
-TranslationState.ErrorId := instTranslationM3.ErrorId;
+TranslationState.Busy := instTranslationM3.Status.Busy;
+TranslationState.Done := instTranslationM3.Status.Done;
+TranslationState.Error := instTranslationM3.Status.Error;
+TranslationState.ErrorId := instTranslationM3.Status.ErrorId;
 TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationState.PositionReached := instTranslationM3.TargetReached;

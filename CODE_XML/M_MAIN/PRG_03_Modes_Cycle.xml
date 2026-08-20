@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:57:18.952402" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:57:18.952402">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T20:49:08.199837" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T20:49:08.199837">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -566,8 +566,8 @@ instCycleSemiAuto(
     Translation_At_P1       := PRG_05_Translation.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.M3_AtMaintenanceStable,
-    Translation_Busy        := PRG_05_Translation.instTranslationM3.Busy,
-    Translation_Done        := PRG_05_Translation.instTranslationM3.Done,
+    Translation_Busy        := PRG_05_Translation.instTranslationM3.Status.Busy,
+    Translation_Done        := PRG_05_Translation.instTranslationM3.Status.Done,
     Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Busy,
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,

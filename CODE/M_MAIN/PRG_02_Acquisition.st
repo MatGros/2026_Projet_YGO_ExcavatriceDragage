@@ -200,8 +200,15 @@ instSimBench(
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
     M2_BrakeCmd              := PRG_06_Outputs.Data.M2BrakeCmd,
-    M3_Direction             := PRG_05_Translation.M3_Direction_Active,
-    M3_SpeedRefPct           := PRG_05_Translation.M3_SpeedRef_Active,
+    // 🧪 Simulation M3 — FIDÉLITÉ : le modèle ne doit progresser QUE quand la
+    // vraie machine commande réellement (sortie FB_Translation, post-interlock), pas sur la
+    // commande brute (sinon il outrepasse butées/limites). Même principe que les treuils M1/M2
+    // (alimentés par la sortie PRG_06). Gate direction + vitesse = demande réelle (rampe/arrêt).
+    M3_Direction             := SEL(PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord <> 0,
+                                    PRG_05_Translation.M3_Direction_Active, 0),
+    M3_SpeedRefPct           := LIMIT(0.0,
+                                      PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz / GVL_PERSISTENT._TranslationMaxFreq_Hz * 100.0,
+                                      100.0),
     M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
     PowerKeepAlive_A         := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     PowerKeepAlive_B         := PRG_06_Outputs.Data.PowerKeepAliveBCmd,

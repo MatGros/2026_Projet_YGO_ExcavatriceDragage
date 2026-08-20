@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:43:34.282655" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:43:34.282655">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T20:48:49.595071" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T20:48:49.595071">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -74,6 +74,133 @@
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_ContactorCheck">
+        <baseType>
+          <struct>
+            <variable name="Command">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre envoyé au contacteur (TRUE = fermé/actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Feedback">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour d'état câblé (TRUE = effectivement fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StuckClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StuckOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag : commande ON mais retour OFF depuis trop longtemps</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cdabe1c4-dd5c-530c-a1a2-2825fa969858</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_FbStatus">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bloc en cours d'exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut actif présent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier (forme cible)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe exactement les six membres nécessaires au suivi
+      synoptique et diagnostic d'un FB standard (contrat §2quinquies).
+   🧬 Forme cible : les FB standard passent de la forme « à plat »
+      (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers
+      `Status : ST_FbStatus`, migré par lot dédié, gradué (pilote d'abord).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -138,58 +265,6 @@
             <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
           </data>
         </addData>
-      </dataType>
-      <dataType name="ST_ContactorCheck">
-        <baseType>
-          <struct>
-            <variable name="Command">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre envoyé au contacteur (TRUE = fermé/actif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Feedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour d'état câblé (TRUE = effectivement fermé)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StuckClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StuckOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag : commande ON mais retour OFF depuis trop longtemps</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cdabe1c4-dd5c-530c-a1a2-2825fa969858</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
-   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
-   =======================================================================</xhtml>
-        </documentation>
       </dataType>
     </dataTypes>
     <pous>
@@ -515,55 +590,16 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt (sortie libre, hors ST_FbStatus)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB occupé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthèse défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bit0: "Défaut frein Translation" - Brake.Error ; bit3: "Défaut variateur AC600" - défaut variateur (DriveStatusWord.4) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat mémorisé au dernier défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Défaut frein Translation" ; bit3: "Défaut variateur AC600" ; bit6: "Limite extrême".</xhtml>
               </documentation>
             </variable>
             <variable name="TargetReached">
@@ -796,15 +832,15 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 
     ArrivalLock := FALSE;
 
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     RETURN;
 END_IF;
 
 // 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -944,7 +980,7 @@ PhysicalDriveDirection := SEL(InvertDriveDirection, CommandedDirection, Commande
 // 0: None, 1: Forward, 2: Reverse, 7: Reset
 IF Reset THEN
     RequestedDriveControlWord := 7; // Reset défaut variateur
-ELSIF Error THEN
+ELSIF Status.Error THEN
     RequestedDriveControlWord := 0; // Arrêt sur défaut
 ELSIF MovementRequested THEN
     IF PhysicalDriveDirection = 1 THEN
@@ -989,50 +1025,50 @@ BrakeContactorCheck := Brake.ContactorCheck;
 {region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
 IF Brake.Error THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // Défaut variateur (bit3) : lu via EtherCAT (DriveStatusWord.4)
 IF DriveStatusWord.4 THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFF7;
+    Status.ErrorId := Status.ErrorId AND 16#FFF7;
 END_IF;
 
 // 🚧 Défaut fin de course extrême (bit6) — si bypassé, on NETTOIE le bit résiduel
 IF BypassLimitSwitch THEN
-    ErrorId := ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
+    Status.ErrorId := Status.ErrorId AND 16#FFBF;   // Nettoie le bit 6 (évite résidu d'avant activation)
 ELSE
-    // Activé UNIQUEMENT en cas de tentative d'avancer DANS la butée active (libéré si dégagement en sens inverse)
+    // Activé UNIQUEMENT en cas de tentative d'avancer vers la butée active (libéré si dégagement en sens inverse)
     IF (CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev) THEN
-        ErrorId := ErrorId OR 16#0040;
+        Status.ErrorId := Status.ErrorId OR 16#0040;
     ELSE
-        ErrorId := ErrorId AND 16#FFBF;
+        Status.ErrorId := Status.ErrorId AND 16#FFBF;
     END_IF;
 END_IF;
 
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // 🚦 8. STATE MACHINE (phase)
 IF (NOT StartStop OR SafeStop) AND ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    State := E_State.STOPPING;
+    Status.State := E_State.STOPPING;
 ELSIF ABS(SpeedRamp.Current) &gt; 0.1 THEN
-    State := E_State.BUSY;
+    Status.State := E_State.BUSY;
 ELSE
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY) OR (State = E_State.STOPPING);
-Done := FALSE;
+Status.Busy := (Status.State = E_State.BUSY) OR (Status.State = E_State.STOPPING);
+Status.Done := FALSE;
 
 // 🛡️ 9. SORTIE SÛRE SUR DÉFAUT
-IF Error THEN
+IF Status.Error THEN
     RequestedDriveControlWord := 0; RequestedDriveFreqHz := 0.0;
     BrakeReleaseRequest := FALSE;
 END_IF;
@@ -1643,11 +1679,12 @@ Current := LIMIT(-100.0, Current, 100.0);
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
+          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
+          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
       </ProjectStructure>
     </data>

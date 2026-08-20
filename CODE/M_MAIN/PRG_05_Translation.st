@@ -375,12 +375,12 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
 
 {region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
-TranslationState.FBState := instTranslationM3.State;
+TranslationState.FBState := instTranslationM3.Status.State;
 TranslationState.Ready := instTranslationM3.Ready;
-TranslationState.Busy := instTranslationM3.Busy;
-TranslationState.Done := instTranslationM3.Done;
-TranslationState.Error := instTranslationM3.Error;
-TranslationState.ErrorId := instTranslationM3.ErrorId;
+TranslationState.Busy := instTranslationM3.Status.Busy;
+TranslationState.Done := instTranslationM3.Status.Done;
+TranslationState.Error := instTranslationM3.Status.Error;
+TranslationState.ErrorId := instTranslationM3.Status.ErrorId;
 TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationState.PositionReached := instTranslationM3.TargetReached;
