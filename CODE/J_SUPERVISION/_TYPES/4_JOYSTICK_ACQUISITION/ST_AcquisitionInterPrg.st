@@ -53,7 +53,6 @@ STRUCT
     M2_EncoderIncoherent     : BOOL; // ❌ Mesure codeur M2 incoherente
 
     // === 🧪 Simulation & variateur M3 filtré ===
-    SimulationBypassActive        : BOOL; // 🧪 Bypass simulation treuils (consommé PRG_04)
     WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)
     M3_StatusWord_Filtered        : UINT; // 📊 Mot d'etat variateur M3 filtre (consommé PRG_05)
     M3_ActualFrequencyHz_Filtered : UINT; // 📊 Frequence reelle M3 filtree (consommé PRG_05)

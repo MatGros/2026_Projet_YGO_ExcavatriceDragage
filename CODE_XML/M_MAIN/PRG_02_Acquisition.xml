@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T15:06:02.802941" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T15:06:02.802941">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T18:05:12.105220" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T18:05:12.105220">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -294,21 +294,13 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M2 incoherente</xhtml>
               </documentation>
             </variable>
-            <variable name="SimulationBypassActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧪 Simulation &amp; variateur M3 filtré ===
-🧪 Bypass simulation treuils (consommé PRG_04)</xhtml>
-              </documentation>
-            </variable>
             <variable name="WinchInputSourceChanged">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Impulsion 1 cycle si source Winch bascule (IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧪 Simulation &amp; variateur M3 filtré ===
+🔀 Impulsion 1 cycle si source Winch bascule (IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_StatusWord_Filtered">
@@ -1484,7 +1476,6 @@ WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_S
 TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
 MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
-Data.SimulationBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive AND GVL_Simulation.SimulationBypassActive;
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}
