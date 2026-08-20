@@ -45,6 +45,9 @@ def take_snapshot():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
 
+    # Compte les variables en erreur (chemin perime / variable inexistante) pour les signaler.
+    error_count = sum(1 for _, v in rows if isinstance(v, str) and v.startswith("ERREUR"))
+
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     output_path = os.path.join(OUTPUT_DIR, "Snapshot_Troubleshooting_" + timestamp + ".csv")
 
@@ -59,6 +62,11 @@ def take_snapshot():
 
     print("Snapshot ecrit : " + output_path)
     print(str(len(rows)) + " variables lues")
+    if error_count:
+        print("⚠️ " + str(error_count) + " variable(s) en ERREUR (chemin perime ?) — regenerer la liste :")
+        print("   python TOOLS/PLC_LIVE_READER/variable_lists/generate_variable_list_from_code.py")
+    else:
+        print("✅ 0 variable en ERREUR")
     print("Temps lecture (read_values, " + str(len(variables) // BATCH_SIZE + 1) + " appels groupes) : {:.3f} s".format(read_time_total))
     print("Temps ecriture fichier : {:.3f} s".format(write_time_total))
     print("Temps total : {:.3f} s".format(read_time_total + write_time_total))

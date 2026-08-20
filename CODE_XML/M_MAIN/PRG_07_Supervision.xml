@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T15:00:13.549561" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T15:00:13.549561">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T15:06:02.887753" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T15:06:02.887753">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6190,8 +6190,8 @@ instTroubleshootingView(
     EmergencyDiag        := PRG_06_Outputs.EmergencyDiag,
     PowerCutOffActive    := PRG_06_Outputs.PowerCutOffActive,
     ArmingPulseActive    := PRG_06_Outputs.EmergencyArmingPulseActive,
-    MaintainAActive      := PRG_06_Outputs.PowerKeepAliveACmd,
-    MaintainBActive      := PRG_06_Outputs.PowerKeepAliveBCmd,
+    MaintainAActive      := PRG_06_Outputs.Data.PowerKeepAliveACmd,
+    MaintainBActive      := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     CycleReady           := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready,
     CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Done,
     CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Error,
@@ -9478,6 +9478,7 @@ GVL_Troubleshooting.Safety.ArmingBusy           := EmergencyState.ArmingBusy;
 GVL_Troubleshooting.Safety.LockoutActive        := EmergencyDiag.LockoutActive;
 GVL_Troubleshooting.Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.Safety.PowerCutOffActive    := PowerCutOffActive;
+GVL_Troubleshooting.Safety.PowerCutOffRequest   := PowerCutOffActive;
 GVL_Troubleshooting.Safety.MaintainAActive      := MaintainAActive;
 GVL_Troubleshooting.Safety.MaintainBActive      := MaintainBActive;
 

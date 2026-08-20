@@ -7277,6 +7277,14 @@ TRUE = Contacteur relâché ; précondition AF01 avant réarmement</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande de coupure safety active</xhtml>
               </documentation>
             </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande de coupure AU (entrée instSafetyEmergencyManagement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="MaintainAActive">
               <type>
                 <BOOL />
@@ -27584,6 +27592,7 @@ GVL_Troubleshooting.Safety.ArmingBusy           := EmergencyState.ArmingBusy;
 GVL_Troubleshooting.Safety.LockoutActive        := EmergencyDiag.LockoutActive;
 GVL_Troubleshooting.Safety.PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.Safety.PowerCutOffActive    := PowerCutOffActive;
+GVL_Troubleshooting.Safety.PowerCutOffRequest   := PowerCutOffActive;
 GVL_Troubleshooting.Safety.MaintainAActive      := MaintainAActive;
 GVL_Troubleshooting.Safety.MaintainBActive      := MaintainBActive;
 
@@ -30944,34 +30953,34 @@ Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Dat
 
 instSimBench(
     Enable                   := GVL_Simulation.SimulationModeActive,
-    M1_RelayFwd              := PRG_06_Outputs.M1RelayFwd,
-    M1_RelayRev              := PRG_06_Outputs.M1RelayRev,
-    M1_SpeedContactor_1      := PRG_06_Outputs.M1SpeedContactor1,
-    M1_SpeedContactor_2      := PRG_06_Outputs.M1SpeedContactor2,
-    M1_SpeedContactor_3      := PRG_06_Outputs.M1SpeedContactor3,
-    M1_SpeedContactor_4      := PRG_06_Outputs.M1SpeedContactor4,
+    M1_RelayFwd              := PRG_06_Outputs.Data.M1RelayFwd,
+    M1_RelayRev              := PRG_06_Outputs.Data.M1RelayRev,
+    M1_SpeedContactor_1      := PRG_06_Outputs.Data.M1SpeedContactor1,
+    M1_SpeedContactor_2      := PRG_06_Outputs.Data.M1SpeedContactor2,
+    M1_SpeedContactor_3      := PRG_06_Outputs.Data.M1SpeedContactor3,
+    M1_SpeedContactor_4      := PRG_06_Outputs.Data.M1SpeedContactor4,
     M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
     M1_PresetTriggerCmd      := instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderAbsM1.PresetValueOut,
-    M1_BrakeCmd              := PRG_06_Outputs.M1BrakeCmd,
-    M2_RelayFwd              := PRG_06_Outputs.M2RelayFwd,
-    M2_RelayRev              := PRG_06_Outputs.M2RelayRev,
-    M2_SpeedContactor_1      := PRG_06_Outputs.M2SpeedContactor1,
-    M2_SpeedContactor_2      := PRG_06_Outputs.M2SpeedContactor2,
-    M2_SpeedContactor_3      := PRG_06_Outputs.M2SpeedContactor3,
-    M2_SpeedContactor_4      := PRG_06_Outputs.M2SpeedContactor4,
+    M1_BrakeCmd              := PRG_06_Outputs.Data.M1BrakeCmd,
+    M2_RelayFwd              := PRG_06_Outputs.Data.M2RelayFwd,
+    M2_RelayRev              := PRG_06_Outputs.Data.M2RelayRev,
+    M2_SpeedContactor_1      := PRG_06_Outputs.Data.M2SpeedContactor1,
+    M2_SpeedContactor_2      := PRG_06_Outputs.Data.M2SpeedContactor2,
+    M2_SpeedContactor_3      := PRG_06_Outputs.Data.M2SpeedContactor3,
+    M2_SpeedContactor_4      := PRG_06_Outputs.Data.M2SpeedContactor4,
     M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
-    M2_BrakeCmd              := PRG_06_Outputs.M2BrakeCmd,
+    M2_BrakeCmd              := PRG_06_Outputs.Data.M2BrakeCmd,
     M3_Direction             := PRG_05_Translation.M3_Direction_Active,
     M3_SpeedRefPct           := PRG_05_Translation.M3_SpeedRef_Active,
-    M3_BrakeCmd              := PRG_06_Outputs.TranslationBrakeCmd,
-    PowerKeepAlive_A         := PRG_06_Outputs.PowerKeepAliveACmd,
-    PowerKeepAlive_B         := PRG_06_Outputs.PowerKeepAliveBCmd,
+    M3_BrakeCmd              := PRG_06_Outputs.Data.TranslationBrakeCmd,
+    PowerKeepAlive_A         := PRG_06_Outputs.Data.PowerKeepAliveACmd,
+    PowerKeepAlive_B         := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
     // inter-POU ArmPulse est observée avec un cycle de retard dans la tâche.
-    EmergencyArming_RQ       := PRG_06_Outputs.EmergencyArmingCmd
+    EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
                                  OR (PRG_06_Outputs.ArmingSeqStep = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
@@ -33532,6 +33541,15 @@ Data.TranslationSafety                := TranslationSafety;
         <interface>
           <inputVars />
           <outputVars>
+            <variable name="Data">
+              <type>
+                <derived name="ST_OutputsInterPrg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚌 BUS INTER-PRG (producteur unique) ===
+&lt;-- [BUS] Ordres actionneurs finaux (rebouclés FB_SimBench)</xhtml>
+              </documentation>
+            </variable>
             <variable name="EmergencyArmingPulseActive">
               <type>
                 <BOOL />
@@ -33613,9 +33631,7 @@ Data.TranslationSafety                := TranslationSafety;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable ne coupe que sur PowerCutOff (barriere finale, AF02 §2, AF06 §5).
-SafeStop = rampe rapide geree en amont par FB_Winch/FB_Translation (Enable maintenu).
-&lt;-- [SAFE] Gate finale M1 (Enable AND NOT PowerCutOff)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Gate finale M1 (Enable AND NOT PowerCutOff)</xhtml>
               </documentation>
             </variable>
             <variable name="M2InterlockEnable">
@@ -33639,8 +33655,7 @@ SafeStop = rampe rapide geree en amont par FB_Winch/FB_Translation (Enable maint
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Info diagnostic (Watch) — ne participe pas au calcul Enable.
-&lt;-- [DIAG] Securites M1 coupant la puissance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Securites M1 coupant la puissance</xhtml>
               </documentation>
             </variable>
             <variable name="M1SafeStopSafetyInfo">
@@ -33707,22 +33722,14 @@ SafeStop = rampe rapide geree en amont par FB_Winch/FB_Translation (Enable maint
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] M3 bloque par securite (PowerCutOff OU SafeStop)</xhtml>
               </documentation>
             </variable>
-            <variable name="TranslationBrakeCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les noms Device bruts (*_DQ / *_RQ) ne sont pas declares ici : les declarer
-creerait une collision avec la globale homonyme du mapping E/S.
-&lt;-- [ACT] Demande frein M3 arbitree — cible mapping E/S</xhtml>
-              </documentation>
-            </variable>
             <variable name="M3_DriveControlWord">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Mot commande variateur M3 (0x3101) — cible mapping E/S</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les noms Device bruts (*_DQ / *_RQ) ne sont pas declares ici : les declarer
+creerait une collision avec la globale homonyme du mapping E/S.
+&lt;-- [ACT] Mot commande variateur M3 (0x3101) — cible mapping E/S</xhtml>
               </documentation>
             </variable>
             <variable name="M3_DriveFreqRefWord">
@@ -33733,149 +33740,12 @@ creerait une collision avec la globale homonyme du mapping E/S.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Consigne frequence M3 (0x3100, x100) — cible mapping E/S</xhtml>
               </documentation>
             </variable>
-            <variable name="M1RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ ORDRES ACTIONNEURS ===
-&lt;-- [ACT] Ordre contacteur montee treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur descente treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1SpeedContactor1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur palier 1 treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1SpeedContactor2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur palier 2 treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1SpeedContactor3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur palier 3 treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1SpeedContactor4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur palier 4 treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1BrakeCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre desserrage frein M1 (1=Desserrer)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur montee/fermeture treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur descente/ouverture treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2SpeedContactor1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur palier 1 treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2SpeedContactor2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur palier 2 treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2SpeedContactor3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur palier 3 treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2SpeedContactor4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur palier 4 treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2BrakeCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre desserrage frein M2 (1=Desserrer)</xhtml>
-              </documentation>
-            </variable>
             <variable name="KoboldContactorCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre alimentation contacteur capteur fond Kobold</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerKeepAliveACmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Maintien puissance voie A (1=Maintenu)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerKeepAliveBCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Maintien puissance voie B (1=Maintenu)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Impulsion rearmement puissance AU</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -33911,6 +33781,151 @@ creerait une collision avec la globale homonyme du mapping E/S.
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Gestionnaire de rearmement AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ ORDRES ACTIONNEURS (publiés via Data) ===
+. [LOC] Ordre contacteur montee treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur descente treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur palier 1 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur palier 2 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur palier 3 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur palier 4 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre desserrage frein M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur montee/fermeture treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur descente/ouverture treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur palier 1 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur palier 2 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur palier 3 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur palier 4 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre desserrage frein M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationBrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande frein M3 arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAliveACmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien puissance voie A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAliveBCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien puissance voie B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Impulsion rearmement puissance AU</xhtml>
               </documentation>
             </variable>
             <variable name="PowerCutOffReq">
@@ -34131,6 +34146,27 @@ EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;
 EmergencyState := instSafetyEmergencyManagement.State;
 EmergencyDiag := instSafetyEmergencyManagement.Diag;
 PowerCutOffActive := PowerCutOffReq;
+
+// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_OutputsInterPrg) ===
+// Copie des ordres actionneurs vers le bus de sortie (rebouclés FB_SimBench).
+Data.M1RelayFwd            := M1RelayFwd;
+Data.M1RelayRev            := M1RelayRev;
+Data.M1SpeedContactor1     := M1SpeedContactor1;
+Data.M1SpeedContactor2     := M1SpeedContactor2;
+Data.M1SpeedContactor3     := M1SpeedContactor3;
+Data.M1SpeedContactor4     := M1SpeedContactor4;
+Data.M1BrakeCmd            := M1BrakeCmd;
+Data.M2RelayFwd            := M2RelayFwd;
+Data.M2RelayRev            := M2RelayRev;
+Data.M2SpeedContactor1     := M2SpeedContactor1;
+Data.M2SpeedContactor2     := M2SpeedContactor2;
+Data.M2SpeedContactor3     := M2SpeedContactor3;
+Data.M2SpeedContactor4     := M2SpeedContactor4;
+Data.M2BrakeCmd            := M2BrakeCmd;
+Data.TranslationBrakeCmd   := TranslationBrakeCmd;
+Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
+Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
+Data.EmergencyArmingCmd    := EmergencyArmingCmd;
 </xhtml>
           </ST>
         </body>
@@ -34664,8 +34700,8 @@ instTroubleshootingView(
     EmergencyDiag        := PRG_06_Outputs.EmergencyDiag,
     PowerCutOffActive    := PRG_06_Outputs.PowerCutOffActive,
     ArmingPulseActive    := PRG_06_Outputs.EmergencyArmingPulseActive,
-    MaintainAActive      := PRG_06_Outputs.PowerKeepAliveACmd,
-    MaintainBActive      := PRG_06_Outputs.PowerKeepAliveBCmd,
+    MaintainAActive      := PRG_06_Outputs.Data.PowerKeepAliveACmd,
+    MaintainBActive      := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     CycleReady           := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready,
     CycleDone            := PRG_03_Modes_Cycle.instCycleSemiAuto.Done,
     CycleError           := PRG_03_Modes_Cycle.instCycleSemiAuto.Error,
