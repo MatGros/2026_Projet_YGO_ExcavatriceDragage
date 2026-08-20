@@ -48,13 +48,10 @@ VAR_INPUT
     BypassProcess         : BOOL := FALSE;   // --> [TST] Bypass groupé SafeStop seul (OperatorComm/DriveComm/PhaseRotation/ContactorFeedback)
 END_VAR
 VAR_OUTPUT
-    Ready               : BOOL;   // <-- [STAT] FB prêt
-    Busy                : BOOL;   // <-- [STAT] FB occupé
-    Done                : BOOL;   // <-- [STAT] Action terminée
-    Error               : BOOL;   // <-- [STAT] Synthèse défaut
-    ErrorId             : WORD;        // <-- [DIAG] bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide
-    State               : E_State;   // <-- [STAT] Etat courant
-    StateAtError        : E_State;   // <-- [DIAG] Etat mémorisé au dernier défaut
+    Ready               : BOOL;   // <-- [STAT] FB prêt (sortie libre, hors ST_FbStatus)
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide
+    Status              : ST_FbStatus;
     SafeStop            : BOOL;        // <-- [ACT] Décélération rapide (PLC)
     PowerCutOff         : BOOL;        // <-- [ACT] Coup de poing / coupure puissance amont
     ErrorOperatorComm   : BOOL;        // <-- [DIAG] Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0)
@@ -85,9 +82,9 @@ END_VAR
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
-    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
-    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
-    Error := (ErrorId <> 16#0000);
+    // 🛡️ Status.ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Status.Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
+    Status.Error := (Status.ErrorId <> 16#0000);
     SafeStop := FALSE;
     PowerCutOff := FALSE;
     ErrorOperatorComm := FALSE;
@@ -102,8 +99,8 @@ IF NOT Enable THEN
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
-    State := E_State.DISABLED;
-    Busy := FALSE; Done := FALSE; Ready := FALSE;
+    Status.State := E_State.DISABLED;
+    Status.Busy := FALSE; Status.Done := FALSE; Ready := FALSE;
     RETURN;
 END_IF;
 
@@ -116,14 +113,14 @@ ResetEdge(CLK := Reset);
 // 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
-// 🌐 BYPASS GLOBAL : si actif → force ErrorId = 0 et saute toutes les vérifications
+// 🌐 BYPASS GLOBAL : si actif → force Status.ErrorId = 0 et saute toutes les vérifications
 // (les bits d'erreur resteraient coincés si on ne les nettoie pas)
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
 END_IF;
@@ -140,42 +137,42 @@ IF NOT BypassGlobal THEN
     // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
         IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-            ErrorId := ErrorId OR 16#0001;
+            Status.ErrorId := Status.ErrorId OR 16#0001;
         ELSE
-            ErrorId := ErrorId AND 16#FFFE; (* Effacement auto si la com repasse saine *)
+            Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Effacement auto si la com repasse saine *)
         END_IF;
     ELSIF NOT TonStartupWarmup.Q THEN
-        ErrorId := ErrorId AND 16#FFFE; (* Inhibition pendant l'initialisation boot *)
+        Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Inhibition pendant l'initialisation boot *)
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFE; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFE; END_IF;
 
     // 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassDriveComm) THEN
         IF (NOT DriveOnline OR NOT DriveOperational) THEN
-            ErrorId := ErrorId OR 16#0002;
+            Status.ErrorId := Status.ErrorId OR 16#0002;
         ELSE
-            ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si l'EtherCAT variateur M3 repasse sain *)
+            Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Effacement auto si l'EtherCAT variateur M3 repasse sain *)
         END_IF;
     ELSIF NOT TonStartupWarmup.Q THEN
-        ErrorId := ErrorId AND 16#FFFD; (* Inhibition pendant l'initialisation boot *)
+        Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Inhibition pendant l'initialisation boot *)
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFD; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFD; END_IF;
 
     // 🔍 3. MAUVAISE ROTATION DE PHASE (bit2)
     IF NOT (BypassProcess OR BypassPhaseRotation) THEN
         IF NOT PhaseRotationOk THEN
-            ErrorId := ErrorId OR 16#0004;
+            Status.ErrorId := Status.ErrorId OR 16#0004;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFB; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFB; END_IF;
 
     // 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (bit3)
     IF NOT (BypassSafety OR BypassBrakeThermal) THEN
         IF BrakeThermalFeedback THEN
-            ErrorId := ErrorId OR 16#0008;
+            Status.ErrorId := Status.ErrorId OR 16#0008;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFF7; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFF7; END_IF;
 
     // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
     IF NOT (BypassSafety OR BypassMecaB) THEN
@@ -187,11 +184,11 @@ IF NOT BypassGlobal THEN
             UncommandedActiveB := FALSE;
         END_IF;
         TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
-        IF TonMecaB.Q THEN ErrorId := ErrorId OR 16#0010; END_IF;
+        IF TonMecaB.Q THEN Status.ErrorId := Status.ErrorId OR 16#0010; END_IF;
     ELSE
         TonMecaB(IN := FALSE);
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFEF; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFEF; END_IF;
 
     // 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
     IF NOT (BypassSafety OR BypassMecaA) THEN
@@ -201,16 +198,16 @@ IF NOT BypassGlobal THEN
             UncommandedActiveA := FALSE;
         END_IF;
         TonMecaA(IN := UncommandedActiveA, PT := T#1S);
-        IF TonMecaA.Q THEN ErrorId := ErrorId OR 16#0020; END_IF;
+        IF TonMecaA.Q THEN Status.ErrorId := Status.ErrorId OR 16#0020; END_IF;
     ELSE
         TonMecaA(IN := FALSE);
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFDF; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFDF; END_IF;
 
     // 🔍 3sexies. SURVEILLANCE ESCALADE FIN DE COURSE (bit6)
     IF (BypassSafety OR BypassLimitSwitch) THEN
         // Nettoie le bit 6 résiduel (posé avant activation du bypass)
-        ErrorId := ErrorId AND 16#FFBF;
+        Status.ErrorId := Status.ErrorId AND 16#FFBF;
         TonLimitSwitchOverrun(IN := FALSE);
     ELSE
         // 🧱 L'erreur 64 (escalade / poussée anormale en butée) ne s'active QUE SI :
@@ -222,23 +219,23 @@ IF NOT BypassGlobal THEN
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
 
         IF TonLimitSwitchOverrun.Q THEN
-            ErrorId := ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
+            Status.ErrorId := Status.ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
         ELSE
             // Si la poussée dans le mauvais sens cesse (ou si on repart en arrière), le défaut s'auto-efface
-            ErrorId := ErrorId AND 16#FFBF;
+            Status.ErrorId := Status.ErrorId AND 16#FFBF;
         END_IF;
     END_IF;
 
     // 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
     IF (BypassSafety OR BypassSensorIncoherent) THEN
         // Nettoye le bit 7 résiduel
-        ErrorId := ErrorId AND 16#FF7F;
+        Status.ErrorId := Status.ErrorId AND 16#FF7F;
     ELSE
         IF SensorWordIncoherent THEN
-            ErrorId := ErrorId OR 16#0080;
+            Status.ErrorId := Status.ErrorId OR 16#0080;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FF7F; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FF7F; END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
@@ -246,34 +243,34 @@ END_IF; // fin IF NOT BypassGlobal
 
 {region "§4 Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-SafeStop := Error OR NOT PowerContactorEngaged;
+SafeStop := Status.Error OR NOT PowerContactorEngaged;
 
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
 // mouvement non commandé (bit5), dépassement de fin de course (bit6),
 // ou incohérence mot capteurs position (bit7)
-PowerCutOff := (ErrorId AND 16#00F8) <> 16#0000;
+PowerCutOff := (Status.ErrorId AND 16#00F8) <> 16#0000;
 
-// Décapsulage du bitfield ErrorId pour l'IHM
-ErrorOperatorComm   := (ErrorId AND 16#0001) <> 16#0000;
-ErrorDriveComm      := (ErrorId AND 16#0002) <> 16#0000;
-ErrorPhaseRotation  := (ErrorId AND 16#0004) <> 16#0000;
-ErrorBrakeThermal   := (ErrorId AND 16#0008) <> 16#0000;
-ErrorMecaB          := (ErrorId AND 16#0010) <> 16#0000;
-ErrorMecaA          := (ErrorId AND 16#0020) <> 16#0000;
-ErrorLimitSwitch    := (ErrorId AND 16#0040) <> 16#0000;
-ErrorSensorIncoherent := (ErrorId AND 16#0080) <> 16#0000;
+// Décapsulage du bitfield Status.ErrorId pour l'IHM
+ErrorOperatorComm   := (Status.ErrorId AND 16#0001) <> 16#0000;
+ErrorDriveComm      := (Status.ErrorId AND 16#0002) <> 16#0000;
+ErrorPhaseRotation  := (Status.ErrorId AND 16#0004) <> 16#0000;
+ErrorBrakeThermal   := (Status.ErrorId AND 16#0008) <> 16#0000;
+ErrorMecaB          := (Status.ErrorId AND 16#0010) <> 16#0000;
+ErrorMecaA          := (Status.ErrorId AND 16#0020) <> 16#0000;
+ErrorLimitSwitch    := (Status.ErrorId AND 16#0040) <> 16#0000;
+ErrorSensorIncoherent := (Status.ErrorId AND 16#0080) <> 16#0000;
 
-Busy := FALSE;
-Done := FALSE;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 // 🚦 5. STATE MACHINE (phase diagnostic)
-State := E_State.READY;
+Status.State := E_State.READY;
 
 
 {endregion}

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:05:00.904619" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:05:00.904619">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:04:13.412379" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:04:13.412379">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -73,6 +73,81 @@
             <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
           </data>
         </addData>
+      </dataType>
+      <dataType name="ST_FbStatus">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bloc en cours d'exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut actif présent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier (forme cible)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe exactement les six membres nécessaires au suivi
+      synoptique et diagnostic d'un FB standard (contrat §2quinquies).
+   🧬 Forme cible : les FB standard passent de la forme « à plat »
+      (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers
+      `Status : ST_FbStatus`, migré par lot dédié, gradué (pilote d'abord).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
       <dataType name="E_State">
         <baseType>
@@ -362,52 +437,13 @@
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Traitement en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthese defaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Code erreur bitmask (bit0: ecart, bit1: incoherence)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ErrorId : &lt;-- [DIAG] bitmask (bit0: ecart, bit1: incoherence)
+&lt;-- [STAT] Statut FB groupe (Busy/Done/Error/State/StateAtError)</xhtml>
               </documentation>
             </variable>
             <variable name="DeltaPosM">
@@ -524,14 +560,14 @@
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
     DeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE;
     SyncDegradedStep1 := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -539,14 +575,14 @@ END_IF;
 
 {region "§2 Initialisation et activation synchro"}
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et ignore toute la surveillance synchro
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
 END_IF;
 
 // 🎚️ 3. SyncActive SELON MODE (Partie9 §9)
@@ -586,13 +622,13 @@ IF NOT BypassGlobal THEN
 DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM &gt; CfgSyncToleranceM);
 DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
 IF DeviationTimer.Q THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q AND NOT DeviationActive THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // 🐢 Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
-SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM &gt; CfgSyncToleranceM) OR ((ErrorId AND 16#0001) &lt;&gt; 16#0000));
+SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM &gt; CfgSyncToleranceM) OR ((Status.ErrorId AND 16#0001) &lt;&gt; 16#0000));
 
 // 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1
 // Vérifie que les commandes envoyées aux deux treuils sont identiques (sens et contacteurs)
@@ -609,9 +645,9 @@ MismatchActive := SyncActive AND (
 MismatchTimer(IN := MismatchActive, PT := T#500ms);
 
 IF MismatchTimer.Q THEN
-    ErrorId := ErrorId OR 16#0002;
+    Status.ErrorId := Status.ErrorId OR 16#0002;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;
 END_IF; // fin du IF MismatchActive
 
 ELSE
@@ -622,15 +658,15 @@ END_IF; // fin IF NOT BypassGlobal
 
 {region "§5 Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-SyncWarn := Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
-Busy := FALSE;
-Done := FALSE;
+SyncWarn := Status.Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}
 </xhtml>
@@ -657,6 +693,7 @@ Done := FALSE;
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
+          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
       </ProjectStructure>

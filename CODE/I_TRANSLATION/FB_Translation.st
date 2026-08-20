@@ -311,7 +311,7 @@ BrakeContactorCheck := Brake.ContactorCheck;
 
 {region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
-IF Brake.Error THEN
+IF Brake.Status.Error THEN
     Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     Status.ErrorId := Status.ErrorId AND 16#FFFE;

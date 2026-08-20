@@ -77,12 +77,12 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
-    Busy                            : BOOL;                           // <-- [STAT] Traitement securite en cours
-    Done                            : BOOL;                           // <-- [STAT] Action terminee
-    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
-    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur bitmask (0..15)
-    State                           : E_State;                        // <-- [STAT] Etat courant machine d'etat FB
-    StateAtError                    : E_State;                        // <-- [DIAG] Etat memorise lors du dernier defaut
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bitmask: bit0: "Perte comms opérateur" ; bit1: "Perte codeur" ; bit2: "Surchauffe moteur" ;
+    // bit3: "Mou de câble" ; bit4: "Rotation phases" ; bit5: "Fin de course haut capteur" ;
+    // bit6: "Limite max câble" ; bit7: "Méca A" ; bit8: "Méca B" ; bit9: "Méca C" ; bit10: "Thermique frein" ;
+    // bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; bit15: "Absence mouvement".
+    Status                         : ST_FbStatus;
 
     // === SORTIES DE SÉCURITÉ ET AUTORISATIONS ===
     SafeStop                        : BOOL;                           // <-- [SAFE] Arret rapide 2 sens (Enable maintenu)
@@ -124,16 +124,16 @@ END_VAR
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
     Ready := FALSE;
-    Busy := FALSE;
-    Done := FALSE;
+    Status.Busy := FALSE;
+    Status.Done := FALSE;
     SafeStop := TRUE;
     DescendPermit := FALSE; // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     AscentPermit := FALSE;  // 🛡️ Fail-Safe : aucun mouvement permis si Safety désactivé
     PowerCutOff := FALSE;
-    State := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
     // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
     // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessus).
-    Error := (ErrorId <> 16#0000);
+    Status.Error := (Status.ErrorId <> 16#0000);
     // Force le réarmement (WasArmed→FALSE) via FB_DriftGuard.
     DriftGuardA(Arm := FALSE, PositionM := CablePosM, ToleranceM := UncommandedDriftToleranceM);
     DriftGuardC(Arm := FALSE, PositionM := CablePosM, ToleranceM := BenneSlipToleranceM);
@@ -147,7 +147,7 @@ IF NOT Enable THEN
 END_IF;
 
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 
 {endregion}
 
@@ -171,13 +171,13 @@ ResetEdge(CLK := Reset);
 // 🧹 Initialisation au premier scan : évitement des alarmes transitoires au démarrage
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
 // 🌐 BYPASS GLOBAL : si TRUE, on force ErrorId = 0 ET on saute toute la logique de sécurité
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
@@ -200,9 +200,9 @@ END_IF;
 // précise, jamais via le bypass global qui vise le reste du domaine : Méca A-E, thermique, phase,
 // comm, sync, codeur).
 IF NOT (BypassProcess OR BypassTopLimitSwitch) AND NOT TopPositionSensor AND NOT InReferencingMode AND (Direction > 0) THEN
-    ErrorId := ErrorId OR 16#0020;
+    Status.ErrorId := Status.ErrorId OR 16#0020;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFDF;
+    Status.ErrorId := Status.ErrorId AND 16#FFDF;
 END_IF;
 
 // 🔍 3septies. LONGUEUR MAX DE CÂBLE (profondeur max autorisée) — bit6
@@ -210,9 +210,9 @@ END_IF;
 // physique (CablePosM <= CfgCableLimitDescentM), alors on interdit uniquement la descente.
 // SORTI du bloc "IF NOT BypassGlobal" — même doctrine que bit5 ci-dessus.
 IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
-    ErrorId := ErrorId OR 16#0040;
+    Status.ErrorId := Status.ErrorId OR 16#0040;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFBF;
+    Status.ErrorId := Status.ErrorId AND 16#FFBF;
 END_IF;
 
 {endregion}
@@ -226,15 +226,15 @@ IF NOT BypassGlobal THEN
 
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
         IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-            ErrorId := ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
+            Status.ErrorId := Status.ErrorId OR 16#0001;       // Perte communication opérateur : joystick CAN ou heartbeat IHM absent
         ELSE
-            ErrorId := ErrorId AND 16#FFFE;      // Effacement auto si la com repasse saine
+            Status.ErrorId := Status.ErrorId AND 16#FFFE;      // Effacement auto si la com repasse saine
         END_IF;
     ELSIF NOT TonStartupWarmup.Q THEN
-        ErrorId := ErrorId AND 16#FFFE;          // Inhibition pendant l'initialisation boot
+        Status.ErrorId := Status.ErrorId AND 16#FFFE;          // Inhibition pendant l'initialisation boot
     END_IF;
     IF ResetEdge.Q THEN
-        ErrorId := ErrorId AND 16#FFFE;
+        Status.ErrorId := Status.ErrorId AND 16#FFFE;
     END_IF;
 
 // 🔍 3bis. PERTE CODEUR DE CE TREUIL
@@ -245,35 +245,35 @@ EncoderAvailableEffective := EncoderAvailable
                              OR BypassGlobal
                              OR ((EncoderFaultBypass OR BypassProcess) AND (Mode = E_Mode.MAINT_N2));
 IF NOT EncoderAvailableEffective THEN
-    ErrorId := ErrorId OR 16#0002;
+    Status.ErrorId := Status.ErrorId OR 16#0002;
 ELSE
-    ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
+    Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Effacement auto si le codeur est dispo OU bypassé *)
 END_IF;
 
 // 🔍 3ter. SURCHAUFFE MOTEUR — bit2, participe au SafeStop total
 // ET BypassMotorThermal — même doctrine que BypassBrakeThermal (§3sexies-ter),
 // bypass dédié plutôt que de dépendre uniquement du bypass groupé BypassSafety.
 IF NOT (BypassSafety OR BypassMotorThermal) AND ThermalFeedback THEN
-    ErrorId := ErrorId OR 16#0004;
+    Status.ErrorId := Status.ErrorId OR 16#0004;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFB;
+    Status.ErrorId := Status.ErrorId AND 16#FFFB;
 END_IF;
 
 // 🔍 3quater. MOU DE CÂBLE (physiquement sur tambour M2, câblé sur les 2 instances Safety)
 // Mode NORMAL (SyncEnable=TRUE) → SafeStop M1+M2 (bit3 inclus dans SafeStop)
 // Mode RÉCUPÉRATION (SyncEnable=FALSE) → DescendPermit uniquement (descente interdite pour ne pas dérouler, montée OK pour retendre/fermer)
 IF NOT BypassProcess AND SlackCableDetected THEN
-    ErrorId := ErrorId OR 16#0008;
+    Status.ErrorId := Status.ErrorId OR 16#0008;
 ELSIF ResetEdge.Q AND NOT SlackCableDetected THEN
-    ErrorId := ErrorId AND 16#FFF7;
+    Status.ErrorId := Status.ErrorId AND 16#FFF7;
 END_IF;
 
 // 🔍 3quinquies. ROTATION DE PHASE —
 // bit4, participe au SafeStop total (sens moteur potentiellement inversé, danger 2 sens).
 IF NOT (BypassProcess OR BypassPhaseRotation) AND NOT PhaseRotationOk THEN
-    ErrorId := ErrorId OR 16#0010;
+    Status.ErrorId := Status.ErrorId OR 16#0010;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFEF;
+    Status.ErrorId := Status.ErrorId AND 16#FFEF;
 END_IF;
 
 // 🔍 3octies. MÉCA A — MOUVEMENT NON COMMANDÉ GÉNÉRAL — bit7
@@ -288,9 +288,9 @@ DriftGuardA(
 MecaADriftM := DriftGuardA.DriftM;   // Diagnostic IHM
 
 IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps))) THEN
-    ErrorId := ErrorId OR 16#0080;
+    Status.ErrorId := Status.ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FF7F;
+    Status.ErrorId := Status.ErrorId AND 16#FF7F;
 END_IF;
 
 // 🔍 3nonies. MÉCA B — PILOTAGE ACTIF SANS COMMANDE OPÉRATEUR — bit8
@@ -303,9 +303,9 @@ MecaB_NoOperatorCmd := (NOT JoystickOnline) OR (NOT JoystickOperational)
 TonMecaB(IN := NOT (BypassSafety OR BypassMecaB) AND MecaB_NoOperatorCmd AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback), PT := PostRampTimeout);
 MecaBElapsedTime := TonMecaB.ET;   // Diagnostic IHM
 IF TonMecaB.Q THEN
-    ErrorId := ErrorId OR 16#0100;
+    Status.ErrorId := Status.ErrorId OR 16#0100;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FEFF;
+    Status.ErrorId := Status.ErrorId AND 16#FEFF;
 END_IF;
 
 // 🔍 3decies. MÉCA C — GLISSEMENT M1 PENDANT BENNE, ESCALADE — bit9
@@ -321,9 +321,9 @@ DriftGuardC(
 MecaCDriftM := DriftGuardC.DriftM;   // Diagnostic IHM
 
 IF DriftGuardC.Violation THEN
-    ErrorId := ErrorId OR 16#0200;
+    Status.ErrorId := Status.ErrorId OR 16#0200;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FDFF;
+    Status.ErrorId := Status.ErrorId AND 16#FDFF;
 END_IF;
 
 // 🔍 3undecies. THERMIQUE FREIN COMMUN M1/M2/M3 — bit10
@@ -331,9 +331,9 @@ END_IF;
 // signifier qu'un frein colle instantanément (frein à manque de courant) → SafeStop ET
 // PowerCutOff (voir bandeau en-tête).
 IF NOT (BypassSafety OR BypassBrakeThermal) AND BrakeThermalFeedback THEN
-    ErrorId := ErrorId OR 16#0400;
+    Status.ErrorId := Status.ErrorId OR 16#0400;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FBFF;
+    Status.ErrorId := Status.ErrorId AND 16#FBFF;
 END_IF;
 
 // 🔍 3duodecies. MÉCA D — ARRIVÉE CAPTEUR HAUT HORS RÉFÉRENCEMENT — bit11
@@ -350,9 +350,9 @@ TonMecaD(
     PT := PostRampTimeout
 );
 IF TonMecaD.Q THEN
-    ErrorId := ErrorId OR 16#0800;
+    Status.ErrorId := Status.ErrorId OR 16#0800;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#F7FF;
+    Status.ErrorId := Status.ErrorId AND 16#F7FF;
 END_IF;
 
 // 🔍 3terdecies. MÉCA E — ÉCART SYNCHRO M1/M2 CRITIQUE — bits 12/13
@@ -365,17 +365,17 @@ END_IF;
 // Bit12 : détection → SafeStop immédiat. Bit13 : escalade si pas confirmé arrêté → PowerCutOff.
 IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
    AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
-    ErrorId := ErrorId OR 16#1000;
+    Status.ErrorId := Status.ErrorId OR 16#1000;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#EFFF;
+    Status.ErrorId := Status.ErrorId AND 16#EFFF;
 END_IF;
 
-TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((ErrorId AND 16#1000) <> 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)),
+TonMecaE(IN := NOT (BypassSafety OR BypassMecaE) AND (((Status.ErrorId AND 16#1000) <> 16#0000) AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback)),
          PT := PostRampTimeout);
 IF TonMecaE.Q THEN
-    ErrorId := ErrorId OR 16#2000;
+    Status.ErrorId := Status.ErrorId OR 16#2000;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#DFFF;
+    Status.ErrorId := Status.ErrorId AND 16#DFFF;
 END_IF;
 
 // 🔍 3quaterdecies — SENS RÉEL OPPOSÉ À LA COMMANDE (bit14)
@@ -386,9 +386,9 @@ OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (Movemen
       OR ((Direction < 0) AND (MeasuredSpeedSignedMps > MovementSpeedThresholdMps))));
 TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
 IF TonOppositeDirection.Q THEN
-    ErrorId := ErrorId OR 16#4000;
+    Status.ErrorId := Status.ErrorId OR 16#4000;
 ELSIF ResetEdge.Q AND NOT OppositeDirectionActive THEN
-    ErrorId := ErrorId AND 16#BFFF;
+    Status.ErrorId := Status.ErrorId AND 16#BFFF;
 END_IF;
 
 // ⏱️ 3quindecies — ABSENCE DE MOUVEMENT MALGRÉ COMMANDE (bit15)
@@ -400,9 +400,9 @@ TonNoMovement(
     PT := NoMovementTimeout
 );
 IF TonNoMovement.Q THEN
-    ErrorId := ErrorId OR 16#8000;
+    Status.ErrorId := Status.ErrorId OR 16#8000;
 ELSIF ResetEdge.Q AND (NOT MeasuredSpeedValid OR NOT MovementCommanded OR (ABS(MeasuredSpeedSignedMps) >= MovementSpeedThresholdMps)) THEN
-    ErrorId := ErrorId AND 16#7FFF;
+    Status.ErrorId := Status.ErrorId AND 16#7FFF;
 END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
@@ -411,10 +411,10 @@ END_IF; // fin IF NOT BypassGlobal
 
 {region "§5 Arbitrage sorties securite"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Error := (ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);       // 🧭 Partie3 §4 : miroir de TOUT le domaine, y compris mou de câble (visible IHM)
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // 🟧 SafeStop : bits 0/1/2/3/4 (joystick, codeur, thermique moteur, MOU CÂBLE, phases) + 7/8/9
@@ -422,24 +422,24 @@ END_IF;
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
-    SafeStop := (ErrorId AND 16#FF97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
+    SafeStop := (Status.ErrorId AND 16#FF97) <> 16#0000;   // bit3 exclu → SafeStop normal sans mou câble
 ELSE
-    SafeStop := (ErrorId AND 16#FF9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
+    SafeStop := (Status.ErrorId AND 16#FF9F) <> 16#0000;   // bit3 inclus → SafeStop complet avec mou câble
 END_IF;
 
 // ⬇️ DescendPermit : TRUE = descente autorisée (pas de limite basse, pas de mou câble en mode récup, contacteur engagé)
 // Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 DescendPermit := NOT (
-    (((ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
+    (((Status.ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
     OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
-    OR (((ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
+    OR (((Status.ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
 );
 
 // ⬆️ AscentPermit : TRUE = montée autorisée (pas de fin course haut, pas de dépassement position)
 // Polarité positive Fail-Safe (TRUE = mouvement autorisé).
 AscentPermit := NOT (
-    (((ErrorId AND 16#0020) <> 16#0000
+    (((Status.ErrorId AND 16#0020) <> 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
     OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM)) AND NOT BypassTopLimitSoftware)
@@ -457,10 +457,10 @@ AscentPermit := NOT (
 // que la coupure locale n'a pas suffi.
 // bit13 (Méca E escalade) : PAS bit12 seul (détection immédiate = SafeStop uniquement ;
 // PowerCutOff seulement si l'arrêt n'est pas confirmé après délai).
-PowerCutOff := (ErrorId AND 16#2F84) <> 16#0000;
+PowerCutOff := (Status.ErrorId AND 16#2F84) <> 16#0000;
 
 // Busy, Done non utilisés mais présents pour conformité (comme FB_Diag_CanOpen)
-Busy := FALSE;
-Done := FALSE;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}

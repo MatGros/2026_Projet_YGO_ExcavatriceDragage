@@ -48,12 +48,8 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
-    Busy                            : BOOL;                           // <-- [STAT] Traitement en cours
-    Done                            : BOOL;                           // <-- [STAT] Action terminee
-    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
-    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur bitmask (bit0: ecart, bit1: incoherence)
-    State                           : E_State;                        // <-- [STAT] Etat courant machine d'etat FB
-    StateAtError                    : E_State;                        // <-- [DIAG] Etat memorise lors du dernier defaut
+    // ErrorId : <-- [DIAG] bitmask (bit0: ecart, bit1: incoherence)
+    Status                          : ST_FbStatus;                    // <-- [STAT] Statut FB groupe (Busy/Done/Error/State/StateAtError)
 
     // === MESURES ET DIAGNOSTICS DE SYNCHRO ===
     DeltaPosM                       : REAL;                           // <-- [DIAG] Ecart absolu position |M1 - M2| (m)
@@ -79,14 +75,14 @@ END_VAR
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE
 IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
-    State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
     DeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE;
     SyncDegradedStep1 := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
@@ -94,14 +90,14 @@ END_IF;
 
 {region "§2 Initialisation et activation synchro"}
 Ready := TRUE;
-State := E_State.READY;
+Status.State := E_State.READY;
 
 // 🔑 2. RESET FRONT
 ResetEdge(CLK := Reset);
 
 // 🌐 BYPASS GLOBAL : force ErrorId = 0 et ignore toute la surveillance synchro
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
 END_IF;
 
 // 🎚️ 3. SyncActive SELON MODE (Partie9 §9)
@@ -141,13 +137,13 @@ IF NOT BypassGlobal THEN
 DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM > CfgSyncToleranceM);
 DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
 IF DeviationTimer.Q THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q AND NOT DeviationActive THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
 // 🐢 Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
-SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM > CfgSyncToleranceM) OR ((ErrorId AND 16#0001) <> 16#0000));
+SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM > CfgSyncToleranceM) OR ((Status.ErrorId AND 16#0001) <> 16#0000));
 
 // 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1
 // Vérifie que les commandes envoyées aux deux treuils sont identiques (sens et contacteurs)
@@ -164,9 +160,9 @@ MismatchActive := SyncActive AND (
 MismatchTimer(IN := MismatchActive, PT := T#500ms);
 
 IF MismatchTimer.Q THEN
-    ErrorId := ErrorId OR 16#0002;
+    Status.ErrorId := Status.ErrorId OR 16#0002;
 ELSIF ResetEdge.Q THEN
-    ErrorId := ErrorId AND 16#FFFD;
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;
 END_IF; // fin du IF MismatchActive
 
 ELSE
@@ -177,14 +173,14 @@ END_IF; // fin IF NOT BypassGlobal
 
 {region "§5 Etats et diagnostic"}
 // 📤 6. SORTIES ÉTAT
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-SyncWarn := Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
-Busy := FALSE;
-Done := FALSE;
+SyncWarn := Status.Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}

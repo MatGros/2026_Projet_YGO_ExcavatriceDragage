@@ -26,12 +26,9 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
     Ready                  : BOOL;        // <-- [STAT] FB pret a fonctionner
-    Busy                   : BOOL;        // <-- [STAT] FB en cours de traitement
-    Done                   : BOOL;        // <-- [STAT] Traitement termine
-    Error                  : BOOL;        // <-- [STAT] Synthese defaut (ErrorId <> 0)
-    ErrorId                : WORD;        // <-- [DIAG] Code defaut (bit0: variation vitesse confirmee)
-    State                  : E_State;     // <-- [STAT] Etat courant du FB
-    StateAtError           : E_State;     // <-- [DIAG] Etat courant lors du dernier defaut
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: "variation vitesse confirmée".
+    Status                 : ST_FbStatus;
 
     // === RESULTATS & MESURES DIAGNOSTIC ===
     SpeedDeltaMps          : REAL;        // <-- [DIAG] Ecart absolu entre deux mesures (m/s)
@@ -58,11 +55,11 @@ END_VAR
 // 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     Ready := FALSE;
-    Busy := FALSE;
-    Done := FALSE;
-    Error := FALSE;
-    ErrorId := 16#0000;
-    State := E_State.DISABLED;
+    Status.Busy := FALSE;
+    Status.Done := FALSE;
+    Status.Error := FALSE;
+    Status.ErrorId := 16#0000;
+    Status.State := E_State.DISABLED;
     SpeedDeltaMps := 0.0;
     SpeedVariationDetected := FALSE;
     SpeedVariationConfirmed := FALSE;
@@ -75,9 +72,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 Ready := TRUE;
-Busy := FALSE;
-Done := FALSE;
-State := E_State.READY;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+Status.State := E_State.READY;
 {endregion}
 
 {region "§2 Reset front"}
@@ -111,17 +108,17 @@ StabilityTimer(IN := HasPreviousSpeed AND NOT VariationActive AND (SpeedStabilit
 SpeedStable := StabilityTimer.Q;
 
 IF SpeedVariationConfirmed THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q AND NOT VariationActive THEN
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 {endregion}
 
 {region "§5 Sorties état"}
 // 📤 5. SORTIES D'ÉTAT — diagnostic standard, aucune commande mouvement.
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 {endregion}

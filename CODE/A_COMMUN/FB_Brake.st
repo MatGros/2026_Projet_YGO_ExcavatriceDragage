@@ -26,12 +26,9 @@ END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DERIVATION ===
     Ready                   : BOOL;               // <-- [STAT] FB pret a fonctionner
-    Busy                    : BOOL;               // <-- [STAT] Sequence temporisee en cours
-    Done                    : BOOL;               // <-- [STAT] Frein ouvert/relache confirme
-    Error                   : BOOL;               // <-- [STAT] Defaut actif sur le frein
-    ErrorId                 : WORD;               // <-- [DIAG] Masque de defauts (bit0: incoherence retour)
-    State                   : E_State;            // <-- [STAT] Etat operationnel courant
-    StateAtError            : E_State;            // <-- [STAT] Etat memorise lors du defaut
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: "incoherence retour contacteur".
+    Status                  : ST_FbStatus;
 
     // === COMMANDES ET CONFIRMATIONS ===
     BrakeCmd                : BOOL;               // <-- [ACT]  Commande bobine frein (TRUE = relache/ouvert)
@@ -56,8 +53,8 @@ IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     RETURN;
 END_IF;
 
@@ -77,21 +74,21 @@ IF MovementRequested THEN
     TonMagnetise(IN := TRUE, PT := DelayMagnetise + DelayContactClose);
     IF TonMagnetise.Q THEN
         BrakeCmd := TRUE;              // ✅ Contacteur + magnétisation acquis → relâche
-        State := E_State.DONE;
+        Status.State := E_State.DONE;
     ELSE
         BrakeCmd := FALSE;             // ⏳ Encore collé pendant la magnétisation
-        State := E_State.BUSY;
+        Status.State := E_State.BUSY;
     END_IF;
 ELSE
     // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY);
-Done := (State = E_State.DONE);
+Status.Busy := (Status.State = E_State.BUSY);
+Status.Done := (Status.State = E_State.DONE);
 {endregion}
 
 {region "§4 Double vérification contacteur"}
@@ -107,18 +104,18 @@ IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
         ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);            // relâche commandée (BrakeCmd=TRUE), frein reste serré (ContactorFeedback=FALSE)
         ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);             // serrage commandé (BrakeCmd=FALSE), frein reste ouvert (ContactorFeedback=TRUE)
-        ErrorId := ErrorId OR 16#0001;
+        Status.ErrorId := Status.ErrorId OR 16#0001;
     ELSIF ResetEdge.Q THEN
         ContactorCheck.StuckClosed := FALSE;
         ContactorCheck.StuckOpen   := FALSE;
-        ErrorId := ErrorId AND 16#FFFE;
+        Status.ErrorId := Status.ErrorId AND 16#FFFE;
     END_IF;
 ELSE
     ContactorCheck.StuckClosed := FALSE;
     ContactorCheck.StuckOpen   := FALSE;
-    ErrorId := ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
     IF BypassEdge.Q THEN
-        StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
+        Status.StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
     END_IF;
 END_IF;
 
@@ -126,16 +123,16 @@ END_IF;
 
 {region "§5 Arbitrage error"}
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 {endregion}
 
 {region "§6 Sortie sûre"}
 // 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
-IF Error THEN
+IF Status.Error THEN
     BrakeCmd := FALSE;
 END_IF;
 {endregion}

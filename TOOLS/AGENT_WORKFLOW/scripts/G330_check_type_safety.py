@@ -38,6 +38,30 @@ def check_type_safety() -> list[str]:
                 fields[mem] = typ
             struct_members[struct_name] = fields
 
+    # 1bis. Collecter les membres VAR_OUTPUT des FUNCTION_BLOCK (instances FB).
+    # Un membre `Status : ST_FbStatus` (forme cible T137) doit être résolu par la chaîne
+    # d'accès `instXxx.Status.Busy` — sinon le guard G330 (type-blind sur les FB) signalait
+    # à tort "Type FB_Xxx n'est pas une STRUCT connue" dès qu'un FB migre vers ST_FbStatus
+    # (REX : la forme plate `instXxx.Busy` n'était jamais vue car mono-membre, invisible au regex).
+    fb_decl = re.compile(r"FUNCTION_BLOCK(?:\s+PUBLIC)?\s+(?P<name>FB_\w+)", re.MULTILINE)
+    fb_output = re.compile(r"\bVAR_OUTPUT\b(?P<body>.*?)\bEND_VAR\b", re.DOTALL)
+    for path in sorted(CODE_DIR.rglob("*.st")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        fb_match = fb_decl.search(text)
+        if not fb_match:
+            continue
+        fb_name = fb_match.group("name")
+        out_match = fb_output.search(text)
+        if not out_match:
+            continue
+        fields: dict[str, str] = {}
+        for fmatch in field_decl.finditer(out_match.group("body")):
+            mem = fmatch.group("member")
+            typ = fmatch.group("type")
+            fields[mem] = typ
+        # Ne pas écraser une éventuelle STRUCT homonyme ; n'enregistre que les FB réels.
+        struct_members.setdefault(fb_name, {}).update(fields)
+
     # 2. Collecter les variables GVLs / VAR_INPUT / VAR_OUTPUT / VAR locales et leurs types
     var_decl = re.compile(r"^\s*(?P<var>[A-Za-z_]\w*)\s*:\s*(?P<type>[A-Za-z_]\w*)", re.MULTILINE)
     gvl_vars: dict[str, dict[str, str]] = {}

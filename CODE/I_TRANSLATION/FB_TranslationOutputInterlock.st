@@ -23,13 +23,10 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
-    Ready                        : BOOL;   // <-- [STAT] FB pret a fonctionner
-    Busy                         : BOOL;   // <-- [STAT] Interlock actif
-    Done                         : BOOL;   // <-- [STAT] Action terminee
-    Error                        : BOOL;   // <-- [STAT] Synthese defaut
-    ErrorId                      : WORD;   // <-- [DIAG] Code erreur (bit0: timeout desserrage frein)
-    State                        : E_State;   // <-- [STAT] Etat courant machine d'etat
-    StateAtError                 : E_State;   // <-- [DIAG] Etat memorise lors du dernier defaut
+    Ready                        : BOOL;   // <-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: "timeout desserrage frein".
+    Status                       : ST_FbStatus;
     Reason                       : E_TranslationFinalInterlockReason;   // <-- [DIAG] Cause de blocage
 
     // === ORDRES ACTIONNEURS VALIDES ===
@@ -78,11 +75,11 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DriveFreqRefWord := 0;
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     // ErrorId reste publiquement visible même hors Enable/AU : une retombée de gate
     // ne doit jamais masquer un timeout mémorisé ni remplacer l'acquittement conscient.
-    Error := (ErrorId <> 16#0000);
-    State := E_State.DISABLED;
+    Status.Error := (Status.ErrorId <> 16#0000);
+    Status.State := E_State.DISABLED;
     Reason := E_TranslationFinalInterlockReason.NONE;
     RETURN;
 END_IF;
@@ -118,22 +115,22 @@ IF ResetEdge.Q THEN
     ResetRequired := FALSE;
 END_IF;
 IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
-    ErrorId := ErrorId OR 16#0001;
+    Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSE
-    ErrorId := ErrorId AND 16#FFFE;
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
 END_IF;
 
-Error := (ErrorId <> 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId <> 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
 // Le mot 7 est un reset AC600, pas un neutre opérateur : il reste autorisé avec
 // fréquence nulle mais ne solde pas RestartInhibit. Seul le mot 0, vu APRÈS
 // disparition de la cause et front Reset, autorise ensuite une nouvelle demande.
-IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
+IF RestartInhibit AND NOT Status.Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     IF RequestedDriveControlWord = 0 THEN
         NeutralRequestSeen := TRUE;
     ELSIF NeutralRequestSeen AND MovementRequested THEN
@@ -149,21 +146,21 @@ DriveFreqRefWord := 0;
 // SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
 // maintenu. La commande/frein suivent cette rampe jusqu'à demande nulle ; seul
 // un gate dur, timeout ou défaut final impose ici la coupure immédiate.
-BrakeCmd := BrakeReleaseRequest AND NOT Error AND NOT RestartInhibit;
-Ready := NOT Error AND NOT RestartInhibit;
-Busy := FALSE;
-Done := FALSE;
-State := E_State.READY;
+BrakeCmd := BrakeReleaseRequest AND NOT Status.Error AND NOT RestartInhibit;
+Ready := NOT Status.Error AND NOT RestartInhibit;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+Status.State := E_State.READY;
 
-IF Error THEN
+IF Status.Error THEN
     BrakeCmd := FALSE;
-    State := E_State.DISABLED;
+    Status.State := E_State.DISABLED;
 ELSIF RequestedDriveControlWord = 7 THEN
     // Reset AC600 préservé, toujours sans consigne fréquence ni couple utile.
     DriveControlWord := 7;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
-    State := E_State.INIT;
+    Status.State := E_State.INIT;
 ELSIF MovementRequested THEN
     // Double condition obligatoire : ordre effectif de desserrage ET confirmation
     // contacteur/bobine. Une confirmation résiduelle seule ne peut jamais autoriser
@@ -171,11 +168,11 @@ ELSIF MovementRequested THEN
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
         DriveFreqRefHz := MAX(0.0, RequestedDriveFreqHz);
-        Busy := TRUE;
-        State := E_State.BUSY;
+        Status.Busy := TRUE;
+        Status.State := E_State.BUSY;
     ELSE
-        Busy := TRUE;
-        State := E_State.INIT;
+        Status.Busy := TRUE;
+        Status.State := E_State.INIT;
     END_IF;
 END_IF;
 

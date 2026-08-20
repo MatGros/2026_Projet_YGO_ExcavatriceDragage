@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T20:48:57.808902" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T20:48:57.808902">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:08:42.358270" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:08:42.358270">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -669,123 +669,6 @@
           </data>
         </addData>
       </dataType>
-      <dataType name="E_State">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="INIT" value="1" />
-              <value name="READY" value="2" />
-              <value name="BUSY" value="3" />
-              <value name="DONE" value="4" />
-              <value name="STOPPING" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BUSY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>DONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STOPPING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="ST_ContactorCheck">
-        <baseType>
-          <struct>
-            <variable name="Command">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre envoyé au contacteur (TRUE = fermé/actif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Feedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour d'état câblé (TRUE = effectivement fermé)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StuckClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StuckOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag : commande ON mais retour OFF depuis trop longtemps</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>cdabe1c4-dd5c-530c-a1a2-2825fa969858</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
-   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_FbStatus">
         <baseType>
           <struct>
@@ -860,6 +743,123 @@
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    =======================================================================</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="ST_ContactorCheck">
+        <baseType>
+          <struct>
+            <variable name="Command">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre envoyé au contacteur (TRUE = fermé/actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Feedback">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour d'état câblé (TRUE = effectivement fermé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StuckClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StuckOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diag : commande ON mais retour OFF depuis trop longtemps</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cdabe1c4-dd5c-530c-a1a2-2825fa969858</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="INIT" value="1" />
+              <value name="READY" value="2" />
+              <value name="BUSY" value="3" />
+              <value name="DONE" value="4" />
+              <value name="STOPPING" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STOPPING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+          </data>
+        </addData>
       </dataType>
       <dataType name="E_TranslationFinalInterlockReason">
         <baseType>
@@ -1432,10 +1432,10 @@ TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationState.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
-TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.State;
+TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.State;
 TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
-TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Error;
-TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.ErrorId;
+TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.Error;
+TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.Status.ErrorId;
 TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
 TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) &lt;&gt; 0;
 TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) &lt;&gt; 0;
@@ -1448,8 +1448,8 @@ TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 // ci-dessus, bitfield différent, jamais mélangé.
 TranslationSafety.SafeStop := M3_SafeStop_Aggregate;
 TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
-TranslationSafety.Error := instSafetyTranslationM3.Error;
-TranslationSafety.ErrorId := instSafetyTranslationM3.ErrorId;
+TranslationSafety.Error := instSafetyTranslationM3.Status.Error;
+TranslationSafety.ErrorId := instSafetyTranslationM3.Status.ErrorId;
 TranslationSafety.ErrorOperatorComm := instSafetyTranslationM3.ErrorOperatorComm;
 TranslationSafety.ErrorDriveComm := instSafetyTranslationM3.ErrorDriveComm;
 TranslationSafety.ErrorPhaseRotation := instSafetyTranslationM3.ErrorPhaseRotation;
@@ -1763,55 +1763,16 @@ Data.TranslationSafety                := TranslationSafety;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt (sortie libre, hors ST_FbStatus)</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB occupé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Synthèse défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat mémorisé au dernier défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Perte communication opérateur" - joystick CAN ou heartbeat IHM absent ; bit1: "Perte communication EtherCAT" - perte com EtherCAT ; bit2: "Défaut Rotation Phases" - rotation phases ; bit3: "Surchauffe Frein Translation" - thermique frein ; bit4: "Absence confirmation arrêt (Méca B)" - Méca B (incohérence arrêt) ; bit5: "Mouvement non commandé (Méca A)" - Méca A (mouvement non commandé) ; bit6: "Limite extrême Translation atteinte" - Fdc extrême atteint ; bit7: "Incohérence mot capteurs position" - combinaison des 5 capteurs Trémie/PV/P2/P1/Maintenance hors table valide</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -2011,9 +1972,9 @@ Data.TranslationSafety                := TranslationSafety;
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
-    // 🛡️ ErrorId conservé : la cause du dernier défaut reste visible IHM.
-    // Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
-    Error := (ErrorId &lt;&gt; 16#0000);
+    // 🛡️ Status.ErrorId conservé : la cause du dernier défaut reste visible IHM.
+    // Status.Error en miroir de cette cause ; les sorties restent fail-safe (lignes ci-dessous).
+    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
     SafeStop := FALSE;
     PowerCutOff := FALSE;
     ErrorOperatorComm := FALSE;
@@ -2028,8 +1989,8 @@ IF NOT Enable THEN
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
-    State := E_State.DISABLED;
-    Busy := FALSE; Done := FALSE; Ready := FALSE;
+    Status.State := E_State.DISABLED;
+    Status.Busy := FALSE; Status.Done := FALSE; Ready := FALSE;
     RETURN;
 END_IF;
 
@@ -2042,14 +2003,14 @@ ResetEdge(CLK := Reset);
 // 🧹 Initialisation au premier scan : purge des résidus RAM d'un Online Change / Warm Start et évitement des alarmes transitoires
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     RETURN;
 END_IF;
 
-// 🌐 BYPASS GLOBAL : si actif → force ErrorId = 0 et saute toutes les vérifications
+// 🌐 BYPASS GLOBAL : si actif → force Status.ErrorId = 0 et saute toutes les vérifications
 // (les bits d'erreur resteraient coincés si on ne les nettoie pas)
 IF BypassGlobal THEN
-    ErrorId := 16#0000;
+    Status.ErrorId := 16#0000;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
 END_IF;
@@ -2066,42 +2027,42 @@ IF NOT BypassGlobal THEN
     // 🔍 2. PERTE COMMUNICATION OPÉRATEUR (bit0) — joystick CAN ou heartbeat IHM.
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
         IF (NOT JoystickOnline OR NOT JoystickOperational OR NOT HeartbeatIhmOk) THEN
-            ErrorId := ErrorId OR 16#0001;
+            Status.ErrorId := Status.ErrorId OR 16#0001;
         ELSE
-            ErrorId := ErrorId AND 16#FFFE; (* Effacement auto si la com repasse saine *)
+            Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Effacement auto si la com repasse saine *)
         END_IF;
     ELSIF NOT TonStartupWarmup.Q THEN
-        ErrorId := ErrorId AND 16#FFFE; (* Inhibition pendant l'initialisation boot *)
+        Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Inhibition pendant l'initialisation boot *)
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFE; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFE; END_IF;
 
     // 🔍 2bis. PERTE ETHERCAT VARIATEUR M3 (bit1)
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassDriveComm) THEN
         IF (NOT DriveOnline OR NOT DriveOperational) THEN
-            ErrorId := ErrorId OR 16#0002;
+            Status.ErrorId := Status.ErrorId OR 16#0002;
         ELSE
-            ErrorId := ErrorId AND 16#FFFD; (* Effacement auto si l'EtherCAT variateur M3 repasse sain *)
+            Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Effacement auto si l'EtherCAT variateur M3 repasse sain *)
         END_IF;
     ELSIF NOT TonStartupWarmup.Q THEN
-        ErrorId := ErrorId AND 16#FFFD; (* Inhibition pendant l'initialisation boot *)
+        Status.ErrorId := Status.ErrorId AND 16#FFFD; (* Inhibition pendant l'initialisation boot *)
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFD; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFD; END_IF;
 
     // 🔍 3. MAUVAISE ROTATION DE PHASE (bit2)
     IF NOT (BypassProcess OR BypassPhaseRotation) THEN
         IF NOT PhaseRotationOk THEN
-            ErrorId := ErrorId OR 16#0004;
+            Status.ErrorId := Status.ErrorId OR 16#0004;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFFB; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFFB; END_IF;
 
     // 🔍 3ter. THERMIQUE FREIN COMMUN M1/M2/M3 (bit3)
     IF NOT (BypassSafety OR BypassBrakeThermal) THEN
         IF BrakeThermalFeedback THEN
-            ErrorId := ErrorId OR 16#0008;
+            Status.ErrorId := Status.ErrorId OR 16#0008;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFF7; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFF7; END_IF;
 
     // 🔍 3quater. INCOHÉRENCE À L'ARRÊT (Méca B — bit4)
     IF NOT (BypassSafety OR BypassMecaB) THEN
@@ -2113,11 +2074,11 @@ IF NOT BypassGlobal THEN
             UncommandedActiveB := FALSE;
         END_IF;
         TonMecaB(IN := UncommandedActiveB, PT := PostRampTimeout);
-        IF TonMecaB.Q THEN ErrorId := ErrorId OR 16#0010; END_IF;
+        IF TonMecaB.Q THEN Status.ErrorId := Status.ErrorId OR 16#0010; END_IF;
     ELSE
         TonMecaB(IN := FALSE);
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFEF; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFEF; END_IF;
 
     // 🔍 3quinquies. MOUVEMENT NON COMMANDÉ (Méca A — bit5)
     IF NOT (BypassSafety OR BypassMecaA) THEN
@@ -2127,16 +2088,16 @@ IF NOT BypassGlobal THEN
             UncommandedActiveA := FALSE;
         END_IF;
         TonMecaA(IN := UncommandedActiveA, PT := T#1S);
-        IF TonMecaA.Q THEN ErrorId := ErrorId OR 16#0020; END_IF;
+        IF TonMecaA.Q THEN Status.ErrorId := Status.ErrorId OR 16#0020; END_IF;
     ELSE
         TonMecaA(IN := FALSE);
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FFDF; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FFDF; END_IF;
 
     // 🔍 3sexies. SURVEILLANCE ESCALADE FIN DE COURSE (bit6)
     IF (BypassSafety OR BypassLimitSwitch) THEN
         // Nettoie le bit 6 résiduel (posé avant activation du bypass)
-        ErrorId := ErrorId AND 16#FFBF;
+        Status.ErrorId := Status.ErrorId AND 16#FFBF;
         TonLimitSwitchOverrun(IN := FALSE);
     ELSE
         // 🧱 L'erreur 64 (escalade / poussée anormale en butée) ne s'active QUE SI :
@@ -2148,23 +2109,23 @@ IF NOT BypassGlobal THEN
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
 
         IF TonLimitSwitchOverrun.Q THEN
-            ErrorId := ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
+            Status.ErrorId := Status.ErrorId OR 16#0040; // Défaut escalade confirmé (coupure puissance amont)
         ELSE
             // Si la poussée dans le mauvais sens cesse (ou si on repart en arrière), le défaut s'auto-efface
-            ErrorId := ErrorId AND 16#FFBF;
+            Status.ErrorId := Status.ErrorId AND 16#FFBF;
         END_IF;
     END_IF;
 
     // 🔍 3septies. INCOHÉRENCE MOT CAPTEURS POSITION (bit7)
     IF (BypassSafety OR BypassSensorIncoherent) THEN
         // Nettoye le bit 7 résiduel
-        ErrorId := ErrorId AND 16#FF7F;
+        Status.ErrorId := Status.ErrorId AND 16#FF7F;
     ELSE
         IF SensorWordIncoherent THEN
-            ErrorId := ErrorId OR 16#0080;
+            Status.ErrorId := Status.ErrorId OR 16#0080;
         END_IF;
     END_IF;
-    IF ResetEdge.Q THEN ErrorId := ErrorId AND 16#FF7F; END_IF;
+    IF ResetEdge.Q THEN Status.ErrorId := Status.ErrorId AND 16#FF7F; END_IF;
 
 END_IF; // fin IF NOT BypassGlobal
 
@@ -2172,34 +2133,34 @@ END_IF; // fin IF NOT BypassGlobal
 
 {region "§4 Arbitrage sorties et etat"}
 // 📤 4. ARBITRAGE DES SORTIES MAÎTRESSES
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 
-SafeStop := Error OR NOT PowerContactorEngaged;
+SafeStop := Status.Error OR NOT PowerContactorEngaged;
 
 // PowerCutOff actif si thermique frein (bit3), incohérence arrêt (bit4),
 // mouvement non commandé (bit5), dépassement de fin de course (bit6),
 // ou incohérence mot capteurs position (bit7)
-PowerCutOff := (ErrorId AND 16#00F8) &lt;&gt; 16#0000;
+PowerCutOff := (Status.ErrorId AND 16#00F8) &lt;&gt; 16#0000;
 
-// Décapsulage du bitfield ErrorId pour l'IHM
-ErrorOperatorComm   := (ErrorId AND 16#0001) &lt;&gt; 16#0000;
-ErrorDriveComm      := (ErrorId AND 16#0002) &lt;&gt; 16#0000;
-ErrorPhaseRotation  := (ErrorId AND 16#0004) &lt;&gt; 16#0000;
-ErrorBrakeThermal   := (ErrorId AND 16#0008) &lt;&gt; 16#0000;
-ErrorMecaB          := (ErrorId AND 16#0010) &lt;&gt; 16#0000;
-ErrorMecaA          := (ErrorId AND 16#0020) &lt;&gt; 16#0000;
-ErrorLimitSwitch    := (ErrorId AND 16#0040) &lt;&gt; 16#0000;
-ErrorSensorIncoherent := (ErrorId AND 16#0080) &lt;&gt; 16#0000;
+// Décapsulage du bitfield Status.ErrorId pour l'IHM
+ErrorOperatorComm   := (Status.ErrorId AND 16#0001) &lt;&gt; 16#0000;
+ErrorDriveComm      := (Status.ErrorId AND 16#0002) &lt;&gt; 16#0000;
+ErrorPhaseRotation  := (Status.ErrorId AND 16#0004) &lt;&gt; 16#0000;
+ErrorBrakeThermal   := (Status.ErrorId AND 16#0008) &lt;&gt; 16#0000;
+ErrorMecaB          := (Status.ErrorId AND 16#0010) &lt;&gt; 16#0000;
+ErrorMecaA          := (Status.ErrorId AND 16#0020) &lt;&gt; 16#0000;
+ErrorLimitSwitch    := (Status.ErrorId AND 16#0040) &lt;&gt; 16#0000;
+ErrorSensorIncoherent := (Status.ErrorId AND 16#0080) &lt;&gt; 16#0000;
 
-Busy := FALSE;
-Done := FALSE;
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 // 🚦 5. STATE MACHINE (phase diagnostic)
-State := E_State.READY;
+Status.State := E_State.READY;
 
 
 {endregion}
@@ -2968,7 +2929,7 @@ BrakeContactorCheck := Brake.ContactorCheck;
 
 {region "§7 Diagnostic etat et repli defaut"}
 // 🧾 7. ERRORID (bitfield, cumul)
-IF Brake.Error THEN
+IF Brake.Status.Error THEN
     Status.ErrorId := Status.ErrorId OR 16#0001;
 ELSIF ResetEdge.Q THEN
     Status.ErrorId := Status.ErrorId AND 16#FFFE;
@@ -3490,52 +3451,13 @@ PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremie
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
-            <variable name="Busy">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence temporisee en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Done">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Frein ouvert/relache confirme</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Error">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Defaut actif sur le frein</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Masque de defauts (bit0: incoherence retour)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat operationnel courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StateAtError">
-              <type>
-                <derived name="E_State" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat memorise lors du defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "incoherence retour contacteur".</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeCmd">
@@ -3637,8 +3559,8 @@ IF NOT Enable THEN
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;
-    State := E_State.DISABLED;
-    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
     RETURN;
 END_IF;
 
@@ -3658,21 +3580,21 @@ IF MovementRequested THEN
     TonMagnetise(IN := TRUE, PT := DelayMagnetise + DelayContactClose);
     IF TonMagnetise.Q THEN
         BrakeCmd := TRUE;              // ✅ Contacteur + magnétisation acquis → relâche
-        State := E_State.DONE;
+        Status.State := E_State.DONE;
     ELSE
         BrakeCmd := FALSE;             // ⏳ Encore collé pendant la magnétisation
-        State := E_State.BUSY;
+        Status.State := E_State.BUSY;
     END_IF;
 ELSE
     // Sécurité positive : fermeture immédiate du frein (collé) dès que les contacteurs de sens s'ouvrent
     TonMagnetise(IN := FALSE, PT := DelayMagnetise + DelayContactClose);
     TonDecel(IN := FALSE, PT := DelayMotorDecel);
     BrakeCmd := FALSE;                 // Fermeture immédiate
-    State := E_State.READY;
+    Status.State := E_State.READY;
 END_IF;
 
-Busy := (State = E_State.BUSY);
-Done := (State = E_State.DONE);
+Status.Busy := (Status.State = E_State.BUSY);
+Status.Done := (Status.State = E_State.DONE);
 {endregion}
 
 {region "§4 Double vérification contacteur"}
@@ -3688,18 +3610,18 @@ IF NOT BypassContactorCheck THEN
     IF TonFeedback.Q THEN
         ContactorCheck.StuckClosed := (BrakeCmd AND NOT ContactorFeedback);            // relâche commandée (BrakeCmd=TRUE), frein reste serré (ContactorFeedback=FALSE)
         ContactorCheck.StuckOpen   := (NOT BrakeCmd AND ContactorFeedback);             // serrage commandé (BrakeCmd=FALSE), frein reste ouvert (ContactorFeedback=TRUE)
-        ErrorId := ErrorId OR 16#0001;
+        Status.ErrorId := Status.ErrorId OR 16#0001;
     ELSIF ResetEdge.Q THEN
         ContactorCheck.StuckClosed := FALSE;
         ContactorCheck.StuckOpen   := FALSE;
-        ErrorId := ErrorId AND 16#FFFE;
+        Status.ErrorId := Status.ErrorId AND 16#FFFE;
     END_IF;
 ELSE
     ContactorCheck.StuckClosed := FALSE;
     ContactorCheck.StuckOpen   := FALSE;
-    ErrorId := ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;   // Bypass actif : efface/maintient à 0 le bit 0
     IF BypassEdge.Q THEN
-        StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
+        Status.StateAtError := E_State.DISABLED; // Front activation bypass : débloque l'état figé
     END_IF;
 END_IF;
 
@@ -3707,16 +3629,16 @@ END_IF;
 
 {region "§5 Arbitrage error"}
 // 🧾 5. ARBITRAGE ERROR / STATEATERROR (figé jusqu'à acquittement)
-Error := (ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Error);
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
 IF ErrorEdge.Q THEN
-    StateAtError := State;
+    Status.StateAtError := Status.State;
 END_IF;
 {endregion}
 
 {region "§6 Sortie sûre"}
 // 🛡️ 6. SORTIE SÛRE SUR DÉFAUT
-IF Error THEN
+IF Status.Error THEN
     BrakeCmd := FALSE;
 END_IF;
 {endregion}
@@ -4001,12 +3923,12 @@ Current := LIMIT(-100.0, Current, 100.0);
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
-          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
+          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
       </ProjectStructure>
     </data>
