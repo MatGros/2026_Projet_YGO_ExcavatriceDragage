@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T03:37:14.351968" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T03:37:14.351968">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T13:58:06.274517" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T13:58:06.274517">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -292,6 +292,39 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M2 incoherente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimulationBypassActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧪 Simulation &amp; variateur M3 filtré ===
+🧪 Bypass simulation treuils (consommé PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Impulsion 1 cycle si source Winch bascule (IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_StatusWord_Filtered">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat variateur M3 filtre (consommé PRG_05)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ActualFrequencyHz_Filtered">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Frequence reelle M3 filtree (consommé PRG_05)</xhtml>
               </documentation>
             </variable>
           </struct>

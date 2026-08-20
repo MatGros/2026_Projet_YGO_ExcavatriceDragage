@@ -100,6 +100,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Mou de cable ignore car simulation active</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 PLC→IHM : source Winch a bascule (reel/simu) ce cycle</xhtml>
+              </documentation>
+            </variable>
             <variable name="TglHeartbeatIhm">
               <type>
                 <BOOL />

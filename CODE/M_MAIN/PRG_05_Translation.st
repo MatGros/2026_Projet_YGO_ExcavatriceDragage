@@ -116,7 +116,7 @@ END_IF;
 // les autres (jeton "dernier point franchi" unique). Libéré
 // (RAZ complet) UNIQUEMENT sur mouvement CONFIRMÉ (fréquence réelle mesurée, pas juste la consigne
 // de sens) soutenu ≥1.5s — pas un rebond capteur ni un changement de sens instantané.
-M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0) > 0.5;
+M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0) > 0.5;
 TonM3ConfirmedMoving(IN := M3_ConfirmedMoving, PT := T#1s500ms);
 
 IF PRG_02_Acquisition.Data.TranslationAtTremie THEN
@@ -261,8 +261,8 @@ instSafetyTranslationM3(
     BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     DriveOnline             := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Online,
     DriveOperational        := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Operational,
-    DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
-    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
+    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
     Direction               := M3_Direction_Active,
@@ -316,8 +316,8 @@ instTranslationM3(
                                    AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
-    DriveStatusWord         := PRG_02_Acquisition.M3_StatusWord_Filtered,
-    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
+    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
     CfgRampDecelNormalRate  := _TranslationRampDecelNormal_Pct,
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
@@ -334,7 +334,7 @@ instTranslationM3(
 instPosEstimatorM3(
     Enable               := (PRG_03_Modes_Cycle.Auth.Mode <> E_Mode.DISABLE),
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
-    DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     Direction            := M3_Direction_Active,
     SensorMaintenance    := PRG_02_Acquisition.Data.TranslationPosMaintenance,
     SensorP1             := PRG_02_Acquisition.Data.TranslationPosP1,
@@ -405,7 +405,7 @@ TranslationState.SensorsWord := PRG_02_Acquisition.Data.M3_SensorsWord;
 TranslationState.SensorWordIncoherent := PRG_02_Acquisition.Data.M3_SensorWordIncoherent;
 TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
-TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
+TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationState.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
 TranslationState.FinalInterlockState := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State;
@@ -413,8 +413,8 @@ TranslationState.FinalInterlockReason := PRG_06_Outputs_LD.instTranslationOutput
 TranslationState.FinalInterlockError := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Error;
 TranslationState.FinalInterlockErrorId := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.ErrorId;
 TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
-TranslationState.DriveCommReady := (PRG_02_Acquisition.M3_StatusWord_Filtered AND 16#0080) <> 0;
-TranslationState.DrivePowerReady := (PRG_02_Acquisition.M3_StatusWord_Filtered AND 16#0001) <> 0;
+TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) <> 0;
+TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) <> 0;
 TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
 TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 

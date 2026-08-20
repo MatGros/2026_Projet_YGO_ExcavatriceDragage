@@ -26,6 +26,7 @@ STRUCT
     (* 🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur *)
     SimTopSensorBypassActive  : BOOL; (* 🩺 Capteur haut ignore car simulation active *)
     SimSlackCableBypassActive : BOOL; (* 🩺 Mou de cable ignore car simulation active *)
+    WinchInputSourceChanged   : BOOL; (* 🔀 PLC→IHM : source Winch a bascule (reel/simu) ce cycle *)
 
     (* 💓 Heartbeat IHM↔PLC — IHM inverse TglHeartbeatIhm toutes les 500 ms. *)
     TglHeartbeatIhm        : BOOL; (* IHM→PLC : toggle périodique, jamais valeur constante *)
