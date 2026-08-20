@@ -120,9 +120,9 @@ VAR_GLOBAL PERSISTENT RETAIN
         ImmersionUpper_M := 0.5,
         ImmersionLower_M := -0.5,
         ExtractionControlDistance_M := 2.0,
-        TglEnableDiveSearch := TRUE,
-        TglEnableExtractionSequence := TRUE,
-        TglEnableDumpAtTremie := TRUE
+        TglEnableDiveSearch := FALSE,
+        TglEnableExtractionSequence := FALSE,
+        TglEnableDumpAtTremie := FALSE
     ); // 🌉 Pont FB_CfgPersistBridge_DredgingAssistCfg
 
     // 📏 RÉGLEMENTATION / LÉGAL

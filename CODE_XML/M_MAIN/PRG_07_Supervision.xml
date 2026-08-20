@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T15:06:02.887753" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T15:06:02.887753">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T17:25:34.289499" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T17:25:34.289499">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -300,7 +300,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance plongée mémorisé</xhtml>
@@ -311,7 +311,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance extraction mémorisé</xhtml>
@@ -322,7 +322,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance vidage trémie mémorisé</xhtml>
@@ -2161,7 +2161,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée active</xhtml>
@@ -2172,7 +2172,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction active</xhtml>
@@ -2210,7 +2210,7 @@ seule source de confirmation).</xhtml>
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: mode vidage à la trémie —</xhtml>
@@ -5764,6 +5764,104 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <derived name="FB_TroubleshootingView" />
               </type>
             </variable>
+            <variable name="PrevTranslationBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚦 MÉMOIRE SYNC BYPASS BIDIRECTIONNEL (RETAIN ↔ IHM) ===
+. [LOC] Memoire bypass Translation (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevM1Bypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass M1 (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevM2Bypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass M2 (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevSyncBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass synchro (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevCommunBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass commun global (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevLimitLegal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass limite legale (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevTopLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass fin de course haut (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevTopLimitSoftware">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass fin de course haut logiciel (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevCableLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass limite cable (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevSlackCable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass mou de cable (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimBypassRise">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧪 DÉTECTEURS FRONT SIMULATION BYPASS (pilotage bypass IHM) ===
+. [LOC] Front montant SimulationBypassActive</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimBypassFall">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant SimulationBypassActive</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -5942,35 +6040,92 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
     GVL_IHM.Commun.Bypass.Initialized := TRUE;
 END_IF;
 
-IF GVL_IHM.TranslationM3.Bypass.Global &lt;&gt; BypassTranslationGlobal THEN
+// 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
+IF GVL_IHM.TranslationM3.Bypass.Global &lt;&gt; PrevTranslationBypass THEN
     BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
+ELSE
+    GVL_IHM.TranslationM3.Bypass.Global := BypassTranslationGlobal;
 END_IF;
-IF GVL_IHM.M1TreuilRetenue.Bypass.Global &lt;&gt; BypassWinchM1Global THEN
+PrevTranslationBypass := GVL_IHM.TranslationM3.Bypass.Global;
+
+IF GVL_IHM.M1TreuilRetenue.Bypass.Global &lt;&gt; PrevM1Bypass THEN
     BypassWinchM1Global := GVL_IHM.M1TreuilRetenue.Bypass.Global;
+ELSE
+    GVL_IHM.M1TreuilRetenue.Bypass.Global := BypassWinchM1Global;
 END_IF;
-IF GVL_IHM.M2TreuilBenne.Bypass.Global &lt;&gt; BypassWinchM2Global THEN
+PrevM1Bypass := GVL_IHM.M1TreuilRetenue.Bypass.Global;
+
+IF GVL_IHM.M2TreuilBenne.Bypass.Global &lt;&gt; PrevM2Bypass THEN
     BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
+ELSE
+    GVL_IHM.M2TreuilBenne.Bypass.Global := BypassWinchM2Global;
 END_IF;
-IF GVL_IHM.M1M2Sync.Bypass.Global &lt;&gt; BypassSyncGlobal THEN
+PrevM2Bypass := GVL_IHM.M2TreuilBenne.Bypass.Global;
+
+IF GVL_IHM.M1M2Sync.Bypass.Global &lt;&gt; PrevSyncBypass THEN
     BypassSyncGlobal := GVL_IHM.M1M2Sync.Bypass.Global;
+ELSE
+    GVL_IHM.M1M2Sync.Bypass.Global := BypassSyncGlobal;
 END_IF;
-IF GVL_IHM.Commun.Bypass.Global &lt;&gt; BypassCommunGlobal THEN
+PrevSyncBypass := GVL_IHM.M1M2Sync.Bypass.Global;
+
+IF GVL_IHM.Commun.Bypass.Global &lt;&gt; PrevCommunBypass THEN
     BypassCommunGlobal := GVL_IHM.Commun.Bypass.Global;
+ELSE
+    GVL_IHM.Commun.Bypass.Global := BypassCommunGlobal;
 END_IF;
-IF GVL_IHM.Commun.Bypass.LimitLegal &lt;&gt; BypassLimitLegal THEN
+PrevCommunBypass := GVL_IHM.Commun.Bypass.Global;
+
+IF GVL_IHM.Commun.Bypass.LimitLegal &lt;&gt; PrevLimitLegal THEN
     BypassLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
+ELSE
+    GVL_IHM.Commun.Bypass.LimitLegal := BypassLimitLegal;
 END_IF;
-IF GVL_IHM.Commun.Bypass.TopLimitSwitch &lt;&gt; BypassTopLimitSwitch THEN
+PrevLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
+
+IF GVL_IHM.Commun.Bypass.TopLimitSwitch &lt;&gt; PrevTopLimitSwitch THEN
     BypassTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
+ELSE
+    GVL_IHM.Commun.Bypass.TopLimitSwitch := BypassTopLimitSwitch;
 END_IF;
-IF GVL_IHM.Commun.Bypass.TopLimitSoftware &lt;&gt; BypassTopLimitSoftware THEN
+PrevTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
+
+IF GVL_IHM.Commun.Bypass.TopLimitSoftware &lt;&gt; PrevTopLimitSoftware THEN
     BypassTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
+ELSE
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := BypassTopLimitSoftware;
 END_IF;
-IF GVL_IHM.Commun.Bypass.CableLimitSwitch &lt;&gt; BypassCableLimitSwitch THEN
+PrevTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
+
+IF GVL_IHM.Commun.Bypass.CableLimitSwitch &lt;&gt; PrevCableLimitSwitch THEN
     BypassCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
+ELSE
+    GVL_IHM.Commun.Bypass.CableLimitSwitch := BypassCableLimitSwitch;
 END_IF;
-IF GVL_IHM.Commun.Bypass.SlackCable &lt;&gt; BypassSlackCable THEN
+PrevCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
+
+IF GVL_IHM.Commun.Bypass.SlackCable &lt;&gt; PrevSlackCable THEN
     BypassSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+ELSE
+    GVL_IHM.Commun.Bypass.SlackCable := BypassSlackCable;
+END_IF;
+PrevSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+
+// 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
+// La simulation emprunte le chemin IHM : SimulationBypassActive set/reset les bypass IHM
+// (TopLimitSwitch / TopLimitSoftware / LimitLegal) au lieu d'un OR direct dans le code.
+SimBypassRise(CLK := GVL_Simulation.SimulationBypassActive);
+SimBypassFall(CLK := GVL_Simulation.SimulationBypassActive);
+
+IF SimBypassRise.Q THEN
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
+    GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
+END_IF;
+IF SimBypassFall.Q THEN
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
+    GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
 END_IF;
 
 {endregion}
