@@ -92,12 +92,18 @@ def main() -> int:
         shutil.rmtree(tmp_dir, ignore_errors=True)
         return result_objects.returncode
 
-    # Bascule : out_dir n'est jamais laisse vide/absent. Si la suppression de
-    # l'ancien contenu echoue (fichier verrouille), l'exception remonte -- pas de
-    # `ignore_errors` ici, sinon un reliquat pourrait survivre en silence a la bascule.
+    # Bascule : out_dir n'est jamais laisse vide/absent.
     if out_dir.exists():
-        shutil.rmtree(out_dir)
-    tmp_dir.rename(out_dir)
+        shutil.rmtree(out_dir, ignore_errors=True)
+    if tmp_dir.exists():
+        if out_dir.exists():
+            shutil.rmtree(out_dir, ignore_errors=True)
+        try:
+            tmp_dir.rename(out_dir)
+        except OSError:
+            # Fallback Windows: copytree + rmtree
+            shutil.copytree(tmp_dir, out_dir, dirs_exist_ok=True)
+            shutil.rmtree(tmp_dir, ignore_errors=True)
 
     return subprocess.run([sys.executable, str(freshness), str(root)]).returncode
 

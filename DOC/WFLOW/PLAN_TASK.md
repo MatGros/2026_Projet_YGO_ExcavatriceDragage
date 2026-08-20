@@ -26,20 +26,21 @@
 
 | Ordre | Lot fonctionnel | Tâches | Dépendances / décision | Statut | Lock Agent | Validation utilisateur |
 |---:|---|---|---|:---:|:---:|---|
-| 1 | Fiabilisation mesure Winch | T84 + T85 + T86 | Fenêtre interne 50 ms ; producteur chaîne codeur ; pulse source générique depuis `PRG_00` ; T87 reporté au lot étude 4 (T91/T93) | ⏳ | PI-01 | ⏳ Validation code attendue |
+| 1 | Fiabilisation mesure Winch | T84 + T85 + T86 | Fenêtre interne 50 ms ; producteur chaîne codeur ; pulse source générique depuis `PRG_02` ; vitesse opérationnelle | ⏳ | PI-01 | ⏳ Validation code attendue |
 | 2 | Assistants Kobold maintenance | T81 + T82 | `FB_DiveSearch` : `0→1→0` ; `FB_ExtractionSequence` : fermeture, palier 1 sur 2 m puis nominal ; hors `FB_Cycle` | ⏳ | PI-01 | ⏳ Validation CODESYS/terrain requise |
 | 3 | Garde-fou et calibration paliers | T94 + T95 + T96 | Dépend du lot 1 : mesure vitesse fiabilisée avant calibration ; T96 = mode apprentissage auto (remplace saisie manuelle T95) | ⬜ | — | — |
-| 4 | Frein et commande par paliers | T91 + T93 + décision T87 | Étude montée/descente avant code ; ne pas choisir arbitrairement le sort de `DelayMotorDecel` | ⬜ | — | — |
+| 4 | Frein et commande par paliers | T91 + T93 | Étude montée/descente avant code (T87 clos : frein piloté sur contacteurs) | ⬜ | — | — |
 | 5 | Reliquats safety | T72 + T73 + T74 | Réévaluer l’état réel du code après les lots précédents | ⬜ | — | — |
 | 2A | Interlocks finaux frein / puissance | Lot 3A | `FB_WinchOutputInterlock_LD` + `FB_TranslationOutputInterlock_LD` ; `SafeStop` reste la rampe rapide métier, tests PLC préparés ; qualification CODESYS/simulation à faire | ⏳ | PI-01 | ⏳ Validation CODESYS/terrain requise |
 | 7 | Translation M3 — sécurité, sortie moteur, homme-mort | T104 + T105 + T106 + T107 | Audit 2026-08-05 (session M3), 4 lots implémentés dans l'ordre LOT0 → M4 → LOT3 → LOT2, `check_linkage.py`/`check_ld_invariants.py`/bundle PASS à chaque lot | ⏳ | HUM | 🟢 Prêt à tester (mise en service) |
-| 6 | Améliorations secondaires | T75 + T76 + T77 + T79 + T88 | T78 attend la décision T93 (T84/T85/T86 déjà implémentés au lot 1, T87 reporté au lot 4) | ⏸️ | — | — |
+| 6 | Améliorations secondaires | T76 + T77 + T79 + T88 | T78 attend la décision T93 (T75 clos, T84/T85/T86 déjà implémentés au lot 1) | ⏸️ | — | — |
 | 8 | Audit doc — lot C4 AU Troubleshooting | Vérifier clôture du lot (§06) | REGISTRE + TEST_DESIGN C4 AU | ⏳ | DSH-01 | ✅ Vérification clôture faite 2026-08-18 : code implémenté (`Step4_ContactorReleased` + préconditions AF01 en lecture seule, 2026-08-14), cohérent avec TEST_DESIGN. ⏳ Essais Watch C4-001→005 non exécutés — validation CODESYS/terrain en suspens |
 | 9 | Audit outillage `TOOLS/AGENT_WORKFLOW` | Purge Herdr/Pi, réécriture C0-C4 vers agents natifs, archivage `G220`, nettoyage `PROJECT_WORKSPACE` | Herdr/Pi abandonné (confirmé 2026-08-17) ; C0-C4 rebranché sur antigravity/Codex/forks Claude Code | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
 | 10 | Audit `CODE_XML` — reliquats & génération | 4 XML orphelins supprimés, génération rendue atomique (`generate_codesys_bundle.py`) | Bug trouvé en revue : purge non-atomique pouvait faire passer `G200` faussement au vert si le générateur échouait — corrigé et testé (2 scénarios d'échec simulés) | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
 | 11 | Audit documentation `DOC/TESTS`, `DOC/WFLOW` | Fusion registre MES (30 entrées, collision `MES-022/023` corrigée), archivage `Architecture/` (migration 7 POU terminée), liens morts corrigés | `ARCHIVES/Doc/` découvert gitignoré (comme `.claude/`/`.vscode/`) — forcé au tracking | ✅ | CC-01 | ✅ Validé (revue experte PASS) |
 | 12 | Refactoring Indexation Dossiers `CODE/` (`A_` à `M_`) | T122-A à T122-D (Phases 1 à 4 terminées) | Aligner explorateur CODESYS sur l'ordre d'exécution MainTask (indexation par lettres `A_COMMUN` .. `M_MAIN`) ; plan détaillé dans `AUDIT_Plan_Refactor_Dossiers_Indexes_v1.0.md` | ✅ | AGY-01 | ✅ Validé (revue experte PASS & 100% Gates verts) |
-| 13 | Standardisation Déclarations ST & En-têtes concis | T123-STD à T123-M | Aligner le rangement des variables (`VAR_INPUT`→`VAR_OUTPUT`→`VAR_IN_OUT`→`VAR`), ajouter les flèches ASCII (`-->`/`<--`/`<->`/`*`/`.`) & tags (`[CMD]`, `[STAT]`, `[INST]`, `[LOC]`), purger les récits REX des en-têtes de code et lier aux AFs. | 🔒 | AGY-01 | 🔒 En cours (Standards à jour, lot par lot par dossier) |
+| 13 | Standardisation Déclarations ST & En-têtes concis | T123-STD à T123-M (Terminé) | Rangement variables, flèches ASCII, tags et purge REX intégrale sur 169 fichiers CODE/ (G430 PASS) | ✅ | AGY-01 | ✅ Validé (Code 100% conforme CQS §2) |
+| 14 | Encapsulation Bus Inter-PRG par DUTs | T142-P1 à T142-P4 (Phasage étanche) | Migration progressive PRG_02 → PRG_04 → PRG_05 → PRG_06 vers structures `Data : ST_xxxInterPrg` avec validation mécanique unitaire | 🔒 | DSH-02 | 🔒 En cours (Phase 1 : PRG_02_Acquisition) — repris d'AGY-01 sur ordre orchestrateur (4 DUT squelettes créés, remap consommateurs à faire) |
 
 ### 🗂️ Chantier Refactoring Indexation Dossiers CODE (T122-A à T122-D)
 
@@ -288,7 +289,6 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T72 | Interverrouillage commande/frein : bloquer `RelayFwd/Rev` si frein fermé | Projet / Sécurité | ⬜ | — | `FB_Winch.st`, `FB_Translation.st` |
 | T73 | Winch : confirmation temporisée + escalade PowerCutOff limite basse | Projet / Sécurité | ⬜ | — | `FB_Safety_Winch.st` |
 | T74 | Translation : temporiser escalade PowerCutOff sur `LimitSwitch` | Projet / Sécurité | ⬜ | — | `FB_Safety_Translation.st` |
-| T75 | `G100_check_code_style.py` : nettoyer exemptions obsolètes | Projet | ⬜ | — | Outillage |
 | T76 | `FB_Cycle.st` : raccorder `DrainingTime` au persistant/IHM | Projet | ⬜ | — | `FB_Cycle.st` |
 | T77 | POO Diagnostics : passer statuts bruts aux FB (retrait expressions) | Projet / Architecture | ⬜ | — | `PRG_02_Acquisition`, `FB_Diag_*` |
 | T78 | Rampe Treuils : passer à 10%/s par défaut et égaliser en couplé | Projet / Commande Treuils | ⬜ | — | `FB_Winch.st`, `PRG_04_Treuils_Benne.st` |
@@ -299,7 +299,6 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T84 | Validation CODESYS/terrain mesure vitesse 50 ms (`FB_Encoder_SpeedMeasure`) | Projet / Sécurité | ⏳ | PI-01 | `FB_Encoder_SpeedMeasure.st` |
 | T85 | Validation chaîne producteur codeur unique (`PRG_02_Acquisition`) | Projet / Architecture | ⏳ | PI-01 | `PRG_02_Acquisition.st` |
 | T86 | Validation blocage déterministe si `Enable=FALSE` (`FB_Safety_Winch`) | Projet / Sécurité | ⏳ | PI-01 | `FB_Safety_Winch.st` |
-| T87 | Sort de `DelayMotorDecel` (code mort dans `FB_Brake` TON à FALSE) | Projet / Sécurité | ⏸️ | — | Lot étude T91/T93 |
 | T88 | Bouclage `TIME()` (49,7j) dans `FB_CycleTime` : garde-fou `DeltaTimeMs > 1000` | Projet | ⬜ | — | `FB_CycleTime.st` |
 | T89 | Valider sur site offset benne fermée ≈ 15 m (grandeur d'état mécanique) | Terrain / Projet | ⏳ | HUM | MES-010 |
 | T90 | Valider sur site cote capteur haut 8.0 m et limite 7.5 m au premier homing | Terrain / Sécurité | ⏳ | HUM | MES-009 |
@@ -309,9 +308,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T94 | Rendre `SpeedGuardEnable` persistant et exposé IHM MAINT_N2 | Projet / Terrain | ⏳ | PI-01 | `PRG_04_Treuils_Benne`, `GVL_PERSISTENT` |
 | T95 | Table `VitesseMax[1..5]` de calibration dans `FB_Winch_Symmetry` | Projet / Terrain | ⏳ | PI-01 | `FB_Winch_Symmetry.st` |
 | T96 | Mode apprentissage automatique des bandes de vitesse à vide et en charge | Projet / Terrain | ⏸️ | — | `AF_Partie-10_v2.0` §9bis.3 |
-| T97 | Rationalisation acquisition / retrait contrôlé `PRG_01_Inputs_LD` et `FB_Input` | Projet / Sécurité | ⬜ | — | `AF_Partie-06_v2.3` |
 | T98 | Câbler `BrakeThermalFault`/`PhaseRotationFault` vers `GVL_IHM.Commun` | Projet | ⬜ | — | `PRG_07_Supervision.st` |
-| T102 | Migration architecture acquisition : validation dossier remappage | Projet / Sécurité | ⬜ | — | `AF_Partie-02_v3.1` |
 | T108 | Interlock Translation M3 si Trémie pleine (`HopperFull_OR_GateRaised_DI`) | Projet / Translation M3 | ⬜ | — | `PRG_05_Translation.st` |
 | T109 | Formaliser convention polarité positive (`*Permit` / `Allowed`) pour arbitrages | Projet / Convention | ⬜ | — | `NAMING_CONVENTION.md` |
 | T110 | Clarifier sémantique `DriveStatusWord.0` AC600 ("Power Ready" vs "Mouvement" Méca B) | Projet / Sécurité | ⬜ | — | `FB_Safety_Translation.st` |
@@ -342,7 +339,7 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T139 | **Restructuration thématique des 77 DUT** dans `CODE/J_SUPERVISION/_TYPES/` (8 sous-dossiers thématiques) + mise à jour outillage et baseline | Projet / Convention | ✅ | AGY-01 | **Validé et commité (2026-08-19)** : 77 DUT dans 8 sous-dossiers, G380 rglob, baseline OK, Palier C PASS |
 | T140 | **Purge de `GVL_Global` & Assainissement Barrière Sorties** : suppression des 18 variables contacteurs de `GVL_Global.st`, passage en `VAR_OUTPUT` taguées/fléchées dans `PRG_06_Outputs_LD.st`, câblage direct `FB_SimBench` | Projet / Convention / Sécurité | ⏳ | AGY-01 | **Implémenté 2026-08-19** : Purge GVL_Global, PRG_06 conforme CQS §2 (tags `[ACT]`, `[SAFE]`, `[CMD]` et flèches ASCII `<--`), câblage direct `PRG_02_Acquisition`, bundle fresh, 15/15 gates PASS (`run_all_gates.py --palier C`), G200 PASS. Contrat : `TASK_CONTRACT_PURGE_GVL_GLOBAL_OUTPUTS.yaml`. ⏳ En attente de validation orchestrateur/humain |
 | T141 | **Standardisation globale des 7 PRG** : ordre strict des blocs de déclaration (`VAR_INPUT` $\rightarrow$ `VAR_OUTPUT` $\rightarrow$ `VAR`), bannières ASCII, tags CQS §2 et purge intégrale des commentaires REX / vestiges historiques | Projet / Convention | ✅ | AGY-01 | **Validé et commité (2026-08-19)** : `PRG_02` à `PRG_07` réordonnés et formatés selon CQS §2, Palier C PASS |
-| T142 | **Encapsulation des échanges inter-PRG par bus DUT typés** (`ST_AcquisitionInterPrg`, `ST_WinchInterPrg`, `ST_TranslationInterPrg`, `ST_OutputsInterPrg`) | Projet / Architecture | ⏳ | — | **Implémenté 2026-08-19** (sous-agent) : 4 DUT créées, `PRG_02/04/05/06` exposent `Data : ST_xxxInterPrg`, remap mécanique de tous les consommateurs identifiés vers `.Data.<champ>`. `ArmingSeqStep` (INT) exclu du bus (cassait G410, page LD stricte BOOL) — laissé en `VAR_OUTPUT` plat. Bundle fresh, G200 PASS (0 erreur), G310 PASS, `run_all_gates.py` 15/15 PASS (palier C et suite complète). Hors périmètre signalé (non corrigé) : `M3_SensorsWord` jamais assigné (bug préexistant) ; couplages cachés supplémentaires non nommés dans AC1-AC4 (`M1/M2LogicRequestDirection`, `CoupledUserRequestDirection/Active`, `M3_Direction_Active`, `M3_SpeedRef_Active`, `M3_AtTremieStable/AtP1Stable/AtMaintenanceStable`) — à trancher pour un lot dédié. Contrat : `TASK_CONTRACT_INTER_PRG_BUS_STRUCTURES.yaml` (execution COMPLETED). ⏳ En attente de validation orchestrateur/humain |
+| T142 | **Encapsulation des échanges inter-PRG par bus DUT typés** (Phasage étanche : P1=PRG_02, P2=PRG_04, P3=PRG_05, P4=PRG_06) | Projet / Architecture | 🔒 | DSH-02 | **Découpage en 4 phases étanches** avec contrôle mécanique unitaire à chaque étape :<br>• **P1 (En cours, repris AGY-01→DSH-02)** : `PRG_02_Acquisition` expose `Data : ST_AcquisitionInterPrg` + remap consommateurs directs (`PRG_03/04/05/07`, Diag) + bundle fresh + Gates Palier C.<br>• **P2** : `PRG_04_Treuils_Benne` expose `Data : ST_WinchInterPrg`.<br>• **P3** : `PRG_05_Translation` expose `Data : ST_TranslationInterPrg`.<br>• **P4** : `PRG_06_Outputs_LD` expose `Data : ST_OutputsInterPrg`. |
 
 ---
 
@@ -366,7 +363,10 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | **T60 / T61 / T62** | Neutralisation `E_Mode.DISABLE`, estimateur charge en montée seule, fin montée 8.0m | ✅ Vérifié. |
 | **T65 / T66 / T67** | Persistance `GVL_PERSISTENT` testée CODESYS, protection Cycle/Translation | ✅ Gate `G380` PASS. |
 | **T68 / T69 / T70 / T71** | VAR_IN_OUT joystick persistant, timeout benne persistant, gate persistance CI | ✅ Gate `G380` intégré. |
+| **T75** | `G100_check_code_style.py` : exemptions obsolètes épurées lors de la refonte des dossiers | ✅ Terminé (outillage adapté à `A_COMMUN`..`M_MAIN`). |
 | **T80** | Capteur PV M3 raccordé (suppression stub) | ✅ Corrigé dans `PRG_02_Acquisition`. |
+| **T87** | Sort de `DelayMotorDecel` / `FB_Brake` M1/M2 | ✅ Sans objet : Freins M1/M2 pilotés directement sur contacteurs FWD/REV + interlocks dans `PRG_06_Outputs_LD`. |
+| **T97 / T102** | Rationalisation acquisition, retrait `PRG_01_Inputs_LD` / `FB_Input` | ✅ Terminé : `PRG_02_Acquisition` est la frontière unique active (`HwReal/HwSim/HwIn`). |
 | **T99** | Suppression `GVL_IHM_AU` & types `ST_Safety_Emergency_Hmi*` | ✅ Code mort archivé dans `ARCHIVES/Code/SUPERVISION/`. |
 | **T100 / T101** | Fix gate L9 mapping E/S, architecture ciblée 7 POU par procédé actée | ✅ Validé. |
 | **T103** | Dépendance Homing déplacée dans le lot M3 (Treuils) | ✅ Architecture résolue. |
