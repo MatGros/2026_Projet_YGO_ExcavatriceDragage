@@ -18,8 +18,11 @@ TOOLS/ST_PLCOPENXML_GENERATOR/scripts/gen_prg06_oracle.py (plus de coil ni de
 VAR_OUTPUT sur les noms Device bruts, renommage *Cmd) + CODE/MAIN/PRG_06_Outputs_LD.st
 + CODE/MAIN/PRG_02_Acquisition.st (références qualifiées mises à jour).
 
-Seul PRG_02_Acquisition (frontière acquisition, AF_Partie-06) a le droit de porter ces
-noms bruts, en VAR_INPUT — c'est son rôle architectural documenté.
+PRG_02_Acquisition (frontière acquisition, AF_Partie-06) référence ces noms bruts en
+GLOBALES (mappées I/O) dans son acquisition HwReal — il ne doit JAMAIS les déclarer en
+VAR/VAR_INPUT/VAR_OUTPUT : un identificateur local masquerait la globale réellement mappée
+au matériel (même piège que PRG_06, REX 2026-08-05). Le gate contrôle donc PRG_02 comme
+tout autre PROGRAM.
 
 Source de vérité matérielle : TOOLS/AGENT_WORKFLOW/config/Device_IO_*.csv (le plus récent)
 (colonne 1, "Mapped variable" — export CODESYS réel, référence AF_Partie-06 §4).
@@ -33,8 +36,8 @@ import re
 import sys
 from pathlib import Path
 
-# Seul POU dont le rôle architectural est de porter les noms Device bruts (AF_Partie-06 §1/§4).
-ACQUISITION_FRONTIER = "M_MAIN/PRG_02_Acquisition.st"
+# Aucun POU (y compris PRG_02_Acquisition) ne doit déclarer un nom Device brut en
+# VAR/VAR_INPUT/VAR_OUTPUT : il le référence en globale mappée I/O (REX 2026-08-05).
 
 # Trappe de sortie pour une collision detectee mais pas encore verifiee terrain :
 # WARN (pas ERROR, non bloquant) le temps de confirmer sur machine reelle. Vide
@@ -117,8 +120,6 @@ def main() -> int:
     main_dir = root / "CODE" / "M_MAIN" if (root / "CODE" / "M_MAIN").is_dir() else root / "CODE" / "MAIN"
     for path in sorted(main_dir.glob("PRG_*.st")):
         rel = path.relative_to(root / "CODE").as_posix()
-        if rel == ACQUISITION_FRONTIER:
-            continue
         text = strip_st_comments(path.read_text(encoding="utf-8", errors="replace"))
         for name, line in declared_names(text):
             if name not in hw_names:

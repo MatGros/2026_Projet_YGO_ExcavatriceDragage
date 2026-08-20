@@ -62,7 +62,10 @@ def test_declaration_dans_prg_non_acquisition_est_une_erreur(tmp_path, monkeypat
     assert exit_code == 1
 
 
-def test_frontiere_acquisition_est_exemptee(tmp_path, monkeypatch) -> None:
+def test_frontiere_acquisition_declare_nom_hw_est_erreur(tmp_path, monkeypatch) -> None:
+    """PRG_02_Acquisition n'est PAS exempt : déclarer un nom HW en VAR_INPUT masque la
+    globale mappée I/O (même piège que PRG_06, REX 2026-08-05). Il doit référencer le
+    nom en globale, jamais le déclarer."""
     root = tmp_path
     main_dir = root / "CODE" / "M_MAIN"
     main_dir.mkdir(parents=True)
@@ -77,7 +80,7 @@ def test_frontiere_acquisition_est_exemptee(tmp_path, monkeypatch) -> None:
 
     monkeypatch.setattr(sys, "argv", ["G350_check_hw_name_collision.py", str(root)])
     exit_code = check_hw_name_collision.main()
-    assert exit_code == 0
+    assert exit_code == 1
 
 
 def test_pending_field_verification_est_warn_pas_error(tmp_path, monkeypatch) -> None:
