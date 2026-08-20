@@ -32939,30 +32939,13 @@ Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
         <interface>
           <inputVars />
           <outputVars>
-            <variable name="TranslationFinalInterlockRequest">
+            <variable name="Data">
               <type>
-                <derived name="ST_TranslationFinalInterlockRequest" />
+                <derived name="ST_TranslationInterPrg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ DEMANDES DE SORTIES FINALES &amp; INTERLOCKS ===
-&lt;-- [ACT] Demande finale et interlocks translation M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationState">
-              <type>
-                <derived name="ST_TranslationState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 ÉTATS PUBLICS &amp; SÉCURITÉS TRANSLATION ===
-&lt;-- [STAT] Etat public translation M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationSafety">
-              <type>
-                <derived name="ST_SafetyTranslation" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites translation M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚌 BUS INTER-PRG (producteur unique) ===
+&lt;-- [BUS] Demande finale, état public, sécurité translation M3</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -32981,6 +32964,31 @@ Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
               <type>
                 <derived name="FB_Translation_PositionEstimator" />
               </type>
+            </variable>
+            <variable name="TranslationFinalInterlockRequest">
+              <type>
+                <derived name="ST_TranslationFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 STRUCTS INTERNES (publiés via Data) ===
+. [LOC] Demande finale et interlocks translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationState">
+              <type>
+                <derived name="ST_TranslationState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat public translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationSafety">
+              <type>
+                <derived name="ST_SafetyTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diagnostic et securites translation M3</xhtml>
+              </documentation>
             </variable>
             <variable name="M3_StartStop_Active">
               <type>
@@ -33503,6 +33511,12 @@ TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIn
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
+
+// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_TranslationInterPrg) ===
+// Copie des structs internes vers le bus de sortie (producteur unique).
+Data.TranslationFinalInterlockRequest := TranslationFinalInterlockRequest;
+Data.TranslationState                 := TranslationState;
+Data.TranslationSafety                := TranslationSafety;
 
 {endregion}
 </xhtml>
@@ -34031,33 +34045,33 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
-M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
-                      AND NOT PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
+M3InterlockEnable := PRG_05_Translation.Data.TranslationFinalInterlockRequest.Enable
+                      AND NOT PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
 
-M3PowerCutOffSafetyInfo := PRG_05_Translation.TranslationSafety.PowerCutOff
-                        OR PRG_05_Translation.TranslationSafety.ErrorMecaA
-                        OR PRG_05_Translation.TranslationSafety.ErrorMecaB
-                        OR PRG_05_Translation.TranslationSafety.ErrorBrakeThermal;
+M3PowerCutOffSafetyInfo := PRG_05_Translation.Data.TranslationSafety.PowerCutOff
+                        OR PRG_05_Translation.Data.TranslationSafety.ErrorMecaA
+                        OR PRG_05_Translation.Data.TranslationSafety.ErrorMecaB
+                        OR PRG_05_Translation.Data.TranslationSafety.ErrorBrakeThermal;
 
-M3SafeStopSafetyInfo := PRG_05_Translation.TranslationSafety.SafeStop
-                     OR PRG_05_Translation.TranslationSafety.Error
-                     OR PRG_05_Translation.TranslationSafety.ErrorOperatorComm
-                     OR PRG_05_Translation.TranslationSafety.ErrorDriveComm
-                     OR PRG_05_Translation.TranslationSafety.ErrorPhaseRotation
-                     OR PRG_05_Translation.TranslationSafety.ErrorLimitSwitch
-                     OR PRG_05_Translation.TranslationSafety.ErrorSensorIncoherent;
+M3SafeStopSafetyInfo := PRG_05_Translation.Data.TranslationSafety.SafeStop
+                     OR PRG_05_Translation.Data.TranslationSafety.Error
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorOperatorComm
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorDriveComm
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorPhaseRotation
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorLimitSwitch
+                     OR PRG_05_Translation.Data.TranslationSafety.ErrorSensorIncoherent;
 
 M3BlockedBySafetyInfo := M3PowerCutOffSafetyInfo OR M3SafeStopSafetyInfo;
 
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_05_Translation.TranslationFinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_05_Translation.TranslationFinalInterlockRequest.SafeStop,
-    BrakeReleaseRequest        := PRG_05_Translation.TranslationFinalInterlockRequest.BrakeReleaseRequest,
-    BrakeCommandOpenConfirmed  := PRG_05_Translation.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
-    RequestedDriveControlWord  := PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveControlWord,
-    RequestedDriveFreqHz       := PRG_05_Translation.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+    PowerContactorEngaged      := PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop,
+    BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest,
+    BrakeCommandOpenConfirmed  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
+    RequestedDriveControlWord  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
+    RequestedDriveFreqHz       := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz
 );
 
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
@@ -34094,7 +34108,7 @@ EmergencyArming_RQ           := EmergencyArmingCmd;
 // PowerCutOffReq = agrégation OU strict des demandes de coupure des trois procédés (M5, A-04).
 PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff
                OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff
-               OR PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
+               OR PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
 
 instSafetyEmergencyManagement(
     Enable := TRUE,
@@ -34457,7 +34471,7 @@ instPreflight(
     Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
     MachineIsStill            := (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber = 0)
                                  AND (PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber = 0)
-                                 AND (PRG_05_Translation.TranslationState.FBState = E_State.READY),
+                                 AND (PRG_05_Translation.Data.TranslationState.FBState = E_State.READY),
     M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     M3BrakeApplied            := TRUE, // Pas de retour frein M3 direct
@@ -34496,8 +34510,8 @@ GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
 GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
 GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
 GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
-GVL_IHM.TranslationM3.State := PRG_05_Translation.TranslationState;
-GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafety;
+GVL_IHM.TranslationM3.State := PRG_05_Translation.Data.TranslationState;
+GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Auth.Mode;
 GVL_IHM.Modes.State.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;

@@ -15,18 +15,19 @@ VAR_INPUT
 END_VAR
 
 VAR_OUTPUT
-    // === ⚡ DEMANDES DE SORTIES FINALES & INTERLOCKS ===
-    TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // <-- [ACT] Demande finale et interlocks translation M3
-
-    // === 📊 ÉTATS PUBLICS & SÉCURITÉS TRANSLATION ===
-    TranslationState                 : ST_TranslationState;                 // <-- [STAT] Etat public translation M3
-    TranslationSafety                : ST_SafetyTranslation;                // <-- [SAFE] Diagnostic et securites translation M3
+    // === 🚌 BUS INTER-PRG (producteur unique) ===
+    Data : ST_TranslationInterPrg; // <-- [BUS] Demande finale, état public, sécurité translation M3
 END_VAR
 
 VAR
     instTranslationM3           : FB_Translation;
     instSafetyTranslationM3     : FB_Safety_Translation;
     instPosEstimatorM3          : FB_Translation_PositionEstimator;
+
+    // === 📊 STRUCTS INTERNES (publiés via Data) ===
+    TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // . [LOC] Demande finale et interlocks translation M3
+    TranslationState                 : ST_TranslationState;                 // . [LOC] Etat public translation M3
+    TranslationSafety                : ST_SafetyTranslation;                // . [LOC] Diagnostic et securites translation M3
 
     M3_StartStop_Active     : BOOL;
     M3_Direction_Active     : INT;
@@ -437,6 +438,12 @@ TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIn
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
+
+// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_TranslationInterPrg) ===
+// Copie des structs internes vers le bus de sortie (producteur unique).
+Data.TranslationFinalInterlockRequest := TranslationFinalInterlockRequest;
+Data.TranslationState                 := TranslationState;
+Data.TranslationSafety                := TranslationSafety;
 
 {endregion}
 END_PROGRAM
