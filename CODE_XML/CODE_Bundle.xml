@@ -30504,6 +30504,15 @@ PreviousQualified := Qualified;
             </variable>
           </inputVars>
           <outputVars>
+            <variable name="Data">
+              <type>
+                <derived name="ST_AcquisitionInterPrg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚌 BUS INTER-PRG (producteur unique) ===
+&lt;-- [BUS] Mesures/joystick/positions M3/diag DI publiés</xhtml>
+              </documentation>
+            </variable>
             <variable name="HwReal">
               <type>
                 <derived name="ST_HardwareImage" />
@@ -31504,6 +31513,45 @@ M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
 M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
 {endregion}
+
+{region "§7 Encapsulation bus inter-PRG (Data)"}
+// === 🔌 §7 PUBLICATION BUS INTER-PRG (Data : ST_AcquisitionInterPrg) ===
+// 🎯 Sortie publique unique vers les consommateurs PRG_03/04/05/07.
+// Isométrique : chaque champ reproduit la sortie plate homonyme, valeurs identiques.
+Data.CablePosM1              := CablePosM1;
+Data.CablePosM2              := CablePosM2;
+Data.M1_Speed_Mps            := M1_Speed_Mps;
+Data.M1_SignedSpeed_Mps      := M1_SignedSpeed_Mps;
+Data.M1_SpeedValid           := M1_SpeedValid;
+Data.M2_Speed_Mps            := M2_Speed_Mps;
+Data.M2_SignedSpeed_Mps      := M2_SignedSpeed_Mps;
+Data.M2_SpeedValid           := M2_SpeedValid;
+Data.JoystickDeadmanArmed    := JoystickDeadmanArmed;
+Data.JoystickYNeutral        := JoystickYNeutral;
+Data.JoystickDirectionX      := JoystickDirectionX;
+Data.JoystickSpeedPctX       := JoystickSpeedPctX;
+Data.JoystickXNeutral        := JoystickXNeutral;
+Data.TranslationPosTremie      := TranslationPosTremie;
+Data.TranslationPosPV          := TranslationPosPV;
+Data.TranslationPosP2          := TranslationPosP2;
+Data.TranslationPosP1          := TranslationPosP1;
+Data.TranslationPosMaintenance := TranslationPosMaintenance;
+Data.TranslationAtTremie       := TranslationAtTremie;
+Data.TranslationAtPV           := TranslationAtPV;
+Data.TranslationAtP2           := TranslationAtP2;
+Data.TranslationAtP1           := TranslationAtP1;
+Data.TranslationAtMaintenance  := TranslationAtMaintenance;
+Data.M3_LimitSwitchFwd         := M3_LimitSwitchFwd;
+Data.M3_LimitSwitchRev         := M3_LimitSwitchRev;
+Data.M3_SensorWordIncoherent   := M3_SensorWordIncoherent;
+Data.M3_SensorsWord            := M3_SensorsWord;
+Data.LocalDigitalIoOk          := LocalDigitalIoOk;
+Data.Vh0800EndOk               := Vh0800EndOk;
+Data.Vh0808EtpOk               := Vh0808EtpOk;
+Data.InputModuleFault          := InputModuleFault;
+Data.M1_EncoderIncoherent      := M1_EncoderIncoherent;
+Data.M2_EncoderIncoherent      := M2_EncoderIncoherent;
+{endregion}
 </xhtml>
           </ST>
         </body>
@@ -31596,7 +31644,7 @@ instCycleSemiAuto(
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := Auth.Mode,
     CycleMotionPermit       := NOT PRG_02_Acquisition.instJoystick.AtNeutral,
-    DeadmanArmed            := PRG_02_Acquisition.JoystickDeadmanArmed,
+    DeadmanArmed            := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
     AbortCycle              := GVL_IHM.Cycle.Cmd.BtnAbort,
@@ -31608,10 +31656,10 @@ instCycleSemiAuto(
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.instWinchSync.Error,
     WinchSyncDeltaM         := PRG_04_Treuils_Benne.instWinchSync.SignedDeltaPosM,
-    M1_CablePosM            := PRG_02_Acquisition.CablePosM1,
-    M2_CablePosM            := PRG_02_Acquisition.CablePosM2,
-    M1_MeasuredSpeedMps     := PRG_02_Acquisition.M1_Speed_Mps,
-    M2_MeasuredSpeedMps     := PRG_02_Acquisition.M2_Speed_Mps,
+    M1_CablePosM            := PRG_02_Acquisition.Data.CablePosM1,
+    M2_CablePosM            := PRG_02_Acquisition.Data.CablePosM2,
+    M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M1_Speed_Mps,
+    M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.M2_Speed_Mps,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _WinchM1CfgPersist.CfgCableLimitAscent_M,
@@ -32239,10 +32287,10 @@ instDiveSearch(
     MotionDirection := CoupledUserRequestDirection,
     BucketIsOpen := _BucketState.IsOpen,
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
-    M1Position_M := PRG_02_Acquisition.CablePosM1,
-    M2Position_M := PRG_02_Acquisition.CablePosM2,
-    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.M1_EncoderIncoherent
-                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.M2_EncoderIncoherent,
+    M1Position_M := PRG_02_Acquisition.Data.CablePosM1,
+    M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
+    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
+                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
@@ -32275,12 +32323,12 @@ instExtractionSequence(
     BucketBusy := instBucket.Busy,
     BucketError := instBucket.Error,
     WinchSyncError := instWinchSync.Error,
-    M1Position_M := PRG_02_Acquisition.CablePosM1,
-    M2Position_M := PRG_02_Acquisition.CablePosM2,
-    M1MeasuredSpeedValid := PRG_02_Acquisition.M1_SpeedValid,
-    M2MeasuredSpeedValid := PRG_02_Acquisition.M2_SpeedValid,
-    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.M1_EncoderIncoherent
-                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.M2_EncoderIncoherent,
+    M1Position_M := PRG_02_Acquisition.Data.CablePosM1,
+    M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
+    M1MeasuredSpeedValid := PRG_02_Acquisition.Data.M1_SpeedValid,
+    M2MeasuredSpeedValid := PRG_02_Acquisition.Data.M2_SpeedValid,
+    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
+                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent,
     ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M
 );
 IF instExtractionSequence.BottomConfirmationConsumed THEN
@@ -32378,8 +32426,8 @@ instBucket(
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := CoupledUserRequestActive,
     MotionDirection     := CoupledUserRequestDirection,
-    CablePosM1          := PRG_02_Acquisition.CablePosM1,
-    CablePosM2          := PRG_02_Acquisition.CablePosM2,
+    CablePosM1          := PRG_02_Acquisition.Data.CablePosM1,
+    CablePosM2          := PRG_02_Acquisition.Data.CablePosM2,
     HomedM1             := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2             := PRG_02_Acquisition.instHomingM2.Homed,
     M1_Busy             := instWinchM1.Busy,
@@ -32470,7 +32518,7 @@ ELSE
                             AND NOT CoupledMotionBlockedByBucket
                             AND NOT ((SyncMinorDeviationBlocksUp   AND (M1LogicRequestDirection = 1))
                                  OR  (SyncMinorDeviationBlocksDown AND (M1LogicRequestDirection = -1)))
-                            AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
+                            AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.Data.JoystickDeadmanArmed);
 END_IF;
 
 // Condition renforcée "instBucket.Busy AND instBucket.M2_StartStop" au lieu de
@@ -32514,7 +32562,7 @@ ELSE
                                 AND NOT CoupledMotionBlockedByBucket
                                 AND NOT ((SyncMinorDeviationBlocksUp   AND (M2LogicRequestDirection = -1))
                                      OR  (SyncMinorDeviationBlocksDown AND (M2LogicRequestDirection = 1)))
-                                AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.JoystickDeadmanArmed);
+                                AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.Data.JoystickDeadmanArmed);
     END_IF;
 END_IF;
 
@@ -32538,12 +32586,12 @@ IF BucketBusyRiseEdge.Q THEN
 END_IF;
 IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
     ControlAscentActive := TRUE;
-    ControlAscentStartM1PosM := PRG_02_Acquisition.CablePosM1;
-    ControlAscentStartM2PosM := PRG_02_Acquisition.CablePosM2;
+    ControlAscentStartM1PosM := PRG_02_Acquisition.Data.CablePosM1;
+    ControlAscentStartM2PosM := PRG_02_Acquisition.Data.CablePosM2;
 END_IF;
 IF ControlAscentActive THEN
-    IF (ABS(PRG_02_Acquisition.CablePosM1 - ControlAscentStartM1PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
-       AND (ABS(PRG_02_Acquisition.CablePosM2 - ControlAscentStartM2PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
+    IF (ABS(PRG_02_Acquisition.Data.CablePosM1 - ControlAscentStartM1PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
+       AND (ABS(PRG_02_Acquisition.Data.CablePosM2 - ControlAscentStartM2PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
         ControlAscentActive := FALSE;             // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)) THEN
         ControlAscentActive := FALSE;             // Montée relâchée/interrompue : annule la phase
@@ -32562,8 +32610,8 @@ instWinchSync(
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode            := PRG_03_Modes_Cycle.Auth.Mode,
-    CablePosM1      := PRG_02_Acquisition.CablePosM1,
-    CablePosM2      := PRG_02_Acquisition.CablePosM2,
+    CablePosM1      := PRG_02_Acquisition.Data.CablePosM1,
+    CablePosM2      := PRG_02_Acquisition.Data.CablePosM2,
     HomedM1         := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2         := PRG_02_Acquisition.instHomingM2.Homed,
     SyncEnable      := PRG_03_Modes_Cycle.Auth.SyncEnable,
@@ -32634,8 +32682,8 @@ END_IF;
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/contacteurs/fin de course des DEUX treuils (VH_0800END,
 // Local_Digital_IO) — pas de granularité par treuil possible, donc SafeStop des DEUX.
-SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.InputModuleFault;
-SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.InputModuleFault;
+SafeStopM1_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault;
+SafeStopM2_Raw      := ((instWinchSync.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
 // : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
@@ -32657,10 +32705,10 @@ IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND (CoupledUserRequestDirection = -1)
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
-    IF (PRG_02_Acquisition.CablePosM1 &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.CablePosM1 &gt;= _DredgingAssistCfgPersist.ImmersionLower_M)
-       AND (PRG_02_Acquisition.CablePosM2 &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.CablePosM2 &gt;= _DredgingAssistCfgPersist.ImmersionLower_M) THEN
+    IF (PRG_02_Acquisition.Data.CablePosM1 &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.CablePosM1 &gt;= _DredgingAssistCfgPersist.ImmersionLower_M)
+       AND (PRG_02_Acquisition.Data.CablePosM2 &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= _DredgingAssistCfgPersist.ImmersionLower_M) THEN
         KoboldImmersionConfirmed := TRUE;
     END_IF;
 END_IF;
@@ -32690,11 +32738,11 @@ DescendPermitM1_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouche
 // unitaire M2, hors instBucket) applique l'anticipation d'inertie OpenAnticipationM/CloseAnticipationM
 // (mêmes que FB_Bucket) pour couvrir aussi le jog unitaire.
 DescendPermitM2_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 &lt;= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.CablePosM2 &lt;= (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
-                      (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
+                      (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _WinchM2CfgPersist.CfgCableLimitAscent_M);
 
 // FB_Safety_Winch M1/M2.
@@ -32717,7 +32765,7 @@ instSafetyWinchM1(
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.instHomingM1.Busy,
-    CablePosM              := PRG_02_Acquisition.CablePosM1,
+    CablePosM              := PRG_02_Acquisition.Data.CablePosM1,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M1LogicRequestDirection,
@@ -32727,14 +32775,14 @@ instSafetyWinchM1(
     TopLimitM              := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
-    JoystickYNeutral       := PRG_02_Acquisition.JoystickYNeutral,
+    JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
     BenneHoldStillActive   := instBucket.Busy,
-    ExpectedOtherWinchPosM := PRG_02_Acquisition.CablePosM2 - instBucket.ActiveOffsetM,
+    ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.CablePosM2 - instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Busy,
     OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM2,
-    MeasuredSpeedMps       := PRG_02_Acquisition.M1_Speed_Mps,
-    MeasuredSpeedSignedMps := PRG_02_Acquisition.M1_SignedSpeed_Mps,
-    MeasuredSpeedValid     := PRG_02_Acquisition.M1_SpeedValid,
+    MeasuredSpeedMps       := PRG_02_Acquisition.Data.M1_Speed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.M1_SignedSpeed_Mps,
+    MeasuredSpeedValid     := PRG_02_Acquisition.Data.M1_SpeedValid,
     BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassSafety           := GVL_IHM.M1TreuilRetenue.Bypass.Safety,
     BypassProcess          := GVL_IHM.M1TreuilRetenue.Bypass.Process,
@@ -32777,7 +32825,7 @@ instSafetyWinchM2(
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.instHomingM2.Busy,
-    CablePosM              := PRG_02_Acquisition.CablePosM2,
+    CablePosM              := PRG_02_Acquisition.Data.CablePosM2,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M2LogicRequestDirection,
@@ -32787,14 +32835,14 @@ instSafetyWinchM2(
     TopLimitM              := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
-    JoystickYNeutral       := PRG_02_Acquisition.JoystickYNeutral,
+    JoystickYNeutral       := PRG_02_Acquisition.Data.JoystickYNeutral,
     BenneHoldStillActive   := FALSE,
-    ExpectedOtherWinchPosM := PRG_02_Acquisition.CablePosM1 + instBucket.ActiveOffsetM,
+    ExpectedOtherWinchPosM := PRG_02_Acquisition.Data.CablePosM1 + instBucket.ActiveOffsetM,
     BenneBusy              := instBucket.Busy,
     OtherWinchInhibited    := PRG_03_Modes_Cycle.Auth.InhibitM1,
-    MeasuredSpeedMps       := PRG_02_Acquisition.M2_Speed_Mps,
-    MeasuredSpeedSignedMps := PRG_02_Acquisition.M2_SignedSpeed_Mps,
-    MeasuredSpeedValid     := PRG_02_Acquisition.M2_SpeedValid,
+    MeasuredSpeedMps       := PRG_02_Acquisition.Data.M2_Speed_Mps,
+    MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.M2_SignedSpeed_Mps,
+    MeasuredSpeedValid     := PRG_02_Acquisition.Data.M2_SpeedValid,
     BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassSafety           := GVL_IHM.M2TreuilBenne.Bypass.Safety,
     BypassProcess          := GVL_IHM.M2TreuilBenne.Bypass.Process,
@@ -32835,7 +32883,7 @@ END_IF;
 AscentPermitM1_Raw  := instSafetyWinchM1.AscentPermit;
 AscentPermitM2_Raw  := instSafetyWinchM2.AscentPermit
     // Même anticipation que DescendPermitM2_Raw ci-dessus.
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.CablePosM2 &gt;= (PRG_02_Acquisition.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
 SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
@@ -32873,7 +32921,7 @@ instWinchM1(
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
     Homed                   := PRG_02_Acquisition.instHomingM1.Homed,
     HomingSuspect           := PRG_02_Acquisition.instHomingM1.HomingSuspect,
-    CablePosM               := PRG_02_Acquisition.CablePosM1,
+    CablePosM               := PRG_02_Acquisition.Data.CablePosM1,
     TopLimitM               := _WinchM1CfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -32909,7 +32957,7 @@ instWinchM2(
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
     Homed                   := PRG_02_Acquisition.instHomingM2.Homed,
     HomingSuspect           := PRG_02_Acquisition.instHomingM2.HomingSuspect,
-    CablePosM               := PRG_02_Acquisition.CablePosM2,
+    CablePosM               := PRG_02_Acquisition.Data.CablePosM2,
     TopLimitM               := _WinchM2CfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
     CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
@@ -32964,11 +33012,11 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 // SpeedDelta_Mps = variation de vitesse ENTRE DEUX SCANS (ST_WinchState.st),
 // pas un écart M1/M2 (qui existe via SyncStateHMI.DeltaPos_M/instWinchSync).
 // Delta temporel via mémoire scan précédent.
-WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
-WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.M1_Speed_Mps - M1_PrevSpeed_Mps;
-M1_PrevSpeed_Mps := PRG_02_Acquisition.M1_Speed_Mps;
+WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
+WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M1_Speed_Mps - M1_PrevSpeed_Mps;
+M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.M1_Speed_Mps;
 
-WinchM1State.Position_M := PRG_02_Acquisition.CablePosM1;
+WinchM1State.Position_M := PRG_02_Acquisition.Data.CablePosM1;
 WinchM1State.SpeedRef_Pct := M1LogicRequestSpeedRef_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
 WinchM1State.FBState := instWinchM1.State;
@@ -33021,11 +33069,11 @@ WinchM1State.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElap
 WinchM1State.DirectionChangePending := instWinchM1.DirectionChangePending;
 
 // Voir bandeau M1 ci-dessus.
-WinchM2State.MeasuredSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
-WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.M2_Speed_Mps - M2_PrevSpeed_Mps;
-M2_PrevSpeed_Mps := PRG_02_Acquisition.M2_Speed_Mps;
+WinchM2State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
+WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.M2_Speed_Mps - M2_PrevSpeed_Mps;
+M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.M2_Speed_Mps;
 
-WinchM2State.Position_M := PRG_02_Acquisition.CablePosM2;
+WinchM2State.Position_M := PRG_02_Acquisition.Data.CablePosM2;
 WinchM2State.SpeedRef_Pct := M2LogicRequestSpeedRef_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
 WinchM2State.FBState := instWinchM2.State;
@@ -33137,7 +33185,7 @@ BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;
 BucketState.M2Direction := instBucket.M2_Direction;
 BucketState.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
-BucketState.M2PositionCorrected := PRG_02_Acquisition.CablePosM2 - instBucket.ActiveOffsetM;
+BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.CablePosM2 - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Busy;
 BucketState.Done := instBucket.Done;
@@ -33377,10 +33425,10 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
 // causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
 // générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
 M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
-                        OR (NOT PRG_02_Acquisition.M1_EncoderIncoherent
-                            AND NOT PRG_02_Acquisition.M2_EncoderIncoherent
-                            AND (PRG_02_Acquisition.CablePosM1 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
-                            AND (PRG_02_Acquisition.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
+                        OR (NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
+                            AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
+                            AND (PRG_02_Acquisition.Data.CablePosM1 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
+                            AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 {endregion}
@@ -33395,13 +33443,13 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 // la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
 // avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
 M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
-                                   NOT PRG_02_Acquisition.TranslationPosP1 AND PRG_02_Acquisition.TranslationPosMaintenance,
-                                   PRG_02_Acquisition.M3_LimitSwitchRev);
+                                   NOT PRG_02_Acquisition.Data.TranslationPosP1 AND PRG_02_Acquisition.Data.TranslationPosMaintenance,
+                                   PRG_02_Acquisition.Data.M3_LimitSwitchRev);
 
 // 🔒 §0ter STABILISATION BISTABLE FINS DE COURSE EXTRÊMES (Trémie &amp; Maintenance/P1)
 // Maintient la détection stable à 1 même si le capteur physique vibre ou saute brièvement.
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
-IF PRG_02_Acquisition.M3_LimitSwitchFwd THEN
+IF PRG_02_Acquisition.Data.M3_LimitSwitchFwd THEN
     M3_LimitSwitchFwdStable := TRUE;
 ELSIF M3_Direction_Active = -1 THEN
     M3_LimitSwitchFwdStable := FALSE;
@@ -33409,7 +33457,7 @@ END_IF;
 
 IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.M3_LimitSwitchRev) THEN
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.Data.M3_LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
@@ -33424,15 +33472,15 @@ END_IF;
 M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0) &gt; 0.5;
 TonM3ConfirmedMoving(IN := M3_ConfirmedMoving, PT := T#1s500ms);
 
-IF PRG_02_Acquisition.TranslationAtTremie THEN
+IF PRG_02_Acquisition.Data.TranslationAtTremie THEN
     M3_AtTremieStable := TRUE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.TranslationAtPV THEN
+ELSIF PRG_02_Acquisition.Data.TranslationAtPV THEN
     M3_AtPVStable := TRUE; M3_AtTremieStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.TranslationAtP2 THEN
+ELSIF PRG_02_Acquisition.Data.TranslationAtP2 THEN
     M3_AtP2Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.TranslationAtP1 THEN
+ELSIF PRG_02_Acquisition.Data.TranslationAtP1 THEN
     M3_AtP1Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.TranslationAtMaintenance THEN
+ELSIF PRG_02_Acquisition.Data.TranslationAtMaintenance THEN
     M3_AtMaintenanceStable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
 ELSIF TonM3ConfirmedMoving.Q THEN
     // Mouvement réel confirmé ≥1.5s sans nouveau front : on a vraiment quitté le dernier point.
@@ -33475,7 +33523,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     ELSIF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
         M3_Direction_Active := -1;
     ELSIF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := PRG_02_Acquisition.JoystickDirectionX;
+        M3_Direction_Active := PRG_02_Acquisition.Data.JoystickDirectionX;
     ELSE
         M3_Direction_Active := 0;
     END_IF;
@@ -33487,7 +33535,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
                                 OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
                                 OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
-                           AND PRG_02_Acquisition.JoystickDeadmanArmed
+                           AND PRG_02_Acquisition.Data.JoystickDeadmanArmed
                            AND M3_HeightInterlockOk; // Hauteur mini M1/M2 (risque collision)
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
@@ -33496,7 +33544,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
     M3_SpeedRef_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
                               FreqPct,
-                              (PRG_02_Acquisition.JoystickSpeedPctX / 100.0) * FreqPct);
+                              (PRG_02_Acquisition.Data.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
     M3_PositioningActive := FALSE;
     SelTarget    := 0;
@@ -33516,7 +33564,7 @@ END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
-M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
+M3_SafeStop_Active := PRG_02_Acquisition.Data.InputModuleFault;
 
 // En mode manuel (SelTarget=0), n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance)
 // arme le verrou anti-rebond §4ter de FB_Translation (DirectionAtArrival). Mot EXACT
@@ -33573,7 +33621,7 @@ instSafetyTranslationM3(
     Direction               := M3_Direction_Active,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
-    SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,
+    SensorWordIncoherent    := PRG_02_Acquisition.Data.M3_SensorWordIncoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
     BypassDriveComm         := GVL_IHM.TranslationM3.Bypass.DriveComm,
@@ -33607,17 +33655,17 @@ instTranslationM3(
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
+    SlowdownSensorTremie       := PRG_02_Acquisition.Data.TranslationPosPV,
     // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
     // FB_Translation_PositionDecoder.st). Chaque zone est délimitée par "capteur PRÉCÉDENT retombé
     // à 0" ET "capteur de la zone encore à 1" — zone P2→P1 = NOT PosP2 AND PosP1 (mot 00011) ;
     // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
     // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
-    SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.TranslationPosP1) AND PRG_02_Acquisition.TranslationPosMaintenance,
+    SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.Data.TranslationPosP1) AND PRG_02_Acquisition.Data.TranslationPosMaintenance,
     // Ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
     // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -&gt; 100% vitesse jusqu'à
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
-    SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1
+    SlowdownSensorP1           := (NOT PRG_02_Acquisition.Data.TranslationPosP2) AND PRG_02_Acquisition.Data.TranslationPosP1
                                    AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
@@ -33641,11 +33689,11 @@ instPosEstimatorM3(
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
     Direction            := M3_Direction_Active,
-    SensorMaintenance    := PRG_02_Acquisition.TranslationPosMaintenance,
-    SensorP1             := PRG_02_Acquisition.TranslationPosP1,
-    SensorP2             := PRG_02_Acquisition.TranslationPosP2,
-    SensorPV             := PRG_02_Acquisition.TranslationPosPV,
-    SensorTremie         := PRG_02_Acquisition.TranslationPosTremie,
+    SensorMaintenance    := PRG_02_Acquisition.Data.TranslationPosMaintenance,
+    SensorP1             := PRG_02_Acquisition.Data.TranslationPosP1,
+    SensorP2             := PRG_02_Acquisition.Data.TranslationPosP2,
+    SensorPV             := PRG_02_Acquisition.Data.TranslationPosPV,
+    SensorTremie         := PRG_02_Acquisition.Data.TranslationPosTremie,
     PosMaintenanceM      := GVL_PERSISTENT._TranslationPosMaintenance_M,
     PosP1M               := GVL_PERSISTENT._TranslationPosP1_M,
     PosP2M               := GVL_PERSISTENT._TranslationPosP2_M,
@@ -33692,11 +33740,11 @@ TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord
 TranslationState.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
 TranslationState.ActiveDirection := M3_Direction_Active;
 TranslationState.ActiveSpeedRef_Pct := M3_SpeedRef_Active;
-TranslationState.PositionTremie := PRG_02_Acquisition.TranslationPosTremie;
-TranslationState.PositionPV := PRG_02_Acquisition.TranslationPosPV;
-TranslationState.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
-TranslationState.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
-TranslationState.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
+TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
+TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
+TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;
+TranslationState.PositionP1 := PRG_02_Acquisition.Data.TranslationPosP1;
+TranslationState.PositionMaintenance := PRG_02_Acquisition.Data.TranslationPosMaintenance;
 // Affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
 // (direction-dépendant), libéré sur mouvement réel confirmé ≥1.5s (pas juste un rebond capteur
 // ni un changement de sens instantané). Même signal que celui consommé par M3_PositionSensorTarget.
@@ -33706,8 +33754,8 @@ TranslationState.AtP2 := M3_AtP2Stable;
 TranslationState.AtP1 := M3_AtP1Stable;
 TranslationState.AtMaintenance := M3_AtMaintenanceStable;
 TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
-TranslationState.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
-TranslationState.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
+TranslationState.SensorsWord := PRG_02_Acquisition.Data.M3_SensorsWord;
+TranslationState.SensorWordIncoherent := PRG_02_Acquisition.Data.M3_SensorWordIncoherent;
 TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;
@@ -37316,8 +37364,8 @@ END_IF;
 // === 📊 §3 PROJECTIONS IHM ET MAPPING ===
 
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
-    AND ((PRG_02_Acquisition.CablePosM1 &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
-      OR (PRG_02_Acquisition.CablePosM2 &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
+    AND ((PRG_02_Acquisition.Data.CablePosM1 &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
+      OR (PRG_02_Acquisition.Data.CablePosM2 &lt;= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
 GVL_IHM.Commun.TopPositionSensorActive   := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.HydraulicThermalOk_DI;
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
@@ -37345,15 +37393,15 @@ instPreflight(
     BrakeThermalOk            := PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     PhaseRotationOk           := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     SlackCableTensioned       := PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
-    M3SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,
+    M3SensorWordIncoherent    := PRG_02_Acquisition.Data.M3_SensorWordIncoherent,
     EmergencyChainClosed      := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderM1Operational      := instDiagEthercat.DeviceEncoderM1.Operational,
     EncoderM2Operational      := instDiagEthercat.DeviceEncoderM2.Operational,
     HomedM1                   := PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed,
     HomedM2                   := PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed,
-    M1PositionInBounds        := NOT PRG_02_Acquisition.M1_EncoderIncoherent,
-    M2PositionInBounds        := NOT PRG_02_Acquisition.M2_EncoderIncoherent
+    M1PositionInBounds        := NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent,
+    M2PositionInBounds        := NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
 );
 GVL_IHM.Commun.Preflight.PreflightOk      := instPreflight.PreflightOk;
 GVL_IHM.Commun.Preflight.PreflightDone    := instPreflight.PreflightDone;
@@ -37383,7 +37431,7 @@ GVL_IHM.Modes.State.EmergencyArmable := PRG_06_Outputs_LD.EmergencyState.Armable
 GVL_IHM.Modes.State.EmergencyArmingBusy := PRG_06_Outputs_LD.EmergencyState.ArmingBusy;
 GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs_LD.EmergencyDiag.RedundancyTestFailed;
 GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs_LD.EmergencyDiag.ArmFailed;
-GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs_LD.EmergencyDiag.Error OR PRG_02_Acquisition.InputModuleFault;
+GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs_LD.EmergencyDiag.Error OR PRG_02_Acquisition.Data.InputModuleFault;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs_LD.PowerCutOffActive;
 
 // 🕹️ Publication état Joystick IHM (GVL_IHM.JOY1Joystick.State)
@@ -37394,7 +37442,7 @@ GVL_IHM.JOY1Joystick.State.AxisCmdX := PRG_02_Acquisition.instJoystick.AxisCmdX;
 GVL_IHM.JOY1Joystick.State.AxisCmdY := PRG_02_Acquisition.instJoystick.AxisCmdY;
 GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.NeutralXAct;
 GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;
-GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.JoystickDeadmanArmed;
+GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
 GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.instJoystick.AtNeutral;
 GVL_IHM.JOY1Joystick.State.Online := instDiagCanOpen.DeviceJoystick.Online;
 GVL_IHM.JOY1Joystick.State.Operational := instDiagCanOpen.DeviceJoystick.Operational;
@@ -37413,9 +37461,9 @@ GVL_IHM.Network.EcatErrorId := instDiagEthercat.ErrorId;
 
 // 🩺 Diagnostic carte des 3 modules DI TOR réelles (AF06 §3bis) — lecture seule, calculé
 // dans PRG_02_Acquisition, simple recopie ici pour l'IHM (même patron que Network.*).
-GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.LocalDigitalIoOk;
-GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Vh0800EndOk;
-GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Vh0808EtpOk;
+GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.Data.LocalDigitalIoOk;
+GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Data.Vh0800EndOk;
+GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Data.Vh0808EtpOk;
 // 🖥️ Bandeau IHM 4 champs (AF-07 §4)
 // Publication des états du cycle semi-auto (lecture seule) — alimente le bandeau
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
@@ -37437,9 +37485,9 @@ GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.instWinchSync
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive;
 GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchConfirmed;
-GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.CablePosM1;
-GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.CablePosM2;
-GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.JoystickDeadmanArmed;
+GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.CablePosM1;
+GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.CablePosM2;
+GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
 GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
 GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.instJoystick.AtNeutral;
 
@@ -37478,7 +37526,7 @@ instHmiBannerFormatter(
     M1LogicRequestDirection     := PRG_04_Treuils_Benne.M1LogicRequestDirection,
     M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CycleRequestDirection       := PRG_03_Modes_Cycle.instCycleSemiAuto.WinchM1Cmd.Direction,
-    DeadmanArmed                := PRG_02_Acquisition.JoystickDeadmanArmed,
+    DeadmanArmed                := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.instJoystick.AtNeutral,
     CycleAutoBusy               := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy
 );
@@ -37493,10 +37541,10 @@ instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
     HwReal               := PRG_02_Acquisition.HwReal,
-    InputModuleFault     := PRG_02_Acquisition.InputModuleFault,
-    LocalDigitalIoOk     := PRG_02_Acquisition.LocalDigitalIoOk,
-    Vh0800EndOk          := PRG_02_Acquisition.Vh0800EndOk,
-    Vh0808EtpOk          := PRG_02_Acquisition.Vh0808EtpOk,
+    InputModuleFault     := PRG_02_Acquisition.Data.InputModuleFault,
+    LocalDigitalIoOk     := PRG_02_Acquisition.Data.LocalDigitalIoOk,
+    Vh0800EndOk          := PRG_02_Acquisition.Data.Vh0800EndOk,
+    Vh0808EtpOk          := PRG_02_Acquisition.Data.Vh0808EtpOk,
     Auth                 := PRG_03_Modes_Cycle.Auth,
     M1LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
@@ -37542,7 +37590,7 @@ instTroubleshootingView(
     CycleSpeedMismatchActive := PRG_03_Modes_Cycle.instCycleSemiAuto.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
     CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Error,
-    JoystickDeadmanArmed := PRG_02_Acquisition.JoystickDeadmanArmed,
+    JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
     HomedM1              := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2              := PRG_02_Acquisition.instHomingM2.Homed

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T21:07:42.949132" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T21:07:42.949132">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T12:28:10.831067" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T12:28:10.831067">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -963,10 +963,10 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
 // causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
 // générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
 M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
-                        OR (NOT PRG_02_Acquisition.M1_EncoderIncoherent
-                            AND NOT PRG_02_Acquisition.M2_EncoderIncoherent
-                            AND (PRG_02_Acquisition.CablePosM1 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
-                            AND (PRG_02_Acquisition.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
+                        OR (NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
+                            AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
+                            AND (PRG_02_Acquisition.Data.CablePosM1 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
+                            AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 
 {endregion}
@@ -981,13 +981,13 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 // la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
 // avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
 M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
-                                   NOT PRG_02_Acquisition.TranslationPosP1 AND PRG_02_Acquisition.TranslationPosMaintenance,
-                                   PRG_02_Acquisition.M3_LimitSwitchRev);
+                                   NOT PRG_02_Acquisition.Data.TranslationPosP1 AND PRG_02_Acquisition.Data.TranslationPosMaintenance,
+                                   PRG_02_Acquisition.Data.M3_LimitSwitchRev);
 
 // 🔒 §0ter STABILISATION BISTABLE FINS DE COURSE EXTRÊMES (Trémie &amp; Maintenance/P1)
 // Maintient la détection stable à 1 même si le capteur physique vibre ou saute brièvement.
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
-IF PRG_02_Acquisition.M3_LimitSwitchFwd THEN
+IF PRG_02_Acquisition.Data.M3_LimitSwitchFwd THEN
     M3_LimitSwitchFwdStable := TRUE;
 ELSIF M3_Direction_Active = -1 THEN
     M3_LimitSwitchFwdStable := FALSE;
@@ -995,7 +995,7 @@ END_IF;
 
 IF M3_LimitSwitchRevEffective THEN
     M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.M3_LimitSwitchRev) THEN
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable AND NOT PRG_02_Acquisition.Data.M3_LimitSwitchRev) THEN
     M3_LimitSwitchRevStable := FALSE;
 END_IF;
 
@@ -1010,15 +1010,15 @@ END_IF;
 M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0) &gt; 0.5;
 TonM3ConfirmedMoving(IN := M3_ConfirmedMoving, PT := T#1s500ms);
 
-IF PRG_02_Acquisition.TranslationAtTremie THEN
+IF PRG_02_Acquisition.Data.TranslationAtTremie THEN
     M3_AtTremieStable := TRUE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.TranslationAtPV THEN
+ELSIF PRG_02_Acquisition.Data.TranslationAtPV THEN
     M3_AtPVStable := TRUE; M3_AtTremieStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.TranslationAtP2 THEN
+ELSIF PRG_02_Acquisition.Data.TranslationAtP2 THEN
     M3_AtP2Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.TranslationAtP1 THEN
+ELSIF PRG_02_Acquisition.Data.TranslationAtP1 THEN
     M3_AtP1Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF PRG_02_Acquisition.TranslationAtMaintenance THEN
+ELSIF PRG_02_Acquisition.Data.TranslationAtMaintenance THEN
     M3_AtMaintenanceStable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
 ELSIF TonM3ConfirmedMoving.Q THEN
     // Mouvement réel confirmé ≥1.5s sans nouveau front : on a vraiment quitté le dernier point.
@@ -1061,7 +1061,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     ELSIF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
         M3_Direction_Active := -1;
     ELSIF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := PRG_02_Acquisition.JoystickDirectionX;
+        M3_Direction_Active := PRG_02_Acquisition.Data.JoystickDirectionX;
     ELSE
         M3_Direction_Active := 0;
     END_IF;
@@ -1073,7 +1073,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
                            AND (GVL_IHM.TranslationM3.Bypass.Global
                                 OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
                                 OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
-                           AND PRG_02_Acquisition.JoystickDeadmanArmed
+                           AND PRG_02_Acquisition.Data.JoystickDeadmanArmed
                            AND M3_HeightInterlockOk; // Hauteur mini M1/M2 (risque collision)
 
     FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
@@ -1082,7 +1082,7 @@ ELSIF (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1)
     // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
     M3_SpeedRef_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
                               FreqPct,
-                              (PRG_02_Acquisition.JoystickSpeedPctX / 100.0) * FreqPct);
+                              (PRG_02_Acquisition.Data.JoystickSpeedPctX / 100.0) * FreqPct);
 ELSE
     M3_PositioningActive := FALSE;
     SelTarget    := 0;
@@ -1102,7 +1102,7 @@ END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
-M3_SafeStop_Active := PRG_02_Acquisition.InputModuleFault;
+M3_SafeStop_Active := PRG_02_Acquisition.Data.InputModuleFault;
 
 // En mode manuel (SelTarget=0), n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance)
 // arme le verrou anti-rebond §4ter de FB_Translation (DirectionAtArrival). Mot EXACT
@@ -1159,7 +1159,7 @@ instSafetyTranslationM3(
     Direction               := M3_Direction_Active,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
-    SensorWordIncoherent    := PRG_02_Acquisition.M3_SensorWordIncoherent,
+    SensorWordIncoherent    := PRG_02_Acquisition.Data.M3_SensorWordIncoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
     BypassDriveComm         := GVL_IHM.TranslationM3.Bypass.DriveComm,
@@ -1193,17 +1193,17 @@ instTranslationM3(
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
     SpeedRefPct             := M3_SpeedRef_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
-    SlowdownSensorTremie       := PRG_02_Acquisition.TranslationPosPV,
+    SlowdownSensorTremie       := PRG_02_Acquisition.Data.TranslationPosPV,
     // Les 5 capteurs forment un code thermomètre cumulatif depuis la Trémie (voir
     // FB_Translation_PositionDecoder.st). Chaque zone est délimitée par "capteur PRÉCÉDENT retombé
     // à 0" ET "capteur de la zone encore à 1" — zone P2→P1 = NOT PosP2 AND PosP1 (mot 00011) ;
     // zone P1→Maintenance = NOT PosP1 AND PosMaintenance (mot 00001). Zones mutuellement exclusives,
     // chacune sa propre vitesse d'approche (CfgApproachSpeedP1_Hz / CfgApproachSpeedMaintenance_Hz).
-    SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.TranslationPosP1) AND PRG_02_Acquisition.TranslationPosMaintenance,
+    SlowdownSensorMaintenance  := (NOT PRG_02_Acquisition.Data.TranslationPosP1) AND PRG_02_Acquisition.Data.TranslationPosMaintenance,
     // Ralentissement P2→P1 UNIQUEMENT si P1 est un vrai point
     // d'arrêt (zone Maintenance NON autorisée). Zone Maintenance autorisée -&gt; 100% vitesse jusqu'à
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
-    SlowdownSensorP1           := (NOT PRG_02_Acquisition.TranslationPosP2) AND PRG_02_Acquisition.TranslationPosP1
+    SlowdownSensorP1           := (NOT PRG_02_Acquisition.Data.TranslationPosP2) AND PRG_02_Acquisition.Data.TranslationPosP1
                                    AND NOT PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
@@ -1227,11 +1227,11 @@ instPosEstimatorM3(
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0,
     Direction            := M3_Direction_Active,
-    SensorMaintenance    := PRG_02_Acquisition.TranslationPosMaintenance,
-    SensorP1             := PRG_02_Acquisition.TranslationPosP1,
-    SensorP2             := PRG_02_Acquisition.TranslationPosP2,
-    SensorPV             := PRG_02_Acquisition.TranslationPosPV,
-    SensorTremie         := PRG_02_Acquisition.TranslationPosTremie,
+    SensorMaintenance    := PRG_02_Acquisition.Data.TranslationPosMaintenance,
+    SensorP1             := PRG_02_Acquisition.Data.TranslationPosP1,
+    SensorP2             := PRG_02_Acquisition.Data.TranslationPosP2,
+    SensorPV             := PRG_02_Acquisition.Data.TranslationPosPV,
+    SensorTremie         := PRG_02_Acquisition.Data.TranslationPosTremie,
     PosMaintenanceM      := GVL_PERSISTENT._TranslationPosMaintenance_M,
     PosP1M               := GVL_PERSISTENT._TranslationPosP1_M,
     PosP2M               := GVL_PERSISTENT._TranslationPosP2_M,
@@ -1278,11 +1278,11 @@ TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord
 TranslationState.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
 TranslationState.ActiveDirection := M3_Direction_Active;
 TranslationState.ActiveSpeedRef_Pct := M3_SpeedRef_Active;
-TranslationState.PositionTremie := PRG_02_Acquisition.TranslationPosTremie;
-TranslationState.PositionPV := PRG_02_Acquisition.TranslationPosPV;
-TranslationState.PositionP2 := PRG_02_Acquisition.TranslationPosP2;
-TranslationState.PositionP1 := PRG_02_Acquisition.TranslationPosP1;
-TranslationState.PositionMaintenance := PRG_02_Acquisition.TranslationPosMaintenance;
+TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
+TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
+TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;
+TranslationState.PositionP1 := PRG_02_Acquisition.Data.TranslationPosP1;
+TranslationState.PositionMaintenance := PRG_02_Acquisition.Data.TranslationPosMaintenance;
 // Affichage IHM = M3_AtXxxStable (§0quater) — armé sur front
 // (direction-dépendant), libéré sur mouvement réel confirmé ≥1.5s (pas juste un rebond capteur
 // ni un changement de sens instantané). Même signal que celui consommé par M3_PositionSensorTarget.
@@ -1292,8 +1292,8 @@ TranslationState.AtP2 := M3_AtP2Stable;
 TranslationState.AtP1 := M3_AtP1Stable;
 TranslationState.AtMaintenance := M3_AtMaintenanceStable;
 TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
-TranslationState.SensorsWord := PRG_02_Acquisition.M3_SensorsWord;
-TranslationState.SensorWordIncoherent := PRG_02_Acquisition.M3_SensorWordIncoherent;
+TranslationState.SensorsWord := PRG_02_Acquisition.Data.M3_SensorsWord;
+TranslationState.SensorWordIncoherent := PRG_02_Acquisition.Data.M3_SensorWordIncoherent;
 TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.M3_ActualFrequencyHz_Filtered) / 100.0;

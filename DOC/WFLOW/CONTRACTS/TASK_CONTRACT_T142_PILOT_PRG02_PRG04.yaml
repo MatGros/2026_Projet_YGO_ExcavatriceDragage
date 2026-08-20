@@ -1,0 +1,114 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — PILOTE T142 : encapsuler l'interface PRG_02 ↔ PRG_04
+# ═══════════════════════════════════════════════════════════════════════════
+# Pilote Option X « par interface » : PRG_02 expose Data:ST_AcquisitionInterPrg,
+# PRG_04 lit les champs bus. Slice non-destructif (sorties plates conservées).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T142_PILOT_PRG02_PRG04
+  criticality: C2            # modification d'interface inter-programmes PLC
+  strategy: patch            # patch isométrique, zéro régression logique
+
+  objective: >
+    PRG_02_Acquisition publie ses mesures/états métier qualifiés via un
+    VAR_OUTPUT unique Data:ST_AcquisitionInterPrg et PRG_04_Treuils_Benne
+    consomme ces données par ce bus, sans aucune modification du comportement
+    (isométrique) ni des sorties plates pendant le pilote.
+
+  acceptance:
+    - id: AC1
+      statement: >
+        PRG_02_Acquisition.st déclare VAR_OUTPUT Data : ST_Acquisition_InterPrg,
+        le nom de fichier du POU égale le nom du POU et le suffixe égale le
+        langage généré dans le bundle.
+      verified_by: >
+        python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py && grep "Data" CODE/M_MAIN/PRG_02_Acquisition.st
+
+    - id: AC2
+      statement: >
+        Data est rempli depuis les sorties internes existantes de PRG_02
+        (câbles, vitesses, joystick, positions M3, diag DI) sans toucher à la
+        logique de calcul : valeurs strictement identiques aux sorties plates.
+      verified_by: "revue git diff : affectations Data.<champ> := <champ> sans IF/seuil/timer modifié"
+
+    - id: AC3
+      statement: >
+        PRG_04_Treuils_Benne référence les champs bus couverts via
+        PRG_02_Acquisition.Data.<champ> ; les accès HwIn.*, instJoystick.*,
+        instHomingM1/M2.*, instEncoderAbsM1/M2.* et SimulationBypassActive
+        restent inchangés.
+      verified_by: "grep de CODE/M_MAIN/PRG_04_Treuils_Benne.st + revue diff"
+
+    - id: AC4
+      statement: >
+        La liaison mécanique est prouvée : instance déclarée/appelée au bon
+        endroit, aucune orpheline, références croisées valides.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report"
+
+    - id: AC5
+      statement: >
+        Le bundle PLCopenXML est régénéré et synchronisé avec les sources.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py --project-name Generated ."
+
+    - id: AC6
+      statement: >
+        La suite des gates du palier C sort verte.
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  # ── Périmètre ────────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T142_PILOT_PRG02_PRG04.yaml
+      - DOC/WFLOW/PLAN_TASK.md
+      - CODE_XML/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
+      - ARCHIVES/
+
+  # ── Contrat de conservation ──────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "L'intégralité de la logique, des calculs, des temporisations et des sécurités physiques reste isométrique."
+      - "Zéro modification des conditions d'activation, seuils métier ou temps."
+      - "Les sorties plates de PRG_02 sont conservées pendant ce pilote (aucune rupture des autres consommateurs)."
+
+  # ── Preuves attendues en restitution ─────────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc Auto-vérification liaison (G200 --report)
+    - run_all_gates          # palier C
+    - bundle                 # CODE_XML/CODE_Bundle.xml régénéré
+
+  # ── Devoir d'alerte ──────────────────────────────────────────────────────
+  alert_duty: >
+    Toute variable consommée hors des 6 PRG, tout couplage caché ou toute
+    divergence isométrique détectée en cours de route est remonté immédiatement,
+    jamais silencieusement.
+
+# ── Suivi ──────────────────────────────────────────────────────────────────
+status: VALIDATED
+
+execution:
+  executed_by: "DSH-02 (DeepSeek Harness)"
+  completed_at: "2026-08-20"
+  status: COMPLETED
+  summary: >
+    Pilote T142 exécuté. PRG_02_Acquisition expose VAR_OUTPUT Data:ST_Acquisition_InterPrg
+    rempli isométriquement (33 champs = sorties plates homonymes, zéro logique modifiée).
+    PRG_04_Treuils_Benne consomme les champs bus via PRG_02_Acquisition.Data.<champ>
+    (52 références remapées). Accès HwIn.*/instJoystick.*/instHoming*/instEncoderAbs*/SimulationBypassActive
+    inchangés (102 refs préservées). Sorties plates conservées (pilote non-destructif).
+    Vérif : bundle fresh, G200 linkage PASS (0 erreur, 1126 instances), Gates Palier C 15/15 PASS.
+  evidence_submitted:
+    - "generate_codesys_bundle.py --project-name Generated . -> PASS: CODE_XML/CODE_Bundle.xml is fresh"
+    - "G200_check_linkage.py --report -> PASS (0 erreur(s), 1067 avertissement(s), 1126 instance(s))"
+    - "run_all_gates.py --palier C -> ALL GATES PASSED (15/15)"
+
+validation:
+  status: APPROVED
+  validated_by: "HUM (utilisateur)"
+  validated_at: "2026-08-20"
+  notes: "Validé par l'utilisateur : compilation OK, run OK, mouvement treuil en simulation réalisé."

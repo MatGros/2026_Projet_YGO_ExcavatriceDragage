@@ -1,6 +1,6 @@
-//CoDeSys Mapping Export V1.2
+//CoDeSys Mapping Export V1.2_;;;;;
 //Mapped variable;//Parameter name @ counter in device;//Unit;//Description;//IEC address;//Device name
-//Important: change only first, third or fourth column in Excel or add variable name before first
+//Important: change only first, third or fourth column in Excel or add variable name before first;;;;;
 ;Input;;Universal digital input;%IB0;Local_Digital_IO
 M1_ContactorsReleased_DI;Bit0;;Retour état contacteur sens avant arrière speed relachés;%IX0.0;Local_Digital_IO
 M1_ThermalOk_DI;Bit1;;Retour état disjoncteur thermique;%IX0.1;Local_Digital_IO

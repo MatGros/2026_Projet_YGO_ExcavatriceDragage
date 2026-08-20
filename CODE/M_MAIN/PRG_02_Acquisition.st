@@ -17,6 +17,9 @@ VAR_INPUT
 END_VAR
 
 VAR_OUTPUT
+    // === 🚌 BUS INTER-PRG (producteur unique) ===
+    Data                     : ST_AcquisitionInterPrg; // <-- [BUS] Mesures/joystick/positions M3/diag DI publiés
+
     // === 🖼️ IMAGES PROCESS MATÉRIEL / SIMULATION ===
     HwReal                   : ST_HardwareImage; // <-- [STAT] Image brute reelle physique
     HwSim                    : ST_HardwareImage; // <-- [STAT] Image simulee banc
@@ -530,6 +533,45 @@ M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 // === 📊 §6 RETOURS VARIATEUR (M3) CONDITIONNÉS ===
 M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
 M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
+{endregion}
+
+{region "§7 Encapsulation bus inter-PRG (Data)"}
+// === 🔌 §7 PUBLICATION BUS INTER-PRG (Data : ST_AcquisitionInterPrg) ===
+// 🎯 Sortie publique unique vers les consommateurs PRG_03/04/05/07.
+// Isométrique : chaque champ reproduit la sortie plate homonyme, valeurs identiques.
+Data.CablePosM1              := CablePosM1;
+Data.CablePosM2              := CablePosM2;
+Data.M1_Speed_Mps            := M1_Speed_Mps;
+Data.M1_SignedSpeed_Mps      := M1_SignedSpeed_Mps;
+Data.M1_SpeedValid           := M1_SpeedValid;
+Data.M2_Speed_Mps            := M2_Speed_Mps;
+Data.M2_SignedSpeed_Mps      := M2_SignedSpeed_Mps;
+Data.M2_SpeedValid           := M2_SpeedValid;
+Data.JoystickDeadmanArmed    := JoystickDeadmanArmed;
+Data.JoystickYNeutral        := JoystickYNeutral;
+Data.JoystickDirectionX      := JoystickDirectionX;
+Data.JoystickSpeedPctX       := JoystickSpeedPctX;
+Data.JoystickXNeutral        := JoystickXNeutral;
+Data.TranslationPosTremie      := TranslationPosTremie;
+Data.TranslationPosPV          := TranslationPosPV;
+Data.TranslationPosP2          := TranslationPosP2;
+Data.TranslationPosP1          := TranslationPosP1;
+Data.TranslationPosMaintenance := TranslationPosMaintenance;
+Data.TranslationAtTremie       := TranslationAtTremie;
+Data.TranslationAtPV           := TranslationAtPV;
+Data.TranslationAtP2           := TranslationAtP2;
+Data.TranslationAtP1           := TranslationAtP1;
+Data.TranslationAtMaintenance  := TranslationAtMaintenance;
+Data.M3_LimitSwitchFwd         := M3_LimitSwitchFwd;
+Data.M3_LimitSwitchRev         := M3_LimitSwitchRev;
+Data.M3_SensorWordIncoherent   := M3_SensorWordIncoherent;
+Data.M3_SensorsWord            := M3_SensorsWord;
+Data.LocalDigitalIoOk          := LocalDigitalIoOk;
+Data.Vh0800EndOk               := Vh0800EndOk;
+Data.Vh0808EtpOk               := Vh0808EtpOk;
+Data.InputModuleFault          := InputModuleFault;
+Data.M1_EncoderIncoherent      := M1_EncoderIncoherent;
+Data.M2_EncoderIncoherent      := M2_EncoderIncoherent;
 {endregion}
 
 END_PROGRAM
