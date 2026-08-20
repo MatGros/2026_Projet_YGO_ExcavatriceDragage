@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:43:34.307035" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:43:34.307035">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:57:07.694180" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:57:07.694180">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -836,6 +836,131 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock.
    🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
       demandes exactes de FB_Winch / ST_SpeedStepTable.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_WinchInterPrg">
+        <baseType>
+          <struct>
+            <variable name="WinchM1FinalInterlockRequest">
+              <type>
+                <derived name="ST_WinchFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ Demandes finales M1/M2 (interlocks &amp; consigne vitesse arbitrée) ===
+🪝 Demande finale et interlocks treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2FinalInterlockRequest">
+              <type>
+                <derived name="ST_WinchFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Demande finale et interlocks treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1LogicRequestSpeedRef_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2LogicRequestSpeedRef_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmdArbitrated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Ordre contacteur capteur fond Kobold (consommé PRG_06)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 États publics des treuils ===
+🚦 Etat public treuil Retenue M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Etat public treuil Benne M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Sécurités des treuils ===
+🛡️ Diagnostic et securites treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Diagnostic et securites treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncState">
+              <type>
+                <derived name="ST_SyncState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🔄 État synchronisation ===
+🔄 Etat synchronisation treuils M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketState">
+              <type>
+                <derived name="ST_BucketHMIState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🏗️ État benne ===
+🏗️ Etat de fonctionnement benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Benne_IsRoughlyClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏗️ Benne consideree fermee (tolerance matiere)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3ec62512-5b23-55ca-ae68-cc9ed0fefa58</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪝 ST_WinchInterPrg — Bus d'échange inter-PRG produit par PRG_04_Treuils_Benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les demandes finales M1/M2, les états publics
+      WinchM1/M2State, les sécurités WinchM1/M2Safety, l'état synchro et
+      l'état benne publiés par PRG_04_Treuils_Benne vers les consommateurs
+      (PRG_02/03/06/07).
+   📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT Data : ST_WinchInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1947,86 +2072,13 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
         <interface>
           <inputVars />
           <outputVars>
-            <variable name="WinchM1FinalInterlockRequest">
+            <variable name="Data">
               <type>
-                <derived name="ST_WinchFinalInterlockRequest" />
+                <derived name="ST_WinchInterPrg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ DEMANDES DE SORTIES FINALES &amp; INTERLOCKS ===
-&lt;-- [ACT] Demande finale et interlocks treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM2FinalInterlockRequest">
-              <type>
-                <derived name="ST_WinchFinalInterlockRequest" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande finale et interlocks treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldContactorCmdArbitrated">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur capteur fond Kobold (1=Alimenter)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM1State">
-              <type>
-                <derived name="ST_WinchState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 ÉTATS PUBLICS &amp; SYNOPTIQUES DES TREUILS ===
-&lt;-- [STAT] Etat public treuil Retenue M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM2State">
-              <type>
-                <derived name="ST_WinchState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat public treuil Benne M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM1Safety">
-              <type>
-                <derived name="ST_SafetyWinch" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM2Safety">
-              <type>
-                <derived name="ST_SafetyWinch" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SyncState">
-              <type>
-                <derived name="ST_SyncState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat synchronisation treuils M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketState">
-              <type>
-                <derived name="ST_BucketHMIState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat de fonctionnement benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Benne_IsRoughlyClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Benne consideree fermee (1=Fermee)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚌 BUS INTER-PRG (producteur unique) ===
+&lt;-- [BUS] Demandes finales, états, sécurités, synchro, benne</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -2081,6 +2133,87 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               <type>
                 <derived name="FB_ExtractionSequence" />
               </type>
+            </variable>
+            <variable name="WinchM1FinalInterlockRequest">
+              <type>
+                <derived name="ST_WinchFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 STRUCTS INTERNES (publiés via Data) ===
+. [LOC] Demande finale et interlocks treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2FinalInterlockRequest">
+              <type>
+                <derived name="ST_WinchFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande finale et interlocks treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmdArbitrated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur capteur fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat public treuil Retenue M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat public treuil Benne M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diagnostic et securites treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diagnostic et securites treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncState">
+              <type>
+                <derived name="ST_SyncState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat synchronisation treuils M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketState">
+              <type>
+                <derived name="ST_BucketHMIState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat de fonctionnement benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Benne_IsRoughlyClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Benne consideree fermee</xhtml>
+              </documentation>
             </variable>
             <variable name="CoupledUserRequestActive">
               <type>
@@ -3461,6 +3594,21 @@ GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 Benne_IsRoughlyClosed := _BucketState.IsClosed
     OR (_BucketState.IsIntermediate
         AND (instBucket.DeltaPosition_M &gt;= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
+
+// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_WinchInterPrg) ===
+// Copie des structs internes vers le bus de sortie (producteur unique).
+Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
+Data.WinchM2FinalInterlockRequest := WinchM2FinalInterlockRequest;
+Data.M1LogicRequestSpeedRef_Pct   := M1LogicRequestSpeedRef_Pct;
+Data.M2LogicRequestSpeedRef_Pct   := M2LogicRequestSpeedRef_Pct;
+Data.KoboldContactorCmdArbitrated := KoboldContactorCmdArbitrated;
+Data.WinchM1State                 := WinchM1State;
+Data.WinchM2State                 := WinchM2State;
+Data.WinchM1Safety                := WinchM1Safety;
+Data.WinchM2Safety                := WinchM2Safety;
+Data.SyncState                    := SyncState;
+Data.BucketState                  := BucketState;
+Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
 
 {endregion}
 </xhtml>
@@ -8533,6 +8681,7 @@ END_CASE;
               <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
               <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
               <Object Name="ST_WinchFinalInterlockRequest" ObjectId="1a0be5b9-7748-52ea-86e2-35102e49b3f8" />
+              <Object Name="ST_WinchInterPrg" ObjectId="3ec62512-5b23-55ca-ae68-cc9ed0fefa58" />
               <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
             </Folder>
             <Folder Name="7_COMMUN_CONFIG">

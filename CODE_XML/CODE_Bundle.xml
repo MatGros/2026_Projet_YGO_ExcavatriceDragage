@@ -9479,6 +9479,14 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)</xhtml>
               </documentation>
             </variable>
+            <variable name="KoboldContactorCmdArbitrated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 Ordre contacteur capteur fond Kobold (consommé PRG_06)</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchM1State">
               <type>
                 <derived name="ST_WinchState" />
@@ -30942,7 +30950,7 @@ instSimBench(
     M1_SpeedContactor_2      := PRG_06_Outputs.M1SpeedContactor2,
     M1_SpeedContactor_3      := PRG_06_Outputs.M1SpeedContactor3,
     M1_SpeedContactor_4      := PRG_06_Outputs.M1SpeedContactor4,
-    M1_SpeedRefPct           := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
+    M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
     M1_PresetTriggerCmd      := instEncoderAbsM1.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderAbsM1.PresetValueOut,
     M1_BrakeCmd              := PRG_06_Outputs.M1BrakeCmd,
@@ -30952,7 +30960,7 @@ instSimBench(
     M2_SpeedContactor_2      := PRG_06_Outputs.M2SpeedContactor2,
     M2_SpeedContactor_3      := PRG_06_Outputs.M2SpeedContactor3,
     M2_SpeedContactor_4      := PRG_06_Outputs.M2SpeedContactor4,
-    M2_SpeedRefPct           := PRG_04_Treuils_Benne.M2LogicRequestSpeedRef_Pct,
+    M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
     M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
     M2_BrakeCmd              := PRG_06_Outputs.M2BrakeCmd,
@@ -31352,9 +31360,9 @@ instCycleSemiAuto(
     Translation_Done        := PRG_05_Translation.instTranslationM3.Done,
     Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Busy,
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
-    Benne_IsOpen            := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
-    Benne_IsClosed          := PRG_04_Treuils_Benne.BucketState.MechState.IsClosed,
-    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // Tolérance matière 2m
+    Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
+    Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
+    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -31379,86 +31387,13 @@ Auth := instModes.Auth;
         <interface>
           <inputVars />
           <outputVars>
-            <variable name="WinchM1FinalInterlockRequest">
+            <variable name="Data">
               <type>
-                <derived name="ST_WinchFinalInterlockRequest" />
+                <derived name="ST_WinchInterPrg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⚡ DEMANDES DE SORTIES FINALES &amp; INTERLOCKS ===
-&lt;-- [ACT] Demande finale et interlocks treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM2FinalInterlockRequest">
-              <type>
-                <derived name="ST_WinchFinalInterlockRequest" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande finale et interlocks treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldContactorCmdArbitrated">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur capteur fond Kobold (1=Alimenter)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM1State">
-              <type>
-                <derived name="ST_WinchState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 ÉTATS PUBLICS &amp; SYNOPTIQUES DES TREUILS ===
-&lt;-- [STAT] Etat public treuil Retenue M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM2State">
-              <type>
-                <derived name="ST_WinchState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat public treuil Benne M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM1Safety">
-              <type>
-                <derived name="ST_SafetyWinch" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites treuil M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchM2Safety">
-              <type>
-                <derived name="ST_SafetyWinch" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Diagnostic et securites treuil M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SyncState">
-              <type>
-                <derived name="ST_SyncState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat synchronisation treuils M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketState">
-              <type>
-                <derived name="ST_BucketHMIState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat de fonctionnement benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Benne_IsRoughlyClosed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Benne consideree fermee (1=Fermee)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚌 BUS INTER-PRG (producteur unique) ===
+&lt;-- [BUS] Demandes finales, états, sécurités, synchro, benne</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -31513,6 +31448,87 @@ Auth := instModes.Auth;
               <type>
                 <derived name="FB_ExtractionSequence" />
               </type>
+            </variable>
+            <variable name="WinchM1FinalInterlockRequest">
+              <type>
+                <derived name="ST_WinchFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 STRUCTS INTERNES (publiés via Data) ===
+. [LOC] Demande finale et interlocks treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2FinalInterlockRequest">
+              <type>
+                <derived name="ST_WinchFinalInterlockRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande finale et interlocks treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmdArbitrated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre contacteur capteur fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat public treuil Retenue M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat public treuil Benne M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diagnostic et securites treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diagnostic et securites treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncState">
+              <type>
+                <derived name="ST_SyncState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat synchronisation treuils M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketState">
+              <type>
+                <derived name="ST_BucketHMIState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat de fonctionnement benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Benne_IsRoughlyClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Benne consideree fermee</xhtml>
+              </documentation>
             </variable>
             <variable name="CoupledUserRequestActive">
               <type>
@@ -32894,6 +32910,21 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
     OR (_BucketState.IsIntermediate
         AND (instBucket.DeltaPosition_M &gt;= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
 
+// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_WinchInterPrg) ===
+// Copie des structs internes vers le bus de sortie (producteur unique).
+Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
+Data.WinchM2FinalInterlockRequest := WinchM2FinalInterlockRequest;
+Data.M1LogicRequestSpeedRef_Pct   := M1LogicRequestSpeedRef_Pct;
+Data.M2LogicRequestSpeedRef_Pct   := M2LogicRequestSpeedRef_Pct;
+Data.KoboldContactorCmdArbitrated := KoboldContactorCmdArbitrated;
+Data.WinchM1State                 := WinchM1State;
+Data.WinchM2State                 := WinchM2State;
+Data.WinchM1Safety                := WinchM1Safety;
+Data.WinchM2Safety                := WinchM2Safety;
+Data.SyncState                    := SyncState;
+Data.BucketState                  := BucketState;
+Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
+
 {endregion}
 </xhtml>
           </ST>
@@ -33899,41 +33930,41 @@ creerait une collision avec la globale homonyme du mapping E/S.
 // (ST_WinchFinalInterlockRequest / ST_TranslationFinalInterlockRequest).
 
 // ── Interlock final M1 (Treuil Retenue) ──────────────────────────────────
-M1InterlockEnable := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff;
+M1InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable
+                      AND NOT PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff;
 
-M1PowerCutOffSafetyInfo := PRG_04_Treuils_Benne.WinchM1Safety.PowerCutOff
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaA
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaB
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaC
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaD
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaE
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ThermalFault;
+M1PowerCutOffSafetyInfo := PRG_04_Treuils_Benne.Data.WinchM1Safety.PowerCutOff
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaA
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaB
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaC
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaD
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaE
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ThermalFault;
 
-M1SafeStopSafetyInfo := PRG_04_Treuils_Benne.WinchM1Safety.SafeStop
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.Error
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorOperatorComm
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorEncoder
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorPhaseRotation
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorOppositeDir
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorNoMovement;
+M1SafeStopSafetyInfo := PRG_04_Treuils_Benne.Data.WinchM1Safety.SafeStop
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.Error
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorOperatorComm
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorEncoder
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorPhaseRotation
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorOppositeDir
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorNoMovement;
 
 M1BlockedBySafetyInfo := M1PowerCutOffSafetyInfo OR M1SafeStopSafetyInfo;
 
 instWinchOutputInterlockM1(
     Enable                     := M1InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop,
-    BrakeFeedback              := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeFeedback,
-    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
-    RequestedRelayFwd          := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd,
-    RequestedRelayRev          := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev,
-    RequestedContactor1        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor1,
-    RequestedContactor2        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor2,
-    RequestedContactor3        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor3,
-    RequestedContactor4        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedStep
+    PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.SafeStop,
+    BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.BrakeFeedback,
+    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev          := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4,
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep
 );
 
 M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
@@ -33946,44 +33977,44 @@ M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
 // ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
-M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff;
+M2InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.Enable
+                      AND NOT PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff;
 
-M2PowerCutOffSafetyInfo := PRG_04_Treuils_Benne.WinchM2Safety.PowerCutOff
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaA
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaB
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaC
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaD
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaE
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ThermalFault;
+M2PowerCutOffSafetyInfo := PRG_04_Treuils_Benne.Data.WinchM2Safety.PowerCutOff
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaA
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaB
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaC
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaD
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaE
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ThermalFault;
 
-M2SafeStopSafetyInfo := PRG_04_Treuils_Benne.WinchM2Safety.SafeStop
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.Error
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorOperatorComm
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorEncoder
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorPhaseRotation
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorOppositeDir
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorNoMovement
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.SlackCable
-                     OR PRG_04_Treuils_Benne.BucketState.Error
-                     OR PRG_04_Treuils_Benne.BucketState.CoupledMotionBlockedByBucket;
+M2SafeStopSafetyInfo := PRG_04_Treuils_Benne.Data.WinchM2Safety.SafeStop
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.Error
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorOperatorComm
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorEncoder
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorPhaseRotation
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorOppositeDir
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorNoMovement
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.SlackCable
+                     OR PRG_04_Treuils_Benne.Data.BucketState.Error
+                     OR PRG_04_Treuils_Benne.Data.BucketState.CoupledMotionBlockedByBucket;
 
 M2BlockedBySafetyInfo := M2PowerCutOffSafetyInfo OR M2SafeStopSafetyInfo;
 
 instWinchOutputInterlockM2(
     Enable                     := M2InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop,
-    BrakeFeedback              := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeFeedback,
-    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
-    RequestedRelayFwd          := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayFwd,
-    RequestedRelayRev          := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayRev,
-    RequestedContactor1        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor1,
-    RequestedContactor2        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor2,
-    RequestedContactor3        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor3,
-    RequestedContactor4        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedStep
+    PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.SafeStop,
+    BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.BrakeFeedback,
+    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev          := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor4,
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep
 );
 
 M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;
@@ -33997,7 +34028,7 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
 // KoboldContactorCmd depuis la commande arbitree PRG_04.
 // Mapping E/S : M1_M2_KoboldMeasureEnable_DQ &lt;- PRG_06_Outputs.KoboldContactorCmd.
-KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;
+KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
@@ -34061,8 +34092,8 @@ EmergencyArming_RQ           := EmergencyArmingCmd;
 
 // === 🛡️ §3 SÉCURITÉ &amp; COUPURE PUISSANCE AMONT ===
 // PowerCutOffReq = agrégation OU strict des demandes de coupure des trois procédés (M5, A-04).
-PowerCutOffReq := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff
-               OR PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff
+PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff
+               OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff
                OR PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
 instSafetyEmergencyManagement(
@@ -34424,8 +34455,8 @@ GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc
 // 🩺 Exécution du Preflight Machine à l'arrêt
 instPreflight(
     Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
-    MachineIsStill            := (PRG_04_Treuils_Benne.WinchM1State.StepNumber = 0)
-                                 AND (PRG_04_Treuils_Benne.WinchM2State.StepNumber = 0)
+    MachineIsStill            := (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber = 0)
+                                 AND (PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber = 0)
                                  AND (PRG_05_Translation.TranslationState.FBState = E_State.READY),
     M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
@@ -34442,8 +34473,8 @@ instPreflight(
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderM1Operational      := instDiagEthercat.DeviceEncoderM1.Operational,
     EncoderM2Operational      := instDiagEthercat.DeviceEncoderM2.Operational,
-    HomedM1                   := PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed,
-    HomedM2                   := PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed,
+    HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed,
+    HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed,
     M1PositionInBounds        := NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent,
     M2PositionInBounds        := NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
 );
@@ -34459,12 +34490,12 @@ GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.WinchInputSourceChanged;
 
-GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.WinchM1State;
-GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.WinchM2State;
-GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.WinchM1Safety;
-GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.WinchM2Safety;
-GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.SyncState;
-GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.BucketState;
+GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
+GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.Data.WinchM2State;
+GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
+GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
+GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
+GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
 GVL_IHM.TranslationM3.State := PRG_05_Translation.TranslationState;
 GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafety;
 
@@ -34548,7 +34579,7 @@ instHmiBannerFormatter(
     CycleStepAtError      := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
-    HomingActive          := (NOT PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed),
+    HomingActive          := (NOT PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed),
     HomingStepM1          := SEL(PRG_02_Acquisition.instHomingM1.Busy, 0, 1),
     HomingStepM2          := SEL(PRG_02_Acquisition.instHomingM2.Busy, 0, 1),
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
@@ -34556,7 +34587,7 @@ instHmiBannerFormatter(
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassTranslation     := GVL_IHM.TranslationM3.Bypass.Global,
     BypassSyncActive      := GVL_IHM.M1M2Sync.Bypass.Global,
-    SyncDegradedActive    := PRG_04_Treuils_Benne.SyncState.SyncDegradedStep1,
+    SyncDegradedActive    := PRG_04_Treuils_Benne.Data.SyncState.SyncDegradedStep1,
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
@@ -34564,7 +34595,7 @@ instHmiBannerFormatter(
     SafeStopActive              := GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop,
     DescendPermit               := GVL_IHM.M1TreuilRetenue.Safety.DescendPermit AND GVL_IHM.M2TreuilBenne.Safety.DescendPermit,
     AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
-    BucketIsOpen                := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
+    BucketIsOpen                := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     DiveActive                  := GVL_IHM.DredgingAssist.State.DiveBusy,
     TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent OR GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
@@ -34591,9 +34622,9 @@ instTroubleshootingView(
     Vh0800EndOk          := PRG_02_Acquisition.Data.Vh0800EndOk,
     Vh0808EtpOk          := PRG_02_Acquisition.Data.Vh0808EtpOk,
     Auth                 := PRG_03_Modes_Cycle.Auth,
-    M1LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
+    M1LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
-    M2LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.M2LogicRequestSpeedRef_Pct,
+    M2LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
     M2LogicRequestDirection := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
     CoupledUserRequestActive := PRG_04_Treuils_Benne.CoupledUserRequestActive,

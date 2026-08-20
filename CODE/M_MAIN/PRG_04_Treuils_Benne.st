@@ -13,19 +13,8 @@ VAR_INPUT
 END_VAR
 
 VAR_OUTPUT
-    // === ⚡ DEMANDES DE SORTIES FINALES & INTERLOCKS ===
-    WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // <-- [ACT] Demande finale et interlocks treuil M1
-    WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // <-- [ACT] Demande finale et interlocks treuil M2
-    KoboldContactorCmdArbitrated : BOOL;                         // <-- [ACT] Ordre contacteur capteur fond Kobold (1=Alimenter)
-
-    // === 📊 ÉTATS PUBLICS & SYNOPTIQUES DES TREUILS ===
-    WinchM1State                 : ST_WinchState;                // <-- [STAT] Etat public treuil Retenue M1
-    WinchM2State                 : ST_WinchState;                // <-- [STAT] Etat public treuil Benne M2
-    WinchM1Safety                : ST_SafetyWinch;               // <-- [SAFE] Diagnostic et securites treuil M1
-    WinchM2Safety                : ST_SafetyWinch;               // <-- [SAFE] Diagnostic et securites treuil M2
-    SyncState                    : ST_SyncState;                 // <-- [STAT] Etat synchronisation treuils M1/M2
-    BucketState                  : ST_BucketHMIState;            // <-- [STAT] Etat de fonctionnement benne
-    Benne_IsRoughlyClosed        : BOOL;                         // <-- [STAT] Benne consideree fermee (1=Fermee)
+    // === 🚌 BUS INTER-PRG (producteur unique) ===
+    Data : ST_WinchInterPrg; // <-- [BUS] Demandes finales, états, sécurités, synchro, benne
 END_VAR
 
 VAR
@@ -39,6 +28,18 @@ VAR
     instWinchM2   : FB_Winch;
     instDiveSearch : FB_DiveSearch;
     instExtractionSequence : FB_ExtractionSequence;
+
+    // === 📊 STRUCTS INTERNES (publiés via Data) ===
+    WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // . [LOC] Demande finale et interlocks treuil M1
+    WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // . [LOC] Demande finale et interlocks treuil M2
+    KoboldContactorCmdArbitrated : BOOL;                         // . [LOC] Ordre contacteur capteur fond Kobold
+    WinchM1State                 : ST_WinchState;                // . [LOC] Etat public treuil Retenue M1
+    WinchM2State                 : ST_WinchState;                // . [LOC] Etat public treuil Benne M2
+    WinchM1Safety                : ST_SafetyWinch;               // . [LOC] Diagnostic et securites treuil M1
+    WinchM2Safety                : ST_SafetyWinch;               // . [LOC] Diagnostic et securites treuil M2
+    SyncState                    : ST_SyncState;                 // . [LOC] Etat synchronisation treuils M1/M2
+    BucketState                  : ST_BucketHMIState;            // . [LOC] Etat de fonctionnement benne
+    Benne_IsRoughlyClosed        : BOOL;                         // . [LOC] Benne consideree fermee
 
     CoupledUserRequestActive : BOOL;
     CoupledUserRequestDirection     : INT;
@@ -1122,6 +1123,21 @@ GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 Benne_IsRoughlyClosed := _BucketState.IsClosed
     OR (_BucketState.IsIntermediate
         AND (instBucket.DeltaPosition_M >= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
+
+// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_WinchInterPrg) ===
+// Copie des structs internes vers le bus de sortie (producteur unique).
+Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
+Data.WinchM2FinalInterlockRequest := WinchM2FinalInterlockRequest;
+Data.M1LogicRequestSpeedRef_Pct   := M1LogicRequestSpeedRef_Pct;
+Data.M2LogicRequestSpeedRef_Pct   := M2LogicRequestSpeedRef_Pct;
+Data.KoboldContactorCmdArbitrated := KoboldContactorCmdArbitrated;
+Data.WinchM1State                 := WinchM1State;
+Data.WinchM2State                 := WinchM2State;
+Data.WinchM1Safety                := WinchM1Safety;
+Data.WinchM2Safety                := WinchM2Safety;
+Data.SyncState                    := SyncState;
+Data.BucketState                  := BucketState;
+Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
 
 {endregion}
 END_PROGRAM

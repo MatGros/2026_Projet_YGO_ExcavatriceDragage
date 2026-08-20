@@ -85,9 +85,9 @@ instCycleSemiAuto(
     Translation_Done        := PRG_05_Translation.instTranslationM3.Done,
     Benne_Busy              := PRG_04_Treuils_Benne.instBucket.Busy,
     Benne_Done              := PRG_04_Treuils_Benne.instBucket.Done,
-    Benne_IsOpen            := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
-    Benne_IsClosed          := PRG_04_Treuils_Benne.BucketState.MechState.IsClosed,
-    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Benne_IsRoughlyClosed,  // Tolérance matière 2m
+    Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
+    Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
+    Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
     HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,

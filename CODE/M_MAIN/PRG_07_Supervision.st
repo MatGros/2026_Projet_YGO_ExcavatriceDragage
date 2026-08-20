@@ -252,8 +252,8 @@ GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc
 // 🩺 Exécution du Preflight Machine à l'arrêt
 instPreflight(
     Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
-    MachineIsStill            := (PRG_04_Treuils_Benne.WinchM1State.StepNumber = 0)
-                                 AND (PRG_04_Treuils_Benne.WinchM2State.StepNumber = 0)
+    MachineIsStill            := (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber = 0)
+                                 AND (PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber = 0)
                                  AND (PRG_05_Translation.TranslationState.FBState = E_State.READY),
     M1BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     M2BrakeApplied            := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
@@ -270,8 +270,8 @@ instPreflight(
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderM1Operational      := instDiagEthercat.DeviceEncoderM1.Operational,
     EncoderM2Operational      := instDiagEthercat.DeviceEncoderM2.Operational,
-    HomedM1                   := PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed,
-    HomedM2                   := PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed,
+    HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed,
+    HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed,
     M1PositionInBounds        := NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent,
     M2PositionInBounds        := NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
 );
@@ -287,12 +287,12 @@ GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.WinchInputSourceChanged;
 
-GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.WinchM1State;
-GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.WinchM2State;
-GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.WinchM1Safety;
-GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.WinchM2Safety;
-GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.SyncState;
-GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.BucketState;
+GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
+GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.Data.WinchM2State;
+GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
+GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
+GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
+GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
 GVL_IHM.TranslationM3.State := PRG_05_Translation.TranslationState;
 GVL_IHM.TranslationM3.Safety := PRG_05_Translation.TranslationSafety;
 
@@ -376,7 +376,7 @@ instHmiBannerFormatter(
     CycleStepAtError      := PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStepAtError,
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
-    HomingActive          := (NOT PRG_04_Treuils_Benne.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.WinchM2State.Encoder.Homed),
+    HomingActive          := (NOT PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed),
     HomingStepM1          := SEL(PRG_02_Acquisition.instHomingM1.Busy, 0, 1),
     HomingStepM2          := SEL(PRG_02_Acquisition.instHomingM2.Busy, 0, 1),
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
@@ -384,7 +384,7 @@ instHmiBannerFormatter(
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassTranslation     := GVL_IHM.TranslationM3.Bypass.Global,
     BypassSyncActive      := GVL_IHM.M1M2Sync.Bypass.Global,
-    SyncDegradedActive    := PRG_04_Treuils_Benne.SyncState.SyncDegradedStep1,
+    SyncDegradedActive    := PRG_04_Treuils_Benne.Data.SyncState.SyncDegradedStep1,
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
@@ -392,7 +392,7 @@ instHmiBannerFormatter(
     SafeStopActive              := GVL_IHM.M1TreuilRetenue.Safety.SafeStop OR GVL_IHM.M2TreuilBenne.Safety.SafeStop,
     DescendPermit               := GVL_IHM.M1TreuilRetenue.Safety.DescendPermit AND GVL_IHM.M2TreuilBenne.Safety.DescendPermit,
     AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
-    BucketIsOpen                := PRG_04_Treuils_Benne.BucketState.MechState.IsOpen,
+    BucketIsOpen                := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     DiveActive                  := GVL_IHM.DredgingAssist.State.DiveBusy,
     TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent OR GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
@@ -419,9 +419,9 @@ instTroubleshootingView(
     Vh0800EndOk          := PRG_02_Acquisition.Data.Vh0800EndOk,
     Vh0808EtpOk          := PRG_02_Acquisition.Data.Vh0808EtpOk,
     Auth                 := PRG_03_Modes_Cycle.Auth,
-    M1LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.M1LogicRequestSpeedRef_Pct,
+    M1LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
-    M2LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.M2LogicRequestSpeedRef_Pct,
+    M2LogicRequestSpeedRef_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
     M2LogicRequestDirection := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
     CoupledUserRequestActive := PRG_04_Treuils_Benne.CoupledUserRequestActive,

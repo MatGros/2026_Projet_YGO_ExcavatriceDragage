@@ -83,41 +83,41 @@ END_VAR
 // (ST_WinchFinalInterlockRequest / ST_TranslationFinalInterlockRequest).
 
 // ── Interlock final M1 (Treuil Retenue) ──────────────────────────────────
-M1InterlockEnable := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff;
+M1InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable
+                      AND NOT PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff;
 
-M1PowerCutOffSafetyInfo := PRG_04_Treuils_Benne.WinchM1Safety.PowerCutOff
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaA
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaB
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaC
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaD
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorMecaE
-                        OR PRG_04_Treuils_Benne.WinchM1Safety.ThermalFault;
+M1PowerCutOffSafetyInfo := PRG_04_Treuils_Benne.Data.WinchM1Safety.PowerCutOff
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaA
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaB
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaC
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaD
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaE
+                        OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ThermalFault;
 
-M1SafeStopSafetyInfo := PRG_04_Treuils_Benne.WinchM1Safety.SafeStop
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.Error
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorOperatorComm
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorEncoder
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorPhaseRotation
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorOppositeDir
-                     OR PRG_04_Treuils_Benne.WinchM1Safety.ErrorNoMovement;
+M1SafeStopSafetyInfo := PRG_04_Treuils_Benne.Data.WinchM1Safety.SafeStop
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.Error
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorOperatorComm
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorEncoder
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorPhaseRotation
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorOppositeDir
+                     OR PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorNoMovement;
 
 M1BlockedBySafetyInfo := M1PowerCutOffSafetyInfo OR M1SafeStopSafetyInfo;
 
 instWinchOutputInterlockM1(
     Enable                     := M1InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.SafeStop,
-    BrakeFeedback              := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.BrakeFeedback,
-    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
-    RequestedRelayFwd          := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayFwd,
-    RequestedRelayRev          := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedRelayRev,
-    RequestedContactor1        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor1,
-    RequestedContactor2        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor2,
-    RequestedContactor3        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor3,
-    RequestedContactor4        := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.RequestedStep
+    PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.SafeStop,
+    BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.BrakeFeedback,
+    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev          := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4,
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep
 );
 
 M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
@@ -130,44 +130,44 @@ M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
 // ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
-M2InterlockEnable := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.Enable
-                      AND NOT PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff;
+M2InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.Enable
+                      AND NOT PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff;
 
-M2PowerCutOffSafetyInfo := PRG_04_Treuils_Benne.WinchM2Safety.PowerCutOff
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaA
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaB
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaC
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaD
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorMecaE
-                        OR PRG_04_Treuils_Benne.WinchM2Safety.ThermalFault;
+M2PowerCutOffSafetyInfo := PRG_04_Treuils_Benne.Data.WinchM2Safety.PowerCutOff
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaA
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaB
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaC
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaD
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaE
+                        OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ThermalFault;
 
-M2SafeStopSafetyInfo := PRG_04_Treuils_Benne.WinchM2Safety.SafeStop
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.Error
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorOperatorComm
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorEncoder
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorPhaseRotation
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorOppositeDir
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.ErrorNoMovement
-                     OR PRG_04_Treuils_Benne.WinchM2Safety.SlackCable
-                     OR PRG_04_Treuils_Benne.BucketState.Error
-                     OR PRG_04_Treuils_Benne.BucketState.CoupledMotionBlockedByBucket;
+M2SafeStopSafetyInfo := PRG_04_Treuils_Benne.Data.WinchM2Safety.SafeStop
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.Error
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorOperatorComm
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorEncoder
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorPhaseRotation
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorOppositeDir
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorNoMovement
+                     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.SlackCable
+                     OR PRG_04_Treuils_Benne.Data.BucketState.Error
+                     OR PRG_04_Treuils_Benne.Data.BucketState.CoupledMotionBlockedByBucket;
 
 M2BlockedBySafetyInfo := M2PowerCutOffSafetyInfo OR M2SafeStopSafetyInfo;
 
 instWinchOutputInterlockM2(
     Enable                     := M2InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged      := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerContactorEngaged,
-    SafeStop                   := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.SafeStop,
-    BrakeFeedback              := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.BrakeFeedback,
-    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
-    RequestedRelayFwd          := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayFwd,
-    RequestedRelayRev          := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedRelayRev,
-    RequestedContactor1        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor1,
-    RequestedContactor2        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor2,
-    RequestedContactor3        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor3,
-    RequestedContactor4        := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.RequestedStep
+    PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.SafeStop,
+    BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.BrakeFeedback,
+    FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev          := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor4,
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep
 );
 
 M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;
@@ -181,7 +181,7 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
 // KoboldContactorCmd depuis la commande arbitree PRG_04.
 // Mapping E/S : M1_M2_KoboldMeasureEnable_DQ <- PRG_06_Outputs.KoboldContactorCmd.
-KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;
+KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
 
 // ── Interlock final M3 (Translation, variateur AC600) ────────────────────
 M3InterlockEnable := PRG_05_Translation.TranslationFinalInterlockRequest.Enable
@@ -245,8 +245,8 @@ EmergencyArming_RQ           := EmergencyArmingCmd;
 
 // === 🛡️ §3 SÉCURITÉ & COUPURE PUISSANCE AMONT ===
 // PowerCutOffReq = agrégation OU strict des demandes de coupure des trois procédés (M5, A-04).
-PowerCutOffReq := PRG_04_Treuils_Benne.WinchM1FinalInterlockRequest.PowerCutOff
-               OR PRG_04_Treuils_Benne.WinchM2FinalInterlockRequest.PowerCutOff
+PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff
+               OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff
                OR PRG_05_Translation.TranslationFinalInterlockRequest.PowerCutOff;
 
 instSafetyEmergencyManagement(
