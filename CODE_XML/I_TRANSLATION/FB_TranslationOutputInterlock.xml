@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T13:40:47.480331" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T13:40:47.480331">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:43:34.283656" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:43:34.283656">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -112,7 +112,7 @@
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_TranslationOutputInterlock_LD" pouType="functionBlock">
+      <pou name="FB_TranslationOutputInterlock" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -404,11 +404,11 @@ Echelle registre 0x3100 (WORD=5000 -&gt; 50,00 Hz)</xhtml>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🛡️ FB_TranslationOutputInterlock_LD — Barrière finale frein / AC600 M3
+   🛡️ FB_TranslationOutputInterlock — Barrière finale frein / AC600 M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Barrière de sécurité finale pour frein et variateur AC600 M3
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
-   🔌 Interface : Interlock de sortie (entre FB_Translation et PRG_06_Outputs_LD)
+   🔌 Interface : Interlock de sortie (entre FB_Translation et PRG_06_Outputs)
    🔒 Sécurité : Surveillance feedback frein et watchdog de desserrage
    =======================================================================</xhtml>
           </documentation>
@@ -541,7 +541,7 @@ DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) 
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6d2c6c5a-239b-575a-b564-e6b87c13e1a9</ObjectId>
+            <ObjectId>25b7b4af-7ad3-51bb-8a91-14df3a52f0a4</ObjectId>
           </data>
         </addData>
       </pou>
@@ -554,7 +554,7 @@ DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) 
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="I_TRANSLATION">
-          <Object Name="FB_TranslationOutputInterlock_LD" ObjectId="6d2c6c5a-239b-575a-b564-e6b87c13e1a9" />
+          <Object Name="FB_TranslationOutputInterlock" ObjectId="25b7b4af-7ad3-51bb-8a91-14df3a52f0a4" />
           <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
         </Folder>
         <Folder Name="A_COMMUN">

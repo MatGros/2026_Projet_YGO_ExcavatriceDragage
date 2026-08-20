@@ -83,7 +83,7 @@ contrairement aux treuils à contacteurs discrets).
 10. **Frein** `FB_Brake` composé.
 
 `FB_Translation` **ne décide pas** la frontière finale : SafeStop produit une rampe rapide,
-Enable maintenu — jamais une coupure sèche. La barrière finale (`FB_TranslationOutputInterlock_LD`)
+Enable maintenu — jamais une coupure sèche. La barrière finale (`FB_TranslationOutputInterlock`)
 applique le gate double condition.
 
 ---
@@ -219,7 +219,7 @@ reprend sa dernière position connue au redémarrage via `GVL_PERSISTENT._Transl
 |---|---|
 | AF11 (chapô) | Rôle machine, intégration programme |
 | AF11 / FB_Safety_Translation | `SafeStop` consommé |
-| AF11 / FB_TranslationOutputInterlock_LD | Consommateur de la demande produite ici |
+| AF11 / FB_TranslationOutputInterlock | Consommateur de la demande produite ici |
 | AF11 / FB_Translation_PositionDecoder | Fournit butées extrêmes |
 | AF03 | Contrat FB mouvement |
 | Code | `CODE/I_TRANSLATION/FB_Translation.st` |

@@ -250,7 +250,7 @@ def _emit_network_title_marker(ld: ET.Element, local_id: int) -> None:
 def _write_comment(ld: ET.Element, comment_text: str, start_id: int) -> int:
     """Emit a comment, distinguishing the two real kinds found in this codebase.
 
-    Structure copied from the genuine CODESYS oracle export (PRG_06_Outputs_LD,
+    Structure copied from the genuine CODESYS oracle export (PRG_06_Outputs,
     PRG_10_LD_Commentaires -- REX 2026-08):
       - `=== §N TITLE ===` box comment -> its OWN dedicated network: <comment> +
         <vendorElement networktitle>, then an EMPTY <comment> + <vendorElement

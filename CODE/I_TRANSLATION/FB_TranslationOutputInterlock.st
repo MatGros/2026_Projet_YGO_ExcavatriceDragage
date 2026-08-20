@@ -1,13 +1,13 @@
 (* =======================================================================
-   🛡️ FB_TranslationOutputInterlock_LD — Barrière finale frein / AC600 M3
+   🛡️ FB_TranslationOutputInterlock — Barrière finale frein / AC600 M3
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Barrière de sécurité finale pour frein et variateur AC600 M3
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
-   🔌 Interface : Interlock de sortie (entre FB_Translation et PRG_06_Outputs_LD)
+   🔌 Interface : Interlock de sortie (entre FB_Translation et PRG_06_Outputs)
    🔒 Sécurité : Surveillance feedback frein et watchdog de desserrage
    ======================================================================= *)
 
-FUNCTION_BLOCK PUBLIC FB_TranslationOutputInterlock_LD
+FUNCTION_BLOCK PUBLIC FB_TranslationOutputInterlock
 VAR_INPUT
     // === COMMANDES & ETATS GENERAL ===
     Enable                       : BOOL;   // --> [CMD] Autorisation generale FB (TRUE=Autorise)

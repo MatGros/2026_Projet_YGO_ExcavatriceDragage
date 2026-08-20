@@ -408,11 +408,11 @@ TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationState.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
-TranslationState.FinalInterlockState := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State;
-TranslationState.FinalInterlockReason := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason;
-TranslationState.FinalInterlockError := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Error;
-TranslationState.FinalInterlockErrorId := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.ErrorId;
-TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
+TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.State;
+TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
+TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Error;
+TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.ErrorId;
+TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
 TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) <> 0;
 TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) <> 0;
 TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
@@ -434,9 +434,9 @@ TranslationSafety.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafety.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafety.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
-TranslationSafety.PowerCutOffSafety := PRG_06_Outputs_LD.M3PowerCutOffSafetyInfo;
-TranslationSafety.SafeStopSafety := PRG_06_Outputs_LD.M3SafeStopSafetyInfo;
-TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
+TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
+TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
+TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
 
 {endregion}
 END_PROGRAM

@@ -2,7 +2,7 @@
 """Run CODESYS Headless compilation test on a granular POU / PRG.
 
 This tool:
-1. Generates a granular PLCopenXML for the requested object (e.g. PRG_06_Outputs_LD_Provisoire)
+1. Generates a granular PLCopenXML for the requested object (e.g. PRG_06_Outputs_Provisoire)
    with all its transitive dependencies resolved automatically.
 2. Copies a base CODESYS project (.project) to a temporary location to keep hardware/IO context.
 3. Invokes CODESYS in Headless mode (--noUI) via an IronPython script.
@@ -13,7 +13,7 @@ Usage:
     python test_codesys_compile.py [OBJECT_NAME] [--base-project PATH] [--codesys-exe PATH]
 
 Example:
-    python test_codesys_compile.py PRG_06_Outputs_LD_Provisoire
+    python test_codesys_compile.py PRG_06_Outputs_Provisoire
 """
 
 from __future__ import annotations
@@ -174,7 +174,7 @@ def main() -> int:
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("object_name", nargs="?", default="PRG_06_Outputs_LD_Provisoire", help="Target POU/PRG to test")
+    parser.add_argument("object_name", nargs="?", default="PRG_06_Outputs_Provisoire", help="Target POU/PRG to test")
     parser.add_argument("--base-project", type=Path, help="Base .project file to load context from")
     parser.add_argument("--codesys-exe", type=Path, help="Path to CODESYS.exe")
     parser.add_argument("--profile", help="CODESYS Profile Name (default: auto-detect)")

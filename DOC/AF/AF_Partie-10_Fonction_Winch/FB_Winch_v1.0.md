@@ -75,7 +75,7 @@ décélération réelle pouvait bloquer indéfiniment `CommandedDirection`).
 - **Redémarrage même sens** : temps mort paramétrable `DeadTimeSameDir` (défaut **1s**) après `MotorRequest=FALSE` → nouvelle demande même sens.
 - **Redémarrage inversion sens** : temps mort paramétrable `DeadTimeOppositeDir` (défaut **1s**, > temps mort même sens) — **en sus** du délai d'inversion 200ms FB_Winch.
 
-Ces temps morts s'appliquent **dans la barrière finale** (FB_WinchOutputInterlock_LD), supérieurs aux délais internes FB_Winch (inversion 200ms + palier 1s250ms).
+Ces temps morts s'appliquent **dans la barrière finale** (FB_WinchOutputInterlock), supérieurs aux délais internes FB_Winch (inversion 200ms + palier 1s250ms).
 
 ---
 
@@ -133,7 +133,7 @@ leur **égalité** qui signale un contacteur/bobine collé (pas leur différence
 
 | # | Gravité | Point | Action |
 |---|---|---|---|
-| 1 | P1 | Délai hausse palier `FB_Winch` (1s500ms) ≠ délai barrière finale (1s250ms) — cumul possible | Voir AF10 §9bis, `FB_WinchOutputInterlock_LD` §4 |
+| 1 | P1 | Délai hausse palier `FB_Winch` (1s500ms) ≠ délai barrière finale (1s250ms) — cumul possible | Voir AF10 §9bis, `FB_WinchOutputInterlock` §4 |
 | 2 | P1 | `DelayMotorDecel` code mort dans `FB_Brake` | Voir AF10 §9bis (T87/T91), étude terrain requise |
 | 3 | P2 | Rampe %/s (`CfgRampAccelRate` etc.) peu pertinente pour paliers discrets | Voir AF10 §9bis (T93) |
 
@@ -145,7 +145,7 @@ leur **égalité** qui signale un contacteur/bobine collé (pas leur différence
 |---|---|
 | AF10 (chapô) | Rôle machine, intégration programme, TBD Lot 4 |
 | AF10 / FB_Safety_Winch | `SafeStop`/`DescendPermit`/`AscentPermit` consommés |
-| AF10 / FB_WinchOutputInterlock_LD | Consommateur de la demande produite ici |
+| AF10 / FB_WinchOutputInterlock | Consommateur de la demande produite ici |
 | AF09 | Encodeurs — `Homed`, `CablePosM`, vitesse |
 | AF10 / [FB_Bucket](FB_Bucket_v1.0.md) | Benne — sous-fonction M2 de ce FB |
 | Code | `CODE/H_TREUILS_BENNE/FB_Winch.st`, `FB_SpeedStep.st`, `CODE/A_COMMUN/FB_Brake.st` |

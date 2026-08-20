@@ -48,5 +48,5 @@ END_VAR
 
 ## 🛡️ 3. Règle Métier & Sécurité
 
-- **Informatif pur** : Cette estimation n'est jamais utilisée par les blocs `FB_Safety_Winch` ni `FB_WinchOutputInterlock_LD`.
+- **Informatif pur** : Cette estimation n'est jamais utilisée par les blocs `FB_Safety_Winch` ni `FB_WinchOutputInterlock`.
 - **Montée uniquement** : L'estimation de charge n'est active que si `MeasuredSpeedSignedMps > 0` (montée). En descente ou à l'arrêt, `EstimatedLoadPct` est maintenu à 0.0 %.

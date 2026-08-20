@@ -3,7 +3,7 @@
 
 Vérifie sur le bundle (ou un XML direct) les contraintes structurelles CODESYS
 découvertes lors du débogage IndexOutOfRangeException / ArgumentNullException.
-Appliqué à chaque POU suffixé `_LD` (initialement figé sur PRG_06_Outputs_LD,
+Appliqué à chaque POU suffixé `_LD` (initialement figé sur PRG_06_Outputs,
 généralisé 2026-08-13 : un nouveau POU `_LD` comme PRG_02_Acquisition_LD doit
 être couvert par le même garde-fou) :
 
@@ -80,7 +80,9 @@ def check_bundle(bundle: Path, report: bool = False) -> tuple[list[str], list[st
         and p.get("pouType") == "program"
     ]
     if not ld_pous:
-        return ["Aucun POU `_LD` dans le bundle"], []
+        # PRG_06_Outputs migré en ST (2026-08-20) : plus aucun POU `_LD` programme.
+        # Rien à vérifier — PASS (les FB `_LD` ne sont pas des programmes).
+        return [], []
 
     for pou in ld_pous:
         pou_errors, pou_warnings = _check_pou(pou)

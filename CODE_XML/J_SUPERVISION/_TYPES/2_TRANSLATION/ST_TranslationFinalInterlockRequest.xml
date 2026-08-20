@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:16:52.509971" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:16:52.509971">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:43:34.291314" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:43:34.291314">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -51,7 +51,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Demande coupure puissance (FB_Safety_Translation) — consommée par PRG_06_Outputs_LD (Enable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Demande coupure puissance (FB_Safety_Translation) — consommée par PRG_06_Outputs (Enable)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
@@ -92,11 +92,11 @@
    ↔️ ST_TranslationFinalInterlockRequest — Demande brute vers PDO M3
    ───────────────────────────────────────────────────────────────
    📤 Producteur unique : PRG_05_Translation (VAR_OUTPUT).
-   📥 Consommateur unique : PRG_06_Outputs_LD, avant
-      FB_TranslationOutputInterlock_LD.
+   📥 Consommateur unique : PRG_06_Outputs, avant
+      FB_TranslationOutputInterlock.
    🔒 Ne contient jamais une commande PDO autorisée.
    PowerCutOff : demande safety M3 (FB_Safety_Translation).
-      Consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
+      Consommée par PRG_06_Outputs comme SEULE cause de coupure
       d'Enable (barrière finale). SafeStop est géré en amont
       par FB_Translation (rampe rapide, Enable maintenu, AF06 §5).
    ═══════════════════════════════════════════════════════════════</xhtml>

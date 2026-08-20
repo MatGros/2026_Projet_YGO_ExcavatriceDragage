@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T03:37:14.350949" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T03:37:14.350949">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:40:51.249548" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:40:51.249548">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -183,12 +183,12 @@
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   📤 ST_OutputsInterPrg — Bus d'échange inter-PRG produit par PRG_06_Outputs_LD
+   📤 ST_OutputsInterPrg — Bus d'échange inter-PRG produit par PRG_06_Outputs
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Encapsuler les ordres actionneurs finaux (M1/M2/M3, AU) produits
-      par PRG_06_Outputs_LD et rebouclés par FB_SimBench (instancié dans
+      par PRG_06_Outputs et rebouclés par FB_SimBench (instancié dans
       PRG_02_Acquisition) pour le banc de simulation intégré.
-   📤 Producteur unique : PRG_06_Outputs_LD (VAR_OUTPUT Data : ST_OutputsInterPrg).
+   📤 Producteur unique : PRG_06_Outputs (VAR_OUTPUT Data : ST_OutputsInterPrg).
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
    🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>

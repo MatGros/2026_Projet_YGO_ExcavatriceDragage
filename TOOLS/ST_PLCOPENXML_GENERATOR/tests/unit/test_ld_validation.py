@@ -65,17 +65,17 @@ def test_ld_body_uses_declared_type_for_every_multi_parameter_fb_call():
     ld_xml = build_ld_body(
         st_code,
         instance_types={
-            "instWinchOutputInterlockM1_LD": "FB_WinchOutputInterlock_LD",
-            "instWinchOutputInterlockM2_LD": "FB_WinchOutputInterlock_LD",
-            "instTranslationOutputInterlock_LD": "FB_TranslationOutputInterlock_LD",
+            "instWinchOutputInterlockM1_LD": "FB_WinchOutputInterlock",
+            "instWinchOutputInterlockM2_LD": "FB_WinchOutputInterlock",
+            "instTranslationOutputInterlock_LD": "FB_TranslationOutputInterlock",
         },
     )
 
     blocks = {block.get("instanceName"): block.get("typeName") for block in ld_xml.findall(".//block")}
     assert blocks == {
-        "instWinchOutputInterlockM1_LD": "FB_WinchOutputInterlock_LD",
-        "instWinchOutputInterlockM2_LD": "FB_WinchOutputInterlock_LD",
-        "instTranslationOutputInterlock_LD": "FB_TranslationOutputInterlock_LD",
+        "instWinchOutputInterlockM1_LD": "FB_WinchOutputInterlock",
+        "instWinchOutputInterlockM2_LD": "FB_WinchOutputInterlock",
+        "instTranslationOutputInterlock_LD": "FB_TranslationOutputInterlock",
     }
 
 
@@ -196,7 +196,7 @@ def test_ld_multi_param_fb_emits_all_declared_outputs():
 
 
 def test_ld_multi_param_fb_first_output_cabled_form():
-    """Garde anti-régression REX 2026-08-04 (PRG_06_Outputs_LD) :
+    """Garde anti-régression REX 2026-08-04 (PRG_06_Outputs) :
     Dans le chemin multi-params (instSafety(...)), le **premier output** DOIT
     être en forme 'câblée' <connectionPointOut/> (SANS <expression/>), même si
     aucune coil n'est connectée. C'est la convention CODESYS pour le 'principal'

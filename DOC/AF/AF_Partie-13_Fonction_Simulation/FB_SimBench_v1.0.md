@@ -59,7 +59,7 @@ de les appeler et d'assembler leurs sorties dans les 4 sous-images `ST_HardwareI
 
 ## 3. Interface — entrées bouclées avec décalage 1 scan
 
-Certaines entrées de `FB_SimBench` sont des **sorties du scan précédent** de `PRG_06_Outputs_LD`
+Certaines entrées de `FB_SimBench` sont des **sorties du scan précédent** de `PRG_06_Outputs`
 (le programme sortie tourne **après** l'acquisition dans la `MainTask`, Partie 02 §4) : le banc
 rejoue donc la vraie chaîne de commande, avec le même retard d'1 scan qu'un vrai automate aurait
 entre une sortie et sa relecture. C'est **documenté et voulu** (Partie 01 §7 « Correctif L1 »),
@@ -68,10 +68,10 @@ un blocage simulation :
 
 | Entrée `FB_SimBench` | Source | Décalage |
 |---|---|---|
-| `PowerKeepAlive_A` | `PRG_06_Outputs_LD.PowerKeepAliveACmd` | 1 scan (PRG_02 avant PRG_06) |
-| `PowerKeepAlive_B` | `PRG_06_Outputs_LD.PowerKeepAliveBCmd` | 1 scan |
-| `EmergencyArming_RQ` | `PRG_06_Outputs_LD.EmergencyArmingCmd OR (ArmingSeqStep=5)` | Le `OR` corrige le retard sur `EmergencyArmingCmd` seul ; `ArmingSeqStep` lui-même reste lu avec 1 scan de retard (non éliminé, sans conséquence connue vu la durée du pulse ≥ plusieurs scans) |
-| `M1/M2_RelayFwd/Rev`, `M1/M2_SpeedContactor_1..4` | `GVL_Global.*` (recopie `PRG_06_Outputs_LD`) | 1 scan |
+| `PowerKeepAlive_A` | `PRG_06_Outputs.PowerKeepAliveACmd` | 1 scan (PRG_02 avant PRG_06) |
+| `PowerKeepAlive_B` | `PRG_06_Outputs.PowerKeepAliveBCmd` | 1 scan |
+| `EmergencyArming_RQ` | `PRG_06_Outputs.EmergencyArmingCmd OR (ArmingSeqStep=5)` | Le `OR` corrige le retard sur `EmergencyArmingCmd` seul ; `ArmingSeqStep` lui-même reste lu avec 1 scan de retard (non éliminé, sans conséquence connue vu la durée du pulse ≥ plusieurs scans) |
+| `M1/M2_RelayFwd/Rev`, `M1/M2_SpeedContactor_1..4` | `GVL_Global.*` (recopie `PRG_06_Outputs`) | 1 scan |
 | `M1/M2_BrakeCmd`, `M3_BrakeCmd` | `GVL_Global.*` | 1 scan |
 
 ⚠️ Ce décalage est la première hypothèse à vérifier devant un comportement simulation qui

@@ -62,7 +62,7 @@ VAR_INPUT
     DredgingAssist           : ST_DredgingAssistHMI; (* --> [HW] GVL_IHM.DredgingAssist *)
     JoystickHMI              : ST_JoystickHMI;   (* --> [HW] GVL_IHM.JOY1Joystick *)
 
-    (* 🛡️ Sorties publiques AU produites par PRG_06_Outputs_LD *)
+    (* 🛡️ Sorties publiques AU produites par PRG_06_Outputs *)
     EmergencyState           : ST_Safety_Emergency_State;   (* --> [SAFE] État AU *)
     EmergencyDiag            : ST_Safety_Emergency_Diag;   (* --> [SAFE] Diagnostic AU *)
     PowerCutOffActive        : BOOL;   (* --> [SAFE] Coupure puissance *)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T13:18:03.331683" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T13:18:03.331683">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:32:23.716712" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:32:23.716712">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -189,7 +189,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Demande coupure puissance (FB_Safety_Translation) — consommée par PRG_06_Outputs_LD (Enable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Demande coupure puissance (FB_Safety_Translation) — consommée par PRG_06_Outputs (Enable)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
@@ -230,11 +230,11 @@
    ↔️ ST_TranslationFinalInterlockRequest — Demande brute vers PDO M3
    ───────────────────────────────────────────────────────────────
    📤 Producteur unique : PRG_05_Translation (VAR_OUTPUT).
-   📥 Consommateur unique : PRG_06_Outputs_LD, avant
-      FB_TranslationOutputInterlock_LD.
+   📥 Consommateur unique : PRG_06_Outputs, avant
+      FB_TranslationOutputInterlock.
    🔒 Ne contient jamais une commande PDO autorisée.
    PowerCutOff : demande safety M3 (FB_Safety_Translation).
-      Consommée par PRG_06_Outputs_LD comme SEULE cause de coupure
+      Consommée par PRG_06_Outputs comme SEULE cause de coupure
       d'Enable (barrière finale). SafeStop est géré en amont
       par FB_Translation (rampe rapide, Enable maintenu, AF06 §5).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -1299,11 +1299,11 @@ TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationState.JoystickDeflection_Pct := INT_TO_REAL(PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1);
-TranslationState.FinalInterlockState := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.State;
-TranslationState.FinalInterlockReason := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Reason;
-TranslationState.FinalInterlockError := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.Error;
-TranslationState.FinalInterlockErrorId := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.ErrorId;
-TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs_LD.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
+TranslationState.FinalInterlockState := PRG_06_Outputs.instTranslationOutputInterlockM3.State;
+TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
+TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Error;
+TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.ErrorId;
+TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
 TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) &lt;&gt; 0;
 TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) &lt;&gt; 0;
 TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Auth.MaintenanceM3TargetEnable;
@@ -1325,9 +1325,9 @@ TranslationSafety.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafety.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafety.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
-TranslationSafety.PowerCutOffSafety := PRG_06_Outputs_LD.M3PowerCutOffSafetyInfo;
-TranslationSafety.SafeStopSafety := PRG_06_Outputs_LD.M3SafeStopSafetyInfo;
-TranslationSafety.BlockedBySafety := PRG_06_Outputs_LD.M3BlockedBySafetyInfo;
+TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
+TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
+TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
 
 {endregion}
 </xhtml>
@@ -2458,7 +2458,7 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier AC600, arbitrée par FB_TranslationOutputInterlock</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedDriveFreqHz">
@@ -2466,7 +2466,7 @@ réel (+1 = physiquement vers Trémie), pour rester apparié aux vrais capteurs
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande métier fréquence, arbitrée par FB_TranslationOutputInterlock</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeReleaseRequest">
@@ -2804,7 +2804,7 @@ END_IF;
 // Le frein de parking ne serre QUE lorsque la fréquence réelle variateur chute sous 1.0 Hz !
 // Borné par un garde-fou 2s — DriveActualFreqHz n'a aucun contrôle de fraîcheur EtherCAT ; si la
 // communication se fige sur une valeur ≥1.0 Hz (perte réseau en mouvement), rien d'autre en aval
-// ne referme le frein (FB_TranslationOutputInterlock_LD ignore volontairement SafeStop par
+// ne referme le frein (FB_TranslationOutputInterlock ignore volontairement SafeStop par
 // conception). Le garde-fou force la fermeture du frein 2s après la fin de la rampe THÉORIQUE, quoi
 // que dise la mesure réelle — combine attente réelle (évite un serrage sur arbre encore tournant)
 // et certitude de fermeture (n'attend jamais indéfiniment).
@@ -2861,7 +2861,7 @@ BrakeContactorCheck := Brake.ContactorCheck;
 // 🛡️ FB_Translation ne décide plus la frontière finale : il expose uniquement
 // ses demandes métier. SafeStop est déjà appliqué dans la rampe rapide §4 : tant que
 // la vitesse ne vaut pas zéro, la demande et le desserrage suivent la décélération.
-// FB_TranslationOutputInterlock_LD ne doit jamais transformer SafeStop en coupure sèche.
+// FB_TranslationOutputInterlock ne doit jamais transformer SafeStop en coupure sèche.
 
 {endregion}
 

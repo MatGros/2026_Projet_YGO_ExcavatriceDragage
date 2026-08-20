@@ -1,13 +1,13 @@
 (* =======================================================================
-   🛡️ FB_WinchOutputInterlock_LD — Barrière finale frein / puissance M1 ou M2
+   🛡️ FB_WinchOutputInterlock — Barrière finale frein / puissance M1 ou M2
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Barrière de sécurité finale pour frein et contacteurs M1/M2
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs_LD)
+   🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs)
    🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
    ======================================================================= *)
 
-FUNCTION_BLOCK PUBLIC FB_WinchOutputInterlock_LD
+FUNCTION_BLOCK PUBLIC FB_WinchOutputInterlock
 VAR_INPUT
     // === COMMANDES ET ETATS GENERAL ===
     Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB (TRUE=Autorise)
@@ -210,7 +210,7 @@ END_IF;
 // conditions de sécurité (Error, RestartInhibit, RestartRequired, MotorRequest)
 // sans avoir à les répéter. Aucun risque d'écart frein/mouvement possible : le
 // frein ne PEUT pas être commandé ouvert sans qu'un des deux relais de sens le
-// soit aussi, puisque c'est la même expression. PRG_06_Outputs_LD recalcule la
+// soit aussi, puisque c'est la même expression. PRG_06_Outputs recalcule la
 // MÊME expression indépendamment sur les DQ finaux (M1RelayFwd OR M1RelayRev)
 // pour piloter physiquement la bobine — ce BrakeCmd ici sert de miroir/diagnostic
 // (State, IHM) mais n'est plus câblé sur la sortie physique (voir PRG_06 §2).

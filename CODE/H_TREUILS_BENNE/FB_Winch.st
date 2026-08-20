@@ -266,7 +266,7 @@ SpeedGuardLimited := SpeedStep.SpeedGuardLimited;
 {region "§4 Commandes contacteurs et sens"}
 // Les sorties métier suivent le palier temporisé. FB_Winch/SpeedStepTable reste
 // propriétaire unique des combinaisons, y compris les mappings M2 Benne dynamiques.
-// FB_WinchOutputInterlock_LD ne fait qu'autoriser ou masquer ces quatre demandes.
+// FB_WinchOutputInterlock ne fait qu'autoriser ou masquer ces quatre demandes.
 CASE StepNumber OF
     1:
         Contactor1 := SpeedStepTable.P1R1; Contactor2 := SpeedStepTable.P1R2;
@@ -301,7 +301,7 @@ END_IF;
 // jusqu'à la retombée de la rampe) — coupure instantanée du contacteur de sens dès le
 // relâchement du joystick, même sécurité que ci-dessus.
 // Le frein n'est pas une condition d'engagement des relais de sens : c'est l'inverse
-// (voir FB_WinchOutputInterlock_LD §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
+// (voir FB_WinchOutputInterlock §6 : BrakeCmd := RelayFwd OR RelayRev, calculé APRÈS ces relais).
 RelayFwd := (Direction = 1) AND (CommandedDirection = 1) AND (RequestedStep > 0);
 RelayRev := (Direction = -1) AND (CommandedDirection = -1) AND (RequestedStep > 0);
 
@@ -338,7 +338,7 @@ END_IF;
 
 IF NOT BypassGlobal THEN
 // bit0 ErrorId libre — la cohérence commande/retour du frein est surveillée dans
-// FB_WinchOutputInterlock_LD (BrakeFeedback).
+// FB_WinchOutputInterlock (BrakeFeedback).
 
 // 🧪 Simulation (GVL_Simulation.SensorMxContactorFeedbackIsReal, passé par l'appelant via
 // BypassContactorCheck) — sans contacteurs réels câblés/cohérents en essai, StuckClosed

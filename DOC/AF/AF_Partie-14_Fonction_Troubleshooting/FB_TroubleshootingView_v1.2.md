@@ -21,7 +21,7 @@
   nouvelle source de vérité. Chaque champ qu'il publie a déjà un producteur ailleurs dans le
   programme ; ce FB ne fait que les recopier dans un ordre utile au dépannage.
 - **Diagnostic AU** : recopie des sorties publiques `EmergencyState`, `EmergencyDiag`,
-  `PowerCutOffActive` et des maintiens A/B produits par `PRG_06_Outputs_LD`. La projection
+  `PowerCutOffActive` et des maintiens A/B produits par `PRG_06_Outputs`. La projection
   reste passive et ne lit aucun interne du FB de sécurité.
 - **Dossier dédié** `CODE/DEPANNAGE/` : regroupe la GVL et ce FB, sans les disperser dans
   `SUPERVISION` ni dans un domaine métier.

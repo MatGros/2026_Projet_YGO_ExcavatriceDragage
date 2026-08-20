@@ -1,4 +1,4 @@
-# 🔬 REX — Bug import CODESYS PRG_06_Outputs_LD (multi-causes)
+# 🔬 REX — Bug import CODESYS PRG_06_Outputs (multi-causes)
 
 **Date** : 2026-08-04 (mis à jour 2026-08, LOT_STRUCTURE_INTERLOCKS_LD)  
 **Version** : v1.1  
@@ -11,7 +11,7 @@
 L'import du bundle `CODE_Bundle.xml` dans CODESYS V3.5 SP19 échouait :
 
 ```
-[ERREUR] Échec de la création de l'objet « PRG_06_Outputs_LD ».
+[ERREUR] Échec de la création de l'objet « PRG_06_Outputs ».
 Cause : L'index se trouve en dehors des limites du tableau.   ← import
 ```
 
@@ -61,7 +61,7 @@ leftPowerRail(0) → comment(1) → vendorElement(2) → block(3, localId RÉSER
 → contact(4) → inVariable(5-10, vides, inputs non connectés) → coil(11)
 ```
 
-Règles tirées des oracles `PRG_06_Outputs_LD.xml` / `PRG_Oracle_Nested.xml` :
+Règles tirées des oracles `PRG_06_Outputs.xml` / `PRG_Oracle_Nested.xml` :
 
 | Règle | Détail |
 |---|---|
@@ -148,7 +148,7 @@ contact pointé sur la broche du bloc producteur.
 | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | coils→blocs, outputs dans bloc (causes 2-3) |
 | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | Le convertisseur universel ST→LD traite désormais directement l'ensemble des POU `_LD`. |
 | `TOOLS/AGENT_WORKFLOW/scripts/G390_check_bundle_freshness.py` | vérifie le bundle frais |
-| `CODE/M_MAIN/PRG_06_Outputs_LD.st` | outputs directs du FB (au lieu de chemins nested) |
+| `CODE/M_MAIN/PRG_06_Outputs.st` | outputs directs du FB (au lieu de chemins nested) |
 
 ---
 

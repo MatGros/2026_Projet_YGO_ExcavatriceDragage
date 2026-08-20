@@ -28,7 +28,7 @@
 ### 🎯 Objectif de séance — 2026-08-07
 - **Cible** : réaliser un **cycle complet** (descente → contact Kobold → remontée → vidage trémie) **sans sécurité particulière, ou à sécurité limitée** — validation mécanique/mouvement avant la mise en place des protections finales.
 - ⚠️ **Risque noté (devoir d'alerte)** : cycle réel sur machine sans les sécurités complètes → **uniquement avec bypass explicites** (`Bypass.Global`/ciblés), **homme-mort** maintenu, vigilance opérateur, **aucun redémarrage auto après défaut**, personnes écartées de la zone.
-- 📌 **Point à clarifier** : la barrière `SafetyStructureNotValidated := TRUE` (`PRG_06_Outputs_LD.st:50`) coupe toutes les sorties → confirmer le moyen d'autoriser le mouvement pour cet essai (retrait ponctuel vs bypass).
+- 📌 **Point à clarifier** : la barrière `SafetyStructureNotValidated := TRUE` (`PRG_06_Outputs.st:50`) coupe toutes les sorties → confirmer le moyen d'autoriser le mouvement pour cet essai (retrait ponctuel vs bypass).
 
 ---
 
@@ -37,7 +37,7 @@
 - 🎯 **Périmètre** : Treuils M1/M2 — commande frein vs contacteurs de sens
 - 🚦 **Statut** : 🟢 **Implémenté (déjà dans le repo, daté 08/06)**
 - 🔍 **Constat / Décision** : Simplification : le frein est commandé **directement** par la commande des **contacteurs de sens** (`BrakeCmd := RelayFwd OR RelayRev`). Aucun écart frein/mouvement possible.
-- 🛠️ **Preuve code** : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock_LD.st:244` (`BrakeCmd := RelayFwd OR RelayRev`), `FB_WinchOutputInterlock_LD.st:13-15`, `FB_Winch.st:9` (+ câblage `PRG_06_Outputs_LD`).
+- 🛠️ **Preuve code** : `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st:244` (`BrakeCmd := RelayFwd OR RelayRev`), `FB_WinchOutputInterlock.st:13-15`, `FB_Winch.st:9` (+ câblage `PRG_06_Outputs`).
 - 📌 **Action** : À tester au chargement `v0.5.9_IOTest` (séquence frein+sens).
 
 ---
@@ -64,8 +64,8 @@
 - 🟦 **Date** : 2026-08-07 | 🟧 **Lieu** : Terrain | 🏷️ **Version** : `aa4219c`
 - 🎯 **Périmètre** : Capteur Kobold — activation contacteur mesure (`M1_M2_KoboldMeasureEnable_DQ`)
 - 🚦 **Statut** : 🟢 **Corrigé**
-- 🔍 **Constat** : `KoboldContactorCmd` (`PRG_06_Outputs_LD`) déclaré mais **jamais assigné** — chaîne `instDiveSearch.KoboldMeasureEnable → KoboldContactorCmdArbitrated` s'arrêtait net, aucune erreur de compilation/gate pour le signaler. Même classe de bug que le fix frein M3 du 2026-08-05.
-- 🛠️ **Solution** : `KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;` + coil directe sur `M1_M2_KoboldMeasureEnable_DQ` (même pattern validé M1/M2/M3). Preuve : `CODE/M_MAIN/PRG_06_Outputs_LD.st` | Générateur PLCopenXML ST→LD | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | 🟢 Généralisé (Ladder standard) | `DIRECT_HW_COILS`.
+- 🔍 **Constat** : `KoboldContactorCmd` (`PRG_06_Outputs`) déclaré mais **jamais assigné** — chaîne `instDiveSearch.KoboldMeasureEnable → KoboldContactorCmdArbitrated` s'arrêtait net, aucune erreur de compilation/gate pour le signaler. Même classe de bug que le fix frein M3 du 2026-08-05.
+- 🛠️ **Solution** : `KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;` + coil directe sur `M1_M2_KoboldMeasureEnable_DQ` (même pattern validé M1/M2/M3). Preuve : `CODE/M_MAIN/PRG_06_Outputs.st` | Générateur PLCopenXML ST→LD | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | 🟢 Généralisé (Ladder standard) | `DIRECT_HW_COILS`.
 - 📌 **Action** : confirmer import CODESYS propre (risque connu, REX 2026-08-04, validé sur M1/M2/M3).
 
 ### MES-024 — 🔴 Permis de mouvement `DescendPermit`/`AscentPermit` calculés mais jamais consommés

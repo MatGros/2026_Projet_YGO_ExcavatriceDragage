@@ -48,7 +48,7 @@ dans sa propre page, visible à côté des blocs métier.
 | 02 | `PRG_03_Modes_Cycle` — (ST pur) |
 | 03 | `PRG_04_Treuils_Benne` — safety M1/M2 intégrée (ST pur) |
 | 04 | `PRG_05_Translation` — safety M3 intégrée (ST pur) |
-| 05 | `PRG_06_Outputs_LD` — agrège `PowerCutOff` |
+| 05 | `PRG_06_Outputs` — agrège `PowerCutOff` |
 | 06 | `PRG_07_Supervision` — absorbe le troubleshooting, lecture seule stricte (ST pur) |
 
 🚫 **Vocabulaire abandonné** — ces POU n'existent pas dans la cible et ne doivent pas être

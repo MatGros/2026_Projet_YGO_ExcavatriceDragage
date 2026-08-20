@@ -63,7 +63,7 @@ E/S TOR + PDO + devices réels ──► PRG_02_Acquisition ──► HwReal bru
                                       │                                 │
                                       └─────────────────────────────────┘
                                                                         │
-Modes/Cycle → procédés avec leur safety → PRG_06_Outputs_LD → Supervision
+Modes/Cycle → procédés avec leur safety → PRG_06_Outputs → Supervision
 ```
 
 | Règle | Exigence |
@@ -81,7 +81,7 @@ Le detail homing/vitesse codeur reste proprietaire de la Partie 09. AF06 porte s
 | Type de signal | Programme propriétaire | Langage | Bloc / DUT |
 |---|---|---|---|
 | E/S TOR, PDO, diagnostics device, simulation et image sélectionnée | `PRG_02_Acquisition` | ST | `ST_HardwareImage`, FB d'acquisition et `GetDeviceState()` |
-| Barrière finale des sorties physiques | `PRG_06_Outputs_LD` | Ladder | Interlocks finaux et coils de sortie |
+| Barrière finale des sorties physiques | `PRG_06_Outputs` | Ladder | Interlocks finaux et coils de sortie |
 | Ancienne qualification TOR | `PRG_01_Inputs_LD` | Ladder | En retrait ; aucun nouveau câblage |
 
 > 📌 La frontière cible est donc unique dans `PRG_02_Acquisition`. Le Ladder reste justifié pour
@@ -110,7 +110,7 @@ L'etat de la chaine d'arret d'urgence est un **fait d'entree qualifie**, acquis 
 entrees pour etre visible des l'acquisition par la maintenance.
 
 ⚠️ **Cela ne change rien a son action.** Le FB de gestion AU agit sur les sorties via la barriere
-finale `PRG_06_Outputs_LD`. **Acquisition de l'etat ≠ lieu d'action.** La chaine materielle AU, sa
+finale `PRG_06_Outputs`. **Acquisition de l'etat ≠ lieu d'action.** La chaine materielle AU, sa
 polarite fail-safe, son auto-test et son rearmement restent proprietaires de la **Partie 01** : le
 PLC ne remplace jamais cette chaine.
 
@@ -119,7 +119,7 @@ PLC ne remplace jamais cette chaine.
 - Aucune decision `SafeStop`, mode, interdiction ou commande actionneur. La safety de chaque
   procede vit **dans la page de son procede** (`PRG_04_Treuils_Benne_CFC`, `PRG_05_Translation_CFC`),
   pas ici et pas dans un POU safety global — qui n'existe pas dans la cible.
-- Aucune sortie physique : elles restent produites uniquement par `PRG_06_Outputs_LD`.
+- Aucune sortie physique : elles restent produites uniquement par `PRG_06_Outputs`.
 
 📌 Lot de migration : **M1** (C4, rebuild) — migration 7 POU soldée, historique archivé (`ARCHIVES/Doc/AUDITS/Architecture_Migration7POU/`).
 Le référencement (`FB_Encoder_Homing`) n'appartient pas à cette frontière de mesure : il rejoint
@@ -256,7 +256,7 @@ EncoderFault.<Treuil> := NOT EncoderAvailable OR EncoderIncoherent
 | `PRG_03_Modes_Cycle_CFC` (`FB_Modes`) | Refuse `SEMI_AUTO` (repli `MAINT_N1`, `Auth.ErrorId` bit0) — **agrégat M1 OR M2** | aucun (SEMI_AUTO ne tolère aucun codeur faux) |
 | `PRG_04_Treuils_Benne_CFC` (`FB_Safety_Winch`) | `SafeStop` du treuil concerné (bit2 `ErrorId`) | individuel `EncoderFaultBypass`, **MAINT_N2 uniquement** |
 | `PRG_03_Modes_Cycle_CFC` (`Auth.SyncEnable` / `Sync`) | Synchro refusée si l'un des 2 codeurs faux | — |
-| `PRG_06_Outputs_LD` / `PRG_04` (commande) | Interdit toute commande reposant sur la position tant que `EncoderFault` | via Modes/Safety uniquement |
+| `PRG_06_Outputs` / `PRG_04` (commande) | Interdit toute commande reposant sur la position tant que `EncoderFault` | via Modes/Safety uniquement |
 | `PRG_07_Supervision_CFC` (IHM) | `EncoderFault` par treuil → alarme/animation | — |
 
 **Producteur unique de l'agrégat** : `PRG_02_Acquisition` produit `ST_EncoderMeasurements`
@@ -383,7 +383,7 @@ confirme la boucle AU (Partie 01).
 
 ## ⚡ 5. Sorties physiques & Barrières de sécurité
 
-Les sorties finales et barrières de commande matérielle sont gérées dans `PRG_06_Outputs_LD` en Ladder.
+Les sorties finales et barrières de commande matérielle sont gérées dans `PRG_06_Outputs` en Ladder.
 
 | Regle | Exigence |
 |---|---|
@@ -394,7 +394,7 @@ Les sorties finales et barrières de commande matérielle sont gérées dans `PR
 
 ### 🔍 Diagnostic graphique Ladder & Publication GVL_IHM
 
-Pour chaque actionneur (**M1 Treuil Retenue**, **M2 Treuil Benne**, **M3 Translation**), `PRG_06_Outputs_LD` intègre 3 blocs opérateurs `OR` de diagnostic pur (Watch/Ladder) :
+Pour chaque actionneur (**M1 Treuil Retenue**, **M2 Treuil Benne**, **M3 Translation**), `PRG_06_Outputs` intègre 3 blocs opérateurs `OR` de diagnostic pur (Watch/Ladder) :
 
 1. **`*PowerCutOffSafetyInfo`** (Bloc 1) : Regroupe les mécanismes critiques provoquant une coupure de puissance amont (Méca A..E, thermiques, perte de contrôle).
 2. **`*SafeStopSafetyInfo`** (Bloc 2) : Regroupe les défauts entraînant une rampe de décélération rapide contrôlée (perte comm opérateur/joystick, codeur, rotation phase, etc.).
@@ -448,7 +448,7 @@ Cible : `PRG_07_Supervision_CFC`, qui absorbe le troubleshooting en lecture seul
 ## 📚 Documents lies
 
 - Partie 01 : AU, `PowerKeepAlive`, rearmement.
-- Partie 02 : architecture cible 7 POU — `PRG_02_Acquisition` et `PRG_06_Outputs_LD`.
+- Partie 02 : architecture cible 7 POU — `PRG_02_Acquisition` et `PRG_06_Outputs`.
 - Partie 08 : traitement joystick.
 - Partie 09 : homing et vitesse codeur.
 - Partie 13 : simulation.

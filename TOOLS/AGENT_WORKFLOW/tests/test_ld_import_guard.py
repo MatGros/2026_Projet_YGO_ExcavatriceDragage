@@ -370,11 +370,10 @@ def test_every_block_has_coil_wired_to_state_output() -> None:
             f"Block {inst_name} (id={block_id}): aucune coil reliée à .State"
 
 
-def test_bundle_prg06_outputs_ld_valid_invariables_and_block_refs() -> None:
-    """PRG_06_Outputs_LD dans le bundle ne doit avoir ni refLocalId=0 sur des inputs FB,
-    ni littéraux 'TRUE'/'FALSE' non convertis dans les inVariable (doivent être '1'/'0').
-    Le programme ne doit pas non plus déclarer de VAR_INPUT (inputVars doit être vide).
-    """
+def test_bundle_prg06_outputs_present_sans_var_input() -> None:
+    """PRG_06_Outputs (ST, migré depuis _LD le 2026-08-20) doit être présent dans le
+    bundle et ne pas déclarer de VAR_INPUT (barrière finale, reçoit via PRG_04/05).
+    Les invariants LD ne s'appliquent plus : le POU est en ST pur."""
     import xml.etree.ElementTree as ET
     bundle = Path(__file__).resolve().parents[2].parent / "CODE_XML" / "CODE_Bundle.xml"
     assert bundle.exists()
@@ -389,30 +388,13 @@ def test_bundle_prg06_outputs_ld_valid_invariables_and_block_refs() -> None:
 
     pous = [
         p for p in root.findall(".//{http://www.plcopen.org/xml/tc6_0200}pou")
-        if p.attrib.get("name") == "PRG_06_Outputs_LD"
+        if p.attrib.get("name") == "PRG_06_Outputs"
     ]
-    assert len(pous) == 1, "PRG_06_Outputs_LD absent ou dupliqué dans le bundle"
+    assert len(pous) == 1, "PRG_06_Outputs absent ou dupliqué dans le bundle"
     pou = pous[0]
 
-    # Vérifier que inputVars est vide sur le PROGRAM PRG_06_Outputs_LD
+    # Vérifier que inputVars est vide sur le PROGRAM PRG_06_Outputs
     input_vars = pou.findall("{http://www.plcopen.org/xml/tc6_0200}interface/{http://www.plcopen.org/xml/tc6_0200}inputVars/{http://www.plcopen.org/xml/tc6_0200}variable")
-    assert len(input_vars) == 0, f"PRG_06_Outputs_LD ne doit pas déclarer de VAR_INPUT dans un PROGRAM: {len(input_vars)} trouvés"
-
-    # 1. Vérifier qu'aucun inputVariable de block n'a refLocalId="0"
-    for block in pou.findall(".//{http://www.plcopen.org/xml/tc6_0200}block"):
-        b_name = block.attrib.get("instanceName")
-        for iv in block.findall("{http://www.plcopen.org/xml/tc6_0200}inputVariables/{http://www.plcopen.org/xml/tc6_0200}variable"):
-            fp = iv.attrib.get("formalParameter")
-            conn = iv.find(".//{http://www.plcopen.org/xml/tc6_0200}connection")
-            ref = conn.attrib.get("refLocalId") if conn is not None else None
-            if fp == "EN" and ref == "0":
-                continue  # Broche EN connectée au leftPowerRail (localId="0")
-            assert ref != "0", f"Block {b_name} parameter {fp} a un refLocalId='0' invalide"
-
-    # 2. Vérifier qu'aucun inVariable ne contient 'TRUE' ou 'FALSE' en chaîne brute
-    for inv in pou.findall(".//{http://www.plcopen.org/xml/tc6_0200}inVariable"):
-        expr = inv.find("{http://www.plcopen.org/xml/tc6_0200}expression")
-        text = expr.text if expr is not None else None
-        assert text not in ("TRUE", "FALSE"), f"inVariable {inv.attrib.get('localId')} contient littéral interdit '{text}' (doit être '1' ou '0')"
+    assert len(input_vars) == 0, f"PRG_06_Outputs ne doit pas déclarer de VAR_INPUT dans un PROGRAM: {len(input_vars)} trouvés"
 
 

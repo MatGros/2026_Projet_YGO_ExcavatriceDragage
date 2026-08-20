@@ -86,7 +86,7 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
     # depuis leur apparition — pas une regression de ce lot.
     "FB_Safety_Winch": (
         "meme classe de bug que FB_Safety_Translation, deja documentee dans "
-        "l'en-tete CODE/M_MAIN/PRG_06_Outputs_LD.st avant cette session — hors "
+        "l'en-tete CODE/M_MAIN/PRG_06_Outputs.st avant cette session — hors "
         "perimetre M3, PLAN_TASK lot 5 'Reliquats safety' (T72-T74) — "
         "suppression/cablage a trancher par l'utilisateur"
     ),

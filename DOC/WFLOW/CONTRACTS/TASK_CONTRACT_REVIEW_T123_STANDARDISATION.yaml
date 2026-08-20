@@ -34,7 +34,7 @@ contract:
       verified_by: "grep ripgrep sur CODE/ : pattern REX|20[0-9]{2}-[0-9]{2}-[0-9]{2}|🆕|retour terrain|correctif|LOT[0-9]|audit|revocation — 0 resultat."
     - id: AC3
       statement: "Les invariants de securite machine (Enable>SafeStop>StartStop, Reset sur front, pas de redemarrage auto, producteur unique, gate final frein, PowerCutOff) sont preserves."
-      verified_by: "Revue ciblee des FB safety/mouvement (FB_Safety_Winch, FB_Safety_Translation, FB_Winch, FB_Translation, FB_Bucket, FB_WinchOutputInterlock_LD, FB_TranslationOutputInterlock_LD, FB_Safety_EmergencyManagement*) contre AF01/AF03/AF10/AF11."
+      verified_by: "Revue ciblee des FB safety/mouvement (FB_Safety_Winch, FB_Safety_Translation, FB_Winch, FB_Translation, FB_Bucket, FB_WinchOutputInterlock, FB_TranslationOutputInterlock, FB_Safety_EmergencyManagement*) contre AF01/AF03/AF10/AF11."
     - id: AC4
       statement: "Chaque cartouche <=15 lignes, contient un lien AF valide sous DOC/AF/ et n'utilise que des emojis de la whitelist CODESYS projet."
       verified_by: "Comptage lignes cartouche + verification lien AF + emojis whitelist sur les 103 fichiers."

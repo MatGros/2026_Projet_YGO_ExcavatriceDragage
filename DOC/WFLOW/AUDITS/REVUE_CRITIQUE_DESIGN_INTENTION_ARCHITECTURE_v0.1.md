@@ -192,7 +192,7 @@ ses structures dédiées, jamais les internes des FB »*) qui paie ici.
 | `PRG_05_Translation` | 10 | 🟢 Idem |
 | `PRG_03_Modes_Cycle` | 5 | 🟢 Idem |
 | `PRG_02_Acquisition` | 3 | 🟢 Idem |
-| `PRG_06_Outputs_LD` | 1 | ✅ **Hors périmètre** — `instSafetyEmergencyManagement.State` est de type `ST_Safety_Emergency_State` (struct métier), pas le `E_State` de phase. Aucun risque d'import Ladder |
+| `PRG_06_Outputs` | 1 | ✅ **Hors périmètre** — `instSafetyEmergencyManagement.State` est de type `ST_Safety_Emergency_State` (struct métier), pas le `E_State` de phase. Aucun risque d'import Ladder |
 | **Total** | **144** | |
 | `GVL_IHM` / SCADA / pupitre | **0** | ✅ Aucun impact |
 

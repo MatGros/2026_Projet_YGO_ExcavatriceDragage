@@ -85,7 +85,7 @@
 | `CODE/L_SIMULATION/FB_Sim_Encoder.st` | 3 | **cartouche 28 lignes** (>15), `Extraction PURE de la logique`, `RawPos déplacé en VAR_IN_OUT` |
 | `CODE/L_SIMULATION/FB_SimBench.st` | 3 | `Lot L6`, `P1 Lot L6` (x2) |
 | `CODE/M_MAIN/GVL_Global.st` | 2 | `orphelines`, `jamais appelée` |
-| `CODE/M_MAIN/PRG_06_Outputs_LD.st` | 3 | `T72-T74`, `ajoutée`, `renommées` |
+| `CODE/M_MAIN/PRG_06_Outputs.st` | 3 | `T72-T74`, `ajoutée`, `renommées` |
 | `CODE/E_CODEURS/FB_Encoder_Scale.st` | 2 | `(à coller dans la partie déclaration...)` |
 | `CODE/H_TREUILS_BENNE/FB_DriftGuard.st` | 1 | `(à coller dans le corps ST...)` |
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T21:13:00.733501" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T21:13:00.733501">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T14:40:51.261504" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T14:40:51.261504">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5833,7 +5833,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <derived name="ST_Safety_Emergency_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sorties publiques AU produites par PRG_06_Outputs_LD
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sorties publiques AU produites par PRG_06_Outputs
 --&gt; [SAFE] État AU</xhtml>
               </documentation>
             </variable>

@@ -94,7 +94,7 @@ def discover_objects(code_dir: Path, diagnostics: DiagnosticCollector) -> list[S
         # de dichotomie (Bundle_H*.xml) : ces derniers contiennent des POU
         # homonymes (ex. FB_Safety_EmergencyManagement) qui ÉCRASENT le vrai FB
         # dans objects_by_name → outputVariables vide → IndexOutOfRangeException
-        # CODESYS à l'import (REX 2026-08-04, PRG_06_Outputs_LD).
+        # CODESYS à l'import (REX 2026-08-04, PRG_06_Outputs).
         if "_Bundle" in f.name or f.name.startswith("CODE_") or f.name.startswith("Bundle_"):
             continue
         rel = f.relative_to(code_dir).as_posix()
