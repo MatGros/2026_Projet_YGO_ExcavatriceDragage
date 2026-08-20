@@ -296,11 +296,22 @@ IF SimBypassRise.Q THEN
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
     GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
+    // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
+    // OppositeDir via Process) pour travailler sans faux blocage en banc.
+    // Reste strictement inert sur machine réelle (SimulationBypassActive gaté MAINT+sim).
+    GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
+    GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;
+    GVL_IHM.M2TreuilBenne.Bypass.Process   := TRUE;
 END_IF;
 IF SimBypassFall.Q THEN
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
     GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Safety  := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Process := FALSE;
+    GVL_IHM.M2TreuilBenne.Bypass.Safety    := FALSE;
+    GVL_IHM.M2TreuilBenne.Bypass.Process   := FALSE;
 END_IF;
 
 {endregion}

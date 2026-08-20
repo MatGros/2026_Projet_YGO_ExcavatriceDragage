@@ -6026,6 +6026,14 @@ bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo confirmation absence mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="TonMecaStopSettled">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo "arret confirme" Meca A (purge fenetre vitesse)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonStartupWarmup">
               <type>
                 <derived name="TON" />
@@ -6095,6 +6103,13 @@ bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; 
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
+    // 🔑 RESET effectif même en DISABLE : le gate RETURNe avant le ResetEdge du chemin
+    // principal, sinon une cause resterait figée et la machine serait impossible à réarmer
+    // (récupération). On traite ici le front Reset pour effacer la cause en mode neutre.
+    ResetEdge(CLK := Reset);
+    IF ResetEdge.Q THEN
+        Status.ErrorId := 16#0000;
+    END_IF;
     Ready := FALSE;
     Status.Busy := FALSE;
     Status.Done := FALSE;
@@ -6259,7 +6274,13 @@ DriftGuardA(
 );
 MecaADriftM := DriftGuardA.DriftM;   // Diagnostic IHM
 
-IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
+// 🕐 La vitesse Meca A est une derive de position sur fenetre glissante 50ms : a l'arret, elle met
+// ~50ms a retomber a 0 alors que l'armement (contacts/frein) est instantane -&gt; faux Meca a chaque
+// arret. Exiger une confirmation "vitesse &lt; seuil" maintenue &gt;= 1 fenetre (100ms) avant d'armer la
+// detection de VITESSE Meca. Impact securite negligeable : une vraie roue libre dure &gt;&gt; 100ms.
+TonMecaStopSettled(IN := (MeasuredSpeedMps &lt; UncommandedSpeedThresholdMps), PT := T#100ms);
+
+IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND TonMecaStopSettled.Q AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
     Status.ErrorId := Status.ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
     Status.ErrorId := Status.ErrorId AND 16#FF7F;

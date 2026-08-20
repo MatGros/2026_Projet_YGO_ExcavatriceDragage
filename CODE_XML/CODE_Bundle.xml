@@ -9412,7 +9412,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="6.75" />
+                <simpleValue value="7.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT</xhtml>
@@ -22504,6 +22504,14 @@ bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; 
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo confirmation absence mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="TonMecaStopSettled">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo "arret confirme" Meca A (purge fenetre vitesse)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonStartupWarmup">
               <type>
                 <derived name="TON" />
@@ -22573,6 +22581,13 @@ bit11: "Méca D" ; bit12/13: "Méca E écart synchro" ; bit14: "Sens opposé" ; 
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
+    // 🔑 RESET effectif même en DISABLE : le gate RETURNe avant le ResetEdge du chemin
+    // principal, sinon une cause resterait figée et la machine serait impossible à réarmer
+    // (récupération). On traite ici le front Reset pour effacer la cause en mode neutre.
+    ResetEdge(CLK := Reset);
+    IF ResetEdge.Q THEN
+        Status.ErrorId := 16#0000;
+    END_IF;
     Ready := FALSE;
     Status.Busy := FALSE;
     Status.Done := FALSE;
@@ -22737,7 +22752,13 @@ DriftGuardA(
 );
 MecaADriftM := DriftGuardA.DriftM;   // Diagnostic IHM
 
-IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
+// 🕐 La vitesse Meca A est une derive de position sur fenetre glissante 50ms : a l'arret, elle met
+// ~50ms a retomber a 0 alors que l'armement (contacts/frein) est instantane -&gt; faux Meca a chaque
+// arret. Exiger une confirmation "vitesse &lt; seuil" maintenue &gt;= 1 fenetre (100ms) avant d'armer la
+// detection de VITESSE Meca. Impact securite negligeable : une vraie roue libre dure &gt;&gt; 100ms.
+TonMecaStopSettled(IN := (MeasuredSpeedMps &lt; UncommandedSpeedThresholdMps), PT := T#100ms);
+
+IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND TonMecaStopSettled.Q AND (MeasuredSpeedMps &gt; UncommandedSpeedThresholdMps))) THEN
     Status.ErrorId := Status.ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
     Status.ErrorId := Status.ErrorId AND 16#FF7F;
@@ -34675,11 +34696,22 @@ IF SimBypassRise.Q THEN
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
     GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
+    // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
+    // OppositeDir via Process) pour travailler sans faux blocage en banc.
+    // Reste strictement inert sur machine réelle (SimulationBypassActive gaté MAINT+sim).
+    GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
+    GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;
+    GVL_IHM.M2TreuilBenne.Bypass.Process   := TRUE;
 END_IF;
 IF SimBypassFall.Q THEN
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
     GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Safety  := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Process := FALSE;
+    GVL_IHM.M2TreuilBenne.Bypass.Safety    := FALSE;
+    GVL_IHM.M2TreuilBenne.Bypass.Process   := FALSE;
 END_IF;
 
 {endregion}

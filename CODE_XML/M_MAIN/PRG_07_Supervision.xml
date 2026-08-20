@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:08:58.513759" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:08:58.513759">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T23:05:49.192503" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T23:05:49.192503">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -529,7 +529,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="6.75" />
+                <simpleValue value="7.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), aligné sur GVL_PERSISTENT</xhtml>
@@ -6181,11 +6181,22 @@ IF SimBypassRise.Q THEN
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
     GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
+    // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
+    // OppositeDir via Process) pour travailler sans faux blocage en banc.
+    // Reste strictement inert sur machine réelle (SimulationBypassActive gaté MAINT+sim).
+    GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
+    GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;
+    GVL_IHM.M2TreuilBenne.Bypass.Process   := TRUE;
 END_IF;
 IF SimBypassFall.Q THEN
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
     GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Safety  := FALSE;
+    GVL_IHM.M1TreuilRetenue.Bypass.Process := FALSE;
+    GVL_IHM.M2TreuilBenne.Bypass.Safety    := FALSE;
+    GVL_IHM.M2TreuilBenne.Bypass.Process   := FALSE;
 END_IF;
 
 {endregion}

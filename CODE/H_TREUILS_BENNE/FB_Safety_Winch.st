@@ -108,6 +108,7 @@ VAR
     TonMecaE                        : TON;                            // . [LOC] Tempo confirmation arret synchro Meca E
     TonOppositeDirection            : TON;                            // . [LOC] Tempo confirmation sens oppose
     TonNoMovement                   : TON;                            // . [LOC] Tempo confirmation absence mouvement
+    TonMecaStopSettled              : TON;                            // . [LOC] Tempo "arret confirme" Meca A (purge fenetre vitesse)
     TonStartupWarmup                : TON;                            // . [LOC] Tempo masquage transitoire au boot
 
     // === VARIABLES LOCALES INTERNES ===
@@ -123,6 +124,13 @@ END_VAR
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE — neutralisation si désactivé
 IF NOT Enable THEN
+    // 🔑 RESET effectif même en DISABLE : le gate RETURNe avant le ResetEdge du chemin
+    // principal, sinon une cause resterait figée et la machine serait impossible à réarmer
+    // (récupération). On traite ici le front Reset pour effacer la cause en mode neutre.
+    ResetEdge(CLK := Reset);
+    IF ResetEdge.Q THEN
+        Status.ErrorId := 16#0000;
+    END_IF;
     Ready := FALSE;
     Status.Busy := FALSE;
     Status.Done := FALSE;
@@ -287,7 +295,13 @@ DriftGuardA(
 );
 MecaADriftM := DriftGuardA.DriftM;   // Diagnostic IHM
 
-IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps))) THEN
+// 🕐 La vitesse Meca A est une derive de position sur fenetre glissante 50ms : a l'arret, elle met
+// ~50ms a retomber a 0 alors que l'armement (contacts/frein) est instantane -> faux Meca a chaque
+// arret. Exiger une confirmation "vitesse < seuil" maintenue >= 1 fenetre (100ms) avant d'armer la
+// detection de VITESSE Meca. Impact securite negligeable : une vraie roue libre dure >> 100ms.
+TonMecaStopSettled(IN := (MeasuredSpeedMps < UncommandedSpeedThresholdMps), PT := T#100ms);
+
+IF NOT (BypassSafety OR BypassMecaA) AND MeasuredSpeedValid AND (DriftGuardA.Violation OR (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT InReferencingMode AND TonMecaStopSettled.Q AND (MeasuredSpeedMps > UncommandedSpeedThresholdMps))) THEN
     Status.ErrorId := Status.ErrorId OR 16#0080;
 ELSIF ResetEdge.Q THEN
     Status.ErrorId := Status.ErrorId AND 16#FF7F;
