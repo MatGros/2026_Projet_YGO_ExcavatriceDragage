@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:30:37.231915" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:30:37.231915">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T18:26:13.600176" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T18:26:13.600176">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -657,6 +657,9 @@ IF NOT Enable THEN
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
+    // Fail-safe : chaine neutralisee = mesure non fiable -&gt; gates forces a l'etat de defaut
+    EncoderFault := TRUE;
+    HomedAndReliable := FALSE;
     RETURN;
 END_IF;
 
@@ -734,6 +737,7 @@ instSpeed(
 Measurement.RawPos            := instAbs.RawPos;
 Measurement.EncoderAvailable  := instAbs.EncoderAvailable;
 Measurement.CablePosM         := instSafety.CablePosMSafe;
+Measurement.CablePosMSafe     := instSafety.CablePosMSafe;
 Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;

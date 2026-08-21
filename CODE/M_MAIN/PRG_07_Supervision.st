@@ -468,7 +468,7 @@ instHmiBannerFormatter(
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassTranslation     := GVL_IHM.TranslationM3.Bypass.Global,
     BypassSyncActive      := GVL_IHM.M1M2Sync.Bypass.Global,
-    SyncDegradedActive    := PRG_04_Treuils_Benne.Data.SyncState.SyncDegradedStep1,
+    SyncDegradedActive    := PRG_04_Treuils_Benne.Data.SyncState.SyncDeviationWarn,
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,

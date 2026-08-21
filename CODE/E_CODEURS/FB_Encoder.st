@@ -82,6 +82,9 @@ IF NOT Enable THEN
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
+    // Fail-safe : chaine neutralisee = mesure non fiable -> gates forces a l'etat de defaut
+    EncoderFault := TRUE;
+    HomedAndReliable := FALSE;
     RETURN;
 END_IF;
 
@@ -159,6 +162,7 @@ instSpeed(
 Measurement.RawPos            := instAbs.RawPos;
 Measurement.EncoderAvailable  := instAbs.EncoderAvailable;
 Measurement.CablePosM         := instSafety.CablePosMSafe;
+Measurement.CablePosMSafe     := instSafety.CablePosMSafe;
 Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;

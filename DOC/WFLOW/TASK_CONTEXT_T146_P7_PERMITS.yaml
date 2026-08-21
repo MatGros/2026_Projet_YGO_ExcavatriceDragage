@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T146 Phase 7 : refactor permits treuils
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T146_P7_PERMITS
+  criticality: C4            # autorisation de mouvement -> safety machine
+  strategy: rebuild          # extraction Safety/Process des permits melanges
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Extraire dans PRG_04 les permits treuils : separer SafetyPermit (FB_Safety_Winch,
+    deja existant) de ProcessPermit (process pur : Kobold/benne/dump/anticipation),
+    produire ProcessAndSafetyPermit (Safety AND Process) et EffectivePermit
+    (ProcessAndSafetyPermit combine au couplage synchro). Bannir le nom _Raw (D-P1).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Les variables _Raw disparaissent ; ProcessAndSafetyPermitM1/M2 et EffectivePermitM1/M2 les remplacent."
+      verified_by: "grep : 0 occurrence *_Raw permit dans PRG_04 + G110 nommage"
+    - id: AC2
+      statement: "SafetyPermitM1/M2 provient de FB_Safety_Winch (AscentPermit/DescendPermit) sans modification de FB_Safety_Winch."
+      verified_by: "lecture PRG_04 + git diff FB_Safety_Winch : inchange"
+    - id: AC3
+      statement: "ProcessAndSafetyPermitM1 := SafetyPermitM1 AND ProcessPermitM1 (et M2), identique a l'ancien _Raw en valeur."
+      verified_by: "lecture ligne a ligne + non regression simu"
+    - id: AC4
+      statement: "EffectivePermitM1 := ProcessAndSafetyPermitM1 AND (NOT SyncActive OR ProcessAndSafetyPermitM2), identique a l'ancien _Active."
+      verified_by: "lecture ligne a ligne + non regression"
+    - id: AC5
+      statement: "Les consommateurs (instWinchM1/M2 SafeStop/DescendPermit/AscentPermit, IHM, WinchState) lisent les nouveaux noms."
+      verified_by: "G200 + grep : 0 reference _Raw/_Active permit"
+    - id: AC6
+      statement: "G200 PASS (0 erreur) et gates palier C 15/15."
+      verified_by: "G200 --report + run_all_gates --palier C"
+    - id: AC7
+      statement: "Controle structurel : nom de fichier egal au nom du POU pour PRG_04_Treuils_Benne.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC8
+      statement: "Controle structurel : suffixe de langage egal au langage genere dans le bundle pour PRG_04_Treuils_Benne.st."
+      verified_by: "G310_check_code_structure"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st   # inchange (source SafetyPermit)
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st      # deja traite (Phase 6)
+
+  # ── 4. Contrat de conservation (rebuild) ─────────────────────────────────
+  conservation:
+    must_survive:
+      - "SafeStopM1/M2_Active (couplage synchro) — consommateur instWinchM1/M2"
+      - "DescendPermitM1/M2_Active + AscentPermitM1/M2_Active (couplage)"
+      - "Toutes les conditions process (Kobold, benne, dump, anticipation, ManualBucketLimits)"
+      - "Le comportement safety (valeur finale identique a l'ancien)"
+    dropped_on_purpose:
+      - "Nom _Raw (trompeur — melange safety+process, D-P1)"
+      - "Nom _Active (renomme EffectivePermit)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Toute perte ou inversion de condition permit (safety ou process) est remontee
+    immediatement. Non regression du mouvement est imperatif — comparer les valeurs
+    finales avant/après.
+
+status: PENDING
+
+execution:
+  executed_by: "deepseek-v4-flash (executeur)"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

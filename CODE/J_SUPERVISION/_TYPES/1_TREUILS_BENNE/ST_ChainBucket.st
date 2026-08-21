@@ -26,7 +26,7 @@ STRUCT
     Idx302_BucketFaultActive     : BOOL; // 0 = Sain | 1 = Défaut Mouvement Benne
     Idx303_KoboldAutoStopEnabled       : BOOL; // 1 = Toggle IHM arrêt auto descente actif
     Idx304_KoboldImmersionConfirmed    : BOOL; // : 1 = Immersion confirmée (front Kobold dans la fenêtre)
-    Idx305_KoboldBottomTouchLatched    : BOOL; // : 1 = Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)
+    Idx305_KoboldBottomTouchLatched    : BOOL; // : 1 = Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend)
     Idx306_ErrorIdRaw             : WORD; // : bitfield brut FB_Bucket (bit0 timeout, bit1 incohérence, bit2 limites, bit3 codeur non référencé, bit4 glissement M1)
 
     Idx401_BucketBusy            : BOOL; // 1 = Mouvement Mâchoires en cours | 0 = Repos
