@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:32:38.767182" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:32:38.767182">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T22:28:28.780561" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T22:28:28.780561">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1278,13 +1278,13 @@ instSafetyTranslationM3(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
-    JoystickOnline          := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational     := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    JoystickOnline          := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational     := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     PhaseRotationOk         := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
-    DriveOnline             := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Online,
-    DriveOperational        := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Operational,
+    DriveOnline             := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur.Online,
+    DriveOperational        := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur.Operational,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
