@@ -16903,10 +16903,10 @@ HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTr
 IF HomingTrigger THEN
     IF UseDynamicTarget THEN
         TargetPositionM := DynamicHomingTargetM;
-    ELSIF HomeEdge.Q THEN
-        TargetPositionM := CfgHomingTargetM;
-    ELSE
+    ELSIF NominalHomingTrigger THEN
         TargetPositionM := CfgTopSensorPosM;
+    ELSE
+        TargetPositionM := CfgHomingTargetM;
     END_IF;
 
     // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
