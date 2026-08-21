@@ -51,6 +51,10 @@ STRUCT
     InputModuleFault         : BOOL; // ❌ Defaut sur au moins un module DI
     M1_EncoderIncoherent     : BOOL; // ❌ Mesure codeur M1 incoherente
     M2_EncoderIncoherent     : BOOL; // ❌ Mesure codeur M2 incoherente
+    M1_EncoderFault          : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
+    M2_EncoderFault          : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
+    M1_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
+    M2_HomedAndReliable      : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
 
     // === 🧪 Simulation & variateur M3 filtré ===
     WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)

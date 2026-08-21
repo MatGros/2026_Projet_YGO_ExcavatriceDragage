@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:12:56.848394" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:12:56.848394">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:30:37.231915" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:30:37.231915">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -539,6 +539,22 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Pulse echec / timeout preset</xhtml>
               </documentation>
             </variable>
+            <variable name="PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Ordre declenchement preset vers PDO Rx (relay Abs)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Valeur preset transmise (relay Abs)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Measurement">
               <type>
                 <derived name="ST_EncoderMeasurement" />
@@ -546,6 +562,23 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES CONDITIONNEES (struct frontiere) ===
 &lt;-- [BUS] Mesures + statuts (interface)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATES DE FIABILITE ===
+&lt;-- [SAFE] Gate general fiabilite (sans Homed) — vitesse/mouvements</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Gate strict M3 : disponible ET reference ET pas incoherent</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -648,6 +681,8 @@ instAbs(
 );
 PresetAck := instAbs.PresetAck;
 PresetNak := instAbs.PresetNak;
+PresetTriggerCmd := instAbs.PresetTriggerCmd;
+PresetValueOut := instAbs.PresetValueOut;
 {endregion}
 
 {region "§3 Scale"}
@@ -706,6 +741,10 @@ Measurement.SpeedValid        := instSpeed.Valid;
 Measurement.HomingStatus      := HomingStatus;
 Measurement.AbsStatus         := instAbs.Status;
 Measurement.HomingRefRaw      := HomingRefRaw;
+
+// Gates de fiabilite exposes (D-A10 complement c) — consumer unifie
+EncoderFault     := instRel.EncoderFault;
+HomedAndReliable := instRel.HomedAndReliable;
 
 // Synthese statut facade
 Status.Busy := instAbs.Status.Busy;

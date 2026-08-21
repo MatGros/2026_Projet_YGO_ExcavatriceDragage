@@ -24,16 +24,10 @@ VAR
     // === 🧩 SOUS-INSTANCES FB ===
     instSimBench             : FB_SimBench;                   // * [INST] Banc de simulation integré
     instJoystick             : FB_Joystick;                   // * [INST] Traitement et filtrage joystick
-    instEncoderAbsM1         : FB_Encoder_Abs;                // * [INST] Acquisition brute codeur M1
-    instEncoderScaleM1       : FB_Encoder_Scale;              // * [INST] Mise a l'echelle codeur M1
+    instEncoderM1            : FB_Encoder;                    // * [INST] Facade chaine mesure codeur M1
     instHomingM1             : FB_Encoder_Homing;             // * [INST] Prise d'origine M1
-    instEncoderSafetyM1      : FB_Encoder_Safety;             // * [INST] Surveillance integrite mesure M1
-    instEncoderSpeedMeasureM1: FB_Encoder_SpeedMeasure;        // * [INST] Calcul vitesse M1
-    instEncoderAbsM2         : FB_Encoder_Abs;                // * [INST] Acquisition brute codeur M2
-    instEncoderScaleM2       : FB_Encoder_Scale;              // * [INST] Mise a l'echelle codeur M2
+    instEncoderM2            : FB_Encoder;                    // * [INST] Facade chaine mesure codeur M2
     instHomingM2             : FB_Encoder_Homing;             // * [INST] Prise d'origine M2
-    instEncoderSafetyM2      : FB_Encoder_Safety;             // * [INST] Surveillance integrite mesure M2
-    instEncoderSpeedMeasureM2: FB_Encoder_SpeedMeasure;        // * [INST] Calcul vitesse M2
     instPosDecoderM3         : FB_Translation_PositionDecoder;// * [INST] Decodage position translation M3
 
     // === 🎛️ VARIABLES LOCALES & DÉTECTEURS ===
@@ -187,8 +181,8 @@ instSimBench(
     M1_SpeedContactor_3      := PRG_06_Outputs.Data.M1SpeedContactor3,
     M1_SpeedContactor_4      := PRG_06_Outputs.Data.M1SpeedContactor4,
     M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
-    M1_PresetTriggerCmd      := instEncoderAbsM1.PresetTriggerCmd,
-    M1_PresetValueOut        := instEncoderAbsM1.PresetValueOut,
+    M1_PresetTriggerCmd      := instEncoderM1.PresetTriggerCmd,
+    M1_PresetValueOut        := instEncoderM1.PresetValueOut,
     M1_BrakeCmd              := PRG_06_Outputs.Data.M1BrakeCmd,
     M2_RelayFwd              := PRG_06_Outputs.Data.M2RelayFwd,
     M2_RelayRev              := PRG_06_Outputs.Data.M2RelayRev,
@@ -197,8 +191,8 @@ instSimBench(
     M2_SpeedContactor_3      := PRG_06_Outputs.Data.M2SpeedContactor3,
     M2_SpeedContactor_4      := PRG_06_Outputs.Data.M2SpeedContactor4,
     M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
-    M2_PresetTriggerCmd      := instEncoderAbsM2.PresetTriggerCmd,
-    M2_PresetValueOut        := instEncoderAbsM2.PresetValueOut,
+    M2_PresetTriggerCmd      := instEncoderM2.PresetTriggerCmd,
+    M2_PresetValueOut        := instEncoderM2.PresetValueOut,
     M2_BrakeCmd              := PRG_06_Outputs.Data.M2BrakeCmd,
     // 🧪 Simulation M3 — FIDÉLITÉ : le modèle ne doit progresser QUE quand la
     // vraie machine commande réellement (sortie FB_Translation, post-interlock), pas sur la
@@ -302,19 +296,8 @@ Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
 // === 🧲 §4 CODEURS & HOMING (M1 / M2) ===
 
 // ── TREUIL M1 (Retenue) ──
-instEncoderAbsM1(
-    Enable                := TRUE,
-    Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
-    RawPosIn              := HwIn.Winch.COD1_PosValue,
-    AlarmsIn              := HwIn.Winch.COD1_Alarms,
-    WarningsIn            := HwIn.Winch.COD1_Warnings,
-    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
-    PresetRequest         := instHomingM1.PresetRequest,
-    PresetValue           := instHomingM1.PresetValue
-);
-
+// Ordre POO : Homing d'abord, puis facade. Homing lit Abs 1 scan en retard (benin) ;
+// la facade lit HomingSuspect/HomingRefRaw AU MEME SCAN (safety preservee).
 instHomingM1(
     Enable                 := TRUE,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -330,10 +313,10 @@ instHomingM1(
     CfgTopSensorPosM       := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
     FwdRevSpeedFeedbackOff := HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := HwIn.Winch.M1_BrakeIsOpen_DI,
-    RawPos                 := instEncoderAbsM1.RawPos,
-    EncoderAvailable       := instEncoderAbsM1.EncoderAvailable,
-    PresetAck              := instEncoderAbsM1.PresetAck,
-    PresetNak              := instEncoderAbsM1.PresetNak,
+    RawPos                 := instEncoderM1.Measurement.RawPos,
+    EncoderAvailable       := instEncoderM1.Measurement.EncoderAvailable,
+    PresetAck              := instEncoderM1.PresetAck,
+    PresetNak              := instEncoderM1.PresetNak,
     PointsPerRev           := ENCODER_POINTS_PER_REV,
     MultiTurnRevsMax       := ENCODER_MULTITURN_REVS_MAX,
     CableM_PerRev          := WINCH_CABLE_M_PER_REV,
@@ -341,48 +324,35 @@ instHomingM1(
     Calib                  := _CalibM1
 );
 
-instEncoderScaleM1(
-    RawPos        := instEncoderAbsM1.RawPos,
-    HomingRefRaw  := instHomingM1.HomingRefRaw,
-    CableM_PerRev := WINCH_CABLE_M_PER_REV,
-    PointsPerRev  := ENCODER_POINTS_PER_REV
-);
-
-instEncoderSafetyM1(
+instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
-    CablePosM             := instEncoderScaleM1.CablePosM,
+    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
+    RawPosIn              := HwIn.Winch.COD1_PosValue,
+    AlarmsIn              := HwIn.Winch.COD1_Alarms,
+    WarningsIn            := HwIn.Winch.COD1_Warnings,
+    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
+    HomingRefRaw          := instHomingM1.HomingRefRaw,
+    Homed                 := instHomingM1.Homed,
     HomingSuspect         := instHomingM1.HomingSuspect,
+    HomingStatus          := instHomingM1.Status,
+    PresetRequest         := instHomingM1.PresetRequest,
+    PresetValue           := instHomingM1.PresetValue,
+    PointsPerRev          := ENCODER_POINTS_PER_REV,
+    CableM_PerRev         := WINCH_CABLE_M_PER_REV,
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
-Data.CablePosM1           := instEncoderSafetyM1.CablePosMSafe;
-Data.M1_EncoderIncoherent := instEncoderSafetyM1.EncoderIncoherent;
-
-instEncoderSpeedMeasureM1(
-    Enable        := TRUE,
-    Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
-    Position_M    := instEncoderSafetyM1.CablePosMSafe,
-    PositionValid := instEncoderAbsM1.EncoderAvailable AND NOT instEncoderSafetyM1.EncoderIncoherent
-);
-Data.M1_Speed_Mps       := instEncoderSpeedMeasureM1.Speed_Mps;
-Data.M1_SignedSpeed_Mps := instEncoderSpeedMeasureM1.SignedSpeed_Mps;
-Data.M1_SpeedValid      := instEncoderSpeedMeasureM1.Valid;
+Data.CablePosM1           := instEncoderM1.Measurement.CablePosM;
+Data.M1_EncoderIncoherent := instEncoderM1.Measurement.EncoderIncoherent;
+Data.M1_EncoderFault      := instEncoderM1.EncoderFault;
+Data.M1_HomedAndReliable  := instEncoderM1.HomedAndReliable;
+Data.M1_Speed_Mps         := instEncoderM1.Measurement.Speed_Mps;
+Data.M1_SignedSpeed_Mps   := instEncoderM1.Measurement.SignedSpeed_Mps;
+Data.M1_SpeedValid        := instEncoderM1.Measurement.SpeedValid;
 
 // ── TREUIL M2 (Benne) ──
-instEncoderAbsM2(
-    Enable                := TRUE,
-    Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
-    RawPosIn              := HwIn.Winch.COD2_PosValue,
-    AlarmsIn              := HwIn.Winch.COD2_Alarms,
-    WarningsIn            := HwIn.Winch.COD2_Warnings,
-    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
-    PresetRequest         := instHomingM2.PresetRequest,
-    PresetValue           := instHomingM2.PresetValue
-);
+// Ordre POO : synchronisation benne, puis Homing, puis facade.
 
 // Synchronisation référencement M2 sur ouverture/fermeture benne
 M2BucketRefOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
@@ -413,10 +383,10 @@ instHomingM2(
     CfgTopSensorPosM       := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
     FwdRevSpeedFeedbackOff := HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := HwIn.Winch.M2_BrakeIsOpen_DI,
-    RawPos                 := instEncoderAbsM2.RawPos,
-    EncoderAvailable       := instEncoderAbsM2.EncoderAvailable,
-    PresetAck              := instEncoderAbsM2.PresetAck,
-    PresetNak              := instEncoderAbsM2.PresetNak,
+    RawPos                 := instEncoderM2.Measurement.RawPos,
+    EncoderAvailable       := instEncoderM2.Measurement.EncoderAvailable,
+    PresetAck              := instEncoderM2.PresetAck,
+    PresetNak              := instEncoderM2.PresetNak,
     PointsPerRev           := ENCODER_POINTS_PER_REV,
     MultiTurnRevsMax       := ENCODER_MULTITURN_REVS_MAX,
     CableM_PerRev          := WINCH_CABLE_M_PER_REV,
@@ -424,34 +394,32 @@ instHomingM2(
     Calib                  := _CalibM2
 );
 
-instEncoderScaleM2(
-    RawPos        := instEncoderAbsM2.RawPos,
-    HomingRefRaw  := instHomingM2.HomingRefRaw,
-    CableM_PerRev := WINCH_CABLE_M_PER_REV,
-    PointsPerRev  := ENCODER_POINTS_PER_REV
-);
-
-instEncoderSafetyM2(
+instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
-    CablePosM             := instEncoderScaleM2.CablePosM,
+    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
+    RawPosIn              := HwIn.Winch.COD2_PosValue,
+    AlarmsIn              := HwIn.Winch.COD2_Alarms,
+    WarningsIn            := HwIn.Winch.COD2_Warnings,
+    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
+    HomingRefRaw          := instHomingM2.HomingRefRaw,
+    Homed                 := instHomingM2.Homed,
     HomingSuspect         := instHomingM2.HomingSuspect,
+    HomingStatus          := instHomingM2.Status,
+    PresetRequest         := instHomingM2.PresetRequest,
+    PresetValue           := instHomingM2.PresetValue,
+    PointsPerRev          := ENCODER_POINTS_PER_REV,
+    CableM_PerRev         := WINCH_CABLE_M_PER_REV,
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
-Data.CablePosM2           := instEncoderSafetyM2.CablePosMSafe;
-Data.M2_EncoderIncoherent := instEncoderSafetyM2.EncoderIncoherent;
-
-instEncoderSpeedMeasureM2(
-    Enable        := TRUE,
-    Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
-    Position_M    := instEncoderSafetyM2.CablePosMSafe,
-    PositionValid := instEncoderAbsM2.EncoderAvailable AND NOT instEncoderSafetyM2.EncoderIncoherent
-);
-Data.M2_Speed_Mps       := instEncoderSpeedMeasureM2.Speed_Mps;
-Data.M2_SignedSpeed_Mps := instEncoderSpeedMeasureM2.SignedSpeed_Mps;
-Data.M2_SpeedValid      := instEncoderSpeedMeasureM2.Valid;
+Data.CablePosM2           := instEncoderM2.Measurement.CablePosM;
+Data.M2_EncoderIncoherent := instEncoderM2.Measurement.EncoderIncoherent;
+Data.M2_EncoderFault      := instEncoderM2.EncoderFault;
+Data.M2_HomedAndReliable  := instEncoderM2.HomedAndReliable;
+Data.M2_Speed_Mps         := instEncoderM2.Measurement.Speed_Mps;
+Data.M2_SignedSpeed_Mps   := instEncoderM2.Measurement.SignedSpeed_Mps;
+Data.M2_SpeedValid        := instEncoderM2.Measurement.SpeedValid;
 {endregion}
 
 {region "§5 Acquisition Translation M3"}

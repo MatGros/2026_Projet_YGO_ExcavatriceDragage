@@ -121,13 +121,6 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
         "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
         "— non investiguee, hors perimetre M3, necessite un audit dedie"
     ),
-    "FB_Encoder": (
-        "facade T146 Phase 3 creee mais NON cablee a ce lot : le cablage dans "
-        "PRG_02_Acquisition.st est le perimetre de la Phase 4 (TASK_CONTEXT_T146_"
-        "P4_CABLAGE), explicitement interdit par le contrat P3 (PRG_02 forbidden). "
-        "P3 = creation de la facade seule, sans instance. Retirer de cette liste "
-        "des qu'elle est instanciee (Phase 4)"
-    ),
 }
 
 # Sections de declaration dont le contenu est une interface, pas une instance
