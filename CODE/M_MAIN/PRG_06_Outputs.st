@@ -10,6 +10,10 @@
 
 PROGRAM PRG_06_Outputs
 
+VAR_INPUT
+    // === 📥 ENTRÉES PROGRAMME (AUCUNE - PILOTÉ VIA GVL_IHM & PRG_02 À 05) ===
+END_VAR
+
 VAR_OUTPUT
     // === 🚌 BUS INTER-PRG (producteur unique) ===
     Data : ST_OutputsInterPrg; // <-- [BUS] Ordres actionneurs finaux (rebouclés FB_SimBench)
