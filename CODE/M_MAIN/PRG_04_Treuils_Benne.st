@@ -894,8 +894,6 @@ WinchM1FinalInterlockRequest.Enable := TRUE;
 WinchM1FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
-WinchM1FinalInterlockRequest.DescendPermit := EffectivePermitM1_Descend;
-WinchM1FinalInterlockRequest.AscentPermit := EffectivePermitM1_Ascent;
 // Plus de BrakeReleaseRequest/
 // BrakeCommandOpenConfirmed calcules par FB_Winch — la barriere finale
 // (FB_WinchOutputInterlock) recoit le retour PHYSIQUE brut directement,
@@ -968,8 +966,8 @@ WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM1.Measurement.RawP
 WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
 WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
 WinchM1State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
-WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM1.PresetTriggerCmd;
-WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM1.PresetValueOut;
+WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM1.HwOut.PresetTriggerCmd;
+WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM1.HwOut.PresetValueOut;
 WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderM1.Measurement.AbsStatus.Error;
 WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM1.Measurement.AbsStatus.ErrorId;
 WinchM1State.Encoder.Homed := PRG_02_Acquisition.instEncoderM1.Homed;
@@ -1025,8 +1023,8 @@ WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM2.Measurement.RawP
 WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
 WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
 WinchM2State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
-WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM2.PresetTriggerCmd;
-WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM2.PresetValueOut;
+WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM2.HwOut.PresetTriggerCmd;
+WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM2.HwOut.PresetValueOut;
 WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderM2.Measurement.AbsStatus.Error;
 WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM2.Measurement.AbsStatus.ErrorId;
 WinchM2State.Encoder.Homed := PRG_02_Acquisition.instEncoderM2.Homed;

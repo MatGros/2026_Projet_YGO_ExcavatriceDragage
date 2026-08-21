@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T19:58:18.199639" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T19:58:18.199639">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:14:52.065276" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:14:52.065276">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -371,56 +371,6 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_HardwareImage">
-        <baseType>
-          <struct>
-            <variable name="Winch">
-              <type>
-                <derived name="ST_HwWinch" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Treuils M1/M2 + codeurs</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Translation">
-              <type>
-                <derived name="ST_HwTranslation" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Translation M3 + variateur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Operator">
-              <type>
-                <derived name="ST_HwOperator" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Opérateur / Joystick / bus CAN</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Machine">
-              <type>
-                <derived name="ST_HwMachine" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Sécurités/Communs Machine</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6f8e5f63-0c17-53f0-bfdd-b43b9a736035</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
-   ───────────────────────────────────────────────────────────────
-   🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_EncoderHw">
         <baseType>
           <struct>
@@ -513,6 +463,56 @@ Ordre declenchement preset vers PDO Rx</xhtml>
       pour exposer l'interface physique de FB_Encoder de façon testable.
    🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
    📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HardwareImage">
+        <baseType>
+          <struct>
+            <variable name="Winch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Treuils M1/M2 + codeurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Translation">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Translation M3 + variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Operator">
+              <type>
+                <derived name="ST_HwOperator" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Opérateur / Joystick / bus CAN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Machine">
+              <type>
+                <derived name="ST_HwMachine" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Sécurités/Communs Machine</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6f8e5f63-0c17-53f0-bfdd-b43b9a736035</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
+   ───────────────────────────────────────────────────────────────
+   🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1570,6 +1570,22 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible metrique etalonnage M2</xhtml>
               </documentation>
             </variable>
+            <variable name="HwM1">
+              <type>
+                <derived name="ST_EncoderHw" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Frontiere hardware codeur M1 (in/out)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwM2">
+              <type>
+                <derived name="ST_EncoderHw" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Frontiere hardware codeur M2 (in/out)</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchInputSourceSimulated">
               <type>
                 <BOOL />
@@ -1811,8 +1827,8 @@ instSimBench(
     M1_SpeedContactor_3      := PRG_06_Outputs.Data.M1SpeedContactor3,
     M1_SpeedContactor_4      := PRG_06_Outputs.Data.M1SpeedContactor4,
     M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
-    M1_PresetTriggerCmd      := instEncoderM1.PresetTriggerCmd,
-    M1_PresetValueOut        := instEncoderM1.PresetValueOut,
+    M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd,
+    M1_PresetValueOut        := instEncoderM1.HwOut.PresetValueOut,
     M1_BrakeCmd              := PRG_06_Outputs.Data.M1BrakeCmd,
     M2_RelayFwd              := PRG_06_Outputs.Data.M2RelayFwd,
     M2_RelayRev              := PRG_06_Outputs.Data.M2RelayRev,
@@ -1821,8 +1837,8 @@ instSimBench(
     M2_SpeedContactor_3      := PRG_06_Outputs.Data.M2SpeedContactor3,
     M2_SpeedContactor_4      := PRG_06_Outputs.Data.M2SpeedContactor4,
     M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
-    M2_PresetTriggerCmd      := instEncoderM2.PresetTriggerCmd,
-    M2_PresetValueOut        := instEncoderM2.PresetValueOut,
+    M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd,
+    M2_PresetValueOut        := instEncoderM2.HwOut.PresetValueOut,
     M2_BrakeCmd              := PRG_06_Outputs.Data.M2BrakeCmd,
     // 🧪 Simulation M3 — FIDÉLITÉ : le modèle ne doit progresser QUE quand la
     // vraie machine commande réellement (sortie FB_Translation, post-interlock), pas sur la
@@ -1928,6 +1944,11 @@ Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
 // ── TREUIL M1 (Retenue) ──
 // Facade codeur complete : Abs→Homing→Scale→Safety→Reliability→Speed.
 // L'autorisation de homing est calculee ici (mode + treuil selectionne).
+// Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
+HwM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
+HwM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
+HwM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
+HwM1.SlaveOperational  := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -1941,10 +1962,7 @@ instEncoderM1(
     UseDynamicTarget      := FALSE,
     DynamicHomingTargetM  := 0.0,
     TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
-    Hw.RawPosIn           := HwIn.Winch.COD1_PosValue,
-    Hw.AlarmsIn           := HwIn.Winch.COD1_Alarms,
-    Hw.WarningsIn         := HwIn.Winch.COD1_Warnings,
-    Hw.SlaveOperational   := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
+    Hw                    := HwM1,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
     BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
@@ -1976,6 +1994,11 @@ ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
     M2BucketRefTargetM := Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
+// Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
+HwM2.RawPosIn          := HwIn.Winch.COD2_PosValue;
+HwM2.AlarmsIn          := HwIn.Winch.COD2_Alarms;
+HwM2.WarningsIn        := HwIn.Winch.COD2_Warnings;
+HwM2.SlaveOperational  := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -1989,10 +2012,7 @@ instEncoderM2(
     UseDynamicTarget      := M2BucketRefRequested,
     DynamicHomingTargetM  := M2BucketRefTargetM,
     TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
-    Hw.RawPosIn           := HwIn.Winch.COD2_PosValue,
-    Hw.AlarmsIn           := HwIn.Winch.COD2_Alarms,
-    Hw.WarningsIn         := HwIn.Winch.COD2_Warnings,
-    Hw.SlaveOperational   := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
+    Hw                    := HwM2,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
     BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
@@ -2480,7 +2500,7 @@ HomedAndReliable := instRel.HomedAndReliable;
 
 // Synthese statut facade
 Status.Busy := instAbs.Status.Busy;
-Status.Done := instSpeed.Valid AND instAbs.Status.Ready;
+Status.Done := instSpeed.Valid AND instAbs.Ready;
 Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
 Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
 {endregion}
@@ -5295,7 +5315,7 @@ END_IF;
 
 {region "§3 Confirmation coherence et demande homing"}
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
-IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
+IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
     Calib.HomingSuspect := FALSE;
     Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
 END_IF;
@@ -7118,13 +7138,13 @@ END_IF;
         </Folder>
         <Folder Name="E_CODEURS">
           <Object Name="FB_Encoder" ObjectId="290327ae-3055-58e1-9bbd-038d8cd93901" />
+          <Object Name="ST_EncoderHw" ObjectId="d49fb2dc-e3eb-5045-a9d9-c8cacf52184b" />
           <Object Name="FB_EncoderReliability" ObjectId="2f0260c4-bd51-584e-a910-46b30488f46d" />
           <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
           <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
           <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
-          <Object Name="ST_EncoderHw" ObjectId="d49fb2dc-e3eb-5045-a9d9-c8cacf52184b" />
           <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
           <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
         </Folder>

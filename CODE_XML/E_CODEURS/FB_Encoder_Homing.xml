@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T19:54:50.198233" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T19:54:50.198233">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:13:22.520279" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:13:22.520279">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -699,7 +699,7 @@ END_IF;
 
 {region "§3 Confirmation coherence et demande homing"}
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
-IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
+IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
     Calib.HomingSuspect := FALSE;
     Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
 END_IF;

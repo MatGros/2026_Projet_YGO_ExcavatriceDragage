@@ -135,7 +135,7 @@ END_IF;
 
 {region "§3 Confirmation coherence et demande homing"}
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
-IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
+IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
     Calib.HomingSuspect := FALSE;
     Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
 END_IF;
