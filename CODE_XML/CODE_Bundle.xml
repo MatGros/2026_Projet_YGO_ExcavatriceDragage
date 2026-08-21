@@ -24365,7 +24365,7 @@ SimContactorOk := ContactorLatch;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0=Trémie ... 5=Maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] 0 m=Trémie ... 30 m=Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPctBounded">
@@ -24402,13 +24402,17 @@ SimContactorOk := ContactorLatch;
               <initialValue>
                 <simpleValue value="0" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Positions réelles des 5 capteurs (mètres) — convention 0 m=Trémie, 30 m=Maintenance.
+Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maintenance).</xhtml>
+              </documentation>
             </variable>
             <variable name="CST_PositionAtPV">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="5" />
               </initialValue>
             </variable>
             <variable name="CST_PositionAtP2">
@@ -24416,7 +24420,7 @@ SimContactorOk := ContactorLatch;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="15" />
               </initialValue>
             </variable>
             <variable name="CST_PositionAtP1">
@@ -24424,7 +24428,7 @@ SimContactorOk := ContactorLatch;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="3" />
+                <simpleValue value="20" />
               </initialValue>
             </variable>
             <variable name="CST_PositionAtMaintenance">
@@ -24432,16 +24436,19 @@ SimContactorOk := ContactorLatch;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="5" />
+                <simpleValue value="30" />
               </initialValue>
             </variable>
-            <variable name="CST_PositionSegmentCount">
+            <variable name="CST_TotalDistanceM">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="5" />
+                <simpleValue value="30" />
               </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance totale Trémie→Maintenance (m)</xhtml>
+              </documentation>
             </variable>
             <variable name="CST_MinFullTravelTimeS">
               <type>
@@ -24463,6 +24470,9 @@ SimContactorOk := ContactorLatch;
       de Trémie vers Maintenance. Le modèle ne publie que les six mots valides
       de FB_Translation_PositionDecoder : 11111 → 01111 → 00111 → 00011 →
       00001 → 00000.
+   📏 Convention : PositionProgress en mètres, 0 m = Trémie … 30 m = Maintenance.
+      Distances NON-linéaires : Trémie(0)→PV(5)=5 m, PV(5)→P2(15)=10 m,
+      P2(15)→P1(20)=5 m, P1(20)→Maintenance(30)=10 m.
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
@@ -24479,8 +24489,8 @@ SimContactorOk := ContactorLatch;
 
 {region "§1 Gate"}
 IF NOT Enable THEN
-    // Prochain démarrage déterministe sur P2, comme l'ancien modèle de banc.
-    PositionProgress := CST_PositionAtP2;
+    // Prochain démarrage déterministe sur la Trémie (0 m), pour un état de départ propre.
+    PositionProgress := CST_PositionAtTremie;
     Initialized := FALSE;
     PosTremie := FALSE;
     PosPV := FALSE;
@@ -24493,7 +24503,7 @@ END_IF;
 
 {region "§2 Initialisation"}
 IF NOT Initialized THEN
-    PositionProgress := CST_PositionAtP2;
+    PositionProgress := CST_PositionAtTremie;
     Initialized := TRUE;
 END_IF;
 {endregion}
@@ -24502,11 +24512,11 @@ END_IF;
 instCycleTime(DefaultValueS := 0.010);
 SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
 
-// Une vitesse à 100 % parcourt les cinq segments uniformes pendant FullTravelTimeS.
+// Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.
 IF FullTravelTimeS &gt;= CST_MinFullTravelTimeS THEN
     PositionIncrement := (SpeedPctBounded / 100.0)
-                         * (CST_PositionSegmentCount / FullTravelTimeS)
+                         * (CST_TotalDistanceM / FullTravelTimeS)
                          * instCycleTime.CycleTimeS;
 ELSE
     PositionIncrement := 0.0;
@@ -26601,7 +26611,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">5 Capteurs de position fixes
---&gt; [HW] Capteur 0 : Maintenance (0.0 m)</xhtml>
+--&gt; [HW] Capteur Maintenance (30.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorP1">
@@ -26609,7 +26619,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 1 : P1 (ex: 6.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P1 (20.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorP2">
@@ -26617,7 +26627,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 2 : P2 (ex: 14.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P2 (15.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorPV">
@@ -26625,7 +26635,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 3 : PV (ex: 21.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur PV (5.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorTremie">
@@ -26633,7 +26643,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur 4 : Trémie (ex: 25.0 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur Trémie (0.0 m)</xhtml>
               </documentation>
             </variable>
             <variable name="PosMaintenanceM">
@@ -26641,7 +26651,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="30" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Positions de référence calibrées (mètres) depuis GVL_PERSISTENT
@@ -26653,7 +26663,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="6" />
+                <simpleValue value="20" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position P1</xhtml>
@@ -26664,7 +26674,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="14" />
+                <simpleValue value="15" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position P2</xhtml>
@@ -26675,7 +26685,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="21" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position PV</xhtml>
@@ -26686,7 +26696,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="25" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position Trémie</xhtml>
@@ -26824,6 +26834,17 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Seed unique depuis Persisted* au premier scan utile</xhtml>
               </documentation>
             </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vrai après le 1er scan utile : les capteurs déjà présents à l'init ne sont pas des franchissements</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -26831,7 +26852,7 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md §3
    🎯 Rôle : Calculer par odométrie (intégration temporelle vitesse/fréquence Hz * sens)
-      la position estimée continue en mètres (0.0 m à la Maintenance -&gt; +X m à la Trémie),
+      la position estimée continue en mètres (0.0 m à la Trémie -&gt; +30.0 m à la Maintenance),
       avec re-calage absolu automatique instantané sur le franchissement des 5 capteurs fixes.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
@@ -26869,49 +26890,58 @@ TrigMaintenance(CLK := SensorMaintenance);
 {endregion}
 
 {region "§3 Recalage et intégration"}
-// 2. Recalage absolu prioritaire sur contact capteur
-IF TrigMaintenance.Q THEN
-    PositionEstimatedM := PosMaintenanceM;
-    Recalibrated := TRUE;
-    RecalibratedSensorId := 0;
-ELSIF TrigP1.Q THEN
-    PositionEstimatedM := PosP1M;
-    Recalibrated := TRUE;
-    RecalibratedSensorId := 1;
-ELSIF TrigP2.Q THEN
-    PositionEstimatedM := PosP2M;
-    Recalibrated := TRUE;
-    RecalibratedSensorId := 2;
-ELSIF TrigPV.Q THEN
-    PositionEstimatedM := PosPVM;
-    Recalibrated := TRUE;
-    RecalibratedSensorId := 3;
-ELSIF TrigTremie.Q THEN
-    PositionEstimatedM := PosTremieM;
-    Recalibrated := TRUE;
-    RecalibratedSensorId := 4;
+// 2. Recalage absolu sur franchissement capteur — UNIQUEMENT après le premier scan utile.
+//    Au 1er scan, un capteur "déjà présent" à l'initialisation (sim démarre à la trémie :
+//    5 capteurs actifs) n'est pas un franchissement réel ; sinon le recalage IF/ELSIF
+//    partirait de Maintenance (premier dans l'ordre) et écraserait la position à 30 m.
+IF NOT FirstScanDone THEN
+    FirstScanDone := TRUE;
 ELSE
-    // Initialisation au tout premier démarrage sur le premier capteur actif vu
-    IF NOT Initialized THEN
-        IF SensorTremie THEN PositionEstimatedM := PosTremieM; Initialized := TRUE;
-        ELSIF SensorPV THEN PositionEstimatedM := PosPVM; Initialized := TRUE;
-        ELSIF SensorP2 THEN PositionEstimatedM := PosP2M; Initialized := TRUE;
-        ELSIF SensorP1 THEN PositionEstimatedM := PosP1M; Initialized := TRUE;
-        ELSIF SensorMaintenance THEN PositionEstimatedM := PosMaintenanceM; Initialized := TRUE;
-        END_IF;
+    IF TrigMaintenance.Q THEN
+        PositionEstimatedM := PosMaintenanceM;
+        Recalibrated := TRUE;
+        RecalibratedSensorId := 0;
+    ELSIF TrigP1.Q THEN
+        PositionEstimatedM := PosP1M;
+        Recalibrated := TRUE;
+        RecalibratedSensorId := 1;
+    ELSIF TrigP2.Q THEN
+        PositionEstimatedM := PosP2M;
+        Recalibrated := TRUE;
+        RecalibratedSensorId := 2;
+    ELSIF TrigPV.Q THEN
+        PositionEstimatedM := PosPVM;
+        Recalibrated := TRUE;
+        RecalibratedSensorId := 3;
+    ELSIF TrigTremie.Q THEN
+        PositionEstimatedM := PosTremieM;
+        Recalibrated := TRUE;
+        RecalibratedSensorId := 4;
     END_IF;
+END_IF;
 
-    // 3. Intégration temporelle continue (Odométrie cycle par cycle)
-    // dX = Direction * (FreqHz * Gain) * dt
-    IF Direction &lt;&gt; 0 AND DriveActualFreqHz &gt; 0.1 THEN
-        PositionEstimatedM := PositionEstimatedM + (INT_TO_REAL(Direction) * DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+// 3. Initialisation au tout premier démarrage sur le premier capteur actif vu (si non initialisé)
+IF NOT Initialized THEN
+    IF SensorTremie THEN PositionEstimatedM := PosTremieM; Initialized := TRUE;
+    ELSIF SensorPV THEN PositionEstimatedM := PosPVM; Initialized := TRUE;
+    ELSIF SensorP2 THEN PositionEstimatedM := PosP2M; Initialized := TRUE;
+    ELSIF SensorP1 THEN PositionEstimatedM := PosP1M; Initialized := TRUE;
+    ELSIF SensorMaintenance THEN PositionEstimatedM := PosMaintenanceM; Initialized := TRUE;
     END_IF;
+END_IF;
+
+// 4. Intégration temporelle continue (Odométrie cycle par cycle)
+// dX = -Direction * (FreqHz * Gain) * dt — convention 0 m=Trémie, 30 m=Maintenance :
+// le sens +1 (vers Trémie) DÉCROÎT la position vers 0 m, le sens -1 (vers Maintenance) la CROÎT vers 30 m.
+IF Direction &lt;&gt; 0 AND DriveActualFreqHz &gt; 0.1 THEN
+    PositionEstimatedM := PositionEstimatedM - (INT_TO_REAL(Direction) * DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
 END_IF;
 {endregion}
 
 {region "§4 Bornage"}
 // Bornage de sécurité pour éviter la dérive infinie hors rail
-PositionEstimatedM := LIMIT(PosMaintenanceM - 0.5, PositionEstimatedM, PosTremieM + 0.5);
+// Convention 0 m=Trémie, 30 m=Maintenance : bornage [Trémie-0.5, Maintenance+0.5].
+PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenanceM + 0.5);
 {endregion}
 </xhtml>
           </ST>
@@ -33535,8 +33565,12 @@ TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpen
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationState.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
-TranslationState.ActiveDirection := M3_Direction_Active;
-TranslationState.ActiveSpeedRef_Pct := M3_SpeedRef_Active;
+// 🎯 Cohérence sim : ActiveDirection/ActiveSpeedRef_Pct n'affichent la
+// consigne QUE si la commande variateur est réellement émise (RequestedDriveControlWord &lt;&gt; 0).
+// Sinon, un interlock bloquant (hauteur, SafeStop…) laisserait l'IHM suggérer un mouvement
+// qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
+TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_Direction_Active, 0);
+TranslationState.ActiveSpeedRef_Pct := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_SpeedRef_Active, 0.0);
 TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
 TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
 TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;

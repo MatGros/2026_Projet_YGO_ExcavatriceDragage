@@ -89,11 +89,14 @@ VAR_GLOBAL PERSISTENT RETAIN
     _TranslationSetFreq_Hz          : REAL := 20.0;  // 🚦 Consigne fréquence manuelle opérateur (Hz) — 20.0 = défaut usine (mise en service), recopie continue (PRG_07_Supervision)
 
     // 📏 Positions calibrées repère Translation M3 (mètres)
-    _TranslationPosMaintenance_M    : REAL := 0.0;   // Position origine (Maintenance)
-    _TranslationPosP1_M             : REAL := 6.0;   // Position P1
-    _TranslationPosP2_M             : REAL := 14.0;  // Position P2
-    _TranslationPosPV_M             : REAL := 21.0;  // Position PV (Pré-ralentissement)
-    _TranslationPosTremie_M         : REAL := 25.0;  // Position Trémie (Extrême gauche)
+    // ✅ Convention : 0 m = Trémie (Extrême gauche), 30 m = Maintenance (Extrême droite).
+    // Distances NON-linéaires : Trémie(0)→PV(5)=5 m, PV(5)→P2(15)=10 m, P2(15)→P1(20)=5 m,
+    // P1(20)→Maintenance(30)=10 m.
+    _TranslationPosTremie_M         : REAL := 0.0;   // Position Trémie (Extrême gauche, origine)
+    _TranslationPosPV_M             : REAL := 5.0;   // Position PV (Pré-ralentissement)
+    _TranslationPosP2_M             : REAL := 15.0;  // Position P2
+    _TranslationPosP1_M             : REAL := 20.0;  // Position P1
+    _TranslationPosMaintenance_M    : REAL := 30.0;  // Position Maintenance (Extrême droite)
     _TranslationGainMetersPerHzSec  : REAL := 0.008333; // Ratio m/s par Hz (ex: 50 Hz = 0.416 m/s)
     // Reprise odométrie après reboot — recopie continue (PRG_05_Translation).
     _TranslationPosEstimated_M          : REAL := 0.0;   // Dernière position estimée connue (m)

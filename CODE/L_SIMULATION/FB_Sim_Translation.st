@@ -5,6 +5,9 @@
       de Trémie vers Maintenance. Le modèle ne publie que les six mots valides
       de FB_Translation_PositionDecoder : 11111 → 01111 → 00111 → 00011 →
       00001 → 00000.
+   📏 Convention : PositionProgress en mètres, 0 m = Trémie … 30 m = Maintenance.
+      Distances NON-linéaires : Trémie(0)→PV(5)=5 m, PV(5)→P2(15)=10 m,
+      P2(15)→P1(20)=5 m, P1(20)→Maintenance(30)=10 m.
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
@@ -28,18 +31,20 @@ VAR_OUTPUT
 END_VAR
 VAR
     instCycleTime              : FB_CycleTime;   (* * [INST] Mesure temps de cycle *)
-    PositionProgress           : REAL;   (* . [LOC] 0=Trémie ... 5=Maintenance *)
+    PositionProgress           : REAL;   (* . [LOC] 0 m=Trémie ... 30 m=Maintenance *)
     SpeedPctBounded            : REAL;   (* . [LOC] Vitesse bornée *)
     PositionIncrement          : REAL;   (* . [LOC] Incrément de progression *)
     Initialized                : BOOL := FALSE;   (* . [LOC] Initialisation *)
 END_VAR
 VAR CONSTANT
+    // 📏 Positions réelles des 5 capteurs (mètres) — convention 0 m=Trémie, 30 m=Maintenance.
+    // Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maintenance).
     CST_PositionAtTremie       : REAL := 0.0;
-    CST_PositionAtPV           : REAL := 1.0;
-    CST_PositionAtP2           : REAL := 2.0;
-    CST_PositionAtP1           : REAL := 3.0;
-    CST_PositionAtMaintenance  : REAL := 5.0;
-    CST_PositionSegmentCount   : REAL := 5.0;
+    CST_PositionAtPV           : REAL := 5.0;
+    CST_PositionAtP2           : REAL := 15.0;
+    CST_PositionAtP1           : REAL := 20.0;
+    CST_PositionAtMaintenance  : REAL := 30.0;
+    CST_TotalDistanceM         : REAL := 30.0; // Distance totale Trémie→Maintenance (m)
     CST_MinFullTravelTimeS     : REAL := 0.1; // Protection division : modèle sans dynamique sous ce seuil
 END_VAR
 
@@ -47,8 +52,8 @@ END_VAR
 
 {region "§1 Gate"}
 IF NOT Enable THEN
-    // Prochain démarrage déterministe sur P2, comme l'ancien modèle de banc.
-    PositionProgress := CST_PositionAtP2;
+    // Prochain démarrage déterministe sur la Trémie (0 m), pour un état de départ propre.
+    PositionProgress := CST_PositionAtTremie;
     Initialized := FALSE;
     PosTremie := FALSE;
     PosPV := FALSE;
@@ -61,7 +66,7 @@ END_IF;
 
 {region "§2 Initialisation"}
 IF NOT Initialized THEN
-    PositionProgress := CST_PositionAtP2;
+    PositionProgress := CST_PositionAtTremie;
     Initialized := TRUE;
 END_IF;
 {endregion}
@@ -70,11 +75,11 @@ END_IF;
 instCycleTime(DefaultValueS := 0.010);
 SpeedPctBounded := LIMIT(0.0, ABS(SpeedRefPct), 100.0);
 
-// Une vitesse à 100 % parcourt les cinq segments uniformes pendant FullTravelTimeS.
+// Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
 // Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.
 IF FullTravelTimeS >= CST_MinFullTravelTimeS THEN
     PositionIncrement := (SpeedPctBounded / 100.0)
-                         * (CST_PositionSegmentCount / FullTravelTimeS)
+                         * (CST_TotalDistanceM / FullTravelTimeS)
                          * instCycleTime.CycleTimeS;
 ELSE
     PositionIncrement := 0.0;

@@ -386,8 +386,12 @@ TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpen
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationState.DriveFreqRef_Hz := instTranslationM3.RequestedDriveFreqHz;
-TranslationState.ActiveDirection := M3_Direction_Active;
-TranslationState.ActiveSpeedRef_Pct := M3_SpeedRef_Active;
+// 🎯 Cohérence sim : ActiveDirection/ActiveSpeedRef_Pct n'affichent la
+// consigne QUE si la commande variateur est réellement émise (RequestedDriveControlWord <> 0).
+// Sinon, un interlock bloquant (hauteur, SafeStop…) laisserait l'IHM suggérer un mouvement
+// qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
+TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_Direction_Active, 0);
+TranslationState.ActiveSpeedRef_Pct := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_SpeedRef_Active, 0.0);
 TranslationState.PositionTremie := PRG_02_Acquisition.Data.TranslationPosTremie;
 TranslationState.PositionPV := PRG_02_Acquisition.Data.TranslationPosPV;
 TranslationState.PositionP2 := PRG_02_Acquisition.Data.TranslationPosP2;

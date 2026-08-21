@@ -19,7 +19,7 @@
 | <nobr><code>TC-P13-040</code></nobr> | Ne publie que les 6 mots thermomètre valides de `FB_Translation_PositionDecoder` (`11111→00000`) | `💻 AUTO` |
 | <nobr><code>TC-P13-041</code></nobr> | `Direction=+1` progresse vers Trémie, `-1` vers Maintenance, `0` maintient la position | `💻 AUTO` |
 | <nobr><code>TC-P13-042</code></nobr> | Position bornée `[Trémie, Maintenance]` — jamais de dépassement | `💻 AUTO` |
-| <nobr><code>TC-P13-043</code></nobr> | `Enable=FALSE` réinitialise sur P2 (position déterministe au redémarrage, comme l'ancien modèle) | `💻 AUTO` |
+| <nobr><code>TC-P13-043</code></nobr> | `Enable=FALSE` réinitialise sur la Trémie (0 m) — état de départ propre (REX 2026-08-21, était P2) | `💻 AUTO` |
 
 ---
 
@@ -29,6 +29,10 @@
 à une vitesse dérivée de `SpeedRefPct`/`FullTravelTimeS`. Le modèle ne publie que les six mots
 valides attendus par `FB_Translation_PositionDecoder` (Partie 11) — jamais un mot incohérent, ce
 FB simule un capteur sain, pas un défaut câblage.
+
+📏 **Convention position (REX 2026-08-21)** : `PositionProgress` interne en **mètres**,
+`0 m = Trémie` … `30 m = Maintenance`. Seuils capteurs aux positions réelles, **distances
+non-linéaires** : Trémie(0)→PV(5)=5 m, PV(5)→P2(15)=10 m, P2(15)→P1(20)=5 m, P1(20)→Maintenance(30)=10 m.
 
 🔒 Source d'entrée confinée derrière `HwIn` : ne pilote aucune sortie réelle. Un éventuel override
 manuel (`SimM3SensorsWordOverrideActive`) est appliqué par `FB_SimBench`, pas par ce FB — séparation
@@ -53,10 +57,12 @@ stricte entre le modèle dynamique et l'injection ponctuelle opérateur.
 
 ## 3. Modèle de progression
 
-Position interne `PositionProgress` (REAL, 0=Trémie … 5=Maintenance), incrémentée/décrémentée
-chaque scan selon `SpeedPctBounded` et `FullTravelTimeS` (`FB_CycleTime` pour le pas réel). Chaque
-intervalle `[0,1[`, `[1,2[`... correspond à un seul mot thermomètre valide — aucune zone
-transitoire à cheval sur deux mots.
+Position interne `PositionProgress` (REAL, **mètres**, 0=Trémie … 30=Maintenance), incrémentée/
+décrémentée chaque scan selon `SpeedPctBounded` et `FullTravelTimeS` (`FB_CycleTime` pour le pas
+réel). À 100 %, le modèle parcourt les **30 m** de distance totale en `FullTravelTimeS`. Chaque
+intervalle délimité par les positions réelles `[0;5[`, `[5;15[`… correspond à un seul mot
+thermomètre valide — aucune zone transitoire à cheval sur deux mots. **Init déterministe sur la
+Trémie (0 m)** au démarrage et sur `Enable=FALSE`.
 
 Protection division : sous `CST_MinFullTravelTimeS` (0.1s), le modèle n'a plus de dynamique
 (`PositionIncrement := 0.0`) plutôt qu'une division qui exploserait.
