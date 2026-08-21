@@ -21,5 +21,10 @@ STRUCT
     Speed_Mps         : REAL;         // Vitesse absolue sur fenetre glissante (m/s)
     SignedSpeed_Mps   : REAL;         // Vitesse signee (m/s, + montee, - descente)
     SpeedValid        : BOOL;         // TRUE si 6 echantillons valides sur au moins 50 ms
+
+    // === STATUTS DES SOUS-FB & REFERENCE ===
+    HomingStatus      : ST_FbStatus;  // Statut FB_Encoder_Homing (etat du referencement)
+    AbsStatus         : ST_FbStatus;  // Statut FB_Encoder_Abs (etat acquisition bus)
+    HomingRefRaw      : UDINT;        // Reference brute du dernier homing reussi (re-expose)
 END_STRUCT
 END_TYPE

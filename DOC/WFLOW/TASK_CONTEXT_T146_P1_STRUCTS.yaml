@@ -1,0 +1,72 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T146 Phase 1 : extension structs de mesure codeur
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+# Porteur : T146 (référencement/homing codeurs) — étude validée, passage à l'exécution.
+# Phase 1 : fondation types (mort code — aucun consommateur aujourd'hui, zéro régression).
+
+contract:
+  task_id: T146_P1_STRUCTS
+  criticality: C1            # types purs, pas de logique métier, aucune sémantique safety touchée
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Étendre la struct frontière ST_EncoderMeasurement pour qu'elle devienne l'interface
+    de sortie de la future façade FB_Encoder (Option B : chaîne de mesure pure) : elle
+    porte les statuts des sous-FB (HomingStatus/AbsStatus) et ré-expose HomingRefRaw,
+    sans rien retirer ni modifier les champs existants (zéro régression).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "ST_EncoderMeasurement gagne les membres HomingStatus:ST_FbStatus, AbsStatus:ST_FbStatus et HomingRefRaw:UDINT."
+      verified_by: "lecture ligne a ligne du .st + G330_check_type_safety sur le bundle apres generation"
+    - id: AC2
+      statement: "Aucun membre existant de ST_EncoderMeasurement n'est supprime ni renomme (RawPos, EncoderAvailable, CablePosM, CablePosMSafe, EncoderIncoherent, Speed_Mps, SignedSpeed_Mps, SpeedValid restent inchanges)."
+      verified_by: "git diff sur CODE/E_CODEURS/ST_EncoderMeasurement.st : uniquement des ajouts"
+    - id: AC3
+      statement: "ST_EncoderMeasurements est inchange (M1:M2 seuls membres)."
+      verified_by: "git diff sur ST_EncoderMeasurements.st : aucun changement"
+    - id: AC4
+      statement: "Aucun consommateur n'est affecte (structs deja mort code : aucune reference ailleurs)."
+      verified_by: "grep ST_EncoderMeasurement -> seules les 2 definitions ST se font reference, preexistant"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/E_CODEURS/ST_EncoderMeasurement.st
+    forbidden:
+      - CODE/E_CODEURS/ST_EncoderMeasurements.st   # ne pas toucher ce lot (0 changement)
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+      - CODE/M_MAIN/PRG_02_Acquisition.st          # non-câblé à ce lot (Phase 4)
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout constat (incoherence de spec, champ deja present, conflit AF-09) est remonte
+    immediatement, pas en fin de phase.
+
+status: VALIDATED
+
+execution:
+  executed_by: "deepseek-v4-flash (executeur)"
+  completed_at: "2026-08-21"
+  status: COMPLETED
+  summary: >
+    Extension ST_EncoderMeasurement : ajout seul de HomingStatus/AbsStatus (ST_FbStatus)
+    + HomingRefRaw. Aucun membre existant retire/renomme (CablePosMSafe conserve, C3 non tranche).
+    Bundle regenere, G200 liaison PASS (0 err), gates palier C 15/15 PASS, compilation CODESYS OK.
+  evidence_submitted: ["G200_check_linkage: PASS (0 erreur)", "run_all_gates --palier C: 15/15 PASS", "compile CODESYS: OK"]
+
+validation:
+  status: APPROVED
+  validated_by: "Humain (utilisateur)"
+  validated_at: "2026-08-21"
+  notes: "Phase 1 validee - compilation CODESYS confirmee par l'utilisateur."
