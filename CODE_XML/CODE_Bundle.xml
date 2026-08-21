@@ -5338,6 +5338,31 @@ Vitesse absolue sur fenetre glissante (m/s)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
               </documentation>
             </variable>
+            <variable name="HomingStatus">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUTS DES SOUS-FB &amp; REFERENCE ===
+Statut FB_Encoder_Homing (etat du referencement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbsStatus">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut FB_Encoder_Abs (etat acquisition bus)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference brute du dernier homing reussi (re-expose)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
