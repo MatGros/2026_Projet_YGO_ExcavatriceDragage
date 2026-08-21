@@ -15,13 +15,8 @@ VAR_INPUT
     Enable                 : BOOL;        // --> [CMD] Autorisation generale FB (TRUE=Autorise)
     Reset                  : BOOL;        // --> [CMD] Acquittement defaut (front montant)
     Home                   : BOOL;        // --> [CMD] Demande de referencement (front)
+    HomingPermit           : BOOL;        // --> [CMD] Autorisation de homer (calculee par le caller)
     BtnConfirmCoherence    : BOOL;        // --> [CMD] Levee de doute d'incoherence au boot (front)
-
-    // === CONTEXTE & MODES ===
-    PowerContactorEngaged  : BOOL;        // --> [HW]  Ligne puissance enclenchee
-    Mode                   : E_Mode;      // --> [CMD] Mode d'exploitation actif (MAINT_N1/N2 requis)
-    UnitaryMode            : BOOL;        // --> [CMD] Mode unitaire a cible libre (MAINT_N2)
-    WinchSelected          : BOOL;        // --> [CMD] Instance est le treuil selectionne
 
     // === CIBLES & CONFIGURATION HOMING ===
     CfgHomingTargetM       : REAL;        // --> [CFG] Cible libre homing unitaire (m)
@@ -153,13 +148,10 @@ DynamicTargetEdge(CLK := UseDynamicTarget);
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
 Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
-HomingModeOk := (Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2);
+HomingModeOk := HomingPermit;
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
-END_IF;
-IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
-    Status.ErrorId := Status.ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
+    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : homing non autorise
 END_IF;
 
 // Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
@@ -167,14 +159,13 @@ END_IF;
 // attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
 // Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
 // quand Home est pressé.
-NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND NOT UnitaryMode
+NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget
                          AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
 
-// Unitaire (MAINT_N2 déjà garanti par UnitaryMode en amont, PRG_02_Acquisition) : bon treuil.
-UnitaryHomingTrigger := HomingModeOk AND UnitaryMode AND WinchSelected AND HomeEdge.Q;
+// Unitaire : cible libre (CfgHomingTargetM), déclenchée par la demande (front).
+UnitaryHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND HomeEdge.Q;
 
-// Dynamique (benne) : Mode + arrêt confirmé (M1/M2 non Busy) déjà gardés à l'appel via
-// M2BucketRefRequested (PRG_02_Acquisition.st) — HomingModeOk reste vérifié ici en défense.
+// Dynamique (benne) : HomingModeOk vérifié ici en défense.
 DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
 HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
@@ -182,7 +173,7 @@ HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTr
 IF HomingTrigger THEN
     IF UseDynamicTarget THEN
         TargetPositionM := DynamicHomingTargetM;
-    ELSIF UnitaryMode THEN
+    ELSIF HomeEdge.Q THEN
         TargetPositionM := CfgHomingTargetM;
     ELSE
         TargetPositionM := CfgTopSensorPosM;

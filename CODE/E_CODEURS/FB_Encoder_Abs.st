@@ -16,10 +16,6 @@ VAR_INPUT
     Reset               : BOOL;        // --> [CMD] Acquittement defaut (front montant)
     PresetRequest       : BOOL;        // --> [CMD] Demande de preset (front montant)
 
-    // === CONTEXTE & ETAT PUISSANCE ===
-    PowerContactorEngaged     : BOOL;  // --> [HW]  Ligne puissance enclenchee
-    Mode                : E_Mode;      // --> [CMD] Mode d'exploitation actif
-
     // === BUS ETHERCAT & CAPTEUR HW ===
     RawPosIn            : UDINT;       // --> [HW]  Position brute EtherCAT
     AlarmsIn            : UINT;        // --> [HW]  Codes alarmes bruts EtherCAT

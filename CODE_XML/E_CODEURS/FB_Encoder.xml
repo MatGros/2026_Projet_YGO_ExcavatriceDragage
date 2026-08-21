@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T18:26:13.600176" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T18:26:13.600176">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T19:58:34.006456" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T19:58:34.006456">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,56 +23,100 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="E_Mode">
+      <dataType name="ST_EncoderHw">
         <baseType>
-          <enum>
-            <values>
-              <value name="DISABLE" value="0" />
-              <value name="MAINT_N1" value="1" />
-              <value name="MAINT_N2" value="2" />
-              <value name="SEMI_AUTO" value="3" />
-            </values>
-          </enum>
+          <struct>
+            <variable name="RawPosIn">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ENTREES BUS ETHERCAT (vers le codeur) ===
+Position brute EtherCAT (in)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmsIn">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codes alarmes bruts EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningsIn">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codes avertissements bruts EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlaveOperational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Esclave EtherCAT operationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetAck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse confirmation preset reussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetNak">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse echec / timeout preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES BUS (vers le codeur) ===
+Ordre declenchement preset vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CodeSeqTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre sequence code vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de preset transmise au PDO Rx</xhtml>
+              </documentation>
+            </variable>
+          </struct>
         </baseType>
         <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N1</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N2</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEMI_AUTO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+            <ObjectId>d49fb2dc-e3eb-5045-a9d9-c8cacf52184b</ObjectId>
           </data>
         </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔌 ST_EncoderHw — Frontière hardware codeur (IN/OUT)
+   ───────────────────────────────────────────────────────────────
+   🎯 Regroupe les entrées/sorties hardware d'un codeur absolu EtherCAT
+      pour exposer l'interface physique de FB_Encoder de façon testable.
+   🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
       </dataType>
       <dataType name="ST_EncoderMeasurement">
         <baseType>
@@ -183,6 +227,72 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
    🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
    🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
    📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Encoder_Calib">
+        <baseType>
+          <struct>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES DE REFERENCE BRUTE (RETAIN) ===
+Valeur brute figee au dernier homing reussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastKnownRawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dernier point brut valide connu (continu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartCoherenceTolerancePts">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; REGLAGES TOLERANCE ===
+Tolerance redemarrage (pts, ~12% de 8192)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS DE CALIBRATION &amp; SECURITE ===
+TRUE des qu'un referencement a reussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incoherence detectee au redemarrage</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>808932ee-dfa9-530c-b6b0-60a6dd0eb372</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 ST_Encoder_Calib — Calibration &amp; référence codeur (1 par treuil, RETAIN)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
+   💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -348,103 +458,88 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
               </documentation>
             </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
+            <variable name="HomingPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Ligne puissance enclenchee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== AUTORISATION HOMING (calculee par le caller PRG) ===
+--&gt; [CMD] TRUE = l'operateur a le droit de homer</xhtml>
               </documentation>
             </variable>
-            <variable name="RawPosIn">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS ETHERCAT &amp; CAPTEUR HW ===
---&gt; [HW]  Position brute EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AlarmsIn">
-              <type>
-                <UINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes alarmes bruts EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningsIn">
-              <type>
-                <UINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes avertissements bruts EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SlaveOperational">
+            <variable name="HomingAtTargetM">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Statut esclave EtherCAT operationnel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES HOMING ===
+--&gt; [CMD] Demande homing vers cible (front montant)</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingRefRaw">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES HOMING EXTERNE (PRG_04_Treuils_Bonne) ===
---&gt; [CFG] Reference brute figee au dernier homing</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Homed">
+            <variable name="HomingAtZero">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Codeur reference (FB_Encoder_Homing)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Force homing a 0.0</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingSuspect">
+            <variable name="ConfirmCoherence">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Incoherence redemarrage a lever</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lever le doute d'incoherence boot</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingStatus">
+            <variable name="CfgHomingTargetM">
               <type>
-                <derived name="ST_FbStatus" />
+                <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Statut complet FB_Encoder_Homing</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible libre homing unitaire (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetRequest">
+            <variable name="CfgTopSensorPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible homing nominal capteur haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UseDynamicTarget">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RELAIS VERS HOMING ===
---&gt; [CMD] Demande preset (front) -&gt; relayee a Abs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active cible dynamique</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetValue">
+            <variable name="DynamicHomingTargetM">
               <type>
-                <UDINT />
+                <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur de preset -&gt; relayee a Abs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible dynamique de referencement (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensor">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS PHYSIQUES ===
+--&gt; [HW]  Capteur physique position haute unique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Hw">
+              <type>
+                <derived name="ST_EncoderHw" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS ETHERCAT &amp; CAPTEUR HW (frontiere testable) ===
+&lt;-&gt; [BUS] Entrees/sorties hardware codeur</xhtml>
               </documentation>
             </variable>
             <variable name="PointsPerRev">
@@ -455,7 +550,7 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <simpleValue value="8192" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES &amp; REGLAGES ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MECANIQUE (constantes) ===
 --&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
               </documentation>
             </variable>
@@ -478,7 +573,8 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <simpleValue value="-99" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond bornage physique bas (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES (modifiables) ===
+--&gt; [CFG] Plafond bornage physique bas (m)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionMaxM">
@@ -522,37 +618,13 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut transverse facade (synthese)</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetAck">
+            <variable name="HwOut">
               <type>
-                <BOOL />
+                <derived name="ST_EncoderHw" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RELAIS VERS HOMING ===
-&lt;-- [STAT] Pulse confirmation preset reussi</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetNak">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Pulse echec / timeout preset</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetTriggerCmd">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Ordre declenchement preset vers PDO Rx (relay Abs)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetValueOut">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Valeur preset transmise (relay Abs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FRONTIERE HW SORTIE (testable) ===
+&lt;-- [BUS] Sorties hardware codeur (preset...)</xhtml>
               </documentation>
             </variable>
             <variable name="Measurement">
@@ -564,13 +636,29 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
 &lt;-- [BUS] Mesures + statuts (interface)</xhtml>
               </documentation>
             </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS CODEUR ===
+&lt;-- [STAT] Codeur reference (sortie homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incoherence redemarrage a lever</xhtml>
+              </documentation>
+            </variable>
             <variable name="EncoderFault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATES DE FIABILITE ===
-&lt;-- [SAFE] Gate general fiabilite (sans Homed) — vitesse/mouvements</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Gate general fiabilite (sans Homed)</xhtml>
               </documentation>
             </variable>
             <variable name="HomedAndReliable">
@@ -578,18 +666,37 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Gate strict M3 : disponible ET reference ET pas incoherent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Gate strict M3 : dispo ET ref ET pas incoherent</xhtml>
               </documentation>
             </variable>
           </outputVars>
+          <inOutVars>
+            <variable name="Calib">
+              <type>
+                <derived name="ST_Encoder_Calib" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALIBRATION PERSISTANTE (externe RETAIN, jamais membre) ===
+&lt;-&gt; [BUS] Calibration RETAIN du treuil</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
           <localVars>
             <variable name="instAbs">
               <type>
                 <derived name="FB_Encoder_Abs" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB (chaine de mesure) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB (chaine codeur complete) ===
 * [INST] Acquisition brute codeur EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instHoming">
+              <type>
+                <derived name="FB_Encoder_Homing" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Referencement (homing) nominal/unitaire</xhtml>
               </documentation>
             </variable>
             <variable name="instScale">
@@ -627,19 +734,15 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 FB_Encoder — Facade chaine de mesure codeur (1 par treuil M1/M2)
+   🔌 FB_Encoder — Objet codeur complet (1 par treuil M1/M2)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Composer la chaine de mesure pure d'un treuil derriere une
-      interface unique : Abs → Scale → Safety → Reliability → Speed.
-   🧬 Option B : SANS FB_Encoder_Homing — le referencement reste
-      une conduite de treuil dans PRG_04_Treuils_Benne. La facade RECOIT les
-      sorties homing (HomingRefRaw, Homed, HomingSuspect, HomingStatus) et
-      relaie PresetRequest/PresetValue &lt;-&gt; Abs.
+   🎯 Rôle : Regrouper toute la chaine codeur derriere une interface unique :
+      Abs → Homing → Scale → Safety → Reliability → Speed.
+   🔌 Frontiere hardware exposee en IN/OUT via le bus ST_EncoderHw (testable).
+   🔒 Homing : autorise par HomingPermit (calcule par le caller), declenche
+      par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
-      de vitesse au meme scan (D-A10 complement c). HomedAndReliable = gate
-      strict reserve a l'interlock hauteur M3 (D-A11/C1).
-   🧬 Pure composition : chaque sous-FB garde sa responsabilite et reste
-      testable isolement. Aucune fusion de logique.
+      de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
    📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
    =======================================================================</xhtml>
           </documentation>
@@ -648,82 +751,89 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Gate neutralisation"}
-// 🛑 1. GATE — neutralisation generale
+{region "Gate neutralisation"}
 IF NOT Enable THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
     Status.State := E_State.DISABLED;
-    PresetAck := FALSE; PresetNak := FALSE;
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
-    // Fail-safe : chaine neutralisee = mesure non fiable -&gt; gates forces a l'etat de defaut
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
     RETURN;
 END_IF;
-
 Ready := TRUE;
 Status.State := E_State.READY;
 {endregion}
 
-{region "§2 Abs"}
-// 🔌 2. ACQUISITION BRUTE (Abs)
+{region "Abs"}
 instAbs(
-    Enable                := Enable,
-    Reset                 := Reset,
-    PowerContactorEngaged := PowerContactorEngaged,
-    Mode                  := Mode,
-    RawPosIn              := RawPosIn,
-    AlarmsIn              := AlarmsIn,
-    WarningsIn            := WarningsIn,
-    SlaveOperational      := SlaveOperational,
-    PresetRequest         := PresetRequest,
-    PresetValue           := PresetValue,
-    PointsPerRev          := PointsPerRev
+    Enable              := Enable,
+    Reset               := Reset,
+    RawPosIn            := Hw.RawPosIn,
+    AlarmsIn            := Hw.AlarmsIn,
+    WarningsIn          := Hw.WarningsIn,
+    SlaveOperational    := Hw.SlaveOperational,
+    PresetRequest       := instHoming.PresetRequest,
+    PresetValue         := instHoming.PresetValue,
+    PointsPerRev        := PointsPerRev
 );
-PresetAck := instAbs.PresetAck;
-PresetNak := instAbs.PresetNak;
-PresetTriggerCmd := instAbs.PresetTriggerCmd;
-PresetValueOut := instAbs.PresetValueOut;
 {endregion}
 
-{region "§3 Scale"}
-// --- 3. MISE A L'ECHELLE POINTS -&gt; METRES
+{region "Homing"}
+instHoming(
+    Enable               := Enable,
+    Reset                := Reset,
+    Home                 := HomingAtTargetM,
+    HomingPermit         := HomingPermit,
+    BtnConfirmCoherence  := ConfirmCoherence,
+    UseDynamicTarget     := UseDynamicTarget,
+    DynamicHomingTargetM := DynamicHomingTargetM,
+    CfgHomingTargetM     := CfgHomingTargetM,
+    CfgTopSensorPosM     := SEL(HomingAtZero, CfgTopSensorPosM, 0.0),
+    TopPositionSensor    := TopPositionSensor,
+    RawPos               := instAbs.RawPos,
+    EncoderAvailable     := instAbs.EncoderAvailable,
+    PresetAck            := instAbs.PresetAck,
+    PresetNak            := instAbs.PresetNak,
+    PointsPerRev         := PointsPerRev,
+    MultiTurnRevsMax     := 4096,
+    CableM_PerRev        := CableM_PerRev,
+    BypassGlobal         := BypassGlobal,
+    Calib                := Calib
+);
+{endregion}
+
+{region "Scale"}
 instScale(
-    RawPos        := instAbs.RawPos,
-    HomingRefRaw  := HomingRefRaw,
+    RawPos       := instAbs.RawPos,
+    HomingRefRaw := instHoming.HomingRefRaw,
     CableM_PerRev := CableM_PerRev,
-    PointsPerRev  := PointsPerRev
+    PointsPerRev := PointsPerRev
 );
 {endregion}
 
-{region "§4 Safety"}
-// --- 4. BORNAGE &amp; COHERENCE
+{region "Safety"}
 instSafety(
-    Enable                := Enable,
-    Reset                 := Reset,
-    PowerContactorEngaged := PowerContactorEngaged,
-    Mode                  := Mode,
-    CablePosM             := instScale.CablePosM,
-    HomingSuspect         := HomingSuspect,
-    PositionMinM          := PositionMinM,
-    PositionMaxM          := PositionMaxM,
-    BypassGlobal          := BypassGlobal
+    Enable             := Enable,
+    Reset              := Reset,
+    CablePosM          := instScale.CablePosM,
+    HomingSuspect      := instHoming.HomingSuspect,
+    PositionMinM       := PositionMinM,
+    PositionMaxM       := PositionMaxM,
+    BypassGlobal       := BypassGlobal
 );
 {endregion}
 
-{region "§5 Fiabilite (gate avant Speed)"}
-// --- 5. 🛡️ GATES DE FIABILITE — AVANT Speed (purge vitesse au meme scan)
+{region "Reliability"}
 instRel(
     EncoderAvailable  := instAbs.EncoderAvailable,
-    Homed             := Homed,
+    Homed             := instHoming.Homed,
     EncoderIncoherent := instSafety.EncoderIncoherent
 );
 {endregion}
 
-{region "§6 Speed"}
-// --- 6. ⚡ VITESSE — PositionValid := NOT EncoderFault (gate general, sans Homed)
+{region "Speed"}
 instSpeed(
     Enable        := Enable,
     Reset         := Reset,
@@ -732,8 +842,7 @@ instSpeed(
 );
 {endregion}
 
-{region "§7 Remplissage struct et synthese"}
-// --- 7. 📦 REMPLISSAGE STRUCT FRONTIERE (interface de sortie)
+{region "Remplissage struct et synthese"}
 Measurement.RawPos            := instAbs.RawPos;
 Measurement.EncoderAvailable  := instAbs.EncoderAvailable;
 Measurement.CablePosM         := instSafety.CablePosMSafe;
@@ -742,19 +851,26 @@ Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
-Measurement.HomingStatus      := HomingStatus;
+Measurement.HomingStatus      := instHoming.Status;
 Measurement.AbsStatus         := instAbs.Status;
-Measurement.HomingRefRaw      := HomingRefRaw;
+Measurement.HomingRefRaw      := instHoming.HomingRefRaw;
 
-// Gates de fiabilite exposes (D-A10 complement c) — consumer unifie
+// Frontiere HW sortie (preset)
+HwOut.PresetTriggerCmd := instAbs.PresetTriggerCmd;
+HwOut.CodeSeqTriggerCmd := instAbs.CodeSeqTriggerCmd;
+HwOut.PresetValueOut    := instAbs.PresetValueOut;
+
+// Etats codeur
+Homed            := instHoming.Homed;
+HomingSuspect    := instHoming.HomingSuspect;
 EncoderFault     := instRel.EncoderFault;
 HomedAndReliable := instRel.HomedAndReliable;
 
 // Synthese statut facade
 Status.Busy := instAbs.Status.Busy;
 Status.Done := instSpeed.Valid AND instAbs.Status.Ready;
-Status.Error := instAbs.Status.Error OR instSafety.Status.Error;
-Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId;
+Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
+Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
 {endregion}
 </xhtml>
           </ST>
@@ -875,23 +991,6 @@ HomedAndReliable := EncoderAvailable AND Homed AND (NOT EncoderIncoherent);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de preset (front montant)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
---&gt; [HW]  Ligne puissance enclenchee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
               </documentation>
             </variable>
             <variable name="RawPosIn">
@@ -1248,7 +1347,7 @@ Status.Done := PresetAck;
           </data>
         </addData>
       </pou>
-      <pou name="FB_Encoder_Safety" pouType="functionBlock">
+      <pou name="FB_Encoder_Homing" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -1268,21 +1367,590 @@ Status.Done := PresetAck;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
+            <variable name="Home">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
---&gt; [HW]  Ligne puissance enclenchee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de referencement (front)</xhtml>
               </documentation>
             </variable>
-            <variable name="Mode">
+            <variable name="HomingPermit">
               <type>
-                <derived name="E_Mode" />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation de homer (calculee par le caller)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnConfirmCoherence">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Levee de doute d'incoherence au boot (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgHomingTargetM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CIBLES &amp; CONFIGURATION HOMING ===
+--&gt; [CFG] Cible libre homing unitaire (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UseDynamicTarget">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Activation cible dynamique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DynamicHomingTargetM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible dynamique de referencement (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTopSensorPosM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible homing nominal capteur haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensor">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS HW &amp; CAPTEURS ===
+--&gt; [HW]  Capteur physique position haute unique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FwdRevSpeedFeedbackOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteurs sens et vitesse retombes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Contacteur frein ouvert/desserre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; RETOURS FB CODEUR ABSOLU ===
+--&gt; [HW]  Position brute codeur (sortie FB_Encoder_Abs)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codeur absolu disponible et valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetAck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Pulse confirmation ecriture preset reussie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetNak">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Pulse echec / timeout ecriture preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CARACTERISTIQUES MECANIQUES &amp; BUS ===
+--&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MultiTurnRevsMax">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="4096" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Capacite multitour max codeur (tours)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableM_PerRev">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Perimetre tambour / developpement cable (m/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TESTS &amp; BYPASS ===
+--&gt; [TST] Neutralisation securites pour mise en service</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Status">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5: preset, bit9: incoherence boot).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES VERS FB_ENCODER_ABS ===
+&lt;-- [ACT]  Pulse demande d'ecriture preset SDO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Valeur de cible brute pour preset SDO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTATS &amp; MEMOIRE CALIBRATION ===
+&lt;-- [STAT] Codeur pagine et referencie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incoherence redemarrage a lever</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Offset de reference brut calcule</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Calib">
+              <type>
+                <derived name="ST_Encoder_Calib" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTURE DE CALIBRATION PERSISTANTE ===
+&lt;-&gt; [BUS] Structure de calibration RETAIN</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomeEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Home</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmCoherenceEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant BtnConfirmCoherence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopSensorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant TopPositionSensor</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DynamicTargetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant UseDynamicTarget</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InitDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS &amp; DRAPEAUX INTERNES ===
+. [LOC] Controle incoherence boot effectue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArretConfirme">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition d'arret moteur confirmee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingModeOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode de fonctionnement valide pour homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NominalHomingTrigger">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition de declenchement homing nominal</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UnitaryHomingTrigger">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition de declenchement homing unitaire</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DynamicHomingTrigger">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition de declenchement homing dynamique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingTrigger">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Synthese declenchement homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueCalc">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES DE CALCUL ===
+. [LOC] Valeur cible de preset (centre plage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetPoints">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart cible converti en points</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TargetPositionM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible retenue en metres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawDiffRestart">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart brut de position au redemarrage</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Encoder_Homing — Référencement codeur nominal ou unitaire
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Séquence de référencement nominal (capteur haut) ou unitaire (MAINT_N2)
+   🔒 Polarité : Homed=TRUE dès qu'un référencement valide est enregistré
+   🔌 Architecture : Expose ST_Encoder_Calib en VAR_IN_OUT
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===
+
+{region "§1 Gate neutralisation"}
+// 🛑 1. GATE — neutralisation ; on continue toutefois d'exposer le dernier état RETAIN connu
+// (FB_Encoder_Scale a besoin de HomingRefRaw même si ce FB est désactivé)
+// PowerContactorEngaged retiré du GATE (le codeur 24V / EtherCAT peut être homé disjoncteurs coupés)
+IF NOT Enable THEN
+    PresetRequest := FALSE;
+    PresetValue := 0;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    InitDone := FALSE;   // Force un nouveau contrôle §3.7 à la prochaine activation
+    Homed := Calib.Homed;
+    HomingSuspect := Calib.HomingSuspect;
+    HomingRefRaw := Calib.HomingRefRaw;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+
+{endregion}
+
+{region "§2 Fronts et coherence demarrage"}
+// 🔑 2. FRONTS
+ResetEdge(CLK := Reset);
+HomeEdge(CLK := Home);
+ConfirmCoherenceEdge(CLK := BtnConfirmCoherence);
+
+// 🔍 3. COHÉRENCE AU REDÉMARRAGE (§3.7) — une fois par session Enable, dès que le codeur répond
+IF NOT InitDone THEN
+    Status.State := E_State.INIT;
+    IF EncoderAvailable THEN
+        RawDiffRestart := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(Calib.LastKnownRawPos);
+        IF Calib.Homed AND (ABS(RawDiffRestart) &gt; UDINT_TO_DINT(Calib.RestartCoherenceTolerancePts)) THEN
+            Calib.HomingSuspect := TRUE;
+            Status.ErrorId := Status.ErrorId OR 16#0200;   // bit9 : incohérence codeur au redémarrage
+        END_IF;
+        InitDone := TRUE;
+    END_IF;
+ELSE
+    IF Status.State = E_State.INIT THEN Status.State := E_State.READY; END_IF;
+END_IF;
+
+{endregion}
+
+{region "§3 Confirmation coherence et demande homing"}
+// ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
+IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
+    Calib.HomingSuspect := FALSE;
+    Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
+END_IF;
+
+PresetRequest := FALSE;
+TopSensorEdge(CLK := TopPositionSensor);
+DynamicTargetEdge(CLK := UseDynamicTarget);
+
+// Gates rejetées = Warning auto-effaçable (§9/TC-P03-007), pas un Fault : recalculées à
+// chaque scan, jamais latchées, aucun Reset requis pour les effacer.
+Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
+
+HomingModeOk := HomingPermit;
+
+IF HomeEdge.Q AND NOT HomingModeOk THEN
+    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : homing non autorise
+END_IF;
+
+// Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
+// (FB_Safety_Winch) coupe déjà la montée indépendamment dès que TopPositionSensor est actif ;
+// attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
+// Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
+// quand Home est pressé.
+NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget
+                         AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
+
+// Unitaire : cible libre (CfgHomingTargetM), déclenchée par la demande (front).
+UnitaryHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND HomeEdge.Q;
+
+// Dynamique (benne) : HomingModeOk vérifié ici en défense.
+DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
+
+HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
+
+IF HomingTrigger THEN
+    IF UseDynamicTarget THEN
+        TargetPositionM := DynamicHomingTargetM;
+    ELSIF HomeEdge.Q THEN
+        TargetPositionM := CfgHomingTargetM;
+    ELSE
+        TargetPositionM := CfgTopSensorPosM;
+    END_IF;
+
+    // Bornage obligatoire avant écriture (CODE_QUALITY_STANDARDS §6) — toute cible, quelle
+    // que soit son origine (config, calcul benne, capteur haut), est vérifiée dans la plage
+    // physique documentée [-99;+99] m avant d'être gravée dans la référence codeur.
+    IF (TargetPositionM &lt; -99.0) OR (TargetPositionM &gt; 99.0) THEN
+        Status.ErrorId := Status.ErrorId OR 16#0010;   // bit4 : cible hors plage, homing refusé
+    ELSE
+        TargetPoints := REAL_TO_DINT(TargetPositionM * UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+        Calib.HomingRefRaw := DINT_TO_UDINT(UDINT_TO_DINT(RawPos) - TargetPoints);
+        Calib.Homed := TRUE;
+        Calib.HomingSuspect := FALSE;
+        Calib.LastKnownRawPos := RawPos;
+        HomingRefRaw := Calib.HomingRefRaw;
+        Homed := TRUE;
+        HomingSuspect := FALSE;
+        Status.Done := TRUE;
+        Status.ErrorId := 16#0000;
+        Status.State := E_State.READY;
+
+        // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
+        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
+        PresetValue := PresetValueCalc;
+        PresetRequest := TRUE;
+    END_IF;
+END_IF;
+
+{endregion}
+
+{region "§4 Suivi SDO reset et sorties etat"}
+// ⏳ 6. SUIVI DE LA SÉQUENCE SDO OPTIONNELLE
+IF Status.State = E_State.BUSY THEN
+    IF PresetAck THEN
+        Status.Done := TRUE;
+        Status.State := E_State.READY;
+        // Un homing réussi efface l'intégralité de ErrorId
+        Status.ErrorId := 16#0000;
+    ELSIF PresetNak THEN
+        Status.ErrorId := Status.ErrorId OR 16#0020;        // bit5 : preset refusé/timeout (voir FB_Encoder_Abs)
+        Status.State := E_State.READY;
+    END_IF;
+END_IF;
+
+// 🧾 7. RESET (front) — efface les bits « dernière tentative rejetée » (pas de cause persistante
+// à revérifier ici : le prochain Home réévalue toutes les conditions de zéro, voir §5)
+IF ResetEdge.Q THEN
+    Status.ErrorId := Status.ErrorId AND 16#FFC0;   // efface bits 0..5 (garde bit9, levé seulement par BtnConfirmCoherence/Home)
+END_IF;
+
+// 📤 8. SORTIES ÉTAT
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
+IF ErrorEdge.Q THEN
+    Status.StateAtError := Status.State;
+END_IF;
+
+// Mise à jour continue du point brut valide connu (hors séquence de homing elle-même)
+IF EncoderAvailable AND (Status.State &lt;&gt; E_State.BUSY) THEN
+    Calib.LastKnownRawPos := RawPos;
+END_IF;
+
+Status.Busy := (Status.State = E_State.BUSY);
+Homed := Calib.Homed AND NOT Calib.HomingSuspect; // Perd l'état homed si suspect (démarrage ou fonctionnement), restauré après BtnConfirmCoherence
+HomingSuspect := Calib.HomingSuspect;
+HomingRefRaw := Calib.HomingRefRaw;
+
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>0d5827b5-87bb-5d18-88a3-fc9c3bf8967b</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Encoder_Safety" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosM">
@@ -1899,13 +2567,13 @@ END_IF;
           <Object Name="FB_Encoder" ObjectId="290327ae-3055-58e1-9bbd-038d8cd93901" />
           <Object Name="FB_EncoderReliability" ObjectId="2f0260c4-bd51-584e-a910-46b30488f46d" />
           <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
+          <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
           <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
+          <Object Name="ST_EncoderHw" ObjectId="d49fb2dc-e3eb-5045-a9d9-c8cacf52184b" />
           <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
-        </Folder>
-        <Folder Name="F_MODES">
-          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+          <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />

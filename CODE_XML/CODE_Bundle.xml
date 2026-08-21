@@ -5300,6 +5300,101 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_EncoderHw">
+        <baseType>
+          <struct>
+            <variable name="RawPosIn">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ENTREES BUS ETHERCAT (vers le codeur) ===
+Position brute EtherCAT (in)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmsIn">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codes alarmes bruts EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningsIn">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codes avertissements bruts EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlaveOperational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Esclave EtherCAT operationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetAck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse confirmation preset reussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetNak">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pulse echec / timeout preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES BUS (vers le codeur) ===
+Ordre declenchement preset vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CodeSeqTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre sequence code vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur de preset transmise au PDO Rx</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d49fb2dc-e3eb-5045-a9d9-c8cacf52184b</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔌 ST_EncoderHw — Frontière hardware codeur (IN/OUT)
+   ───────────────────────────────────────────────────────────────
+   🎯 Regroupe les entrées/sorties hardware d'un codeur absolu EtherCAT
+      pour exposer l'interface physique de FB_Encoder de façon testable.
+   🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_EncoderMeasurement">
         <baseType>
           <struct>
@@ -15421,103 +15516,88 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
               </documentation>
             </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
+            <variable name="HomingPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Ligne puissance enclenchee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== AUTORISATION HOMING (calculee par le caller PRG) ===
+--&gt; [CMD] TRUE = l'operateur a le droit de homer</xhtml>
               </documentation>
             </variable>
-            <variable name="RawPosIn">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS ETHERCAT &amp; CAPTEUR HW ===
---&gt; [HW]  Position brute EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AlarmsIn">
-              <type>
-                <UINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes alarmes bruts EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningsIn">
-              <type>
-                <UINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes avertissements bruts EtherCAT</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SlaveOperational">
+            <variable name="HomingAtTargetM">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Statut esclave EtherCAT operationnel</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES HOMING ===
+--&gt; [CMD] Demande homing vers cible (front montant)</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingRefRaw">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES HOMING EXTERNE (PRG_04_Treuils_Bonne) ===
---&gt; [CFG] Reference brute figee au dernier homing</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Homed">
+            <variable name="HomingAtZero">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Codeur reference (FB_Encoder_Homing)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Force homing a 0.0</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingSuspect">
+            <variable name="ConfirmCoherence">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Incoherence redemarrage a lever</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lever le doute d'incoherence boot</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingStatus">
+            <variable name="CfgHomingTargetM">
               <type>
-                <derived name="ST_FbStatus" />
+                <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Statut complet FB_Encoder_Homing</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible libre homing unitaire (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetRequest">
+            <variable name="CfgTopSensorPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible homing nominal capteur haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UseDynamicTarget">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RELAIS VERS HOMING ===
---&gt; [CMD] Demande preset (front) -&gt; relayee a Abs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Active cible dynamique</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetValue">
+            <variable name="DynamicHomingTargetM">
               <type>
-                <UDINT />
+                <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur de preset -&gt; relayee a Abs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cible dynamique de referencement (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensor">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS PHYSIQUES ===
+--&gt; [HW]  Capteur physique position haute unique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Hw">
+              <type>
+                <derived name="ST_EncoderHw" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS ETHERCAT &amp; CAPTEUR HW (frontiere testable) ===
+&lt;-&gt; [BUS] Entrees/sorties hardware codeur</xhtml>
               </documentation>
             </variable>
             <variable name="PointsPerRev">
@@ -15528,7 +15608,7 @@ END_IF;
                 <simpleValue value="8192" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES &amp; REGLAGES ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MECANIQUE (constantes) ===
 --&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
               </documentation>
             </variable>
@@ -15551,7 +15631,8 @@ END_IF;
                 <simpleValue value="-99" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond bornage physique bas (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES (modifiables) ===
+--&gt; [CFG] Plafond bornage physique bas (m)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionMaxM">
@@ -15595,37 +15676,13 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut transverse facade (synthese)</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetAck">
+            <variable name="HwOut">
               <type>
-                <BOOL />
+                <derived name="ST_EncoderHw" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RELAIS VERS HOMING ===
-&lt;-- [STAT] Pulse confirmation preset reussi</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetNak">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Pulse echec / timeout preset</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetTriggerCmd">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Ordre declenchement preset vers PDO Rx (relay Abs)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PresetValueOut">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Valeur preset transmise (relay Abs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FRONTIERE HW SORTIE (testable) ===
+&lt;-- [BUS] Sorties hardware codeur (preset...)</xhtml>
               </documentation>
             </variable>
             <variable name="Measurement">
@@ -15637,13 +15694,29 @@ END_IF;
 &lt;-- [BUS] Mesures + statuts (interface)</xhtml>
               </documentation>
             </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS CODEUR ===
+&lt;-- [STAT] Codeur reference (sortie homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incoherence redemarrage a lever</xhtml>
+              </documentation>
+            </variable>
             <variable name="EncoderFault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATES DE FIABILITE ===
-&lt;-- [SAFE] Gate general fiabilite (sans Homed) — vitesse/mouvements</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Gate general fiabilite (sans Homed)</xhtml>
               </documentation>
             </variable>
             <variable name="HomedAndReliable">
@@ -15651,18 +15724,37 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Gate strict M3 : disponible ET reference ET pas incoherent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Gate strict M3 : dispo ET ref ET pas incoherent</xhtml>
               </documentation>
             </variable>
           </outputVars>
+          <inOutVars>
+            <variable name="Calib">
+              <type>
+                <derived name="ST_Encoder_Calib" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALIBRATION PERSISTANTE (externe RETAIN, jamais membre) ===
+&lt;-&gt; [BUS] Calibration RETAIN du treuil</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
           <localVars>
             <variable name="instAbs">
               <type>
                 <derived name="FB_Encoder_Abs" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB (chaine de mesure) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB (chaine codeur complete) ===
 * [INST] Acquisition brute codeur EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instHoming">
+              <type>
+                <derived name="FB_Encoder_Homing" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Referencement (homing) nominal/unitaire</xhtml>
               </documentation>
             </variable>
             <variable name="instScale">
@@ -15700,19 +15792,15 @@ END_IF;
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🔌 FB_Encoder — Facade chaine de mesure codeur (1 par treuil M1/M2)
+   🔌 FB_Encoder — Objet codeur complet (1 par treuil M1/M2)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Composer la chaine de mesure pure d'un treuil derriere une
-      interface unique : Abs → Scale → Safety → Reliability → Speed.
-   🧬 Option B : SANS FB_Encoder_Homing — le referencement reste
-      une conduite de treuil dans PRG_04_Treuils_Benne. La facade RECOIT les
-      sorties homing (HomingRefRaw, Homed, HomingSuspect, HomingStatus) et
-      relaie PresetRequest/PresetValue &lt;-&gt; Abs.
+   🎯 Rôle : Regrouper toute la chaine codeur derriere une interface unique :
+      Abs → Homing → Scale → Safety → Reliability → Speed.
+   🔌 Frontiere hardware exposee en IN/OUT via le bus ST_EncoderHw (testable).
+   🔒 Homing : autorise par HomingPermit (calcule par le caller), declenche
+      par HomingAtTargetM (front). La cible est fournie par le caller.
    🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
-      de vitesse au meme scan (D-A10 complement c). HomedAndReliable = gate
-      strict reserve a l'interlock hauteur M3 (D-A11/C1).
-   🧬 Pure composition : chaque sous-FB garde sa responsabilite et reste
-      testable isolement. Aucune fusion de logique.
+      de vitesse au meme scan. HomedAndReliable = gate strict interlock M3.
    📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
    =======================================================================</xhtml>
           </documentation>
@@ -15721,82 +15809,89 @@ END_IF;
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Gate neutralisation"}
-// 🛑 1. GATE — neutralisation generale
+{region "Gate neutralisation"}
 IF NOT Enable THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
     Status.State := E_State.DISABLED;
-    PresetAck := FALSE; PresetNak := FALSE;
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
-    // Fail-safe : chaine neutralisee = mesure non fiable -&gt; gates forces a l'etat de defaut
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
     RETURN;
 END_IF;
-
 Ready := TRUE;
 Status.State := E_State.READY;
 {endregion}
 
-{region "§2 Abs"}
-// 🔌 2. ACQUISITION BRUTE (Abs)
+{region "Abs"}
 instAbs(
-    Enable                := Enable,
-    Reset                 := Reset,
-    PowerContactorEngaged := PowerContactorEngaged,
-    Mode                  := Mode,
-    RawPosIn              := RawPosIn,
-    AlarmsIn              := AlarmsIn,
-    WarningsIn            := WarningsIn,
-    SlaveOperational      := SlaveOperational,
-    PresetRequest         := PresetRequest,
-    PresetValue           := PresetValue,
-    PointsPerRev          := PointsPerRev
+    Enable              := Enable,
+    Reset               := Reset,
+    RawPosIn            := Hw.RawPosIn,
+    AlarmsIn            := Hw.AlarmsIn,
+    WarningsIn          := Hw.WarningsIn,
+    SlaveOperational    := Hw.SlaveOperational,
+    PresetRequest       := instHoming.PresetRequest,
+    PresetValue         := instHoming.PresetValue,
+    PointsPerRev        := PointsPerRev
 );
-PresetAck := instAbs.PresetAck;
-PresetNak := instAbs.PresetNak;
-PresetTriggerCmd := instAbs.PresetTriggerCmd;
-PresetValueOut := instAbs.PresetValueOut;
 {endregion}
 
-{region "§3 Scale"}
-// --- 3. MISE A L'ECHELLE POINTS -&gt; METRES
+{region "Homing"}
+instHoming(
+    Enable               := Enable,
+    Reset                := Reset,
+    Home                 := HomingAtTargetM,
+    HomingPermit         := HomingPermit,
+    BtnConfirmCoherence  := ConfirmCoherence,
+    UseDynamicTarget     := UseDynamicTarget,
+    DynamicHomingTargetM := DynamicHomingTargetM,
+    CfgHomingTargetM     := CfgHomingTargetM,
+    CfgTopSensorPosM     := SEL(HomingAtZero, CfgTopSensorPosM, 0.0),
+    TopPositionSensor    := TopPositionSensor,
+    RawPos               := instAbs.RawPos,
+    EncoderAvailable     := instAbs.EncoderAvailable,
+    PresetAck            := instAbs.PresetAck,
+    PresetNak            := instAbs.PresetNak,
+    PointsPerRev         := PointsPerRev,
+    MultiTurnRevsMax     := 4096,
+    CableM_PerRev        := CableM_PerRev,
+    BypassGlobal         := BypassGlobal,
+    Calib                := Calib
+);
+{endregion}
+
+{region "Scale"}
 instScale(
-    RawPos        := instAbs.RawPos,
-    HomingRefRaw  := HomingRefRaw,
+    RawPos       := instAbs.RawPos,
+    HomingRefRaw := instHoming.HomingRefRaw,
     CableM_PerRev := CableM_PerRev,
-    PointsPerRev  := PointsPerRev
+    PointsPerRev := PointsPerRev
 );
 {endregion}
 
-{region "§4 Safety"}
-// --- 4. BORNAGE &amp; COHERENCE
+{region "Safety"}
 instSafety(
-    Enable                := Enable,
-    Reset                 := Reset,
-    PowerContactorEngaged := PowerContactorEngaged,
-    Mode                  := Mode,
-    CablePosM             := instScale.CablePosM,
-    HomingSuspect         := HomingSuspect,
-    PositionMinM          := PositionMinM,
-    PositionMaxM          := PositionMaxM,
-    BypassGlobal          := BypassGlobal
+    Enable             := Enable,
+    Reset              := Reset,
+    CablePosM          := instScale.CablePosM,
+    HomingSuspect      := instHoming.HomingSuspect,
+    PositionMinM       := PositionMinM,
+    PositionMaxM       := PositionMaxM,
+    BypassGlobal       := BypassGlobal
 );
 {endregion}
 
-{region "§5 Fiabilite (gate avant Speed)"}
-// --- 5. 🛡️ GATES DE FIABILITE — AVANT Speed (purge vitesse au meme scan)
+{region "Reliability"}
 instRel(
     EncoderAvailable  := instAbs.EncoderAvailable,
-    Homed             := Homed,
+    Homed             := instHoming.Homed,
     EncoderIncoherent := instSafety.EncoderIncoherent
 );
 {endregion}
 
-{region "§6 Speed"}
-// --- 6. ⚡ VITESSE — PositionValid := NOT EncoderFault (gate general, sans Homed)
+{region "Speed"}
 instSpeed(
     Enable        := Enable,
     Reset         := Reset,
@@ -15805,8 +15900,7 @@ instSpeed(
 );
 {endregion}
 
-{region "§7 Remplissage struct et synthese"}
-// --- 7. 📦 REMPLISSAGE STRUCT FRONTIERE (interface de sortie)
+{region "Remplissage struct et synthese"}
 Measurement.RawPos            := instAbs.RawPos;
 Measurement.EncoderAvailable  := instAbs.EncoderAvailable;
 Measurement.CablePosM         := instSafety.CablePosMSafe;
@@ -15815,19 +15909,26 @@ Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
-Measurement.HomingStatus      := HomingStatus;
+Measurement.HomingStatus      := instHoming.Status;
 Measurement.AbsStatus         := instAbs.Status;
-Measurement.HomingRefRaw      := HomingRefRaw;
+Measurement.HomingRefRaw      := instHoming.HomingRefRaw;
 
-// Gates de fiabilite exposes (D-A10 complement c) — consumer unifie
+// Frontiere HW sortie (preset)
+HwOut.PresetTriggerCmd := instAbs.PresetTriggerCmd;
+HwOut.CodeSeqTriggerCmd := instAbs.CodeSeqTriggerCmd;
+HwOut.PresetValueOut    := instAbs.PresetValueOut;
+
+// Etats codeur
+Homed            := instHoming.Homed;
+HomingSuspect    := instHoming.HomingSuspect;
 EncoderFault     := instRel.EncoderFault;
 HomedAndReliable := instRel.HomedAndReliable;
 
 // Synthese statut facade
 Status.Busy := instAbs.Status.Busy;
 Status.Done := instSpeed.Valid AND instAbs.Status.Ready;
-Status.Error := instAbs.Status.Error OR instSafety.Status.Error;
-Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId;
+Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
+Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
 {endregion}
 </xhtml>
           </ST>
@@ -15948,23 +16049,6 @@ HomedAndReliable := EncoderAvailable AND Homed AND (NOT EncoderIncoherent);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de preset (front montant)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
---&gt; [HW]  Ligne puissance enclenchee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
               </documentation>
             </variable>
             <variable name="RawPosIn">
@@ -16349,45 +16433,20 @@ Status.Done := PresetAck;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de referencement (front)</xhtml>
               </documentation>
             </variable>
+            <variable name="HomingPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation de homer (calculee par le caller)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BtnConfirmCoherence">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Levee de doute d'incoherence au boot (front)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; MODES ===
---&gt; [HW]  Ligne puissance enclenchee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif (MAINT_N1/N2 requis)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="UnitaryMode">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode unitaire a cible libre (MAINT_N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchSelected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Instance est le treuil selectionne</xhtml>
               </documentation>
             </variable>
             <variable name="CfgHomingTargetM">
@@ -16827,13 +16886,10 @@ DynamicTargetEdge(CLK := UseDynamicTarget);
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
 Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
-HomingModeOk := (Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2);
+HomingModeOk := HomingPermit;
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
-END_IF;
-IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
-    Status.ErrorId := Status.ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
+    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : homing non autorise
 END_IF;
 
 // Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
@@ -16841,14 +16897,13 @@ END_IF;
 // attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
 // Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
 // quand Home est pressé.
-NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND NOT UnitaryMode
+NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget
                          AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
 
-// Unitaire (MAINT_N2 déjà garanti par UnitaryMode en amont, PRG_02_Acquisition) : bon treuil.
-UnitaryHomingTrigger := HomingModeOk AND UnitaryMode AND WinchSelected AND HomeEdge.Q;
+// Unitaire : cible libre (CfgHomingTargetM), déclenchée par la demande (front).
+UnitaryHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND HomeEdge.Q;
 
-// Dynamique (benne) : Mode + arrêt confirmé (M1/M2 non Busy) déjà gardés à l'appel via
-// M2BucketRefRequested (PRG_02_Acquisition.st) — HomingModeOk reste vérifié ici en défense.
+// Dynamique (benne) : HomingModeOk vérifié ici en défense.
 DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
 HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
@@ -16856,7 +16911,7 @@ HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTr
 IF HomingTrigger THEN
     IF UseDynamicTarget THEN
         TargetPositionM := DynamicHomingTargetM;
-    ELSIF UnitaryMode THEN
+    ELSIF HomeEdge.Q THEN
         TargetPositionM := CfgHomingTargetM;
     ELSE
         TargetPositionM := CfgTopSensorPosM;
@@ -16954,23 +17009,6 @@ HomingRefRaw := Calib.HomingRefRaw;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
---&gt; [HW]  Ligne puissance enclenchee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
               </documentation>
             </variable>
             <variable name="CablePosM">
@@ -31797,15 +31835,7 @@ PreviousQualified := Qualified;
                 <derived name="FB_Encoder" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Facade chaine mesure codeur M1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instHomingM1">
-              <type>
-                <derived name="FB_Encoder_Homing" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Prise d'origine M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Facade codeur complet M1 (Abs+Homing+Scale+Safety+Rel+Speed)</xhtml>
               </documentation>
             </variable>
             <variable name="instEncoderM2">
@@ -31813,15 +31843,7 @@ PreviousQualified := Qualified;
                 <derived name="FB_Encoder" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Facade chaine mesure codeur M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instHomingM2">
-              <type>
-                <derived name="FB_Encoder_Homing" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Prise d'origine M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Facade codeur complet M2</xhtml>
               </documentation>
             </variable>
             <variable name="instPosDecoderM3">
@@ -32221,52 +32243,29 @@ Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
 // === 🧲 §4 CODEURS &amp; HOMING (M1 / M2) ===
 
 // ── TREUIL M1 (Retenue) ──
-// Ordre POO : Homing d'abord, puis facade. Homing lit Abs 1 scan en retard (benin) ;
-// la facade lit HomingSuspect/HomingRefRaw AU MEME SCAN (safety preservee).
-instHomingM1(
-    Enable                 := TRUE,
-    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged  := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
-    Home                   := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
-    UnitaryMode            := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                              AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 0),
-    WinchSelected          := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1),
-    CfgHomingTargetM       := _WinchM1CfgPersist.CfgHomingTarget_M,
-    BtnConfirmCoherence    := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
-    TopPositionSensor      := HwIn.Winch.M1M2_TopPositionFree_DI,
-    CfgTopSensorPosM       := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero, _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
-    FwdRevSpeedFeedbackOff := HwIn.Winch.M1_ContactorsReleased_DI,
-    BrakeFeedback          := HwIn.Winch.M1_BrakeIsOpen_DI,
-    RawPos                 := instEncoderM1.Measurement.RawPos,
-    EncoderAvailable       := instEncoderM1.Measurement.EncoderAvailable,
-    PresetAck              := instEncoderM1.PresetAck,
-    PresetNak              := instEncoderM1.PresetNak,
-    PointsPerRev           := ENCODER_POINTS_PER_REV,
-    MultiTurnRevsMax       := ENCODER_MULTITURN_REVS_MAX,
-    CableM_PerRev          := WINCH_CABLE_M_PER_REV,
-    BypassGlobal           := GVL_IHM.M1TreuilRetenue.Bypass.Global,
-    Calib                  := _CalibM1
-);
-
+// Facade codeur complete : Abs→Homing→Scale→Safety→Reliability→Speed.
+// L'autorisation de homing est calculee ici (mode + treuil selectionne).
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
-    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
-    RawPosIn              := HwIn.Winch.COD1_PosValue,
-    AlarmsIn              := HwIn.Winch.COD1_Alarms,
-    WarningsIn            := HwIn.Winch.COD1_Warnings,
-    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
-    HomingRefRaw          := instHomingM1.HomingRefRaw,
-    Homed                 := instHomingM1.Homed,
-    HomingSuspect         := instHomingM1.HomingSuspect,
-    HomingStatus          := instHomingM1.Status,
-    PresetRequest         := instHomingM1.PresetRequest,
-    PresetValue           := instHomingM1.PresetValue,
+    HomingPermit          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2),
+    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome,
+    HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
+    ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
+    CfgHomingTargetM      := _WinchM1CfgPersist.CfgHomingTarget_M,
+    CfgTopSensorPosM      := _WinchM1CfgPersist.CfgTopSensorPos_M,
+    UseDynamicTarget      := FALSE,
+    DynamicHomingTargetM  := 0.0,
+    TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
+    Hw.RawPosIn           := HwIn.Winch.COD1_PosValue,
+    Hw.AlarmsIn           := HwIn.Winch.COD1_Alarms,
+    Hw.WarningsIn         := HwIn.Winch.COD1_Warnings,
+    Hw.SlaveOperational   := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
-    BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global
+    BypassGlobal          := GVL_IHM.M1TreuilRetenue.Bypass.Global,
+    Calib                 := _CalibM1
 );
 Data.CablePosM1           := instEncoderM1.Measurement.CablePosM;
 Data.M1_EncoderIncoherent := instEncoderM1.Measurement.EncoderIncoherent;
@@ -32275,6 +32274,9 @@ Data.M1_HomedAndReliable  := instEncoderM1.HomedAndReliable;
 Data.M1_Speed_Mps         := instEncoderM1.Measurement.Speed_Mps;
 Data.M1_SignedSpeed_Mps   := instEncoderM1.Measurement.SignedSpeed_Mps;
 Data.M1_SpeedValid        := instEncoderM1.Measurement.SpeedValid;
+COD1_PresettTrigCmd := instEncoderM1.HwOut.PresetTriggerCmd;
+COD1_CodeSeqTrigCmd := instEncoderM1.HwOut.CodeSeqTriggerCmd;
+COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
 
 // ── TREUIL M2 (Benne) ──
 // Ordre POO : synchronisation benne, puis Homing, puis facade.
@@ -32291,52 +32293,27 @@ ELSIF M2BucketRefRequested AND M2BucketRefCloseEdge.Q THEN
     M2BucketRefTargetM := Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
-instHomingM2(
-    Enable                 := TRUE,
-    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged  := HwIn.Machine.PowerContactorEngaged_DI,
-    Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
-    Home                   := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero OR M2BucketRefRequested,
-    UseDynamicTarget       := M2BucketRefRequested,
-    DynamicHomingTargetM   := M2BucketRefTargetM,
-    UnitaryMode            := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
-                              AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 0),
-    WinchSelected          := (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
-    CfgHomingTargetM       := _WinchM2CfgPersist.CfgHomingTarget_M,
-    BtnConfirmCoherence    := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
-    TopPositionSensor      := HwIn.Winch.M1M2_TopPositionFree_DI,
-    CfgTopSensorPosM       := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero, _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
-    FwdRevSpeedFeedbackOff := HwIn.Winch.M2_ContactorsReleased_DI,
-    BrakeFeedback          := HwIn.Winch.M2_BrakeIsOpen_DI,
-    RawPos                 := instEncoderM2.Measurement.RawPos,
-    EncoderAvailable       := instEncoderM2.Measurement.EncoderAvailable,
-    PresetAck              := instEncoderM2.PresetAck,
-    PresetNak              := instEncoderM2.PresetNak,
-    PointsPerRev           := ENCODER_POINTS_PER_REV,
-    MultiTurnRevsMax       := ENCODER_MULTITURN_REVS_MAX,
-    CableM_PerRev          := WINCH_CABLE_M_PER_REV,
-    BypassGlobal           := GVL_IHM.M2TreuilBenne.Bypass.Global,
-    Calib                  := _CalibM2
-);
-
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    Mode                  := PRG_03_Modes_Cycle.Auth.Mode,
-    PowerContactorEngaged := HwIn.Machine.PowerContactorEngaged_DI,
-    RawPosIn              := HwIn.Winch.COD2_PosValue,
-    AlarmsIn              := HwIn.Winch.COD2_Alarms,
-    WarningsIn            := HwIn.Winch.COD2_Warnings,
-    SlaveOperational      := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
-    HomingRefRaw          := instHomingM2.HomingRefRaw,
-    Homed                 := instHomingM2.Homed,
-    HomingSuspect         := instHomingM2.HomingSuspect,
-    HomingStatus          := instHomingM2.Status,
-    PresetRequest         := instHomingM2.PresetRequest,
-    PresetValue           := instHomingM2.PresetValue,
+    HomingPermit          := (PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1),
+    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested,
+    HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
+    ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
+    CfgHomingTargetM      := _WinchM2CfgPersist.CfgHomingTarget_M,
+    CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,
+    UseDynamicTarget      := M2BucketRefRequested,
+    DynamicHomingTargetM  := M2BucketRefTargetM,
+    TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
+    Hw.RawPosIn           := HwIn.Winch.COD2_PosValue,
+    Hw.AlarmsIn           := HwIn.Winch.COD2_Alarms,
+    Hw.WarningsIn         := HwIn.Winch.COD2_Warnings,
+    Hw.SlaveOperational   := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
-    BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global
+    BypassGlobal          := GVL_IHM.M2TreuilBenne.Bypass.Global,
+    Calib                 := _CalibM2
 );
 Data.CablePosM2           := instEncoderM2.Measurement.CablePosM;
 Data.M2_EncoderIncoherent := instEncoderM2.Measurement.EncoderIncoherent;
@@ -32345,6 +32322,9 @@ Data.M2_HomedAndReliable  := instEncoderM2.HomedAndReliable;
 Data.M2_Speed_Mps         := instEncoderM2.Measurement.Speed_Mps;
 Data.M2_SignedSpeed_Mps   := instEncoderM2.Measurement.SignedSpeed_Mps;
 Data.M2_SpeedValid        := instEncoderM2.Measurement.SpeedValid;
+COD2_PresettTrigCmd := instEncoderM2.HwOut.PresetTriggerCmd;
+COD2_CodeSeqTrigCmd := instEncoderM2.HwOut.CodeSeqTriggerCmd;
+COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 {endregion}
 
 {region "§5 Acquisition Translation M3"}
@@ -32499,8 +32479,8 @@ instCycleSemiAuto(
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
-    HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
-    HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
+    HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed,
+    HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     SampleCount            := _CycleSampleCount
@@ -33298,8 +33278,8 @@ instBucket(
     MotionDirection     := CoupledUserRequestDirection,
     CablePosM1          := PRG_02_Acquisition.Data.CablePosM1,
     CablePosM2          := PRG_02_Acquisition.Data.CablePosM2,
-    HomedM1             := PRG_02_Acquisition.instHomingM1.Homed,
-    HomedM2             := PRG_02_Acquisition.instHomingM2.Homed,
+    HomedM1             := PRG_02_Acquisition.instEncoderM1.Homed,
+    HomedM2             := PRG_02_Acquisition.instEncoderM2.Homed,
     M1_Busy             := instWinchM1.Status.Busy,
     M2_Busy             := instWinchM2.Status.Busy,
     ConfirmOpenPosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
@@ -33634,14 +33614,14 @@ instSafetyWinchM1(
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.instHomingM1.Status.Busy,
+    InReferencingMode      := PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy,
     CablePosM              := PRG_02_Acquisition.Data.CablePosM1,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M1LogicRequestDirection,
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
-    Homed                  := PRG_02_Acquisition.instHomingM1.Homed,
-    HomingSuspect          := PRG_02_Acquisition.instHomingM1.HomingSuspect,
+    Homed                  := PRG_02_Acquisition.instEncoderM1.Homed,
+    HomingSuspect          := PRG_02_Acquisition.instEncoderM1.HomingSuspect,
     TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
@@ -33690,14 +33670,14 @@ instSafetyWinchM2(
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.instHomingM2.Status.Busy,
+    InReferencingMode      := PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy,
     CablePosM              := PRG_02_Acquisition.Data.CablePosM2,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
     Direction              := M2LogicRequestDirection,
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
-    Homed                  := PRG_02_Acquisition.instHomingM2.Homed,
-    HomingSuspect          := PRG_02_Acquisition.instHomingM2.HomingSuspect,
+    Homed                  := PRG_02_Acquisition.instEncoderM2.Homed,
+    HomingSuspect          := PRG_02_Acquisition.instEncoderM2.HomingSuspect,
     TopLimitM              := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     FwdRevSpeedFeedbackOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BrakeFeedback          := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
@@ -33788,8 +33768,8 @@ instWinchM1(
     HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     BypassContactorCheck    := GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback,
-    Homed                   := PRG_02_Acquisition.instHomingM1.Homed,
-    HomingSuspect           := PRG_02_Acquisition.instHomingM1.HomingSuspect,
+    Homed                   := PRG_02_Acquisition.instEncoderM1.Homed,
+    HomingSuspect           := PRG_02_Acquisition.instEncoderM1.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.CablePosM1,
     TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M,
     BottomLimitM            := BottomLimitM1_Active,
@@ -33824,8 +33804,8 @@ instWinchM2(
     HomingApproachActive    := PRG_03_Modes_Cycle.Auth.HomingApproachEnable,
     FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     BypassContactorCheck    := GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback,
-    Homed                   := PRG_02_Acquisition.instHomingM2.Homed,
-    HomingSuspect           := PRG_02_Acquisition.instHomingM2.HomingSuspect,
+    Homed                   := PRG_02_Acquisition.instEncoderM2.Homed,
+    HomingSuspect           := PRG_02_Acquisition.instEncoderM2.HomingSuspect,
     CablePosM               := PRG_02_Acquisition.Data.CablePosM2,
     TopLimitM               := _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
     BottomLimitM            := BottomLimitM2_Active,
@@ -33922,15 +33902,15 @@ WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM1.Preset
 WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM1.PresetValueOut;
 WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderM1.Measurement.AbsStatus.Error;
 WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM1.Measurement.AbsStatus.ErrorId;
-WinchM1State.Encoder.Homed := PRG_02_Acquisition.instHomingM1.Homed;
-WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM1.Status.Busy;
-WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM1.Status.Done;
-WinchM1State.Encoder.HomingError := PRG_02_Acquisition.instHomingM1.Status.Error;
-WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM1.Status.ErrorId;
-WinchM1State.Encoder.HomingState := PRG_02_Acquisition.instHomingM1.Status.State;
-WinchM1State.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM1.Status.StateAtError;
-WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM1.HomingSuspect;
-WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM1.HomingRefRaw;
+WinchM1State.Encoder.Homed := PRG_02_Acquisition.instEncoderM1.Homed;
+WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy;
+WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Done;
+WinchM1State.Encoder.HomingError := PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Error;
+WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.ErrorId;
+WinchM1State.Encoder.HomingState := PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.State;
+WinchM1State.Encoder.HomingStateAtError := PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.StateAtError;
+WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.instEncoderM1.HomingSuspect;
+WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.instEncoderM1.Measurement.HomingRefRaw;
 WinchM1State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM1;
 WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
 WinchM1State.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
@@ -33979,15 +33959,15 @@ WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM2.Preset
 WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM2.PresetValueOut;
 WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderM2.Measurement.AbsStatus.Error;
 WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM2.Measurement.AbsStatus.ErrorId;
-WinchM2State.Encoder.Homed := PRG_02_Acquisition.instHomingM2.Homed;
-WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM2.Status.Busy;
-WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM2.Status.Done;
-WinchM2State.Encoder.HomingError := PRG_02_Acquisition.instHomingM2.Status.Error;
-WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.instHomingM2.Status.ErrorId;
-WinchM2State.Encoder.HomingState := PRG_02_Acquisition.instHomingM2.Status.State;
-WinchM2State.Encoder.HomingStateAtError := PRG_02_Acquisition.instHomingM2.Status.StateAtError;
-WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.instHomingM2.HomingSuspect;
-WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.instHomingM2.HomingRefRaw;
+WinchM2State.Encoder.Homed := PRG_02_Acquisition.instEncoderM2.Homed;
+WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy;
+WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Done;
+WinchM2State.Encoder.HomingError := PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Error;
+WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.ErrorId;
+WinchM2State.Encoder.HomingState := PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.State;
+WinchM2State.Encoder.HomingStateAtError := PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.StateAtError;
+WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.instEncoderM2.HomingSuspect;
+WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.instEncoderM2.Measurement.HomingRefRaw;
 WinchM2State.InhibitActive := PRG_03_Modes_Cycle.Auth.InhibitM2;
 WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
 WinchM2State.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
@@ -35964,8 +35944,8 @@ instHmiBannerFormatter(
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
     HomingActive          := (NOT PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed),
-    HomingStepM1          := SEL(PRG_02_Acquisition.instHomingM1.Status.Busy, 0, 1),
-    HomingStepM2          := SEL(PRG_02_Acquisition.instHomingM2.Status.Busy, 0, 1),
+    HomingStepM1          := SEL(PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy, 0, 1),
+    HomingStepM2          := SEL(PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy, 0, 1),
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
@@ -36061,8 +36041,8 @@ instTroubleshootingView(
     CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
-    HomedM1              := PRG_02_Acquisition.instHomingM1.Homed,
-    HomedM2              := PRG_02_Acquisition.instHomingM2.Homed
+    HomedM1              := PRG_02_Acquisition.instEncoderM1.Homed,
+    HomedM2              := PRG_02_Acquisition.instEncoderM2.Homed
 );
 
 {endregion}
@@ -36977,6 +36957,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
           <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
           <Object Name="FB_Encoder_SpeedMonitor" ObjectId="c1cd7624-9491-50e0-9332-6845d97ac927" />
+          <Object Name="ST_EncoderHw" ObjectId="d49fb2dc-e3eb-5045-a9d9-c8cacf52184b" />
           <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
           <Object Name="ST_EncoderMeasurements" ObjectId="65c54961-1ede-5088-bb46-6d69104691fb" />
           <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />

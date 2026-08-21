@@ -1,0 +1,109 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T146 C4 : FB_Encoder objet codeur complet
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T146_C4_FBENCODER_COMPLET
+  criticality: C4            # coeur machine : referencement + mesure + preset hardware
+  strategy: rebuild          # facade complète incluant Homing + interface HW testable
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Regrouper TOUS les FB codeur (Abs + Homing + Scale + Safety + Reliability + Speed)
+    dans la facade FB_Encoder, qui expose les HW codeur en entree/sortie (bus ST_EncoderHw)
+    pour permettre un test automatise de non-regression. L'autorisation de homing est
+    une entree unique M1/M2_HomingEncoderPermit, calculee par le caller (PRG).
+
+  # ── 1bis. Interface homing CONTRÔLÉE (verrouillée par l'utilisateur) ──────
+  interface_homing:
+    inputs:
+      - "HomingAtTargetM : BOOL        // demande homing (front montant)"
+      - "HomingAtZero    : BOOL        // force homing a 0.0"
+      - "ConfirmCoherence: BOOL        // lever le doute boot"
+      - "CfgHomingTargetM : REAL       // cible unitaire (m)"
+      - "CfgTopSensorPosM : REAL       // cible nominale capteur haut (m)"
+      - "UseDynamicTarget : BOOL       // active cible dynamique"
+      - "DynamicHomingTargetM : REAL   // cible dynamique (benne)"
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_Encoder compose Abs, Homing, Scale, Safety, Reliability, Speed (6 sous-instances)."
+      verified_by: "lecture FB_Encoder + G315 + G200"
+    - id: AC2
+      statement: "FB_Encoder n'a plus ni Mode, ni UnitaryMode, ni WinchSelected ; il recoit M1_HomingEncoderPermit (BOOL) unique, calculee par le caller."
+      verified_by: "grep : 0 occurrence Mode/UnitaryMode/WinchSelected dans FB_Encoder + interface"
+    - id: AC3
+      statement: "Le home est declenche si et seulement si M1_HomingEncoderPermit=TRUE et Home=TRUE (l'autorisation est un fait d'entree, pas une logique interne)."
+      verified_by: "lecture body FB_Encoder + test injecte Permit TRUE/FALSE"
+    - id: AC4
+      statement: "Les HW codeur sont exposes en entree/sortie par un bus ST_EncoderHw regroupant RawPosIn, AlarmsIn, PresetAck, PresetTriggerCmd, PresetValueOut."
+      verified_by: "interface FB_Encoder + G330 (struct bus)"
+    - id: AC5
+      statement: "Les sorties PresetTriggerCmd/PresetValueOut sont repliquees hors facade vers COD1_* (restauration du cablage hardware perdu par ee4d08b)."
+      verified_by: "PRG_02 : COD1_PresetValue := instEncoderM1.PresetValueOut (retabli) + G200"
+    - id: AC6
+      statement: "Un test automatise de non-regression codeur est pre-requis (schema ci-dessous) : injecte RawPosIn/PresetAck/Permit, verifie PresetTriggerCmd/CablePosM/Speed."
+      verified_by: "test Python/codesys simulable documente dans le contrat"
+    - id: AC7
+      statement: "G200 PASS (0 erreur) et gates palier C 15/15."
+      verified_by: "G200 --report + run_all_gates --palier C"
+    - id: AC8
+      statement: "Controle structurel : nom de fichier egal au nom du POU pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC9
+      statement: "Controle structurel : suffixe de langage egal au langage genere dans le bundle pour PRG_02_Acquisition.st."
+      verified_by: "G310_check_code_structure"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/E_CODEURS/FB_Encoder.st              # facade complete
+      - CODE/E_CODEURS/ST_EncoderHw.st            # nouveau bus HW IN/OUT (si cree)
+      - CODE/E_CODEURS/FB_Encoder_Homing.st       # retirer Mode/Unitary/Winch -> Permit
+      - CODE/M_MAIN/PRG_02_Acquisition.st         # recabler instEncoderM1/2 + COD1_*
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st  # si besoin champ preset
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/  # hors perimetre (FB_WinchSync, FB_Bucket etc.)
+
+  # ── 4. Contrat de conservation (rebuild) ─────────────────────────────────
+  conservation:
+    must_survive:
+      - "La mesure CablePosM / Speed identique en valeur (non-regression mesure)"
+      - "Le homing nominal (capteur haut 8,5m) et unitaire — meme logique interne, entree deplacement uniquement"
+      - "Le gate EncoderFault avant Speed (purge meme scan)"
+      - "HomedAndReliable pour l'interlock hauteur M3"
+      - "La sequence preset SDO (PresetTriggerCmd=2) + PresetValueOut"
+    dropped_on_purpose:
+      - "Mode/UnitaryMode/WinchSelected lus par FB_Encoder_Homing (remplace par M1/M2_HomingEncoderPermit en entree de facade)"
+      - "L'ancien decoupage PRG_02 instHoming separe (fusionne dans la facade)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - test_nonregression      # test automatise codeur
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Toute perte de valeur (CablePosM/Speed), de gate, ou de la sequence preset
+    (front PresetTriggerCmd=2) entre l'ancien decoupage et la facade complete est
+    remontee immediatement. Non-regression de la mesure + referencement est imperatif.
+
+status: PENDING
+
+execution:
+  executed_by: "deepseek-v4-flash (executeur)"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

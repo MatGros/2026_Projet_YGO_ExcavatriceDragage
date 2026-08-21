@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:00:35.472372" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:00:35.472372">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T19:54:50.198233" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T19:54:50.198233">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,57 +23,6 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="E_Mode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLE" value="0" />
-              <value name="MAINT_N1" value="1" />
-              <value name="MAINT_N2" value="2" />
-              <value name="SEMI_AUTO" value="3" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N1</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N2</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEMI_AUTO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="ST_Encoder_Calib">
         <baseType>
           <struct>
@@ -310,45 +259,20 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de referencement (front)</xhtml>
               </documentation>
             </variable>
+            <variable name="HomingPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation de homer (calculee par le caller)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BtnConfirmCoherence">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Levee de doute d'incoherence au boot (front)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; MODES ===
---&gt; [HW]  Ligne puissance enclenchee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif (MAINT_N1/N2 requis)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="UnitaryMode">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode unitaire a cible libre (MAINT_N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchSelected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Instance est le treuil selectionne</xhtml>
               </documentation>
             </variable>
             <variable name="CfgHomingTargetM">
@@ -788,13 +712,10 @@ DynamicTargetEdge(CLK := UseDynamicTarget);
 // chaque scan, jamais latchées, aucun Reset requis pour les effacer.
 Status.ErrorId := Status.ErrorId AND 16#FFEC;   // efface bits 0/1/4 (garde bit5, bit9 — inchangés)
 
-HomingModeOk := (Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2);
+HomingModeOk := HomingPermit;
 
 IF HomeEdge.Q AND NOT HomingModeOk THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : Mode non autorisé (hors MAINT_N1/N2)
-END_IF;
-IF HomeEdge.Q AND UnitaryMode AND NOT WinchSelected THEN
-    Status.ErrorId := Status.ErrorId OR 16#0002;   // bit1 : mauvais treuil sélectionné (flux unitaire)
+    Status.ErrorId := Status.ErrorId OR 16#0001;   // bit0 : homing non autorise
 END_IF;
 
 // Nominal : capture AU FRONT du capteur haut, pas après arrêt confirmé — AscentPermit
@@ -802,14 +723,13 @@ END_IF;
 // attendre l'arrêt casserait la répétabilité recherchée à vitesse d'accostage constante.
 // Couvre les deux cas : Home déjà maintenu quand le capteur déclenche, ou capteur déjà actif
 // quand Home est pressé.
-NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND NOT UnitaryMode
+NominalHomingTrigger := HomingModeOk AND NOT UseDynamicTarget
                          AND ((Home AND TopSensorEdge.Q) OR (HomeEdge.Q AND TopPositionSensor));
 
-// Unitaire (MAINT_N2 déjà garanti par UnitaryMode en amont, PRG_02_Acquisition) : bon treuil.
-UnitaryHomingTrigger := HomingModeOk AND UnitaryMode AND WinchSelected AND HomeEdge.Q;
+// Unitaire : cible libre (CfgHomingTargetM), déclenchée par la demande (front).
+UnitaryHomingTrigger := HomingModeOk AND NOT UseDynamicTarget AND HomeEdge.Q;
 
-// Dynamique (benne) : Mode + arrêt confirmé (M1/M2 non Busy) déjà gardés à l'appel via
-// M2BucketRefRequested (PRG_02_Acquisition.st) — HomingModeOk reste vérifié ici en défense.
+// Dynamique (benne) : HomingModeOk vérifié ici en défense.
 DynamicHomingTrigger := HomingModeOk AND (DynamicTargetEdge.Q OR (UseDynamicTarget AND HomeEdge.Q));
 
 HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTrigger;
@@ -817,7 +737,7 @@ HomingTrigger := NominalHomingTrigger OR UnitaryHomingTrigger OR DynamicHomingTr
 IF HomingTrigger THEN
     IF UseDynamicTarget THEN
         TargetPositionM := DynamicHomingTargetM;
-    ELSIF UnitaryMode THEN
+    ELSIF HomeEdge.Q THEN
         TargetPositionM := CfgHomingTargetM;
     ELSE
         TargetPositionM := CfgTopSensorPosM;
@@ -908,9 +828,6 @@ HomingRefRaw := Calib.HomingRefRaw;
         <Folder Name="E_CODEURS">
           <Object Name="FB_Encoder_Homing" ObjectId="0d5827b5-87bb-5d18-88a3-fc9c3bf8967b" />
           <Object Name="ST_Encoder_Calib" ObjectId="808932ee-dfa9-530c-b6b0-60a6dd0eb372" />
-        </Folder>
-        <Folder Name="F_MODES">
-          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />

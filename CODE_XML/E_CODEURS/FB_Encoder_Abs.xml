@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:00:03.088388" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:00:03.088388">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T19:56:00.102374" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T19:56:00.102374">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,57 +23,6 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="E_Mode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLE" value="0" />
-              <value name="MAINT_N1" value="1" />
-              <value name="MAINT_N2" value="2" />
-              <value name="SEMI_AUTO" value="3" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N1</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N2</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEMI_AUTO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="ST_FbStatus">
         <baseType>
           <struct>
@@ -242,23 +191,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de preset (front montant)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
---&gt; [HW]  Ligne puissance enclenchee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
               </documentation>
             </variable>
             <variable name="RawPosIn">
@@ -625,9 +557,6 @@ Status.Done := PresetAck;
       <ProjectStructure>
         <Folder Name="E_CODEURS">
           <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
-        </Folder>
-        <Folder Name="F_MODES">
-          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />

@@ -13,10 +13,6 @@ VAR_INPUT
     Enable                : BOOL;        // --> [CMD] Autorisation generale FB (TRUE=Autorise)
     Reset                 : BOOL;        // --> [CMD] Acquittement defaut (front montant)
 
-    // === CONTEXTE & ETAT PUISSANCE ===
-    PowerContactorEngaged : BOOL;        // --> [HW]  Ligne puissance enclenchee
-    Mode                  : E_Mode;      // --> [CMD] Mode d'exploitation actif
-
     // === MESURES & ALERTE HOMING ===
     CablePosM             : REAL;        // --> [HW]  Position calculee (m, sortie FB_Encoder_Scale)
     HomingSuspect         : BOOL;        // --> [SAFE] Alerte incoherence redemarrage (FB_Encoder_Homing)

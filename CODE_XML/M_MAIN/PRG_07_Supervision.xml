@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T18:02:48.276151" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T18:02:48.276151">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:00:19.484801" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:00:19.484801">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6359,8 +6359,8 @@ instHmiBannerFormatter(
     DiveState             := GVL_IHM.DredgingAssist.State.DiveState,
     ExtractionState       := GVL_IHM.DredgingAssist.State.ExtractionState,
     HomingActive          := (NOT PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed),
-    HomingStepM1          := SEL(PRG_02_Acquisition.instHomingM1.Status.Busy, 0, 1),
-    HomingStepM2          := SEL(PRG_02_Acquisition.instHomingM2.Status.Busy, 0, 1),
+    HomingStepM1          := SEL(PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy, 0, 1),
+    HomingStepM2          := SEL(PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy, 0, 1),
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
@@ -6456,8 +6456,8 @@ instTroubleshootingView(
     CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Status.Error,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
-    HomedM1              := PRG_02_Acquisition.instHomingM1.Homed,
-    HomedM2              := PRG_02_Acquisition.instHomingM2.Homed
+    HomedM1              := PRG_02_Acquisition.instEncoderM1.Homed,
+    HomedM2              := PRG_02_Acquisition.instEncoderM2.Homed
 );
 
 {endregion}

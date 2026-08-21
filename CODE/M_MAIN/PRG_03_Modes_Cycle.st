@@ -88,8 +88,8 @@ instCycleSemiAuto(
     Benne_IsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     Benne_IsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
-    HomedM1                 := PRG_02_Acquisition.instHomingM1.Homed,
-    HomedM2                 := PRG_02_Acquisition.instHomingM2.Homed,
+    HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed,
+    HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     SampleCount            := _CycleSampleCount
