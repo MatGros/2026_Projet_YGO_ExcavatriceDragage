@@ -87,8 +87,12 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
 
 {endregion}
 
-{region "§2 Persistance et restauration configuration"}
-// === 🌉 §2 PERSISTANCE & RESTAURATION CONFIG ===
+{region "§2 Persistance, bypass et simulation"}
+// === 🌉 §2 PERSISTANCE, RESTAURATION & BYPASS ===
+// Quatre responsabilités distinctes : persistance des configs, restauration boot des
+// bypass, synchronisation bidirectionnelle IHM↔RETAIN, et pilotage des bypass par simulation.
+
+// ---------- §2a. Persistance des configs (bridges) ----------
 // Chaque FB_CfgPersistBridge_* synchronise UNE structure de config entre GVL_IHM (Hmi)
 // et GVL_PERSISTENT (Persist) sur le flag `Initialized` :
 //   - au 1er cycle (Hmi.Initialized=FALSE) : Hmi := Persist (restaure la config sauvegardée)
@@ -162,6 +166,7 @@ IF instAckConfigRestored.Q THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := FALSE;
 END_IF;
 
+// ---------- §2b. Restauration boot des bypass (RETAIN → IHM) ----------
 // 🎚️ Restauration boot des BYPASS IHM depuis le RETAIN (BypassXxxGlobal) :
 // au 1er cycle (Bypass.Initialized=FALSE), si un bypass global RETAIN est actif, on le
 // rejoue sur l'IHM, puis on marque Initialized pour ne pas réécraser les actions suivantes
@@ -217,6 +222,7 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
     GVL_IHM.Commun.Bypass.Initialized := TRUE;
 END_IF;
 
+// ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
 // 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
 IF GVL_IHM.TranslationM3.Bypass.Global <> PrevTranslationBypass THEN
     BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
@@ -288,6 +294,7 @@ ELSE
 END_IF;
 PrevSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
 
+// ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
 // La simulation emprunte le chemin IHM : SimulationBypassActive set/reset les bypass IHM
 // (TopLimitSwitch / TopLimitSoftware / LimitLegal) au lieu d'un OR direct dans le code.
