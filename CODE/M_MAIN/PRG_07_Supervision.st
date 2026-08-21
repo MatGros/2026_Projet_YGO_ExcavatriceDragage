@@ -315,7 +315,10 @@ END_IF;
 
 {region "§3 Projections IHM et mapping"}
 // === 📊 §3 PROJECTIONS IHM ET MAPPING ===
+// Ensemble des recopies GVL_IHM ← sources inter-PRG. Chaque sous-région est un domaine
+// IHM cohérent (faits machine, heartbeat, preflight, bypass, état, réseau, cycle, bandeau).
 
+// ---------- §3a. Faits machine communs (lecture seule) ----------
 GVL_IHM.Commun.LimitLegalReached         := _CommunCfgPersist.LimitLegalEnabled
     AND ((PRG_02_Acquisition.Data.CablePosM1 <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M)
       OR (PRG_02_Acquisition.Data.CablePosM2 <= _CommunCfgPersist.LimitLegalDepthMinAllowed_M));
@@ -324,13 +327,13 @@ GVL_IHM.Commun.HydraulicThermalFault     := NOT PRG_02_Acquisition.HwIn.Machine.
 GVL_IHM.Commun.BrakeThermalFault         := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI;
 GVL_IHM.Commun.PhaseRotationFault        := NOT PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI;
 
-// 💓 Publication heartbeat IHM↔PLC
+// ---------- §3b. Heartbeat IHM↔PLC ----------
 GVL_IHM.Commun.HeartbeatIhmOk            := instDiagIhmHeartbeat.HeartbeatIhmOk;
 GVL_IHM.Commun.HeartbeatIhmTimeout       := instDiagIhmHeartbeat.HeartbeatIhmTimeout;
 GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdge;
 GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc;
 
-// 🩺 Exécution du Preflight Machine à l'arrêt
+// ---------- §3c. Preflight machine à l'arrêt ----------
 instPreflight(
     Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
     MachineIsStill            := (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber = 0)
@@ -361,6 +364,7 @@ GVL_IHM.Commun.Preflight.PreflightDone    := instPreflight.PreflightDone;
 GVL_IHM.Commun.Preflight.PreflightBusy    := instPreflight.PreflightBusy;
 GVL_IHM.Commun.Preflight.PreflightErrorId := instPreflight.PreflightErrorId;
 
+// ---------- §3d. Bypass simulation (retours simulés vers IHM) ----------
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
@@ -368,7 +372,7 @@ GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.WinchInputSourceChanged;
 
-// 📦 Publication des structures d'état & safety vers IHM (recopies directes des bus inter-PRG)
+// ---------- §3e. Structures d'état & safety (recopies directes des bus) ----------
 GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
 GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.Data.WinchM2State;
 GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
@@ -389,7 +393,7 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs.EmergencyDiag.ArmFai
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error OR PRG_02_Acquisition.Data.InputModuleFault;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
 
-// 🕹️ Publication état Joystick IHM (GVL_IHM.JOY1Joystick.State)
+// ---------- §3f. État joystick & réseau (diagnostic bus) ----------
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;
 GVL_IHM.JOY1Joystick.State.RawY := PRG_02_Acquisition.HwIn.Operator.JoyYRaw_ANA2;
 GVL_IHM.JOY1Joystick.State.RawButton := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw;
@@ -419,8 +423,8 @@ GVL_IHM.Network.EcatErrorId := PRG_02_Acquisition.instDiagEthercat.ErrorId;
 GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.Data.LocalDigitalIoOk;
 GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Data.Vh0800EndOk;
 GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Data.Vh0808EtpOk;
-// 🖥️ Bandeau IHM 4 champs (AF-07 §4)
-// Publication des états du cycle semi-auto (lecture seule) — alimente le bandeau
+
+// ---------- §3g. État cycle semi-auto & bandeau ----------
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.instCycleSemiAuto.Ready;
 GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Busy;
 GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.instCycleSemiAuto.Done;
