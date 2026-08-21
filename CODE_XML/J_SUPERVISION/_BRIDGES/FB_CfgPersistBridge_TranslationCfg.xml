@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:54.240462" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:54.240462">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:59.874428" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:59.874428">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,29 +23,40 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_SyncCfg">
+      <dataType name="ST_TranslationCfg">
         <baseType>
           <struct>
-            <variable name="CfgSyncTolerance_M">
+            <variable name="CfgApproachSpeedTremie_Hz">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.8" />
+                <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Trémie (Hz), déclenchée par capteur PV, Direction=1</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgSyncCriticalTolerance_M">
+            <variable name="CfgApproachSpeedMaintenance_Hz">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="10" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Seuil 2 critique (m) — blocage synchro ; doit être &gt; CfgSyncTolerance_M</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche Maintenance (Hz), déclenchée par capteur P1, Direction=-1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgApproachSpeedP1_Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Vitesse réduite d'approche P1 (Hz), déclenchée par capteur P2, Direction=-1</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -56,25 +67,29 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (config restaurée depuis GVL_PERSISTENT)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Flag restauration boot (défaut FALSE non ambigu) — même patron que ST_WinchCfg
+🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a3eb8b55-b4ee-5884-9780-22df0c7ecf3c</ObjectId>
+            <ObjectId>2d4e63ef-38b4-5f0c-b42d-ccf25658d58a</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_SyncCfg — Configuration de la synchronisation M1/M2
+   ST_TranslationCfg — Configurations et paramètres réglables pour Translation M3
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné au paramétrage depuis l'IHM (RETAIN) — même patron que ST_WinchCfg.
+   📄 Vitesses de ralentissement d'approche réglables depuis l'IHM (RETAIN), même patron que ST_WinchCfg.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_CfgPersistBridge_SyncCfg" pouType="functionBlock">
+      <pou name="FB_CfgPersistBridge_TranslationCfg" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -91,7 +106,7 @@
           <inOutVars>
             <variable name="Hmi">
               <type>
-                <derived name="ST_SyncCfg" />
+                <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
@@ -100,7 +115,7 @@
             </variable>
             <variable name="Persist">
               <type>
-                <derived name="ST_SyncCfg" />
+                <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
@@ -109,11 +124,11 @@
           </inOutVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_SyncCfg — Pont persistance pour ST_SyncCfg
+   💾 FB_CfgPersistBridge_TranslationCfg — Pont persistance pour ST_TranslationCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -134,7 +149,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>13a2c158-675a-51ae-9722-c0aab6c4c8b0</ObjectId>
+            <ObjectId>38d43e50-d468-567a-8c85-9b295bf88c4c</ObjectId>
           </data>
         </addData>
       </pou>
@@ -147,10 +162,12 @@ END_IF;
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="J_SUPERVISION">
-          <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
+          <Folder Name="_BRIDGES">
+            <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
+          </Folder>
           <Folder Name="_TYPES">
-            <Folder Name="7_COMMUN_CONFIG">
-              <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
             </Folder>
           </Folder>
         </Folder>

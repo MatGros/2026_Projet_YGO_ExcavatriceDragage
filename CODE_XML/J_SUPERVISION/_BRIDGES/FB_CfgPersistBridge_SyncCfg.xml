@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:35:02.832885" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:35:02.832885">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:54.240462" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:54.240462">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,73 +23,29 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_WinchCfg">
+      <dataType name="ST_SyncCfg">
         <baseType>
           <struct>
-            <variable name="CfgTopSensorPos_M">
+            <variable name="CfgSyncTolerance_M">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="8.5" />
+                <simpleValue value="0.8" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position cible du capteur haut (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgHomingTarget_M">
+            <variable name="CfgSyncCriticalTolerance_M">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgRampAccelRate">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="50" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Rampe d'accélération (%/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgRampDecelNormalRate">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="150" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Rampe de décélération normale (%/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgRampDecelFastRate">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="400" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rampe de décélération rapide / SafeStop (%/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgCableLimitDescent_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-20" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Seuil 2 critique (m) — blocage synchro ; doit être &gt; CfgSyncTolerance_M</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -100,28 +56,25 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot — défaut FALSE non ambigu
-🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (config restaurée depuis GVL_PERSISTENT)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>239338a1-0092-5a3b-aef0-6597a3358ff4</ObjectId>
+            <ObjectId>a3eb8b55-b4ee-5884-9780-22df0c7ecf3c</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
-   ───────────────────────────────────────────────────────────────
-   🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
+   ST_SyncCfg — Configuration de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_CfgPersistBridge_WinchCfg" pouType="functionBlock">
+      <pou name="FB_CfgPersistBridge_SyncCfg" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -138,7 +91,7 @@
           <inOutVars>
             <variable name="Hmi">
               <type>
-                <derived name="ST_WinchCfg" />
+                <derived name="ST_SyncCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
@@ -147,7 +100,7 @@
             </variable>
             <variable name="Persist">
               <type>
-                <derived name="ST_WinchCfg" />
+                <derived name="ST_SyncCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
@@ -156,11 +109,11 @@
           </inOutVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_WinchCfg — Pont persistance pour ST_WinchCfg
+   💾 FB_CfgPersistBridge_SyncCfg — Pont persistance pour ST_SyncCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -181,7 +134,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>45adcc1b-fe93-5f2e-8192-a109f147a5f3</ObjectId>
+            <ObjectId>13a2c158-675a-51ae-9722-c0aab6c4c8b0</ObjectId>
           </data>
         </addData>
       </pou>
@@ -194,10 +147,12 @@ END_IF;
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="J_SUPERVISION">
-          <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
+          <Folder Name="_BRIDGES">
+            <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
+          </Folder>
           <Folder Name="_TYPES">
-            <Folder Name="1_TREUILS_BENNE">
-              <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
             </Folder>
           </Folder>
         </Folder>

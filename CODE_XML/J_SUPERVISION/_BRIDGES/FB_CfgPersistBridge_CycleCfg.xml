@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:43.184518" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:43.184518">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:48.440034" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:48.440034">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,26 +23,29 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_BucketCfg">
+      <dataType name="ST_CycleCfg">
         <baseType>
           <struct>
-            <variable name="Config">
+            <variable name="SetDepth_M">
               <type>
-                <derived name="ST_BucketConfig" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Offsets Open/Close/Coherence</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgTimeoutDuration">
-              <type>
-                <TIME />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="TIME#30s0ms" />
+                <simpleValue value="-12.5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temps max pour l'ouverture/fermeture</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetOffset_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage cible de fermeture de la benne (m)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -60,83 +63,19 @@
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>51266ef6-8a4b-5d43-bb90-88297b050ea8</ObjectId>
+            <ObjectId>19cafd99-3b26-50ad-b40a-cdf9fb79d238</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_BucketCfg — Configuration de la benne (M2)
+   ST_CycleCfg — Configuration du cycle semi-automatique
+   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_BucketConfig">
-        <baseType>
-          <struct>
-            <variable name="OffsetOpenM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OffsetCloseM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoherenceLimitM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CloseAnticipationM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OpenAnticipationM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00315f60-8cf4-50aa-8e85-badae3d657b1</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_BucketConfig — Configuration des offsets du benne
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   =======================================================================</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_CfgPersistBridge_BucketCfg" pouType="functionBlock">
+      <pou name="FB_CfgPersistBridge_CycleCfg" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -153,7 +92,7 @@
           <inOutVars>
             <variable name="Hmi">
               <type>
-                <derived name="ST_BucketCfg" />
+                <derived name="ST_CycleCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
@@ -162,7 +101,7 @@
             </variable>
             <variable name="Persist">
               <type>
-                <derived name="ST_BucketCfg" />
+                <derived name="ST_CycleCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
@@ -171,7 +110,7 @@
           </inOutVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_BucketCfg — Pont persistance pour ST_BucketCfg
+   💾 FB_CfgPersistBridge_CycleCfg — Pont persistance pour ST_CycleCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
@@ -196,7 +135,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>92413952-2771-5afc-8a20-3321f99627f5</ObjectId>
+            <ObjectId>8d6e7f94-2d43-5ea3-b409-34f87f99a9e5</ObjectId>
           </data>
         </addData>
       </pou>
@@ -209,16 +148,13 @@ END_IF;
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="J_SUPERVISION">
-          <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
-          <Folder Name="_TYPES">
-            <Folder Name="1_TREUILS_BENNE">
-              <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
-            </Folder>
+          <Folder Name="_BRIDGES">
+            <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
           </Folder>
-        </Folder>
-        <Folder Name="H_TREUILS_BENNE">
-          <Folder Name="BENNE">
-            <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
+          <Folder Name="_TYPES">
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+            </Folder>
           </Folder>
         </Folder>
       </ProjectStructure>

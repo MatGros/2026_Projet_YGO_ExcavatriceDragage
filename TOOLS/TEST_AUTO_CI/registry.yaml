@@ -1,0 +1,29 @@
+# Registre figé des FB testables via TEST_AUTO_CI.
+# Chaque entree = un FB teste en boite noire (IN/OUT), avec sa chaine de dependances
+# de compilation figee a la main (ordre exact = ordre de compilation : DUT/enum d'abord,
+# sous-FB, FB composite en dernier). Le runner ne devine jamais de dependance -- toute
+# nouvelle entree se fait ici, jamais en modifiant run_tests.py.
+
+FB_Joystick:
+  domain: JOYSTICK
+  sources:
+    - CODE/F_MODES/E_Mode.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/D_JOYSTICK/ST_Joystick_AxisCmd.st
+    - CODE/A_COMMUN/FB_CycleTime.st
+    - CODE/D_JOYSTICK/FB_AxisScale.st
+    - CODE/D_JOYSTICK/FB_Filter_PT1.st
+    - CODE/D_JOYSTICK/FB_Joystick.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/JOYSTICK/tests/test_fb_joystick.st
+
+FB_Safety_EmergencyManagement:
+  domain: AU_SECURITE
+  sources:
+    - CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st
+    - CODE/B_AU_SECURITE/ST_Safety_Emergency_State.st
+    - CODE/B_AU_SECURITE/ST_Safety_Emergency_Diag.st
+    - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st
+    - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st
+    - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/AU_SECURITE/tests/test_fb_safety_emergency.st

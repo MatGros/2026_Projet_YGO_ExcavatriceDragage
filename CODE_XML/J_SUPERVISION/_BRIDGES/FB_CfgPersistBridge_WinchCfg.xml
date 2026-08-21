@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:45.707726" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:45.707726">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:35:02.832885" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:35:02.832885">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,120 +23,73 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_CommunCfg">
+      <dataType name="ST_WinchCfg">
         <baseType>
           <struct>
-            <variable name="LimitLegalDepthMinAllowed_M">
+            <variable name="CfgTopSensorPos_M">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="-999" />
+                <simpleValue value="8.5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Blocage instantané à 0m : sans défaut explicite,
-ce champ vaut 0.0 tant qu'il n'a pas été réglé côté IHM -- "CablePosM &lt;= 0.0" se déclenche
-dès la position de référence, avant tout réglage réel de la cote légale. Défaut -999.0
-(jamais atteint en pratique) : LimitLegalEnabled=TRUE sans réglage ne bloque plus rien par
-erreur -- il faut régler la vraie cote pour que la protection devienne active.
-📐 Cote min de dragage autorisée (m, négatif)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position cible du capteur haut (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitLegalEnabled">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Activation de la limite légale</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SelHomingApproachEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchMaxStepDescente">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descente (1..5), commun M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchMaxStepAscent">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Limitation palier vitesse en montée (1..5), commun M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchSlowdownDistance_M">
+            <variable name="CfgHomingTarget_M">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchSlowdownMaxStep">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
-pas une vitesse continue.
-: Plafond palier dans la zone de ralentissement (1..5), commun M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgCableLimitAscent_M">
+            <variable name="CfgRampAccelRate">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="7.5" />
+                <simpleValue value="50" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Rampe d'accélération (%/s)</xhtml>
               </documentation>
             </variable>
-            <variable name="TglEnableKoboldAutoStopDescent">
+            <variable name="CfgRampDecelNormalRate">
               <type>
-                <BOOL />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="150" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Arrêt auto descente sur détection fond Kobold (pilotage normal)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Rampe de décélération normale (%/s)</xhtml>
               </documentation>
             </variable>
-            <variable name="TglEnableCoupledBucketSequencing">
+            <variable name="CfgRampDecelFastRate">
               <type>
-                <BOOL />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="FALSE" />
+                <simpleValue value="400" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe-circuit d'urgence pour le séquencement auto benne.
-Défaut FALSE = mouvement M1/M2 synchro jamais
-gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rampe de décélération rapide / SafeStop (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitDescent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -147,25 +100,28 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot — défaut FALSE non ambigu
+🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a78d6264-59a9-5814-98b4-1f4ebf760abf</ObjectId>
+            <ObjectId>239338a1-0092-5a3b-aef0-6597a3358ff4</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_CommunCfg — Configuration des paramètres communs machine
+   ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_CfgPersistBridge_CommunCfg" pouType="functionBlock">
+      <pou name="FB_CfgPersistBridge_WinchCfg" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -182,7 +138,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
           <inOutVars>
             <variable name="Hmi">
               <type>
-                <derived name="ST_CommunCfg" />
+                <derived name="ST_WinchCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
@@ -191,7 +147,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
             </variable>
             <variable name="Persist">
               <type>
-                <derived name="ST_CommunCfg" />
+                <derived name="ST_WinchCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
@@ -200,11 +156,11 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
           </inOutVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_CommunCfg — Pont persistance pour ST_CommunCfg
+   💾 FB_CfgPersistBridge_WinchCfg — Pont persistance pour ST_WinchCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -225,7 +181,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b0d11d68-8853-56c7-85fa-cb0f8b6449b6</ObjectId>
+            <ObjectId>45adcc1b-fe93-5f2e-8192-a109f147a5f3</ObjectId>
           </data>
         </addData>
       </pou>
@@ -238,10 +194,12 @@ END_IF;
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="J_SUPERVISION">
-          <Object Name="FB_CfgPersistBridge_CommunCfg" ObjectId="b0d11d68-8853-56c7-85fa-cb0f8b6449b6" />
+          <Folder Name="_BRIDGES">
+            <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
+          </Folder>
           <Folder Name="_TYPES">
-            <Folder Name="7_COMMUN_CONFIG">
-              <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
             </Folder>
           </Folder>
         </Folder>

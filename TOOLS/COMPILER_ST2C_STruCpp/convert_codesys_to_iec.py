@@ -2,7 +2,7 @@
 """Moulinette : convertit les idiomes CODESYS 3.5 non reconnus par STruCpp (compilateur
 ST -> C++17, https://github.com/Autonomy-Logic/STruCpp) vers de l'IEC 61131-3 equivalent.
 Ne touche jamais aux fichiers CODE/ sources -- ecrit une copie dans un dossier de sortie,
-pour la chaine de compilation PoC (TOOLS/OUTILS_ST2C).
+pour la chaine de compilation PoC (TOOLS/COMPILER_ST2C_STruCpp).
 
 3 transformations, toutes mecaniques et semantiquement neutres pour la logique du FB :
 

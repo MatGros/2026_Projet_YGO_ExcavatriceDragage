@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T15:58:35.301546" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T15:58:35.301546">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T22:52:51.726448" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T22:52:51.726448">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3669,7 +3669,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕵️‍♂️ GVL_Troubleshooting — GVL Globale de Recherche de Pannes (Orientée Fonctions &amp; Contexte)
    ───────────────────────────────────────────────────────────────
-   ⚙️ Emplacement : CODE/K_DEPANNAGE/GVL_Troubleshooting.st
+   ⚙️ Emplacement : CODE/J_SUPERVISION/GVL_Troubleshooting.st
    🎨 Structurée par CONTEXTE GLOBAL MACHINE + FONCTIONS MÉTIER (Utilisation Opérateur).
    💬 Permet de localiser en 3 secondes l'environnement et le blocage d'une action.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -3678,10 +3678,8 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="K_DEPANNAGE">
-          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
-        </Folder>
         <Folder Name="J_SUPERVISION">
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
           <Folder Name="_TYPES">
             <Folder Name="1_TREUILS_BENNE">
               <Object Name="ST_ChainBucket" ObjectId="7699fad2-6e4d-5ba2-8474-a7ccec9b870d" />
