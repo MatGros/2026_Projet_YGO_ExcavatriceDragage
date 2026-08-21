@@ -35,6 +35,7 @@ VAR_INPUT
     PresetCmd        : BOOL;   (* --> [CMD] Applique un preset (homing) *)
     PresetValue      : UDINT;   (* --> [CFG] Valeur brute à charger au preset *)
     SpeedScaleFactor : REAL := 1.0;   (* --> [CFG] Confort de test, voir bandeau ci-dessus *)
+    PresetLatencyCycles : INT := 3;   (* --> [CFG] Nb cycles automate avant application du preset (referencement non instantane) *)
     TestOffsetCmd    : BOOL;          (* --> [TST] Front montant = applique TestOffsetPts (test banc) *)
     TestOffsetPts    : DINT := 0;     (* --> [TST] Décalage signé à appliquer (points bruts) *)
 END_VAR
@@ -47,6 +48,9 @@ END_VAR
 VAR
     Increment      : UDINT;              (* . [LOC] Évite de dupliquer le calcul 2x *)
     TestOffsetEdge : R_TRIG;             (* . [LOC] Front TestOffsetCmd *)
+    PresetEdge     : R_TRIG;             (* . [LOC] Front montant PresetCmd *)
+    PresetPending  : BOOL;               (* . [LOC] Preset en attente d'application (latence) *)
+    PresetCount    : INT;                (* . [LOC] Compteur cycles de latence restants *)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
@@ -70,8 +74,24 @@ END_IF;
 {region "§3 Comptage"}
 Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
 
-IF PresetCmd THEN
-    RawPos := PresetValue;
+// Front du preset : lance la latence de referencement (le codeur réel n'est pas
+// instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
+PresetEdge(CLK := PresetCmd);
+IF PresetEdge.Q THEN
+    PresetPending := TRUE;
+    PresetCount := PresetLatencyCycles;
+END_IF;
+
+// Pendant l'attente, la position brute est conservee (le codeur n'a pas encore re-reference).
+// Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
+IF PresetPending THEN
+    IF PresetCount > 0 THEN
+        PresetCount := PresetCount - 1;
+    ELSE
+        // Latence écoulée : applique la valeur cible du preset.
+        RawPos := PresetValue;
+        PresetPending := FALSE;
+    END_IF;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
 ELSIF RelayRev THEN

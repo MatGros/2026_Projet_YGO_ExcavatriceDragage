@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:47:48.965332" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:47:48.965332">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:45:08.230128" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:45:08.230128">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -111,11 +111,11 @@
 // 🧮 Écart signé sûr : conversion DINT AVANT soustraction (§3.1) — jamais l'inverse
 RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(HomingRefRaw);
 
-// 📏 Formule fixe points → mètres (Partie10 §2)
+// 📏 Formule fixe points → mètres (Partie10 §2), garde division par zéro
 IF PointsPerRev &gt; 0 THEN
     CablePosM := DINT_TO_REAL(RawDiff) * (CableM_PerRev / UDINT_TO_REAL(PointsPerRev));
 ELSE
-    CablePosM := 0.0;   // Garde division par zéro (PointsPerRev mal configuré)
+    CablePosM := 0.0;
 END_IF;
 </xhtml>
           </ST>

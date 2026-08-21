@@ -16776,21 +16776,13 @@ ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Synthese declenchement homing</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetValueCalc">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES DE CALCUL ===
-. [LOC] Valeur cible de preset (centre plage)</xhtml>
-              </documentation>
-            </variable>
             <variable name="TargetPoints">
               <type>
                 <DINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart cible converti en points</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES DE CALCUL ===
+. [LOC] Ecart cible converti en points</xhtml>
               </documentation>
             </variable>
             <variable name="TargetPositionM">
@@ -16935,9 +16927,9 @@ IF HomingTrigger THEN
         Status.ErrorId := 16#0000;
         Status.State := E_State.READY;
 
-        // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
-        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
-        PresetValue := PresetValueCalc;
+        // Envoi de la demande de Preset SDO au matériel : la valeur brute injectee
+        // correspond a la cible (calcul inverse) pour que CablePosM = cible.
+        PresetValue := DINT_TO_UDINT(UDINT_TO_DINT(Calib.HomingRefRaw) + TargetPoints);
         PresetRequest := TRUE;
     END_IF;
 END_IF;
@@ -17294,11 +17286,11 @@ Status.Done := FALSE;
 // 🧮 Écart signé sûr : conversion DINT AVANT soustraction (§3.1) — jamais l'inverse
 RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(HomingRefRaw);
 
-// 📏 Formule fixe points → mètres (Partie10 §2)
+// 📏 Formule fixe points → mètres (Partie10 §2), garde division par zéro
 IF PointsPerRev &gt; 0 THEN
     CablePosM := DINT_TO_REAL(RawDiff) * (CableM_PerRev / UDINT_TO_REAL(PointsPerRev));
 ELSE
-    CablePosM := 0.0;   // Garde division par zéro (PointsPerRev mal configuré)
+    CablePosM := 0.0;
 END_IF;
 </xhtml>
           </ST>
@@ -24509,6 +24501,17 @@ Done := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Confort de test, voir bandeau ci-dessus</xhtml>
               </documentation>
             </variable>
+            <variable name="PresetLatencyCycles">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Nb cycles automate avant application du preset (referencement non instantane)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TestOffsetCmd">
               <type>
                 <BOOL />
@@ -24566,6 +24569,30 @@ Done := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front TestOffsetCmd</xhtml>
               </documentation>
             </variable>
+            <variable name="PresetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant PresetCmd</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetPending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Preset en attente d'application (latence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetCount">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur cycles de latence restants</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -24621,8 +24648,24 @@ END_IF;
 {region "§3 Comptage"}
 Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
 
-IF PresetCmd THEN
-    RawPos := PresetValue;
+// Front du preset : lance la latence de referencement (le codeur réel n'est pas
+// instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
+PresetEdge(CLK := PresetCmd);
+IF PresetEdge.Q THEN
+    PresetPending := TRUE;
+    PresetCount := PresetLatencyCycles;
+END_IF;
+
+// Pendant l'attente, la position brute est conservee (le codeur n'a pas encore re-reference).
+// Le mouvement est gelé pendant la latence, comme un codeur réel en cours de referencement.
+IF PresetPending THEN
+    IF PresetCount &gt; 0 THEN
+        PresetCount := PresetCount - 1;
+    ELSE
+        // Latence écoulée : applique la valeur cible du preset.
+        RawPos := PresetValue;
+        PresetPending := FALSE;
+    END_IF;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
 ELSIF RelayRev THEN

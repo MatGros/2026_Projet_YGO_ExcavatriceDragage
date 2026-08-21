@@ -33,9 +33,9 @@ END_VAR
 // 🧮 Écart signé sûr : conversion DINT AVANT soustraction (§3.1) — jamais l'inverse
 RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(HomingRefRaw);
 
-// 📏 Formule fixe points → mètres (Partie10 §2)
+// 📏 Formule fixe points → mètres (Partie10 §2), garde division par zéro
 IF PointsPerRev > 0 THEN
     CablePosM := DINT_TO_REAL(RawDiff) * (CableM_PerRev / UDINT_TO_REAL(PointsPerRev));
 ELSE
-    CablePosM := 0.0;   // Garde division par zéro (PointsPerRev mal configuré)
+    CablePosM := 0.0;
 END_IF;
