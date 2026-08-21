@@ -36441,10 +36441,12 @@ instTroubleshootingView(
             <BOOL />
           </type>
           <initialValue>
-            <simpleValue value="FALSE" />
+            <simpleValue value="TRUE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Master Bypass Essais Banc — arme LimitLegal + TopLimits en mode MAINT (inopérant sur machine réelle)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Master Bypass Essais Banc — arme LimitLegal + TopLimits en mode MAINT (inopérant sur machine réelle)
+Défaut TRUE : pré-arme le bypass banc dès le boot (n'agit que si SimulationModeActive AND SimWinchActive).
+Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.</xhtml>
           </documentation>
         </variable>
         <variable name="SimWinchActive">
