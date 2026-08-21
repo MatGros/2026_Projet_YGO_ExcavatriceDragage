@@ -81,3 +81,24 @@ Catalogue synthétique des **6 grands tests macro fonctionnels** du domaine Tran
 - **POU cible unique** : `PRG_05_Translation` (ST/CFC).
 - **Source des autorisations** : `ST_Modes_Autorisations` distribué par `PRG_03_Modes_Cycle`.
 - **Image des sorties** : Transmise à `PRG_06_Outputs` pour la barrière finale matérielle.
+
+---
+
+## 📏 Convention de position M3 (REX 2026-08-21)
+
+**0 m = Trémie (Extrême gauche)** · **30 m = Maintenance (Extrême droite)**. Le sens physique
+`+1 = vers Trémie`, `-1 = vers Maintenance` reste inchangé partout (indépendant de la convention).
+
+Positions calibrées des 5 capteurs (`_TranslationPosXxx_M`, `GVL_PERSISTENT`) — **distances
+non-linéaires** :
+
+| Capteur | Position (m) | Segment | Longueur |
+|---|---|---|---|
+| Trémie | 0.0 | Trémie→PV | 5 m |
+| PV | 5.0 | PV→P2 | 10 m |
+| P2 | 15.0 | P2→P1 | 5 m |
+| P1 | 20.0 | P1→Maintenance | 10 m |
+| Maintenance | 30.0 | — | — |
+
+Consommateurs : `FB_Translation_PositionEstimator` (odométrie + recalage), `FB_Sim_Translation`
+(modèle sim, init à la Trémie 0 m), recopie persistante `_TranslationPosEstimated_M`.
