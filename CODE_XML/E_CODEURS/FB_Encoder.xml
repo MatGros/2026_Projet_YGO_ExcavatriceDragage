@@ -1,0 +1,1874 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:12:56.848394" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:12:56.848394">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_EncoderMeasurement">
+        <baseType>
+          <struct>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES BRUTES &amp; STATUT BUS ===
+Position brute codeur (gelee si EncoderAvailable=FALSE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bus/esclave EtherCAT operationnel et disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE POSITION CABLE ===
+Position cable (m, signee, + enroule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosMSafe">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable instantanee validee par EncoderIncoherent (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incoherence redemarrage ou hors bornes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
+Vitesse absolue sur fenetre glissante (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingStatus">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUTS DES SOUS-FB &amp; REFERENCE ===
+Statut FB_Encoder_Homing (etat du referencement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbsStatus">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut FB_Encoder_Abs (etat acquisition bus)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference brute du dernier homing reussi (re-expose)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>499ca9fe-eaec-5231-81a8-db655268cece</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_EncoderMeasurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
+   🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_FbStatus">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bloc en cours d'exécution</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut actif présent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur bitfield / enum diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État courant de la machine d'état</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>06c92900-1ebd-5fc9-b098-483d32a7b08a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier (forme cible)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe exactement les six membres nécessaires au suivi
+      synoptique et diagnostic d'un FB standard (contrat §2quinquies).
+   🧬 Forme cible : les FB standard passent de la forme « à plat »
+      (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers
+      `Status : ST_FbStatus`, migré par lot dédié, gradué (pilote d'abord).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="INIT" value="1" />
+              <value name="READY" value="2" />
+              <value name="BUSY" value="3" />
+              <value name="DONE" value="4" />
+              <value name="STOPPING" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Enable faux, neutralisé</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Démarrage / vérifs</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt, attend ordre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action en cours</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action terminée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STOPPING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>00d1a0b6-13af-5333-b67c-646a1ec9c1fc</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_Encoder" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Ligne puissance enclenchee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawPosIn">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS ETHERCAT &amp; CAPTEUR HW ===
+--&gt; [HW]  Position brute EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmsIn">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes alarmes bruts EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningsIn">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes avertissements bruts EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlaveOperational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Statut esclave EtherCAT operationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES HOMING EXTERNE (PRG_04_Treuils_Bonne) ===
+--&gt; [CFG] Reference brute figee au dernier homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Codeur reference (FB_Encoder_Homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Incoherence redemarrage a lever</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingStatus">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Statut complet FB_Encoder_Homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RELAIS VERS HOMING ===
+--&gt; [CMD] Demande preset (front) -&gt; relayee a Abs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur de preset -&gt; relayee a Abs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES &amp; REGLAGES ===
+--&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableM_PerRev">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Developpement cable par tour (m/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionMinM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-99" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond bornage physique bas (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionMaxM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="99" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond bornage physique haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Neutralisation defauts pour mise en service</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Status">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut transverse facade (synthese)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetAck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RELAIS VERS HOMING ===
+&lt;-- [STAT] Pulse confirmation preset reussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetNak">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Pulse echec / timeout preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Measurement">
+              <type>
+                <derived name="ST_EncoderMeasurement" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES CONDITIONNEES (struct frontiere) ===
+&lt;-- [BUS] Mesures + statuts (interface)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instAbs">
+              <type>
+                <derived name="FB_Encoder_Abs" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB (chaine de mesure) ===
+* [INST] Acquisition brute codeur EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instScale">
+              <type>
+                <derived name="FB_Encoder_Scale" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Mise a l'echelle points -&gt; metres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instSafety">
+              <type>
+                <derived name="FB_Encoder_Safety" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Bornage &amp; coherence mesure</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instRel">
+              <type>
+                <derived name="FB_EncoderReliability" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Gates de fiabilite</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instSpeed">
+              <type>
+                <derived name="FB_Encoder_SpeedMeasure" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Calcul vitesse cable</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 FB_Encoder — Facade chaine de mesure codeur (1 par treuil M1/M2)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Composer la chaine de mesure pure d'un treuil derriere une
+      interface unique : Abs → Scale → Safety → Reliability → Speed.
+   🧬 Option B : SANS FB_Encoder_Homing — le referencement reste
+      une conduite de treuil dans PRG_04_Treuils_Benne. La facade RECOIT les
+      sorties homing (HomingRefRaw, Homed, HomingSuspect, HomingStatus) et
+      relaie PresetRequest/PresetValue &lt;-&gt; Abs.
+   🔒 Fiabilite : gate EncoderFault (sans Homed) calcule AVANT Speed — purge
+      de vitesse au meme scan (D-A10 complement c). HomedAndReliable = gate
+      strict reserve a l'interlock hauteur M3 (D-A11/C1).
+   🧬 Pure composition : chaque sous-FB garde sa responsabilite et reste
+      testable isolement. Aucune fusion de logique.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate neutralisation"}
+// 🛑 1. GATE — neutralisation generale
+IF NOT Enable THEN
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
+    Status.State := E_State.DISABLED;
+    PresetAck := FALSE; PresetNak := FALSE;
+    Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
+    Measurement.CablePosM := 0.0; Measurement.EncoderIncoherent := FALSE;
+    Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+Status.State := E_State.READY;
+{endregion}
+
+{region "§2 Abs"}
+// 🔌 2. ACQUISITION BRUTE (Abs)
+instAbs(
+    Enable                := Enable,
+    Reset                 := Reset,
+    PowerContactorEngaged := PowerContactorEngaged,
+    Mode                  := Mode,
+    RawPosIn              := RawPosIn,
+    AlarmsIn              := AlarmsIn,
+    WarningsIn            := WarningsIn,
+    SlaveOperational      := SlaveOperational,
+    PresetRequest         := PresetRequest,
+    PresetValue           := PresetValue,
+    PointsPerRev          := PointsPerRev
+);
+PresetAck := instAbs.PresetAck;
+PresetNak := instAbs.PresetNak;
+{endregion}
+
+{region "§3 Scale"}
+// --- 3. MISE A L'ECHELLE POINTS -&gt; METRES
+instScale(
+    RawPos        := instAbs.RawPos,
+    HomingRefRaw  := HomingRefRaw,
+    CableM_PerRev := CableM_PerRev,
+    PointsPerRev  := PointsPerRev
+);
+{endregion}
+
+{region "§4 Safety"}
+// --- 4. BORNAGE &amp; COHERENCE
+instSafety(
+    Enable                := Enable,
+    Reset                 := Reset,
+    PowerContactorEngaged := PowerContactorEngaged,
+    Mode                  := Mode,
+    CablePosM             := instScale.CablePosM,
+    HomingSuspect         := HomingSuspect,
+    PositionMinM          := PositionMinM,
+    PositionMaxM          := PositionMaxM,
+    BypassGlobal          := BypassGlobal
+);
+{endregion}
+
+{region "§5 Fiabilite (gate avant Speed)"}
+// --- 5. 🛡️ GATES DE FIABILITE — AVANT Speed (purge vitesse au meme scan)
+instRel(
+    EncoderAvailable  := instAbs.EncoderAvailable,
+    Homed             := Homed,
+    EncoderIncoherent := instSafety.EncoderIncoherent
+);
+{endregion}
+
+{region "§6 Speed"}
+// --- 6. ⚡ VITESSE — PositionValid := NOT EncoderFault (gate general, sans Homed)
+instSpeed(
+    Enable        := Enable,
+    Reset         := Reset,
+    Position_M    := instSafety.CablePosMSafe,
+    PositionValid := NOT instRel.EncoderFault
+);
+{endregion}
+
+{region "§7 Remplissage struct et synthese"}
+// --- 7. 📦 REMPLISSAGE STRUCT FRONTIERE (interface de sortie)
+Measurement.RawPos            := instAbs.RawPos;
+Measurement.EncoderAvailable  := instAbs.EncoderAvailable;
+Measurement.CablePosM         := instSafety.CablePosMSafe;
+Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
+Measurement.Speed_Mps         := instSpeed.Speed_Mps;
+Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
+Measurement.SpeedValid        := instSpeed.Valid;
+Measurement.HomingStatus      := HomingStatus;
+Measurement.AbsStatus         := instAbs.Status;
+Measurement.HomingRefRaw      := HomingRefRaw;
+
+// Synthese statut facade
+Status.Busy := instAbs.Status.Busy;
+Status.Done := instSpeed.Valid AND instAbs.Status.Ready;
+Status.Error := instAbs.Status.Error OR instSafety.Status.Error;
+Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>290327ae-3055-58e1-9bbd-038d8cd93901</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_EncoderReliability" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FAITS DE LA CHAINE CODEUR ===
+--&gt; [HW]  Codeur operationnel sur bus (FB_Encoder_Abs)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Codeur reference (FB_Encoder_Homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Incoherence ou hors bornes (FB_Encoder_Safety)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATES DE FIABILITE ===
+&lt;-- [SAFE] Gate general fiabilite (SANS Homed) — vitesse/mouvements</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Gate strict M3 : disponible ET reference ET pas incoherent</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🛡️ FB_EncoderReliability — Gates de fiabilite de la chaine codeur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Synthetise les gates de fiabilite d'un treuil a partir des
+      faits produits par la chaine codeur (Abs/Homing/Safety), pur calcul
+      combinatoire, sans memoire ni machine d'etat.
+   🔒 Polarité :
+      EncoderFault     = NOT EncoderAvailable OR EncoderIncoherent   (gate GENERAL, SANS Homed)
+      HomedAndReliable = EncoderAvailable AND Homed AND NOT EncoderIncoherent (gate STRICT M3)
+   🧩 Responsabilite scindee (D-A2bis) : Homing = referencement, Safety = coherence,
+      ce FB = « le codeur est fiable ». Aucune recomposition chez les consommateurs.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// 🛡️ 1. GATE GENERAL (D-A11, C1) — PAS de Homed : non-reference ≠ incoherent.
+//    Ce gate sert a la fiabilite de la mesure (vitesse, mouvements, PositionsValid).
+EncoderFault := (NOT EncoderAvailable) OR EncoderIncoherent;
+
+// 🎯 2. GATE STRICT — reserve a l'interlock hauteur M3 (C1) : on ne translate pas
+//    si la hauteur est inconnue (jamais home) ou douteuse.
+HomedAndReliable := EncoderAvailable AND Homed AND (NOT EncoderIncoherent);
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>2f0260c4-bd51-584e-a910-46b30488f46d</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Encoder_Abs" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de preset (front montant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
+--&gt; [HW]  Ligne puissance enclenchee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawPosIn">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS ETHERCAT &amp; CAPTEUR HW ===
+--&gt; [HW]  Position brute EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AlarmsIn">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes alarmes bruts EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningsIn">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Codes avertissements bruts EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlaveOperational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]  Statut esclave EtherCAT operationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES &amp; REGLAGES ===
+--&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Valeur cible de preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temporisation max attente preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetTolerancePts">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance relecture post-preset (pts)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Status">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Com", bit1: "Preset Timeout".</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; DONNEES CODEUR ===
+&lt;-- [DIAG] Position brute gelee si non disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Codeur operationnel et disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AngleRaw">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Angle brut sur un tour (MOD PointsPerRev)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TurnCount">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Nombre de tours bruts (RawPos / PointsPerRev)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetAck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; ECHANGE BUS ETHERCAT ===
+&lt;-- [STAT] Pulse confirmation preset reussi</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetNak">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Pulse refus / timeout preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Ordre declenchement preset vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CodeSeqTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Ordre sequence code vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Valeur de preset transmise au PDO Rx</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetReqEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant PresetRequest</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
+. [LOC] Temporisateur timeout sequence preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetTimerVisual">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisateur maintien visuel impulsion (500ms)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetSeqStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES INTERNES DE CALCUL &amp; ETAT ===
+. [LOC] Etape sequence preset (0:IDLE, 1:PULSE/WAIT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawDiff">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart signe entre RawPos et PresetValueOut</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 FB_Encoder_Abs — Acquisition codeur absolu (accès bus EtherCAT)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
+   🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
+   🔌 Architecture : Module d'acquisition codeur absolu
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Abs) ===
+
+{region "§1 Gate"}
+// 🛑 1. GATE
+IF NOT Enable THEN
+    EncoderAvailable := FALSE;
+    Status.State := E_State.DISABLED;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
+    PresetSeqStep := 0;
+    PresetTimer(IN := FALSE, PT := PresetTimeout);
+    PresetTimerVisual(IN := FALSE, PT := T#500MS);
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+Status.State := E_State.READY;
+{endregion}
+
+{region "§2 Reset front"}
+// 🔑 2. RESET FRONT
+ResetEdge(CLK := Reset);
+{endregion}
+
+{region "§3 Diagnostic bus et alarme"}
+// 🔍 3. DIAGNOSTIC BUS / ALARME
+IF (AlarmsIn &lt;&gt; 0) OR NOT SlaveOperational THEN
+    Status.ErrorId := Status.ErrorId OR 16#0001;
+ELSE
+    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès que le bus et l'esclave sont OK *)
+END_IF;
+EncoderAvailable := (Status.ErrorId AND 16#0001) = 0;
+{endregion}
+
+{region "§4 Lecture position"}
+// 📥 4. LECTURE POSITION — GELER SUR DOUTE (Partie10 §6)
+// Si EncoderAvailable=FALSE : RawPos/AngleRaw/TurnCount conservent leur dernière valeur (pas de RETURN
+// global ici pour ne pas geler aussi la séquence preset/l'état — seule la lecture est gelée).
+IF EncoderAvailable THEN
+    RawPos := RawPosIn;   // Sens de comptage géré côté codeur (CoE 6000h bit0, startup parameter CODESYS) — voir Partie10 §3bis. Plus de calcul ici.
+    AngleRaw := UDINT_TO_UINT(RawPos MOD PointsPerRev);
+    TurnCount := RawPos / PointsPerRev;
+END_IF;
+{endregion}
+
+{region "§5 Séquence preset"}
+// 🔧 5. SÉQUENCE PRESET (écriture bus)
+// PresetTriggerCmd := 2 déclenche le référencement à PresetValue (valeur de commande, pas un
+// masque de bits). CodeSeqTriggerCmd : rôle non identifié — laissé à 0, PAS piloté tant que sa
+// fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
+PresetReqEdge(CLK := PresetRequest);
+PresetAck := FALSE; PresetNak := FALSE; // pulses 1 cycle uniquement
+CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
+CASE PresetSeqStep OF
+    0: // IDLE
+        PresetTriggerCmd := 0;
+        IF PresetReqEdge.Q AND EncoderAvailable THEN
+            PresetValueOut := PresetValue;
+            PresetSeqStep := 1;
+            PresetTimer(IN := TRUE, PT := PresetTimeout);
+        END_IF;
+    1: // Déclenchement preset (laissé actif pendant 0.5s pour confort visuel en simulation/bus)
+        PresetTriggerCmd := 2;   // Référence le codeur à PresetValueOut
+        RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(PresetValueOut);
+        IF ABS(RawDiff) &lt;= UDINT_TO_DINT(PresetTolerancePts) THEN
+            PresetTimer(IN := FALSE, PT := PresetTimeout);
+            PresetTimerVisual(IN := TRUE, PT := T#500MS);
+            IF PresetTimerVisual.Q THEN
+                PresetTriggerCmd := 0;
+                PresetAck := TRUE;
+                PresetSeqStep := 0;
+                PresetTimerVisual(IN := FALSE, PT := T#500MS);
+            END_IF;
+        ELSIF PresetTimer.Q THEN
+            PresetTriggerCmd := 0;
+            PresetNak := TRUE;
+            Status.ErrorId := Status.ErrorId OR 16#0002;
+            PresetSeqStep := 0;
+            PresetTimer(IN := FALSE, PT := PresetTimeout);
+            PresetTimerVisual(IN := FALSE, PT := T#500MS);
+        END_IF;
+END_CASE;
+IF ResetEdge.Q AND (PresetSeqStep = 0) THEN
+    Status.ErrorId := Status.ErrorId AND 16#FFFD;
+END_IF;
+{endregion}
+
+{region "§6 Error et StateAtError"}
+// 🧾 6. ERROR / STATEATERROR
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
+IF ErrorEdge.Q THEN
+    Status.StateAtError := Status.State;
+END_IF;
+
+Status.Busy := (PresetSeqStep &lt;&gt; 0);
+Status.Done := PresetAck;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cc7ae6ce-7a02-54cf-9759-459f5de2a1e4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Encoder_Safety" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
+--&gt; [HW]  Ligne puissance enclenchee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; ALERTE HOMING ===
+--&gt; [HW]  Position calculee (m, sortie FB_Encoder_Scale)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Alerte incoherence redemarrage (FB_Encoder_Homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionMinM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-99" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES &amp; BORNES PHYSIQUES ===
+--&gt; [CFG] Plafond bornage physique bas (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionMaxM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="99" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond bornage physique haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TESTS &amp; BYPASS ===
+--&gt; [TST] Neutralisation defaut de bornage pour mise en service</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Status">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+ErrorId bit0: "Bornes", bit1: "Boot suspect".</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosMSafe">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES SURE &amp; SECURITE ===
+&lt;-- [DIAG] Position cable instantanee transmise (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Incoherence ou hors bornes (TRUE = defaut)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🛡️ FB_Encoder_Safety — Bornage physique &amp; surveillance cohérence
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d'incohérence redémarrage
+   🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
+   🛡️ Sécurité : Verrouillage de la position câble sûre
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate"}
+// 🛑 1. GATE
+IF NOT Enable THEN
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
+    CablePosMSafe := CablePosM;
+    EncoderIncoherent := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+Status.State := E_State.READY;
+{endregion}
+
+{region "§2 Reset front"}
+// 🔑 2. RESET FRONT
+ResetEdge(CLK := Reset);
+{endregion}
+
+{region "§3 Bypass global"}
+// 🌐 3. BYPASS GLOBAL
+IF BypassGlobal THEN
+    Status.ErrorId := 16#0000;
+END_IF;
+{endregion}
+
+{region "§4 Surveillance bornage"}
+// 🔍 4. SURVEILLANCE BORNAGE PHYSIQUE ABSOLU (bit0)
+IF NOT BypassGlobal AND ((CablePosM &lt; PositionMinM) OR (CablePosM &gt; PositionMaxM)) THEN
+    Status.ErrorId := Status.ErrorId OR 16#0001;
+ELSE
+    Status.ErrorId := Status.ErrorId AND 16#FFFE; (* Auto-clearing dès retour dans la plage *)
+END_IF;
+{endregion}
+
+{region "§5 Relais incohérence redémarrage"}
+// 🔍 5. RELAIS INCOHÉRENCE REDÉMARRAGE (bit1)
+IF NOT BypassGlobal THEN
+    IF HomingSuspect THEN
+        Status.ErrorId := Status.ErrorId OR 16#0002;
+    ELSE
+        Status.ErrorId := Status.ErrorId AND 16#FFFD;
+    END_IF;
+END_IF;
+{endregion}
+
+{region "§6 Transmission mesure"}
+// 📏 6. TRANSMISSION DE LA MESURE (Toujours réelle, non figée)
+CablePosMSafe := CablePosM;
+{endregion}
+
+{region "§7 Sorties état et sécurité"}
+// 📤 7. SORTIES ÉTAT &amp; SÉCURITÉ
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
+IF ErrorEdge.Q THEN
+    Status.StateAtError := Status.State;
+END_IF;
+
+EncoderIncoherent := Status.Error;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>69c17808-0a2e-5cda-8135-4bc53222fe41</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Encoder_Scale" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES ENTREE &amp; REFERENCES BRUTES ===
+--&gt; [HW]  Position brute codeur (sortie FB_Encoder_Abs, gelee sur doute)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Reference brute figee au dernier homing (ST_Encoder_Calib)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableM_PerRev">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES &amp; RATIOS DE CONVERSION ===
+--&gt; [CFG] Developpement cable par tour tambour (m/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Resolution codeur (pts/tour)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE CONVERTIE ===
+&lt;-- [DIAG] Position cable en metres (+ enroule, - sous l'eau)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="RawDiff">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS INTERNES ===
+. [LOC] Ecart signe RawPos - HomingRefRaw</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Encoder_Scale — Mise à l'échelle points → mètres (1 par treuil)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
+   🔒 Polarité : CablePosM signée (+ enroulé, - sous l'eau)
+   🔌 Architecture : Convertisseur de mesure unitaire par treuil
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================
+=== DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Scale) ===
+
+// 🧮 Écart signé sûr : conversion DINT AVANT soustraction (§3.1) — jamais l'inverse
+RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(HomingRefRaw);
+
+// 📏 Formule fixe points → mètres (Partie10 §2)
+IF PointsPerRev &gt; 0 THEN
+    CablePosM := DINT_TO_REAL(RawDiff) * (CableM_PerRev / UDINT_TO_REAL(PointsPerRev));
+ELSE
+    CablePosM := 0.0;   // Garde division par zéro (PointsPerRev mal configuré)
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ccb7d973-53c2-5255-9462-8b4a7dc68cd6</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Encoder_SpeedMeasure" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Purge immediate de l'historique (front montant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE SURES EN ENTREE ===
+--&gt; [HW]  Position cable sure en metres (FB_Encoder_Safety)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Validite de la chaine codeur</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSE CALCULÉE &amp; VALIDITE ===
+&lt;-- [DIAG] Vitesse absolue sur la fenetre glissante (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse signee (+ montee, - descente) (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Valid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse valide (6 ech. sur 50 ms)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Positions_M">
+              <type>
+                <array>
+                  <dimension lower="0" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HISTORIQUE &amp; ECHANTILLONS ===
+. [LOC] Tableau des 6 positions enregistrees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Timestamps">
+              <type>
+                <array>
+                  <dimension lower="0" upper="5" />
+                  <baseType>
+                    <TIME />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage associe aux 6 positions</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CurrentTimestamp">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORODATAGE &amp; TEMPORISATION ===
+. [LOC] Horodatage courant du cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastTimestamp">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage de l'echantillon precedent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ElapsedSinceSample">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps ecoule depuis le dernier echantillon</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WindowElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps total ecoule sur la fenetre de mesure</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CollectedSamples">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEURS &amp; ETATS INTERNES ===
+. [LOC] Nombre d'echantillons collectes dans la fenetre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Index">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de boucle de decalage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimestampInitialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur d'initialisation du premier horodatage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WindowTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES DE LA FENETRE GLISSANTE ===
+Fenetre glissante de mesure</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SamplePeriod">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#10MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Periode minimale entre deux echantillons</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCount">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total d'echantillons requis</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
+   🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Horodatage et purge"}
+// ⏱️ Horodatage natif : le calcul utilise le temps réellement écoulé, jamais un cycle supposé.
+CurrentTimestamp := TIME();
+
+// Purge des six positions sur rupture de confiance : aucune source antérieure ne peut contaminer la mesure.
+IF NOT Enable OR Reset OR NOT PositionValid THEN
+    Speed_Mps := 0.0;
+    SignedSpeed_Mps := 0.0;
+    Valid := FALSE;
+    CollectedSamples := 0;
+    TimestampInitialized := FALSE;
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§2 Première position"}
+// 🕒 Première position de la nouvelle fenêtre.
+IF NOT TimestampInitialized THEN
+    Positions_M[0] := Position_M;
+    Timestamps[0] := CurrentTimestamp;
+    LastTimestamp := CurrentTimestamp;
+    CollectedSamples := 1;
+    TimestampInitialized := TRUE;
+    Speed_Mps := 0.0;
+    SignedSpeed_Mps := 0.0;
+    Valid := FALSE;
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§3 Rebouclage TIME"}
+// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant.
+IF CurrentTimestamp &lt; LastTimestamp THEN
+    Positions_M[0] := Position_M;
+    Timestamps[0] := CurrentTimestamp;
+    LastTimestamp := CurrentTimestamp;
+    CollectedSamples := 1;
+    Speed_Mps := 0.0;
+    SignedSpeed_Mps := 0.0;
+    Valid := FALSE;
+    RETURN;
+END_IF;
+
+ElapsedSinceSample := CurrentTimestamp - LastTimestamp;
+
+// 🛡️ Delta nul : aucune division et aucun doublon d'échantillon.
+IF ElapsedSinceSample &lt;= T#0MS THEN
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§4 Collecte échantillons"}
+// 📥 Six positions espacées d'au moins 10 ms donnent cinq intervalles sur la fenêtre interne de 50 ms.
+IF ElapsedSinceSample &gt;= SamplePeriod THEN
+    LastTimestamp := CurrentTimestamp;
+
+    IF CollectedSamples &lt; SampleCount THEN
+        Positions_M[CollectedSamples] := Position_M;
+        Timestamps[CollectedSamples] := CurrentTimestamp;
+        CollectedSamples := CollectedSamples + 1;
+    ELSE
+        FOR Index := 0 TO 4 DO
+            Positions_M[Index] := Positions_M[Index + 1];
+            Timestamps[Index] := Timestamps[Index + 1];
+        END_FOR;
+        Positions_M[5] := Position_M;
+        Timestamps[5] := CurrentTimestamp;
+    END_IF;
+{endregion}
+
+{region "§5 Calcul vitesse"}
+    IF CollectedSamples = SampleCount THEN
+        // 🛡️ Ordre temporel et durée minimale contrôlés avant toute conversion/division.
+        IF Timestamps[5] &gt;= Timestamps[0] THEN
+            WindowElapsed := Timestamps[5] - Timestamps[0];
+            IF WindowElapsed &gt;= WindowTime THEN
+                SignedSpeed_Mps := (Positions_M[5] - Positions_M[0])
+                                   / (UDINT_TO_REAL(TIME_TO_UDINT(WindowElapsed)) / 1000.0);
+                Speed_Mps := ABS(SignedSpeed_Mps);
+                Valid := TRUE;
+            ELSE
+                Speed_Mps := 0.0;
+                SignedSpeed_Mps := 0.0;
+                Valid := FALSE;
+            END_IF;
+        ELSE
+            Speed_Mps := 0.0;
+            SignedSpeed_Mps := 0.0;
+            Valid := FALSE;
+            CollectedSamples := 0;
+            TimestampInitialized := FALSE;
+        END_IF;
+    END_IF;
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="E_CODEURS">
+          <Object Name="FB_Encoder" ObjectId="290327ae-3055-58e1-9bbd-038d8cd93901" />
+          <Object Name="FB_EncoderReliability" ObjectId="2f0260c4-bd51-584e-a910-46b30488f46d" />
+          <Object Name="FB_Encoder_Abs" ObjectId="cc7ae6ce-7a02-54cf-9759-459f5de2a1e4" />
+          <Object Name="FB_Encoder_Safety" ObjectId="69c17808-0a2e-5cda-8135-4bc53222fe41" />
+          <Object Name="FB_Encoder_Scale" ObjectId="ccb7d973-53c2-5255-9462-8b4a7dc68cd6" />
+          <Object Name="FB_Encoder_SpeedMeasure" ObjectId="7c9ddc31-d2fb-5a0c-b88b-8e212bb798cd" />
+          <Object Name="ST_EncoderMeasurement" ObjectId="499ca9fe-eaec-5231-81a8-db655268cece" />
+        </Folder>
+        <Folder Name="F_MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
+          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

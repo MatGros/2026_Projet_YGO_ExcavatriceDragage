@@ -23,10 +23,10 @@ class TestFbInterfaceGuard(unittest.TestCase):
         standard_fbs, light_fbs, documented_exceptions, unauthorized = analyze_fb_files(REPO_ROOT)
 
         total = len(standard_fbs) + len(light_fbs) + len(documented_exceptions) + len(unauthorized)
-        self.assertEqual(total, 53, f"Attendu 53 FB au total, obtenu {total}")
+        self.assertEqual(total, 55, f"Attendu 55 FB au total, obtenu {total}")
         # REX 2026-08-20 : classifieur type-aware — 5 FB à « State » domaine retirés des standard.
-        self.assertEqual(len(standard_fbs), 16, f"Attendu 16 FB standard, obtenu {len(standard_fbs)}")
-        self.assertEqual(len(light_fbs), 28, f"Attendu 28 FB light, obtenu {len(light_fbs)}")
+        self.assertEqual(len(standard_fbs), 17, f"Attendu 17 FB standard, obtenu {len(standard_fbs)}")
+        self.assertEqual(len(light_fbs), 29, f"Attendu 29 FB light, obtenu {len(light_fbs)}")
         self.assertEqual(len(documented_exceptions), 9, f"Attendu 9 exceptions, obtenu {len(documented_exceptions)}")
         self.assertEqual(len(unauthorized), 0, f"Aucun FB non autorisé attendu, obtenu {len(unauthorized)}")
 
@@ -58,8 +58,8 @@ class TestFbInterfaceGuard(unittest.TestCase):
             "Cloture T137 : tous les FB standard sont migres en forme cible (plus de forme a plat)",
         )
         self.assertEqual(
-            len(cible), 16,
-            "Cloture T137 : les 16 FB standard sont en forme cible (Status : ST_FbStatus)",
+            len(cible), 17,
+            "Cloture T137 : les 17 FB standard sont en forme cible (Status : ST_FbStatus)",
         )
 
 
@@ -139,8 +139,8 @@ END_FUNCTION_BLOCK
             "Cloture T137 : tous les FB standard sont migres en forme cible (plus de forme a plat)",
         )
         self.assertEqual(
-            len(cible), 16,
-            "Cloture T137 : les 16 FB standard sont en forme cible (Status : ST_FbStatus)",
+            len(cible), 17,
+            "Cloture T137 : les 17 FB standard sont en forme cible (Status : ST_FbStatus)",
         )
 
 
