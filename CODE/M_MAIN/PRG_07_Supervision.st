@@ -70,6 +70,10 @@ instDiagIhmHeartbeat(
     TglHeartbeatIhm := SEL(GVL_IHM.Network.Bypass.IhmHeartbeat, GVL_IHM.Commun.TglHeartbeatIhm, GVL_Global.BlinkClock)
 );
 
+// 🚨 Acquittement global machine : une impulsion est émise dès que l'opérateur appuie
+// sur l'un des boutons de reset IHM (défaut global, treuil M1, treuil M2, ou benne).
+// Ce signal est consommé par tous les FB du domaine sécurité/métier pour réarmer
+// les défauts (Reset sur front). C'est LA porte d'entrée unique de l'acquittement.
 FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
@@ -80,6 +84,13 @@ FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
 
 {region "§2 Persistance et restauration configuration"}
 // === 🌉 §2 PERSISTANCE & RESTAURATION CONFIG ===
+// Chaque FB_CfgPersistBridge_* synchronise UNE structure de config entre GVL_IHM (Hmi)
+// et GVL_PERSISTENT (Persist) sur le flag `Initialized` :
+//   - au 1er cycle (Hmi.Initialized=FALSE) : Hmi := Persist (restaure la config sauvegardée)
+//     et JustRestored := TRUE sur ce seul cycle ;
+//   - ensuite : Persist := Hmi (la config IHM est sauvegardée en continu).
+// Le flag commun GVL_IHM.Commun.ConfigRestoredFromPersistent est levé dès qu'au moins
+// un bridge a restauré au boot, pour signaler à l'IHM qu'une config persistante a été rappelée.
 
 instCfgPersistBridgeWinchM1(Hmi := GVL_IHM.M1TreuilRetenue.Cfg, Persist := _WinchM1CfgPersist);
 IF instCfgPersistBridgeWinchM1.JustRestored THEN
@@ -128,6 +139,9 @@ ELSE
     GVL_IHM.DredgingAssist.Cfg.TglEnableDumpAtTremie       := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
 END_IF;
 
+// Consigne variateur M3 (SetFreq_Hz) : pas de bridge Cfg dédié (c'est une Cmd, pas une
+// Cfg) → initialisation manuelle au 1er cycle à partir du persist RETAIN _TranslationSetFreq_Hz.
+// Le flag Cmd.Initialized distingue le 1er passage (restaure) des suivants (survit).
 IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
     GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := _TranslationSetFreq_Hz;
     GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
@@ -137,11 +151,16 @@ END_IF;
 // prochain boot/reset chaud, pas seulement le défaut d'usine.
 _TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
 
+// Acquittement du bandeau « config restaurée » par l'opérateur (front) → efface le flag.
 instAckConfigRestored(CLK := GVL_IHM.Commun.BtnAckConfigRestored);
 IF instAckConfigRestored.Q THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := FALSE;
 END_IF;
 
+// 🎚️ Restauration boot des BYPASS IHM depuis le RETAIN (BypassXxxGlobal) :
+// au 1er cycle (Bypass.Initialized=FALSE), si un bypass global RETAIN est actif, on le
+// rejoue sur l'IHM, puis on marque Initialized pour ne pas réécraser les actions suivantes
+// de l'opérateur. Même pattern pour chaque domaine (Translation / M1 / M2 / Sync / Commun).
 IF NOT GVL_IHM.TranslationM3.Bypass.Initialized THEN
     IF BypassTranslationGlobal THEN
         GVL_IHM.TranslationM3.Bypass.Global := TRUE;
