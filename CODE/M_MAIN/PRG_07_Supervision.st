@@ -52,9 +52,12 @@ VAR
     SimBypassFall           : F_TRIG; // . [LOC] Front descendant SimulationBypassActive
 END_VAR
 
-{region "§1 Horloge et reset machine"}
-// === 🧩 §1 HORLOGE & RESET MACHINE ===
+{region "§1 Horloge, heartbeat et reset machine"}
+// === 🧩 §1 HORLOGE, HEARTBEAT & RESET MACHINE ===
+// Trois fonctions de tête : clignotant global, heartbeat IHM (surveillance lien),
+// et acquittement machine (porte d'entrée des reset).
 
+// ---------- §1a. Horloge clignotante ----------
 instBlink1Hz(
     ENABLE   := TRUE,
     TIMEHIGH := _BlinkTimeOn,
@@ -62,6 +65,7 @@ instBlink1Hz(
 );
 GVL_Global.BlinkClock := instBlink1Hz.OUT;
 
+// ---------- §1b. Heartbeat IHM (front simulé) ----------
 // 💓 Front heartbeat simulé par le clignotant PLC 1 Hz quand le bypass
 // IhmHeartbeat est actif (défaut sécurisé), pour ne jamais latcher un timeout
 // artificiel. Repasser le bypass à FALSE côté IHM active la vraie surveillance.
@@ -70,6 +74,7 @@ instDiagIhmHeartbeat(
     TglHeartbeatIhm := SEL(GVL_IHM.Network.Bypass.IhmHeartbeat, GVL_IHM.Commun.TglHeartbeatIhm, GVL_Global.BlinkClock)
 );
 
+// ---------- §1c. Acquittement global machine (reset) ----------
 // 🚨 Acquittement global machine : une impulsion est émise dès que l'opérateur appuie
 // sur l'un des boutons de reset IHM (défaut global, treuil M1, treuil M2, ou benne).
 // Ce signal est consommé par tous les FB du domaine sécurité/métier pour réarmer
