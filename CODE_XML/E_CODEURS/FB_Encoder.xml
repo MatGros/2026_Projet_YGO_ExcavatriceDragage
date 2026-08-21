@@ -1718,21 +1718,13 @@ ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Synthese declenchement homing</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetValueCalc">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES DE CALCUL ===
-. [LOC] Valeur cible de preset (centre plage)</xhtml>
-              </documentation>
-            </variable>
             <variable name="TargetPoints">
               <type>
                 <DINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart cible converti en points</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES DE CALCUL ===
+. [LOC] Ecart cible converti en points</xhtml>
               </documentation>
             </variable>
             <variable name="TargetPositionM">
@@ -1877,9 +1869,9 @@ IF HomingTrigger THEN
         Status.ErrorId := 16#0000;
         Status.State := E_State.READY;
 
-        // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
-        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
-        PresetValue := PresetValueCalc;
+        // Envoi de la demande de Preset SDO au matériel : la valeur brute injectee
+        // correspond a la cible (calcul inverse) pour que CablePosM = cible.
+        PresetValue := DINT_TO_UDINT(UDINT_TO_DINT(Calib.HomingRefRaw) + TargetPoints);
         PresetRequest := TRUE;
     END_IF;
 END_IF;
@@ -2236,11 +2228,11 @@ Status.Done := FALSE;
 // 🧮 Écart signé sûr : conversion DINT AVANT soustraction (§3.1) — jamais l'inverse
 RawDiff := UDINT_TO_DINT(RawPos) - UDINT_TO_DINT(HomingRefRaw);
 
-// 📏 Formule fixe points → mètres (Partie10 §2)
+// 📏 Formule fixe points → mètres (Partie10 §2), garde division par zéro
 IF PointsPerRev &gt; 0 THEN
     CablePosM := DINT_TO_REAL(RawDiff) * (CableM_PerRev / UDINT_TO_REAL(PointsPerRev));
 ELSE
-    CablePosM := 0.0;   // Garde division par zéro (PointsPerRev mal configuré)
+    CablePosM := 0.0;
 END_IF;
 </xhtml>
           </ST>

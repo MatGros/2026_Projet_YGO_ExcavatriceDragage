@@ -82,7 +82,6 @@ VAR
     HomingTrigger          : BOOL;        // . [LOC] Synthese declenchement homing
 
     // === VARIABLES DE CALCUL ===
-    PresetValueCalc        : UDINT;       // . [LOC] Valeur cible de preset (centre plage)
     TargetPoints           : DINT;        // . [LOC] Ecart cible converti en points
     TargetPositionM        : REAL;        // . [LOC] Cible retenue en metres
     RawDiffRestart         : DINT;        // . [LOC] Ecart brut de position au redemarrage
@@ -197,9 +196,9 @@ IF HomingTrigger THEN
         Status.ErrorId := 16#0000;
         Status.State := E_State.READY;
 
-        // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
-        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
-        PresetValue := PresetValueCalc;
+        // Envoi de la demande de Preset SDO au matériel : la valeur brute injectee
+        // correspond a la cible (calcul inverse) pour que CablePosM = cible.
+        PresetValue := DINT_TO_UDINT(UDINT_TO_DINT(Calib.HomingRefRaw) + TargetPoints);
         PresetRequest := TRUE;
     END_IF;
 END_IF;

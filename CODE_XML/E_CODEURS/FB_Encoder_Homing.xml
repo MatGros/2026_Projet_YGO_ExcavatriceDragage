@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:13:22.520279" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:13:22.520279">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:45:27.700754" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:45:27.700754">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -602,21 +602,13 @@ ErrorId : masque de bits de défaut (bit0: mode, bit1: treuil, bit4: cible, bit5
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Synthese declenchement homing</xhtml>
               </documentation>
             </variable>
-            <variable name="PresetValueCalc">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES DE CALCUL ===
-. [LOC] Valeur cible de preset (centre plage)</xhtml>
-              </documentation>
-            </variable>
             <variable name="TargetPoints">
               <type>
                 <DINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart cible converti en points</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES DE CALCUL ===
+. [LOC] Ecart cible converti en points</xhtml>
               </documentation>
             </variable>
             <variable name="TargetPositionM">
@@ -761,9 +753,9 @@ IF HomingTrigger THEN
         Status.ErrorId := 16#0000;
         Status.State := E_State.READY;
 
-        // Envoi parallèle de la demande de Preset SDO au matériel s'il est disponible
-        PresetValueCalc := (PointsPerRev * MultiTurnRevsMax) / 2;
-        PresetValue := PresetValueCalc;
+        // Envoi de la demande de Preset SDO au matériel : la valeur brute injectee
+        // correspond a la cible (calcul inverse) pour que CablePosM = cible.
+        PresetValue := DINT_TO_UDINT(UDINT_TO_DINT(Calib.HomingRefRaw) + TargetPoints);
         PresetRequest := TRUE;
     END_IF;
 END_IF;
