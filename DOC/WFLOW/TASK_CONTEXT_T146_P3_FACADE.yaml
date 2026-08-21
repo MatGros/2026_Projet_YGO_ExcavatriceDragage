@@ -1,0 +1,79 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T146 Phase 3 : facade FB_Encoder
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T146_P3_FACADE
+  criticality: C3            # produit gates de fiabilite -> mouvement/interlock
+  strategy: patch            # nouveau FB, pur composition
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Creer la facade FB_Encoder par treuil qui compose la chaine de mesure pure
+    (Abs→Scale→Safety→Speed) + instancie FB_EncoderReliability (gates), derriere une
+    interface unique. Option B (D-A10) : SANS FB_Encoder_Homing — le homing reste
+    dans PRG_04, la facade le reçoit en entree (HomingRefRaw, Homed, HomingSuspect,
+    HomingStatus). Sortie principale : struct ST_EncoderMeasurement (Phase 1).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_Encoder a pour entrees les faits bus (RawPosIn/AlarmsIn/WarningsIn/SlaveOperational) + les sorties homing externe (HomingRefRaw, Homed, HomingSuspect, HomingStatus, PresetRequest, PresetValue)."
+      verified_by: "lecture interface + G315"
+    - id: AC2
+      statement: "La facade instancie et appelle Abs, Scale, Safety, SpeedMeasure ET FB_EncoderReliability (5 sous-instances)."
+      verified_by: "G200 : 5 sous-FB instancies dans FB_Encoder"
+    - id: AC3
+      statement: "FB_EncoderReliability est calcule AVANT SpeedMeasure (gate EncoderFault -> purge vitesse meme scan)."
+      verified_by: "ordre des appels dans le corps ST (lecture ligne a ligne)"
+    - id: AC4
+      statement: "La facade est une pure composition : chaque sous-FB conserve sa responsabilite, aucun Reset/Status propre invente."
+      verified_by: "G315 + lecture : pas de logique fusionnee"
+    - id: AC5
+      statement: "Les gate EncoderFault/HomedAndReliable sont produits et la sortie principale est ST_EncoderMeasurement (remplit HomingStatus/AbsStatus/HomingRefRaw)."
+      verified_by: "lecture + G330 type safe"
+    - id: AC6
+      statement: "Le FB_EncoderReliability precedent (Phase 2) est desormais instancie -> G200 L13-FB orphelin resolu."
+      verified_by: "G200 PASS (0 erreur)"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/E_CODEURS/FB_Encoder.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/E_CODEURS/ST_EncoderMeasurement.st    # Phase 1 committe
+      - CODE/E_CODEURS/FB_EncoderReliability.st    # Phase 2 committe (non modifie)
+      - CODE/M_MAIN/PRG_02_Acquisition.st          # non-cable a ce lot (Phase 4)
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout constat (incoherence d'interface, port de sous-FB manquant, conflit AF-09)
+    est remonte immediatement.
+
+status: VALIDATED
+
+execution:
+  executed_by: "deepseek-v4-flash (executeur)"
+  completed_at: "2026-08-21"
+  status: COMPLETED
+  summary: >
+    Facade FB_Encoder creee : composition Abs->Scale->Safety->Reliability->Speed,
+    Option B (sans Homing). Gate avant Speed, sortie Measurement:ST_EncoderMeasurement.
+    Façade orpheline VOLONTAIRE (cablage = Phase 4, interdit par contrat P3) :
+    exemption tracee KNOWN_ORPHANS_PENDING_DECISION dans G200 (a retirer en Phase 4).
+    Bundle regenere, G200 PASS (0 err), gates palier C 15/15 PASS.
+  evidence_submitted: ["G200_check_linkage: PASS (0 erreur, facade en WARN exempte)", "run_all_gates --palier C: 15/15 PASS"]
+
+validation:
+  status: APPROVED
+  validated_by: "Humain (utilisateur)"
+  validated_at: "2026-08-21"
+  notes: "Phase 3 validee - facade creee sans depasser le perimetre (PRG_02 intouche)."

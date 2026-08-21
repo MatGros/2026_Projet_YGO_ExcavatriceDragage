@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:03:59.330310" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:03:59.330310">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_EncoderReliability" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FAITS DE LA CHAINE CODEUR ===
+--&gt; [HW]  Codeur operationnel sur bus (FB_Encoder_Abs)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Codeur reference (FB_Encoder_Homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Incoherence ou hors bornes (FB_Encoder_Safety)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATES DE FIABILITE ===
+&lt;-- [SAFE] Gate general fiabilite (SANS Homed) — vitesse/mouvements</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Gate strict M3 : disponible ET reference ET pas incoherent</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🛡️ FB_EncoderReliability — Gates de fiabilite de la chaine codeur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Synthetise les gates de fiabilite d'un treuil a partir des
+      faits produits par la chaine codeur (Abs/Homing/Safety), pur calcul
+      combinatoire, sans memoire ni machine d'etat.
+   🔒 Polarité :
+      EncoderFault     = NOT EncoderAvailable OR EncoderIncoherent   (gate GENERAL, SANS Homed)
+      HomedAndReliable = EncoderAvailable AND Homed AND NOT EncoderIncoherent (gate STRICT M3)
+   🧩 Responsabilite scindee (D-A2bis) : Homing = referencement, Safety = coherence,
+      ce FB = « le codeur est fiable ». Aucune recomposition chez les consommateurs.
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// 🛡️ 1. GATE GENERAL (D-A11, C1) — PAS de Homed : non-reference ≠ incoherent.
+//    Ce gate sert a la fiabilite de la mesure (vitesse, mouvements, PositionsValid).
+EncoderFault := (NOT EncoderAvailable) OR EncoderIncoherent;
+
+// 🎯 2. GATE STRICT — reserve a l'interlock hauteur M3 (C1) : on ne translate pas
+//    si la hauteur est inconnue (jamais home) ou douteuse.
+HomedAndReliable := EncoderAvailable AND Homed AND (NOT EncoderIncoherent);
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>2f0260c4-bd51-584e-a910-46b30488f46d</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="E_CODEURS">
+          <Object Name="FB_EncoderReliability" ObjectId="2f0260c4-bd51-584e-a910-46b30488f46d" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
