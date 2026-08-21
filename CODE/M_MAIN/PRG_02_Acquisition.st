@@ -10,6 +10,10 @@
 
 PROGRAM PRG_02_Acquisition
 
+VAR_INPUT
+    // === 📥 ENTRÉES PROGRAMME (AUCUNE - PILOTÉ VIA GVL_IHM & GVL_Simulation) ===
+END_VAR
+
 VAR_OUTPUT
     // === 🚌 BUS INTER-PRG (producteur unique) ===
     Data                     : ST_AcquisitionInterPrg; // <-- [BUS] Mesures/joystick/positions M3/diag DI publiés
