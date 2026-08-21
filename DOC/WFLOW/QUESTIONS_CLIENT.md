@@ -1,5 +1,6 @@
 # 🗒️ QUESTIONS CLIENT — À POSER PENDANT L'ÉTUDE
 
+> 📄 Statut : **LISTE DE TRAVAIL** · 📅 2026-08-21 · 🧠 DSH-02 + utilisateur
 > 🎯 Rôle : recueillir les questions à poser au client au fil de l'étude, pour ne rien oublier.
 > 📌 Usage : noter une question dès qu'elle apparaît ; la cocher / dater quand elle est posée et répondue.
 > 📄 Ce fichier n'est pas une spec — c'est une **liste de travail** (voir [PLAN_TASK](PLAN_TASK.md)).
