@@ -36905,7 +36905,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🕵️‍♂️ GVL_Troubleshooting — GVL Globale de Recherche de Pannes (Orientée Fonctions &amp; Contexte)
    ───────────────────────────────────────────────────────────────
-   ⚙️ Emplacement : CODE/K_DEPANNAGE/GVL_Troubleshooting.st
+   ⚙️ Emplacement : CODE/J_SUPERVISION/GVL_Troubleshooting.st
    🎨 Structurée par CONTEXTE GLOBAL MACHINE + FONCTIONS MÉTIER (Utilisation Opérateur).
    💬 Permet de localiser en 3 secondes l'environnement et le blocage d'une action.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -36980,15 +36980,19 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
-          <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
-          <Object Name="FB_CfgPersistBridge_CommunCfg" ObjectId="b0d11d68-8853-56c7-85fa-cb0f8b6449b6" />
-          <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
-          <Object Name="FB_CfgPersistBridge_DredgingAssistCfg" ObjectId="01900664-1243-5018-b595-4c32b467d2c5" />
-          <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
-          <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
-          <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
           <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
+          <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
           <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
+          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
+          <Folder Name="_BRIDGES">
+            <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
+            <Object Name="FB_CfgPersistBridge_CommunCfg" ObjectId="b0d11d68-8853-56c7-85fa-cb0f8b6449b6" />
+            <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
+            <Object Name="FB_CfgPersistBridge_DredgingAssistCfg" ObjectId="01900664-1243-5018-b595-4c32b467d2c5" />
+            <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
+            <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
+            <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
+          </Folder>
           <Folder Name="_TYPES">
             <Folder Name="4_JOYSTICK_ACQUISITION">
               <Object Name="ST_AcquisitionInterPrg" ObjectId="ee4214b6-c9e0-5d00-aa74-b2d385e1b08d" />
@@ -37126,10 +37130,6 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_Sim_Translation" ObjectId="d7634526-8de9-5f93-b858-7e0bb59cdce2" />
           <Object Name="GVL_BypassRetain" ObjectId="8a5a0aa3-b846-51e6-8d69-984f589c979d" />
           <Object Name="GVL_Simulation" ObjectId="c5681e14-c01a-5262-a590-fb12af051728" />
-        </Folder>
-        <Folder Name="K_DEPANNAGE">
-          <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
-          <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
         </Folder>
         <Folder Name="M_MAIN">
           <Object Name="GVL_Global" ObjectId="51cb1508-137d-505a-a2f0-d30091cada6c" />

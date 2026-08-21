@@ -14,7 +14,7 @@ TARGETS = {
     "G_CYCLE/FB_Cycle.st",
     "G_CYCLE/FB_DiveSearch.st",
     "G_CYCLE/FB_ExtractionSequence.st",
-    "K_DEPANNAGE/FB_TroubleshootingView.st",
+    "J_SUPERVISION/FB_TroubleshootingView.st",
     "C_DIAG_RESEAUX/FB_Diag_Ethercat.st",
     "D_JOYSTICK/FB_Joystick.st",
     "M_MAIN/PRG_02_Acquisition.st",

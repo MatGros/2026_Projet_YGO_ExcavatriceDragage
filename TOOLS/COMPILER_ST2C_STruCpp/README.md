@@ -1,4 +1,4 @@
-# 🧪 OUTILS_ST2C
+# 🧪 COMPILER_ST2C_STruCpp
 
 Compile du **vrai ST CODESYS 3.5** en C++17 (via [STruCpp](https://github.com/Autonomy-Logic/STruCpp))
 pour tester des FB **en boîte noire** (IN/OUT), hors CODESYS, en VS Code ou en CI.
@@ -60,7 +60,7 @@ interne ni le câblage des sous-FB (risque de faute de câblage humaine — REX 
 curl -sL -o strucpp.zip \
   https://github.com/Autonomy-Logic/STruCpp/releases/latest/download/strucpp-win32-x64.zip
 unzip strucpp.zip -d /tmp/strucpp_new
-cp -r /tmp/strucpp_new/strucpp/. TOOLS/OUTILS_ST2C/bin/win32-x64/
+cp -r /tmp/strucpp_new/strucpp/. TOOLS/COMPILER_ST2C_STruCpp/bin/win32-x64/
 ```
 Vérifier : `bin/win32-x64/strucpp.exe -v` · Releases : https://github.com/Autonomy-Logic/STruCpp/releases
 </details>
@@ -82,7 +82,7 @@ comble ça, sans jamais changer la sémantique :
 
 **1. Convertir** (fichier + ses dépendances de type) :
 ```bash
-python TOOLS/OUTILS_ST2C/convert_codesys_to_iec.py \
+python TOOLS/COMPILER_ST2C_STruCpp/convert_codesys_to_iec.py \
   CODE/A_COMMUN/E_State.st CODE/E_CODEURS/FB_Encoder.st --out /tmp/converted
 ```
 Repérer les dépendances : `grep -oE ": (ST_|E_|FB_)[A-Za-z0-9_]+" CODE/E_CODEURS/FB_Encoder.st | sort -u`
@@ -90,7 +90,7 @@ Une dépendance manquante lève `Undefined type 'X'` — itérer jusqu'à liste 
 
 **2. Compiler en C++** (sans test) :
 ```bash
-TOOLS/OUTILS_ST2C/bin/win32-x64/strucpp.exe <fichiers convertis, DUT/enum d'abord> -o out/FB.cpp
+TOOLS/COMPILER_ST2C_STruCpp/bin/win32-x64/strucpp.exe <fichiers convertis, DUT/enum d'abord> -o out/FB.cpp
 ```
 
 **3. Écrire et lancer des tests** (nécessite `g++`) :
@@ -107,7 +107,7 @@ TEST 'nom du scenario'
 END_TEST
 ```
 ```bash
-TOOLS/OUTILS_ST2C/bin/win32-x64/strucpp.exe <fichiers convertis> -o out/FB.cpp --test mon_test.st
+TOOLS/COMPILER_ST2C_STruCpp/bin/win32-x64/strucpp.exe <fichiers convertis> -o out/FB.cpp --test mon_test.st
 ```
 
 ⚠️ **2 pièges vérifiés empiriquement** :
