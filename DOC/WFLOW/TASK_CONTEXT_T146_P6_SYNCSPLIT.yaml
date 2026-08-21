@@ -1,0 +1,97 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T146 Phase 6 : split FB_WinchSync
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T146_P6_SYNCSPLIT
+  criticality: C4            # verrou securite synchro (mouvement coordonne)
+  strategy: rebuild          # scission d'un FB monolithique en 2 blocs + coordonnateur
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Scinder FB_WinchSync (2 responsabilites melangees) en FB_SyncDeviation
+    (ecart codeurs, comparateur pur, 2 seuils Warn/Fault) + FB_SyncContactor
+    (coherence commandes/contacteurs), coordonnes par FB_WinchSync conserve
+    comme coordonnateur (SyncActive + Status + remap interne).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_SyncDeviation est un comparateur pur : entrees CablePosM1/M2, HomedAndReliableM1/M2, ActiveOffsetM resolu, SyncEnable ; sorties SyncDeviationWarn/Fault, DeltaPosM, SignedDeltaPosM."
+      verified_by: "lecture interface + G315"
+    - id: AC2
+      statement: "FB_SyncContactor detecte la discordance commandes/contacteurs (RelayFwd/Rev, Contactor1-4) et sort ContactorMismatch, independant des codeurs."
+      verified_by: "lecture interface + G315"
+    - id: AC3
+      statement: "FB_WinchSync (coordonnateur) instancie les 2 sous-blocs, garde SyncActive (mode) + Status, et remappe bit0=Warn, bit1=ContactorMismatch, bit2=Fault."
+      verified_by: "lecture FB_WinchSync + G200 (2 sous-FB instancies)"
+    - id: AC4
+      statement: "SyncDegradedStep1 n'existe plus ; les consommateurs (PRG_04, PRG_07, ST_SyncState) lisent SyncDeviationWarn."
+      verified_by: "grep : 0 occurrence SyncDegradedStep1 dans CODE/"
+    - id: AC5
+      statement: "Le cablage PRG_04 passe HomedAndReliableM1/M2 (au lieu de HomedM1/M2) et retire PowerContactorEngaged."
+      verified_by: "lecture instWinchSync cablage + G200"
+    - id: AC6
+      statement: "G200 PASS (0 erreur) et gates palier C 15/15."
+      verified_by: "G200 --report + run_all_gates --palier C"
+    - id: AC7
+      statement: "Controle structurel : nom de fichier egal au nom du POU pour PRG_04_Treuils_Benne.st et PRG_07_Supervision.st."
+      verified_by: "G310_check_code_structure"
+    - id: AC8
+      statement: "Controle structurel : suffixe de langage egal au langage genere dans le bundle pour PRG_04_Treuils_Benne.st et PRG_07_Supervision.st."
+      verified_by: "G310_check_code_structure"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st      # coordonnateur (rewrite)
+      - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st  # nouveau
+      - CODE/H_TREUILS_BENNE/FB_SyncContactor.st  # nouveau
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st       # cablage + migration consommateurs
+      - CODE/M_MAIN/PRG_07_Supervision.st         # migration SyncDegradedActive
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st  # renommage membre
+      - TOOLS/AGENT_WORKFLOW/tests/test_fb_interface_guard.py      # compte FB
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st   # Phase 5 deja traitee
+
+  # ── 4. Contrat de conservation (rebuild) ─────────────────────────────────
+  conservation:
+    must_survive:
+      - "SyncActive (autorisation couplage) selon mode, independante de l'erreur"
+      - "SignedDeltaPosM / DeltaPosM exposes (consommateurs PRG_04/PRG_07/IHM)"
+      - "Status.Error et ErrorId (bits 0/1) lus par PRG_04:375,595, PRG_07, IHM"
+      - "SyncWarn (IHM)"
+      - "Force palier 1 sur ecart modere (ex SyncDegradedStep1) — via SyncDeviationWarn"
+    dropped_on_purpose:
+      - "SyncDegradedStep1 (nom) — remplace par SyncDeviationWarn"
+      - "Entree PowerContactorEngaged (revue 2.4, hors responsabilite bloc)"
+      - "Entree HomedM1/M2 (remplacee par HomedAndReliableM1/M2)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Toute perte de comportement (bit, seuil, timing 800/500ms) entre l'ancien
+    FB_WinchSync et la version coordonnee est remontee immediatement. La non
+    regression de la synchro est imperatif.
+
+status: PENDING
+
+execution:
+  executed_by: "deepseek-v4-flash (executeur)"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

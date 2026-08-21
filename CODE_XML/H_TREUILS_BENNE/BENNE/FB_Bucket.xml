@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:06:29.053022" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:06:29.053022">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T17:33:08.111394" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T17:33:08.111394">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -779,6 +779,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Quitte position de depart</xhtml>
               </documentation>
             </variable>
+            <variable name="HoldOffsetM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart reel mémorise (gel en position intermediaire)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -1218,11 +1226,17 @@ IF Status.State = E_State.BUSY THEN
     // la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne) sans à-coup,
     // tandis que le câble brut de M2 montre son enroulement.
     ActiveOffsetM := CablePosM2 - CablePosM1;
+    HoldOffsetM := ActiveOffsetM;   // Mémorise l'écart réel pour le gel en position intermédiaire
 ELSIF CloseReq OR BucketState.IsClosed THEN
     ActiveOffsetM := Config.OffsetCloseM;
-ELSE
-    // Par défaut, ou en cours/état d'ouverture, on applique l'offset ouvert
+    HoldOffsetM := ActiveOffsetM;
+ELSIF OpenReq OR BucketState.IsOpen THEN
     ActiveOffsetM := Config.OffsetOpenM;
+    HoldOffsetM := ActiveOffsetM;
+ELSE
+    // Position intermédiaire non référencée : gèle l'écart réel mémorisé (HoldOffsetM) au lieu de
+    // sauter vers la config. Évite l'à-coup sur la position corrigée M2 / la synchro.
+    ActiveOffsetM := HoldOffsetM;
 END_IF;
 
 {endregion}

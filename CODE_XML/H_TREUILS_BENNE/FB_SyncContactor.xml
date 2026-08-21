@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T18:01:13.683292" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T18:01:13.683292">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_SyncContactor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD] Validation surveillance globale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation utilisateur synchro</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwdM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET FEEDBACKS ACTIONS ===
+--&gt; [HW] Feedback/Ordre montee M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwdM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre montee M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre descente M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre descente M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor1_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 1 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor1_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 1 M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor2_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 2 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor2_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 2 M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor3_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 3 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor3_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 3 M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor4_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor4_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASSES ET SIMULATION ===
+--&gt; [TST] Neutralise la surveillance contacteurs</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ContactorMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTAT ===
+&lt;-- [SAFE] Discordance commande/contacteurs confirmee</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="MismatchTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Tempo filtrage incoherence commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MismatchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Discordance commande active</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔀 FB_SyncContactor — Coherence commandes/contacteurs M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Detecter une discordance entre les commandes/contacteurs des
+      2 treuils (sens + paliers). Independante des codeurs — surveillable
+      meme si les codeurs sont bypasses.
+   🔌 Interface : Bloc de surveillance transverse (1 instance)
+   🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate neutralisation"}
+// 🛑 1. GATE
+IF NOT Enable THEN
+    ContactorMismatch := FALSE;
+    MismatchActive := FALSE;
+    MismatchTimer(IN := FALSE);
+    RETURN;
+END_IF;
+{endregion}
+
+{region "§2 Detection discordance"}
+// 🔍 2. COHÉRENCE DES COMMANDES SÉCURITÉ — verifie que les commandes envoyees
+// aux deux treuils sont identiques (sens et contacteurs).
+// Filtre de 500ms pour tolerer les transitions et rampes.
+IF NOT BypassGlobal THEN
+    MismatchActive := SyncEnable AND (
+        (RelayFwdM1 &lt;&gt; RelayFwdM2) OR
+        (RelayRevM1 &lt;&gt; RelayRevM2) OR
+        (Contactor1_M1 &lt;&gt; Contactor1_M2) OR
+        (Contactor2_M1 &lt;&gt; Contactor2_M2) OR
+        (Contactor3_M1 &lt;&gt; Contactor3_M2) OR
+        (Contactor4_M1 &lt;&gt; Contactor4_M2)
+    );
+    MismatchTimer(IN := MismatchActive, PT := T#500ms);
+    ContactorMismatch := MismatchTimer.Q;
+ELSE
+    ContactorMismatch := FALSE;
+    MismatchActive := FALSE;
+    MismatchTimer(IN := FALSE);
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>afd229de-316d-5899-8a37-8c30dbfd06db</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="H_TREUILS_BENNE">
+          <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

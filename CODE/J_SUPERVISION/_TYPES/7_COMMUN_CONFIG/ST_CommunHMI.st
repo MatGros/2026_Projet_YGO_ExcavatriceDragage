@@ -48,7 +48,7 @@ STRUCT
 
     (* 🩺 Diagnostic arrêt auto descente Kobold (pilotage normal) *)
     KoboldImmersionConfirmed : BOOL; (* Front Kobold confirmé dans la fenêtre d'immersion *)
-    KoboldBottomTouchLatched : BOOL; (* Fond détecté, descente bloquée (DescendPermitM1/M2_Raw) *)
+    KoboldBottomTouchLatched : BOOL; (* Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend) *)
 
     (* 📐 Configuration des paramètres communs machine (au-dessus des bypass) *)
     Cfg : ST_CommunCfg;

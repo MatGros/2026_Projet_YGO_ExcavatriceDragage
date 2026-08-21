@@ -82,8 +82,6 @@ VAR
 
     BottomLimitM1_Active    : REAL;
     BottomLimitM2_Active    : REAL;
-    DescendPermitM1_Active  : BOOL;
-    DescendPermitM2_Active  : BOOL;
 
     CableLimitAscentM1Reached : BOOL;
     CableLimitAscentM2Reached : BOOL;
@@ -92,12 +90,24 @@ VAR
     SafeStopM2_Raw          : BOOL;
     SafeStopM1_Active       : BOOL;
     SafeStopM2_Active       : BOOL;
-    DescendPermitM1_Raw     : BOOL;
-    DescendPermitM2_Raw     : BOOL;
-    AscentPermitM1_Raw      : BOOL;
-    AscentPermitM2_Raw      : BOOL;
-    AscentPermitM1_Active   : BOOL;
-    AscentPermitM2_Active   : BOOL;
+    // Taxonomie permit (D-P1 à D-P11) : SafetyPermit (safety pure), ProcessPermit (process pur),
+    // ProcessAndSafetyPermit (= Safety AND Process), EffectivePermit (= couplage synchro).
+    SafetyPermitM1_Descend   : BOOL;
+    SafetyPermitM2_Descend   : BOOL;
+    SafetyPermitM1_Ascent    : BOOL;
+    SafetyPermitM2_Ascent    : BOOL;
+    ProcessPermitM1_Descend  : BOOL;
+    ProcessPermitM2_Descend  : BOOL;
+    ProcessPermitM1_Ascent   : BOOL;
+    ProcessPermitM2_Ascent   : BOOL;
+    ProcessAndSafetyPermitM1_Descend : BOOL;
+    ProcessAndSafetyPermitM2_Descend : BOOL;
+    ProcessAndSafetyPermitM1_Ascent  : BOOL;
+    ProcessAndSafetyPermitM2_Ascent  : BOOL;
+    EffectivePermitM1_Descend : BOOL;
+    EffectivePermitM2_Descend : BOOL;
+    EffectivePermitM1_Ascent  : BOOL;
+    EffectivePermitM2_Ascent  : BOOL;
 
     BenneBusyFallEdge     : F_TRIG;
 
@@ -518,14 +528,14 @@ instWinchSync(
     Enable          := PRG_03_Modes_Cycle.Auth.SyncEnable AND NOT instBucket.Status.Busy
                         AND NOT PRG_03_Modes_Cycle.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode            := PRG_03_Modes_Cycle.Auth.Mode,
     CablePosM1      := PRG_02_Acquisition.Data.CablePosM1,
     CablePosM2      := PRG_02_Acquisition.Data.CablePosM2,
-    HomedM1         := PRG_02_Acquisition.instHomingM1.Homed,
-    HomedM2         := PRG_02_Acquisition.instHomingM2.Homed,
+    HomedAndReliableM1 := PRG_02_Acquisition.Data.M1_HomedAndReliable,
+    HomedAndReliableM2 := PRG_02_Acquisition.Data.M2_HomedAndReliable,
     SyncEnable      := PRG_03_Modes_Cycle.Auth.SyncEnable,
     CfgSyncToleranceM  := _SyncCfgPersist.CfgSyncTolerance_M,
+    CfgSyncCriticalToleranceM := _SyncCfgPersist.CfgSyncCriticalTolerance_M,
     ActiveOffsetM   := instBucket.ActiveOffsetM,
     RelayFwdM1      := instWinchM1.RelayFwd,
     RelayFwdM2      := instWinchM2.RelayFwd,
@@ -643,11 +653,11 @@ DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequest
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
     AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2);
 
-DescendPermitM1_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
+ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
 // Ce chemin (pilotage
 // unitaire M2, hors instBucket) applique l'anticipation d'inertie OpenAnticipationM/CloseAnticipationM
 // (mêmes que FB_Bucket) pour couvrir aussi le jog unitaire.
-DescendPermitM2_Raw := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
+ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.CablePosM2 <= (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2),
@@ -770,8 +780,14 @@ instSafetyWinchM2(
 
 SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
 SafeStopM2_Raw := SafeStopM2_Raw OR instSafetyWinchM2.SafeStop;
-DescendPermitM1_Raw := DescendPermitM1_Raw AND instSafetyWinchM1.DescendPermit;
-DescendPermitM2_Raw := DescendPermitM2_Raw AND instSafetyWinchM2.DescendPermit;
+// SafetyPermit = sorties FB_Safety_Winch (safety pure)
+SafetyPermitM1_Descend := instSafetyWinchM1.DescendPermit;
+SafetyPermitM2_Descend := instSafetyWinchM2.DescendPermit;
+SafetyPermitM1_Ascent  := instSafetyWinchM1.AscentPermit;
+SafetyPermitM2_Ascent  := instSafetyWinchM2.AscentPermit;
+// ProcessAndSafetyPermit = Safety AND Process (ex _Raw)
+ProcessAndSafetyPermitM1_Descend := ProcessPermitM1_Descend AND SafetyPermitM1_Descend;
+ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_Descend;
 
 // Mode "vidage à la trémie" : descente M1 ET M2 interdite tant
 // que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
@@ -779,20 +795,21 @@ DescendPermitM2_Raw := DescendPermitM2_Raw AND instSafetyWinchM2.DescendPermit;
 GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked :=
     DumpAtTremieAssistActive AND NOT (PRG_05_Translation.M3_AtP1Stable OR PRG_05_Translation.M3_AtMaintenanceStable);
 IF GVL_IHM.DredgingAssist.State.DumpAtTremieDescentLocked THEN
-    DescendPermitM1_Raw := FALSE;
-    DescendPermitM2_Raw := FALSE;
+    ProcessAndSafetyPermitM1_Descend := FALSE;
+    ProcessAndSafetyPermitM2_Descend := FALSE;
 END_IF;
-AscentPermitM1_Raw  := instSafetyWinchM1.AscentPermit;
-AscentPermitM2_Raw  := instSafetyWinchM2.AscentPermit
-    // Même anticipation que DescendPermitM2_Raw ci-dessus.
+ProcessAndSafetyPermitM1_Ascent := SafetyPermitM1_Ascent;
+ProcessAndSafetyPermitM2_Ascent := SafetyPermitM2_Ascent
+    // Même anticipation que ProcessPermitM2_Descend ci-dessus.
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.CablePosM2 >= (PRG_02_Acquisition.Data.CablePosM1 + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
-SafeStopM1_Active      := SafeStopM1_Raw      OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
-SafeStopM2_Active      := SafeStopM2_Raw      OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
-DescendPermitM1_Active := DescendPermitM1_Raw AND (NOT instWinchSync.SyncActive OR DescendPermitM2_Raw);
-DescendPermitM2_Active := DescendPermitM2_Raw AND (NOT instWinchSync.SyncActive OR DescendPermitM1_Raw);
-AscentPermitM1_Active  := AscentPermitM1_Raw  AND (NOT instWinchSync.SyncActive OR AscentPermitM2_Raw);
-AscentPermitM2_Active  := AscentPermitM2_Raw  AND (NOT instWinchSync.SyncActive OR AscentPermitM1_Raw);
+SafeStopM1_Active := SafeStopM1_Raw OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
+SafeStopM2_Active := SafeStopM2_Raw OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
+// EffectivePermit = ProcessAndSafetyPermit combine au couplage synchro (anti-télescopage)
+EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Descend);
+EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
+EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
+EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
 
 
 {endregion}
@@ -807,14 +824,14 @@ instWinchM1(
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
     StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
-    DescendPermit           := DescendPermitM1_Active,
-    AscentPermit            := AscentPermitM1_Active,
+    DescendPermit           := EffectivePermitM1_Descend,
+    AscentPermit            := EffectivePermitM1_Ascent,
     Direction               := M1LogicRequestDirection,
     SpeedRefPct             := M1LogicRequestSpeedRef_Pct,
     SpeedStepTable          := _WinchSpeedStepTable,
-    CfgMaxStepDescente      := SEL(instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
+    CfgMaxStepDescente      := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
     // Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := NOT instWinchSync.Status.Error,
@@ -838,8 +855,8 @@ instWinchM2(
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
     StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
-    DescendPermit           := DescendPermitM2_Active,
-    AscentPermit            := AscentPermitM2_Active,
+    DescendPermit           := EffectivePermitM2_Descend,
+    AscentPermit            := EffectivePermitM2_Ascent,
     Direction               := M2LogicRequestDirection,
     SpeedRefPct             := M2LogicRequestSpeedRef_Pct,
     SpeedStepTable          := M2_SpeedStepTableActive,
@@ -847,10 +864,10 @@ instWinchM2(
     // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) plafonne le palier
     // autorisé pendant CLOSING_BUCKET/ouverture benne : MaxStepAscent et CfgMaxStepDescente
     // suivent instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
-    // instWinchSync.SyncDegradedStep1 dégrade M2 au Palier 1 sur écart modéré.
+    // instWinchSync.SyncDeviationWarn dégrade M2 au Palier 1 sur écart modéré.
     // BucketNotClosedAscentStep1 et SlackCableAscentStep1 dégradent la montée au Palier 1.
-    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDegradedStep1 OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
+    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
+    MaxStepAscent           := SEL(instExtractionSequence.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Status.Error,
@@ -877,6 +894,8 @@ WinchM1FinalInterlockRequest.Enable := TRUE;
 WinchM1FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
 WinchM1FinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 WinchM1FinalInterlockRequest.SafeStop := SafeStopM1_Active;
+WinchM1FinalInterlockRequest.DescendPermit := EffectivePermitM1_Descend;
+WinchM1FinalInterlockRequest.AscentPermit := EffectivePermitM1_Ascent;
 // Plus de BrakeReleaseRequest/
 // BrakeCommandOpenConfirmed calcules par FB_Winch — la barriere finale
 // (FB_WinchOutputInterlock) recoit le retour PHYSIQUE brut directement,
@@ -1028,8 +1047,8 @@ WinchM2State.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElap
 WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
 
 WinchM1Safety.SafeStop := SafeStopM1_Active;
-WinchM1Safety.AscentPermit := AscentPermitM1_Active;
-WinchM1Safety.DescendPermit := DescendPermitM1_Active;
+WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
+WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
 WinchM1Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
 WinchM1Safety.PowerCutOff := instSafetyWinchM1.PowerCutOff;
 WinchM1Safety.Error := instWinchM1.Status.Error OR instSafetyWinchM1.Status.Error;
@@ -1050,8 +1069,8 @@ WinchM1Safety.SafeStopSafety     := PRG_06_Outputs.M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := PRG_06_Outputs.M1BlockedBySafetyInfo;
 
 WinchM2Safety.SafeStop := SafeStopM2_Active;
-WinchM2Safety.AscentPermit := AscentPermitM2_Active;
-WinchM2Safety.DescendPermit := DescendPermitM2_Active;
+WinchM2Safety.AscentPermit := EffectivePermitM2_Ascent;
+WinchM2Safety.DescendPermit := EffectivePermitM2_Descend;
 WinchM2Safety.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
 WinchM2Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
 WinchM2Safety.PowerCutOff := instSafetyWinchM2.PowerCutOff;
@@ -1075,7 +1094,7 @@ WinchM2Safety.BlockedBySafety    := PRG_06_Outputs.M2BlockedBySafetyInfo;
 SyncState.DeltaPos_M := instWinchSync.SignedDeltaPosM;
 SyncState.SyncActive := instWinchSync.SyncActive;
 SyncState.SyncWarn := instWinchSync.SyncWarn;
-SyncState.SyncDegradedStep1 := instWinchSync.SyncDegradedStep1;
+SyncState.SyncDeviationWarn := instWinchSync.SyncDeviationWarn;
 SyncState.Ready := instWinchSync.Ready;
 SyncState.Error := instWinchSync.Status.Error;
 SyncState.ErrorId := instWinchSync.Status.ErrorId;

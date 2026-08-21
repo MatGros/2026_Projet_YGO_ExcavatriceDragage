@@ -610,7 +610,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ LED d'alarme écart hors tolérance</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncDegradedStep1">
+            <variable name="SyncDeviationWarn">
               <type>
                 <BOOL />
               </type>

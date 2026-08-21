@@ -79,6 +79,7 @@ VAR
     WasOpenAtStart                  : BOOL;                           // . [LOC] Etat IsOpen memorise a l'entree Busy
     WasClosedAtStart                : BOOL;                           // . [LOC] Etat IsClosed memorise a l'entree Busy
     LeftStartSinceArm               : BOOL;                           // . [LOC] Quitte position de depart
+    HoldOffsetM                     : REAL;                           // . [LOC] Ecart reel mémorise (gel en position intermediaire)
 END_VAR
 
 {region "§1 Gate securite"}
@@ -504,11 +505,17 @@ IF Status.State = E_State.BUSY THEN
     // la position corrigée de M2 reste stable (égale à M1, cad la hauteur du benne) sans à-coup,
     // tandis que le câble brut de M2 montre son enroulement.
     ActiveOffsetM := CablePosM2 - CablePosM1;
+    HoldOffsetM := ActiveOffsetM;   // Mémorise l'écart réel pour le gel en position intermédiaire
 ELSIF CloseReq OR BucketState.IsClosed THEN
     ActiveOffsetM := Config.OffsetCloseM;
-ELSE
-    // Par défaut, ou en cours/état d'ouverture, on applique l'offset ouvert
+    HoldOffsetM := ActiveOffsetM;
+ELSIF OpenReq OR BucketState.IsOpen THEN
     ActiveOffsetM := Config.OffsetOpenM;
+    HoldOffsetM := ActiveOffsetM;
+ELSE
+    // Position intermédiaire non référencée : gèle l'écart réel mémorisé (HoldOffsetM) au lieu de
+    // sauter vers la config. Évite l'à-coup sur la position corrigée M2 / la synchro.
+    ActiveOffsetM := HoldOffsetM;
 END_IF;
 
 {endregion}

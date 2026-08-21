@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:04:13.412379" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:04:13.412379">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T18:01:51.621149" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T18:01:51.621149">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -252,15 +252,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation utilisateur synchro</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SECOURS ET HARDWARE ===
---&gt; [SAFE] Puissance contacteur ligne engagee</xhtml>
-              </documentation>
-            </variable>
             <variable name="CablePosM1">
               <type>
                 <REAL />
@@ -278,20 +269,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position cable treuil M2 (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="HomedM1">
+            <variable name="HomedAndReliableM1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuil M1 reference</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gate fiable M1 (FB_EncoderReliability)</xhtml>
               </documentation>
             </variable>
-            <variable name="HomedM2">
+            <variable name="HomedAndReliableM2">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuil M2 reference</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gate fiable M2 (FB_EncoderReliability)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgSyncToleranceM">
@@ -303,7 +294,18 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
---&gt; [CFG] Ecart max tolere avant alerte (m)</xhtml>
+--&gt; [CFG] Seuil 1 (Warn) — ecart max avant alerte (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgSyncCriticalToleranceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil 2 (Fault) — ecart critique (m)</xhtml>
               </documentation>
             </variable>
             <variable name="ActiveOffsetM">
@@ -314,7 +316,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Offset cible applique (ex: benne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Offset cible RESOLU (ex: benne)</xhtml>
               </documentation>
             </variable>
             <variable name="RelayFwdM1">
@@ -442,7 +444,7 @@
                 <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ErrorId : &lt;-- [DIAG] bitmask (bit0: ecart, bit1: incoherence)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ErrorId : &lt;-- [DIAG] bitmask (bit0: ecart Warn, bit1: discordance contacteurs, bit2: ecart Fault)
 &lt;-- [STAT] Statut FB groupe (Busy/Done/Error/State/StateAtError)</xhtml>
               </documentation>
             </variable>
@@ -476,15 +478,23 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Avertissement IHM ecart tolere depasse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Avertissement IHM (Warn ou discordance)</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncDegradedStep1">
+            <variable name="SyncDeviationWarn">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Forcage palier 1 sur ecart modere</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart seuil 1 depasse (force palier 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncDeviationFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Ecart seuil 2 critique (block signal)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -506,20 +516,322 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Erreur</xhtml>
               </documentation>
             </variable>
+            <variable name="instDeviation">
+              <type>
+                <derived name="FB_SyncDeviation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Comparateur ecart codeurs (pur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instContactor">
+              <type>
+                <derived name="FB_SyncContactor" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Coherence commandes/contacteurs</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚖️ FB_WinchSync — Coordonnateur synchro M1/M2 (1 instance)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Coordonner les 2 blocs de surveillance synchro :
+      - FB_SyncDeviation  (ecart codeurs M1/M2, 2 seuils Warn/Fault)
+      - FB_SyncContactor  (coherence commandes/contacteurs)
+      et produire SyncActive (autorisation de couplage) + le statut
+      transverse d'ensemble pour les consommateurs (PRG_04/PRG_07/IHM).
+   🧬 Responsabilite : coordination + autorisation de couplage. L'ecart
+      codeur vit dans FB_SyncDeviation, la coherence contacteurs dans
+      FB_SyncContactor. Ce bloc NE calcule PAS l'ecart lui-meme.
+   🔒 SyncActive : autorisation de couplage (anti-telescopage), independante
+      de l'erreur — le probleme est porte par SyncDeviationWarn/Fault.
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate neutralisation"}
+// 🛑 1. GATE
+IF NOT Enable THEN
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
+    DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
+    SyncActive := FALSE;
+    SyncWarn := FALSE; SyncDeviationWarn := FALSE; SyncDeviationFault := FALSE;
+    Status.Error := FALSE; Status.ErrorId := 16#0000;
+    RETURN;
+END_IF;
+Ready := TRUE;
+Status.State := E_State.READY;
+{endregion}
+
+{region "§2 Activation synchro"}
+// 🔑 2. RESET FRONT
+ResetEdge(CLK := Reset);
+
+// 🌐 BYPASS GLOBAL : force ErrorId = 0 et ignore toute la surveillance synchro
+IF BypassGlobal THEN
+    Status.ErrorId := 16#0000;
+END_IF;
+
+// 🎚️ 3. SyncActive SELON MODE (Partie9 §9) — autorisation de couplage, independante de l'erreur
+CASE Mode OF
+    E_Mode.MAINT_N1:
+        SyncActive := TRUE;                  // Imposée, non désactivable (sécurité maintenue N1)
+    E_Mode.MAINT_N2:
+        SyncActive := SyncEnable;             // Polarité positive (TRUE = synchro active)
+    ELSE
+        SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : actif par prudence
+END_CASE;
+{endregion}
+
+{region "§3 Sous-blocs deviation et contacteurs"}
+// 📏 4. ÉCART CODEURS (FB_SyncDeviation) + COHERENCE CONTACTEURS (FB_SyncContactor)
+instDeviation(
+    Enable               := Enable,
+    Reset                := Reset,
+    SyncEnable           := SyncActive,
+    CablePosM1           := CablePosM1,
+    CablePosM2           := CablePosM2,
+    HomedAndReliableM1   := HomedAndReliableM1,
+    HomedAndReliableM2   := HomedAndReliableM2,
+    CfgSyncToleranceM    := CfgSyncToleranceM,
+    CfgSyncCriticalToleranceM := CfgSyncCriticalToleranceM,
+    ActiveOffsetM        := ActiveOffsetM,
+    BypassGlobal         := BypassGlobal
+);
+DeltaPosM := instDeviation.DeltaPosM;
+SignedDeltaPosM := instDeviation.SignedDeltaPosM;
+SyncDeviationWarn := instDeviation.SyncDeviationWarn;
+SyncDeviationFault := instDeviation.SyncDeviationFault;
+
+instContactor(
+    Enable          := Enable,
+    Reset           := Reset,
+    SyncEnable      := SyncActive,
+    RelayFwdM1      := RelayFwdM1,
+    RelayFwdM2      := RelayFwdM2,
+    RelayRevM1      := RelayRevM1,
+    RelayRevM2      := RelayRevM2,
+    Contactor1_M1   := Contactor1_M1,
+    Contactor1_M2   := Contactor1_M2,
+    Contactor2_M1   := Contactor2_M1,
+    Contactor2_M2   := Contactor2_M2,
+    Contactor3_M1   := Contactor3_M1,
+    Contactor3_M2   := Contactor3_M2,
+    Contactor4_M1   := Contactor4_M1,
+    Contactor4_M2   := Contactor4_M2,
+    BypassGlobal    := BypassGlobal
+);
+{endregion}
+
+{region "§4 Synthese statut"}
+// 📤 5. SYNTHESE STATUT — consommateurs (PRG_04/PRG_07/IHM) lisent ce Status
+IF NOT BypassGlobal THEN
+    // bit0 : ecart seuil 1 (Warn) — force palier 1
+    IF instDeviation.SyncDeviationWarn THEN
+        Status.ErrorId := Status.ErrorId OR 16#0001;
+    ELSIF ResetEdge.Q AND NOT instDeviation.SyncDeviationWarn THEN
+        Status.ErrorId := Status.ErrorId AND 16#FFFE;
+    END_IF;
+    // bit1 : discordance contacteurs
+    IF instContactor.ContactorMismatch THEN
+        Status.ErrorId := Status.ErrorId OR 16#0002;
+    ELSIF ResetEdge.Q THEN
+        Status.ErrorId := Status.ErrorId AND 16#FFFD;
+    END_IF;
+    // bit2 : ecart seuil 2 (Fault) — critique
+    IF instDeviation.SyncDeviationFault THEN
+        Status.ErrorId := Status.ErrorId OR 16#0004;
+    ELSIF ResetEdge.Q AND NOT instDeviation.SyncDeviationFault THEN
+        Status.ErrorId := Status.ErrorId AND 16#FFFB;
+    END_IF;
+ELSE
+    Status.ErrorId := 16#0000;
+END_IF;
+
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
+IF ErrorEdge.Q THEN
+    Status.StateAtError := Status.State;
+END_IF;
+
+SyncWarn := Status.Error;   // ⚠️ IHM uniquement — pas de SafeStop
+Status.Busy := FALSE;
+Status.Done := FALSE;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>05970ca2-4250-543c-bfcf-5f8ad1f9efae</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_SyncContactor" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD] Validation surveillance globale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation utilisateur synchro</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwdM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET FEEDBACKS ACTIONS ===
+--&gt; [HW] Feedback/Ordre montee M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwdM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre montee M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre descente M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback/Ordre descente M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor1_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 1 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor1_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 1 M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor2_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 2 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor2_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 2 M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor3_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 3 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor3_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 3 M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor4_M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor4_M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Contacteur palier 4 M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASSES ET SIMULATION ===
+--&gt; [TST] Neutralise la surveillance contacteurs</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="ContactorMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTAT ===
+&lt;-- [SAFE] Discordance commande/contacteurs confirmee</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
             <variable name="MismatchTimer">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo filtrage incoherence commande</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeviationTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo filtrage transitoire ecart</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Tempo filtrage incoherence commande</xhtml>
               </documentation>
             </variable>
             <variable name="MismatchActive">
@@ -531,23 +843,17 @@
 . [LOC] Discordance commande active</xhtml>
               </documentation>
             </variable>
-            <variable name="DeviationActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart position hors tolerance actif</xhtml>
-              </documentation>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚖️ FB_WinchSync — Surveillance de synchro M1/M2 (sans correction)
+   🔀 FB_SyncContactor — Coherence commandes/contacteurs M1/M2
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Calcul d'écart de position entre M1 et M2 et contrôle de cohérence
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   🔌 Interface : FB standard de surveillance transverse (1 instance)
-   🔒 Sécurité : Génération d'avertissement et détection de discordances
+   🎯 Rôle : Detecter une discordance entre les commandes/contacteurs des
+      2 treuils (sens + paliers). Independante des codeurs — surveillable
+      meme si les codeurs sont bypasses.
+   🔌 Interface : Bloc de surveillance transverse (1 instance)
+   🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -555,126 +861,305 @@
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION (à coller dans le corps ST du POU FB_WinchSync) ===
-
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE
-IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
-    Status.State := E_State.DISABLED;
-    DeltaPosM := 0.0;
-    SyncActive := FALSE;
-    SyncWarn := FALSE;
-    SyncDegradedStep1 := FALSE;
-    Status.Error := FALSE;
-    Status.ErrorId := 16#0000;
+IF NOT Enable THEN
+    ContactorMismatch := FALSE;
+    MismatchActive := FALSE;
+    MismatchTimer(IN := FALSE);
     RETURN;
 END_IF;
-
 {endregion}
 
-{region "§2 Initialisation et activation synchro"}
-Ready := TRUE;
-Status.State := E_State.READY;
-
-// 🔑 2. RESET FRONT
-ResetEdge(CLK := Reset);
-
-// 🌐 BYPASS GLOBAL : force ErrorId = 0 et ignore toute la surveillance synchro
-IF BypassGlobal THEN
-    Status.ErrorId := 16#0000;
-END_IF;
-
-// 🎚️ 3. SyncActive SELON MODE (Partie9 §9)
-CASE Mode OF
-    E_Mode.MAINT_N1:
-        SyncActive := TRUE;                  // Imposée, non désactivable (sécurité maintenue N1)
-    E_Mode.MAINT_N2:
-        SyncActive := SyncEnable;             // Polarité positive (TRUE = synchro active)
-    ELSE
-        SyncActive := TRUE;                  // MANUEL/SEMI_AUTO : pas de logique dédiée (FB_Cycle absent), actif par prudence
-END_CASE;
-
-{endregion}
-
-{region "§3 Calcul ecart position"}
-// 📏 4. ÉCART M1/M2 — calculé en continu si les 2 treuils sont homés (même si BypassGlobal est actif)
-IF HomedM1 AND HomedM2 THEN
-    SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
-    DeltaPosM := ABS(SignedDeltaPosM);
-ELSE
-    SignedDeltaPosM := 0.0;
-    DeltaPosM := 0.0;
-END_IF;
-
-{endregion}
-
-{region "§4 Surveillance synchronisme"}
-// 🌐 BYPASS GLOBAL : si actif, on saute TOUTE la logique d'erreur/surveillance
+{region "§2 Detection discordance"}
+// 🔍 2. COHÉRENCE DES COMMANDES SÉCURITÉ — verifie que les commandes envoyees
+// aux deux treuils sont identiques (sens et contacteurs).
+// Filtre de 500ms pour tolerer les transitions et rampes.
 IF NOT BypassGlobal THEN
-
-// 🔍 5. DÉTECTION ÉCART HORS TOLÉRANCE — bit0
-// Filtre temporel (même pattern que MismatchTimer bit1) — absorbe le transitoire mécanique
-// normal d'arrêt (coast-down différentiel M1/M2), évite le blocage intempestif.
-// Si écart &gt; CfgSyncToleranceM -&gt; alarme d'écart (SyncWarn / bit0) et dégradation en vitesse
-// lente Palier 1 (SyncDegradedStep1). L'arrêt brutal SafeStop est réservé à l'écart critique
-// Méca E (&gt; CriticalSyncToleranceM).
-DeviationActive := SyncActive AND HomedM1 AND HomedM2 AND (DeltaPosM &gt; CfgSyncToleranceM);
-DeviationTimer(IN := DeviationActive, PT := T#800ms);  // 🔧 théorique, à ajuster sur site — absorbe le transitoire mécanique normal d'arrêt (coast-down différentiel M1/M2)
-IF DeviationTimer.Q THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSIF ResetEdge.Q AND NOT DeviationActive THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;
-END_IF;
-
-// 🐢 Dégradation au Palier 1 dès que l'écart dépasse la tolérance (sans attendre le SafeStop)
-SyncDegradedStep1 := SyncActive AND HomedM1 AND HomedM2 AND ((DeltaPosM &gt; CfgSyncToleranceM) OR ((Status.ErrorId AND 16#0001) &lt;&gt; 16#0000));
-
-// 🔍 5bis. COHÉRENCE DES COMMANDES SÉCURITÉ — bit1
-// Vérifie que les commandes envoyées aux deux treuils sont identiques (sens et contacteurs)
-// Filtre de 500ms pour tolérer les transitions et rampes.
-MismatchActive := SyncActive AND (
-    (RelayFwdM1 &lt;&gt; RelayFwdM2) OR
-    (RelayRevM1 &lt;&gt; RelayRevM2) OR
-    (Contactor1_M1 &lt;&gt; Contactor1_M2) OR
-    (Contactor2_M1 &lt;&gt; Contactor2_M2) OR
-    (Contactor3_M1 &lt;&gt; Contactor3_M2) OR
-    (Contactor4_M1 &lt;&gt; Contactor4_M2)
-);
-
-MismatchTimer(IN := MismatchActive, PT := T#500ms);
-
-IF MismatchTimer.Q THEN
-    Status.ErrorId := Status.ErrorId OR 16#0002;
-ELSIF ResetEdge.Q THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFD;
-END_IF; // fin du IF MismatchActive
-
+    MismatchActive := SyncEnable AND (
+        (RelayFwdM1 &lt;&gt; RelayFwdM2) OR
+        (RelayRevM1 &lt;&gt; RelayRevM2) OR
+        (Contactor1_M1 &lt;&gt; Contactor1_M2) OR
+        (Contactor2_M1 &lt;&gt; Contactor2_M2) OR
+        (Contactor3_M1 &lt;&gt; Contactor3_M2) OR
+        (Contactor4_M1 &lt;&gt; Contactor4_M2)
+    );
+    MismatchTimer(IN := MismatchActive, PT := T#500ms);
+    ContactorMismatch := MismatchTimer.Q;
 ELSE
-    SyncDegradedStep1 := FALSE;
-END_IF; // fin IF NOT BypassGlobal
-
-{endregion}
-
-{region "§5 Etats et diagnostic"}
-// 📤 6. SORTIES ÉTAT
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
-    Status.StateAtError := Status.State;
+    ContactorMismatch := FALSE;
+    MismatchActive := FALSE;
+    MismatchTimer(IN := FALSE);
 END_IF;
-
-SyncWarn := Status.Error;   // ⚠️ IHM uniquement — voir en-tête, pas de SafeStop
-Status.Busy := FALSE;
-Status.Done := FALSE;
-
 {endregion}
 </xhtml>
           </ST>
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>05970ca2-4250-543c-bfcf-5f8ad1f9efae</ObjectId>
+            <ObjectId>afd229de-316d-5899-8a37-8c30dbfd06db</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_SyncDeviation" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONSIGNES ===
+--&gt; [CMD] Validation surveillance globale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation utilisateur synchro</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM1">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET ETATS CODEURS ===
+--&gt; [HW] Position cable treuil M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position cable treuil M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliableM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gate fiable M1 (FB_EncoderReliability)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliableM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gate fiable M2 (FB_EncoderReliability)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgSyncToleranceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
+--&gt; [CFG] Seuil 1 (Warn) — ecart max avant alerte (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgSyncCriticalToleranceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil 2 (Fault) — ecart critique (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveOffsetM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Offset cible RESOLU (ex: benne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASSES ET SIMULATION ===
+--&gt; [TST] Neutralise la surveillance ecart</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="DeltaPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET DIAGNOSTICS DE SYNCHRO ===
+&lt;-- [DIAG] Ecart absolu position |M1 - M2| (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignedDeltaPosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart signe position (M1 - M2) (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncDeviationWarn">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Seuil 1 depasse : signaler / forcer palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncDeviationFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Seuil 2 depasse : ecart critique (block signal)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeviationFaultTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo filtrage transitoire ecart (seuil 2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarnActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
+. [LOC] Ecart hors seuil 1 actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart hors seuil 2 actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarnLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch ecart seuil 1 (degrada palier 1 stable)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📏 FB_SyncDeviation — Comparateur d'ecart position M1/M2 (pur)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Signaler l'ecart de position entre M1 et M2 sur 2 seuils
+      (Warn = signaler / Fault = critique). Comparateur PUR : il signale,
+      il ne decide pas de ralentir ni d'arreter — le consommateur decide.
+   🔌 Interface : Bloc de surveillance transverse (1 instance)
+   🧬 Responsabilite : n'interprete PAS l'etat benne. Il reçoit ActiveOffsetM
+      deja resolu (calcul offset-selon-etat-benne = FB_Bucket/HoldOffset).
+   🔒 Polarite : SyncDeviationWarn/Fault = TRUE si ecart hors seuil.
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate neutralisation"}
+// 🛑 1. GATE
+IF NOT Enable THEN
+    DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
+    SyncDeviationWarn := FALSE; SyncDeviationFault := FALSE;
+    WarnLatched := FALSE;
+    RETURN;
+END_IF;
+ResetEdge(CLK := Reset);
+{endregion}
+
+{region "§2 Calcul ecart"}
+// 📏 2. ÉCART M1/M2 — calculé en continu si les 2 treuils sont fiables (HomedAndReliable)
+IF HomedAndReliableM1 AND HomedAndReliableM2 THEN
+    SignedDeltaPosM := CablePosM1 - CablePosM2 + ActiveOffsetM;
+    DeltaPosM := ABS(SignedDeltaPosM);
+ELSE
+    SignedDeltaPosM := 0.0;
+    DeltaPosM := 0.0;
+END_IF;
+{endregion}
+
+{region "§3 Surveillance ecart 2 seuils"}
+// 🔍 3. SURVEILLANCE ECART — 2 seuils (Warn/Fault).
+// Warn (seuil 1) = INSTANTANE + LATCH : degrade le palier 1 des que l'ecart depasse,
+// sans retard temporel ni oscillation (fidele a l'ancien SyncDegradedStep1).
+// Fault (seuil 2) = filtre temporel pour le transitoire mecanique d'arret.
+IF NOT BypassGlobal THEN
+    WarnActive  := SyncEnable AND HomedAndReliableM1 AND HomedAndReliableM2 AND (DeltaPosM &gt; CfgSyncToleranceM);
+    FaultActive := SyncEnable AND HomedAndReliableM1 AND HomedAndReliableM2 AND (DeltaPosM &gt; CfgSyncCriticalToleranceM);
+
+    // Latch Warn : reste actif tant que la cause persiste OU que Reset n'a pas ete demande
+    IF WarnActive THEN
+        WarnLatched := TRUE;
+    ELSIF ResetEdge.Q AND NOT WarnActive THEN
+        WarnLatched := FALSE;
+    END_IF;
+    SyncDeviationWarn := WarnActive OR WarnLatched;
+
+    DeviationFaultTimer(IN := FaultActive, PT := T#800ms);
+    SyncDeviationFault := DeviationFaultTimer.Q;
+ELSE
+    SyncDeviationWarn := FALSE;
+    SyncDeviationFault := FALSE;
+    WarnLatched := FALSE;
+END_IF;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>24ca6948-aaa5-587d-b1af-7e9dbd94d79d</ObjectId>
           </data>
         </addData>
       </pou>
@@ -688,6 +1173,8 @@ Status.Done := FALSE;
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
           <Object Name="FB_WinchSync" ObjectId="05970ca2-4250-543c-bfcf-5f8ad1f9efae" />
+          <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
+          <Object Name="FB_SyncDeviation" ObjectId="24ca6948-aaa5-587d-b1af-7e9dbd94d79d" />
         </Folder>
         <Folder Name="F_MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />

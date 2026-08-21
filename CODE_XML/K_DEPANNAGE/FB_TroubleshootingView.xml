@@ -319,7 +319,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (DescendPermitM1/M2_Raw)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend)</xhtml>
               </documentation>
             </variable>
             <variable name="Cfg">
@@ -2501,6 +2501,17 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgSyncCriticalTolerance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Seuil 2 critique (m) — blocage synchro ; doit être &gt; CfgSyncTolerance_M</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -2579,7 +2590,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ LED d'alarme écart hors tolérance</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncDegradedStep1">
+            <variable name="SyncDeviationWarn">
               <type>
                 <BOOL />
               </type>
