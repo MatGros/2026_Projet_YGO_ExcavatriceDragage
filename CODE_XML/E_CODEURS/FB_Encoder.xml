@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T19:58:34.006456" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T19:58:34.006456">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:13:42.312728" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:13:42.312728">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -868,7 +868,7 @@ HomedAndReliable := instRel.HomedAndReliable;
 
 // Synthese statut facade
 Status.Busy := instAbs.Status.Busy;
-Status.Done := instSpeed.Valid AND instAbs.Status.Ready;
+Status.Done := instSpeed.Valid AND instAbs.Ready;
 Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
 Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
 {endregion}
@@ -1815,7 +1815,7 @@ END_IF;
 
 {region "§3 Confirmation coherence et demande homing"}
 // ✅ 4. LEVÉE DU DOUTE (BtnConfirmCoherence, §3.7) — indépendant du Reset générique
-IF ConfirmCoherenceEdge.Q AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2) THEN
+IF ConfirmCoherenceEdge.Q AND HomingPermit THEN
     Calib.HomingSuspect := FALSE;
     Status.ErrorId := Status.ErrorId AND 16#FDFF;   // efface bit9
 END_IF;

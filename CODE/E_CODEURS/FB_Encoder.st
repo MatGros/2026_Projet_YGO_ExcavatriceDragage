@@ -192,7 +192,7 @@ HomedAndReliable := instRel.HomedAndReliable;
 
 // Synthese statut facade
 Status.Busy := instAbs.Status.Busy;
-Status.Done := instSpeed.Valid AND instAbs.Status.Ready;
+Status.Done := instSpeed.Valid AND instAbs.Ready;
 Status.Error := instAbs.Status.Error OR instSafety.Status.Error OR instHoming.Status.Error;
 Status.ErrorId := instAbs.Status.ErrorId OR instSafety.Status.ErrorId OR instHoming.Status.ErrorId;
 {endregion}
