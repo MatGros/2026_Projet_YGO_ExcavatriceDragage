@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:43.184518" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:43.184518">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:35:02.832885" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:35:02.832885">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,26 +23,73 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_BucketCfg">
+      <dataType name="ST_WinchCfg">
         <baseType>
           <struct>
-            <variable name="Config">
+            <variable name="CfgTopSensorPos_M">
               <type>
-                <derived name="ST_BucketConfig" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Offsets Open/Close/Coherence</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgTimeoutDuration">
-              <type>
-                <TIME />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="TIME#30s0ms" />
+                <simpleValue value="8.5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temps max pour l'ouverture/fermeture</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position cible du capteur haut (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgHomingTarget_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible libre Homing unitaire MAINT_N2 [-99..+99 m]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampAccelRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="50" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Rampe d'accélération (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampDecelNormalRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="150" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📉 Rampe de décélération normale (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampDecelFastRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="400" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rampe de décélération rapide / SafeStop (%/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitDescent_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -53,90 +100,28 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot — défaut FALSE non ambigu
+🚦 TRUE = config restaurée depuis GVL_PERSISTENT ce boot</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>51266ef6-8a4b-5d43-bb90-88297b050ea8</ObjectId>
+            <ObjectId>239338a1-0092-5a3b-aef0-6597a3358ff4</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_BucketCfg — Configuration de la benne (M2)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_BucketConfig">
-        <baseType>
-          <struct>
-            <variable name="OffsetOpenM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ouvert (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OffsetCloseM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 en metres benne ferme (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoherenceLimitM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil de detection d'incoherence au boot (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CloseAnticipationM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OpenAnticipationM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>00315f60-8cf4-50aa-8e85-badae3d657b1</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_BucketConfig — Configuration des offsets du benne
+   ST_WinchCfg — Configurations et paramètres réglables pour un Treuil M1/M2
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de paramétrage des décalages et anticipations benne
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
-   =======================================================================</xhtml>
+   🎨 Destiné au paramétrage et calibration depuis l'IHM (RETAIN).
+   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_CfgPersistBridge_BucketCfg" pouType="functionBlock">
+      <pou name="FB_CfgPersistBridge_WinchCfg" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -153,7 +138,7 @@
           <inOutVars>
             <variable name="Hmi">
               <type>
-                <derived name="ST_BucketCfg" />
+                <derived name="ST_WinchCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
@@ -162,7 +147,7 @@
             </variable>
             <variable name="Persist">
               <type>
-                <derived name="ST_BucketCfg" />
+                <derived name="ST_WinchCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
@@ -171,11 +156,11 @@
           </inOutVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_BucketCfg — Pont persistance pour ST_BucketCfg
+   💾 FB_CfgPersistBridge_WinchCfg — Pont persistance pour ST_WinchCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -196,7 +181,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>92413952-2771-5afc-8a20-3321f99627f5</ObjectId>
+            <ObjectId>45adcc1b-fe93-5f2e-8192-a109f147a5f3</ObjectId>
           </data>
         </addData>
       </pou>
@@ -208,19 +193,12 @@ END_IF;
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="A_COMMUN">
-          <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
-        </Folder>
         <Folder Name="J_SUPERVISION">
+          <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
           <Folder Name="_TYPES">
             <Folder Name="1_TREUILS_BENNE">
-              <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
+              <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
             </Folder>
-          </Folder>
-        </Folder>
-        <Folder Name="H_TREUILS_BENNE">
-          <Folder Name="BENNE">
-            <Object Name="ST_BucketConfig" ObjectId="00315f60-8cf4-50aa-8e85-badae3d657b1" />
           </Folder>
         </Folder>
       </ProjectStructure>

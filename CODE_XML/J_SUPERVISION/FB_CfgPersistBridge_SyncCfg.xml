@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:50.927930" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:50.927930">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:34:54.240462" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:34:54.240462">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,43 +23,21 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_DredgingAssistCfg">
+      <dataType name="ST_SyncCfg">
         <baseType>
           <struct>
-            <variable name="DiveStartMin_M">
+            <variable name="CfgSyncTolerance_M">
               <type>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="0.8" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position mini M1/M2 avant plongée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
               </documentation>
             </variable>
-            <variable name="ImmersionUpper_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute fenêtre front immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionLower_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse fenêtre front immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ExtractionControlDistance_M">
+            <variable name="CfgSyncCriticalTolerance_M">
               <type>
                 <REAL />
               </type>
@@ -67,40 +45,7 @@
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 avant accélération</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableDiveSearch">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance plongée mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableExtractionSequence">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance extraction mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableDumpAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance vidage trémie mémorisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Seuil 2 critique (m) — blocage synchro ; doit être &gt; CfgSyncTolerance_M</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -111,26 +56,25 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pont persistance/IHM initialisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (config restaurée depuis GVL_PERSISTENT)</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>87619634-4f54-54d8-88b9-0cd7f0921c36</ObjectId>
+            <ObjectId>a3eb8b55-b4ee-5884-9780-22df0c7ecf3c</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md §3ter
+   ST_SyncCfg — Configuration de la synchronisation M1/M2
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_CfgPersistBridge_DredgingAssistCfg" pouType="functionBlock">
+      <pou name="FB_CfgPersistBridge_SyncCfg" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -147,7 +91,7 @@
           <inOutVars>
             <variable name="Hmi">
               <type>
-                <derived name="ST_DredgingAssistCfg" />
+                <derived name="ST_SyncCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
@@ -156,7 +100,7 @@
             </variable>
             <variable name="Persist">
               <type>
-                <derived name="ST_DredgingAssistCfg" />
+                <derived name="ST_SyncCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
@@ -165,7 +109,7 @@
           </inOutVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_DredgingAssistCfg — Pont persistance prélèvement
+   💾 FB_CfgPersistBridge_SyncCfg — Pont persistance pour ST_SyncCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
@@ -190,7 +134,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>01900664-1243-5018-b595-4c32b467d2c5</ObjectId>
+            <ObjectId>13a2c158-675a-51ae-9722-c0aab6c4c8b0</ObjectId>
           </data>
         </addData>
       </pou>
@@ -202,13 +146,11 @@ END_IF;
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="A_COMMUN">
-          <Object Name="FB_CfgPersistBridge_DredgingAssistCfg" ObjectId="01900664-1243-5018-b595-4c32b467d2c5" />
-        </Folder>
         <Folder Name="J_SUPERVISION">
+          <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
           <Folder Name="_TYPES">
-            <Folder Name="5_ASSISTANCE_DRAGAGE">
-              <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
             </Folder>
           </Folder>
         </Folder>

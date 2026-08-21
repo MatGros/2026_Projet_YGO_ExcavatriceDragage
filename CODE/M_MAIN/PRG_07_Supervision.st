@@ -19,22 +19,23 @@ VAR_OUTPUT
 END_VAR
 
 VAR
-    instBlink1Hz : BLINK;
-    instAckConfigRestored : R_TRIG;
-    instCfgPersistBridgeSync : FB_CfgPersistBridge_SyncCfg;
-    instCfgPersistBridgeCycle : FB_CfgPersistBridge_CycleCfg;
-    instCfgPersistBridgeDredgingAssist : FB_CfgPersistBridge_DredgingAssistCfg;
-    instCfgPersistBridgeCommun : FB_CfgPersistBridge_CommunCfg;
-    instCfgPersistBridgeBucket : FB_CfgPersistBridge_BucketCfg;
-    instCfgPersistBridgeWinchM1 : FB_CfgPersistBridge_WinchCfg;
-    instCfgPersistBridgeWinchM2 : FB_CfgPersistBridge_WinchCfg;
-    instCfgPersistBridgeTranslation : FB_CfgPersistBridge_TranslationCfg; // Pont de persistance config Translation
-    instDiagCanOpen : FB_Diag_CanOpen;
-    instDiagEthercat : FB_Diag_Ethercat;
-    instDiagIhmHeartbeat : FB_Diag_IhmHeartbeat;
-    instPreflight        : FB_Acquisition_Preflight;
-    instHmiBannerFormatter : FB_Hmi_BannerFormatter;
-    instTroubleshootingView : FB_TroubleshootingView;
+    // === ⏱️ SOUS-INSTANCES FB ===
+    instBlink1Hz            : BLINK;                          // * [INST] Clignoteur 1 Hz (heartbeat IHM)
+    instAckConfigRestored   : R_TRIG;                         // * [INST] Front acquittement config restauree
+    instCfgPersistBridgeSync           : FB_CfgPersistBridge_SyncCfg;            // * [INST] Pont persistance config synchro
+    instCfgPersistBridgeCycle          : FB_CfgPersistBridge_CycleCfg;            // * [INST] Pont persistance config cycle
+    instCfgPersistBridgeDredgingAssist : FB_CfgPersistBridge_DredgingAssistCfg;   // * [INST] Pont persistance config assist dragage
+    instCfgPersistBridgeCommun         : FB_CfgPersistBridge_CommunCfg;           // * [INST] Pont persistance config commune
+    instCfgPersistBridgeBucket         : FB_CfgPersistBridge_BucketCfg;           // * [INST] Pont persistance config benne
+    instCfgPersistBridgeWinchM1        : FB_CfgPersistBridge_WinchCfg;            // * [INST] Pont persistance config treuil M1
+    instCfgPersistBridgeWinchM2        : FB_CfgPersistBridge_WinchCfg;            // * [INST] Pont persistance config treuil M2
+    instCfgPersistBridgeTranslation    : FB_CfgPersistBridge_TranslationCfg;      // * [INST] Pont persistance config translation
+    instDiagCanOpen        : FB_Diag_CanOpen;                 // * [INST] Diagnostic reseau CANopen (joystick)
+    instDiagEthercat       : FB_Diag_Ethercat;                // * [INST] Diagnostic reseau EtherCAT (codeurs/variateur)
+    instDiagIhmHeartbeat   : FB_Diag_IhmHeartbeat;            // * [INST] Surveillance heartbeat IHM
+    instPreflight          : FB_Acquisition_Preflight;        // * [INST] Preflight acquisition avant demarrage
+    instHmiBannerFormatter : FB_Hmi_BannerFormatter;          // * [INST] Formatage bandeau IHM (alarmes/etats)
+    instTroubleshootingView : FB_TroubleshootingView;         // * [INST] Vue troubleshooting (diagnostic IHM)
 
     // === 🚦 MÉMOIRE SYNC BYPASS BIDIRECTIONNEL (RETAIN ↔ IHM) ===
     PrevTranslationBypass   : BOOL; // . [LOC] Memoire bypass Translation (sync bidirectionnel)
@@ -371,6 +372,7 @@ GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.WinchInputSourceChanged;
 
+// 📦 Publication des structures d'état & safety vers IHM (recopies directes des bus inter-PRG)
 GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
 GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.Data.WinchM2State;
 GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
