@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:00:19.484801" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:00:19.484801">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T22:03:37.089908" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T22:03:37.089908">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5758,84 +5758,130 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <type>
                 <derived name="BLINK" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ⏱️ SOUS-INSTANCES FB ===
+* [INST] Clignoteur 1 Hz (heartbeat IHM)</xhtml>
+              </documentation>
             </variable>
             <variable name="instAckConfigRestored">
               <type>
                 <derived name="R_TRIG" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front acquittement config restauree</xhtml>
+              </documentation>
             </variable>
             <variable name="instCfgPersistBridgeSync">
               <type>
                 <derived name="FB_CfgPersistBridge_SyncCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config synchro</xhtml>
+              </documentation>
             </variable>
             <variable name="instCfgPersistBridgeCycle">
               <type>
                 <derived name="FB_CfgPersistBridge_CycleCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle</xhtml>
+              </documentation>
             </variable>
             <variable name="instCfgPersistBridgeDredgingAssist">
               <type>
                 <derived name="FB_CfgPersistBridge_DredgingAssistCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config assist dragage</xhtml>
+              </documentation>
             </variable>
             <variable name="instCfgPersistBridgeCommun">
               <type>
                 <derived name="FB_CfgPersistBridge_CommunCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config commune</xhtml>
+              </documentation>
             </variable>
             <variable name="instCfgPersistBridgeBucket">
               <type>
                 <derived name="FB_CfgPersistBridge_BucketCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config benne</xhtml>
+              </documentation>
             </variable>
             <variable name="instCfgPersistBridgeWinchM1">
               <type>
                 <derived name="FB_CfgPersistBridge_WinchCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config treuil M1</xhtml>
+              </documentation>
             </variable>
             <variable name="instCfgPersistBridgeWinchM2">
               <type>
                 <derived name="FB_CfgPersistBridge_WinchCfg" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config treuil M2</xhtml>
+              </documentation>
             </variable>
             <variable name="instCfgPersistBridgeTranslation">
               <type>
                 <derived name="FB_CfgPersistBridge_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pont de persistance config Translation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config translation</xhtml>
               </documentation>
             </variable>
             <variable name="instDiagCanOpen">
               <type>
                 <derived name="FB_Diag_CanOpen" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Diagnostic reseau CANopen (joystick)</xhtml>
+              </documentation>
             </variable>
             <variable name="instDiagEthercat">
               <type>
                 <derived name="FB_Diag_Ethercat" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Diagnostic reseau EtherCAT (codeurs/variateur)</xhtml>
+              </documentation>
             </variable>
             <variable name="instDiagIhmHeartbeat">
               <type>
                 <derived name="FB_Diag_IhmHeartbeat" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Surveillance heartbeat IHM</xhtml>
+              </documentation>
             </variable>
             <variable name="instPreflight">
               <type>
                 <derived name="FB_Acquisition_Preflight" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Preflight acquisition avant demarrage</xhtml>
+              </documentation>
             </variable>
             <variable name="instHmiBannerFormatter">
               <type>
                 <derived name="FB_Hmi_BannerFormatter" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Formatage bandeau IHM (alarmes/etats)</xhtml>
+              </documentation>
             </variable>
             <variable name="instTroubleshootingView">
               <type>
                 <derived name="FB_TroubleshootingView" />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Vue troubleshooting (diagnostic IHM)</xhtml>
+              </documentation>
             </variable>
             <variable name="PrevTranslationBypass">
               <type>
@@ -6269,6 +6315,7 @@ GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationMod
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.WinchInputSourceChanged;
 
+// 📦 Publication des structures d'état &amp; safety vers IHM (recopies directes des bus inter-PRG)
 GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
 GVL_IHM.M2TreuilBenne.State := PRG_04_Treuils_Benne.Data.WinchM2State;
 GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
@@ -10411,6 +10458,10 @@ END_IF;
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="FB_Acquisition_Preflight" ObjectId="78a087ce-501c-55a1-a50d-014fd4495703" />
+          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
+          <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
+        </Folder>
+        <Folder Name="J_SUPERVISION">
           <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
           <Object Name="FB_CfgPersistBridge_CommunCfg" ObjectId="b0d11d68-8853-56c7-85fa-cb0f8b6449b6" />
           <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
@@ -10418,17 +10469,6 @@ END_IF;
           <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
           <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
           <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
-          <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
-          <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
-        </Folder>
-        <Folder Name="C_DIAG_RESEAUX">
-          <Object Name="FB_Diag_CanOpen" ObjectId="335793a2-469c-5bc1-8663-6c12c4d0dfde" />
-          <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
-          <Object Name="FB_Diag_IhmHeartbeat" ObjectId="7e9589ba-412d-5501-80d5-184905e87d23" />
-          <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
-          <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
-        </Folder>
-        <Folder Name="J_SUPERVISION">
           <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
           <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
           <Folder Name="_TYPES">
@@ -10497,6 +10537,13 @@ END_IF;
               <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
             </Folder>
           </Folder>
+        </Folder>
+        <Folder Name="C_DIAG_RESEAUX">
+          <Object Name="FB_Diag_CanOpen" ObjectId="335793a2-469c-5bc1-8663-6c12c4d0dfde" />
+          <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
+          <Object Name="FB_Diag_IhmHeartbeat" ObjectId="7e9589ba-412d-5501-80d5-184905e87d23" />
+          <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
+          <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
         </Folder>
         <Folder Name="K_DEPANNAGE">
           <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
