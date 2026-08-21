@@ -73,8 +73,8 @@ END_VAR
 // causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
 // générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
 M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
-                        OR (NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
-                            AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
+                        OR (PRG_02_Acquisition.Data.M1_HomedAndReliable
+                            AND PRG_02_Acquisition.Data.M2_HomedAndReliable
                             AND (PRG_02_Acquisition.Data.CablePosM1 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
                             AND (PRG_02_Acquisition.Data.CablePosM2 >= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;

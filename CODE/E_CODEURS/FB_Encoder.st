@@ -54,9 +54,15 @@ VAR_OUTPUT
     // === RELAIS VERS HOMING ===
     PresetAck             : BOOL;        // <-- [STAT] Pulse confirmation preset reussi
     PresetNak             : BOOL;        // <-- [STAT] Pulse echec / timeout preset
+    PresetTriggerCmd      : WORD;        // <-- [ACT]  Ordre declenchement preset vers PDO Rx (relay Abs)
+    PresetValueOut        : UDINT;       // <-- [ACT]  Valeur preset transmise (relay Abs)
 
     // === MESURES CONDITIONNEES (struct frontiere) ===
     Measurement           : ST_EncoderMeasurement; // <-- [BUS] Mesures + statuts (interface)
+
+    // === GATES DE FIABILITE ===
+    EncoderFault          : BOOL;        // <-- [SAFE] Gate general fiabilite (sans Homed) — vitesse/mouvements
+    HomedAndReliable      : BOOL;        // <-- [STAT] Gate strict M3 : disponible ET reference ET pas incoherent
 END_VAR
 VAR
     // === SOUS-INSTANCES FB (chaine de mesure) ===
@@ -100,6 +106,8 @@ instAbs(
 );
 PresetAck := instAbs.PresetAck;
 PresetNak := instAbs.PresetNak;
+PresetTriggerCmd := instAbs.PresetTriggerCmd;
+PresetValueOut := instAbs.PresetValueOut;
 {endregion}
 
 {region "§3 Scale"}
@@ -158,6 +166,10 @@ Measurement.SpeedValid        := instSpeed.Valid;
 Measurement.HomingStatus      := HomingStatus;
 Measurement.AbsStatus         := instAbs.Status;
 Measurement.HomingRefRaw      := HomingRefRaw;
+
+// Gates de fiabilite exposes (D-A10 complement c) — consumer unifie
+EncoderFault     := instRel.EncoderFault;
+HomedAndReliable := instRel.HomedAndReliable;
 
 // Synthese statut facade
 Status.Busy := instAbs.Status.Busy;

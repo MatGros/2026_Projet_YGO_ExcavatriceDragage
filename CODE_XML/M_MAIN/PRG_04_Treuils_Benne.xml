@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T23:26:16.835933" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T23:26:16.835933">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:31:03.874691" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:31:03.874691">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2739,8 +2739,8 @@ instDiveSearch(
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     M1Position_M := PRG_02_Acquisition.Data.CablePosM1,
     M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
-    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
-                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent,
+    PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
+                       AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
     DiveStartMin_M := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M,
     ImmersionUpper_M := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M,
     ImmersionLower_M := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M,
@@ -2777,8 +2777,8 @@ instExtractionSequence(
     M2Position_M := PRG_02_Acquisition.Data.CablePosM2,
     M1MeasuredSpeedValid := PRG_02_Acquisition.Data.M1_SpeedValid,
     M2MeasuredSpeedValid := PRG_02_Acquisition.Data.M2_SpeedValid,
-    PositionsValid := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
-                       AND PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent,
+    PositionsValid := NOT PRG_02_Acquisition.Data.M1_EncoderFault
+                       AND NOT PRG_02_Acquisition.Data.M2_EncoderFault,
     ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M
 );
 IF instExtractionSequence.BottomConfirmationConsumed THEN
@@ -3207,7 +3207,7 @@ instSafetyWinchM1(
     JoystickOnline         := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational    := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
-    EncoderAvailable       := PRG_02_Acquisition.instEncoderAbsM1.EncoderAvailable,
+    EncoderAvailable       := PRG_02_Acquisition.instEncoderM1.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI,
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
@@ -3263,7 +3263,7 @@ instSafetyWinchM2(
     JoystickOnline         := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
     JoystickOperational    := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
-    EncoderAvailable       := PRG_02_Acquisition.instEncoderAbsM2.EncoderAvailable,
+    EncoderAvailable       := PRG_02_Acquisition.instEncoderM2.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
     ThermalFeedback        := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI,
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
@@ -3485,14 +3485,14 @@ WinchM1State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM1.Re
 WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
 WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.RestartDelayElapsed;
 WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.StepDelayElapsed;
-WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderAbsM1.RawPos;
+WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM1.Measurement.RawPos;
 WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
 WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
 WinchM1State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
-WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderAbsM1.PresetTriggerCmd;
-WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderAbsM1.PresetValueOut;
-WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM1.Status.Error;
-WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM1.Status.ErrorId;
+WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM1.PresetTriggerCmd;
+WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM1.PresetValueOut;
+WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderM1.Measurement.AbsStatus.Error;
+WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM1.Measurement.AbsStatus.ErrorId;
 WinchM1State.Encoder.Homed := PRG_02_Acquisition.instHomingM1.Homed;
 WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM1.Status.Busy;
 WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM1.Status.Done;
@@ -3542,14 +3542,14 @@ WinchM2State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM2.Re
 WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
 WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.RestartDelayElapsed;
 WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.StepDelayElapsed;
-WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderAbsM2.RawPos;
+WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM2.Measurement.RawPos;
 WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
 WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
 WinchM2State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
-WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderAbsM2.PresetTriggerCmd;
-WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderAbsM2.PresetValueOut;
-WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderAbsM2.Status.Error;
-WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderAbsM2.Status.ErrorId;
+WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM2.PresetTriggerCmd;
+WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM2.PresetValueOut;
+WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderM2.Measurement.AbsStatus.Error;
+WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.instEncoderM2.Measurement.AbsStatus.ErrorId;
 WinchM2State.Encoder.Homed := PRG_02_Acquisition.instHomingM2.Homed;
 WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.instHomingM2.Status.Busy;
 WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.instHomingM2.Status.Done;

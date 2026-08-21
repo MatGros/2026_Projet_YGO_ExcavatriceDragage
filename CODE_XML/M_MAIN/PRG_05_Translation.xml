@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T12:11:31.349600" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T12:11:31.349600">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:32:38.767182" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:32:38.767182">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1096,8 +1096,8 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
 // causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
 // générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
 M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
-                        OR (NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent
-                            AND NOT PRG_02_Acquisition.Data.M2_EncoderIncoherent
+                        OR (PRG_02_Acquisition.Data.M1_HomedAndReliable
+                            AND PRG_02_Acquisition.Data.M2_HomedAndReliable
                             AND (PRG_02_Acquisition.Data.CablePosM1 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
                             AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M));
 TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;

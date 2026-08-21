@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T18:04:57.287292" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T18:04:57.287292">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T16:32:24.674037" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T16:32:24.674037">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -292,6 +292,38 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Mesure codeur M2 incoherente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
