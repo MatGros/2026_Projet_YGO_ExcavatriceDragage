@@ -31873,6 +31873,22 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Traitement et filtrage joystick</xhtml>
               </documentation>
             </variable>
+            <variable name="instDiagCanOpen">
+              <type>
+                <derived name="FB_Diag_CanOpen" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Diagnostic reseau CANopen (joystick) — rang 02 (consomme PRG 04/05)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instDiagEthercat">
+              <type>
+                <derived name="FB_Diag_Ethercat" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Diagnostic reseau EtherCAT (codeurs/variateur) — rang 02</xhtml>
+              </documentation>
+            </variable>
             <variable name="instEncoderM1">
               <type>
                 <derived name="FB_Encoder" />
@@ -32175,6 +32191,30 @@ END_IF;
 Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Data.Vh0808EtpOk);
 {endregion}
 
+{region "§1ter Diagnostic reseaux (CANopen + EtherCAT)"}
+// 🔌 Diagnostics reseau produits ICI (rang 02) car consommes par PRG_02 (joystick,
+// codeurs) et par les PRG 04/05 — producteur avant consommateur (AF02 §4).
+instDiagCanOpen(
+    Enable                 := TRUE,
+    Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
+    CANbusStateRaw         := HwReal.Operator.CanBusState,
+    DeviceJoystickStateRaw := HwReal.Operator.JOY1_DeviceState,
+    SimBypassActive        := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive,
+    NetworkBypassActive    := GVL_IHM.Network.Bypass.Global
+);
+instDiagEthercat(
+    Enable                   := TRUE,
+    Reset                    := PRG_07_Supervision.FaultMachineReset_IHM,
+    DeviceVariateurStateRaw  := HwReal.Translation.AC600_DeviceState,
+    DeviceVariateurSimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive,
+    DeviceEncoderM1StateRaw  := HwReal.Winch.COD1_DeviceState,
+    DeviceEncoderM1SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
+    DeviceEncoderM2StateRaw  := HwReal.Winch.COD2_DeviceState,
+    DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
+    NetworkBypassActive      := GVL_IHM.Network.Bypass.Global
+);
+{endregion}
+
 {region "§2 Simulation et aiguillage — HwIn"}
 // === 🎭 §2 SIMULATION &amp; AIGUILLAGE (HwIn) ===
 
@@ -32273,8 +32313,8 @@ instJoystick(
     BenneBusy                 := PRG_04_Treuils_Benne.instBucket.Status.Busy,
     PreserveArmingAfterBucket := PRG_04_Treuils_Benne.instExtractionSequence.Status.Busy
                                  AND (PRG_04_Treuils_Benne.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
-    BusCanOpenOP              := PRG_07_Supervision.instDiagCanOpen.DeviceCanOpenMaster,
-    JoystickOP                := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick,
+    BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
+    JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
     RawY                      := HwIn.Operator.JoyYRaw_ANA2,
     RawButton                 := HwIn.Operator.JoyBtnRaw,
@@ -32308,7 +32348,7 @@ Data.JoystickXNeutral     := (instJoystick.DirectionX = 0);
 HwM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
-HwM1.SlaveOperational  := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
+HwM1.SlaveOperational  := instDiagEthercat.DeviceEncoderM1.Operational;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -32358,7 +32398,7 @@ END_IF;
 HwM2.RawPosIn          := HwIn.Winch.COD2_PosValue;
 HwM2.AlarmsIn          := HwIn.Winch.COD2_Alarms;
 HwM2.WarningsIn        := HwIn.Winch.COD2_Warnings;
-HwM2.SlaveOperational  := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
+HwM2.SlaveOperational  := instDiagEthercat.DeviceEncoderM2.Operational;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -33667,8 +33707,8 @@ instSafetyWinchM1(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
-    JoystickOnline         := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational    := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    JoystickOnline         := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
     EncoderAvailable       := PRG_02_Acquisition.instEncoderM1.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
@@ -33723,8 +33763,8 @@ instSafetyWinchM2(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
-    JoystickOnline         := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational    := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    JoystickOnline         := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
     EncoderAvailable       := PRG_02_Acquisition.instEncoderM2.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
@@ -33958,7 +33998,7 @@ WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.
 WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM1.Measurement.RawPos;
 WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
 WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
-WinchM1State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
+WinchM1State.Encoder.SlaveOperational := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational;
 WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM1.HwOut.PresetTriggerCmd;
 WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM1.HwOut.PresetValueOut;
 WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderM1.Measurement.AbsStatus.Error;
@@ -34015,7 +34055,7 @@ WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.
 WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM2.Measurement.RawPos;
 WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
 WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
-WinchM2State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
+WinchM2State.Encoder.SlaveOperational := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational;
 WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM2.HwOut.PresetTriggerCmd;
 WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM2.HwOut.PresetValueOut;
 WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderM2.Measurement.AbsStatus.Error;
@@ -34542,13 +34582,13 @@ instSafetyTranslationM3(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Auth.Mode,
-    JoystickOnline          := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational     := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    JoystickOnline          := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational     := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     PhaseRotationOk         := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
-    DriveOnline             := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Online,
-    DriveOperational        := PRG_07_Supervision.instDiagEthercat.DeviceVariateur.Operational,
+    DriveOnline             := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur.Online,
+    DriveOperational        := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur.Operational,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
@@ -35481,22 +35521,6 @@ Data.EmergencyArmingCmd    := EmergencyArmingCmd;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config translation</xhtml>
               </documentation>
             </variable>
-            <variable name="instDiagCanOpen">
-              <type>
-                <derived name="FB_Diag_CanOpen" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Diagnostic reseau CANopen (joystick)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instDiagEthercat">
-              <type>
-                <derived name="FB_Diag_Ethercat" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Diagnostic reseau EtherCAT (codeurs/variateur)</xhtml>
-              </documentation>
-            </variable>
             <variable name="instDiagIhmHeartbeat">
               <type>
                 <derived name="FB_Diag_IhmHeartbeat" />
@@ -35652,27 +35676,6 @@ instBlink1Hz(
     TIMELOW  := _BlinkTimeOff
 );
 GVL_Global.BlinkClock := instBlink1Hz.OUT;
-
-instDiagCanOpen(
-    Enable                 := TRUE,
-    Reset                  := GVL_IHM.Modes.Cmd.BtnFaultReset,
-    CANbusStateRaw         := PRG_02_Acquisition.HwReal.Operator.CanBusState,
-    DeviceJoystickStateRaw := PRG_02_Acquisition.HwReal.Operator.JOY1_DeviceState,
-    SimBypassActive        := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive,
-    NetworkBypassActive    := GVL_IHM.Network.Bypass.Global
-);
-
-instDiagEthercat(
-    Enable                   := TRUE,
-    Reset                    := GVL_IHM.Modes.Cmd.BtnFaultReset,
-    DeviceVariateurStateRaw  := PRG_02_Acquisition.HwReal.Translation.AC600_DeviceState,
-    DeviceVariateurSimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive,
-    DeviceEncoderM1StateRaw  := PRG_02_Acquisition.HwReal.Winch.COD1_DeviceState,
-    DeviceEncoderM1SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
-    DeviceEncoderM2StateRaw  := PRG_02_Acquisition.HwReal.Winch.COD2_DeviceState,
-    DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
-    NetworkBypassActive      := GVL_IHM.Network.Bypass.Global
-);
 
 // 💓 Front heartbeat simulé par le clignotant PLC 1 Hz quand le bypass
 // IhmHeartbeat est actif (défaut sécurisé), pour ne jamais latcher un timeout
@@ -35942,8 +35945,8 @@ instPreflight(
     M3SensorWordIncoherent    := PRG_02_Acquisition.Data.M3_SensorWordIncoherent,
     EmergencyChainClosed      := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    EncoderM1Operational      := instDiagEthercat.DeviceEncoderM1.Operational,
-    EncoderM2Operational      := instDiagEthercat.DeviceEncoderM2.Operational,
+    EncoderM1Operational      := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational,
+    EncoderM2Operational      := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational,
     HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed,
     HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed,
     M1PositionInBounds        := NOT PRG_02_Acquisition.Data.M1_EncoderIncoherent,
@@ -35992,20 +35995,20 @@ GVL_IHM.JOY1Joystick.State.NeutralXAct := PRG_02_Acquisition.instJoystick.Neutra
 GVL_IHM.JOY1Joystick.State.NeutralYAct := PRG_02_Acquisition.instJoystick.NeutralYAct;
 GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed;
 GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.instJoystick.AtNeutral;
-GVL_IHM.JOY1Joystick.State.Online := instDiagCanOpen.DeviceJoystick.Online;
-GVL_IHM.JOY1Joystick.State.Operational := instDiagCanOpen.DeviceJoystick.Operational;
-GVL_IHM.JOY1Joystick.State.Error := instDiagCanOpen.Error;
-GVL_IHM.JOY1Joystick.State.ErrorId := instDiagCanOpen.ErrorId;
+GVL_IHM.JOY1Joystick.State.Online := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online;
+GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational;
+GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instDiagCanOpen.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instDiagCanOpen.ErrorId;
 
-GVL_IHM.Network.CanError    := instDiagCanOpen.Error;
-GVL_IHM.Network.CanErrorId  := instDiagCanOpen.ErrorId;
-GVL_IHM.Network.Joystick    := instDiagCanOpen.DeviceJoystick;
-GVL_IHM.Network.BusEthercat := instDiagEthercat.DeviceEthercatMaster;
-GVL_IHM.Network.EncoderM1   := instDiagEthercat.DeviceEncoderM1;
-GVL_IHM.Network.EncoderM2   := instDiagEthercat.DeviceEncoderM2;
-GVL_IHM.Network.VariateurM3 := instDiagEthercat.DeviceVariateur;
-GVL_IHM.Network.EcatError   := instDiagEthercat.Error;
-GVL_IHM.Network.EcatErrorId := instDiagEthercat.ErrorId;
+GVL_IHM.Network.CanError    := PRG_02_Acquisition.instDiagCanOpen.Error;
+GVL_IHM.Network.CanErrorId  := PRG_02_Acquisition.instDiagCanOpen.ErrorId;
+GVL_IHM.Network.Joystick    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick;
+GVL_IHM.Network.BusEthercat := PRG_02_Acquisition.instDiagEthercat.DeviceEthercatMaster;
+GVL_IHM.Network.EncoderM1   := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1;
+GVL_IHM.Network.EncoderM2   := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2;
+GVL_IHM.Network.VariateurM3 := PRG_02_Acquisition.instDiagEthercat.DeviceVariateur;
+GVL_IHM.Network.EcatError   := PRG_02_Acquisition.instDiagEthercat.Error;
+GVL_IHM.Network.EcatErrorId := PRG_02_Acquisition.instDiagEthercat.ErrorId;
 
 // 🩺 Diagnostic carte des 3 modules DI TOR réelles (AF06 §3bis) — lecture seule, calculé
 // dans PRG_02_Acquisition, simple recopie ici pour l'IHM (même patron que Network.*).

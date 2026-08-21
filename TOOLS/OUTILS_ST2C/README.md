@@ -10,14 +10,14 @@ pour tester des FB **en boîte noire** (IN/OUT), hors CODESYS, en VS Code ou en 
 ## 🔄 Flux de travail
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["📄 .st CODESYS 3.5\nfragment CODE/"] --> B["🔧 convert_codesys_to_iec.py\nmoulinette"]
     B --> C["📄 .st IEC standard"]
     C --> D["⚙️ strucpp.exe\nST → C++17"]
+    H["🧪 test.st\nSETUP / TEST / ASSERT"] --> D
     D --> E["📄 .cpp / .hpp"]
     E --> F["🛠️ g++\nMinGW-w64"]
     F --> G["✅ exécutable natif"]
-    H["🧪 test.st\nSETUP / TEST / ASSERT"] --> D
     G --> I["📊 PASS / FAIL"]
 
     style A fill:#fff3e0,stroke:#e65100

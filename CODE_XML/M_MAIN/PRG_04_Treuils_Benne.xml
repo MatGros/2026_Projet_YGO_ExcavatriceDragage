@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:15:37.008085" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:15:37.008085">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T22:27:52.454579" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T22:27:52.454579">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3248,8 +3248,8 @@ instSafetyWinchM1(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
-    JoystickOnline         := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational    := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    JoystickOnline         := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
     EncoderAvailable       := PRG_02_Acquisition.instEncoderM1.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M1TreuilRetenue.Bypass.EncoderFault,
@@ -3304,8 +3304,8 @@ instSafetyWinchM2(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Auth.SyncEnable,
-    JoystickOnline         := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Online,
-    JoystickOperational    := PRG_07_Supervision.instDiagCanOpen.DeviceJoystick.Operational,
+    JoystickOnline         := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online,
+    JoystickOperational    := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
     EncoderAvailable       := PRG_02_Acquisition.instEncoderM2.Measurement.EncoderAvailable,
     EncoderFaultBypass     := GVL_IHM.M2TreuilBenne.Bypass.EncoderFault,
@@ -3539,7 +3539,7 @@ WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.
 WinchM1State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM1.Measurement.RawPos;
 WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
 WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
-WinchM1State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM1.Operational;
+WinchM1State.Encoder.SlaveOperational := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM1.Operational;
 WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM1.HwOut.PresetTriggerCmd;
 WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM1.HwOut.PresetValueOut;
 WinchM1State.Encoder.Error := PRG_02_Acquisition.instEncoderM1.Measurement.AbsStatus.Error;
@@ -3596,7 +3596,7 @@ WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.
 WinchM2State.Encoder.RawPos := PRG_02_Acquisition.instEncoderM2.Measurement.RawPos;
 WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
 WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
-WinchM2State.Encoder.SlaveOperational := PRG_07_Supervision.instDiagEthercat.DeviceEncoderM2.Operational;
+WinchM2State.Encoder.SlaveOperational := PRG_02_Acquisition.instDiagEthercat.DeviceEncoderM2.Operational;
 WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.instEncoderM2.HwOut.PresetTriggerCmd;
 WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.instEncoderM2.HwOut.PresetValueOut;
 WinchM2State.Encoder.Error := PRG_02_Acquisition.instEncoderM2.Measurement.AbsStatus.Error;
