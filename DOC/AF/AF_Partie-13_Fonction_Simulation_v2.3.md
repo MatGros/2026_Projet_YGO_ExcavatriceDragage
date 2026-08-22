@@ -176,4 +176,4 @@ Les gates Python interdisent désormais :
 6. 🆕 Devant un blocage d'armement AU en simulation qui persiste après correction d'un bug de
    modèle suspecté : presser **Reset** (`BtnFaultReset`) avant de rejouer l'essai (§5, §6).
 
-📌 Suivi organisationnel : `DOC/WFLOW/PLAN_TASK.md`.
+📌 Suivi organisationnel : `DOC/WFLOW/TASKS.yaml`.

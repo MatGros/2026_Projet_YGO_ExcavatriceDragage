@@ -178,7 +178,7 @@ Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document :
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
 - [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 provider `omniroute` + délégation multi-modèles (workflow `provider`/`model`)
-- [PLAN_TASK](DOC/WFLOW/PLAN_TASK.md) & [TASKS.yaml](DOC/WFLOW/TASKS.yaml) — 🗂️ **pilotage des tâches & contrats** : skill `.claude/skills/task-planner/SKILL.md` (bannière `WORKFLOW TÂCHES / TASK-PLANNER ACTIF` au lancement, horodatage ISO 8601 `locked_at`/`updated_at`/`completed_at` obligatoire, isolation `git worktree` et anti-destruction Git).
+- [PLAN_TASK](DOC/WFLOW/TASKS.yaml) & [TASKS.yaml](DOC/WFLOW/TASKS.yaml) — 🗂️ **pilotage des tâches & contrats** : skill `.claude/skills/task-planner/SKILL.md` (bannière `WORKFLOW TÂCHES / TASK-PLANNER ACTIF` au lancement, horodatage ISO 8601 `locked_at`/`updated_at`/`completed_at` obligatoire, isolation `git worktree` et anti-destruction Git).
 - [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
   `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),
   méthode `TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md`, gabarit `TEMPLATE_Troubleshooting.md`,

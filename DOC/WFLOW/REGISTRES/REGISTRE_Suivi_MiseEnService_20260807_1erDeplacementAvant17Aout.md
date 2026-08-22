@@ -1,7 +1,7 @@
 # 🧾 Registre de Suivi Mise en Service (v1.0)
 
 > 🎯 **Rôle** : Historique factuel des séances banc/terrain (actions, mesures, constats, décisions).
-> 📌 **Reliquats & Actions** : `DOC/WFLOW/PLAN_TASK.md` §3 (registre maître `Txx`).
+> 📌 **Reliquats & Actions** : `DOC/WFLOW/TASKS.yaml` §3 (registre maître `Txx`).
 
 ---
 

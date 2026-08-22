@@ -21,7 +21,7 @@ Point d'entrée agents (guardrails, workflow, délégation) : **[AGENTS.md](AGEN
 | Architecture programme (CFC, Ladder, tâches) | [ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md](ARCHIVES/Doc/AF_Partie-02_Architecture_Programme_v3.0.md) |
 | Contrats FB, DUT et CFC | [ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md](ARCHIVES/Doc/AF_Partie-03_Contrats_Composants_v2.0.md) |
 | Fonctions métier (une par FB, 08+) | Joystick · Encoder/Homing · Treuils (Benne incluse) · Translation · Simulation · Troubleshooting — voir [DOC/README.md](DOC/README.md) |
-| Pilotage projet (tâches, reliquats, TBD) | [DOC/WFLOW/PLAN_TASK.md](DOC/WFLOW/PLAN_TASK.md) |
+| Pilotage projet (tâches, reliquats, TBD) | [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml) |
 
 🚫 `ARCHIVES/` n'est **jamais** une source active — versions remplacées uniquement.
 
@@ -125,7 +125,7 @@ restitution bloquante).
 1. **Lire [NAMING_CONVENTION.md](DOC/STDS/NAMING_CONVENTION.md)** ← commence ici
 2. Consulter [DOC/README.md](DOC/README.md) pour l'index complet des spécifications actives
 3. Charger la skill [`codesys-workflow`](.claude/skills/codesys-workflow.md) avant toute modif `CODE/`
-4. Consulter [PLAN_TASK (v1.0)](DOC/WFLOW/PLAN_TASK.md) pour savoir ce qu'il reste à faire, trancher ou demander au client
+4. Consulter [PLAN_TASK (v1.0)](DOC/WFLOW/TASKS.yaml) pour savoir ce qu'il reste à faire, trancher ou demander au client
 
 ---
 
