@@ -22,18 +22,19 @@
 
 | ID | Intention | Preuve | Type | Réf |
 |---|---|---|---|---|
-| <nobr><code>TC-P08-001</code></nobr> | Perte contacteur / CAN ➔ désarmer et annuler axes | `SpeedRef=0`, `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | <small>§3</small> |
-| <nobr><code>TC-P08-002</code></nobr> | Armement homme-mort sur front au neutre uniquement | Armement ➔ `SpeedRef` actif | `⚡ SITE+AUTO` | <small>§4</small> |
-| <nobr><code>TC-P08-003</code></nobr> | Bouton relâché en mouvement : **sans** reconfirmation (`DeadmanReconfEnable=FALSE`, défaut) armement conservé ; **avec** reconfirmation (TRUE) relâchement > 10 s ➔ désarmement | `DeadmanArmed` conservé / `DeadmanArmed=FALSE` | `⚡ SITE+AUTO` | <small>§4</small> |
+| <nobr><code>TC-P08-001</code></nobr> | Perte contacteur / CAN ➔ désarmer, annuler axes, et lever `Error` (`ErrorId` bit2, auto-effacé au retour) | `SpeedRef=0`, `DeadmanArmed=FALSE`, `Error=TRUE` | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P08-002</code></nobr> | Armement homme-mort par maintien `DeadmanArmHoldTime` (100ms) ; relâchement **avant** la fin du maintien annule la tentative (pas d'armement différé) | Tenu 100ms ➔ armé / relâché avant ➔ `DeadmanArmed` reste `FALSE`, nouvel appui exigé | `⚡ SITE+AUTO` | <small>§4</small> |
+| <nobr><code>TC-P08-003</code></nobr> | Bouton relâché en mouvement : **sans** reconfirmation (`DeadmanReconfEnable=FALSE`, défaut) armement conservé ; **avec** reconfirmation (TRUE) relâchement > 10 s ➔ désarmement | `DeadmanReconfEnable`/`DeadmanRearmTimeout` absents de `FB_Joystick.st` | `🔒 INTERFACE MANQUANTE` | <small>§4</small> |
 | <nobr><code>TC-P08-004</code></nobr> | Neutre rapide (<100ms) conserve armement, prolongé désarme | Armement conservé / perdu | `💻 AUTO` | <small>§4</small> |
 | <nobr><code>TC-P08-005</code></nobr> | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | <small>§4, §6</small> |
 | <nobr><code>TC-P08-006</code></nobr> | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | <small>§5</small> |
-| <nobr><code>TC-P08-007</code></nobr> | Consigne `SpeedRef` signée [-100;+100] sur `ST_Joystick_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | <small>§1, §2</small> |
+| <nobr><code>TC-P08-007</code></nobr> | `SpeedRef` signée [-100;+100] ; si `RawX`/`RawY` sort de la plage capteur (défaut/fil coupé) ⇒ arrêt (`SpeedRef=0`) + `ErrorId` bit1, pas de commande à pleine vitesse (voir exemple §5bis) | `SpeedRef=0`, `ErrorId` bit1 actif | `💻 AUTO` | <small>§1, §2, §5bis</small> |
 | <nobr><code>TC-P08-008</code></nobr> | Winch, Translation et Cycle exigent `DeadmanArmed` | ⚠️ gate câblé dans le PRG de collage, pas dans un FB — vérifié par `G375` (note ↓), pas par `test_fb_joystick.st` | `🔒 GATE` | <small>§6</small> |
 | <nobr><code>TC-P08-011</code></nobr> | Fin de cycle benne désarme par défaut (hors exception) | `DeadmanArmed=FALSE` | `💻 AUTO` | <small>§4, §6</small> |
 | <nobr><code>TC-P08-012</code></nobr> | `PreserveArmingAfterBucket` conserve l'armement en fin de benne (exception CLOSING Extraction) | `DeadmanArmed` conservé | `💻 AUTO` | <small>§6, alerte P1</small> |
+| <nobr><code>TC-P08-014</code></nobr> | Mise à l'échelle **proportionnelle** sur valeurs intermédiaires (`RawX=9000`→80%, `RawY=300`→-94%), pas seulement correcte aux bornes 0/10000/neutre | `SpeedRef` exact ±0.01%, `Direction` cohérent | `💻 AUTO` | <small>§1, §2</small> |
 
-> ⚠️ **TC-P08-008 — pourquoi ce n'est PAS un test de FB** (décision 2026-08-22, révisée)
+> ⚠️ **TC-P08-008 — pourquoi ce n'est PAS un test de FB**
 >
 > Le gate `AND (NOT TglJoystickMaster OR JoystickDeadmanArmed)` — celui qui interdit tout
 > mouvement Winch tant que l'homme-mort du Joystick n'est pas armé — n'est écrit **dans
@@ -61,7 +62,8 @@
 | Fait | Producteur d'**intention** de conduite, pas d'actionneur |
 | Ne fait pas | Arbitrage mode, limites machine, frein, PowerCutOff, Q physiques |
 
-Profil AF03 : brique métier non-mouvement. Gate : `Enable`, `PowerContactorEngaged`, diag CAN/device.
+Profil AF03 : contrat `light` (acquisition/conditionnement pur, aucun organe piloté). Gate :
+`Enable`, diag CAN/device.
 
 ---
 
@@ -131,6 +133,10 @@ Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depui
 
 **Gate** (`Enable` / `PowerContactorEngaged` / master CAN OP / device OP) :
 sorties axes à 0, `DeadmanArmed=FALSE`, timers deadman reset, `RETURN`.
+
+La perte de `BusCanOpenOP.Operational` ou `JoystickOP.Operational` neutralise les sorties
+(`Ready=FALSE`) et lève `ErrorId` bit2 (`16#0004`), auto-effacé dès le retour (catégorie
+Info/Warning `CODE_QUALITY_STANDARDS.md §9` — pas un Fault à acquitter).
 
 ---
 
@@ -211,7 +217,28 @@ sous interlocks Extraction. **Hors** cet état, toute fin benne désarme (pas de
 | Reset | Front + Raw encore dans plage → clear bit0 |
 | Neutres | Persistants (`_JoystickNeutralX/Y`) |
 
-### 5bis. Procédure calibration terrain (SITE)
+### 5bis. Surveillance capteur en fonctionnement (défaut hors plage ADC)
+
+Distinct du §5 (calibration, front `BtnCalibrate` uniquement) : ici la surveillance est
+**continue**, à chaque scan, pendant le fonctionnement normal.
+
+| Règle | Détail |
+|---|---|
+| Détection | `RawX`/`RawY` hors `[0 - CST_RawOutOfRangeMargin ; 10000 + CST_RawOutOfRangeMargin]`, évalué en continu (pas seulement au front `BtnCalibrate`) |
+| Marge de tolérance | `CST_RawOutOfRangeMargin := 500` — évite un faux défaut sur simple bruit ADC/léger dépassement près des bornes nominales |
+| Effet immédiat | `AxisCmdX/Y.SpeedRef := 0`, `StartStop := FALSE`, `Direction := 0` sur **les 2 axes** (confiance perdue dans tout le geste, pas seulement l'axe en défaut) |
+| Diagnostic | `ErrorId` bit1 (`16#0002`), pattern Cause/Ack (`CODE_QUALITY_STANDARDS.md §9`) : cause brute évaluée en continu, interlock (forçage neutre) toujours sur la cause brute, jamais sur l'acquittement |
+| Reset | Toujours effectif (jamais conditionné) : acquitte l'affichage ; ré-alarme automatiquement si la cause est toujours/de nouveau présente |
+
+**Exemples** (`Neutral = 5000`) :
+
+| `RawX` | Zone | `SpeedRef` attendu |
+|---|---|---|
+| `10000` | Plage nominale (max) | `100` |
+| `11000` | Hors plage + marge | `0` |
+| `-1000` | Hors plage + marge (sens inverse) | `0` |
+
+### 5ter. Procédure calibration terrain (SITE)
 
 | # | Étape | Attendu |
 |---|---|---|
@@ -245,7 +272,7 @@ Supervision  Mapping IHM JOY1Joystick.State
 ```
 
 Consommateurs **doivent** combiner `AxisCmd*.StartStop` **et** `DeadmanArmed`
-(déjà le cas Winch/Trans/Cycle — TC-P08-013).
+(déjà le cas Winch/Trans/Cycle — TC-P08-008).
 
 Cible archi AF02 : Joystick reste dans le domaine **Acquisition** (page CFC acquisition),
 pas une page mouvement.

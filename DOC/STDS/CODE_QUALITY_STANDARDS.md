@@ -260,13 +260,25 @@ Destiné aux blocs sans cycle de vie complexe (filtres, mises à l'échelle, con
 
 ### 2. Contrat `standard` (Composants métier, séquenceurs, organes)
 Destiné aux blocs procédant à une action, portant des états d'erreur ou orchestrant un équipement.
-- **`VAR_INPUT`** :
+- **`VAR_INPUT`** (socle fixe — 2 champs) :
   - `Enable : BOOL;` (en `BOOL` nu : autorisation générale).
   - `Reset : BOOL;` (en `BOOL` nu : acquittement sur front).
-  - `PowerContactorEngaged : BOOL;` (en `BOOL` nu : chaîne de sécurité et puissance OK).
 - **`VAR_OUTPUT`** :
   - `Ready : BOOL;` (en `BOOL` nu).
   - `Status : ST_FbStatus;` — **forme cible**.
+
+> ⚠️ **`PowerContactorEngaged` n'est PAS un champ du socle `standard`.** Ce n'est pas un troisième
+> `VAR_INPUT` imposé par défaut — c'est une entrée **conditionnelle**, à ajouter **seulement** si
+> le FB pilote lui-même un organe consommant de la puissance (contacteur, frein, moteur) et doit
+> en conséquence interlocker sa propre action sur l'état de la chaîne de puissance. `Reset`/`Error`
+> (gestion de défaut, ex. calibration, capteur hors plage) est une question totalement indépendante
+> de `PowerContactorEngaged` (pilotage d'organe) — les deux ne se déduisent jamais l'un de l'autre.
+> Un FB de pure acquisition/conditionnement qui gère un défaut capteur (donc `Reset`/`Error`
+> légitimes) mais ne pilote **aucun** actionneur ne porte **jamais** `PowerContactorEngaged`.
+> Ajouter ce champ par réflexe de conformité au tableau, sans vérifier que le FB pilote réellement
+> un organe, est une erreur (constaté sur `FB_Joystick` : gate sur `PowerContactorEngaged` sans
+> piloter aucun actionneur, forçait le reset du timer d'armement homme-mort pendant toute la
+> séquence de réarmement AU). Décision au cas par cas, par FB — jamais par copie du tableau.
 
 > ⏳ **Tolérance transitoire (levée à la clôture de T137)** — les FB antérieurs exposent encore ces
 > six membres **à plat** (`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` déclarés
