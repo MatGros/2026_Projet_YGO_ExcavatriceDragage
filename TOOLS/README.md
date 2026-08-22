@@ -18,6 +18,11 @@ TOOLS/
     ├── SAMPLES_CODESYS/
     ├── test_import_poc/
     └── docs/
+├── LINTER_ST/               # Linter ST CODESYS 3.5 (STruCpp vendoré, 100% encapsulé)
+│   ├── resolve_deps.py       # Résolveur de dépendances (types/FB) autonome
+│   ├── lint.py                # Orchestrateur : deps → conversion → compile → diagnostics JSON
+│   └── bin/win32-x64/         # strucpp.exe vendoré (copie propre)
+├── COMPILER_ST2C_STruCpp/   # PoC compilation FB en C++17 pour tests boîte noire (STruCpp)
 ├── PROJECT_WORKSPACE/       # Environnement de travail du projet (AGY, Claude, Codex, OpenCode, Gates, Graph)
 │   ├── README.md             # Documentation et guide (terminaux VS Code)
 │   ├── MARKDOWN_WORKSPACE.md # Édition & cochage des fichiers Markdown (Ctrl+K V)
@@ -135,6 +140,20 @@ Code, seul `.claude/skills/` l'est) : `codesys-change`, `codesys-review`, `doc-s
 - **`WORKFLOW.md`** 🔄 : Cycle d'édition (règles → archi → code → vérif → REX)
 - **`DOC_WRITING.md`** ✍️ : Style documentation (précision = robustesse)
 
+### `LINTER_ST/` — Linter ST (vraies erreurs, zéro faux positif)
+
+🧹 Compile chaque `.st` (+ dépendances résolues automatiquement) via STruCpp vendoré, remonte
+les erreurs réelles en JSON (`file/line/col/message`) — voir `TOOLS/LINTER_ST/README.md`.
+Objectif final : diagnostics live dans VSCode (Problems panel), visibles aussi par les agents IA
+via `getDiagnostics`. Priorité explicite : ne jamais remonter de fausse alerte (dépendance non
+résolue → silence, pas d'erreur inventée).
+
+### `COMPILER_ST2C_STruCpp/` — PoC tests boîte noire
+
+🧪 Compile un FB en C++17 pour le tester en boîte noire (IN/OUT), hors CODESYS — voir
+`TOOLS/COMPILER_ST2C_STruCpp/README.md`. Ne pas confondre avec `LINTER_ST/` : deux outils
+indépendants qui vendorent chacun leur propre copie de STruCpp (pas de lien entre eux).
+
 ### `ST_PLCOPENXML_GENERATOR/` — Compilateur maison
 
 🏭 **Convertisseur autonome** : ST (notre dialecte) → PLCopenXML (format CODESYS universal) :
@@ -156,6 +175,8 @@ Code, seul `.claude/skills/` l'est) : `codesys-change`, `codesys-review`, `doc-s
 | Outil | Indépendance | Dépendances |
 |---|---|---|
 | `ST_PLCOPENXML_GENERATOR` | **100% autonome** | Aucune (Python stdlib + pytest) |
+| `LINTER_ST` | **100% autonome** | Aucune — vendore sa propre copie de STruCpp, aucun lien vers `COMPILER_ST2C_STruCpp` |
+| `COMPILER_ST2C_STruCpp` | **100% autonome** | Aucune — vendore sa propre copie de STruCpp |
 | `AGENT_WORKFLOW` | Orchestration | Appelle le générateur via CLI, n'intègre pas son code |
 
 Ne **jamais** copier du code du générateur dans AGENT_WORKFLOW.
