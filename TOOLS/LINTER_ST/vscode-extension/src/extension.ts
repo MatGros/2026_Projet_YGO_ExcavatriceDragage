@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as cp from 'child_process';
+import * as fs from 'fs';
 
 // Extension minimale (pas de LSP) : diagnostics pousses a la sauvegarde d'un .st, via le
 // linter Python autonome TOOLS/LINTER_ST/lint.py (encapsule, aucune dependance externe a ce
@@ -32,69 +33,176 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.workspace.onDidSaveTextDocument((doc) => {
             if (doc.fileName.toLowerCase().endsWith('.st')) {
-                lintDocument(doc, context);
+                lintFilePath(doc.fileName);
             }
         })
     );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('linterSt.lintSelection', (uri: vscode.Uri, uris?: vscode.Uri[]) =>
+            lintSelectionCommand(uris && uris.length > 0 ? uris : uri ? [uri] : [])
+        ),
+        vscode.commands.registerCommand('linterSt.lintWorkspace', () => lintWorkspaceCommand())
+    );
 }
 
-function lintDocument(doc: vscode.TextDocument, context: vscode.ExtensionContext) {
+/** Resout lint.py + --code-root pour un workspace donne (memes regles que le mode sauvegarde). */
+function resolveLintInvocation(workspaceFolder: vscode.WorkspaceFolder): { pythonPath: string; lintScript: string; codeRoot: string } {
     const config = vscode.workspace.getConfiguration('linterSt');
-
-    if (!config.get<boolean>('enableSyntaxCheck', true)) {
-        // Interrupteur general : coupe la couche base (compilation STruCpp) sans desinstaller
-        // l'extension. La couche standards projet (enableProjectRules) n'existe pas encore --
-        // rien a executer dans ce cas non plus.
-        diagnosticCollection.delete(doc.uri);
-        return;
-    }
-
     const pythonPath = config.get<string>('pythonPath', 'python');
     const codeRootSetting = config.get<string>('codeRoot', 'CODE');
     const lintScriptSetting = config.get<string>('lintScriptPath', 'TOOLS/LINTER_ST/lint.py');
-
-    const workspaceFolder = vscode.workspace.getWorkspaceFolder(doc.uri);
-    if (!workspaceFolder) {
-        outputChannel.appendLine(`[SKIP] ${doc.fileName} -- hors workspace, impossible de resoudre --code-root`);
-        return;
-    }
 
     // lint.py est resolu relativement au WORKSPACE ouvert, pas au dossier d'installation de
     // l'extension (context.extensionPath) : une fois installee via .vsix, l'extension tourne
     // depuis ~/.vscode/extensions/... -- un dossier totalement separe du repo, qui ne contient
     // que le TypeScript compile (le .vsix n'embarque jamais lint.py/resolve_deps.py/strucpp.exe,
     // 58 Mo). Cet outil est fait pour UN repo precis (celui qui porte TOOLS/LINTER_ST/) : on
-    // suppose que le workspace ouvert EST ce repo, comme convert_codesys_to_iec et strucpp.exe
-    // deja verses dans TOOLS/LINTER_ST/ (bug verifie empiriquement, session 2026-08-23 : "python:
-    // can't open file '~/.vscode/extensions/lint.py'" apres install .vsix reelle).
+    // suppose que le workspace ouvert EST ce repo (bug verifie empiriquement, session 2026-08-23).
     const lintScript = path.isAbsolute(lintScriptSetting)
         ? lintScriptSetting
         : path.join(workspaceFolder.uri.fsPath, lintScriptSetting);
     const codeRoot = path.join(workspaceFolder.uri.fsPath, codeRootSetting);
 
-    cp.execFile(
-        pythonPath,
-        [lintScript, doc.fileName, '--code-root', codeRoot],
-        { cwd: workspaceFolder.uri.fsPath, maxBuffer: 10 * 1024 * 1024 },
-        (_error, stdout, stderr) => {
-            // lint.py sort avec un code != 0 pour "errors" (1) et "incomplete" (2) --
-            // execFile remonte ca comme _error, mais stdout reste un JSON valide dans ces deux
-            // cas (seul le code 3, usage, n'a rien d'exploitable sur stdout).
-            let result: LintResult;
-            try {
-                result = JSON.parse(stdout);
-            } catch {
-                outputChannel.appendLine(`[ERREUR] Sortie non-JSON pour ${doc.fileName} :`);
-                outputChannel.appendLine(stdout);
-                if (stderr) {
-                    outputChannel.appendLine(stderr);
-                }
-                return;
-            }
+    return { pythonPath, lintScript, codeRoot };
+}
 
-            applyResult(doc, result);
+/** Lance lint.py sur un fichier, retourne le resultat JSON ou null (erreur usage/sortie non-JSON,
+ * deja loguee dans Output). */
+function runLint(fsPath: string, workspaceFolder: vscode.WorkspaceFolder): Promise<LintResult | null> {
+    const { pythonPath, lintScript, codeRoot } = resolveLintInvocation(workspaceFolder);
+
+    return new Promise((resolve) => {
+        cp.execFile(
+            pythonPath,
+            [lintScript, fsPath, '--code-root', codeRoot],
+            { cwd: workspaceFolder.uri.fsPath, maxBuffer: 10 * 1024 * 1024 },
+            (_error, stdout, stderr) => {
+                // lint.py sort avec un code != 0 pour "errors" (1) et "incomplete" (2) --
+                // execFile remonte ca comme _error, mais stdout reste un JSON valide dans ces
+                // deux cas (seul le code 3, usage, n'a rien d'exploitable sur stdout).
+                try {
+                    resolve(JSON.parse(stdout));
+                } catch {
+                    outputChannel.appendLine(`[ERREUR] Sortie non-JSON pour ${fsPath} :`);
+                    outputChannel.appendLine(stdout);
+                    if (stderr) {
+                        outputChannel.appendLine(stderr);
+                    }
+                    resolve(null);
+                }
+            }
+        );
+    });
+}
+
+async function lintFilePath(fsPath: string): Promise<LintResult | null> {
+    const config = vscode.workspace.getConfiguration('linterSt');
+    if (!config.get<boolean>('enableSyntaxCheck', true)) {
+        // Interrupteur general : coupe la couche base (compilation STruCpp) sans desinstaller
+        // l'extension. La couche standards projet (enableProjectRules) n'existe pas encore --
+        // rien a executer dans ce cas non plus.
+        diagnosticCollection.delete(vscode.Uri.file(fsPath));
+        return null;
+    }
+
+    const uri = vscode.Uri.file(fsPath);
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+    if (!workspaceFolder) {
+        outputChannel.appendLine(`[SKIP] ${fsPath} -- hors workspace, impossible de resoudre --code-root`);
+        return null;
+    }
+
+    const result = await runLint(fsPath, workspaceFolder);
+    if (result) {
+        const doc = await vscode.workspace.openTextDocument(uri);
+        applyResult(doc, result);
+    }
+    return result;
+}
+
+/** Trouve recursivement tous les .st sous un dossier (ou le fichier lui-meme s'il en est un). */
+async function collectStFiles(fsPath: string): Promise<string[]> {
+    const stat = await fs.promises.stat(fsPath);
+    if (stat.isFile()) {
+        return fsPath.toLowerCase().endsWith('.st') ? [fsPath] : [];
+    }
+
+    const out: string[] = [];
+    const entries = await fs.promises.readdir(fsPath, { withFileTypes: true });
+    for (const entry of entries) {
+        const full = path.join(fsPath, entry.name);
+        if (entry.isDirectory()) {
+            out.push(...(await collectStFiles(full)));
+        } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.st')) {
+            out.push(full);
+        }
+    }
+    return out;
+}
+
+async function lintBatch(files: string[], label: string): Promise<void> {
+    if (files.length === 0) {
+        vscode.window.showInformationMessage(`Linter ST : aucun fichier .st trouve dans ${label}.`);
+        return;
+    }
+
+    let errorFiles = 0;
+    let incompleteFiles = 0;
+
+    await vscode.window.withProgress(
+        { location: vscode.ProgressLocation.Notification, title: `Linter ST : analyse de ${label}`, cancellable: false },
+        async (progress) => {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                progress.report({ message: `${i + 1}/${files.length} -- ${path.basename(file)}`, increment: 100 / files.length });
+                const result = await lintFilePath(file);
+                if (result?.status === 'errors') {
+                    errorFiles++;
+                } else if (result?.status === 'incomplete') {
+                    incompleteFiles++;
+                }
+            }
         }
     );
+
+    const parts = [`${files.length} fichier(s) analyse(s)`];
+    if (errorFiles > 0) {
+        parts.push(`${errorFiles} avec erreur(s)`);
+    }
+    if (incompleteFiles > 0) {
+        parts.push(`${incompleteFiles} incomplet(s) (voir Output "Linter ST")`);
+    }
+    const message = `Linter ST -- ${parts.join(', ')}.`;
+    if (errorFiles > 0) {
+        vscode.window.showWarningMessage(message);
+    } else {
+        vscode.window.showInformationMessage(message);
+    }
+}
+
+async function lintSelectionCommand(uris: vscode.Uri[]): Promise<void> {
+    if (uris.length === 0) {
+        vscode.window.showWarningMessage('Linter ST : aucune selection (clic droit sur un dossier ou fichier .st dans l\'Explorateur).');
+        return;
+    }
+    const files: string[] = [];
+    for (const uri of uris) {
+        files.push(...(await collectStFiles(uri.fsPath)));
+    }
+    await lintBatch(files, uris.length === 1 ? path.basename(uris[0].fsPath) : `${uris.length} elements selectionnes`);
+}
+
+async function lintWorkspaceCommand(): Promise<void> {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+        vscode.window.showWarningMessage('Linter ST : aucun workspace ouvert.');
+        return;
+    }
+    const codeRootSetting = vscode.workspace.getConfiguration('linterSt').get<string>('codeRoot', 'CODE');
+    const codeRoot = path.join(workspaceFolder.uri.fsPath, codeRootSetting);
+    const files = await collectStFiles(codeRoot);
+    await lintBatch(files, codeRootSetting);
 }
 
 function applyResult(doc: vscode.TextDocument, result: LintResult) {
