@@ -1243,13 +1243,27 @@ def save_tasks_html(tasks, output_path: Path):
         render();
         updateSyncIndicator();
     </script>
-
 </body>
 </html>
 """
+
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
 
+
+def load_tasks_yaml(yaml_path: Path):
+
+
+    """Charge les tâches depuis TASKS.yaml."""
+    if not yaml_path.exists():
+        return []
+    with open(yaml_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    if isinstance(data, dict) and "tasks" in data:
+        return data["tasks"]
+    elif isinstance(data, list):
+        return data
+    return []
 
 
 def main():
@@ -1257,8 +1271,11 @@ def main():
     print("🔄 GÉNÉRATION DU CATALOGUE OFFICIEL (TASKS.yaml & TASKS.html)")
     print("=" * 60)
 
-    tasks = parse_plan_task_md(PLAN_TASK_MD)
-    save_tasks_yaml(tasks, TASKS_YAML)
+    # 1. Si TASKS.yaml existe, c'est la source de vérité !
+    tasks = load_tasks_yaml(TASKS_YAML)
+    if not tasks:
+        tasks = parse_plan_task_md(PLAN_TASK_MD)
+        save_tasks_yaml(tasks, TASKS_YAML)
     
     html_path = WFLOW_DIR / "TASK_VIEWER.html"
     save_tasks_html(tasks, html_path)
@@ -1272,6 +1289,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
