@@ -73,13 +73,19 @@ def save_tasks_html(tasks, output_path: Path):
             --cyan: #8be9fd;
             --red: #ff5555;
         }}
+        html {{
+            scroll-behavior: smooth;
+        }}
         body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
             padding: 20px;
+            overflow-y: scroll; /* Force une barre de défilement permanente pour éviter les sauts de largeur */
         }}
+
+
         .header {{
             display: flex;
             justify-content: space-between;
