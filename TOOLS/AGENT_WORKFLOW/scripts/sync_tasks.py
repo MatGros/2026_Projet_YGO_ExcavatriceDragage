@@ -244,10 +244,17 @@ def save_tasks_html(tasks, output_path: Path):
             margin-bottom: 16px;
         }}
         .title {{ font-size: 20px; font-weight: bold; color: var(--accent); }}
-        .stats {{ display: flex; gap: 10px; font-size: 13px; }}
         .badge {{ padding: 3px 8px; border-radius: 6px; font-weight: bold; }}
         .badge-done {{ background: rgba(80, 250, 123, 0.2); color: var(--green); }}
         .badge-lock {{ background: rgba(255, 184, 108, 0.2); color: var(--orange); }}
+        .badge-wait {{ background: rgba(139, 233, 253, 0.2); color: var(--cyan); }}
+        .badge-todo {{ background: rgba(166, 173, 200, 0.2); color: var(--subtext); }}
+
+        @keyframes pulse {{
+            0% {{ opacity: 1; transform: scale(1); }}
+            50% {{ opacity: 0.4; transform: scale(1.2); }}
+            100% {{ opacity: 1; transform: scale(1); }}
+        }}
         .badge-open {{ background: rgba(139, 233, 253, 0.2); color: var(--cyan); }}
         
         .controls {{
@@ -519,8 +526,18 @@ def save_tasks_html(tasks, output_path: Path):
         <button class="filter-btn" onclick="setDomain('CYCLE', this)">⚙️ Cycle</button>
         
         <button class="btn-action btn-save" onclick="openNewTaskModal()">➕ Nouvelle Tâche</button>
-        <button class="btn-action btn-primary" onclick="exportJsonYaml()">💾 Copier / Exporter</button>
+        
+        <div id="sync-warning-badge" style="display:none; align-items:center; gap:8px; background: rgba(255, 85, 85, 0.15); border: 1px solid #ff5555; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #ff5555; font-weight: bold;">
+            <span style="width:10px; height:10px; background:#ff5555; border-radius:50%; box-shadow:0 0 10px #ff5555; animation: pulse 1.2s infinite; display:inline-block;"></span>
+            <span>Modifications non exportées</span>
+        </div>
+
+        <button class="btn-action btn-primary" onclick="exportJsonYaml()" id="btn-export">
+            <span>💾 Exporter TASKS.yaml</span>
+        </button>
     </div>
+
+
     
     <div class="table-container">
         <table>
@@ -654,25 +671,62 @@ def save_tasks_html(tasks, output_path: Path):
 
     <script>
 
-        // Toujours charger la base officielle fraîche injectée dans le fichier
+        // Chargement intelligent : si des modifications locales non exportées existent, les conserver !
         const defaultTasks = {tasks_json};
-        let tasks = [...defaultTasks];
+        let tasks = [];
+        let hasUnsavedChanges = false;
 
-        function persistTasks() {{
-            try {{
-                localStorage.setItem('TASK_VIEWER_DATA', JSON.stringify(tasks));
-            }} catch(e) {{}}
+        try {{
+            const savedChanges = localStorage.getItem('TASK_VIEWER_UNSAVED');
+            const savedData = localStorage.getItem('TASK_VIEWER_DATA');
+            if (savedChanges === 'true' && savedData) {{
+                tasks = JSON.parse(savedData);
+                hasUnsavedChanges = true;
+            }} else {{
+                tasks = [...defaultTasks];
+                hasUnsavedChanges = false;
+            }}
+        }} catch(e) {{
+            tasks = [...defaultTasks];
+            hasUnsavedChanges = false;
         }}
 
+        function updateSyncIndicator() {{
+            const badge = document.getElementById('sync-warning-badge');
+            const btn = document.getElementById('btn-export');
+            if (!badge || !btn) return;
 
+            if (hasUnsavedChanges) {{
+                badge.style.display = 'inline-flex';
+                btn.style.background = '#bd93f9';
+                btn.style.color = '#000';
+            }} else {{
+                badge.style.display = 'none';
+                btn.style.background = 'var(--primary)';
+                btn.style.color = '#fff';
+            }}
+        }}
+
+        function persistTasks() {{
+            hasUnsavedChanges = true;
+            updateSyncIndicator();
+            try {{
+                localStorage.setItem('TASK_VIEWER_DATA', JSON.stringify(tasks));
+                localStorage.setItem('TASK_VIEWER_UNSAVED', 'true');
+            }} catch(e) {{}}
+        }}
 
         function resetToOfficial() {{
             if (confirm('Voulez-vous réinitialiser le catalogue avec les données officielles du projet ?')) {{
                 localStorage.removeItem('TASK_VIEWER_DATA');
+                localStorage.removeItem('TASK_VIEWER_UNSAVED');
                 tasks = [...defaultTasks];
+                hasUnsavedChanges = false;
+                updateSyncIndicator();
                 render();
             }}
         }}
+
 
         let currentStatus = 'ALL';
         let currentDomain = 'ALL';
@@ -1056,6 +1110,9 @@ def save_tasks_html(tasks, output_path: Path):
                     const writable = await handle.createWritable();
                     await writable.write(yamlText);
                     await writable.close();
+                    localStorage.removeItem('TASK_VIEWER_UNSAVED');
+                    hasUnsavedChanges = false;
+                    updateSyncIndicator();
                     alert('✅ Fichier TASKS.yaml enregistré directement sur votre disque !');
                     return;
                 }} catch (err) {{
@@ -1073,7 +1130,12 @@ def save_tasks_html(tasks, output_path: Path):
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            localStorage.removeItem('TASK_VIEWER_UNSAVED');
+            hasUnsavedChanges = false;
+            updateSyncIndicator();
         }}
+
+
 
 
 
