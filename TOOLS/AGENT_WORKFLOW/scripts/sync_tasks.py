@@ -313,7 +313,7 @@ def save_tasks_html(tasks, output_path: Path):
             border-bottom: 2px solid var(--border);
         }}
         th {{
-            padding: 10px 12px;
+            padding: 6px 8px;
             font-weight: bold;
             color: var(--accent);
             white-space: nowrap;
@@ -339,9 +339,10 @@ def save_tasks_html(tasks, output_path: Path):
             background: rgba(189, 147, 249, 0.2);
         }}
         td {{
-            padding: 8px 12px;
+            padding: 5px 8px;
             vertical-align: middle;
         }}
+
 
         /* Couleurs de criticité - Texte direct sans fond */
         .col-crit {{
@@ -525,14 +526,15 @@ def save_tasks_html(tasks, output_path: Path):
         <table>
             <thead>
                 <tr>
-                    <th style="width: 45px;" onclick="sortBy('statut')" id="th-statut">État ↕</th>
-                    <th style="width: 85px;" onclick="sortBy('id')" id="th-id">ID ↕</th>
-                    <th style="width: 65px;" onclick="sortBy('parent_id')" id="th-parent_id">Parent ↕</th>
-                    <th style="width: 70px;" onclick="sortBy('agent')" id="th-agent">Agent ↕</th>
-                    <th style="width: 110px;" onclick="sortBy('date')" id="th-date">Date ↕</th>
-                    <th style="width: 35px;" onclick="sortBy('criticite')" id="th-criticite">Crit. ↕</th>
-                    <th style="width: 100px;" onclick="sortBy('domaine')" id="th-domaine">Domaine ↕</th>
+                    <th style="width: 40px; text-align: center;" onclick="sortBy('statut')" id="th-statut">État ↕</th>
+                    <th style="width: 75px;" onclick="sortBy('id')" id="th-id">ID ↕</th>
+                    <th style="width: 55px;" onclick="sortBy('parent_id')" id="th-parent_id">Parent ↕</th>
+                    <th style="width: 60px;" onclick="sortBy('agent')" id="th-agent">Agent ↕</th>
+                    <th style="width: 95px;" onclick="sortBy('date')" id="th-date">Date ↕</th>
+                    <th style="width: 30px; text-align: center;" onclick="sortBy('criticite')" id="th-criticite">Crit. ↕</th>
+                    <th style="width: 85px;" onclick="sortBy('domaine')" id="th-domaine">Domaine ↕</th>
                     <th onclick="sortBy('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier la ligne) ↕</th>
+
                 </tr>
             </thead>
             <tbody id="table-body"></tbody>
