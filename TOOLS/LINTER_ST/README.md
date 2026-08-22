@@ -76,6 +76,14 @@ avalé silencieusement. Vérifié empiriquement (session 2026-08-23, typo `INT_I
   serait pas résolu automatiquement.
 - Binaire `strucpp.exe` vendoré = version figée. Mise à jour manuelle si besoin (voir
   [releases STruCpp](https://github.com/Autonomy-Logic/STruCpp/releases)).
+- ⚠️ **GVL avec `{attribute 'qualified_only'}` (ex: `GVL_IHM`, `GVL_Global`)** : `resolve_deps.py`
+  les trouve et les inclut désormais dans la compilation (elles n'ont aucun mot-clé de
+  déclaration, indexées par nom de fichier), mais STruCpp lève ensuite `Undeclared variable
+  'GVL_XXX'` en cascade sur les PRG qui y accèdent en écriture qualifiée. Cause probable :
+  `linter_st_convert_codesys_to_iec.py` supprime `{attribute 'qualified_only'}` comme un pragma
+  cosmétique, alors qu'il change la sémantique d'accès (`GVL_IHM.Membre` vs `Membre` nu). **Pas
+  encore corrigé** (trouvé session 2026-08-23, sur `PRG_07_Supervision.st`) — un PRG qui lit/écrit
+  une GVL qualifiée remonte des faux positifs "Undeclared variable" tant que ce n'est pas réglé.
 
 ## 🖥️ Extension VSCode (`vscode-extension/`)
 
