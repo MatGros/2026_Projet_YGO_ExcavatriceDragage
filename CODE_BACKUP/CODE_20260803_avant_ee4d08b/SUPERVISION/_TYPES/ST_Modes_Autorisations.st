@@ -1,0 +1,21 @@
+(* ═══════════════════════════════════════════════════════════════
+   🎚️ ST_Modes_Autorisations — Bus d'autorisations du mode machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF_Partie-05_Modes_Maintenance_v2.0.md
+                   DOC/AF_Partie-02_Architecture_Programme_v3.0.md §2
+   🎯 Produit par FB_Modes (via PRG_MODES_CFC)
+      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_Modes_Autorisations :
+STRUCT
+    Mode                        : E_Mode;     // Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)
+    SyncEnable                  : BOOL;       // Synchro M1/M2 (logique positive)
+    InhibitM1                   : BOOL;       // Inhibition M1 (MAINT_N2 only)
+    InhibitM2                   : BOOL;       // Inhibition M2 (MAINT_N2 only)
+    JoystickWinchSelectArbitrated : INT;      // 1=M1, 2=M2, 3=Couplé (N2 only)
+    HomingApproachEnable        : BOOL;       // Dépassement butée haut (N2)
+    MaintenanceM3TargetEnable   : BOOL;       // Cible Translation Maintenance (N2 only)
+END_STRUCT
+END_TYPE

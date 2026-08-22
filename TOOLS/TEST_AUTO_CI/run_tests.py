@@ -25,8 +25,8 @@ import tempfile
 import yaml
 
 import chronogram
-from af_coverage import check_af_coverage
-from html_report import render_html_report
+from af_coverage import check_af_coverage, check_extra_tests
+from html_report import render_group_report, render_html_report
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TEST_AUTO_CI = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"
@@ -176,9 +176,11 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                 trace_entries, field_types = [], {}
 
         af_warnings = []
+        extra_test_warnings = []
         af_doc = entry.get("af_doc")
         if af_doc:
             af_warnings = check_af_coverage(REPO_ROOT / af_doc, test_file)
+            extra_test_warnings = check_extra_tests(REPO_ROOT / af_doc, test_file)
 
         reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
         reports_dir.mkdir(parents=True, exist_ok=True)
@@ -187,16 +189,21 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         base = reports_dir / fb_name
         shutil.copyfile(test_file, reports_dir / f"{fb_name}_test.st")
         report_path = None
+        report_group = entry.get("report_group")
+
+        section_kwargs = dict(fb_name=fb_name, domain=domain, sources=entry["sources"],
+                               json_data=json_data or {}, text_report=text_report,
+                               test_st_path=test_file, trace_entries=trace_entries,
+                               source_paths=sources, cycle_time_ms=cycle_time_ms,
+                               field_types=field_types, af_warnings=af_warnings,
+                               extra_test_warnings=extra_test_warnings)
 
         if json_data is not None:
             (base.with_suffix(".json")).write_text(json.dumps(json_data, indent=2), encoding="utf-8")
-            html = render_html_report(fb_name=fb_name, domain=domain, test_file=str(entry["test"]),
-                                       sources=entry["sources"], json_data=json_data, text_report=text_report,
-                                       test_st_path=test_file, trace_entries=trace_entries,
-                                       source_paths=sources, cycle_time_ms=cycle_time_ms,
-                                       field_types=field_types, af_warnings=af_warnings)
-            base.with_suffix(".html").write_text(html, encoding="utf-8")
-            report_path = base.with_suffix(".html")
+            if not report_group:
+                html = render_html_report(**section_kwargs, test_file=str(entry["test"]))
+                base.with_suffix(".html").write_text(html, encoding="utf-8")
+                report_path = base.with_suffix(".html")
         else:
             base.with_suffix(".txt").write_text(text_report, encoding="utf-8")
             report_path = base.with_suffix(".txt")
@@ -214,7 +221,9 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         if not tests:
             tests = [{"name": "(pas de resultat JSON)", "passed": result.returncode == 0, "detail": ""}]
 
-        return {"ok": result.returncode == 0, "tests": tests, "report": report_path, "af_warnings": af_warnings}
+        return {"ok": result.returncode == 0, "tests": tests, "report": report_path,
+                "af_warnings": af_warnings, "extra_test_warnings": extra_test_warnings,
+                "report_group": report_group, "section_kwargs": section_kwargs}
 
 
 def main() -> int:
@@ -254,6 +263,26 @@ def main() -> int:
     else:
         results = {name: run_one(name, entry, cycle_time_ms, args.debug) for name, entry in registry.items()}
 
+    # Fiches de rapport groupees : plusieurs FB independants (compiles/testes separement)
+    # partagent UNE seule page HTML -- registry.yaml en decide via "report_group".
+    groups: dict = {}
+    for name, res in results.items():
+        rg = res.get("report_group")
+        if rg:
+            groups.setdefault(rg, []).append(name)
+    group_report_paths = {}
+    for group_name, members in groups.items():
+        domain = registry[members[0]]["domain"]
+        reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        _archive_previous(reports_dir, group_name)
+        html = render_group_report(group_name, [results[m]["section_kwargs"] for m in members])
+        path = reports_dir / f"{group_name}.html"
+        path.write_text(html, encoding="utf-8")
+        for m in members:
+            results[m]["report"] = path
+        group_report_paths[group_name] = path
+
     print("=== RESUME ===")
     for name, res in results.items():
         print(f"{_c('PASS' if res['ok'] else 'FAIL', res['ok'])}  {name}")
@@ -264,8 +293,12 @@ def main() -> int:
             print(line)
         for tc_id, intention in res.get("af_warnings", []):
             print(f"  {_warn('WARN')}  {tc_id} attendu par l AF (type AUTO) mais absent des tests -- {intention}")
-        if res["report"]:
+        for tc_id in res.get("extra_test_warnings", []):
+            print(f"  {_warn('WARN')}  {tc_id} teste mais absent du catalogue AF (ID inconnu ou retire)")
+        if res["report"] and not res.get("report_group"):
             print(f"  Rapport : {res['report']}")
+    for group_name, path in group_report_paths.items():
+        print(f"Rapport groupe {group_name} : {path}")
     n_fail = sum(1 for res in results.values() if not res["ok"])
     summary = f"{len(results)} FB testes, {len(results) - n_fail} PASS, {n_fail} FAIL"
     print(f"\n{_c(summary, n_fail == 0)}")
