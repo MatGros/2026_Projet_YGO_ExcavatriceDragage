@@ -7,10 +7,17 @@
 FB_Encoder:
   domain: CODEURS
   af_doc: DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
-  # NB : pas de prod_instance -- FB_Encoder n'est pas encore instancie dans un PRG (aucun
-  # appel FB_Encoder(...) trouve sous CODE/ au 2026-08-22). Smoke test seul pour l'instant :
-  # valide la population IN/OUT du rapport (structs ST_EncoderHw/ST_Encoder_Calib/
-  # ST_EncoderMeasurement, VAR_IN_OUT Calib), pas encore le catalogue de tests AF-09.
+  # Deux instances production (un FB, deux treuils) -- le rapport affiche un bloc pinout par
+  # instance avec son cablage reel propre (instEncoderM1 != instEncoderM2). Smoke test seul
+  # pour l'instant : valide la population IN/OUT du rapport (structs ST_EncoderHw/
+  # ST_Encoder_Calib/ST_EncoderMeasurement, VAR_IN_OUT Calib), pas encore le catalogue AF-09.
+  prod_instances:
+    - file: CODE/M_MAIN/PRG_02_Acquisition.st
+      name: instEncoderM1
+      label: M1
+    - file: CODE/M_MAIN/PRG_02_Acquisition.st
+      name: instEncoderM2
+      label: M2
   sources:
     - CODE/A_COMMUN/E_State.st
     - CODE/A_COMMUN/ST_FbStatus.st
@@ -67,6 +74,29 @@ FB_Acquisition_Preflight:
   sources:
     - CODE/A_COMMUN/FB_Acquisition_Preflight.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_acquisition_preflight.st
+
+FB_FbStatus:
+  domain: A_COMMUN
+  report_group: A_COMMUN
+  af_doc: DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+  # TC-P03-004 (pas de SafeStop/StartStop hors mouvement) et TC-P03-005 (encapsulation stricte)
+  # sont des regles transverses a TOUS les composants du catalogue AF_Partie-03, pas specifiques
+  # a FB_FbStatus -- TC-P03-005 est deja prouve mecaniquement par encapsulation_check.py (section
+  # Encapsulation du rapport), TC-P03-004 n'a pas de sens pour un socle statut (pas un FB
+  # mouvement). Hors perimetre de CE fichier de test, pas un oubli.
+  af_ignore: [TC-P03-004, TC-P03-005]
+  sources:
+    - CODE/A_COMMUN/E_State.st
+    - CODE/A_COMMUN/ST_FbStatus.st
+    - CODE/A_COMMUN/FB_FbStatus.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st
+
+FB_Filter:
+  domain: A_COMMUN
+  report_group: A_COMMUN
+  sources:
+    - CODE/A_COMMUN/FB_Filter.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_filter.st
 
 FB_Brake:
   domain: A_COMMUN

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T11:33:24.636955" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T11:33:24.636955">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T12:39:29.319093" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T12:39:29.319093">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -272,18 +272,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Textes des warnings (par bit)</xhtml>
               </documentation>
             </variable>
-            <variable name="RotatePeriod">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#1S" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIG DISPLAY ===
---&gt; [CFG] Période de rotation texte multi-erreurs</xhtml>
-              </documentation>
-            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -322,14 +310,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front apparition cause fault (ré-alarme)</xhtml>
               </documentation>
             </variable>
-            <variable name="RotateTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Rotation du texte affiché (multi-erreurs)</xhtml>
-              </documentation>
-            </variable>
             <variable name="FaultCause">
               <type>
                 <WORD />
@@ -355,12 +335,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] code fault mémorisé (jusqu'au Reset)</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrIdx">
+            <variable name="i">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] index de rotation du texte (multi-erreurs)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] index de boucle (recherche du premier bit actif)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -394,7 +374,6 @@ IF NOT Enable THEN
     Status.ResetRequested := FALSE;
     Status.WarningIdTxt := ''; Status.ErrorIdTxt := '';
     ErrorIdLatched := 0; FaultCause := 0; WarningCause := 0;
-    RotateTimer(IN := FALSE, PT := RotatePeriod);
     RETURN;
 END_IF;
 Status.State := E_State.READY;
@@ -413,89 +392,53 @@ IF ResetEdge.Q THEN
     ErrorIdLatched := 0;
 END_IF;
 // 4. Ré-alarme : nouvelle apparition d'un fault non encore acquitté -&gt; relatte
-FaultEdge(CLK := (FaultCause &lt;&gt; 16#0000));
+FaultEdge(CLK := (FaultCause &lt;&gt; 0));
 IF FaultEdge.Q THEN
     ErrorIdLatched := ErrorIdLatched OR FaultCause;
 END_IF;
 // 5. Mémoire de l'état au défaut
-IF (FaultCause &lt;&gt; 16#0000) THEN
+IF (FaultCause &lt;&gt; 0) THEN
     Status.StateAtError := Status.State;
 END_IF;
-// 6. Sorties défaut : affiché = laté OU cause courante
-Status.ErrorId := ErrorIdLatched OR FaultCause;
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-Status.ResetRequested := (ErrorIdLatched &lt;&gt; 16#0000);
+// 6. Sorties défaut : ErrorId = TOUS les bits (fault laté + warning auto-effacé).
+//    WarningId reste le sous-ensemble warning (affichage IHM orange).
+Status.ErrorId := ErrorIdLatched OR FaultCause OR WarningCause;
+Status.Error := (Status.ErrorId &lt;&gt; 0);
+Status.ResetRequested := (ErrorIdLatched &lt;&gt; 0);
 {endregion}
 
 {region "§4 Warning auto-effacé"}
 Status.WarningId := WarningCause;
-Status.Warning := (WarningCause &lt;&gt; 16#0000);
+Status.Warning := (WarningCause &lt;&gt; 0);
 {endregion}
 
-{region "§5 Textes IHM + rotation 1s"}
-// 8. Sélection du texte : on affiche le texte du bit le plus bas encore présent.
-//    S'il y a plusieurs erreurs/warnings, l'affichage tourne toutes les RotatePeriod.
+{region "§5 Textes IHM"}
+// 8. Sélection du texte : on affiche le texte du premier bit actif (le plus bas).
+//    Parcours par boucle FOR + SHR (décalage) -&gt; on lit le bit directement, aucun masque.
 Status.ErrorIdTxt := '';
 Status.WarningIdTxt := '';
 
-// Rotation de l'index de départ (pour faire défiler les textes multi-erreurs)
-RotateTimer(IN := (Status.ErrorId &lt;&gt; 16#0000) OR (Status.WarningId &lt;&gt; 16#0000),
-            PT := RotatePeriod);
-IF RotateTimer.Q THEN
-    ErrIdx := (ErrIdx + 1) MOD 16;
-    RotateTimer(IN := FALSE, PT := RotatePeriod);
-END_IF;
-
-// -- Texte ERROR : premier bit set à partir de ErrIdx (circulaire) --
-IF Status.ErrorId &lt;&gt; 16#0000 THEN
-    // scan 16 bits, départ ErrIdx
-    // (boucle simple : les blocs métier gardent peu de bits -&gt; OK performance)
-    // remplit ErrorIdTxt avec le texte du bit le plus bas set
-    IF (Status.ErrorId AND 16#0001) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[0];
-    ELSIF (Status.ErrorId AND 16#0002) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[1];
-    ELSIF (Status.ErrorId AND 16#0004) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[2];
-    ELSIF (Status.ErrorId AND 16#0008) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[3];
-    ELSIF (Status.ErrorId AND 16#0010) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[4];
-    ELSIF (Status.ErrorId AND 16#0020) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[5];
-    ELSIF (Status.ErrorId AND 16#0040) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[6];
-    ELSIF (Status.ErrorId AND 16#0080) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[7];
-    ELSIF (Status.ErrorId AND 16#0100) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[8];
-    ELSIF (Status.ErrorId AND 16#0200) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[9];
-    ELSIF (Status.ErrorId AND 16#0400) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[10];
-    ELSIF (Status.ErrorId AND 16#0800) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[11];
-    ELSIF (Status.ErrorId AND 16#1000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[12];
-    ELSIF (Status.ErrorId AND 16#2000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[13];
-    ELSIF (Status.ErrorId AND 16#4000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[14];
-    ELSIF (Status.ErrorId AND 16#8000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[15];
+// -- Texte ERROR : premier bit actif --
+FOR i := 0 TO 15 DO
+    IF (SHR(Status.ErrorId, i) AND 1) &lt;&gt; 0 THEN
+        Status.ErrorIdTxt := ErrorTexts[i];
+        EXIT;
     END_IF;
-END_IF;
+END_FOR;
 
-// -- Texte WARNING : premier bit set --
-IF Status.WarningId &lt;&gt; 16#0000 THEN
-    IF (Status.WarningId AND 16#0001) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[0];
-    ELSIF (Status.WarningId AND 16#0002) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[1];
-    ELSIF (Status.WarningId AND 16#0004) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[2];
-    ELSIF (Status.WarningId AND 16#0008) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[3];
-    ELSIF (Status.WarningId AND 16#0010) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[4];
-    ELSIF (Status.WarningId AND 16#0020) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[5];
-    ELSIF (Status.WarningId AND 16#0040) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[6];
-    ELSIF (Status.WarningId AND 16#0080) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[7];
-    ELSIF (Status.WarningId AND 16#0100) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[8];
-    ELSIF (Status.WarningId AND 16#0200) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[9];
-    ELSIF (Status.WarningId AND 16#0400) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[10];
-    ELSIF (Status.WarningId AND 16#0800) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[11];
-    ELSIF (Status.WarningId AND 16#1000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[12];
-    ELSIF (Status.WarningId AND 16#2000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[13];
-    ELSIF (Status.WarningId AND 16#4000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[14];
-    ELSIF (Status.WarningId AND 16#8000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[15];
+// -- Texte WARNING : premier bit actif --
+FOR i := 0 TO 15 DO
+    IF (SHR(Status.WarningId, i) AND 1) &lt;&gt; 0 THEN
+        Status.WarningIdTxt := WarningTexts[i];
+        EXIT;
     END_IF;
-END_IF;
+END_FOR;
 {endregion}
 
-// Busy/Done : conditionneur toujours prêt -&gt; Busy/Done FALSE (usage métier)
-Status.Busy := FALSE;
-Status.Done := FALSE;
-
+// Busy/Done : pilotés par le FB MÉTIER (cycle propre), pas par le socle.
+// Le socle ne décide pas du cycle du FB métier — il gère Error/Warning/State/textes.
+// Un conditionneur synchrone (ex. joystick) les laisse à FALSE ; un organe à cycle
+// (treuil, séquenceur) les pilote lui-même après l'appel du socle.
 </xhtml>
           </ST>
         </body>

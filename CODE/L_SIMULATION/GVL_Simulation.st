@@ -38,6 +38,8 @@ VAR_GLOBAL
     SimJoystickRawX                    : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
     SimJoystickRawY                    : INT := 5000;  // Stimulus analogique avancé 0..10000, utilisé sans bouton directionnel
     SimJoystickRawButton               : BOOL := FALSE; // Homme-mort brut : TRUE = bouton joystick appuyé
+    SimJoystickOvershoot_Active        : BOOL := FALSE; // TRUE = dépassement de montée au-delà de 100% (défaut capteur hors plage)
+    SimJoystickBagotement_Active       : BOOL := FALSE; // TRUE = bagotement au relâchement (petit balancement autour du neutre)
 
     // 🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
     SimEncoderSpeedFactor       : REAL := 1.0;  // Multiplicateur vitesse codeurs simulés ; 1.0 = nominal

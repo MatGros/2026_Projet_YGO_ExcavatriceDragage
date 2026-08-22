@@ -306,10 +306,13 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
                         json_data: dict, text_report: str = "", test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
                         field_types=None, af_warnings=None, extra_test_warnings=None,
-                        wiring=None, encapsulation_report=None) -> dict:
+                        wirings=None, encapsulation_report=None) -> dict:
     """Construit le contenu d'un FB (sous-titre + warning AF + cartes de test + details
     sources) SANS l'enveloppe de page complete -- reutilise a l'identique par un rapport
-    mono-FB (render_html_report) et un rapport groupe multi-FB (render_group_report)."""
+    mono-FB (render_html_report) et un rapport groupe multi-FB (render_group_report).
+    wirings : liste de {"label": str|None, "wiring": dict|None} -- un element par instance
+    production configuree (registry.yaml prod_instances), ou un seul element label=None pour
+    un FB mono-instance / pas encore instancie (retro-compat prod_instance singulier)."""
     field_types = field_types or {}
     af_warnings = af_warnings or []
     extra_test_warnings = extra_test_warnings or []
@@ -419,7 +422,10 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         </table>
     </details>"""
 
-    pin_diagram_html = _render_pin_diagram(fb_name, wiring)
+    pin_diagram_html = "".join(
+        _render_pin_diagram(fb_name, item.get("wiring"), label=item.get("label"))
+        for item in (wirings or [])
+    )
 
     body_html = f"""
     <div class="subtitle">
@@ -638,13 +644,15 @@ def _page_shell(title: str, inner_html: str, all_pass: bool = True) -> str:
 """
 
 
-def _render_pin_diagram(fb_name: str, wiring: dict | None) -> str:
+def _render_pin_diagram(fb_name: str, wiring: dict | None, label: str | None = None) -> str:
     """Bloc pinout FBD-like : pins IN/IN_OUT a gauche, OUT a droite, autour d'un rectangle
     central portant le nom du FB. L'interface (liste/type/ordre des pins) vient exclusivement
     du compilateur (generated.hpp, via prod_wiring.extract_pins) -- jamais du .st. Le cablage
     affiche a cote de chaque pin (expression reelle en production) vient du point
     d'instanciation .st -- seule source qui la connaisse. Non bloquant : degrade en pinout nu
-    si aucun cablage de production n'est configure/trouve."""
+    si aucun cablage de production n'est configure/trouve. `label` distingue plusieurs
+    instances production d'un meme FB (ex: instEncoderM1/instEncoderM2) -- un bloc par
+    instance, chacun avec son propre cablage reel."""
     if not wiring or not any(wiring.get("pins", {}).values()):
         return ""
 
@@ -699,13 +707,15 @@ def _render_pin_diagram(fb_name: str, wiring: dict | None) -> str:
             <ul>{items}</ul>
         </div>"""
 
+    summary_txt = f"🔌 Interface & câblage production — {_html.escape(label)}" if label else "🔌 Interface & câblage production"
+    block_label = f"{_html.escape(fb_name)} ({_html.escape(label)})" if label else _html.escape(fb_name)
     return f"""
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
+        <summary>{summary_txt}</summary>
         {warnings_html}
         <div class="pin-diagram">
             <div class="pin-col pin-col-in">{left_html}</div>
-            <div class="pin-block">{_html.escape(fb_name)}</div>
+            <div class="pin-block">{block_label}</div>
             <div class="pin-col pin-col-out">{right_html}</div>
         </div>
     </details>"""
@@ -739,11 +749,11 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
                         json_data: dict, text_report: str, test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
                         field_types=None, af_warnings=None, extra_test_warnings=None,
-                        wiring=None, encapsulation_report=None) -> str:
+                        wirings=None, encapsulation_report=None) -> str:
     """Rapport HTML autonome pour UN SEUL FB."""
     section = _render_fb_section(fb_name, domain, sources, json_data, text_report, test_st_path,
                                   trace_entries, source_paths, cycle_time_ms, field_types,
-                                  af_warnings, extra_test_warnings, wiring, encapsulation_report)
+                                  af_warnings, extra_test_warnings, wirings, encapsulation_report)
     exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     toc_html = _render_toc([(None, section["toc_entries"])])
     inner = f"""
