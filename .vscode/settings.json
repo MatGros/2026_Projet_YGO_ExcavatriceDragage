@@ -6,5 +6,13 @@
         "TOOLS/OUTILS_ST2PY/RESULTS"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.cwd": "${workspaceFolder}"
+    "python.testing.cwd": "${workspaceFolder}",
+
+    // 🗂️ Configuration Data Preview (Random Fractals) pour TASKS.yaml
+    "data.preview.rowHeight": 60,
+    "data.preview.headerHeight": 32,
+    "data.preview.autoResizeColumns": true,
+    "data.preview.viewType": "grid",
+    "data.preview.theme": "dark"
 }
+
