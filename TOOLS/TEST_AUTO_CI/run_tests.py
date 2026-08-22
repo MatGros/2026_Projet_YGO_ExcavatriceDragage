@@ -17,6 +17,7 @@ import datetime as _dt
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -134,7 +135,15 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         if debug:
             print(*a)
 
-    print(f"-> {fb_name} ({domain})...", flush=True)
+    try:
+        n_tests_declared = len(re.findall(r"^TEST\s+'", test_file.read_text(encoding="utf-8"), re.MULTILINE))
+    except OSError:
+        n_tests_declared = None
+
+    def _progress_line(phase: str) -> str:
+        return f"-> {fb_name} ({domain})... {phase}".ljust(70)
+
+    print(_progress_line("conversion"), end="", flush=True)
     _log(f"\n=== {fb_name} (domaine {domain}) ===")
 
     with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_") as tmp:
@@ -143,6 +152,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8")
         _log(result.stdout)
         if result.returncode != 0:
+            print()
             print(f"[ERREUR] Conversion echouee pour {fb_name}")
             print(result.stderr, file=sys.stderr)
             return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}], "report": None}
@@ -152,8 +162,18 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         tmp_root = pathlib.Path(tempfile.gettempdir())
         before = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
 
+        # Lance en streaming (pas subprocess.run) pour afficher les etapes reelles en direct --
+        # la conversion/compilation C++ (strucpp+g++) est la partie longue ; l'execution des
+        # tests eux-memes est quasi instantanee (temps SIMULE via ADVANCE_TIME, pas du temps
+        # reel) -- donc pas de compteur test-par-test utile, seulement les phases qui prennent
+        # reellement du temps machine.
+        print(f"\r{_progress_line('compilation')}", end="", flush=True)
         strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "--test", str(test_file)]
-        result = subprocess.run(strucpp_cmd, capture_output=True, text=True, encoding="utf-8", cwd=str(converted_dir))
+        proc = subprocess.Popen(strucpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                 text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1)
+        lines = list(proc.stdout)
+        proc.wait()
+        result = subprocess.CompletedProcess(strucpp_cmd, proc.returncode, "".join(lines), "")
         text_report = result.stdout + result.stderr
         _log(text_report)
 
@@ -169,6 +189,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                     json_data = json.loads(json_result.stdout)
                 except json.JSONDecodeError:
                     json_data = None
+            print(f"\r{_progress_line('chronogramme')}", end="", flush=True)
             try:
                 trace_entries, field_types = chronogram.build_and_run_traced(
                     strucpp_temp_dir, RUNTIME_INCLUDE, RUNTIME_TEST, fb_name.upper())
@@ -179,6 +200,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         wiring = None
         prod_instance = entry.get("prod_instance")
         if strucpp_temp_dir is not None and prod_instance:
+            print(f"\r{_progress_line('cablage production')}", end="", flush=True)
             try:
                 wiring = prod_wiring.build_wiring(
                     strucpp_temp_dir / "generated.hpp", fb_name.upper(),
@@ -187,6 +209,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             except Exception as exc:  # cablage prod = bonus, ne doit jamais casser le run
                 _log(f"[prod_wiring] indisponible pour {fb_name} : {exc}")
                 wiring = None
+
+        print(f"\r{_progress_line('rapport')}", end="", flush=True)
 
         af_warnings = []
         extra_test_warnings = []
@@ -233,6 +257,10 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             tests.append({"name": r.get("name", ""), "passed": r.get("passed", False), "detail": detail})
         if not tests:
             tests = [{"name": "(pas de resultat JSON)", "passed": result.returncode == 0, "detail": ""}]
+
+        n_pass = sum(1 for t in tests if t["passed"])
+        counter = f" {n_pass}/{len(tests)}" if n_tests_declared else ""
+        print(f"\r{f'-> {fb_name} ({domain})...{counter}'.ljust(70)}")
 
         return {"ok": result.returncode == 0, "tests": tests, "report": report_path,
                 "af_warnings": af_warnings, "extra_test_warnings": extra_test_warnings,
@@ -298,7 +326,8 @@ def main() -> int:
 
     print("=== RESUME ===")
     for name, res in results.items():
-        print(f"{_c('PASS' if res['ok'] else 'FAIL', res['ok'])}  {name}")
+        n_pass = sum(1 for t in res["tests"] if t["passed"])
+        print(f"{_c('PASS' if res['ok'] else 'FAIL', res['ok'])}  {name} ({n_pass}/{len(res['tests'])})")
         for t in res["tests"]:
             line = f"  {_c('PASS' if t['passed'] else 'FAIL', t['passed'])}  {t['name']}"
             if not t["passed"] and t["detail"]:

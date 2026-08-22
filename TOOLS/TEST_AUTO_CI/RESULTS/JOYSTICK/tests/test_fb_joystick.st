@@ -8,26 +8,79 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'TC-P08-001 Bus non operationnel neutralise les sorties sans lever Error'
+TEST 'TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)'
     diagDown.ONLINE := FALSE; diagDown.OPERATIONAL := FALSE; diagDown.ERROR := FALSE;
     diagDown.ERRORID := 0; diagDown.STATE := E_DIAG_STATE.INIT; diagDown.STATEATERROR := E_DIAG_STATE.DISABLED;
     diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
     diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
 
+    (* arme le geste au neutre, bus sain *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* deplace le joystick : mouvement actif, bus toujours sain *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 60.0, 0.01, 'mouvement actif : consigne non nulle (RawX=8000, Neutral=5000)');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'sens avant pendant le mouvement');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'RawY au neutre : axe Y reste a 0, aucun couplage entre les axes');
+    ASSERT_EQ(fb.AXISCMDY.DIRECTION, 0, 'axe Y au neutre : Direction=0');
+
+    (* perte du bus CAN EN PLEIN MOUVEMENT : neutralisation immediate + desarmement *)
+    ADVANCE_TIME(10000000);
     fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
        MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
        BUSCANOPENOP := diagDown, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.READY, 'bus CAN non operationnel doit bloquer Ready');
+    ASSERT_TRUE(fb.ERROR, 'perte de comm doit lever Error (AF08)');
+    ASSERT_EQ(fb.ERRORID, 16#0004, 'bit2 : HW/bus non operationnel');
+    ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'sorties axe X neutralisees des la perte du bus, meme en plein mouvement');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'consigne X coupee immediatement, pas de decel progressive');
+    ASSERT_FALSE(fb.AXISCMDY.ENABLE, 'sorties axe Y aussi neutralisees (gate global, pas seulement l axe en mouvement)');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'consigne Y aussi coupee');
+    ASSERT_FALSE(fb.DEADMANARMED, 'le geste est desarme par la perte du bus (AF08 TC-P08-001)');
+
+    (* bus revient : pas de rearmement automatique, nouvel appui conscient exige *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
        RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
        INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-
-    ASSERT_FALSE(fb.READY, 'bus CAN non operationnel doit bloquer Ready');
-    ASSERT_FALSE(fb.ERROR, 'un bus down est un GATE de securite, PAS une Error diagnostiquee (pas de bit ErrorId leve ici)');
-    ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'sorties axe neutralisees si non operationnel');
+    ASSERT_TRUE(fb.READY, 'bus revenu : FB de nouveau pret');
+    ASSERT_FALSE(fb.ERROR, 'bus revenu : Error auto-effacee sans geste operateur (categorie Info/Warning, pas un Fault a acquitter)');
+    ASSERT_EQ(fb.ERRORID, 0, 'bit2 efface automatiquement');
+    ASSERT_FALSE(fb.DEADMANARMED, 'pas de rearmement automatique au retour du bus : nouvel appui conscient exige');
 END_TEST
 
-TEST 'TC-P08-002 Appui maintenu 100ms arme le geste (DeadmanArmHoldTime)'
+TEST 'TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant'
     diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
     diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
 
@@ -51,44 +104,35 @@ TEST 'TC-P08-002 Appui maintenu 100ms arme le geste (DeadmanArmHoldTime)'
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.DEADMANARMED, 'front bouton seul ne doit pas armer immediatement (maintien requis)');
 
-    (* 50ms plus tard : maintien pas termine *)
+    (* 50ms plus tard : maintien pas termine -- l operateur bouge DEJA l axe X seul (Y reste
+       neutre) pendant l attente : aucune commande ne doit partir tant que ce n est pas arme *)
     ADVANCE_TIME(50000000);
     fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
        MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
        BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
        INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.DEADMANARMED, '50ms < DeadmanArmHoldTime (100ms) : pas encore arme');
+    ASSERT_NEAR(fb.CMDXVAL, 0.0, 0.01, 'consigne interne X (CmdXVal) forcee a 0 : pas encore arme');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'axe X seul pousse (RawX=8000, RawY neutre) mais pas encore arme : aucune commande ne part');
 
-    (* 60ms de plus (total 110ms) : maintien termine -> arme *)
-    ADVANCE_TIME(60000000);
+    (* 20ms de plus (toujours < 100ms) : cette fois l axe Y seul est pousse (X revient au
+       neutre) -- meme preuve, isolee sur l autre axe *)
+    ADVANCE_TIME(20000000);
     fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
        MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
        BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       RAWX := 5000, RAWY := 2000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
        INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_TRUE(fb.DEADMANARMED, '110ms >= DeadmanArmHoldTime (100ms) : geste arme');
-END_TEST
+    ASSERT_FALSE(fb.DEADMANARMED, '70ms < DeadmanArmHoldTime (100ms) : toujours pas arme');
+    ASSERT_NEAR(fb.CMDYVAL, 0.0, 0.01, 'consigne interne Y (CmdYVal) forcee a 0 : pas encore arme');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'axe Y seul pousse (RawY=2000, RawX neutre) mais pas encore arme : aucune commande ne part');
 
-TEST 'TC-P08-003 Relachement du bouton avant fin du maintien annule la tentative armement'
-    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
-    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
-
-    (* front bouton : demarre le maintien *)
-    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
-       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
-       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
-       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
-       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
-       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-
-    (* relache a 50ms, avant la fin des 100ms de maintien *)
-    ADVANCE_TIME(50000000);
+    (* relache a 50ms, avant la fin des 100ms de maintien : annule la tentative *)
     fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
        MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
        BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
@@ -98,18 +142,21 @@ TEST 'TC-P08-003 Relachement du bouton avant fin du maintien annule la tentative
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.DEADMANARMED, 'relachement avant la fin du maintien annule la tentative');
 
-    (* le bouton reste relache : meme 100ms plus tard, aucun armement differe *)
-    ADVANCE_TIME(100000000);
+    (* le bouton reste relache PENDANT 1s ENTIERE, manche pousse a fond (RawX=8000) tout du
+       long : aucun armement differe, et surtout aucune commande de mouvement ne demarre,
+       meme apres une longue attente sur une position hors neutre *)
+    ADVANCE_TIME(1000000000);
     fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
        MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
        BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
        INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_FALSE(fb.DEADMANARMED, 'pas d armement differe sur une tentative deja annulee (nouvel appui conscient exige)');
+    ASSERT_FALSE(fb.DEADMANARMED, 'pas d armement differe sur une tentative deja annulee, meme apres 1s (nouvel appui conscient exige)');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'manche a fond depuis 1s mais jamais arme : toujours aucune commande de mouvement');
 
-    (* nouveau front + maintien complet : l armement redevient possible normalement *)
+    (* nouveau front + maintien complet (110ms) : l armement redevient possible normalement *)
     ADVANCE_TIME(10000000);
     fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
        MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
@@ -126,7 +173,7 @@ TEST 'TC-P08-003 Relachement du bouton avant fin du maintien annule la tentative
        INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_TRUE(fb.DEADMANARMED, 'un nouvel appui complet doit toujours pouvoir armer');
+    ASSERT_TRUE(fb.DEADMANARMED, '110ms >= DeadmanArmHoldTime (100ms) : geste arme');
 END_TEST
 
 TEST 'TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace'
@@ -340,8 +387,10 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, -100.0, 0.01, 'RawX au min nominal (0) : SpeedRef sature a -100');
     ASSERT_EQ(fb.AXISCMDX.DIRECTION, -1, 'Direction coherente avec le signe de la consigne');
 
-    (* Depassement franc au-dela de la plage ADC nominale (defaut capteur/cablage Hall) :
-       le garde-fou LIMIT(-100,OutPct,100) de FB_AxisScale doit clamper, jamais deborder *)
+    (* Depassement franc au-dela de la plage ADC nominale + marge de tolerance (defaut
+       capteur/cablage Hall, ex: fil coupe -> ADC fige a une valeur aberrante) : neutre +
+       defaut visible, PAS une saturation a pleine vitesse dans une direction sur une donnee
+       dont on ne peut plus garantir la validite (AF08 §5bis). *)
     ADVANCE_TIME(10000000);
     fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
        MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
@@ -350,10 +399,11 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 100.0, 0.01, 'RawX=20000 (hors plage ADC 0..10000, defaut capteur) : toujours clampe a +100, pas de debordement');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 100.0, 0.01, 'meme garde-fou sur l axe Y');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'RawX=20000 (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'meme garde-fou sur l axe Y');
+    ASSERT_EQ(fb.ERRORID, 16#0002, 'bit1 : defaut capteur hors plage pendant fonctionnement, visible operateur');
 
-    (* Valeur negative (hors plage ADC, meme scenario defaut cablage) *)
+    (* Valeur negative (hors plage ADC + marge, meme scenario defaut cablage) *)
     ADVANCE_TIME(10000000);
     fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
        MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
@@ -362,8 +412,21 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, -100.0, 0.01, 'RawX negatif (hors plage ADC, defaut capteur) : toujours clampe a -100, pas de debordement');
-    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, -100.0, 0.01, 'meme garde-fou sur l axe Y');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'RawX negatif (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'meme garde-fou sur l axe Y');
+
+    (* Depassement leger (< marge de tolerance) : ne doit PAS declencher le defaut -- evite les
+       faux positifs sur bruit ADC/overshoot mineur pres des bornes nominales *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 10200, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 100.0, 0.01, 'RawX=10200 : dans la marge de tolerance (+500), toujours saturation normale +100, pas de defaut');
+    ASSERT_EQ(fb.ERRORID, 0, 'leger depassement tolere : aucun defaut leve');
 END_TEST
 
 TEST 'TC-P08-011 Fin de cycle benne desarme le geste par defaut'
@@ -453,4 +516,54 @@ TEST 'TC-P08-012 PreserveArmingAfterBucket protege l armement en fin de benne (e
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_TRUE(fb.DEADMANARMED, 'PreserveArmingAfterBucket=TRUE : armement conserve malgre la fin de benne (exception documentee AF, alerte P1 : ne jamais elargir hors CLOSING Extraction)');
+END_TEST
+
+TEST 'TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* RawX=9000 (au-dela du neutre 5000, hors zone morte) : OutPct = (9000-5000)/(10000-5000)*100 = 80% *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 80.0, 0.01, 'RawX=9000 : proportionnel, 80% -- pas seulement correct aux bornes 0/10000');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'sens avant coherent');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'RawY toujours au neutre : axe Y inchange');
+
+    (* RawY=300 (en-deca du neutre 5000, hors zone morte) : OutPct = (300-5000)/5000*100 = -94% *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 300, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, -94.0, 0.01, 'RawY=300 : proportionnel, -94% -- pas seulement correct aux bornes 0/10000');
+    ASSERT_EQ(fb.AXISCMDY.DIRECTION, -1, 'sens arriere coherent');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'RawX revenu au neutre : axe X inchange');
 END_TEST

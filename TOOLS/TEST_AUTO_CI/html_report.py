@@ -267,6 +267,26 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
             f"n'existent pas).</div>"
         )
 
+    # Test a scan unique (souvent un test d'etat fige, pas une sequence temporelle) : la
+    # detection de changement compare 2 scans consecutifs, donc TOUJOURS 0 variable "active"
+    # ici par construction -- afficher un graphique/tableau vides serait trompeur. On montre
+    # directement les valeurs plutot que 2 panneaux vides.
+    if len(scans) == 1:
+        single_rows = "".join(
+            f"<tr><td><code>{_html.escape(f)}</code></td>"
+            f"<td>{_fmt_val(scans[0]['fields'].get(f, ''), field_types.get(f, True))}</td></tr>"
+            for f in all_fields
+        )
+        return f"""
+    <div class="chronogram-group">
+        {fail_note}
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique ({len(all_fields)})</summary>
+            <table class="static-table"><tbody>{single_rows}</tbody></table>
+        </details>
+    </div>"""
+
     return f"""
     <div class="chronogram-group">
         {fail_note}
@@ -485,6 +505,7 @@ _CSS = """
     tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
     .chronogram-static { margin-top: 10px; }
     .chronogram-static summary { font-size: 11px; }
+    .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
     .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
     .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
     .exec-time { color: var(--muted); font-size: 12px; margin: 0 0 20px; }
