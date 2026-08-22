@@ -7416,42 +7416,6 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_OperatorAction">
-        <baseType>
-          <struct>
-            <variable name="ActionId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant stable : table de textes IHM possible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Text">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte de secours pour IHM/diagnostic acceptant les STRING</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6e6d9b5d-226e-566e-908c-f3aa313a7e26</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_OperatorAction — Consigne unique de conduite opérateur
-   ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md
-   🎯 Les alarmes restent dans Error/ErrorId : cette struct répond seulement
-      à « quelle action attend-on maintenant de l'opérateur ? ».
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_OutputsInterPrg">
         <baseType>
           <struct>
@@ -18826,6 +18790,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut chaîne AU (FB_Safety_EmergencyManagement.Diag.ErrorId)</xhtml>
               </documentation>
             </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut redondance contacteurs AU (lisee -&gt; message explicite)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Echec rearmement contacteur AU (lisee -&gt; message explicite)</xhtml>
+              </documentation>
+            </variable>
             <variable name="AlarmHoldTime">
               <type>
                 <TIME />
@@ -19172,7 +19152,13 @@ END_IF;
 DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
                 OR (CurrentDirection &gt; 0 AND NOT AscentPermit);
 
-IF NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
+IF NOT EmergencyChainClosed THEN
+    OperatorActionCandidate := '[PUPITRE] Boucle urgence ouverte - réarmer';
+ELSIF RedundancyTestFailed THEN
+    OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer';
+ELSIF EmergencyArmingFailed THEN
+    OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
+ELSIF NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
     OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
@@ -36339,6 +36325,8 @@ instHmiBannerFormatter(
     DiveErrorId                 := GVL_IHM.DredgingAssist.State.DiveErrorId,
     ExtractionErrorId           := GVL_IHM.DredgingAssist.State.ExtractionErrorId,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
+    RedundancyTestFailed         := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed,
+    EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
     AlarmHoldTime               := T#1s
 );
 GVL_IHM.Banner := instHmiBannerFormatter.Banner;
@@ -36675,15 +36663,7 @@ instTroubleshootingView(
             <derived name="ST_HmiBanner" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OperatorAction">
-          <type>
-            <derived name="ST_OperatorAction" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Unique consigne conduite, arbitré en supervision</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4) — OperatorActionText = unique consigne conduite</xhtml>
           </documentation>
         </variable>
         <variable name="Network">
@@ -37226,7 +37206,6 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
               <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
-              <Object Name="ST_OperatorAction" ObjectId="6e6d9b5d-226e-566e-908c-f3aa313a7e26" />
               <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
             </Folder>
             <Folder Name="1_TREUILS_BENNE">

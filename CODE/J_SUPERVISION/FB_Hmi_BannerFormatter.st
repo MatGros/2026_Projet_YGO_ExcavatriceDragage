@@ -64,6 +64,8 @@ VAR_INPUT
     DiveErrorId          : WORD;   // --> [DIAG] Code défaut plongée (FB_DiveSearch.ErrorId)
     ExtractionErrorId    : WORD;   // --> [DIAG] Code défaut extraction (FB_ExtractionSequence.ErrorId)
     EmergencyErrorId     : WORD;   // --> [DIAG] Code défaut chaîne AU (FB_Safety_EmergencyManagement.Diag.ErrorId)
+    RedundancyTestFailed : BOOL;   // --> [DIAG] Defaut redondance contacteurs AU (lisee -> message explicite)
+    EmergencyArmingFailed: BOOL;   // --> [DIAG] Echec rearmement contacteur AU (lisee -> message explicite)
     AlarmHoldTime        : TIME := T#1s; // --> [CFG] Durée d'affichage par message du carrousel
 END_VAR
 VAR_OUTPUT
@@ -242,7 +244,13 @@ END_IF;
 DirectionBlocked := (CurrentDirection < 0 AND NOT DescendPermit)
                 OR (CurrentDirection > 0 AND NOT AscentPermit);
 
-IF NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
+IF NOT EmergencyChainClosed THEN
+    OperatorActionCandidate := '[PUPITRE] Boucle urgence ouverte - réarmer';
+ELSIF RedundancyTestFailed THEN
+    OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer';
+ELSIF EmergencyArmingFailed THEN
+    OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
+ELSIF NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
     OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
