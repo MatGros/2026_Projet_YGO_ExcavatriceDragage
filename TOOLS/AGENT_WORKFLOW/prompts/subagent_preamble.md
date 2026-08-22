@@ -98,8 +98,10 @@ Hors scope constaté (devoir d'alerte) : ...
 
 - Commit, push, reset, rebase — **jamais**, la validation est humaine
 - Modifier `PRJ_CODESYS/PROJ_Full_ImportExport/Device.export`
+- Créer des scripts ou fichiers temporaires jetables (`_tmp_*.py`, `tmp.sh`) ou bricoler des écritures via Heredoc shell (`cat << EOF`) : utiliser exclusivement les outils d'édition natifs (`view_file`, `replace_file_content`, `write_to_file`).
 - Élargir le scope au-delà de la tâche : signaler, ne pas décider
 - Annoncer « terminé » sans les preuves ci-dessus
+
 
 ---
 
