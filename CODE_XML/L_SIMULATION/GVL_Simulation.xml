@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T23:41:01.409490" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T23:41:01.409490">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T13:10:22.846517" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T13:10:22.846517">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -202,6 +202,28 @@ Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Homme-mort brut : TRUE = bouton joystick appuyé</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickOvershoot_Active">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = dépassement de montée au-delà de 100% (défaut capteur hors plage)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimJoystickBagotement_Active">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bagotement au relâchement (petit balancement autour du neutre)</xhtml>
           </documentation>
         </variable>
         <variable name="SimEncoderSpeedFactor">

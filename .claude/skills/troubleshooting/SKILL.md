@@ -38,6 +38,28 @@ Dès que la skill est déclenchée, **afficher immédiatement** ce texte clair e
 
 Puis annoncer en 1 ligne le sujet du diagnostic (ex. « Diagnostic : DeadmanArmed tombe à 0 en commande descente »).
 
+## 🎯 ORIENTATION MÉTHODE (obligatoire au lancement — AUCUNE voie imposée)
+
+> ⛔ **Le test CI ad hoc (§4ter) n'est PAS la voie obligatoire.** Il existe **plusieurs méthodes** de débogage, et le choix se fait **par discussion avec l'utilisateur**, en fonction des **données disponibles** et de la **facilité**, dès le début.
+
+Afficher ensuite une **notice des méthodes possibles** pour que l'utilisateur voie les options et puisse orienter (et commenter ce qui a déjà été testé) :
+
+```
+🧭 Méthodes de débogage possibles :
+  [1] Snapshot PLC (GVL_Troubleshooting) — lecture de variables en simu/site
+  [2] Test CI ad hoc (_TROUBLESHOOTING/) — compiler un FB + vérifier une fonction
+  [3] Analyse statique déléguée (sous-agent trace la chaîne dans le code)
+  [4] Lecture trace CODESYS (variables internes d'un FB) par l'utilisateur
+  [5] Autre / combinaison
+```
+
+Puis **poser la question d'orientation** (adaptée au symptôme) :
+- Quelles **données sont déjà disponibles** (snapshot, trace, variables) ?
+- Quelle méthode est la **plus facile / rapide** dans ce cas précis ?
+- (option) Que voulez-vous que je **documente / que j'ai testé** jusqu'ici, pour vos commentaires ?
+
+➡️ **L'agent suit l'orientation choisie** ; il peut combiner plusieurs méthodes. Il ne démarre **pas** une méthode lourde (ex. ajout de variable à `GVL_Troubleshooting` ou test CI) sans que ce soit adapté au cas. L'utilisateur voit **ce qui a été testé** (journal de la fiche) et peut commenter.
+
 ---
 
 ## 📋 Procédure
@@ -73,6 +95,27 @@ Selon le résultat :
 
 Acquisition max = **UN snapshot**. Si la cause exige > 2-3 structures à lire → le troubleshooting est mal conçu OU il faut une structure dédiée → le signaler.
 
+### Étape 4ter — Test CI ad hoc de dépannage (compiler un FB et vérifier une fonction)
+
+> 🔬 **Méthode complémentaire** : quand le doute porte sur une **fonction d'un FB isolé** (simulation, logique interne, machine d'état), on peut la **prouver par un test automatisé** au lieu d'un snapshot PLC. Utile notamment quand la variable n'est pas dans `GVL_Troubleshooting` (cas `FB_Sim_*`, internes de FB).
+
+Dossier dédié : `TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/` (le **underscore** signale que c'est spécial/jetable, **hors registry principal**).
+
+Démarche :
+1. **Mettre à jour le script** `run_troubleshooting.py` : définir l'**entrée ad hoc** `FB_NAME` + `ENTRY["sources"]` (DUT/enum d'abord, FB en dernier) + `ENTRY["test"]`.
+2. **Mettre à jour le test** `.st` (format `TEST '...'` + `ASSERT_*`, voir exemples dans `RESULTS/<domaine>/tests/`). Le test ne doit lire que les **sorties publiques** du FB (jamais les internes).
+3. **Compiler + exécuter** :
+   ```
+   python TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/run_troubleshooting.py
+   ```
+   → génère le rapport dans `RESULTS/_TROUBLESHOOTING/reports/` et affiche PASS/FAIL.
+4. **Preuve** : un test PASS **prouve** le comportement attendu ; un FAIL donne le message d'assertion exact (différence valeur attendue/obtenue).
+
+Règles :
+- **⚠️ Dossier jetable** : nettoyer `RESULTS/_TROUBLESHOOTING/` après chaque dépannage (ne pas commiter les tests ad hoc).
+- Le test n'accède **jamais** aux `VAR` internes du FB (seulement `VAR_INPUT`/`VAR_OUTPUT`/`VAR_IN_OUT`).
+- ⚠️ Dans le runner CI, **chaque appel `fb(...)` = 1 scan** (10ms) : `ADVANCE_TIME` avance le temps simulé mais ne fait pas tourner le FB — pour simuler N ms il faut **N/CycleTimeS appels** (ex. 1.6s @10ms = 160 appels) ou tester à l'échelle d'un scan.
+
 ### Étape 5 — Tracage inverse + élimination par preuve (§5, §6)
 Remonter du symptôme à la source. Lire les variables de décision dans le **snapshot CSV** (jamais Watch). Éliminer les branches par FAIT. S'arrêter au critère d'arrêt (§6).
 
@@ -102,8 +145,9 @@ Si des CSV ont été produits pendant la session (`TOOLS/PLC_LIVE_READER/RESULTS
 - [ ] Contexte figé rempli (pas de re-questions)
 - [ ] Arbre des causes complet (6 catégories)
 - [ ] **Variables de décision vérifiées dans `GVL_Troubleshooting` ET dans `troubleshooting_variables.txt` avant toute demande** (ajoutées + régénérées si manquantes, avec validation)
-- [ ] Acquisition par **snapshot CSV unique** (pas de lecture Watch)
+- [ ] Acquisition par **snapshot CSV unique** (pas de lecture Watch) **OU test CI ad hoc** (§4ter) selon le besoin
 - [ ] Hypothèses éliminées par PREUVE (lecture), pas par inférence
 - [ ] Cause racine + correction proposée
 - [ ] Aucun code modifié / aucune variable forcée sans validation
+- [ ] `_TROUBLESHOOTING/` nettoyé après usage (dossier jetable)
 - [ ] CSV `PLC_LIVE_READER/RESULTS/` de la session archivés dans `ARCHIVES/Tools/PLC_LIVE_READER/RESULTS/<Sujet>_<date>/`

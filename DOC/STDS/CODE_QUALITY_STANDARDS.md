@@ -271,13 +271,19 @@ Destiné aux blocs qui **remontent un défaut** (acquittable ou non) ou pilotent
   - `Ready : BOOL;` (en `BOOL` nu).
   - `Status : ST_FbStatus;` — **forme cible**, remplie via le socle `FB_FbStatus` (§3bis).
 
+> 🎯 **Un device qui remonte un défaut est `standard`, même sans machine d'état.**
+> Le critère de classement est **« remonte-t-il un défaut ? »**, pas « a-t-il une machine d'état ? ».
+> Ex. `FB_Joystick` (device d'acquisition) remonte un défaut capteur/calibration/bus → il est
+> `standard`. `State`/`StateAtError` sont alors remplis par le socle `FB_FbStatus` (valeur par
+> défaut `READY`), sans exiger de machine d'état côté FB métier.
+
 > ⚠️ **`PowerContactorEngaged` n'est PAS un champ du socle `standard`.** Ce n'est pas un troisième
 > `VAR_INPUT` imposé par défaut — c'est une entrée **conditionnelle**, à ajouter **seulement** si
 > le FB pilote lui-même un organe consommant de la puissance (contacteur, frein, moteur) et doit
 > en conséquence interlocker sa propre action sur l'état de la chaîne de puissance. `Reset`/`Error`
 > (gestion de défaut, ex. calibration, capteur hors plage) est une question totalement indépendante
 > de `PowerContactorEngaged` (pilotage d'organe) — les deux ne se déduisent jamais l'un de l'autre.
-> Un FB de pure acquisition/conditionnement qui gère un défaut capteur (donc `Reset`/`Error`
+> Un FB `standard` de pure acquisition/conditionnement qui gère un défaut capteur (donc `Reset`/`Error`
 > légitimes) mais ne pilote **aucun** actionneur ne porte **jamais** `PowerContactorEngaged`.
 > Ajouter ce champ par réflexe de conformité au tableau, sans vérifier que le FB pilote réellement
 > un organe, est une erreur (constaté sur `FB_Joystick` : gate sur `PowerContactorEngaged` sans
@@ -338,6 +344,10 @@ FB_FbStatus
 - `WarningMask = 0` (défaut) → **toutes** les erreurs sont des Fault à acquitter = **sécurité maximale**.
 - On **lève un bit à 1** dans `WarningMask` pour déclarer cette erreur **Warning** (auto-effacée).
 - Un bit est **exclusivement** warning **ou** fault — jamais les deux (un seul masque → pas d'incohérence possible).
+- ⚠️ **Exigence de sécurité à tester nommément** (pas seulement en conséquence incidente d'un autre
+  test) : `WarningMask` omis ou câblé à `0` doit classer **tout** bit d'`ErrorIdCause` en Fault, jamais
+  en Warning. Le nom du test doit porter l'exigence elle-même (ex. `'WarningMask non fourni/à 0 :
+  tout défaut classé Fault (fail-safe)'`), pas la déduire d'un test générique sur un autre sujet.
 
 **Comportement** :
 - `Warning` : s'affiche et s'efface **seul** avec la cause (`WarningIdCause`). Aucun `Reset` impliqué (§9).
@@ -345,6 +355,18 @@ FB_FbStatus
 - `ErrorIdLatched` : code du défaut déclenchant **mémorisé** (ne disparaît pas avec la cause) → c'est la
   mémoire nécessaire à l'acquittement.
 - `Reset` : **toujours effectif, jamais conditionné** (§9).
+- `State`/`StateAtError` : remplis par le socle (valeur par défaut `READY`) — le FB métier n'a **pas**
+  besoin de machine d'état pour être `standard` (cf. §2, device qui remonte un défaut). Conséquence :
+  pour un FB **standard sans** machine d'état propre (ex. `FB_Joystick`), `StateAtError` vaut donc
+  **toujours** `READY` — c'est correct et attendu, pas un défaut. Un FB métier qui possède **sa propre**
+  machine d'état (ex. un séquenceur treuil) ne doit **pas** s'appuyer sur `StateAtError` du socle pour
+  capturer son propre état au moment du défaut : il doit gérer cette capture lui-même (comme le fait
+  déjà `FB_Modes.st`, qui ne passe pas par `FB_FbStatus`) — le socle écraserait sinon la valeur utile
+  avec `READY`.
+- `Busy`/`Done` : **non gérés par le socle** — `FB_FbStatus` ne pilote que Error/Warning/State/textes.
+  Le FB métier appelant reste responsable de renseigner `Status.Busy`/`Status.Done` selon son propre
+  cycle : un conditionneur synchrone (ex. `FB_Joystick`) les laisse à `FALSE` ; un organe à cycle
+  (ex. un treuil/séquenceur) les pilote lui-même après l'appel du socle.
 - Textes : `ErrorIdTxt`/`WarningIdTxt` générés à partir de **tableaux de chaînes** indexés par le code ;
   si **plusieurs** erreurs/warnings actifs, le texte affiché **tourne toutes les 1 s** (rotation).
 

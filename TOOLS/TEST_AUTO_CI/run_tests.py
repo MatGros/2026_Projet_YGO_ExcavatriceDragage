@@ -198,23 +198,39 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                 _log(f"[chronogram] indisponible pour {fb_name} : {exc}")
                 trace_entries, field_types = [], {}
 
-        wiring = None
-        prod_instance = entry.get("prod_instance")
+        # prod_instances (liste) : plusieurs instances production du meme FB (ex: instEncoderM1/
+        # instEncoderM2, un FB par treuil). prod_instance (singulier) reste supporte pour les FB
+        # mono-instance (ex: FB_Joystick) -- retro-compat, converti en liste a 1 element ici.
+        prod_instances = entry.get("prod_instances")
+        if prod_instances is None:
+            # Mono-instance (legacy prod_instance) : pas de label -- une seule instance donc pas
+            # d'ambiguite a lever dans le rapport.
+            single = entry.get("prod_instance")
+            prod_instances = [dict(single, label=None)] if single else [
+                {"file": None, "name": None, "label": None}]
+        else:
+            prod_instances = [dict(pi, label=pi.get("label", pi.get("name"))) for pi in prod_instances]
+
+        wirings = []
         if strucpp_temp_dir is not None:
-            # Extraction des pins (verite compilateur) toujours tentee, meme sans prod_instance :
+            # Extraction des pins (verite compilateur) toujours tentee, meme sans prod_instances :
             # build_wiring degrade proprement en pinout nu (tous les pins "non cable en
             # production") quand prod_file est None -- c'est le seul moyen de voir la boite
-            # noire IN/OUT d'un FB pas encore instancie dans un PRG (ex: FB_Encoder au 2026-08-22).
+            # noire IN/OUT d'un FB pas encore instancie dans un PRG.
             print(f"\r{_progress_line('cablage production')}", end="", flush=True)
-            try:
-                wiring = prod_wiring.build_wiring(
-                    strucpp_temp_dir / "generated.hpp", fb_name.upper(),
-                    REPO_ROOT / prod_instance["file"] if prod_instance else None,
-                    prod_instance["name"] if prod_instance else None,
-                    search_root=REPO_ROOT / "CODE")
-            except Exception as exc:  # cablage prod = bonus, ne doit jamais casser le run
-                _log(f"[prod_wiring] indisponible pour {fb_name} : {exc}")
-                wiring = None
+            for pi in prod_instances:
+                try:
+                    w = prod_wiring.build_wiring(
+                        strucpp_temp_dir / "generated.hpp", fb_name.upper(),
+                        REPO_ROOT / pi["file"] if pi.get("file") else None,
+                        pi.get("name"),
+                        search_root=REPO_ROOT / "CODE")
+                except Exception as exc:  # cablage prod = bonus, ne doit jamais casser le run
+                    _log(f"[prod_wiring] indisponible pour {fb_name} ({pi.get('label')}) : {exc}")
+                    w = None
+                wirings.append({"label": pi.get("label"), "wiring": w})
+        else:
+            wirings = [{"label": pi.get("label"), "wiring": None} for pi in prod_instances]
 
         print(f"\r{_progress_line('rapport')}", end="", flush=True)
 
@@ -245,7 +261,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                                test_st_path=test_file, trace_entries=trace_entries,
                                source_paths=sources, cycle_time_ms=cycle_time_ms,
                                field_types=field_types, af_warnings=af_warnings,
-                               extra_test_warnings=extra_test_warnings, wiring=wiring,
+                               extra_test_warnings=extra_test_warnings, wirings=wirings,
                                encapsulation_report=encapsulation_report)
 
         if json_data is not None:

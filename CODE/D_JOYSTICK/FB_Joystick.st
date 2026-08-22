@@ -306,10 +306,10 @@ NeutralYAct := NeutralYMem;
 Done := NOT Error;
 
 // 🧩 SOCLE DE STATUT STANDARD (forme cible) — remplit Status : ST_FbStatus
-// Le joystick produit ErrorId (bit0 calib, bit1 capteur, bit2 bus). On le passe au socle
-// qui classe : WarningMask bit=1 → warning auto, bit=0 → fault à acquitter.
-// Joystick : bit0 (calib) = FAULT à acquitter ; bit1 (capteur) + bit2 (bus) = WARNING auto.
-WarningMask := 16#0006;   // bits 1+2 = warning (auto-effacés) ; bit0 = fault
+// Le joystick produit ErrorId (bit0 calib, bit1 capteur, bit2 bus) avec sa propre logique
+// (validée par les tests). On le passe au socle qui remplit Status (Warning, textes, Reset).
+// WarningMask = 0 : tous les bits restent dans ErrorId (comportement joystick inchangé).
+WarningMask := 0;
 ErrorIdCause := ErrorId;
 
 // Textes IHM (par bit) — stockés dans des tableaux locaux
@@ -321,11 +321,15 @@ JoystickWarningTexts[2] := 'Perte liaison bus CAN joystick (warning)';
 
 instFbStatus(Enable := Enable, Reset := Reset,
              ErrorIdCause := ErrorIdCause, WarningMask := WarningMask,
-             ErrorTexts := JoystickErrorTexts, WarningTexts := JoystickWarningTexts,
-             RotatePeriod := T#1S);
+             ErrorTexts := JoystickErrorTexts, WarningTexts := JoystickWarningTexts);
 Status := instFbStatus.Status;
 Error := Status.Error;      // miroir (source de vérité = socle)
 ErrorId := Status.ErrorId;    // miroir
 Ready := NOT Error;
+
+// Busy/Done : pilotés par le FB métier (cycle propre). Le joystick est un conditionneur
+// synchrone sans cycle -> toujours FALSE (jamais "en cours" ni "terminé").
+Status.Busy := FALSE;
+Status.Done := FALSE;
 
 {endregion}

@@ -90,6 +90,8 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimJoystickRawX := 5000;
     GVL_Simulation.SimJoystickRawY := 5000;
     GVL_Simulation.SimJoystickRawButton := FALSE;
+    GVL_Simulation.SimJoystickOvershoot_Active := FALSE;
+    GVL_Simulation.SimJoystickBagotement_Active := FALSE;
     GVL_Simulation.SimEncoderSpeedFactor := 1.0;
     GVL_Simulation.SimSyncDeviationInjectM1 := FALSE;
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
@@ -255,6 +257,8 @@ instSimBench(
     SimJoystickRawX                    := GVL_Simulation.SimJoystickRawX,
     SimJoystickRawY                    := GVL_Simulation.SimJoystickRawY,
     SimJoystickRawButton               := GVL_Simulation.SimJoystickRawButton,
+    SimJoystickOvershoot_Active        := GVL_Simulation.SimJoystickOvershoot_Active,
+    SimJoystickBagotement_Active       := GVL_Simulation.SimJoystickBagotement_Active,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
     BtnEmergencyStop         := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff,
     HwReal                   := HwReal,

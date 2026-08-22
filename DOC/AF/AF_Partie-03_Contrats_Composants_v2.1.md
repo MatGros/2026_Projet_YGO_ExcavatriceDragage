@@ -7,7 +7,7 @@
 
 1. Regles socle
 2. Profils de composants
-3. Cycle de vie, etats et defauts
+3. Cycle de vie, etats et defauts (3.1 Fiche FB_FbStatus)
 4. Contrats DUT
 5. Regles CFC
 
@@ -22,6 +22,12 @@
 | <nobr><code>TC-P03-005</code></nobr> | Encapsulation stricte | Échanges via interfaces/DUTs publics uniquement | `💻 AUTO` | <small>§1</small> |
 | <nobr><code>TC-P03-006</code></nobr> | Re-latch sur ré-apparition Cause | Nouveau front Cause ➔ `Ack=FALSE` | `💻 AUTO` | <small>§3</small> |
 | <nobr><code>TC-P03-007</code></nobr> | Warning auto-effaçable vs Fault latché | Warning s'efface sans Reset, Fault exige Ack | `💻 AUTO` | <small>§3</small> |
+| <nobr><code>TC-P03-008</code></nobr> | Cumul de plusieurs Fault latchés | 2 bits distincts apparus à des instants différents s'accumulent dans `ErrorId`, Reset les acquitte ensemble | `💻 AUTO` | <small>§3.1</small> |
+| <nobr><code>TC-P03-009</code></nobr> | Priorité d'affichage texte IHM si Fault+Warning actifs ensemble | Texte du bit actif le plus bas affiché (comportement documenté, pas de priorité Fault>Warning à ce jour) | `💻 AUTO` | <small>§3.1</small> |
+| <nobr><code>TC-P03-010</code></nobr> | Bornes du bitfield `ErrorId`/`WarningId` (16 bits) | `bit0` et `bit15` correctement gérés, pas d'off-by-one | `💻 AUTO` | <small>§3.1</small> |
+| <nobr><code>TC-P03-011</code></nobr> | `Reset` sans historique de défaut | Aucun effet parasite, `ResetRequested` reste `FALSE` | `💻 AUTO` | <small>§3.1</small> |
+| <nobr><code>TC-P03-012</code></nobr> | `Reset` maintenu (niveau haut) pendant plusieurs scans | ⚠️ Faille identifiée (T148) : si la cause disparaît pendant que `Reset` reste haut sans nouveau front, l'acquittement se fait sans confirmation au moment réel — comportement actuel prouvé, pas validé comme cible | `💻 AUTO` | <small>§3.1</small> |
+| <nobr><code>TC-P03-013</code></nobr> | Texte IHM pour un bit actif sans texte configuré | Chaîne vide, pas de plantage ni de texte résiduel d'un autre bit | `💻 AUTO` | <small>§3.1</small> |
 
 ---
 
@@ -72,6 +78,73 @@ StartStop       -> acceleration ou deceleration normale
 - `ErrorId` est un bitfield cumulatif. Chaque bit a une cause, un proprietaire et un texte IHM documentes.
 - `Error := (ErrorId <> 0)`.
 - `State` decrit la phase ; `StateAtError` fige la phase lors du defaut jusqu'a l'acquittement effectif.
+
+### 3.1 Fiche `FB_FbStatus` — socle transverse de statut (forme cible)
+
+> 🧩 Implémentation concrète du pattern Cause/Ack décrit en §3. Un seul socle, réutilisé par
+> tout FB `standard` qui doit remplir `Status : ST_FbStatus` — code écrit une fois, comportement
+> identique partout (cf. §2 Profils de composants).
+
+**But** : remplir de façon standardisée la sortie `Status : ST_FbStatus` d'un FB métier —
+classification Fault (latché, à acquitter) vs Warning (auto-effacé), textes IHM prêts à
+afficher, sans que chaque FB métier ré-implémente sa propre logique d'acquittement.
+
+**Où il se place** : instancié **dans** le FB métier qui expose `Status : ST_FbStatus` (pas un
+programme séparé) — le FB métier ne fait que déclarer où vivent ses bits d'erreur
+(`ErrorIdCause`, `WarningMask`) et recopie `Status := instFbStatus.Status`. Consommateur actuel
+confirmé (`grep CODE/`, 2026-08-22) : `FB_Joystick` (`instFbStatus`, `CODE/D_JOYSTICK/FB_Joystick.st`).
+Forme cible destinée à se généraliser aux autres FB `standard` (cf. §2).
+
+**Interfaces** :
+
+| Sens | Nom | Type | Rôle |
+|---|---|---|---|
+| IN | `Enable` | `BOOL` | Autorisation générale — `FALSE` neutralise le statut (façade), voir limite ci-dessous |
+| IN | `Reset` | `BOOL` | Front d'acquittement, jamais conditionné par un état externe (§3) |
+| IN | `ErrorIdCause` | `WORD` | Bits d'erreur **actifs** (cause brute), fournis par le FB métier |
+| IN | `WarningMask` | `WORD` | `bit=1` → ce bit est Warning (auto-effacé) ; `bit=0` (défaut) → Fault (à acquitter) — fail-safe |
+| IN | `ErrorTexts[0..15]` | `ARRAY OF STRING` | Textes IHM par bit, source pour `ErrorIdTxt` **quel que soit** Fault ou Warning |
+| IN | `WarningTexts[0..15]` | `ARRAY OF STRING` | Textes IHM par bit, source pour `WarningIdTxt` uniquement |
+| OUT | `Ready` | `BOOL` | Recopie de `Enable` |
+| OUT | `Status` | `ST_FbStatus` | Statut complet — mappé 1:1 sur la sortie `Status` du FB métier appelant |
+
+**Comportement clé** (détail Cause/Ack : §3 + `CODE_QUALITY_STANDARDS.md §9`) :
+- Un bit est **exclusivement** Fault ou Warning (jamais les deux) selon `WarningMask`.
+- `ErrorId` = union (`ErrorIdLatched OR FaultCause OR WarningCause`) : reste vrai tant que la
+  cause brute est active, **même si** le latch vient d'être vidé (protection anti-acquittement
+  prématuré, cf. `TC-P03-012` pour la limite connue de cette protection).
+- Sélection du texte IHM : **premier bit actif le plus bas**, pas de priorité Fault > Warning
+  (`TC-P03-009`) — à challenger côté spec si un cas réel de Fault+Warning simultanés apparaît.
+- `State`/`StateAtError` : remplis par le socle à `READY` par défaut — un FB avec sa **propre**
+  machine d'état (ex. séquenceur treuil) ne doit pas s'appuyer dessus (cf. `FB_Modes.st`, qui
+  gère sa capture lui-même sans passer par ce socle).
+- `Busy`/`Done` : **non gérés par le socle**, à la charge du FB métier appelant selon son cycle.
+
+**⚠️ Limites connues, non résolues au 2026-08-22** (voir `DOC/WFLOW/PLAN_TASK.md` T147/T148,
+décision de spec en attente d'implémentation) :
+- **T147** : `Enable=FALSE` remet actuellement `ErrorIdLatched` à zéro — un défaut non acquitté
+  disparaît silencieusement si le FB est désactivé puis réactivé sans `Reset`. Décision actée :
+  ce comportement doit changer (le latch doit survivre à un cycle `Enable=FALSE`).
+- **T148** : un `Reset` simplement **maintenu** (niveau haut, pas de nouveau front) pendant que
+  la cause disparaît acquitte silencieusement le défaut, sans confirmation au moment réel de la
+  disparition — prouvé par `TC-P03-012`.
+
+**Tests** (`TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st`, 11 scénarios,
+multi-scans) :
+
+| ID | Scénario | Points clés vérifiés |
+|---|---|---|
+| <nobr><code>TC-P03-001</code></nobr> | Gate `Enable=FALSE` | Statut neutre, `Ready=FALSE` |
+| — | Nominal sans cause | `Ready=TRUE`, aucun défaut ni warning |
+| <nobr><code>TC-P03-007</code></nobr> | Warning auto-effacé | Apparition + texte IHM + disparition sans `Reset` |
+| <nobr><code>TC-P03-002/003</code></nobr> | Fault latché | Mémorisé après disparition de la cause, acquitté seulement par `Reset` avec cause absente |
+| <nobr><code>TC-P03-006</code></nobr> | `Reset` refusé si cause présente | Interlock sur la cause brute, jamais sur l'acquittement |
+| <nobr><code>TC-P03-008</code></nobr> | Cumul multi-bits latchés | 2 faults apparus à des instants différents s'accumulent, acquittés ensemble |
+| <nobr><code>TC-P03-009</code></nobr> | Fault + Warning simultanés | Texte affiché = bit le plus bas (comportement documenté) |
+| <nobr><code>TC-P03-010</code></nobr> | Bornes bitfield | `bit0` et `bit15` |
+| <nobr><code>TC-P03-011</code></nobr> | `Reset` à vide | Aucun effet parasite |
+| <nobr><code>TC-P03-012</code></nobr> | `Reset` maintenu + cause qui disparaît | ⚠️ Faille T148 prouvée |
+| <nobr><code>TC-P03-013</code></nobr> | Texte IHM non configuré | Chaîne vide, pas de plantage |
 
 ## 🚌 4. Contrats DUT internes
 

@@ -4,7 +4,29 @@
 > L'agent NE PEUT PAS exécuter le PLC : il lit des variables de diagnostic et raisonne par arbre de décision.
 > Fiche de session : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_<Sujet>_<AAAAMMJJ>.md` (depuis `TEMPLATE_Troubleshooting.md`).
 
-## 0. 📥 ACQUISITION DES VALEURS (canal)
+## 0. 🎯 ORIENTATION MÉTHODE (obligatoire au lancement — AUCUNE voie imposée)
+
+> ⛔ **Aucune méthode n'est obligatoire.** Le débogage se fait **par discussion avec l'utilisateur**, en fonction des **données disponibles** et de la **facilité**, dès le début. L'agent n'impose pas une voie lourde (ajout de variable à `GVL_Troubleshooting`, test CI...) sans que ce soit adapté au cas.
+
+Afficher la **notice des méthodes possibles** pour que l'utilisateur voie les options et oriente (et commente ce qui a déjà été testé) :
+
+```
+🧭 Méthodes de débogage possibles :
+  [1] Snapshot PLC (GVL_Troubleshooting) — lecture de variables en simu/site
+  [2] Test CI ad hoc (_TROUBLESHOOTING/) — compiler un FB + vérifier une fonction
+  [3] Analyse statique déléguée (sous-agent trace la chaîne dans le code)
+  [4] Lecture trace CODESYS (variables internes d'un FB) par l'utilisateur
+  [5] Autre / combinaison
+```
+
+Puis poser la question d'orientation (adaptée au symptôme) :
+- Quelles **données sont déjà disponibles** (snapshot, trace, variables) ?
+- Quelle méthode est la **plus facile / rapide** dans ce cas précis ?
+- (option) Que voulez-vous que je **documente / que j'ai testé** jusqu'ici, pour vos commentaires ?
+
+➡️ L'agent suit l'orientation choisie, peut combiner plusieurs méthodes, et documente dans la fiche **ce qui a été testé** (journal) pour que l'utilisateur puisse commenter.
+
+## 0bis-A. 📥 ACQUISITION DES VALEURS (canal)
 
 > **Comment l'agent obtient les valeurs du PLC sans l'exécuter.**
 
@@ -16,6 +38,28 @@
 - **Si manquante** → **ne pas demander de valeur live** : proposer d'ajouter la variable dans `GVL_Troubleshooting`, régénérer la liste (`generate_variable_list_from_code.py`), **validation humaine**, puis compiler + snapshot.
 - ⚠️ Si la cause exige > 2-3 structures → le troubleshooting est **mal conçu** OU il faut **créer une structure dédiée** à ce type de problématique. Le signaler.
 - 🚫 **Ne JAMAIS se baser sur `Device.export`** (souvent périmé). Sources fiables : `CODE/*.st` + `GVL_Troubleshooting` (via snapshot).
+
+## 0bis-B. 🔬 TEST CI AD HOC DE DÉPANNAGE (compiler un FB et vérifier une fonction)
+
+> Méthode **complémentaire** au snapshot : quand le doute porte sur une **fonction d'un FB isolé**
+> (simulation `FB_Sim_*`, logique interne, machine d'état), la **prouver par un test automatisé**
+> plutôt que par un snapshot PLC. Utile quand la variable n'est pas dans `GVL_Troubleshooting`.
+
+Dossier dédié : `TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/` (le **underscore** = spécial/jetable, **hors registry principal** `registry.yaml`).
+
+Démarche :
+1. **Mettre à jour le script** `run_troubleshooting.py` : définir l'entrée ad hoc `FB_NAME` + `ENTRY["sources"]` (DUT/enum d'abord, FB en dernier) + `ENTRY["test"]`.
+2. **Mettre à jour le test** `.st` (format `TEST '...'` + `ASSERT_*`, voir exemples dans `RESULTS/<domaine>/tests/`). Le test ne lit que les **sorties publiques** du FB (`VAR_INPUT`/`VAR_OUTPUT`/`VAR_IN_OUT`), jamais les internes.
+3. **Compiler + exécuter** :
+   ```
+   python TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/run_troubleshooting.py
+   ```
+   → rapport dans `RESULTS/_TROUBLESHOOTING/reports/` + affichage PASS/FAIL par test.
+4. **Preuve** : PASS prouve le comportement attendu ; FAIL donne le message d'assertion exact (valeur attendue vs obtenue).
+
+Règles :
+- **⚠️ Dossier jetable** : nettoyer `RESULTS/_TROUBLESHOOTING/` après chaque dépannage (ne pas commiter les tests ad hoc).
+- ⚠️ Dans le runner CI, **chaque appel `fb(...)` = 1 scan** (10ms) : `ADVANCE_TIME` avance le temps simulé mais ne fait **pas** tourner le FB — pour simuler N ms il faut **N/CycleTimeS appels** (ex. 1.6s @10ms = 160 appels), ou tester à l'échelle d'un scan.
 
 ## 1. 🧊 CONTEXTE FIGÉ (à remplir UNE fois selon la situation)
 

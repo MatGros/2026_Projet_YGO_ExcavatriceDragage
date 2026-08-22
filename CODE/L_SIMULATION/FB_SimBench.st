@@ -74,6 +74,8 @@ VAR_INPUT
     SimJoystickRawX                    : INT := 5000;   (* --> [TST] Valeur brute X *)
     SimJoystickRawY                    : INT := 5000;   (* --> [TST] Valeur brute Y *)
     SimJoystickRawButton               : BOOL := FALSE;   (* --> [TST] Bouton homme-mort *)
+    SimJoystickOvershoot_Active        : BOOL := FALSE;   (* --> [TST] Dépassement de montée au-delà de 100% (défaut capteur hors plage) *)
+    SimJoystickBagotement_Active       : BOOL := FALSE;   (* --> [TST] Bagotement au relâchement (petit balancement autour du neutre) *)
 
     SimKoboldContactValue      : BOOL := FALSE;   (* --> [TST] Contact fond Kobold *)
     BtnEmergencyStop           : BOOL := FALSE;    (* --> [TST] Simulation appui coup-de-poing AU *)
@@ -281,36 +283,32 @@ Translation.AC600_DeviceState    := DEVICE_STATE.RUNNING; // État device RUNNIN
 {region "§4 Simulation operateur joystick"}
 // ── 3. MODÈLE OPÉRATEUR / JOYSTICK ───────────────────────────────────────────
 instSimJoystick(
-    Enable     := TRUE,
-    NeutralRaw := 5000,
-    MaxRaw     := 10000
+    Enable              := TRUE,
+    NeutralRaw          := 5000,
+    MaxRaw              := 10000,
+    BtnLeft_Rev_TREMIE  := SimJoystickLeft_Rev_TREMIE_Active,
+    BtnRight_Fwd_MAINT  := SimJoystickRight_Fwd_MAINT_Active,
+    BtnFwd_Up_Close     := SimJoystickFwd_Up_Close_Active,
+    BtnRev_Down_Open    := SimJoystickRev_Down_Open_Active,
+    OvershootActive     := SimJoystickOvershoot_Active,
+    BagotementActive    := SimJoystickBagotement_Active,
+    CycleTimeS          := 0.010
 );
 
 // Les boutons directionnels simplifient les essais : une commande unique impose
 // une butée d'axe ; aucune commande ou une combinaison reste au neutre / stimulus avancé.
+// Le modèle dynamique (montée/retombée/bagotement) pilote RawX/RawY dès qu'un bouton est actif.
 SimJoystickDirectionCount := BOOL_TO_INT(SimJoystickLeft_Rev_TREMIE_Active)
                            + BOOL_TO_INT(SimJoystickRight_Fwd_MAINT_Active)
                            + BOOL_TO_INT(SimJoystickFwd_Up_Close_Active)
                            + BOOL_TO_INT(SimJoystickRev_Down_Open_Active);
-IF SimJoystickDirectionCount = 1 THEN
-    IF SimJoystickLeft_Rev_TREMIE_Active THEN
-        Operator.JoyXRaw_ANA1 := 0;
-        Operator.JoyYRaw_ANA2 := 5000;
-    ELSIF SimJoystickRight_Fwd_MAINT_Active THEN
-        Operator.JoyXRaw_ANA1 := 10000;
-        Operator.JoyYRaw_ANA2 := 5000;
-    ELSIF SimJoystickFwd_Up_Close_Active THEN
-        Operator.JoyXRaw_ANA1 := 5000;
-        Operator.JoyYRaw_ANA2 := 10000;
-    ELSE
-        Operator.JoyXRaw_ANA1 := 5000;
-        Operator.JoyYRaw_ANA2 := 0;
-    END_IF;
-ELSIF SimJoystickDirectionCount > 1 THEN
-    // Deux directions simultanées ne créent jamais une diagonale / un double mouvement implicite.
-    Operator.JoyXRaw_ANA1 := 5000;
-    Operator.JoyYRaw_ANA2 := 5000;
+IF (SimJoystickDirectionCount >= 1) OR instSimJoystick.ReturningActive THEN
+    // Bouton(s) actif(s) OU retour dynamique en cours (retombée/bagotement) → sortie du modèle.
+    // (≥2 boutons : le modèle gère lui-même le neutre — pas de diagonale implicite.)
+    Operator.JoyXRaw_ANA1 := instSimJoystick.RawX;
+    Operator.JoyYRaw_ANA2 := instSimJoystick.RawY;
 ELSE
+    // Modèle au repos → stimulus analogique avancé (mode « sans bouton »).
     Operator.JoyXRaw_ANA1 := SimJoystickRawX;
     Operator.JoyYRaw_ANA2 := SimJoystickRawY;
 END_IF;
@@ -348,3 +346,5 @@ Busy := FALSE;
 Done := TRUE;
 
 {endregion}
+
+END_FUNCTION_BLOCK
