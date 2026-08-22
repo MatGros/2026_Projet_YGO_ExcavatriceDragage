@@ -294,7 +294,6 @@ HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machi
 instJoystick(
     Enable                    := TRUE,
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                      := PRG_03_Modes_Cycle.Auth.Mode,
     BenneBusy                 := PRG_04_Treuils_Benne.instBucket.Status.Busy,
     PreserveArmingAfterBucket := PRG_04_Treuils_Benne.instExtractionSequence.Status.Busy
@@ -308,10 +307,10 @@ instJoystick(
     InvertX                   := _JoystickInvertX,
     InvertY                   := _JoystickInvertY,
     DeadbandRaw               := _JoystickDeadbandRaw,
-    FilterTime                := _JoystickFilterTime,
     NeutralHoldTime           := T#100MS,
     DeadmanArmHoldTime        := T#100MS,
     DeadmanArmGraceTime       := T#3S,
+    RawOutOfRangeMargin       := 500,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
 );

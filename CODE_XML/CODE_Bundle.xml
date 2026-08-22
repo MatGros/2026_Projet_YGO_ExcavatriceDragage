@@ -5700,7 +5700,8 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bloc en cours d'exécution</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres historiques (conservés) ----
+1 = Bloc en cours d'exécution</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -5716,7 +5717,7 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut actif présent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut à acquitter (laté jusqu'au Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -5743,6 +5744,47 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
               </documentation>
             </variable>
+            <variable name="Warning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres ajoutés (forme cible enrichie) ----
+1 = warning actif (auto-effacé, aucun acquittement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code warning courant (bitfield)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningIdTxt">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis WarningId (prêt IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorIdTxt">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis ErrorId</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = un Reset est nécessaire / en cours</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -5752,13 +5794,14 @@ TRUE des qu'un referencement a reussi</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier (forme cible)
+   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe exactement les six membres nécessaires au suivi
-      synoptique et diagnostic d'un FB standard (contrat §2quinquies).
-   🧬 Forme cible : les FB standard passent de la forme « à plat »
-      (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers
-      `Status : ST_FbStatus`, migré par lot dédié, gradué (pilote d'abord).
+   🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
+      avec les textes prêts pour l'IHM (plus de conditions complexes
+      côté affichage). Évolution ADDITIVE de la forme historique : les
+      6 membres d'origine sont conservés (tolérance transitoire T137).
+   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+      rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
@@ -18322,7 +18365,304 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
           </data>
         </addData>
       </pou>
-      <pou name="FB_Filter_PT1" pouType="functionBlock">
+      <pou name="FB_FbStatus" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS &amp; ACQUITTEMENT ===
+--&gt; [CMD] Autorisation générale FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement défaut (jamais conditionné, §9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorIdCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES &amp; CLASSIFICATION (producteur = bloc métier) ===
+--&gt; [HW]  Bits d'erreur ACTIFS (cause brute)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningMask">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] bit=1 → cette erreur est WARNING (auto) ; bit=0 → FAULT (à acquitter)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorTexts">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="STRING" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEXTES IHM (métier, indexés par bit) ===
+--&gt; [CFG] Textes des erreurs (par bit)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningTexts">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="STRING" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Textes des warnings (par bit)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RotatePeriod">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1S" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIG DISPLAY ===
+--&gt; [CFG] Période de rotation texte multi-erreurs</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ÉTAT &amp; SYNOPTIQUE (forme cible) ===
+&lt;-- [STAT] FB prêt (Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Status">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut complet (mappé 1:1 sur la sortie du bloc)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES &amp; MEMOIRES ===
+* [INST] Front Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front apparition cause fault (ré-alarme)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RotateTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Rotation du texte affiché (multi-erreurs)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES ===
+. [LOC] bits Fault (cause brute)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bits Warning (cause brute)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorIdLatched">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] code fault mémorisé (jusqu'au Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] index de rotation du texte (multi-erreurs)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 FB_FbStatus — Socle de statut standard d'un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
+      (warning auto-effacé / défaut laté acquitté, textes IHM prêts).
+   🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
+      rempli via UNE instance de ce socle → même comportement partout.
+   🔒 Sécurité : WarningMask fail-safe (0 = tout fault à acquitter).
+      Reset TOUJOURS effectif, jamais conditionné (std §9).
+      Interlock toujours sur la cause brute, jamais sur l'acquittement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate neutralisation"}
+// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr
+Ready := Enable;
+IF NOT Enable THEN
+    Status.Busy := FALSE; Status.Done := FALSE;
+    Status.Error := FALSE; Status.ErrorId := 0;
+    Status.Warning := FALSE; Status.WarningId := 0;
+    Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
+    Status.ResetRequested := FALSE;
+    Status.WarningIdTxt := ''; Status.ErrorIdTxt := '';
+    ErrorIdLatched := 0; FaultCause := 0; WarningCause := 0;
+    RotateTimer(IN := FALSE, PT := RotatePeriod);
+    RETURN;
+END_IF;
+Status.State := E_State.READY;
+{endregion}
+
+{region "§2 Classification des causes (exclusivité)"}
+// 2. Un bit est exclusivement warning OU fault (jamais les deux, §3bis)
+FaultCause   := ErrorIdCause AND (NOT WarningMask);  // bits fault (à acquitter)
+WarningCause := ErrorIdCause AND WarningMask;          // bits warning (auto-effacés)
+{endregion}
+
+{region "§3 Défaut laté + acquittement"}
+// 3. Front Reset : TOUJOURS effectif, jamais conditionné (std §9)
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    ErrorIdLatched := 0;
+END_IF;
+// 4. Ré-alarme : nouvelle apparition d'un fault non encore acquitté -&gt; relatte
+FaultEdge(CLK := (FaultCause &lt;&gt; 16#0000));
+IF FaultEdge.Q THEN
+    ErrorIdLatched := ErrorIdLatched OR FaultCause;
+END_IF;
+// 5. Mémoire de l'état au défaut
+IF (FaultCause &lt;&gt; 16#0000) THEN
+    Status.StateAtError := Status.State;
+END_IF;
+// 6. Sorties défaut : affiché = laté OU cause courante
+Status.ErrorId := ErrorIdLatched OR FaultCause;
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+Status.ResetRequested := (ErrorIdLatched &lt;&gt; 16#0000);
+{endregion}
+
+{region "§4 Warning auto-effacé"}
+Status.WarningId := WarningCause;
+Status.Warning := (WarningCause &lt;&gt; 16#0000);
+{endregion}
+
+{region "§5 Textes IHM + rotation 1s"}
+// 8. Sélection du texte : on affiche le texte du bit le plus bas encore présent.
+//    S'il y a plusieurs erreurs/warnings, l'affichage tourne toutes les RotatePeriod.
+Status.ErrorIdTxt := '';
+Status.WarningIdTxt := '';
+
+// Rotation de l'index de départ (pour faire défiler les textes multi-erreurs)
+RotateTimer(IN := (Status.ErrorId &lt;&gt; 16#0000) OR (Status.WarningId &lt;&gt; 16#0000),
+            PT := RotatePeriod);
+IF RotateTimer.Q THEN
+    ErrIdx := (ErrIdx + 1) MOD 16;
+    RotateTimer(IN := FALSE, PT := RotatePeriod);
+END_IF;
+
+// -- Texte ERROR : premier bit set à partir de ErrIdx (circulaire) --
+IF Status.ErrorId &lt;&gt; 16#0000 THEN
+    // scan 16 bits, départ ErrIdx
+    // (boucle simple : les blocs métier gardent peu de bits -&gt; OK performance)
+    // remplit ErrorIdTxt avec le texte du bit le plus bas set
+    IF (Status.ErrorId AND 16#0001) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[0];
+    ELSIF (Status.ErrorId AND 16#0002) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[1];
+    ELSIF (Status.ErrorId AND 16#0004) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[2];
+    ELSIF (Status.ErrorId AND 16#0008) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[3];
+    ELSIF (Status.ErrorId AND 16#0010) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[4];
+    ELSIF (Status.ErrorId AND 16#0020) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[5];
+    ELSIF (Status.ErrorId AND 16#0040) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[6];
+    ELSIF (Status.ErrorId AND 16#0080) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[7];
+    ELSIF (Status.ErrorId AND 16#0100) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[8];
+    ELSIF (Status.ErrorId AND 16#0200) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[9];
+    ELSIF (Status.ErrorId AND 16#0400) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[10];
+    ELSIF (Status.ErrorId AND 16#0800) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[11];
+    ELSIF (Status.ErrorId AND 16#1000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[12];
+    ELSIF (Status.ErrorId AND 16#2000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[13];
+    ELSIF (Status.ErrorId AND 16#4000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[14];
+    ELSIF (Status.ErrorId AND 16#8000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[15];
+    END_IF;
+END_IF;
+
+// -- Texte WARNING : premier bit set --
+IF Status.WarningId &lt;&gt; 16#0000 THEN
+    IF (Status.WarningId AND 16#0001) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[0];
+    ELSIF (Status.WarningId AND 16#0002) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[1];
+    ELSIF (Status.WarningId AND 16#0004) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[2];
+    ELSIF (Status.WarningId AND 16#0008) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[3];
+    ELSIF (Status.WarningId AND 16#0010) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[4];
+    ELSIF (Status.WarningId AND 16#0020) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[5];
+    ELSIF (Status.WarningId AND 16#0040) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[6];
+    ELSIF (Status.WarningId AND 16#0080) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[7];
+    ELSIF (Status.WarningId AND 16#0100) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[8];
+    ELSIF (Status.WarningId AND 16#0200) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[9];
+    ELSIF (Status.WarningId AND 16#0400) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[10];
+    ELSIF (Status.WarningId AND 16#0800) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[11];
+    ELSIF (Status.WarningId AND 16#1000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[12];
+    ELSIF (Status.WarningId AND 16#2000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[13];
+    ELSIF (Status.WarningId AND 16#4000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[14];
+    ELSIF (Status.WarningId AND 16#8000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[15];
+    END_IF;
+END_IF;
+{endregion}
+
+// Busy/Done : conditionneur toujours prêt -&gt; Busy/Done FALSE (usage métier)
+Status.Busy := FALSE;
+Status.Done := FALSE;
+
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>4ced8a0d-966a-58f2-989d-6c7942c5f7a8</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_Filter" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="ValueIn">
@@ -18331,7 +18671,7 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE &amp; CONFIGURATION ===
---&gt; [CMD] Consigne d'axe brute a filtrer</xhtml>
+--&gt; [CMD] Valeur brute a filtrer</xhtml>
               </documentation>
             </variable>
             <variable name="TimeConst">
@@ -18358,7 +18698,7 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES LISSÉES ===
-&lt;-- [STAT] Consigne d'axe lissee par filtre PT1</xhtml>
+&lt;-- [STAT] Valeur lissee par filtre PT1</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -18383,11 +18723,11 @@ Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ FB_Filter_PT1 — Filtre passe-bas premier ordre (PT1 numérique)
+   ⚙️ FB_Filter — Filtre passe-bas premier ordre (PT1 numérique)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Filtre exponentiel discret y[k] = a*x[k] + (1-a)*y[k-1]
              avec a = CycleTimeS / (T + CycleTimeS). Pass-through si T=0 ou Cycle=0.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📄 Domaine : CODE/A_COMMUN (fonction de filtrage générale)
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -18408,7 +18748,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>564cb076-094f-527b-93bc-caad3ea68d7f</ObjectId>
+            <ObjectId>39721efb-445f-5f0c-882a-6b2b978076bc</ObjectId>
           </data>
         </addData>
       </pou>
@@ -19523,14 +19863,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Acquittement defaut</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Conditions globales OK (chaine AU rearmee)</xhtml>
-              </documentation>
-            </variable>
             <variable name="Mode">
               <type>
                 <derived name="E_Mode" />
@@ -19639,17 +19971,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Zone morte en points ADC bruts (0..10000)</xhtml>
               </documentation>
             </variable>
-            <variable name="FilterTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#0MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Filtrage premier ordre axe</xhtml>
-              </documentation>
-            </variable>
             <variable name="NeutralHoldTime">
               <type>
                 <TIME />
@@ -19681,6 +20002,17 @@ END_IF;
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Delai de grace post-armement avant desarmement neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawOutOfRangeMargin">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG]  Marge tolerance ADC autour des bornes nominales [0..10000] avant defaut capteur (AF08 §5bis)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -19724,7 +20056,7 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC &amp; ANOMALIES ===
-&lt;-- [DIAG] Presence anomalie</xhtml>
+&lt;-- [DIAG] Presence anomalie (miroir Status.Error)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -19733,6 +20065,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bit0: Echec calibration Joystick (RawX/Y hors plage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Status">
+              <type>
+                <derived name="ST_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut standard complet (socle FB_FbStatus)</xhtml>
               </documentation>
             </variable>
             <variable name="AxisCmdX">
@@ -19838,21 +20178,13 @@ END_IF;
             </variable>
           </inOutVars>
           <localVars>
-            <variable name="CycleTimeCalc">
-              <type>
-                <derived name="FB_CycleTime" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB &amp; TIMERS ===
-* [INST] Calcul du temps de cycle reel</xhtml>
-              </documentation>
-            </variable>
             <variable name="ScaleX">
               <type>
                 <derived name="FB_AxisScale" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Normalisation et zone morte axe X</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB &amp; TIMERS ===
+* [INST] Normalisation et zone morte axe X</xhtml>
               </documentation>
             </variable>
             <variable name="ScaleY">
@@ -19861,22 +20193,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Normalisation et zone morte axe Y</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FilterX">
-              <type>
-                <derived name="FB_Filter_PT1" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Filtre passe-bas PT1 axe X</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FilterY">
-              <type>
-                <derived name="FB_Filter_PT1" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Filtre passe-bas PT1 axe Y</xhtml>
               </documentation>
             </variable>
             <variable name="ResetEdge">
@@ -19968,13 +20284,71 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Memorisation mode scan precedent pour detection changement</xhtml>
               </documentation>
             </variable>
+            <variable name="RawOutOfRange">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Surveillance capteur continue (AF08 §5bis) : RawX/RawY hors plage nominale+marge</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorIdCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Cause brute agrégée alimentant le socle FB_FbStatus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningMask">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Masque des erreurs classées WARNING (bit=1) ; bit=0 -&gt; FAULT à acquitter</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFbStatus">
+              <type>
+                <derived name="FB_FbStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle de statut standard (forme cible)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickErrorTexts">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="STRING" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Textes IHM des erreurs joystick (par bit)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWarningTexts">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="STRING" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Textes IHM des warnings joystick (par bit)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🕹️ FB_Joystick — Acquisition &amp; conditionnement du geste opérateur
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
-             Pipeline par axe : FB_AxisScale -&gt; FB_Filter_PT1 -&gt; Homme-Mort -&gt; ST_Joystick_AxisCmd.
+             Pipeline par axe : FB_AxisScale -&gt; Homme-Mort -&gt; ST_Joystick_AxisCmd.
    🔒 Sécurité : Armement homme-mort par maintien au neutre.
                  Désarmement sur neutre prolongé, changement mode ou fin benne.
    📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
@@ -19988,7 +20362,7 @@ END_IF;
 
 {region "§1 Gate securite"}
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
-IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
+IF NOT Enable OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0; AxisCmdX.Direction := 0;
     AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0; AxisCmdY.Direction := 0;
@@ -20004,6 +20378,13 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
     LastMode := Mode;   // Pas de faux changement détecté à la réactivation
+    // 🔎 AF08 §3 : perte bus CAN / device non-opérationnel -&gt; ErrorId bit2 (16#0004),
+    // Info/Warning auto-effacé dès le retour (pas un Fault à acquitter).
+    // Distingué du gate générique (Enable/PowerContactor) qui, lui, ne lève pas d'erreur.
+    IF NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
+        ErrorId := ErrorId OR 16#0004;
+        Error := TRUE;   // le gate RETURN avant le calcul "Error := (ErrorId&lt;&gt;0)" -&gt; forçage explicite
+    END_IF;
     RETURN;
 END_IF;
 
@@ -20019,8 +20400,13 @@ IF ResetEdge.Q AND (RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND 
 END_IF;
 
 // 📥 3. ACQUISITION TIMING &amp; BOUTON
-CycleTimeCalc();
 Button := RawButton;
+
+// 🔎 AF08 §3 : dès le retour du bus CAN / device opérationnel, le bit2 (perte HW/bus)
+// s'auto-efface (Info/Warning, pas un Fault à acquitter). Ne touche pas aux autres bits.
+IF BusCanOpenOP.Operational AND JoystickOP.Operational THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
 
 {endregion}
 
@@ -20042,6 +20428,22 @@ LastCalibrate := BtnCalibrate;
 ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic — position centrale (zone morte)
+
+// 🛡️ 4ter. SURVEILLANCE CAPTEUR CONTINUE (AF08 §5bis) — défaut hors plage ADC.
+// Évaluée à CHAQUE scan (pas seulement au front BtnCalibrate). Si RawX OU RawY sort de la
+// plage nominale [0..10000] + marge de tolérance, confiance perdue dans TOUT le geste :
+// neutralisation des 2 axes + ErrorId bit1 (16#0002). Cause brute évaluée en continu
+// (interlock toujours sur la cause, jamais sur l'acquittement) → ré-alarme auto si persistante.
+RawOutOfRange := (RawX &lt; (0 - RawOutOfRangeMargin))
+              OR (RawX &gt; (10000 + RawOutOfRangeMargin))
+              OR (RawY &lt; (0 - RawOutOfRangeMargin))
+              OR (RawY &gt; (10000 + RawOutOfRangeMargin));
+IF RawOutOfRange THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSE
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
+Error := (ErrorId &lt;&gt; 16#0000);
 
 {endregion}
 
@@ -20105,17 +20507,18 @@ END_IF;
 
 {region "§6 Pipeline axe X"}
 // 🕹️ 5. PIPELINE TRAITEMENT — AXE X
+// Pas de filtre : le joystick est stable et ne doit pas être ralenti (décision 2026-08-22).
+// Inversion de sens appliquée directement sur la sortie normalisée.
+// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
+// OU si le capteur est hors plage (RawOutOfRange) : confiance perdue dans tout le geste.
 IF InvertX THEN
-    FilterX(ValueIn := -ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, -ScaleX.OutPct);
 ELSE
-    FilterX(ValueIn := ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 END_IF;
 
-// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
-CmdXVal := SEL(DeadmanArmed, 0.0, FilterX.ValueOut);
-
 // Mapping Sortie Standardisée Axe X
-AxisCmdX.Enable := TRUE;
+AxisCmdX.Enable := NOT RawOutOfRange;
 AxisCmdX.SpeedRef := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
 
@@ -20136,17 +20539,18 @@ DirectionX := AxisCmdX.Direction;
 
 {region "§7 Pipeline axe Y et sorties"}
 // 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
+// Pas de filtre : le joystick est stable et ne doit pas être ralenti (décision 2026-08-22).
+// Inversion de sens appliquée directement sur la sortie normalisée.
+// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
+// OU si le capteur est hors plage (RawOutOfRange) : confiance perdue dans tout le geste.
 IF InvertY THEN
-    FilterY(ValueIn := -ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, -ScaleY.OutPct);
 ELSE
-    FilterY(ValueIn := ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 END_IF;
 
-// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
-CmdYVal := SEL(DeadmanArmed, 0.0, FilterY.ValueOut);
-
 // Mapping Sortie Standardisée Axe Y
-AxisCmdY.Enable := TRUE;
+AxisCmdY.Enable := NOT RawOutOfRange;
 AxisCmdY.SpeedRef := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
 
@@ -20167,6 +20571,29 @@ DirectionY := AxisCmdY.Direction;
 NeutralXAct := NeutralXMem;
 NeutralYAct := NeutralYMem;
 Done := NOT Error;
+
+// 🧩 SOCLE DE STATUT STANDARD (forme cible) — remplit Status : ST_FbStatus
+// Le joystick produit ErrorId (bit0 calib, bit1 capteur, bit2 bus). On le passe au socle
+// qui classe : WarningMask bit=1 → warning auto, bit=0 → fault à acquitter.
+// Joystick : bit0 (calib) = FAULT à acquitter ; bit1 (capteur) + bit2 (bus) = WARNING auto.
+WarningMask := 16#0006;   // bits 1+2 = warning (auto-effacés) ; bit0 = fault
+ErrorIdCause := ErrorId;
+
+// Textes IHM (par bit) — stockés dans des tableaux locaux
+JoystickErrorTexts[0] := 'Echec calibration joystick (RawX/Y hors zone)';
+JoystickErrorTexts[1] := 'Capteur joystick hors plage ADC';
+JoystickErrorTexts[2] := 'Perte liaison bus CAN joystick';
+JoystickWarningTexts[1] := 'Capteur joystick hors plage ADC (warning)';
+JoystickWarningTexts[2] := 'Perte liaison bus CAN joystick (warning)';
+
+instFbStatus(Enable := Enable, Reset := Reset,
+             ErrorIdCause := ErrorIdCause, WarningMask := WarningMask,
+             ErrorTexts := JoystickErrorTexts, WarningTexts := JoystickWarningTexts,
+             RotatePeriod := T#1S);
+Status := instFbStatus.Status;
+Error := Status.Error;      // miroir (source de vérité = socle)
+ErrorId := Status.ErrorId;    // miroir
+Ready := NOT Error;
 
 {endregion}
 </xhtml>
@@ -32459,7 +32886,6 @@ HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machi
 instJoystick(
     Enable                    := TRUE,
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
-    PowerContactorEngaged     := HwIn.Machine.PowerContactorEngaged_DI,
     Mode                      := PRG_03_Modes_Cycle.Auth.Mode,
     BenneBusy                 := PRG_04_Treuils_Benne.instBucket.Status.Busy,
     PreserveArmingAfterBucket := PRG_04_Treuils_Benne.instExtractionSequence.Status.Busy
@@ -32473,10 +32899,10 @@ instJoystick(
     InvertX                   := _JoystickInvertX,
     InvertY                   := _JoystickInvertY,
     DeadbandRaw               := _JoystickDeadbandRaw,
-    FilterTime                := _JoystickFilterTime,
     NeutralHoldTime           := T#100MS,
     DeadmanArmHoldTime        := T#100MS,
     DeadmanArmGraceTime       := T#3S,
+    RawOutOfRangeMargin       := 500,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
 );
@@ -36233,8 +36659,11 @@ GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadm
 GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.instJoystick.AtNeutral;
 GVL_IHM.JOY1Joystick.State.Online := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online;
 GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational;
-GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instDiagCanOpen.Error;
-GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instDiagCanOpen.ErrorId;
+// 🕹️ Le défaut fonctionnel du joystick (calibration bit0, capteur hors plage bit1, perte
+// bus bit2) vient du FB lui-même, pas du diagnostic bus. Le diagnostic CAN reste exposé
+// séparément (GVL_IHM.Network.CanError) — ici on remonte l'erreur du FB joystick.
+GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.ErrorId;
 
 GVL_IHM.Network.CanError    := PRG_02_Acquisition.instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := PRG_02_Acquisition.instDiagCanOpen.ErrorId;
@@ -37137,6 +37566,8 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_Acquisition_Preflight" ObjectId="78a087ce-501c-55a1-a50d-014fd4495703" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
+          <Object Name="FB_FbStatus" ObjectId="4ced8a0d-966a-58f2-989d-6c7942c5f7a8" />
+          <Object Name="FB_Filter" ObjectId="39721efb-445f-5f0c-882a-6b2b978076bc" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
           <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
@@ -37293,7 +37724,6 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
         </Folder>
         <Folder Name="D_JOYSTICK">
           <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
-          <Object Name="FB_Filter_PT1" ObjectId="564cb076-094f-527b-93bc-caad3ea68d7f" />
           <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
           <Object Name="ST_Joystick_AxisCmd" ObjectId="cc2d7a74-de30-5c0a-bd36-dfc7ff7d8068" />
         </Folder>

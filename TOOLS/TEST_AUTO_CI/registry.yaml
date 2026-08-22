@@ -4,6 +4,28 @@
 # sous-FB, FB composite en dernier). Le runner ne devine jamais de dependance -- toute
 # nouvelle entree se fait ici, jamais en modifiant run_tests.py.
 
+FB_Encoder:
+  domain: CODEURS
+  af_doc: DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+  # NB : pas de prod_instance -- FB_Encoder n'est pas encore instancie dans un PRG (aucun
+  # appel FB_Encoder(...) trouve sous CODE/ au 2026-08-22). Smoke test seul pour l'instant :
+  # valide la population IN/OUT du rapport (structs ST_EncoderHw/ST_Encoder_Calib/
+  # ST_EncoderMeasurement, VAR_IN_OUT Calib), pas encore le catalogue de tests AF-09.
+  sources:
+    - CODE/A_COMMUN/E_State.st
+    - CODE/A_COMMUN/ST_FbStatus.st
+    - CODE/E_CODEURS/ST_EncoderHw.st
+    - CODE/E_CODEURS/ST_Encoder_Calib.st
+    - CODE/E_CODEURS/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/FB_Encoder_Abs.st
+    - CODE/E_CODEURS/FB_Encoder_Homing.st
+    - CODE/E_CODEURS/FB_Encoder_Scale.st
+    - CODE/E_CODEURS/FB_Encoder_Safety.st
+    - CODE/E_CODEURS/FB_EncoderReliability.st
+    - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+    - CODE/E_CODEURS/FB_Encoder.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/CODEURS/tests/test_fb_encoder.st
+
 FB_Joystick:
   domain: JOYSTICK
   af_doc: DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
@@ -17,10 +39,11 @@ FB_Joystick:
     - CODE/F_MODES/E_Mode.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/A_COMMUN/E_State.st
+    - CODE/A_COMMUN/ST_FbStatus.st
+    - CODE/A_COMMUN/FB_FbStatus.st
     - CODE/D_JOYSTICK/ST_Joystick_AxisCmd.st
-    - CODE/A_COMMUN/FB_CycleTime.st
     - CODE/D_JOYSTICK/FB_AxisScale.st
-    - CODE/D_JOYSTICK/FB_Filter_PT1.st
     - CODE/D_JOYSTICK/FB_Joystick.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/JOYSTICK/tests/test_fb_joystick.st
 

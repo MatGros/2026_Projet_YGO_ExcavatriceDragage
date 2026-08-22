@@ -416,8 +416,11 @@ GVL_IHM.JOY1Joystick.State.DeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadm
 GVL_IHM.JOY1Joystick.State.AtNeutral := PRG_02_Acquisition.instJoystick.AtNeutral;
 GVL_IHM.JOY1Joystick.State.Online := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Online;
 GVL_IHM.JOY1Joystick.State.Operational := PRG_02_Acquisition.instDiagCanOpen.DeviceJoystick.Operational;
-GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instDiagCanOpen.Error;
-GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instDiagCanOpen.ErrorId;
+// 🕹️ Le défaut fonctionnel du joystick (calibration bit0, capteur hors plage bit1, perte
+// bus bit2) vient du FB lui-même, pas du diagnostic bus. Le diagnostic CAN reste exposé
+// séparément (GVL_IHM.Network.CanError) — ici on remonte l'erreur du FB joystick.
+GVL_IHM.JOY1Joystick.State.Error := PRG_02_Acquisition.instJoystick.Error;
+GVL_IHM.JOY1Joystick.State.ErrorId := PRG_02_Acquisition.instJoystick.ErrorId;
 
 GVL_IHM.Network.CanError    := PRG_02_Acquisition.instDiagCanOpen.Error;
 GVL_IHM.Network.CanErrorId  := PRG_02_Acquisition.instDiagCanOpen.ErrorId;

@@ -143,7 +143,8 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bloc en cours d'exécution</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres historiques (conservés) ----
+1 = Bloc en cours d'exécution</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -159,7 +160,7 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut actif présent</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut à acquitter (laté jusqu'au Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -186,6 +187,47 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">État mémorisé lors de l'apparition du défaut</xhtml>
               </documentation>
             </variable>
+            <variable name="Warning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">---- membres ajoutés (forme cible enrichie) ----
+1 = warning actif (auto-effacé, aucun acquittement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code warning courant (bitfield)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WarningIdTxt">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis WarningId (prêt IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorIdTxt">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte généré depuis ErrorId</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = un Reset est nécessaire / en cours</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -195,13 +237,14 @@ Statut FB_Encoder_Homing (etat du referencement)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier (forme cible)
+   🧩 ST_FbStatus — Socle transverse de statut d'un FB métier
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : regroupe exactement les six membres nécessaires au suivi
-      synoptique et diagnostic d'un FB standard (contrat §2quinquies).
-   🧬 Forme cible : les FB standard passent de la forme « à plat »
-      (Busy/Done/Error/ErrorId/State/StateAtError en VAR_OUTPUT) vers
-      `Status : ST_FbStatus`, migré par lot dédié, gradué (pilote d'abord).
+   🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
+      avec les textes prêts pour l'IHM (plus de conditions complexes
+      côté affichage). Évolution ADDITIVE de la forme historique : les
+      6 membres d'origine sont conservés (tolérance transitoire T137).
+   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+      rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
       Un FB dont l'état est un énum domaine (E_Diag_State, CycleStep,
       ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne

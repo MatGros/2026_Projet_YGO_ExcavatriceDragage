@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:44:00.119461" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:44:00.119461">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T10:34:08.439263" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T10:34:08.439263">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -24,7 +24,7 @@
   <types>
     <dataTypes />
     <pous>
-      <pou name="FB_Filter_PT1" pouType="functionBlock">
+      <pou name="FB_Filter" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="ValueIn">
@@ -33,7 +33,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE &amp; CONFIGURATION ===
---&gt; [CMD] Consigne d'axe brute a filtrer</xhtml>
+--&gt; [CMD] Valeur brute a filtrer</xhtml>
               </documentation>
             </variable>
             <variable name="TimeConst">
@@ -60,7 +60,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES LISSÉES ===
-&lt;-- [STAT] Consigne d'axe lissee par filtre PT1</xhtml>
+&lt;-- [STAT] Valeur lissee par filtre PT1</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -85,11 +85,11 @@
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ FB_Filter_PT1 — Filtre passe-bas premier ordre (PT1 numérique)
+   ⚙️ FB_Filter — Filtre passe-bas premier ordre (PT1 numérique)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Filtre exponentiel discret y[k] = a*x[k] + (1-a)*y[k-1]
              avec a = CycleTimeS / (T + CycleTimeS). Pass-through si T=0 ou Cycle=0.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+   📄 Domaine : CODE/A_COMMUN (fonction de filtrage générale)
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -110,7 +110,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>564cb076-094f-527b-93bc-caad3ea68d7f</ObjectId>
+            <ObjectId>39721efb-445f-5f0c-882a-6b2b978076bc</ObjectId>
           </data>
         </addData>
       </pou>
@@ -122,8 +122,8 @@ END_IF;
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="D_JOYSTICK">
-          <Object Name="FB_Filter_PT1" ObjectId="564cb076-094f-527b-93bc-caad3ea68d7f" />
+        <Folder Name="A_COMMUN">
+          <Object Name="FB_Filter" ObjectId="39721efb-445f-5f0c-882a-6b2b978076bc" />
         </Folder>
       </ProjectStructure>
     </data>

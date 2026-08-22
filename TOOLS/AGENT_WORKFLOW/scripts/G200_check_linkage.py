@@ -121,6 +121,12 @@ KNOWN_ORPHANS_PENDING_DECISION: dict[str, str] = {
         "orpheline revelee 2026-08-05, meme situation que FB_Acquisition_Preflight "
         "— non investiguee, hors perimetre M3, necessite un audit dedie"
     ),
+    "FB_Filter": (
+        "deplace 2026-08-22 depuis FB_Filter_PT1 (retire du pipeline FB_Joystick, "
+        "decide par l'utilisateur) vers CODE/A_COMMUN comme fonction de filtrage "
+        "generale reutilisable — legitimement non encore instancie, a retirer de "
+        "cette liste des qu'il est consomme par un FB"
+    ),
 }
 
 # Sections de declaration dont le contenu est une interface, pas une instance

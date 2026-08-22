@@ -70,15 +70,19 @@ Profil AF03 : contrat `light` (acquisition/conditionnement pur, aucun organe pil
 ## 2. Pipeline et composition
 
 ```text
-Raw ─► FB_AxisScale ─► FB_Filter_PT1 ─► Homme-Mort (0 si non armé) ─► ST_Joystick_AxisCmd
-         deadband raw       τ filtre
+Raw ─► FB_AxisScale ─► Homme-Mort (0 si non armé) ─► ST_Joystick_AxisCmd
+         deadband raw
 ```
 
 | Brique | Rôle |
 |---|---|
 | `FB_AxisScale` | Neutre + deadband (compte brut ADC, 🔧 2026-08-07 : remplace le %) → % signé, borné ±100 |
-| `FB_Filter_PT1` | Lissage haute fréquence ; `CycleTimeS` via `FB_CycleTime` interne |
 | Homme-mort | Force la consigne à 0.0 si non armé (`DeadmanArmed = FALSE`) |
+
+> 🔧 **2026-08-22 — `FB_Filter_PT1` retiré du pipeline** : le joystick est stable et ne doit
+> **pas** être ralenti (aucun lissage). Décision : pas de filtre dans `FB_Joystick`.
+> L'éventuel lissage de la consigne reste confié aux FB de mouvement aval si besoin.
+> La fonction de filtrage PT1 est déplacée en généraliste `CODE/A_COMMUN/FB_Filter` (réutilisable).
 
 > 📌 **Architecture des rampes** : `FB_Ramp` n'est pas instancié dans `FB_Joystick`.
 > La gestion des rampes d'accélération et de décélération est confiée exclusivement aux FB
@@ -94,7 +98,7 @@ Raw ─► FB_AxisScale ─► FB_Filter_PT1 ─► Homme-Mort (0 si non armé) 
 | `SpeedRef` | % **signé** −100..+100 |
 | `Direction` | −1 / 0 / +1 (seuil ±0,1 sur rampe) |
 
-Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depuis `GVL_PERSISTENT` ;
+Paramètres d'appel production (`Acquisition`) : deadband depuis `GVL_PERSISTENT` ;
 `DeadmanRearmTimeout=T#10s`, `NeutralHoldTime=T#100ms` (🔧 2026-08-07, réduit de 500ms), `DeadmanReconfEnable=FALSE` (figé, défaut cible).
 
 ---
@@ -107,14 +111,13 @@ Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depui
 |---|---|
 | `Enable` | `TRUE` fixe dans Acquisition |
 | `Reset` | `FaultMachineReset_IHM` |
-| `PowerContactorEngaged` | `Acquisition (CFC).PowerContactorEngaged` |
 | `Mode` | `Modes (CFC).instModes.Mode` (scan N−1) |
 | `BenneBusy` | `Treuils.instBucket.Busy` (scan N−1) |
 | `PreserveArmingAfterBucket` | Extraction Busy **et** état `CLOSING_BUCKET` |
 | `BusCanOpenOP` / `JoystickOP` | `FB_Diag_CanOpen` |
 | `RawX/Y`, `RawButton` | `Acquisition.HwIn.Operator` |
 | `BtnCalibrate` | `GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate` |
-| `Invert*`, `DeadbandRaw`, `FilterTime`, `AccelRate`, `DecelRate` | PERSISTENT |
+| `Invert*`, `DeadbandRaw` | PERSISTENT |
 | `NeutralXMem/YMem` | `VAR_IN_OUT` persistants |
 | `DeadmanRearmTimeout` | `T#10s` — reconfirmation (n'agit que si `DeadmanReconfEnable=TRUE`) |
 | `NeutralHoldTime` | `T#100ms` (🔧 2026-08-07, réduit de 500ms) — neutre tenu avant désarmement |
@@ -131,7 +134,7 @@ Paramètres d'appel production (`Acquisition`) : deadband / filtre / rates depui
 | `DeadmanArmed` | Geste armé |
 | `Ready/Busy/Done/Error/ErrorId` | État FB |
 
-**Gate** (`Enable` / `PowerContactorEngaged` / master CAN OP / device OP) :
+**Gate** (`Enable` / master CAN OP / device OP) :
 sorties axes à 0, `DeadmanArmed=FALSE`, timers deadman reset, `RETURN`.
 
 La perte de `BusCanOpenOP.Operational` ou `JoystickOP.Operational` neutralise les sorties
@@ -226,7 +229,7 @@ Distinct du §5 (calibration, front `BtnCalibrate` uniquement) : ici la surveill
 |---|---|
 | Détection | `RawX`/`RawY` hors `[0 - CST_RawOutOfRangeMargin ; 10000 + CST_RawOutOfRangeMargin]`, évalué en continu (pas seulement au front `BtnCalibrate`) |
 | Marge de tolérance | `CST_RawOutOfRangeMargin := 500` — évite un faux défaut sur simple bruit ADC/léger dépassement près des bornes nominales |
-| Effet immédiat | `AxisCmdX/Y.SpeedRef := 0`, `StartStop := FALSE`, `Direction := 0` sur **les 2 axes** (confiance perdue dans tout le geste, pas seulement l'axe en défaut) |
+| Effet immédiat | `AxisCmdX/Y.Enable := FALSE`, `SpeedRef := 0`, `StartStop := FALSE`, `Direction := 0` sur **les 2 axes** (confiance perdue dans tout le geste, pas seulement l'axe en défaut) — même traitement `Enable` que la perte bus (§3) : une donnée dont la validité n'est plus garantie ne doit jamais laisser un aval interpréter "commandé à 0" différemment de "non commandé" |
 | Diagnostic | `ErrorId` bit1 (`16#0002`), pattern Cause/Ack (`CODE_QUALITY_STANDARDS.md §9`) : cause brute évaluée en continu, interlock (forçage neutre) toujours sur la cause brute, jamais sur l'acquittement |
 | Reset | Toujours effectif (jamais conditionné) : acquitte l'affichage ; ré-alarme automatiquement si la cause est toujours/de nouveau présente |
 
@@ -314,20 +317,21 @@ une instance, gate fail-safe.
 > `FB_Translation`. Section de suivi ; décision et code dans un lot dédié, contrat de tâche requis
 > (C3/C4 — accélération/décélération treuil = sécurité machine).
 
-### 8bis.1 Filtre PT1 par défaut — supprimé (retour terrain 2026-08-07)
+### 8bis.1 Filtre PT1 — supprimé (décision 2026-08-22)
 
-`_JoystickFilterTime` : `T#100ms` → `T#50ms` (2026-08-06) → **`T#0ms`** (2026-08-07, `GVL_PERSISTENT`
-+ défaut `FB_Joystick.st`), décidé sur retour terrain répété : délai joystick→contacteur de sens
-toujours perceptible même à 50ms. `T#0ms` = pass-through exact, documenté et supporté nativement
-par `FB_Filter_PT1.st` ("Si TimeConst=0, sortie=entrée") — pas un contournement, un mode prévu.
-Contrepartie assumée : plus aucun lissage du bruit capteur Hall — à surveiller de près (chatter
-contacteur sur signal bruité, plus de marge comme avec 50ms). Pas de calcul théorique substitué
-à l'essai terrain qui a validé chaque palier de réduction.
+Historique du lissage joystick, désormais **caduc** :
+
+`_JoystickFilterTime` : `T#100ms` → `T#50ms` (2026-08-06) → **`T#0ms`** (2026-08-07) sur retour
+terrain (délai joystick→contacteur de sens toujours perceptible) — **puis `FB_Filter_PT1` retiré
+du code et du pipeline (2026-08-22)** : le joystick est stable et ne doit **pas** être ralenti.
+`_JoystickFilterTime` supprimé de `GVL_PERSISTENT`. La fonction de filtrage PT1 reste disponible
+en généraliste dans `CODE/A_COMMUN/FB_Filter` si un besoin de lissage apparaît ailleurs
+(le lissage éventuel de la consigne est confié aux FB de mouvement aval).
 
 ### 8bis.2 Double rampe en cascade — ⚠️ constat périmé (code déjà sans `FB_Ramp` côté joystick)
 
 > Vérifié 2026-08-06 : `FB_Joystick.st` actuel n'instancie **aucun** `FB_Ramp` (pipeline réel :
-> `FB_AxisScale` → `FB_Filter_PT1` → homme-mort, voir §2). `_JoystickAccelRate_Pct`/
+> `FB_AxisScale` → homme-mort, voir §2). `_JoystickAccelRate_Pct`/
 > `_JoystickDecelRate_Pct` (`GVL_PERSISTENT`) sont **orphelins** — plus référencés nulle part
 > dans `CODE/`. Le TBD ci-dessous décrivait un état du code antérieur à cette vérification ;
 > conservé pour mémoire mais **la double rampe qu'il décrit n'existe plus**. Nettoyage des
@@ -375,4 +379,4 @@ identifiée, mais **à valider explicitement avant code**.
 | AF07 | `ST_JoystickHMI` |
 | AF10 / AF11 | Consommateurs AxisCmd + DeadmanArmed (Treuils Benne incluse · Translation) ; exception Extraction |
 | AF13 | `FB_Sim_Joystick` amont |
-| Code | `CODE/D_JOYSTICK/FB_Joystick.st`, `FB_AxisScale.st`, `FB_Filter_PT1.st`, `ST_Joystick_AxisCmd.st` |
+| Code | `CODE/D_JOYSTICK/FB_Joystick.st`, `FB_AxisScale.st`, `ST_Joystick_AxisCmd.st` |

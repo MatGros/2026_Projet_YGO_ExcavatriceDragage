@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T22:01:00.980505" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T22:01:00.980505">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T11:33:24.636955" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T11:33:24.636955">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,57 +23,6 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="E_Mode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLE" value="0" />
-              <value name="MAINT_N1" value="1" />
-              <value name="MAINT_N2" value="2" />
-              <value name="SEMI_AUTO" value="3" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N1</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N2</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEMI_AUTO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="ST_FbStatus">
         <baseType>
           <struct>
@@ -259,7 +208,7 @@
       </dataType>
     </dataTypes>
     <pous>
-      <pou name="FB_Encoder_SpeedMonitor" pouType="functionBlock">
+      <pou name="FB_FbStatus" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -267,8 +216,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
---&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS &amp; ACQUITTEMENT ===
+--&gt; [CMD] Autorisation générale FB</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -276,57 +225,63 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front montant)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement défaut (jamais conditionné, §9)</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
+            <variable name="ErrorIdCause">
               <type>
-                <BOOL />
+                <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTEXTE &amp; ETAT PUISSANCE ===
---&gt; [HW]  Ligne puissance enclenchee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES &amp; CLASSIFICATION (producteur = bloc métier) ===
+--&gt; [HW]  Bits d'erreur ACTIFS (cause brute)</xhtml>
               </documentation>
             </variable>
-            <variable name="Mode">
+            <variable name="WarningMask">
               <type>
-                <derived name="E_Mode" />
+                <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode d'exploitation actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] bit=1 → cette erreur est WARNING (auto) ; bit=0 → FAULT (à acquitter)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedMps">
+            <variable name="ErrorTexts">
               <type>
-                <REAL />
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="STRING" />
+                  </baseType>
+                </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; CONSIGNES SURVEILLANCE ===
---&gt; [HW]  Vitesse lineaire absolue mesuree (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEXTES IHM (métier, indexés par bit) ===
+--&gt; [CFG] Textes des erreurs (par bit)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedVariationThresholdMps">
+            <variable name="WarningTexts">
               <type>
-                <REAL />
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="STRING" />
+                  </baseType>
+                </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil de variation minimale a surveiller (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Textes des warnings (par bit)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedVariationTimeout">
+            <variable name="RotatePeriod">
               <type>
                 <TIME />
               </type>
+              <initialValue>
+                <simpleValue value="TIME#1S" />
+              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Duree minimale de confirmation variation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStabilityTimeout">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Duree sans variation avant vitesse stable</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIG DISPLAY ===
+--&gt; [CFG] Période de rotation texte multi-erreurs</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -336,8 +291,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
-&lt;-- [STAT] FB pret a fonctionner</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ÉTAT &amp; SYNOPTIQUE (forme cible) ===
+&lt;-- [STAT] FB prêt (Enable)</xhtml>
               </documentation>
             </variable>
             <variable name="Status">
@@ -345,41 +300,7 @@
                 <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
-ErrorId bit0: "variation vitesse confirmée".</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedDeltaMps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTATS &amp; MESURES DIAGNOSTIC ===
-&lt;-- [DIAG] Ecart absolu entre deux mesures (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedVariationDetected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Seuil depasse sur le cycle courant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedVariationConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Seuil depasse pendant la duree requise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse stable pendant SpeedStabilityTimeout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut complet (mappé 1:1 sur la sortie du bloc)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -389,69 +310,72 @@ ErrorId bit0: "variation vitesse confirmée".</xhtml>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
-. [LOC] Detecteur front montant Reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES &amp; MEMOIRES ===
+* [INST] Front Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorEdge">
+            <variable name="FaultEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front apparition cause fault (ré-alarme)</xhtml>
               </documentation>
             </variable>
-            <variable name="VariationTimer">
+            <variable name="RotateTimer">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATEURS INTERNES ===
-. [LOC] Temporisateur de confirmation de variation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Rotation du texte affiché (multi-erreurs)</xhtml>
               </documentation>
             </variable>
-            <variable name="StabilityTimer">
+            <variable name="FaultCause">
               <type>
-                <derived name="TON" />
+                <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisateur de confirmation de stabilite</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES ===
+. [LOC] bits Fault (cause brute)</xhtml>
               </documentation>
             </variable>
-            <variable name="PreviousSpeedMps">
+            <variable name="WarningCause">
               <type>
-                <REAL />
+                <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES ET MEMOIRES INTERNES ===
-. [LOC] Vitesse mesuree au cycle precedent (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bits Warning (cause brute)</xhtml>
               </documentation>
             </variable>
-            <variable name="HasPreviousSpeed">
+            <variable name="ErrorIdLatched">
               <type>
-                <BOOL />
+                <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Premiere mesure enregistree</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] code fault mémorisé (jusqu'au Reset)</xhtml>
               </documentation>
             </variable>
-            <variable name="VariationActive">
+            <variable name="ErrIdx">
               <type>
-                <BOOL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition de depassement de seuil active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] index de rotation du texte (multi-erreurs)</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📊 FB_Encoder_SpeedMonitor — Détection variation brusque vitesse câble
+   🧩 FB_FbStatus — Socle de statut standard d'un FB métier
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Surveillance et détection de variation brusque de vitesse câble
-   🔒 Polarité : SpeedVariationConfirmed=TRUE si variation &gt; seuil pendant timeout
-   📊 Diagnostic : Brique de surveillance diagnostic sans actionneur direct
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
+      (warning auto-effacé / défaut laté acquitté, textes IHM prêts).
+   🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
+      rempli via UNE instance de ce socle → même comportement partout.
+   🔒 Sécurité : WarningMask fail-safe (0 = tout fault à acquitter).
+      Reset TOUJOURS effectif, jamais conditionné (std §9).
+      Interlock toujours sur la cause brute, jamais sur l'acquittement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -459,83 +383,125 @@ ErrorId bit0: "variation vitesse confirmée".</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Gate"}
-// 🛑 1. GATE — désactivation ou AU non réarmé : aucune alarme persistante.
-IF NOT Enable OR NOT PowerContactorEngaged THEN
-    Ready := FALSE;
-    Status.Busy := FALSE;
-    Status.Done := FALSE;
-    Status.Error := FALSE;
-    Status.ErrorId := 16#0000;
-    Status.State := E_State.DISABLED;
-    SpeedDeltaMps := 0.0;
-    SpeedVariationDetected := FALSE;
-    SpeedVariationConfirmed := FALSE;
-    SpeedStable := FALSE;
-    VariationActive := FALSE;
-    HasPreviousSpeed := FALSE;
-    VariationTimer(IN := FALSE, PT := SpeedVariationTimeout);
-    StabilityTimer(IN := FALSE, PT := SpeedStabilityTimeout);
+{region "§1 Gate neutralisation"}
+// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr
+Ready := Enable;
+IF NOT Enable THEN
+    Status.Busy := FALSE; Status.Done := FALSE;
+    Status.Error := FALSE; Status.ErrorId := 0;
+    Status.Warning := FALSE; Status.WarningId := 0;
+    Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
+    Status.ResetRequested := FALSE;
+    Status.WarningIdTxt := ''; Status.ErrorIdTxt := '';
+    ErrorIdLatched := 0; FaultCause := 0; WarningCause := 0;
+    RotateTimer(IN := FALSE, PT := RotatePeriod);
     RETURN;
 END_IF;
-
-Ready := TRUE;
-Status.Busy := FALSE;
-Status.Done := FALSE;
 Status.State := E_State.READY;
 {endregion}
 
-{region "§2 Reset front"}
-// 🔑 2. RESET FRONT — l'acquittement n'efface le défaut que si la cause a disparu.
+{region "§2 Classification des causes (exclusivité)"}
+// 2. Un bit est exclusivement warning OU fault (jamais les deux, §3bis)
+FaultCause   := ErrorIdCause AND (NOT WarningMask);  // bits fault (à acquitter)
+WarningCause := ErrorIdCause AND WarningMask;          // bits warning (auto-effacés)
+{endregion}
+
+{region "§3 Défaut laté + acquittement"}
+// 3. Front Reset : TOUJOURS effectif, jamais conditionné (std §9)
 ResetEdge(CLK := Reset);
-{endregion}
-
-{region "§3 Calcul écart vitesse"}
-// 📏 3. CALCUL DE L'ÉCART DE VITESSE — première mesure utilisée comme référence.
-IF NOT HasPreviousSpeed THEN
-    PreviousSpeedMps := SpeedMps;
-    HasPreviousSpeed := TRUE;
-    SpeedDeltaMps := 0.0;
-ELSE
-    SpeedDeltaMps := ABS(SpeedMps - PreviousSpeedMps);
-    PreviousSpeedMps := SpeedMps;
+IF ResetEdge.Q THEN
+    ErrorIdLatched := 0;
 END_IF;
-{endregion}
-
-{region "§4 Détection et filtre temporel"}
-// 🔍 4. DÉTECTION BRUTE + FILTRE TEMPOREL — pas de déclenchement si la durée vaut zéro.
-VariationActive := HasPreviousSpeed
-                   AND (SpeedVariationThresholdMps &gt;= 0.0)
-                   AND (SpeedVariationTimeout &gt; T#0ms)
-                   AND (SpeedDeltaMps &gt; SpeedVariationThresholdMps);
-SpeedVariationDetected := VariationActive;
-
-VariationTimer(IN := VariationActive, PT := SpeedVariationTimeout);
-SpeedVariationConfirmed := VariationTimer.Q;
-StabilityTimer(IN := HasPreviousSpeed AND NOT VariationActive AND (SpeedStabilityTimeout &gt; T#0ms), PT := SpeedStabilityTimeout);
-SpeedStable := StabilityTimer.Q;
-
-IF SpeedVariationConfirmed THEN
-    Status.ErrorId := Status.ErrorId OR 16#0001;
-ELSIF ResetEdge.Q AND NOT VariationActive THEN
-    Status.ErrorId := Status.ErrorId AND 16#FFFE;
+// 4. Ré-alarme : nouvelle apparition d'un fault non encore acquitté -&gt; relatte
+FaultEdge(CLK := (FaultCause &lt;&gt; 16#0000));
+IF FaultEdge.Q THEN
+    ErrorIdLatched := ErrorIdLatched OR FaultCause;
 END_IF;
-{endregion}
-
-{region "§5 Sorties état"}
-// 📤 5. SORTIES D'ÉTAT — diagnostic standard, aucune commande mouvement.
-Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
-ErrorEdge(CLK := Status.Error);
-IF ErrorEdge.Q THEN
+// 5. Mémoire de l'état au défaut
+IF (FaultCause &lt;&gt; 16#0000) THEN
     Status.StateAtError := Status.State;
 END_IF;
+// 6. Sorties défaut : affiché = laté OU cause courante
+Status.ErrorId := ErrorIdLatched OR FaultCause;
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+Status.ResetRequested := (ErrorIdLatched &lt;&gt; 16#0000);
 {endregion}
+
+{region "§4 Warning auto-effacé"}
+Status.WarningId := WarningCause;
+Status.Warning := (WarningCause &lt;&gt; 16#0000);
+{endregion}
+
+{region "§5 Textes IHM + rotation 1s"}
+// 8. Sélection du texte : on affiche le texte du bit le plus bas encore présent.
+//    S'il y a plusieurs erreurs/warnings, l'affichage tourne toutes les RotatePeriod.
+Status.ErrorIdTxt := '';
+Status.WarningIdTxt := '';
+
+// Rotation de l'index de départ (pour faire défiler les textes multi-erreurs)
+RotateTimer(IN := (Status.ErrorId &lt;&gt; 16#0000) OR (Status.WarningId &lt;&gt; 16#0000),
+            PT := RotatePeriod);
+IF RotateTimer.Q THEN
+    ErrIdx := (ErrIdx + 1) MOD 16;
+    RotateTimer(IN := FALSE, PT := RotatePeriod);
+END_IF;
+
+// -- Texte ERROR : premier bit set à partir de ErrIdx (circulaire) --
+IF Status.ErrorId &lt;&gt; 16#0000 THEN
+    // scan 16 bits, départ ErrIdx
+    // (boucle simple : les blocs métier gardent peu de bits -&gt; OK performance)
+    // remplit ErrorIdTxt avec le texte du bit le plus bas set
+    IF (Status.ErrorId AND 16#0001) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[0];
+    ELSIF (Status.ErrorId AND 16#0002) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[1];
+    ELSIF (Status.ErrorId AND 16#0004) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[2];
+    ELSIF (Status.ErrorId AND 16#0008) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[3];
+    ELSIF (Status.ErrorId AND 16#0010) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[4];
+    ELSIF (Status.ErrorId AND 16#0020) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[5];
+    ELSIF (Status.ErrorId AND 16#0040) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[6];
+    ELSIF (Status.ErrorId AND 16#0080) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[7];
+    ELSIF (Status.ErrorId AND 16#0100) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[8];
+    ELSIF (Status.ErrorId AND 16#0200) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[9];
+    ELSIF (Status.ErrorId AND 16#0400) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[10];
+    ELSIF (Status.ErrorId AND 16#0800) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[11];
+    ELSIF (Status.ErrorId AND 16#1000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[12];
+    ELSIF (Status.ErrorId AND 16#2000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[13];
+    ELSIF (Status.ErrorId AND 16#4000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[14];
+    ELSIF (Status.ErrorId AND 16#8000) &lt;&gt; 0 THEN Status.ErrorIdTxt := ErrorTexts[15];
+    END_IF;
+END_IF;
+
+// -- Texte WARNING : premier bit set --
+IF Status.WarningId &lt;&gt; 16#0000 THEN
+    IF (Status.WarningId AND 16#0001) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[0];
+    ELSIF (Status.WarningId AND 16#0002) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[1];
+    ELSIF (Status.WarningId AND 16#0004) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[2];
+    ELSIF (Status.WarningId AND 16#0008) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[3];
+    ELSIF (Status.WarningId AND 16#0010) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[4];
+    ELSIF (Status.WarningId AND 16#0020) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[5];
+    ELSIF (Status.WarningId AND 16#0040) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[6];
+    ELSIF (Status.WarningId AND 16#0080) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[7];
+    ELSIF (Status.WarningId AND 16#0100) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[8];
+    ELSIF (Status.WarningId AND 16#0200) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[9];
+    ELSIF (Status.WarningId AND 16#0400) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[10];
+    ELSIF (Status.WarningId AND 16#0800) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[11];
+    ELSIF (Status.WarningId AND 16#1000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[12];
+    ELSIF (Status.WarningId AND 16#2000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[13];
+    ELSIF (Status.WarningId AND 16#4000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[14];
+    ELSIF (Status.WarningId AND 16#8000) &lt;&gt; 0 THEN Status.WarningIdTxt := WarningTexts[15];
+    END_IF;
+END_IF;
+{endregion}
+
+// Busy/Done : conditionneur toujours prêt -&gt; Busy/Done FALSE (usage métier)
+Status.Busy := FALSE;
+Status.Done := FALSE;
+
 </xhtml>
           </ST>
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c1cd7624-9491-50e0-9332-6845d97ac927</ObjectId>
+            <ObjectId>4ced8a0d-966a-58f2-989d-6c7942c5f7a8</ObjectId>
           </data>
         </addData>
       </pou>
@@ -547,13 +513,8 @@ END_IF;
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
-        <Folder Name="E_CODEURS">
-          <Object Name="FB_Encoder_SpeedMonitor" ObjectId="c1cd7624-9491-50e0-9332-6845d97ac927" />
-        </Folder>
-        <Folder Name="F_MODES">
-          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
-        </Folder>
         <Folder Name="A_COMMUN">
+          <Object Name="FB_FbStatus" ObjectId="4ced8a0d-966a-58f2-989d-6c7942c5f7a8" />
           <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>
