@@ -490,6 +490,7 @@ instHmiBannerFormatter(
     DescendPermit               := GVL_IHM.M1TreuilRetenue.Safety.DescendPermit AND GVL_IHM.M2TreuilBenne.Safety.DescendPermit,
     AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
     BucketIsOpen                := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
+    BucketIsClosed              := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     DiveActive                  := GVL_IHM.DredgingAssist.State.DiveBusy,
     TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent OR GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
     CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,

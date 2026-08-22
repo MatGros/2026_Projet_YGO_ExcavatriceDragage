@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T20:14:58.544637" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T20:14:58.544637">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T01:18:00.203401" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T01:18:00.203401">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1061,6 +1061,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne ouverte</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketIsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Benne fermee (montee non bridée)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DiveActive">
               <type>
                 <BOOL />
@@ -1616,6 +1624,10 @@ ELSIF NOT BucketIsOpen AND CurrentDirection &lt; 0 THEN
     OperatorActionCandidate := '[BENNE] Ouvrir la benne';
 ELSIF TopLimitReached AND CurrentDirection &gt; 0 THEN
     OperatorActionCandidate := '[TREUIL] Limite haute';
+ELSIF NOT BucketIsClosed AND CurrentDirection &gt; 0 THEN
+    // Sécurité : benne mal fermée (branche/caillou) → montee bridee palier 1 pour eviter un choc
+    // si la benne se refermait d'un coup en montant vite.
+    OperatorActionCandidate := '[BENNE] Benne non fermee - montee bridee palier 1 (securite)';
 ELSIF NOT DeadmanArmed THEN
     OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF CurrentMode = E_Mode.DISABLE THEN
