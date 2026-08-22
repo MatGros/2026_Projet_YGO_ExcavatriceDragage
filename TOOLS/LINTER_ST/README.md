@@ -117,8 +117,11 @@ Puis dans VSCode : `Ctrl+Shift+P` → **Extensions: Install from VSIX...** → s
 
 ## 🗺️ Roadmap
 
-- ✅ **Lot 1** : CLI Python (`resolve_deps.py`, `lint.py`) — fait, validé sur 7 FB réels.
-- ✅ **Lot 2** : extension VSCode (diagnostics live) — squelette fonctionnel, compile sans
-  erreur. Reste à tester en conditions réelles dans l'éditeur (F5) avant adoption.
+- ✅ **Lot 1** : CLI Python (`resolve_deps.py`, `lint.py`) — fait, validé sur 7 FB réels + 4 cas
+  d'erreur réels (typo type, commentaire cassé, `IF` mal fermé, caractère invalide).
+- ✅ **Lot 2** : extension VSCode (diagnostics live) — **validé en conditions réelles** (F5,
+  Extension Development Host, 2026-08-23) : erreur `IF`/`END_IF` détectée et affichée dans
+  Problems à la sauvegarde. Reste en mode debug (F5) — packaging `.vsix` pour install permanente
+  disponible mais pas encore fait (voir section ci-dessus).
 - Si le besoin de feedback à la frappe (pas juste à la sauvegarde) se confirme → migrer vers un
   vrai LSP Python (`pygls`), pas anticipé pour l'instant.
