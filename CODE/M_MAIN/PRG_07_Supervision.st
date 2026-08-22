@@ -508,6 +508,8 @@ instHmiBannerFormatter(
     DiveErrorId                 := GVL_IHM.DredgingAssist.State.DiveErrorId,
     ExtractionErrorId           := GVL_IHM.DredgingAssist.State.ExtractionErrorId,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
+    RedundancyTestFailed         := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed,
+    EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
     AlarmHoldTime               := T#1s
 );
 GVL_IHM.Banner := instHmiBannerFormatter.Banner;

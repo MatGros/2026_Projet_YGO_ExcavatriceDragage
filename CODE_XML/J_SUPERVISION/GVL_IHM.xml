@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:04:28.523420" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:04:28.523420">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T03:19:06.085170" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T03:19:06.085170">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -536,42 +536,6 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
    📡 ST_NetworkDiagHMI — Données d'échange IHM pour les diagnostics réseau
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des diagnostics CANopen et EtherCAT.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_OperatorAction">
-        <baseType>
-          <struct>
-            <variable name="ActionId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Identifiant stable : table de textes IHM possible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Text">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte de secours pour IHM/diagnostic acceptant les STRING</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6e6d9b5d-226e-566e-908c-f3aa313a7e26</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_OperatorAction — Consigne unique de conduite opérateur
-   ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.1.md
-   🎯 Les alarmes restent dans Error/ErrorId : cette struct répond seulement
-      à « quelle action attend-on maintenant de l'opérateur ? ».
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -5721,15 +5685,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             <derived name="ST_HmiBanner" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="OperatorAction">
-          <type>
-            <derived name="ST_OperatorAction" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Unique consigne conduite, arbitré en supervision</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4) — OperatorActionText = unique consigne conduite</xhtml>
           </documentation>
         </variable>
         <variable name="Network">
@@ -5804,7 +5760,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             </Folder>
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
-              <Object Name="ST_OperatorAction" ObjectId="6e6d9b5d-226e-566e-908c-f3aa313a7e26" />
               <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
               <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
             </Folder>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T01:18:00.203401" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T01:18:00.203401">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T03:18:51.012442" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T03:18:51.012442">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1206,6 +1206,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut chaîne AU (FB_Safety_EmergencyManagement.Diag.ErrorId)</xhtml>
               </documentation>
             </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut redondance contacteurs AU (lisee -&gt; message explicite)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Echec rearmement contacteur AU (lisee -&gt; message explicite)</xhtml>
+              </documentation>
+            </variable>
             <variable name="AlarmHoldTime">
               <type>
                 <TIME />
@@ -1552,7 +1568,13 @@ END_IF;
 DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
                 OR (CurrentDirection &gt; 0 AND NOT AscentPermit);
 
-IF NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
+IF NOT EmergencyChainClosed THEN
+    OperatorActionCandidate := '[PUPITRE] Boucle urgence ouverte - réarmer';
+ELSIF RedundancyTestFailed THEN
+    OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer';
+ELSIF EmergencyArmingFailed THEN
+    OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
+ELSIF NOT PowerContactorEngaged OR PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
     OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
