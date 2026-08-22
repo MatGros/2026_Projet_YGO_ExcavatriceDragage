@@ -30,6 +30,8 @@
 | <nobr><code>TC-P08-006</code></nobr> | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | <small>§5</small> |
 | <nobr><code>TC-P08-007</code></nobr> | Consigne `SpeedRef` signée [-100;+100] sur `ST_Joystick_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | <small>§1, §2</small> |
 | <nobr><code>TC-P08-008</code></nobr> | Winch, Translation et Cycle exigent `DeadmanArmed` | Linkage vérifié | `💻 AUTO` | <small>§6</small> |
+| <nobr><code>TC-P08-011</code></nobr> | Fin de cycle benne désarme par défaut (hors exception) | `DeadmanArmed=FALSE` | `💻 AUTO` | <small>§4, §6</small> |
+| <nobr><code>TC-P08-012</code></nobr> | `PreserveArmingAfterBucket` conserve l'armement en fin de benne (exception CLOSING Extraction) | `DeadmanArmed` conservé | `💻 AUTO` | <small>§6, alerte P1</small> |
 
 ---
 

@@ -42,6 +42,7 @@
 | <nobr><code>TC-P01-007</code></nobr> | Lockout 5s | Échec confirmation contacteur ➔ verrouillage 5s | `LockoutActive=TRUE` | `💻 AUTO` | §5.3 |
 | <nobr><code>TC-P01-008</code></nobr> | Coupure métier | `PowerCutOffRequest=TRUE` coupe A et B sans armer | `MaintainA/B_RQ=FALSE` | `💻 AUTO` | §3 |
 | <nobr><code>TC-P01-009</code></nobr> | Re-latch Cause | Cause persistante ➔ ré-alarme au prochain essai | `Ack=FALSE` | `💻 AUTO` | §3.4bis |
+| <nobr><code>TC-P01-010</code></nobr> | Cohérence coupure IHM | `BtnEmergencyCutOff` pendant le pulse de réarmement (step 5) | ⚠️ `ArmPulse_RQ` reste TRUE — écart relevé, non corrigé (audit 2026-08-22) | `💻 AUTO` | §7 |
 
 ---
 
@@ -353,11 +354,20 @@ un **autotest de cohérence** avant d'autoriser toute séquence de réarmement :
 |---|---|---|
 | 1 | `EmergencyChainClosed = TRUE` (boucle AU fermée) | Bloque toute séquence ; `ErrorId` bit0 si boucle ouverte sans demande |
 | 2 | `PowerContactorEngaged = FALSE` (contacteur au repos) | Bloque ; contacteur déjà engagé = anomalie câblage/retour |
-| 3 | `PowerKeepAlive_A = TRUE` ET `PowerKeepAlive_B = TRUE` (maintien actif) | `RedundancyTestFailed` si l'un FALSE (canal ouvert) |
-| 4 | Pas de séquence en cours (`ArmingSeqStep = 0`) | Bloque si séquence résiduelle |
+| 3 | Pas de séquence en cours (`ArmingSeqStep = 0`) | Bloque si séquence résiduelle |
 
 Ces vérifications sont **synchrones, déterministes, non bloquantes** (1 cycle). Si tout est OK,
 le FB passe en `Ready=TRUE` et attend un front `ArmRequest`.
+
+> ⚠️ **Retiré (2026-08-22)** : une étape "`PowerKeepAlive_A = TRUE` ET `PowerKeepAlive_B = TRUE`"
+> figurait ici. Retirée car incohérente à double titre : (1) au premier cycle après boot, les
+> sorties de maintien sont **forcément** au repos (fail-safe) — le contrôle échouerait
+> systématiquement par construction, sans rapport avec un défaut réel ; (2) `PowerKeepAlive_A/B`
+> ne sont pas des retours matériels mais les **propres sorties calculées** par ce FB
+> (`Cmd.MaintainA/B_Cmd`) — les vérifier reviendrait à comparer le FB avec lui-même, pas à
+> constater un état physique. La vérification réelle de la redondance des canaux existe déjà et
+> est correcte : c'est l'autotest dynamique §3.3bis (steps 1-4, `TC-P01-002/003/006`), qui coupe
+> **réellement** chaque canal et observe la réaction de `EmergencyChainClosed`.
 
 ---
 

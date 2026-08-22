@@ -110,9 +110,19 @@ END_TEST
 TOOLS/COMPILER_ST2C_STruCpp/bin/win32-x64/strucpp.exe <fichiers convertis> -o out/FB.cpp --test mon_test.st
 ```
 
-⚠️ **2 pièges vérifiés empiriquement** :
+⚠️ **4 pièges vérifiés empiriquement** :
 - Titres `TEST` et messages `ASSERT_*` en **guillemets simples** (`'...'`) — pas doubles, malgré la doc officielle.
 - Tous les identifiants sont **MAJUSCULES** dans le C++/tests générés (`fb.ERROR`, pas `fb.Error`).
+- L'initialisation `:= valeur` d'une `VAR` du bloc `SETUP` (ex. `nx : INT := 5000;`) **n'est
+  jamais appliquée** — `TestSetup_N::setup()` généré est vide, la variable démarre à la valeur
+  par défaut du type (`0` pour un `INT`). Toujours initialiser explicitement dans le corps du
+  `TEST` (`nx := 5000;`) avant le premier `fb(...)`, jamais compter sur le défaut déclaré en `SETUP`.
+- Une `VAR_IN_OUT` du FB testé (ex. `NeutralXMem`) **n'est pas re-copiée** vers la variable de
+  test après `fb(...)` — chaque appel réécrit l'entrée depuis la variable de test (`s.FB.X = s.NX;`)
+  sans jamais faire le retour `s.NX = s.FB.X;`. Toute valeur calculée par le FB sur un scan
+  (ex. calibration dynamique d'un neutre) est donc **perdue** au scan suivant si on compte sur le
+  round-trip. Contournement : forcer explicitement la variable de test à la valeur attendue dans
+  le corps du `TEST` plutôt que de compter sur ce que le FB a écrit au scan précédent.
 
 📄 Exemple réel validé (2/2 PASS) : [`examples/test_fb_joystick.st`](examples/test_fb_joystick.st)
 — bus non opérationnel neutralise les sorties **sans** lever d'erreur (gate sécurité, pas un

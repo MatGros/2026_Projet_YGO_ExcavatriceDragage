@@ -60,5 +60,9 @@ Nouveau FB à tester = ajouter une entrée `registry.yaml` + un fichier `RESULTS
 
 | FB | Domaine | Tests |
 |---|---|---|
-| `FB_Joystick` | JOYSTICK | 2/2 PASS |
-| `FB_Safety_EmergencyManagement` | AU_SECURITE | 5/6 PASS — `TC-P01-002, 003, 006, 007, 008` OK ; `TC-P01-004/009` **rouge intentionnellement**, preuve d'un écart réel entre le code (`FB_Safety_EmergencyManagementLogic.st`, bloc Reset) et l'AF §3.4bis (`Reset` ne devrait jamais réarmer le maintien de puissance sans re-test physique du canal) |
+| `FB_Joystick` | JOYSTICK | 8/8 PASS (`TC-P08-001..006, 011, 012`) |
+| `FB_Safety_EmergencyManagement` | AU_SECURITE | 6/8 PASS — `TC-P01-002, 003, 006, 007, 008` OK ; `TC-P01-004/009` et `TC-P01-010` **rouges intentionnellement** |
+
+Rouges intentionnels (écarts réels code/AF, non corrigés — audit 2026-08-22) :
+- `TC-P01-004/009` : `Reset` réarme le maintien de puissance sans re-test physique du canal (`FB_Safety_EmergencyManagementLogic.st`, bloc Reset) — contredit l'AF §3.4bis.
+- `TC-P01-010` : `BtnEmergencyCutOff` coupe `MaintainA/B_RQ` mais pas `ArmPulse_RQ` pendant le pulse de réarmement (step 5) — incohérence §7 du même fichier.
