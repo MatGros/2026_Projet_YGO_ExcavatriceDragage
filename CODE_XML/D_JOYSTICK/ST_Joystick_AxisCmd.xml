@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:44:10.236588" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:44:10.236588">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T16:48:57.706380" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T16:48:57.706380">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -40,7 +40,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedRef">
@@ -48,15 +48,31 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse signee (-100.0..+100.0 %, signe coherent avec Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="DirectionNegative">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction joystick ou intension de gestuelle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionPositive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction joystick ou intension de gestuelle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AtNeutral">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE si axes en zone morte (position centrale)</xhtml>
               </documentation>
             </variable>
           </struct>
