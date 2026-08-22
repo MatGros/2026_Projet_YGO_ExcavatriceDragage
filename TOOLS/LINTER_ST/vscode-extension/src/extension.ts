@@ -40,6 +40,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 function lintDocument(doc: vscode.TextDocument, context: vscode.ExtensionContext) {
     const config = vscode.workspace.getConfiguration('linterSt');
+
+    if (!config.get<boolean>('enableSyntaxCheck', true)) {
+        // Interrupteur general : coupe la couche base (compilation STruCpp) sans desinstaller
+        // l'extension. La couche standards projet (enableProjectRules) n'existe pas encore --
+        // rien a executer dans ce cas non plus.
+        diagnosticCollection.delete(doc.uri);
+        return;
+    }
+
     const pythonPath = config.get<string>('pythonPath', 'python');
     const codeRootSetting = config.get<string>('codeRoot', 'CODE');
     const lintScriptSetting = config.get<string>('lintScriptPath', 'TOOLS/LINTER_ST/lint.py');
