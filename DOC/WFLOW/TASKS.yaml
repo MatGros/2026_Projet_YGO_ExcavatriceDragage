@@ -635,20 +635,6 @@ tasks:
     objectifs: []
     bloque_par: []
 
-  - id: "T72"
-    parent_id: ""
-    statut: "⬜"
-    criticite: "C4"
-    domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-07-20T08:00:00"
-    titre: "Interverrouillage commande/frein : bloquer RelayFwd/Rev si fre..."
-    contexte: "Intitulé complet : Interverrouillage commande/frein : bloquer RelayFwd/Rev si frein fermé"
-    description: "FB_Winch.st, FB_Translation.st"
-    contrat: ""
-    objectifs: []
-    bloque_par: []
-
   - id: "T81"
     parent_id: ""
     statut: "⏳"
