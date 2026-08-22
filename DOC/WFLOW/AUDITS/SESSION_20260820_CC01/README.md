@@ -1,7 +1,7 @@
 # 🔍 Session d'audit 2026-08-20 — État réel `PLAN_TASK` ↔ `CODE/`
 
 > 📅 2026-08-20 · 🤖 Agent `CC-01` · 🔍 **Read-only** : aucune ligne de `CODE/` modifiée.
-> 📏 Référentiels : `DOC/STDS/CODE_QUALITY_STANDARDS.md` · `DOC/WFLOW/PLAN_TASK.md` · `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`
+> 📏 Référentiels : `DOC/STDS/CODE_QUALITY_STANDARDS.md` · `DOC/WFLOW/TASKS.yaml` · `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`
 
 ---
 

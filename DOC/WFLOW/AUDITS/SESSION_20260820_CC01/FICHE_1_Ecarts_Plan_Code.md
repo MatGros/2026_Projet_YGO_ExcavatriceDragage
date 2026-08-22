@@ -37,7 +37,7 @@ Sans preuve `fichier:ligne`, la tâche est classée *indéterminable* — jamais
 | `SpeedGuardEnable` local | `CODE/M_MAIN/PRG_04_Treuils_Benne.st:71-72` | Déclaré en variable interne du programme, pas dans `GVL_PERSISTENT` ni `GVL_IHM` |
 | `DescendPermit`/`AscentPermit` | `CODE/H_TREUILS_BENNE/FB_Safety_Winch.st:89-90` | Sorties déjà nommées en polarité positive |
 | `FB_Input` disparu | *(aucun fichier)* | Recherche sur tout `CODE/` : zéro occurrence |
-| Sous-tâches T123 closes | `DOC/WFLOW/PLAN_TASK.md:58-70` | 13 lignes `✅`, une seule `⬜` (`T123-VAL`) |
+| Sous-tâches T123 closes | `DOC/WFLOW/TASKS.yaml:58-70` | 13 lignes `✅`, une seule `⬜` (`T123-VAL`) |
 
 ---
 

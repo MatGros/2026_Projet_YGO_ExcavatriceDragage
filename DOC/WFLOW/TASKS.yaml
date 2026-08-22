@@ -691,20 +691,6 @@ tasks:
     objectifs: []
     bloque_par: []
 
-  - id: "T77"
-    parent_id: ""
-    statut: "⬜"
-    criticite: "C4"
-    domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-07-20T08:00:00"
-    titre: "POO Diagnostics : passer statuts bruts aux FB (r..."
-    contexte: "Intitulé complet : POO Diagnostics : passer statuts bruts aux FB (retrait expressions)"
-    description: "PRG_02_Acquisition, FB_Diag_*"
-    contrat: ""
-    objectifs: []
-    bloque_par: []
-
   - id: "T81"
     parent_id: ""
     statut: "⏳"

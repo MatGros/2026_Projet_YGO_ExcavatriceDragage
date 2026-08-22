@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 WFLOW_DIR = BASE_DIR / "DOC" / "WFLOW"
 CONTRACTS_DIR = WFLOW_DIR / "CONTRACTS"
 TASKS_YAML = WFLOW_DIR / "TASKS.yaml"
-PLAN_TASK_MD = WFLOW_DIR / "PLAN_TASK.md"
+
 
 
 def load_tasks_yaml(yaml_path: Path):

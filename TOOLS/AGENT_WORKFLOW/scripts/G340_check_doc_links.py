@@ -242,10 +242,11 @@ def main() -> int:
                 continue
 
             basename = Path(target).name
-            if basename == "PLAN_TASK_v1.0.md":
-                candidates = ["DOC/WFLOW/PLAN_TASK.md"]
+            if basename in ("PLAN_TASK_v1.0.md", "PLAN_TASK.md"):
+                candidates = ["DOC/WFLOW/TASKS.yaml"]
             else:
                 candidates = by_basename.get(basename, [])
+
             if len(candidates) == 1 and candidates[0] != target:
                 if args.fix:
                     text = text.replace(target, candidates[0])

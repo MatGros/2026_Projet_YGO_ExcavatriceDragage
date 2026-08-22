@@ -171,7 +171,7 @@ Forme cible destinée à se généraliser aux autres FB `standard` (cf. §2).
   gère sa capture lui-même sans passer par ce socle).
 - `Busy`/`Done` : **non gérés par le socle**, à la charge du FB métier appelant selon son cycle.
 
-**⚠️ Limites restantes** (voir `DOC/WFLOW/PLAN_TASK.md`) :
+**⚠️ Limites restantes** (voir `DOC/WFLOW/TASKS.yaml`) :
 - **T147 — RÉSOLU** : le latch d'un défaut survit désormais à un cycle `Enable=FALSE` (décision (b)).
 - **T148** : un `Reset` simplement **maintenu** (niveau haut, pas de nouveau front) pendant que
   la cause disparaît acquitte silencieusement le défaut, sans confirmation au moment réel de la

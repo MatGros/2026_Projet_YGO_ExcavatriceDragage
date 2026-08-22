@@ -197,7 +197,7 @@ Contrôle : la numérotation des régions est vérifiée par revue (pas de gate 
      - ❌ *« suite demande client du 07/08... »*
      - ❌ *« correctif bug trouvé par audit M3... »*
 2. **La Traçabilité Vit dans la Documentation** :
-   - Tout l'historique des arbitrages, analyses de cause racine, REX, décisions de réunions et comparatifs avant/après est consigné dans `DOC/` (`DOC/VERSION_HISTORY.md`, `DOC/AF/`, `DOC/WFLOW/PLAN_TASK.md`, `ARCHIVES/Doc/AUDIT_*`).
+   - Tout l'historique des arbitrages, analyses de cause racine, REX, décisions de réunions et comparatifs avant/après est consigné dans `DOC/` (`DOC/VERSION_HISTORY.md`, `DOC/AF/`, `DOC/WFLOW/TASKS.yaml`, `ARCHIVES/Doc/AUDIT_*`).
 3. **Style de Commentaire dans le Code** :
    - **Concis, direct, TDAH-friendly** avec repères visuels emojis (`🎯 Rôle`, `⚡ Front`, `🔀 Aiguillage`, `📏 Mesure`, `🛡️ Sécurité`).
    - L'explication porte sur le **« Pourquoi » métier / physique**, jamais sur les péripéties de développement passées.

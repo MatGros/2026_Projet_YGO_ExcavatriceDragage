@@ -1,7 +1,7 @@
 # 🧾 Registre de Suivi Post-Mise en Service — Livraison 10 Août (v1.0)
 
 > 🎯 **Rôle** : Historique factuel et journal de bord de la phase post-mise en service en vue de la **livraison finale du 10 août 2026**. Suivi des ajustements terrain, réserves, ré-essais et levées de réserves.
-> 📌 **Source des actions à réaliser** : `DOC/WFLOW/PLAN_TASK.md` §3 reste le registre maître des reliquats (`Txx`).
+> 📌 **Source des actions à réaliser** : `DOC/WFLOW/TASKS.yaml` §3 reste le registre maître des reliquats (`Txx`).
 > 🚫 Ce registre trace les constats, réglages et preuves de validation pour la recette finale de la livraison du 10 août.
 
 ---
