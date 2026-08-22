@@ -1238,7 +1238,9 @@ def save_tasks_html(tasks, output_path: Path):
         }}
 
         render();
+        updateSyncIndicator();
     </script>
+
 </body>
 </html>
 """
