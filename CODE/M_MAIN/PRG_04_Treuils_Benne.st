@@ -1044,6 +1044,19 @@ WinchM2State.CommandedDirection := instWinchM2.CommandedDirection;
 WinchM2State.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElapsed;
 WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
 
+// ⛔️ Limite haute atteinte (fait public) — miroir de la butée logicielle de AscentPermit
+// (Homed, hors homing, non suspect, position >= limite). Fait pur "Reached", sans bypass.
+CableLimitAscentM1Reached := PRG_02_Acquisition.instEncoderM1.Homed
+    AND NOT PRG_02_Acquisition.instEncoderM1.HomingSuspect
+    AND NOT PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy
+    AND (PRG_02_Acquisition.Data.CablePosM1 >= _CommunCfgPersist.CfgCableLimitAscent_M);
+CableLimitAscentM2Reached := PRG_02_Acquisition.instEncoderM2.Homed
+    AND NOT PRG_02_Acquisition.instEncoderM2.HomingSuspect
+    AND NOT PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy
+    AND (PRG_02_Acquisition.Data.CablePosM2 >= (_CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift));
+
+WinchM1Safety.CableLimitAscent := CableLimitAscentM1Reached;
+WinchM1Safety.CableLimitDescent := (PRG_02_Acquisition.Data.CablePosM1 <= _WinchM1CfgPersist.CfgCableLimitDescent_M);
 WinchM1Safety.SafeStop := SafeStopM1_Active;
 WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
 WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
@@ -1066,6 +1079,8 @@ WinchM1Safety.PowerCutOffSafety  := PRG_06_Outputs.M1PowerCutOffSafetyInfo;
 WinchM1Safety.SafeStopSafety     := PRG_06_Outputs.M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := PRG_06_Outputs.M1BlockedBySafetyInfo;
 
+WinchM2Safety.CableLimitAscent := CableLimitAscentM2Reached;
+WinchM2Safety.CableLimitDescent := (PRG_02_Acquisition.Data.CablePosM2 <= _WinchM2CfgPersist.CfgCableLimitDescent_M);
 WinchM2Safety.SafeStop := SafeStopM2_Active;
 WinchM2Safety.AscentPermit := EffectivePermitM2_Ascent;
 WinchM2Safety.DescendPermit := EffectivePermitM2_Descend;

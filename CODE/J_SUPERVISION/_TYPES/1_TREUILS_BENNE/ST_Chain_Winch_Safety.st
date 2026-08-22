@@ -21,5 +21,17 @@ STRUCT
     Idx318_ErrorBrakeThermal : BOOL; // bit10 Surchauffe thermique frein commun
     Idx319_ErrorOppositeDir  : BOOL; // bit14 Sens réel opposé au sens commandé
     Idx320_ErrorNoMovement   : BOOL; // bit15 Absence de mouvement malgré commande
+    (* ⛔ Bloc "Pourquoi la montée ne s'arrête pas à la limite haute ?" — diagnostic ordonné
+       (lecture maintenance) : config + position → butée atteinte → bypass actifs. *)
+    Idx321_CfgTopLimitM               : REAL;  // 📐 Limite haute effective active (m) = CfgCableLimitAscent_M
+    Idx322_CablePosM                  : REAL;  // 📐 Position câble courante (m)
+    Idx323_TopLimitReached            : BOOL;  // 1 = position >= limite haute (hors homing) | 0 = en dessous
+    Idx324_AscentBlockedByTopLimit    : BOOL;  // 1 = montée réellement coupée par la butée logicielle (AscentPermit=0) | 0 = limitée non bloquante (bypass ?)
+    Idx325_BypassTopLimitSoftware     : BOOL;  // ⚠️ 1 = butée logicielle shunétee IHM (individuel)
+    Idx326_BypassTopLimitSoftCommun   : BOOL;  // ⚠️ 1 = butée logicielle shunétee (commun)
+    Idx327_BypassTopLimitSwitch       : BOOL;  // ⚠️ 1 = capteur fin de course haut shuné IHM (individuel)
+    Idx328_BypassTopLimitSwitchCommun : BOOL;  // ⚠️ 1 = capteur fin de course haut shuné (commun)
+    Idx329_BypassGlobal               : BOOL;  // ⚠️ 1 = bypass global treuil (individuel)
+    Idx330_BypassGlobalCommun         : BOOL;  // ⚠️ 1 = bypass global (commun)
 END_STRUCT
 END_TYPE

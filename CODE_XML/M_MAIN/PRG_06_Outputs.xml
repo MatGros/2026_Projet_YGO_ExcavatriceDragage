@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T22:31:14.537774" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T22:31:14.537774">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T00:26:21.240719" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T00:26:21.240719">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1041,6 +1041,10 @@ creerait une collision avec la globale homonyme du mapping E/S.
    🛡️ Interlocks finaux M1/M2/M3 + agrégation PowerCutOff + chaîne AU.
    🔒 SafetyStructureNotValidated reste TRUE : aucune sortie moteur/frein
        autorisée tant que ce garde-fou n'est pas retiré.
+   🎨 Organisation FONCTIONNELLE : chaque bloc regroupe la chaîne complète d'une
+       fonction — conditions qui activent/désactivent la sortie (SafeStop / PowerCutOff /
+       interlocks) → FB interlock → ordres → sorties physiques → bus inter-PRG. Lisible
+       d'un coup d'œil.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -1048,11 +1052,16 @@ creerait une collision avec la globale homonyme du mapping E/S.
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === 🛡️ §1 BARRIÈRES FINALES M1 / M2 / M3 ===
-// Chaque bloc reçoit la demande brute publique du procédé propriétaire
-// (ST_WinchFinalInterlockRequest / ST_TranslationFinalInterlockRequest).
+// ═══════════════════════════════════════════════════════════════
+// 🛗 §1 TREUIL M1 (Retenue) — conditions + interlock + sorties
+// ═══════════════════════════════════════════════════════════════
+// 👁️ D'un coup d'œil : ce qui active/désactive la sortie M1.
+//   - M1InterlockEnable      : gate finale (Enable ET pas de PowerCutOff)
+//   - M1PowerCutOffSafetyInfo: défauts qui COUPENT la puissance
+//   - M1SafeStopSafetyInfo   : défauts qui font SafeStop (rampe rapide)
+//   - M1BlockedBySafetyInfo  : synthèse (PowerCutOff OU SafeStop)
+// Sources : PRG_04 (WinchM1FinalInterlockRequest / WinchM1Safety).
 
-// ── Interlock final M1 (Treuil Retenue) ──────────────────────────────────
 M1InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable
                       AND NOT PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff;
 
@@ -1099,7 +1108,30 @@ M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 // Recalcul independant sur les DQ finaux (pas une recopie de BrakeCmd).
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
-// ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
+// ── Sorties physiques M1 ──
+M1_RelayFwd_Up_DQ            := M1RelayFwd;
+M1_RelayRev_Down_DQ          := M1RelayRev;
+M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
+M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
+M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
+M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
+M1_BrakeRelease_RQ           := M1BrakeCmd;
+
+// ── Bus inter-PRG M1 ──
+Data.M1RelayFwd            := M1RelayFwd;
+Data.M1RelayRev            := M1RelayRev;
+Data.M1SpeedContactor1     := M1SpeedContactor1;
+Data.M1SpeedContactor2     := M1SpeedContactor2;
+Data.M1SpeedContactor3     := M1SpeedContactor3;
+Data.M1SpeedContactor4     := M1SpeedContactor4;
+Data.M1BrakeCmd            := M1BrakeCmd;
+
+// ═══════════════════════════════════════════════════════════════
+// 🛗 §2 TREUIL M2 (Benne) — conditions + interlock + sorties
+// ═══════════════════════════════════════════════════════════════
+// 👁️ Même lecture que M1 : gate finale, défauts PowerCutOff / SafeStop, synthèse.
+// Sources : PRG_04 (WinchM2FinalInterlockRequest / WinchM2Safety / BucketState).
+
 M2InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.Enable
                       AND NOT PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff;
 
@@ -1149,11 +1181,30 @@ M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 // Recalcul independant, voir M1.
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
-// KoboldContactorCmd depuis la commande arbitree PRG_04.
-// Mapping E/S : M1_M2_KoboldMeasureEnable_DQ &lt;- PRG_06_Outputs.KoboldContactorCmd.
-KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
+// ── Sorties physiques M2 ──
+M2_RelayFwd_Up_Close_DQ      := M2RelayFwd;
+M2_RelayRev_Down_Open_DQ     := M2RelayRev;
+M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
+M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
+M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
+M2_SpeedContactor_4_DQ       := M2SpeedContactor4;
+M2_BrakeRelease_RQ           := M2BrakeCmd;
 
-// ── Interlock final M3 (Translation, variateur AC600) ────────────────────
+// ── Bus inter-PRG M2 ──
+Data.M2RelayFwd            := M2RelayFwd;
+Data.M2RelayRev            := M2RelayRev;
+Data.M2SpeedContactor1     := M2SpeedContactor1;
+Data.M2SpeedContactor2     := M2SpeedContactor2;
+Data.M2SpeedContactor3     := M2SpeedContactor3;
+Data.M2SpeedContactor4     := M2SpeedContactor4;
+Data.M2BrakeCmd            := M2BrakeCmd;
+
+// ═══════════════════════════════════════════════════════════════
+// ↔️ §3 TRANSLATION M3 (variateur AC600) — conditions + interlock + sorties
+// ═══════════════════════════════════════════════════════════════
+// 👁️ Même lecture : gate finale, défauts PowerCutOff / SafeStop, synthèse.
+// Sources : PRG_05 (TranslationFinalInterlockRequest / TranslationSafety).
+
 M3InterlockEnable := PRG_05_Translation.Data.TranslationFinalInterlockRequest.Enable
                       AND NOT PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
 
@@ -1187,33 +1238,27 @@ TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
 M3_CommandWord := instTranslationOutputInterlockM3.DriveControlWord;
 M3_SetpointFrequencyHz := instTranslationOutputInterlockM3.DriveFreqRefWord;
 
-// === ⚡ §2 SORTIES PHYSIQUES DIRECTES (M1 / M2 / M3 / AU / KOBOLD) ===
-M1_RelayFwd_Up_DQ            := M1RelayFwd;
-M1_RelayRev_Down_DQ          := M1RelayRev;
-M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
-M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
-M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
-M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
-M1_BrakeRelease_RQ           := M1BrakeCmd;
-
-M2_RelayFwd_Up_Close_DQ      := M2RelayFwd;
-M2_RelayRev_Down_Open_DQ     := M2RelayRev;
-M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
-M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
-M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
-M2_SpeedContactor_4_DQ       := M2SpeedContactor4;
-M2_BrakeRelease_RQ           := M2BrakeCmd;
-
+// ── Sorties physiques M3 ──
 M3_BrakeRelease_RQ           := TranslationBrakeCmd;
 
+// ── Bus inter-PRG M3 ──
+Data.TranslationBrakeCmd   := TranslationBrakeCmd;
+
+// ═══════════════════════════════════════════════════════════════
+// 🪝 §4 KOBOLD (capteur fond) — commande + sortie
+// ═══════════════════════════════════════════════════════════════
+// Source : PRG_04 (KoboldContactorCmdArbitrated).
+KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
 M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd;
 
-PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
-PowerKeepAlive_B_RQ          := PowerKeepAliveBCmd;
-EmergencyArming_RQ           := EmergencyArmingCmd;
+// ═══════════════════════════════════════════════════════════════
+// 🛡️ §5 AU / MAINTIEN PUISSANCE — coupure + réarmement + sorties
+// ═══════════════════════════════════════════════════════════════
+// 👁️ D'un coup d'œil : ce qui coupe la puissance (PowerCutOffReq) et ce qui
+//    maintient/réarme (instSafetyEmergencyManagement) → sorties physiques.
+// Sources : PRG_04/05 (PowerCutOff), GVL_IHM (ArmRequest / BtnEmergencyCutOff),
+//           PRG_02 (EmergencyChainClosed / PowerContactorEngaged).
 
-
-// === 🛡️ §3 SÉCURITÉ &amp; COUPURE PUISSANCE AMONT ===
 // PowerCutOffReq = agrégation OU strict des demandes de coupure des trois procédés (M5, A-04).
 PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff
                OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff
@@ -1229,10 +1274,22 @@ instSafetyEmergencyManagement(
     BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
 );
 
+// ── Ordres AU (logique) ──
 PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;
 PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;
 EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;
 
+// ── Sorties physiques AU ──
+PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
+PowerKeepAlive_B_RQ          := PowerKeepAliveBCmd;
+EmergencyArming_RQ           := EmergencyArmingCmd;
+
+// ── Bus inter-PRG AU ──
+Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
+Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
+Data.EmergencyArmingCmd    := EmergencyArmingCmd;
+
+// ── Diagnostics chaîne AU ──
 EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
 ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
 RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;
@@ -1240,27 +1297,6 @@ EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;
 EmergencyState := instSafetyEmergencyManagement.State;
 EmergencyDiag := instSafetyEmergencyManagement.Diag;
 PowerCutOffActive := PowerCutOffReq;
-
-// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_OutputsInterPrg) ===
-// Copie des ordres actionneurs vers le bus de sortie (rebouclés FB_SimBench).
-Data.M1RelayFwd            := M1RelayFwd;
-Data.M1RelayRev            := M1RelayRev;
-Data.M1SpeedContactor1     := M1SpeedContactor1;
-Data.M1SpeedContactor2     := M1SpeedContactor2;
-Data.M1SpeedContactor3     := M1SpeedContactor3;
-Data.M1SpeedContactor4     := M1SpeedContactor4;
-Data.M1BrakeCmd            := M1BrakeCmd;
-Data.M2RelayFwd            := M2RelayFwd;
-Data.M2RelayRev            := M2RelayRev;
-Data.M2SpeedContactor1     := M2SpeedContactor1;
-Data.M2SpeedContactor2     := M2SpeedContactor2;
-Data.M2SpeedContactor3     := M2SpeedContactor3;
-Data.M2SpeedContactor4     := M2SpeedContactor4;
-Data.M2BrakeCmd            := M2BrakeCmd;
-Data.TranslationBrakeCmd   := TranslationBrakeCmd;
-Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
-Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
-Data.EmergencyArmingCmd    := EmergencyArmingCmd;
 </xhtml>
           </ST>
         </body>

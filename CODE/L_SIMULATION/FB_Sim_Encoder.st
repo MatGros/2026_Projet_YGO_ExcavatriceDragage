@@ -6,16 +6,15 @@
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
    🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
-      réellement, à partir des relais de sens commandés et de la vitesse rampée
-      courante.
+      réellement, à partir des relais de sens commandés et du palier de vitesse courant.
    📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
    📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
-   📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
+   📥 StepNumber  : palier vitesse courant (1..5) — ex. instWinchM1.StepNumber
+      Vitesse = interpolation linéaire : palier 1 → MinSpeedMps (1 m/s), palier 5 → MaxSpeedMps (2 m/s).
    📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
    📥 PresetValue : valeur brute à charger lors du preset
-   📥 SpeedScaleFactor : multiplicateur de vitesse simulation (confort de test
-      banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
-      d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
+   📥 SpeedScaleFactor : facteur fin de confort (réglable à chaud, sans recompiler). Défaut 1.0 = vitesse
+      réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
    `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
@@ -31,13 +30,20 @@ VAR_INPUT
     Enable           : BOOL;   (* --> [CMD] Active la simulation *)
     RelayFwd         : BOOL;   (* --> [HW] Sens commandé avant *)
     RelayRev         : BOOL;   (* --> [HW] Sens commandé arrière *)
-    SpeedRefPct      : REAL;   (* --> [CMD] Vitesse rampée courante (%) *)
+    StepNumber       : INT;    (* --> [CMD] Palier vitesse courant (1..5, 0 = arrêt) *)
     PresetCmd        : BOOL;   (* --> [CMD] Applique un preset (homing) *)
     PresetValue      : UDINT;   (* --> [CFG] Valeur brute à charger au preset *)
-    SpeedScaleFactor : REAL := 1.0;   (* --> [CFG] Confort de test, voir bandeau ci-dessus *)
+    SpeedScaleFactor : REAL := 1.0;   (* --> [CFG] Facteur fin de confort (défaut 1.0) *)
     PresetLatencyCycles : INT := 3;   (* --> [CFG] Nb cycles automate avant application du preset (referencement non instantane) *)
     TestOffsetCmd    : BOOL;          (* --> [TST] Front montant = applique TestOffsetPts (test banc) *)
     TestOffsetPts    : DINT := 0;     (* --> [TST] Décalage signé à appliquer (points bruts) *)
+    // 📐 Paramètres physiques du treuil (mêmes valeurs que FB_Encoder_Scale) + vitesse réelle.
+    // Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps.
+    MinSpeedMps      : REAL := 1.0;    (* --> [CFG] Vitesse palier 1 (m/s) *)
+    MaxSpeedMps      : REAL := 2.0;    (* --> [CFG] Vitesse palier 5 (m/s) *)
+    PointsPerRev     : UDINT := 8192;  (* --> [CFG] Résolution codeur (pts/tour) *)
+    CableM_PerRev    : REAL := 2.0;    (* --> [CFG] Développement câble (m/tour) *)
+    CycleTimeS       : REAL := 0.010;  (* --> [CFG] Période tâche PLC (s) — MainTask 10 ms *)
 END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;   (* <-- [DIAG] Position brute simulée *)
@@ -46,7 +52,9 @@ VAR_IN_OUT
     RawPos      : UDINT;   (* <-> [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid) *)
 END_VAR
 VAR
-    Increment      : UDINT;              (* . [LOC] Évite de dupliquer le calcul 2x *)
+    Increment      : UDINT;              (* . [LOC] Points ajoutés par cycle *)
+    EffStep        : INT;               (* . [LOC] Pas borné (>= 1) *)
+    SpeedMps       : REAL;              (* . [LOC] Vitesse simulée (m/s) *)
     TestOffsetEdge : R_TRIG;             (* . [LOC] Front TestOffsetCmd *)
     PresetEdge     : R_TRIG;             (* . [LOC] Front montant PresetCmd *)
     PresetPending  : BOOL;               (* . [LOC] Preset en attente d'application (latence) *)
@@ -72,7 +80,13 @@ END_IF;
 {endregion}
 
 {region "§3 Comptage"}
-Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
+// 🎚️ Vitesse simulée = interpolation linéaire du palier (palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps),
+// pas par pas de (Max−Min)/4. Palier 0 (arrêt) ramène au palier 1 mais aucun mouvement n'est
+// appliqué tant que RelayFwd/RelayRev = FALSE (section plus bas).
+EffStep  := MAX(StepNumber, 1);
+SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
+// Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
+Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
 
 // Front du preset : lance la latence de referencement (le codeur réel n'est pas
 // instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).

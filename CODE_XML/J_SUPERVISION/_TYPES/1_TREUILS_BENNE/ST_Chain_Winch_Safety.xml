@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T19:32:13.772956" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T19:32:13.772956">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T23:15:42.091495" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T23:15:42.091495">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -185,6 +185,88 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">bit15 Absence de mouvement malgré commande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx321_CfgTopLimitM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⛔ Bloc "Pourquoi la montée ne s'arrête pas à la limite haute ?" — diagnostic ordonné
+       (lecture maintenance) : config + position → butée atteinte → bypass actifs.
+📐 Limite haute effective active (m) = CfgCableLimitAscent_M</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx322_CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position câble courante (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx323_TopLimitReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = position &gt;= limite haute (hors homing) | 0 = en dessous</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx324_AscentBlockedByTopLimit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = montée réellement coupée par la butée logicielle (AscentPermit=0) | 0 = limitée non bloquante (bypass ?)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx325_BypassTopLimitSoftware">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = butée logicielle shunétee IHM (individuel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx326_BypassTopLimitSoftCommun">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = butée logicielle shunétee (commun)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx327_BypassTopLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = capteur fin de course haut shuné IHM (individuel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx328_BypassTopLimitSwitchCommun">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = capteur fin de course haut shuné (commun)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx329_BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = bypass global treuil (individuel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx330_BypassGlobalCommun">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = bypass global (commun)</xhtml>
               </documentation>
             </variable>
           </struct>

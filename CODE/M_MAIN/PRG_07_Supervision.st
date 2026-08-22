@@ -302,12 +302,11 @@ SimBypassRise(CLK := GVL_Simulation.SimulationBypassActive);
 SimBypassFall(CLK := GVL_Simulation.SimulationBypassActive);
 
 IF SimBypassRise.Q THEN
-    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
-    GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
-    GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
     // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
     // OppositeDir via Process) pour travailler sans faux blocage en banc.
-    // Reste strictement inert sur machine réelle (SimulationBypassActive gaté MAINT+sim).
+    // ❗ Les limites réelles (TopLimitSwitch / TopLimitSoftware / LimitLegal) NE sont PAS
+    //    bypassées par la simulation : la protection de montée/descente reste active au banc.
+    // Reste strictement inerte sur machine réelle (SimulationBypassActive gaté MAINT+sim).
     GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
     GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
     GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;
@@ -573,7 +572,8 @@ instTroubleshootingView(
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
     HomedM1              := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomedM2              := PRG_02_Acquisition.instEncoderM2.Homed
+    HomedM2              := PRG_02_Acquisition.instEncoderM2.Homed,
+    CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M
 );
 
 {endregion}

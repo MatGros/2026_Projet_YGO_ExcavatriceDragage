@@ -3953,6 +3953,88 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">bit15 Absence de mouvement malgré commande</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx321_CfgTopLimitM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⛔ Bloc "Pourquoi la montée ne s'arrête pas à la limite haute ?" — diagnostic ordonné
+       (lecture maintenance) : config + position → butée atteinte → bypass actifs.
+📐 Limite haute effective active (m) = CfgCableLimitAscent_M</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx322_CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position câble courante (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx323_TopLimitReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = position &gt;= limite haute (hors homing) | 0 = en dessous</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx324_AscentBlockedByTopLimit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = montée réellement coupée par la butée logicielle (AscentPermit=0) | 0 = limitée non bloquante (bypass ?)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx325_BypassTopLimitSoftware">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = butée logicielle shunétee IHM (individuel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx326_BypassTopLimitSoftCommun">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = butée logicielle shunétee (commun)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx327_BypassTopLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = capteur fin de course haut shuné IHM (individuel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx328_BypassTopLimitSwitchCommun">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = capteur fin de course haut shuné (commun)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx329_BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = bypass global treuil (individuel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx330_BypassGlobalCommun">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ 1 = bypass global (commun)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -23650,6 +23732,14 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse M1</xhtml>
               </documentation>
             </variable>
+            <variable name="M1_StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier vitesse courant M1 (1..5)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1_PresetTriggerCmd">
               <type>
                 <WORD />
@@ -23728,6 +23818,14 @@ palier est encore engagé (fausse condition d'armement Méca A).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne vitesse M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier vitesse courant M2 (1..5)</xhtml>
               </documentation>
             </variable>
             <variable name="M2_PresetTriggerCmd">
@@ -24249,7 +24347,7 @@ instSimEncoderM1(
     Enable           := TRUE,
     RelayFwd         := M1_RelayFwd,
     RelayRev         := M1_RelayRev,
-    SpeedRefPct      := M1_SpeedRefPct,
+    StepNumber       := M1_StepNumber,
     PresetCmd        := M1_PresetCmd,
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
@@ -24263,7 +24361,7 @@ instSimEncoderM2(
     Enable           := TRUE,
     RelayFwd         := M2_RelayFwd,
     RelayRev         := M2_RelayRev,
-    SpeedRefPct      := M2_SpeedRefPct,
+    StepNumber       := M2_StepNumber,
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
@@ -24466,12 +24564,12 @@ Done := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé arrière</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="StepNumber">
               <type>
-                <REAL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse rampée courante (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier vitesse courant (1..5, 0 = arrêt)</xhtml>
               </documentation>
             </variable>
             <variable name="PresetCmd">
@@ -24498,7 +24596,7 @@ Done := TRUE;
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Confort de test, voir bandeau ci-dessus</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Facteur fin de confort (défaut 1.0)</xhtml>
               </documentation>
             </variable>
             <variable name="PresetLatencyCycles">
@@ -24531,6 +24629,63 @@ Done := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Décalage signé à appliquer (points bruts)</xhtml>
               </documentation>
             </variable>
+            <variable name="MinSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Paramètres physiques du treuil (mêmes valeurs que FB_Encoder_Scale) + vitesse réelle.
+Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps.
+--&gt; [CFG] Vitesse palier 1 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse palier 5 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Résolution codeur (pts/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableM_PerRev">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Développement câble (m/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawPosOut">
@@ -24558,7 +24713,23 @@ Done := TRUE;
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Évite de dupliquer le calcul 2x</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Points ajoutés par cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas borné (&gt;= 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse simulée (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="TestOffsetEdge">
@@ -24603,16 +24774,15 @@ Done := TRUE;
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
    🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
-      réellement, à partir des relais de sens commandés et de la vitesse rampée
-      courante.
+      réellement, à partir des relais de sens commandés et du palier de vitesse courant.
    📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
    📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
-   📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
+   📥 StepNumber  : palier vitesse courant (1..5) — ex. instWinchM1.StepNumber
+      Vitesse = interpolation linéaire : palier 1 → MinSpeedMps (1 m/s), palier 5 → MaxSpeedMps (2 m/s).
    📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
    📥 PresetValue : valeur brute à charger lors du preset
-   📥 SpeedScaleFactor : multiplicateur de vitesse simulation (confort de test
-      banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
-      d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
+   📥 SpeedScaleFactor : facteur fin de confort (réglable à chaud, sans recompiler). Défaut 1.0 = vitesse
+      réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
    `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
@@ -24646,7 +24816,13 @@ END_IF;
 {endregion}
 
 {region "§3 Comptage"}
-Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
+// 🎚️ Vitesse simulée = interpolation linéaire du palier (palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps),
+// pas par pas de (Max−Min)/4. Palier 0 (arrêt) ramène au palier 1 mais aucun mouvement n'est
+// appliqué tant que RelayFwd/RelayRev = FALSE (section plus bas).
+EffStep  := MAX(StepNumber, 1);
+SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
+// Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
+Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
 
 // Front du preset : lance la latence de referencement (le codeur réel n'est pas
 // instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
@@ -28582,6 +28758,15 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M2 référencé</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgTopLimitM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Config effective limite haute — source _CommunCfgPersist (≠ copie IHM)
+--&gt; [CFG] Limite haute active (m) = CfgCableLimitAscent_M</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -28703,6 +28888,17 @@ GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx317_ErrorMecaE        := Winc
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx318_ErrorBrakeThermal := WinchM1.Safety.ErrorBrakeThermal;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx319_ErrorOppositeDir  := WinchM1.Safety.ErrorOppositeDir;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx320_ErrorNoMovement   := WinchM1.Safety.ErrorNoMovement;
+// ⛔ Bloc "limite haute" — pourquoi la montée ne s'arrête pas (M1)
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx322_CablePosM                  := WinchM1.State.Position_M;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx323_TopLimitReached            := (WinchM1.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM1.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM1.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM1.Bypass.TopLimitSoftware;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM1.Bypass.TopLimitSwitch;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx328_BypassTopLimitSwitchCommun := Commun.Bypass.TopLimitSwitch;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx329_BypassGlobal               := WinchM1.Bypass.Global;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx330_BypassGlobalCommun         := Commun.Bypass.Global;
 
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx401_MotionAllowed := WinchM1.State.Ready;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated := WinchM1.State.StepNumber;
@@ -28764,6 +28960,17 @@ GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx317_ErrorMecaE        := Winc
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx318_ErrorBrakeThermal := WinchM2.Safety.ErrorBrakeThermal;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx319_ErrorOppositeDir  := WinchM2.Safety.ErrorOppositeDir;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx320_ErrorNoMovement   := WinchM2.Safety.ErrorNoMovement;
+// ⛔ Bloc "limite haute" — pourquoi la montée ne s'arrête pas (M2, sans M2_LimitShift ici)
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx322_CablePosM                  := WinchM2.State.Position_M;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx323_TopLimitReached            := (WinchM2.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM2.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy AND NOT (WinchM2.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM2.Bypass.TopLimitSoftware;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM2.Bypass.TopLimitSwitch;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx328_BypassTopLimitSwitchCommun := Commun.Bypass.TopLimitSwitch;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx329_BypassGlobal               := WinchM2.Bypass.Global;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx330_BypassGlobalCommun         := Commun.Bypass.Global;
 
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx401_MotionAllowed := WinchM2.State.Ready;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated := WinchM2.State.StepNumber;
@@ -32227,6 +32434,7 @@ instSimBench(
     M1_SpeedContactor_3      := PRG_06_Outputs.Data.M1SpeedContactor3,
     M1_SpeedContactor_4      := PRG_06_Outputs.Data.M1SpeedContactor4,
     M1_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedRef_Pct,
+    M1_StepNumber            := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber,
     M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd,
     M1_PresetValueOut        := instEncoderM1.HwOut.PresetValueOut,
     M1_BrakeCmd              := PRG_06_Outputs.Data.M1BrakeCmd,
@@ -32237,6 +32445,7 @@ instSimBench(
     M2_SpeedContactor_3      := PRG_06_Outputs.Data.M2SpeedContactor3,
     M2_SpeedContactor_4      := PRG_06_Outputs.Data.M2SpeedContactor4,
     M2_SpeedRefPct           := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedRef_Pct,
+    M2_StepNumber            := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd,
     M2_PresetValueOut        := instEncoderM2.HwOut.PresetValueOut,
     M2_BrakeCmd              := PRG_06_Outputs.Data.M2BrakeCmd,
@@ -34077,6 +34286,19 @@ WinchM2State.CommandedDirection := instWinchM2.CommandedDirection;
 WinchM2State.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElapsed;
 WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
 
+// ⛔️ Limite haute atteinte (fait public) — miroir de la butée logicielle de AscentPermit
+// (Homed, hors homing, non suspect, position &gt;= limite). Fait pur "Reached", sans bypass.
+CableLimitAscentM1Reached := PRG_02_Acquisition.instEncoderM1.Homed
+    AND NOT PRG_02_Acquisition.instEncoderM1.HomingSuspect
+    AND NOT PRG_02_Acquisition.instEncoderM1.Measurement.HomingStatus.Busy
+    AND (PRG_02_Acquisition.Data.CablePosM1 &gt;= _CommunCfgPersist.CfgCableLimitAscent_M);
+CableLimitAscentM2Reached := PRG_02_Acquisition.instEncoderM2.Homed
+    AND NOT PRG_02_Acquisition.instEncoderM2.HomingSuspect
+    AND NOT PRG_02_Acquisition.instEncoderM2.Measurement.HomingStatus.Busy
+    AND (PRG_02_Acquisition.Data.CablePosM2 &gt;= (_CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift));
+
+WinchM1Safety.CableLimitAscent := CableLimitAscentM1Reached;
+WinchM1Safety.CableLimitDescent := (PRG_02_Acquisition.Data.CablePosM1 &lt;= _WinchM1CfgPersist.CfgCableLimitDescent_M);
 WinchM1Safety.SafeStop := SafeStopM1_Active;
 WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
 WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
@@ -34099,6 +34321,8 @@ WinchM1Safety.PowerCutOffSafety  := PRG_06_Outputs.M1PowerCutOffSafetyInfo;
 WinchM1Safety.SafeStopSafety     := PRG_06_Outputs.M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := PRG_06_Outputs.M1BlockedBySafetyInfo;
 
+WinchM2Safety.CableLimitAscent := CableLimitAscentM2Reached;
+WinchM2Safety.CableLimitDescent := (PRG_02_Acquisition.Data.CablePosM2 &lt;= _WinchM2CfgPersist.CfgCableLimitDescent_M);
 WinchM2Safety.SafeStop := SafeStopM2_Active;
 WinchM2Safety.AscentPermit := EffectivePermitM2_Ascent;
 WinchM2Safety.DescendPermit := EffectivePermitM2_Descend;
@@ -35196,6 +35420,10 @@ creerait une collision avec la globale homonyme du mapping E/S.
    🛡️ Interlocks finaux M1/M2/M3 + agrégation PowerCutOff + chaîne AU.
    🔒 SafetyStructureNotValidated reste TRUE : aucune sortie moteur/frein
        autorisée tant que ce garde-fou n'est pas retiré.
+   🎨 Organisation FONCTIONNELLE : chaque bloc regroupe la chaîne complète d'une
+       fonction — conditions qui activent/désactivent la sortie (SafeStop / PowerCutOff /
+       interlocks) → FB interlock → ordres → sorties physiques → bus inter-PRG. Lisible
+       d'un coup d'œil.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -35203,11 +35431,16 @@ creerait une collision avec la globale homonyme du mapping E/S.
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === 🛡️ §1 BARRIÈRES FINALES M1 / M2 / M3 ===
-// Chaque bloc reçoit la demande brute publique du procédé propriétaire
-// (ST_WinchFinalInterlockRequest / ST_TranslationFinalInterlockRequest).
+// ═══════════════════════════════════════════════════════════════
+// 🛗 §1 TREUIL M1 (Retenue) — conditions + interlock + sorties
+// ═══════════════════════════════════════════════════════════════
+// 👁️ D'un coup d'œil : ce qui active/désactive la sortie M1.
+//   - M1InterlockEnable      : gate finale (Enable ET pas de PowerCutOff)
+//   - M1PowerCutOffSafetyInfo: défauts qui COUPENT la puissance
+//   - M1SafeStopSafetyInfo   : défauts qui font SafeStop (rampe rapide)
+//   - M1BlockedBySafetyInfo  : synthèse (PowerCutOff OU SafeStop)
+// Sources : PRG_04 (WinchM1FinalInterlockRequest / WinchM1Safety).
 
-// ── Interlock final M1 (Treuil Retenue) ──────────────────────────────────
 M1InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable
                       AND NOT PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff;
 
@@ -35254,7 +35487,30 @@ M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 // Recalcul independant sur les DQ finaux (pas une recopie de BrakeCmd).
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
-// ── Interlock final M2 (Treuil Benne) ────────────────────────────────────
+// ── Sorties physiques M1 ──
+M1_RelayFwd_Up_DQ            := M1RelayFwd;
+M1_RelayRev_Down_DQ          := M1RelayRev;
+M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
+M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
+M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
+M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
+M1_BrakeRelease_RQ           := M1BrakeCmd;
+
+// ── Bus inter-PRG M1 ──
+Data.M1RelayFwd            := M1RelayFwd;
+Data.M1RelayRev            := M1RelayRev;
+Data.M1SpeedContactor1     := M1SpeedContactor1;
+Data.M1SpeedContactor2     := M1SpeedContactor2;
+Data.M1SpeedContactor3     := M1SpeedContactor3;
+Data.M1SpeedContactor4     := M1SpeedContactor4;
+Data.M1BrakeCmd            := M1BrakeCmd;
+
+// ═══════════════════════════════════════════════════════════════
+// 🛗 §2 TREUIL M2 (Benne) — conditions + interlock + sorties
+// ═══════════════════════════════════════════════════════════════
+// 👁️ Même lecture que M1 : gate finale, défauts PowerCutOff / SafeStop, synthèse.
+// Sources : PRG_04 (WinchM2FinalInterlockRequest / WinchM2Safety / BucketState).
+
 M2InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.Enable
                       AND NOT PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff;
 
@@ -35304,11 +35560,30 @@ M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 // Recalcul independant, voir M1.
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
-// KoboldContactorCmd depuis la commande arbitree PRG_04.
-// Mapping E/S : M1_M2_KoboldMeasureEnable_DQ &lt;- PRG_06_Outputs.KoboldContactorCmd.
-KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
+// ── Sorties physiques M2 ──
+M2_RelayFwd_Up_Close_DQ      := M2RelayFwd;
+M2_RelayRev_Down_Open_DQ     := M2RelayRev;
+M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
+M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
+M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
+M2_SpeedContactor_4_DQ       := M2SpeedContactor4;
+M2_BrakeRelease_RQ           := M2BrakeCmd;
 
-// ── Interlock final M3 (Translation, variateur AC600) ────────────────────
+// ── Bus inter-PRG M2 ──
+Data.M2RelayFwd            := M2RelayFwd;
+Data.M2RelayRev            := M2RelayRev;
+Data.M2SpeedContactor1     := M2SpeedContactor1;
+Data.M2SpeedContactor2     := M2SpeedContactor2;
+Data.M2SpeedContactor3     := M2SpeedContactor3;
+Data.M2SpeedContactor4     := M2SpeedContactor4;
+Data.M2BrakeCmd            := M2BrakeCmd;
+
+// ═══════════════════════════════════════════════════════════════
+// ↔️ §3 TRANSLATION M3 (variateur AC600) — conditions + interlock + sorties
+// ═══════════════════════════════════════════════════════════════
+// 👁️ Même lecture : gate finale, défauts PowerCutOff / SafeStop, synthèse.
+// Sources : PRG_05 (TranslationFinalInterlockRequest / TranslationSafety).
+
 M3InterlockEnable := PRG_05_Translation.Data.TranslationFinalInterlockRequest.Enable
                       AND NOT PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
 
@@ -35342,33 +35617,27 @@ TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
 M3_CommandWord := instTranslationOutputInterlockM3.DriveControlWord;
 M3_SetpointFrequencyHz := instTranslationOutputInterlockM3.DriveFreqRefWord;
 
-// === ⚡ §2 SORTIES PHYSIQUES DIRECTES (M1 / M2 / M3 / AU / KOBOLD) ===
-M1_RelayFwd_Up_DQ            := M1RelayFwd;
-M1_RelayRev_Down_DQ          := M1RelayRev;
-M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
-M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
-M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
-M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
-M1_BrakeRelease_RQ           := M1BrakeCmd;
-
-M2_RelayFwd_Up_Close_DQ      := M2RelayFwd;
-M2_RelayRev_Down_Open_DQ     := M2RelayRev;
-M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
-M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
-M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
-M2_SpeedContactor_4_DQ       := M2SpeedContactor4;
-M2_BrakeRelease_RQ           := M2BrakeCmd;
-
+// ── Sorties physiques M3 ──
 M3_BrakeRelease_RQ           := TranslationBrakeCmd;
 
+// ── Bus inter-PRG M3 ──
+Data.TranslationBrakeCmd   := TranslationBrakeCmd;
+
+// ═══════════════════════════════════════════════════════════════
+// 🪝 §4 KOBOLD (capteur fond) — commande + sortie
+// ═══════════════════════════════════════════════════════════════
+// Source : PRG_04 (KoboldContactorCmdArbitrated).
+KoboldContactorCmd := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated;
 M1_M2_KoboldMeasureEnable_DQ := KoboldContactorCmd;
 
-PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
-PowerKeepAlive_B_RQ          := PowerKeepAliveBCmd;
-EmergencyArming_RQ           := EmergencyArmingCmd;
+// ═══════════════════════════════════════════════════════════════
+// 🛡️ §5 AU / MAINTIEN PUISSANCE — coupure + réarmement + sorties
+// ═══════════════════════════════════════════════════════════════
+// 👁️ D'un coup d'œil : ce qui coupe la puissance (PowerCutOffReq) et ce qui
+//    maintient/réarme (instSafetyEmergencyManagement) → sorties physiques.
+// Sources : PRG_04/05 (PowerCutOff), GVL_IHM (ArmRequest / BtnEmergencyCutOff),
+//           PRG_02 (EmergencyChainClosed / PowerContactorEngaged).
 
-
-// === 🛡️ §3 SÉCURITÉ &amp; COUPURE PUISSANCE AMONT ===
 // PowerCutOffReq = agrégation OU strict des demandes de coupure des trois procédés (M5, A-04).
 PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff
                OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff
@@ -35384,10 +35653,22 @@ instSafetyEmergencyManagement(
     BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
 );
 
+// ── Ordres AU (logique) ──
 PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;
 PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;
 EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;
 
+// ── Sorties physiques AU ──
+PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
+PowerKeepAlive_B_RQ          := PowerKeepAliveBCmd;
+EmergencyArming_RQ           := EmergencyArmingCmd;
+
+// ── Bus inter-PRG AU ──
+Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
+Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
+Data.EmergencyArmingCmd    := EmergencyArmingCmd;
+
+// ── Diagnostics chaîne AU ──
 EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
 ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
 RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;
@@ -35395,27 +35676,6 @@ EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;
 EmergencyState := instSafetyEmergencyManagement.State;
 EmergencyDiag := instSafetyEmergencyManagement.Diag;
 PowerCutOffActive := PowerCutOffReq;
-
-// === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_OutputsInterPrg) ===
-// Copie des ordres actionneurs vers le bus de sortie (rebouclés FB_SimBench).
-Data.M1RelayFwd            := M1RelayFwd;
-Data.M1RelayRev            := M1RelayRev;
-Data.M1SpeedContactor1     := M1SpeedContactor1;
-Data.M1SpeedContactor2     := M1SpeedContactor2;
-Data.M1SpeedContactor3     := M1SpeedContactor3;
-Data.M1SpeedContactor4     := M1SpeedContactor4;
-Data.M1BrakeCmd            := M1BrakeCmd;
-Data.M2RelayFwd            := M2RelayFwd;
-Data.M2RelayRev            := M2RelayRev;
-Data.M2SpeedContactor1     := M2SpeedContactor1;
-Data.M2SpeedContactor2     := M2SpeedContactor2;
-Data.M2SpeedContactor3     := M2SpeedContactor3;
-Data.M2SpeedContactor4     := M2SpeedContactor4;
-Data.M2BrakeCmd            := M2BrakeCmd;
-Data.TranslationBrakeCmd   := TranslationBrakeCmd;
-Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
-Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
-Data.EmergencyArmingCmd    := EmergencyArmingCmd;
 </xhtml>
           </ST>
         </body>
@@ -35917,12 +36177,11 @@ SimBypassRise(CLK := GVL_Simulation.SimulationBypassActive);
 SimBypassFall(CLK := GVL_Simulation.SimulationBypassActive);
 
 IF SimBypassRise.Q THEN
-    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
-    GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
-    GVL_IHM.Commun.Bypass.LimitLegal       := TRUE;
     // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
     // OppositeDir via Process) pour travailler sans faux blocage en banc.
-    // Reste strictement inert sur machine réelle (SimulationBypassActive gaté MAINT+sim).
+    // ❗ Les limites réelles (TopLimitSwitch / TopLimitSoftware / LimitLegal) NE sont PAS
+    //    bypassées par la simulation : la protection de montée/descente reste active au banc.
+    // Reste strictement inerte sur machine réelle (SimulationBypassActive gaté MAINT+sim).
     GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
     GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
     GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;
@@ -36188,7 +36447,8 @@ instTroubleshootingView(
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.JoystickDeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.instJoystick.AtNeutral,
     HomedM1              := PRG_02_Acquisition.instEncoderM1.Homed,
-    HomedM2              := PRG_02_Acquisition.instEncoderM2.Homed
+    HomedM2              := PRG_02_Acquisition.instEncoderM2.Homed,
+    CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M
 );
 
 {endregion}
@@ -36529,7 +36789,9 @@ instTroubleshootingView(
             <simpleValue value="TRUE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Master Bypass Essais Banc — arme LimitLegal + TopLimits en mode MAINT (inopérant sur machine réelle)
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Master Bypass Essais Banc — arme les bypass Meca (Safety/Process) en mode MAINT
+(inopérant sur machine réelle). ❗ N'arme PLUS les limites réelles (TopLimitSwitch /
+TopLimitSoftware / LimitLegal) : la protection de montée/descente reste active au banc.
 Défaut TRUE : pré-arme le bypass banc dès le boot (n'agit que si SimulationModeActive AND SimWinchActive).
 Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.</xhtml>
           </documentation>
