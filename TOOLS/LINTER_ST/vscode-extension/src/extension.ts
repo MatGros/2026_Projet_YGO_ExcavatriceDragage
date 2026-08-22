@@ -207,13 +207,17 @@ async function lintWorkspaceCommand(): Promise<void> {
 
 function applyResult(doc: vscode.TextDocument, result: LintResult) {
     if (result.status === 'incomplete') {
-        // Priorite "zero faux positif" : aucune alerte visuelle si une dependance de type
-        // n'a pas pu etre resolue -- seulement une trace dans Output pour comprendre pourquoi
-        // rien n'est remonte.
-        diagnosticCollection.delete(doc.uri);
-        outputChannel.appendLine(
-            `[INCOMPLET] ${doc.fileName} -- type(s) non resolu(s), aucune alerte emise : ${result.unresolved_types.join(', ')}`
-        );
+        // Priorite "zero faux positif" MAINTENUE : ceci n'est jamais une erreur (pas de
+        // vscode.DiagnosticSeverity.Error), juste un avertissement informatif -- le linter
+        // n'affirme rien sur un bug potentiel, il signale seulement qu'il n'a pas pu conclure
+        // (type externe hors CODE/, ex: DEVICE_STATE natif CODESYS/CANopen). Avant : silence
+        // total sauf Output, facile a manquer (demande utilisateur, session 2026-08-23).
+        const range = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 1));
+        const message = `Analyse incomplete -- type(s) hors CODE/ non resolu(s), verification partielle seulement : ${result.unresolved_types.join(', ')}`;
+        const diag = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+        diag.source = 'linter-st';
+        diagnosticCollection.set(doc.uri, [diag]);
+        outputChannel.appendLine(`[INCOMPLET] ${doc.fileName} -- ${message}`);
         return;
     }
 
