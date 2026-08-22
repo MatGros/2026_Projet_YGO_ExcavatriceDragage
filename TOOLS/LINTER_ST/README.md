@@ -1,0 +1,83 @@
+# 🧹 LINTER_ST
+
+Linter ST CODESYS 3.5 : remonte les **vraies** erreurs de compilation (types non déclarés,
+incompatibilités, etc.) en JSON structuré, exploitable par un éditeur (Problems panel) ou un
+agent IA. Basé sur [STruCpp](https://github.com/Autonomy-Logic/STruCpp) (compilateur ST → C++17
+actif, 2026), vendoré en copie locale.
+
+🔒 **Outil 100% encapsulé** — aucune dépendance d'exécution vers `TOOLS/COMPILER_ST2C_STruCpp/`
+ni tout autre dossier de `TOOLS/`. Binaire `strucpp.exe` et moulinette de conversion sont des
+copies propres à ce dossier (consigne 2026-08-23 : chaque outil porte sa responsabilité, pas de
+lien inter-outils).
+
+🎯 **Priorité absolue : zéro faux positif.** Si une dépendance de type ne peut pas être résolue,
+le linter **ne remonte aucune alerte** plutôt que de signaler une fausse erreur — préférence
+explicite de l'utilisateur (mieux vaut un silence qu'une fausse alerte).
+
+## 📦 Contenu
+
+| Fichier | Rôle |
+|---|---|
+| `resolve_deps.py` | Scan `CODE/` une fois, résout récursivement les dépendances (types/FB) d'un `.st` cible |
+| `linter_st_convert_codesys_to_iec.py` | Convertit les idiomes CODESYS 3.5 (enum, pragmas, qualificatifs `PUBLIC`, `END_xxx` manquant) vers IEC standard |
+| `lint.py` | Orchestrateur : résolution deps → conversion → compilation STruCpp → diagnostics JSON |
+| `bin/win32-x64/strucpp.exe` | Compilateur ST→C++17 vendoré (copie, v0.6.2) |
+
+## 🚀 Utilisation
+
+```powershell
+python TOOLS/LINTER_ST/lint.py CODE/D_JOYSTICK/FB_Joystick.st
+```
+
+Sortie JSON sur stdout :
+
+```json
+{
+  "status": "clean",
+  "target": "CODE/D_JOYSTICK/FB_Joystick.st",
+  "diagnostics": [],
+  "unresolved_types": []
+}
+```
+
+**Codes de sortie** :
+- `0` = propre, 0 erreur
+- `1` = vraies erreurs trouvées (dans `diagnostics`)
+- `2` = analyse incomplète — une dépendance de type n'a pas pu être résolue (voir
+  `unresolved_types`) ; **aucune fausse alerte n'est émise dans ce cas**
+- `3` = erreur d'usage (fichier introuvable, `strucpp.exe` absent, ...)
+
+### Résoudre seulement les dépendances
+
+```powershell
+python TOOLS/LINTER_ST/resolve_deps.py CODE/D_JOYSTICK/FB_Joystick.st
+```
+
+## ⚠️ Comment le filtre anti-faux-positif fonctionne
+
+`resolve_deps.py` calcule d'abord la liste des types référencés mais absents de l'index `CODE/`
+(`unresolved`, avant toute compilation). Seuls **ces noms-là** sont filtrés si STruCpp les
+signale ensuite comme `Undefined type`. Un `Undefined type` sur un nom que `resolve_deps.py`
+n'avait **pas** identifié comme manquant à l'avance (ex : typo hors des préfixes `ST_`/`E_`/`FB_`
+surveillés) est un signal fort de vraie erreur → toujours remonté comme diagnostic réel, jamais
+avalé silencieusement. Vérifié empiriquement (session 2026-08-23, typo `INT_INCONNU`).
+
+## 🧪 Validation effectuée (session 2026-08-23)
+
+7 FB réels testés `clean`, 0 faux positif : `FB_Joystick`, `FB_Encoder`, `FB_Modes`,
+`FB_Safety_EmergencyManagement`, `FB_Bucket`, `FB_Ramp`, `FB_FbStatus`. Cas négatif contrôlé
+(typo dans une copie hors `CODE/`) → erreur remontée avec ligne/colonne exactes.
+
+## 📌 Limites connues
+
+- Pas une preuve FAT/SAT — valide la syntaxe/typage, pas le comportement réel sur automate.
+- `resolve_deps.py` ne suit que les préfixes `ST_`, `E_`, `FB_` (convention de nommage du
+  projet, voir `DOC/STDS/NAMING_CONVENTION.md`) — un type qui ne suit pas cette convention ne
+  serait pas résolu automatiquement.
+- Binaire `strucpp.exe` vendoré = version figée. Mise à jour manuelle si besoin (voir
+  [releases STruCpp](https://github.com/Autonomy-Logic/STruCpp/releases)).
+
+## 🗺️ Roadmap
+
+- **Lot 2** : extension VSCode (diagnostics live dans Problems panel à la sauvegarde) — pas
+  encore implémenté.
