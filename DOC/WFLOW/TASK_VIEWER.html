@@ -926,16 +926,18 @@
             // 2. Si File System Access API est supportée
             if ('showSaveFilePicker' in window) {
                 try {
-                    savedFileHandle = await window.showSaveFilePicker({
+                    const handle = await window.showSaveFilePicker({
                         suggestedName: 'TASKS.yaml',
                         types: [{
                             description: 'Fichier YAML des Tâches',
                             accept: { 'text/yaml': ['.yaml', '.yml'] }
                         }]
                     });
-                    const writable = await savedFileHandle.createWritable();
+                    // L'utilisateur a choisi et validé le fichier dans Windows :
+                    const writable = await handle.createWritable();
                     await writable.write(yamlText);
                     await writable.close();
+                    savedFileHandle = handle;
                     localStorage.removeItem('TASK_VIEWER_UNSAVED');
                     hasUnsavedChanges = false;
                     updateSyncIndicator();
@@ -944,11 +946,12 @@
                     return;
                 } catch (err) {
                     if (err.name === 'AbortError') {
-                        return; // Annulation utilisateur : on laisse le voyant rouge
+                        return; // Annulation utilisateur : on laisse le voyant rouge et on ne ferme pas
                     }
                     console.warn('Fallback téléchargement :', err);
                 }
             }
+
 
             // 3. Fallback téléchargement direct classique
             const blob = new Blob([yamlText], { type: 'text/yaml;charset=utf-8' });
