@@ -518,7 +518,7 @@ def save_tasks_html(tasks, output_path: Path):
 
     <script>
 
-        // Persistance locale tant que les modifications ne sont pas exportées
+        // Persistance locale intelligente
         const defaultTasks = {tasks_json};
         let tasks = [];
         let hasUnsavedChanges = false;
@@ -526,10 +526,9 @@ def save_tasks_html(tasks, output_path: Path):
         try {{
             const savedChanges = localStorage.getItem('TASK_VIEWER_UNSAVED');
             const savedData = localStorage.getItem('TASK_VIEWER_DATA');
-            if (savedChanges === 'true' && savedData) {{
-                // L'utilisateur a des modifications en cours : ON GARDE SON TRAVAIL !
+            if (savedData) {{
                 tasks = JSON.parse(savedData);
-                hasUnsavedChanges = true;
+                hasUnsavedChanges = (savedChanges === 'true');
             }} else {{
                 tasks = [...defaultTasks];
                 hasUnsavedChanges = false;
@@ -538,6 +537,7 @@ def save_tasks_html(tasks, output_path: Path):
             tasks = [...defaultTasks];
             hasUnsavedChanges = false;
         }}
+
 
         function updateSyncIndicator() {{
             const badge = document.getElementById('sync-warning-badge');
@@ -956,6 +956,7 @@ def save_tasks_html(tasks, output_path: Path):
                     await writable.write(yamlText);
                     await writable.close();
                     localStorage.removeItem('TASK_VIEWER_UNSAVED');
+                    localStorage.setItem('TASK_VIEWER_DATA', JSON.stringify(tasks));
                     hasUnsavedChanges = false;
                     updateSyncIndicator();
                     document.getElementById('export-modal').style.display = 'none';
@@ -980,6 +981,7 @@ def save_tasks_html(tasks, output_path: Path):
                     await writable.close();
                     savedFileHandle = handle;
                     localStorage.removeItem('TASK_VIEWER_UNSAVED');
+                    localStorage.setItem('TASK_VIEWER_DATA', JSON.stringify(tasks));
                     hasUnsavedChanges = false;
                     updateSyncIndicator();
                     document.getElementById('export-modal').style.display = 'none';
@@ -1003,10 +1005,12 @@ def save_tasks_html(tasks, output_path: Path):
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             localStorage.removeItem('TASK_VIEWER_UNSAVED');
+            localStorage.setItem('TASK_VIEWER_DATA', JSON.stringify(tasks));
             hasUnsavedChanges = false;
             updateSyncIndicator();
             document.getElementById('export-modal').style.display = 'none';
         }}
+
 
 
 
