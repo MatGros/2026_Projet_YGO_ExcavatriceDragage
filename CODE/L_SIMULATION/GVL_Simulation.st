@@ -12,7 +12,9 @@
 VAR_GLOBAL
     // 🔑 Bit maître — rien n'est simulé si FALSE (machine réelle)
     SimulationModeActive        : BOOL := FALSE;
-    // 🎭 Master Bypass Essais Banc — arme LimitLegal + TopLimits en mode MAINT (inopérant sur machine réelle)
+    // 🎭 Master Bypass Essais Banc — arme les bypass Meca (Safety/Process) en mode MAINT
+    // (inopérant sur machine réelle). ❗ N'arme PLUS les limites réelles (TopLimitSwitch /
+    // TopLimitSoftware / LimitLegal) : la protection de montée/descente reste active au banc.
     // Défaut TRUE : pré-arme le bypass banc dès le boot (n'agit que si SimulationModeActive AND SimWinchActive).
     // Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.
     SimulationBypassActive      : BOOL := TRUE;

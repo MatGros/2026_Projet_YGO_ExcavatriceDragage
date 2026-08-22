@@ -2,16 +2,20 @@
 
 > Prompt réutilisable pour diagnostiquer un blocage/bug dans le programme CODESYS.
 > L'agent NE PEUT PAS exécuter le PLC : il lit des variables de diagnostic et raisonne par arbre de décision.
-> Fiche de session : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_<Sujet>_<AAAA-MM-JJ>.md` (depuis `TEMPLATE_Troubleshooting.md`).
+> Fiche de session : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_<Sujet>_<AAAAMMJJ>.md` (depuis `TEMPLATE_Troubleshooting.md`).
 
 ## 0. 📥 ACQUISITION DES VALEURS (canal)
 
 > **Comment l'agent obtient les valeurs du PLC sans l'exécuter.**
 
-- **Demander à l'utilisateur l'état des variables automate** — **UNIQUEMENT** si c'est nécessaire pour décider / identifier la cause, et qu'aucun autre moyen n'existe.
-- **Toujours demander depuis `GVL_Troubleshooting` et ses structures** (jamais des internes de FB).
-- ⚠️ **Si tu dois demander plus de 2-3 structures différentes** → le troubleshooting est **mal conçu** OU il faut **créer une structure dédiée** à ce type de problématique. Le signaler.
-- 🚫 **Ne JAMAIS se baser sur `Device.export`** (souvent périmé). Sources fiables : `CODE/*.st` + `GVL_Troubleshooting`.
+- **Canal unique = snapshot CSV** du script `codesys_snapshot_troubleshooting.py` (lit `troubleshooting_variables.txt`). **Jamais de lecture Watch variable par variable.**
+- **Règle de vérification avant demande** : pour chaque variable de décision, **vérifier d'abord** qu'elle est :
+  1. implémentée dans `GVL_Troubleshooting` (grep `CODE/J_SUPERVISION/GVL_Troubleshooting.st` + types `_TYPES/ST_*.st` + câblage `FB_TroubleshootingView.st`) ;
+  2. présente dans la liste du script `TOOLS/PLC_LIVE_READER/variable_lists/troubleshooting_variables.txt`.
+- **Si présente** dans les deux → demander **un seul snapshot** (« lance `Ctrl+W` / `execfile(codesys_snapshot_troubleshooting.py)` et renvoie le CSV »).
+- **Si manquante** → **ne pas demander de valeur live** : proposer d'ajouter la variable dans `GVL_Troubleshooting`, régénérer la liste (`generate_variable_list_from_code.py`), **validation humaine**, puis compiler + snapshot.
+- ⚠️ Si la cause exige > 2-3 structures → le troubleshooting est **mal conçu** OU il faut **créer une structure dédiée** à ce type de problématique. Le signaler.
+- 🚫 **Ne JAMAIS se baser sur `Device.export`** (souvent périmé). Sources fiables : `CODE/*.st` + `GVL_Troubleshooting` (via snapshot).
 
 ## 1. 🧊 CONTEXTE FIGÉ (à remplir UNE fois selon la situation)
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T20:47:16.771409" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T20:47:16.771409">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T00:07:38.870632" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T00:07:38.870632">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -51,12 +51,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens commandé arrière</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedRefPct">
+            <variable name="StepNumber">
               <type>
-                <REAL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse rampée courante (%)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier vitesse courant (1..5, 0 = arrêt)</xhtml>
               </documentation>
             </variable>
             <variable name="PresetCmd">
@@ -83,7 +83,7 @@
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Confort de test, voir bandeau ci-dessus</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Facteur fin de confort (défaut 1.0)</xhtml>
               </documentation>
             </variable>
             <variable name="PresetLatencyCycles">
@@ -116,6 +116,63 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Décalage signé à appliquer (points bruts)</xhtml>
               </documentation>
             </variable>
+            <variable name="MinSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Paramètres physiques du treuil (mêmes valeurs que FB_Encoder_Scale) + vitesse réelle.
+Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps.
+--&gt; [CFG] Vitesse palier 1 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse palier 5 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Résolution codeur (pts/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableM_PerRev">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Développement câble (m/tour)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTimeS">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Période tâche PLC (s) — MainTask 10 ms</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="RawPosOut">
@@ -143,7 +200,23 @@
                 <UDINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Évite de dupliquer le calcul 2x</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Points ajoutés par cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas borné (&gt;= 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse simulée (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="TestOffsetEdge">
@@ -188,16 +261,15 @@
       Enable/Reset/Error complet, pas de StartStop/SafeStop — outil de banc, pas
       du métier machine.
    🎯 Rôle : fait "compter" un codeur absolu comme si le treuil tournait
-      réellement, à partir des relais de sens commandés et de la vitesse rampée
-      courante.
+      réellement, à partir des relais de sens commandés et du palier de vitesse courant.
    📥 Enable      : simulation active (SimulationModeActive AND NOT BusEncoderMxIsReal)
    📥 RelayFwd/RelayRev : sens commandé (contacteurs de sens du treuil)
-   📥 SpeedRefPct : vitesse rampée courante (magnitude, %) — ex. instWinchM1.SpeedRamp.Current
+   📥 StepNumber  : palier vitesse courant (1..5) — ex. instWinchM1.StepNumber
+      Vitesse = interpolation linéaire : palier 1 → MinSpeedMps (1 m/s), palier 5 → MaxSpeedMps (2 m/s).
    📥 PresetCmd   : TRUE le cycle où un preset (homing) doit être appliqué (PresettTrigCmd = 2)
    📥 PresetValue : valeur brute à charger lors du preset
-   📥 SpeedScaleFactor : multiplicateur de vitesse simulation (confort de test
-      banc uniquement, sans rapport avec une calibration réelle). Défaut 1.0 = comportement
-      d'origine. Câblé sur GVL_Simulation.TstEncoderSpeedFactor (réglable à chaud, sans recompiler).
+   📥 SpeedScaleFactor : facteur fin de confort (réglable à chaud, sans recompiler). Défaut 1.0 = vitesse
+      réelle telle que définie par MinSpeedMps/MaxSpeedMps/PointsPerRev/CableM_PerRev/CycleTimeS.
    📤 RawPosOut   : position brute simulée (UDINT), à aiguiller à la place de la valeur
       EtherCAT réelle quand le device n'est pas Operational (voir PRG_02_Encoders.st)
    `RawPos` en `VAR_IN_OUT`, référencé depuis `GVL_PERSISTENT`
@@ -231,7 +303,13 @@ END_IF;
 {endregion}
 
 {region "§3 Comptage"}
-Increment := REAL_TO_UDINT(SpeedRefPct * 0.1 * SpeedScaleFactor);
+// 🎚️ Vitesse simulée = interpolation linéaire du palier (palier 1 → MinSpeedMps, palier 5 → MaxSpeedMps),
+// pas par pas de (Max−Min)/4. Palier 0 (arrêt) ramène au palier 1 mais aucun mouvement n'est
+// appliqué tant que RelayFwd/RelayRev = FALSE (section plus bas).
+EffStep  := MAX(StepNumber, 1);
+SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
+// Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
+Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
 
 // Front du preset : lance la latence de referencement (le codeur réel n'est pas
 // instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).

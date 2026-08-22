@@ -14,12 +14,18 @@ Necessite g++ (MinGW-w64) dans le PATH -- voir TOOLS/COMPILER_ST2C_STruCpp/READM
 
 import argparse
 import datetime as _dt
+import json
+import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
 
 import yaml
+
+import chronogram
+from html_report import render_html_report
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TEST_AUTO_CI = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"
@@ -27,13 +33,76 @@ COMPILER_DIR = REPO_ROOT / "TOOLS" / "COMPILER_ST2C_STruCpp"
 CONVERTER = COMPILER_DIR / "convert_codesys_to_iec.py"
 STRUCPP = COMPILER_DIR / "bin" / "win32-x64" / "strucpp.exe"
 REGISTRY = TEST_AUTO_CI / "registry.yaml"
+CONFIG = TEST_AUTO_CI / "config.yaml"
+RUNTIME_INCLUDE = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "include"
+RUNTIME_TEST = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "test"
+
+
+def _ensure_gpp_in_path() -> None:
+    """Si g++ n'est pas trouve dans le PATH (cas frequent : winget vient de l'installer mais
+    le terminal/VS Code en cours n'a pas recharge son PATH), cherche dans les emplacements
+    d'installation connus et l'ajoute pour CE process seulement -- evite de devoir fermer/
+    rouvrir VS Code a chaque fois. N'ecrit jamais dans le PATH systeme/utilisateur."""
+    if shutil.which("g++"):
+        return
+    candidates = []
+    local_appdata = os.environ.get("LOCALAPPDATA")
+    if local_appdata:
+        candidates += list(pathlib.Path(local_appdata).glob(
+            "Microsoft/WinGet/Packages/BrechtSanders.WinLibs*/mingw64/bin/g++.exe"))
+    for fixed in (r"C:\mingw64\bin\g++.exe", r"C:\msys64\mingw64\bin\g++.exe"):
+        p = pathlib.Path(fixed)
+        if p.exists():
+            candidates.append(p)
+    if not candidates:
+        return
+    bin_dir = str(candidates[0].parent)
+    os.environ["PATH"] = bin_dir + os.pathsep + os.environ.get("PATH", "")
+    print(f"[info] g++ absent du PATH -- trouve automatiquement dans {bin_dir} (ajoute pour cette execution uniquement)")
 
 
 def load_registry() -> dict:
     return yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
 
 
-def run_one(fb_name: str, entry: dict) -> bool:
+def load_config() -> dict:
+    if not CONFIG.exists():
+        return {"cycle_time_ms": 10}
+    return yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+
+
+def _archive_previous(reports_dir: pathlib.Path, fb_name: str) -> None:
+    """Deplace le dernier rapport (html/json) + le .st de test qui l'a produit vers
+    reports/archive/, horodates ensemble -- pour que la racine reports/ ne contienne toujours
+    que le DERNIER run, tout en gardant l'historique complet et tracable (quel .st a produit
+    quel rapport, meme si le .st a ete modifie depuis)."""
+    existing = [p for p in reports_dir.glob(f"{fb_name}.*") if p.is_file()] + \
+               [p for p in reports_dir.glob(f"{fb_name}_test.*") if p.is_file()]
+    if not existing:
+        return
+    archive_dir = reports_dir / "archive"
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+    for p in existing:
+        p.rename(archive_dir / f"{timestamp}_{p.name}")
+
+
+def _find_strucpp_temp_dir(before: set, tmp_root: pathlib.Path) -> pathlib.Path | None:
+    """STruCpp --test compile+build+execute dans un dossier strucpp-test-XXXXXX du TEMP
+    systeme, jamais nettoye (constate empiriquement). On diffe avant/apres pour retrouver
+    celui de CET appel (pas un dossier residuel d'un run precedent)."""
+    after = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
+    new_dirs = after - before
+    candidates = new_dirs or after
+    if not candidates:
+        return None
+    return max(candidates, key=lambda p: p.stat().st_mtime)
+
+
+def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10) -> dict:
+    """Retourne {"ok": bool, "tests": [{"name", "passed", "detail"}, ...]} -- le detail par
+    test (pas seulement le statut global du FB) permet a un agent de lire le resultat complet
+    depuis le seul stdout, sans devoir ouvrir le rapport HTML."""
     domain = entry["domain"]
     sources = [REPO_ROOT / p for p in entry["sources"]]
     test_file = REPO_ROOT / entry["test"]
@@ -43,58 +112,121 @@ def run_one(fb_name: str, entry: dict) -> bool:
     with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_") as tmp:
         converted_dir = pathlib.Path(tmp)
         convert_cmd = [sys.executable, str(CONVERTER), *[str(s) for s in sources], "--out", str(converted_dir)]
-        result = subprocess.run(convert_cmd, capture_output=True, text=True)
+        result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8")
         print(result.stdout)
         if result.returncode != 0:
             print(result.stderr, file=sys.stderr)
             print(f"[ERREUR] Conversion echouee pour {fb_name}")
-            return False
+            return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}]}
 
         converted_files = [str(converted_dir / s.name) for s in sources]
         out_cpp = converted_dir / f"{fb_name}.cpp"
+        tmp_root = pathlib.Path(tempfile.gettempdir())
+        before = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
+
         strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "--test", str(test_file)]
-        result = subprocess.run(strucpp_cmd, capture_output=True, text=True, cwd=str(converted_dir))
-        report = result.stdout + result.stderr
-        print(report)
+        result = subprocess.run(strucpp_cmd, capture_output=True, text=True, encoding="utf-8", cwd=str(converted_dir))
+        text_report = result.stdout + result.stderr
+        print(text_report)
 
-        reports_dir = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI" / "RESULTS" / domain / "reports"
+        strucpp_temp_dir = _find_strucpp_temp_dir(before, tmp_root)
+        json_data = None
+        trace_entries = []
+        field_types = {}
+        if strucpp_temp_dir is not None:
+            test_runner = strucpp_temp_dir / "test_runner.exe"
+            if test_runner.exists():
+                json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8")
+                try:
+                    json_data = json.loads(json_result.stdout)
+                except json.JSONDecodeError:
+                    json_data = None
+            try:
+                trace_entries, field_types = chronogram.build_and_run_traced(
+                    strucpp_temp_dir, RUNTIME_INCLUDE, RUNTIME_TEST, fb_name.upper())
+            except Exception as exc:  # chronogramme = bonus, ne doit jamais casser le run
+                print(f"[chronogram] indisponible pour {fb_name} : {exc}")
+                trace_entries, field_types = [], {}
+
+        reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
         reports_dir.mkdir(parents=True, exist_ok=True)
-        timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+        _archive_previous(reports_dir, fb_name)
         status = "PASS" if result.returncode == 0 else "FAIL"
-        report_path = reports_dir / f"{fb_name}_{timestamp}_{status}.txt"
-        report_path.write_text(report, encoding="utf-8")
-        print(f"Rapport : {report_path}")
+        base = reports_dir / fb_name
+        shutil.copyfile(test_file, reports_dir / f"{fb_name}_test.st")
 
-        return result.returncode == 0
+        if json_data is not None:
+            (base.with_suffix(".json")).write_text(json.dumps(json_data, indent=2), encoding="utf-8")
+            html = render_html_report(fb_name=fb_name, domain=domain, test_file=str(entry["test"]),
+                                       sources=entry["sources"], json_data=json_data, text_report=text_report,
+                                       test_st_path=test_file, trace_entries=trace_entries,
+                                       source_paths=sources, cycle_time_ms=cycle_time_ms,
+                                       field_types=field_types)
+            base.with_suffix(".html").write_text(html, encoding="utf-8")
+            print(f"Rapport : {base.with_suffix('.html')}")
+        else:
+            base.with_suffix(".txt").write_text(text_report, encoding="utf-8")
+            print(f"Rapport (JSON indisponible, texte brut) : {base.with_suffix('.txt')}")
+
+        tests = []
+        for r in (json_data or {}).get("results", []):
+            detail = ""
+            failure = r.get("failure")
+            if failure:
+                detail = f"{failure.get('assertType', '')}: {failure.get('detail', '')}"
+                if failure.get("message"):
+                    detail += f" -- {failure['message']}"
+            tests.append({"name": r.get("name", ""), "passed": r.get("passed", False), "detail": detail})
+        if not tests:
+            tests = [{"name": "(pas de resultat JSON)", "passed": result.returncode == 0, "detail": ""}]
+
+        return {"ok": result.returncode == 0, "tests": tests}
 
 
 def main() -> int:
+    _ensure_gpp_in_path()
     parser = argparse.ArgumentParser(description=__doc__)
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group()
     group.add_argument("--fb", help="Nom du FB a tester (cle du registry.yaml)")
-    group.add_argument("--all", action="store_true", help="Tester tous les FB du registre")
+    group.add_argument("--domain", help="Tester tous les FB d'un domaine (ex: AU_SECURITE, JOYSTICK)")
+    group.add_argument("--all", action="store_true", help="Tester tous les FB du registre (defaut si aucune option)")
     args = parser.parse_args()
+    if not args.fb and not args.domain and not args.all:
+        args.all = True
 
     if not STRUCPP.exists():
         print(f"[ERREUR] strucpp.exe introuvable : {STRUCPP}")
         return 1
 
     registry = load_registry()
+    cycle_time_ms = load_config().get("cycle_time_ms", 10)
 
-    if args.fb:
+    if args.domain:
+        selected = {name: e for name, e in registry.items() if e["domain"] == args.domain}
+        if not selected:
+            domains = sorted({e["domain"] for e in registry.values()})
+            print(f"[ERREUR] Aucun FB dans le domaine '{args.domain}' -- domaines disponibles : {', '.join(domains)}")
+            return 1
+        results = {name: run_one(name, entry, cycle_time_ms) for name, entry in selected.items()}
+    elif args.fb:
         if args.fb not in registry:
             print(f"[ERREUR] '{args.fb}' absent de {REGISTRY} -- entrees disponibles : {', '.join(registry)}")
             return 1
-        ok = run_one(args.fb, registry[args.fb])
+        ok = run_one(args.fb, registry[args.fb], cycle_time_ms)
         results = {args.fb: ok}
     else:
-        results = {name: run_one(name, entry) for name, entry in registry.items()}
+        results = {name: run_one(name, entry, cycle_time_ms) for name, entry in registry.items()}
 
     print("\n=== RESUME ===")
-    for name, ok in results.items():
-        print(f"  {'PASS' if ok else 'FAIL'}  {name}")
-    n_fail = sum(1 for ok in results.values() if not ok)
-    print(f"{len(results)} FB testes, {len(results) - n_fail} PASS, {n_fail} FAIL")
+    for name, res in results.items():
+        print(f"{'PASS' if res['ok'] else 'FAIL'}  {name}")
+        for t in res["tests"]:
+            line = f"  {'PASS' if t['passed'] else 'FAIL'}  {t['name']}"
+            if not t["passed"] and t["detail"]:
+                line += f"\n        {t['detail']}"
+            print(line)
+    n_fail = sum(1 for res in results.values() if not res["ok"])
+    print(f"\n{len(results)} FB testes, {len(results) - n_fail} PASS, {n_fail} FAIL")
 
     return 1 if n_fail else 0
 

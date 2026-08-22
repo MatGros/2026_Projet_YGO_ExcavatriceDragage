@@ -20,7 +20,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CODE_DIR = REPO_ROOT / "CODE"
-GVL_PATH = CODE_DIR / "K_DEPANNAGE" / "GVL_Troubleshooting.st"
+GVL_PATH = CODE_DIR / "J_SUPERVISION" / "GVL_Troubleshooting.st"
 DEFAULT_OUTPUT = Path(__file__).resolve().parent / "troubleshooting_variables.txt"
 
 # Ligne de declaration d'un champ STRUCT : "Nom : Type;"

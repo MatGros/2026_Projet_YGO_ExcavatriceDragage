@@ -33,6 +33,7 @@ VAR_INPUT
     M1_SpeedContactor_3        : BOOL;   (* --> [HW] Contacteur palier 3 M1 *)
     M1_SpeedContactor_4        : BOOL;   (* --> [HW] Contacteur palier 4 M1 *)
     M1_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M1 *)
+    M1_StepNumber              : INT;    (* --> [CMD] Palier vitesse courant M1 (1..5) *)
     M1_PresetTriggerCmd        : WORD;   (* --> [CMD] Trigger preset M1 *)
     M1_PresetValueOut          : UDINT;   (* --> [CFG] Valeur preset M1 *)
     M1_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M1 *)
@@ -44,6 +45,7 @@ VAR_INPUT
     M2_SpeedContactor_3        : BOOL;   (* --> [HW] Contacteur palier 3 M2 *)
     M2_SpeedContactor_4        : BOOL;   (* --> [HW] Contacteur palier 4 M2 *)
     M2_SpeedRefPct             : REAL;   (* --> [CMD] Consigne vitesse M2 *)
+    M2_StepNumber              : INT;    (* --> [CMD] Palier vitesse courant M2 (1..5) *)
     M2_PresetTriggerCmd        : WORD;   (* --> [CMD] Trigger preset M2 *)
     M2_PresetValueOut          : UDINT;   (* --> [CFG] Valeur preset M2 *)
     M2_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M2 *)
@@ -165,7 +167,7 @@ instSimEncoderM1(
     Enable           := TRUE,
     RelayFwd         := M1_RelayFwd,
     RelayRev         := M1_RelayRev,
-    SpeedRefPct      := M1_SpeedRefPct,
+    StepNumber       := M1_StepNumber,
     PresetCmd        := M1_PresetCmd,
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
@@ -179,7 +181,7 @@ instSimEncoderM2(
     Enable           := TRUE,
     RelayFwd         := M2_RelayFwd,
     RelayRev         := M2_RelayRev,
-    SpeedRefPct      := M2_SpeedRefPct,
+    StepNumber       := M2_StepNumber,
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,

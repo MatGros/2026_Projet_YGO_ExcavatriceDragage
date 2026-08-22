@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-20T19:32:30.112598" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-20T19:32:30.112598">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T23:15:54.257041" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T23:15:54.257041">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6035,6 +6035,15 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M2 référencé</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgTopLimitM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Config effective limite haute — source _CommunCfgPersist (≠ copie IHM)
+--&gt; [CFG] Limite haute active (m) = CfgCableLimitAscent_M</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -6156,6 +6165,17 @@ GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx317_ErrorMecaE        := Winc
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx318_ErrorBrakeThermal := WinchM1.Safety.ErrorBrakeThermal;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx319_ErrorOppositeDir  := WinchM1.Safety.ErrorOppositeDir;
 GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx320_ErrorNoMovement   := WinchM1.Safety.ErrorNoMovement;
+// ⛔ Bloc "limite haute" — pourquoi la montée ne s'arrête pas (M1)
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx322_CablePosM                  := WinchM1.State.Position_M;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx323_TopLimitReached            := (WinchM1.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM1.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM1.State.Encoder.HomingBusy AND NOT (WinchM1.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM1.Bypass.TopLimitSoftware;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM1.Bypass.TopLimitSwitch;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx328_BypassTopLimitSwitchCommun := Commun.Bypass.TopLimitSwitch;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx329_BypassGlobal               := WinchM1.Bypass.Global;
+GVL_Troubleshooting.LevageUnitaireM1.Safety_300.Idx330_BypassGlobalCommun         := Commun.Bypass.Global;
 
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx401_MotionAllowed := WinchM1.State.Ready;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx402_SpeedStepCalculated := WinchM1.State.StepNumber;
@@ -6217,6 +6237,17 @@ GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx317_ErrorMecaE        := Winc
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx318_ErrorBrakeThermal := WinchM2.Safety.ErrorBrakeThermal;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx319_ErrorOppositeDir  := WinchM2.Safety.ErrorOppositeDir;
 GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx320_ErrorNoMovement   := WinchM2.Safety.ErrorNoMovement;
+// ⛔ Bloc "limite haute" — pourquoi la montée ne s'arrête pas (M2, sans M2_LimitShift ici)
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx321_CfgTopLimitM               := CfgTopLimitM;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx322_CablePosM                  := WinchM2.State.Position_M;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx323_TopLimitReached            := (WinchM2.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx324_AscentBlockedByTopLimit    := (WinchM2.State.Position_M &gt;= CfgTopLimitM) AND NOT WinchM2.State.Encoder.HomingBusy AND NOT (WinchM2.Bypass.TopLimitSoftware OR Commun.Bypass.TopLimitSoftware);
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx325_BypassTopLimitSoftware     := WinchM2.Bypass.TopLimitSoftware;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx326_BypassTopLimitSoftCommun   := Commun.Bypass.TopLimitSoftware;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx327_BypassTopLimitSwitch       := WinchM2.Bypass.TopLimitSwitch;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx328_BypassTopLimitSwitchCommun := Commun.Bypass.TopLimitSwitch;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx329_BypassGlobal               := WinchM2.Bypass.Global;
+GVL_Troubleshooting.LevageUnitaireM2.Safety_300.Idx330_BypassGlobalCommun         := Commun.Bypass.Global;
 
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx401_MotionAllowed := WinchM2.State.Ready;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx402_SpeedStepCalculated := WinchM2.State.StepNumber;

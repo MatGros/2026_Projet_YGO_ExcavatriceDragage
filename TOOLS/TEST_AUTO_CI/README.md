@@ -28,20 +28,32 @@ FB_Joystick:
 ## 🚀 Utilisation
 
 ```bash
-python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Joystick   # un seul FB
-python TOOLS/TEST_AUTO_CI/run_tests.py --all              # tous les FB du registre, un seul rapport
+python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Joystick
+python TOOLS/TEST_AUTO_CI/run_tests.py --domain AU_SECURITE
+python TOOLS/TEST_AUTO_CI/run_tests.py            # --all par defaut, sans option
 ```
 
-Nécessite `g++` (MinGW-w64) dans le PATH — voir `TOOLS/COMPILER_ST2C_STruCpp/README.md`.
+Nécessite `g++` (MinGW-w64) — voir `TOOLS/COMPILER_ST2C_STruCpp/README.md` pour l'installer.
+Si `g++` est installé mais absent du `PATH` de la session en cours (cas classique juste après
+un `winget install`, avant de redémarrer VS Code), `run_tests.py` le détecte automatiquement
+dans l'emplacement d'installation WinGet connu et l'ajoute pour cette exécution seule — pas
+besoin de fermer/rouvrir le terminal à chaque fois.
+
+Le résumé final (`=== RESUME ===`) liste le résultat **par test individuel** (pas seulement par
+FB), avec le détail de l'assertion en échec — lisible directement dans le terminal/par un
+agent, sans avoir besoin d'ouvrir le rapport HTML. Code de sortie : `0` si tout passe, `1` sinon.
 
 ## 📁 `RESULTS/<DOMAINE>/`
 
 ```
 RESULTS/JOYSTICK/
 ├── tests/    *.st versionné (comme du code) — QUOI on teste, COMMENT
-└── reports/  *.txt horodaté, régénéré à chaque run, gitignoré
+└── reports/
+    ├── <FB>.html / .json / _test.st   # dernier run uniquement, toujours a jour
+    └── archive/                        # historique horodate (rapport + .st associe), gitignore
 ```
 
+`reports/` (racine + `archive/`) est gitignoré — seuls `tests/*.st` sont versionnés (comme du code).
 Nouveau FB à tester = ajouter une entrée `registry.yaml` + un fichier `RESULTS/<DOMAINE>/tests/*.st`. Ne jamais toucher `run_tests.py`.
 
 ## ✅ État actuel (2026-08)
@@ -49,4 +61,4 @@ Nouveau FB à tester = ajouter une entrée `registry.yaml` + un fichier `RESULTS
 | FB | Domaine | Tests |
 |---|---|---|
 | `FB_Joystick` | JOYSTICK | 2/2 PASS |
-| `FB_Safety_EmergencyManagement` | AU_SECURITE | 2/2 PASS (`TC-P01-004`, `006`, `008`, `009`) |
+| `FB_Safety_EmergencyManagement` | AU_SECURITE | 5/6 PASS — `TC-P01-002, 003, 006, 007, 008` OK ; `TC-P01-004/009` **rouge intentionnellement**, preuve d'un écart réel entre le code (`FB_Safety_EmergencyManagementLogic.st`, bloc Reset) et l'AF §3.4bis (`Reset` ne devrait jamais réarmer le maintien de puissance sans re-test physique du canal) |
