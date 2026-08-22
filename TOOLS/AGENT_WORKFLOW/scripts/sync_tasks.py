@@ -648,6 +648,12 @@ def save_tasks_html(tasks, output_path: Path):
     </div>
 
 
+    <!-- Toast Notification Flottante -->
+    <div id="toast" style="display:none; position:fixed; top:20px; right:20px; z-index:9999; background:#50fa7b; color:#000; padding:12px 20px; border-radius:8px; font-weight:bold; font-size:14px; box-shadow:0 4px 20px rgba(0,0,0,0.5); align-items:center; gap:10px;">
+        <span>✅</span>
+        <span id="toast-msg">Synchronisation effective : TASKS.yaml mis à jour avec succès !</span>
+    </div>
+
     <!-- Modal d'Exportation des Données -->
     <div class="modal-overlay" id="export-modal">
         <div class="modal-box" style="width: 600px;">
@@ -667,6 +673,7 @@ def save_tasks_html(tasks, output_path: Path):
 
         </div>
     </div>
+
 
 
     <script>
@@ -1094,11 +1101,21 @@ def save_tasks_html(tasks, output_path: Path):
             alert('📋 Contenu TASKS.yaml copié dans le presse-papier !');
         }}
 
+        function showToast(msg) {{
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            if (!toast || !msgEl) return;
+            msgEl.innerText = msg;
+            toast.style.display = 'inline-flex';
+            setTimeout(() => {{
+                toast.style.display = 'none';
+            }}, 3500);
+        }}
+
         let savedFileHandle = null;
 
         async function downloadExportFile() {{
             const yamlText = generateYamlText();
-
 
             // 1. Si on a déjà un handle ouvert, on écrit directement dedans sans ouvrir de fenêtre !
             if (savedFileHandle) {{
@@ -1109,7 +1126,8 @@ def save_tasks_html(tasks, output_path: Path):
                     localStorage.removeItem('TASK_VIEWER_UNSAVED');
                     hasUnsavedChanges = false;
                     updateSyncIndicator();
-                    alert('✅ Fichier TASKS.yaml mis à jour directement sur votre disque !');
+                    document.getElementById('export-modal').style.display = 'none';
+                    showToast('🎉 Synchronisation effective : TASKS.yaml mis à jour avec succès !');
                     return;
                 }} catch (e) {{
                     savedFileHandle = null; // En cas d'erreur de permission, réinitialiser
@@ -1132,7 +1150,8 @@ def save_tasks_html(tasks, output_path: Path):
                     localStorage.removeItem('TASK_VIEWER_UNSAVED');
                     hasUnsavedChanges = false;
                     updateSyncIndicator();
-                    alert('✅ Fichier TASKS.yaml enregistré directement sur votre disque !');
+                    document.getElementById('export-modal').style.display = 'none';
+                    showToast('🎉 Synchronisation effective : TASKS.yaml mis à jour avec succès !');
                     return;
                 }} catch (err) {{
                     if (err.name === 'AbortError') {{
@@ -1155,8 +1174,10 @@ def save_tasks_html(tasks, output_path: Path):
             localStorage.removeItem('TASK_VIEWER_UNSAVED');
             hasUnsavedChanges = false;
             updateSyncIndicator();
-            alert('📥 Fichier TASKS.yaml téléchargé dans vos Téléchargements !');
+            document.getElementById('export-modal').style.display = 'none';
+            showToast('📥 Fichier TASKS.yaml téléchargé avec succès !');
         }}
+
 
 
 
