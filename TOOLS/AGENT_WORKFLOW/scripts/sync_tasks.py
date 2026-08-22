@@ -514,10 +514,26 @@ def save_tasks_html(tasks, output_path: Path):
     </div>
 
     <script>
-        // Base officielle ultra-rapide et stable
+        // Base officielle et persistance locale
         const defaultTasks = {tasks_json};
-        let tasks = [...defaultTasks];
+        let tasks = [];
         let hasUnsavedChanges = false;
+
+        try {{
+            const savedData = localStorage.getItem('TASK_VIEWER_DATA');
+            const unsaved = localStorage.getItem('TASK_VIEWER_UNSAVED');
+            if (savedData) {{
+                tasks = JSON.parse(savedData);
+                hasUnsavedChanges = (unsaved === 'true');
+            }} else {{
+                tasks = [...defaultTasks];
+                hasUnsavedChanges = false;
+            }}
+        }} catch (e) {{
+            tasks = [...defaultTasks];
+            hasUnsavedChanges = false;
+        }}
+
 
 
 
