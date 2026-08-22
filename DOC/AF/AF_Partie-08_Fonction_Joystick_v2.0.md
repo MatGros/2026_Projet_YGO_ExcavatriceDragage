@@ -29,9 +29,17 @@
 | <nobr><code>TC-P08-005</code></nobr> | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | <small>§4, §6</small> |
 | <nobr><code>TC-P08-006</code></nobr> | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | <small>§5</small> |
 | <nobr><code>TC-P08-007</code></nobr> | Consigne `SpeedRef` signée [-100;+100] sur `ST_Joystick_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | <small>§1, §2</small> |
-| <nobr><code>TC-P08-008</code></nobr> | Winch, Translation et Cycle exigent `DeadmanArmed` | Linkage vérifié | `💻 AUTO` | <small>§6</small> |
+| <nobr><code>TC-P08-008</code></nobr> | Winch, Translation et Cycle exigent `DeadmanArmed` | ⚠️ hors périmètre `test_fb_joystick.st` — teste un AUTRE FB, voir `test_fb_winch/translation/cycle.st` (note ↓) | `❌ N/A` | <small>§6</small> |
 | <nobr><code>TC-P08-011</code></nobr> | Fin de cycle benne désarme par défaut (hors exception) | `DeadmanArmed=FALSE` | `💻 AUTO` | <small>§4, §6</small> |
 | <nobr><code>TC-P08-012</code></nobr> | `PreserveArmingAfterBucket` conserve l'armement en fin de benne (exception CLOSING Extraction) | `DeadmanArmed` conservé | `💻 AUTO` | <small>§6, alerte P1</small> |
+
+> ⚠️ **TC-P08-008 hors périmètre de `test_fb_joystick.st`** (décision 2026-08-22) : ce point
+> vérifie la **réaction** de Winch/Translation/Cycle à `DeadmanArmed`, pas le comportement du
+> Joystick lui-même — responsabilité unique. `FB_Joystick` ne peut que garantir qu'il *produit*
+> `DeadmanArmed` correctement (couvert par `TC-P08-002..005/011/012`) ; la vérification que les
+> consommateurs *réagissent* bien à cette intention appartient aux futures suites
+> `test_fb_winch.st` / `test_fb_translation.st` / `test_fb_cycle.st`. Exception déclarée dans
+> `TOOLS/TEST_AUTO_CI/registry.yaml` (`af_ignore`).
 
 ---
 

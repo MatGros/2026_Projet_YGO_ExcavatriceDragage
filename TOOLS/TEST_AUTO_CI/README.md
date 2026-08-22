@@ -38,6 +38,35 @@ dans le `.st` — **dans les deux sens** :
 Jamais bloquant (n'affecte pas PASS/FAIL) -- juste un `WARN` jaune dans le terminal et une
 banniere orange en haut du rapport HTML. Implemente dans `af_coverage.py`.
 
+### Un point AF n'est pas testable ICI (decision 2026-08-22) -- comment le marquer
+
+Un `TC-Pxx-nnn` de type `AUTO` peut exister mais ne pas etre testable **depuis ce FB** -- cas
+type : le point verifie la **reaction d'un AUTRE FB consommateur** a une sortie (ex: AF08
+`TC-P08-008` "Winch/Translation/Cycle exigent DeadmanArmed" -- ce n'est pas `FB_Joystick` qui
+peut prouver ca, c'est `FB_Winch`/`FB_Translation`/`FB_Cycle` chacun dans leur propre suite,
+responsabilite unique).
+
+**Reflexe a avoir : corriger la donnee source (le tableau AF), pas ajouter une exception a
+cote.** Deux etapes, toujours ensemble :
+
+1. Dans le tableau "Points de validation" de l'AF, changer la colonne **Type** de `💻 AUTO`
+   (ou `⚡ AUTO_PLC` / `⚡ SITE+AUTO`) vers `❌ N/A` -- le coverage-check ne detecte QUE les
+   cellules matchant `SITE`/`AUTO`/`AUTO_PLC`, donc `N/A` sort naturellement le point de la
+   verification, sans rien toucher dans `TOOLS/TEST_AUTO_CI/`.
+2. Dans la colonne **Preuve** de la MEME ligne, ecrire `⚠️ hors périmètre <fichier.st>` +
+   pourquoi + quel fichier de test le couvre reellement. **Directement dans la ligne**, pas
+   seulement dans un encart plus bas dans le document -- un lecteur qui scanne juste le tableau
+   ne doit rien manquer.
+
+Optionnellement, un encart `> ⚠️ ...` sous le tableau peut detailler le raisonnement complet
+pour qui veut creuser -- mais jamais a la place des 2 etapes ci-dessus, seulement en plus.
+
+**Filet de secours** : `check_af_coverage()` accepte aussi un parametre `ignore` (liste d'ID),
+branchable via `af_ignore:` dans `registry.yaml`. A n'utiliser que si changer le Type de l'AF
+n'est pas approprie (ex: le point reste `AUTO` au sens large mais on documente une exception
+temporaire) -- dans le doute, preferer la methode "Type -> N/A" ci-dessus : une seule source de
+verite (le tableau AF), rien a synchroniser entre deux fichiers.
+
 ## 🚀 Utilisation
 
 ```bash

@@ -7,6 +7,12 @@
 FB_Joystick:
   domain: JOYSTICK
   af_doc: DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
+  # NB : TC-P08-008 n'a plus besoin d'exception ici -- son Type dans l'AF est passe a
+  # "N/A ici" (pas "AUTO"), donc le coverage-check ne le detecte plus comme manquant tout
+  # seul. Source unique = le tableau AF, pas une liste de suppression a cote.
+  prod_instance:                         # optionnel : active le diagramme pinout + cablage prod reel
+    file: CODE/M_MAIN/PRG_02_Acquisition.st
+    name: instJoystick
   sources:
     - CODE/F_MODES/E_Mode.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -52,6 +58,9 @@ FB_Brake:
 FB_Safety_EmergencyManagement:
   domain: AU_SECURITE
   af_doc: DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
+  prod_instance:
+    file: CODE/M_MAIN/PRG_06_Outputs.st
+    name: instSafetyEmergencyManagement
   sources:
     - CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st
     - CODE/B_AU_SECURITE/ST_Safety_Emergency_State.st
