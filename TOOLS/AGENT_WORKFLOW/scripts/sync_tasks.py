@@ -1111,9 +1111,9 @@ def save_tasks_html(tasks, output_path: Path):
             if (!isShown) {{
                 detailEl.classList.add('show');
                 rowEl.classList.add('expanded');
-                rowEl.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
             }}
         }}
+
 
         function filterTasks() {{ render(); }}
         function setSort(sortVal) {{
