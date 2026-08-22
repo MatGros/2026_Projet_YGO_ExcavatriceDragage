@@ -130,9 +130,9 @@ TEST 'TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persi
     (* Complete TC-P01-004 : sa colonne "Comportement attendu" precise "Reset efface l affichage
        (interlock reste sur Cause)" -- assertion manquante jusqu ici. Le canal n a JAMAIS ete
        re-teste physiquement a ce stade (aucun nouveau ArmRequest), donc le maintien de puissance
-       ne doit PAS etre restaure par le seul Reset (AF §3.4bis : interlock sur Cause brute,
+       ne doit PAS etre restaure par le seul Reset (AF 3.4bis : interlock sur Cause brute,
        jamais sur l Ack). *)
-    ASSERT_FALSE(fb.MAINTAINA_RQ, 'TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF §3.4bis)');
+    ASSERT_FALSE(fb.MAINTAINA_RQ, 'TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF 3.4bis)');
 
     (* nouvel essai : cause toujours presente (canal toujours colle) -> doit re-alarmer (TC-P01-009) -- +1 cycle *)
     ADVANCE_TIME(10000000);
@@ -228,6 +228,45 @@ TEST 'TC-P01-007 timeout confirmation contacteur -> lockout 5s'
     fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
     ASSERT_EQ(fb.ARMINGSEQSTEP, 1, 'apres le lockout, un nouveau front doit reellement relancer TestA (pas juste le drapeau qui retombe)');
+END_TEST
+
+TEST 'TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien'
+    (* Meme montee en sequence que TC-P01-003 jusqu au pulse (step 5) *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_EQ(fb.ARMINGSEQSTEP, 5, 'les 2 canaux valides -> pulse (step 5)');
+    ASSERT_TRUE(fb.ARMPULSE_RQ, 'precondition : pulse actif');
+
+    (* Operateur appuie sur la coupure d urgence IHM PENDANT l impulsion mecanique de reamement *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := TRUE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_FALSE(fb.MAINTAINA_RQ, 'BtnEmergencyCutOff coupe bien le maintien canal A (comportement attendu, deja correct)');
+    ASSERT_FALSE(fb.MAINTAINB_RQ, 'BtnEmergencyCutOff coupe bien le maintien canal B (comportement attendu, deja correct)');
+    (* Coherence attendue : si la coupure d urgence IHM coupe le maintien de puissance, elle doit
+       aussi couper l impulsion mecanique de reamement en cours -- continuer a pulser le contacteur
+       de reamement pendant qu on demande sa coupure est incoherent (Cmd.ArmPulse_Cmd n est
+       conditionne par aucune des memes gardes que Cmd.MaintainA/B_Cmd dans
+       FB_Safety_EmergencyManagementLogic.st §7 -- ecart releve par l audit du 2026-08-22). *)
+    ASSERT_FALSE(fb.ARMPULSE_RQ, 'BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)');
 END_TEST
 
 TEST 'TC-P01-008 PowerCutOffRequest coupe A et B sans armer'

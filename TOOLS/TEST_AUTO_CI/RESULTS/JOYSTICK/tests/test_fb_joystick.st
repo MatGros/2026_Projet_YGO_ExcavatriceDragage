@@ -8,7 +8,7 @@ VAR
 END_VAR
 END_SETUP
 
-TEST 'Bus non operationnel neutralise les sorties sans lever Error'
+TEST 'TC-P08-001 Bus non operationnel neutralise les sorties sans lever Error'
     diagDown.ONLINE := FALSE; diagDown.OPERATIONAL := FALSE; diagDown.ERROR := FALSE;
     diagDown.ERRORID := 0; diagDown.STATE := E_DIAG_STATE.INIT; diagDown.STATEATERROR := E_DIAG_STATE.DISABLED;
     diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
@@ -27,7 +27,306 @@ TEST 'Bus non operationnel neutralise les sorties sans lever Error'
     ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'sorties axe neutralisees si non operationnel');
 END_TEST
 
-TEST 'Reset acquitte une erreur de calibration seulement si la cause a disparu'
+TEST 'TC-P08-002 Appui maintenu 100ms arme le geste (DeadmanArmHoldTime)'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+
+    (* baseline : neutre, bouton relache *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'baseline : bouton relache, pas arme');
+
+    (* front bouton : demarre le maintien, pas encore arme *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'front bouton seul ne doit pas armer immediatement (maintien requis)');
+
+    (* 50ms plus tard : maintien pas termine *)
+    ADVANCE_TIME(50000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, '50ms < DeadmanArmHoldTime (100ms) : pas encore arme');
+
+    (* 60ms de plus (total 110ms) : maintien termine -> arme *)
+    ADVANCE_TIME(60000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, '110ms >= DeadmanArmHoldTime (100ms) : geste arme');
+END_TEST
+
+TEST 'TC-P08-003 Relachement du bouton avant fin du maintien annule la tentative armement'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+
+    (* front bouton : demarre le maintien *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    (* relache a 50ms, avant la fin des 100ms de maintien *)
+    ADVANCE_TIME(50000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'relachement avant la fin du maintien annule la tentative');
+
+    (* le bouton reste relache : meme 100ms plus tard, aucun armement differe *)
+    ADVANCE_TIME(100000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'pas d armement differe sur une tentative deja annulee (nouvel appui conscient exige)');
+
+    (* nouveau front + maintien complet : l armement redevient possible normalement *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'un nouvel appui complet doit toujours pouvoir armer');
+END_TEST
+
+TEST 'TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+
+    (* nx/ny fixes explicitement a 5000 avant CHAQUE appel : STruCpp ne re-copie PAS la sortie
+       VAR_IN_OUT vers la variable de test entre deux appels fb() (limite outillage constatee,
+       round-trip IN_OUT absent -- cf. README). Sans ce forcage, NeutralXMem retomberait a 0
+       (valeur SETUP jamais appliquee non plus) des le 2e scan, et AtNeutral resterait FALSE. *)
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* bouton relache, reste au neutre : 500ms plus tard (largement > NeutralHoldTime seul 100ms) mais < grace (3s) *)
+    ADVANCE_TIME(500000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'la grace (3s) protege l armement malgre un neutre deja tenu bien plus longtemps que NeutralHoldTime seul (evite le REX terrain : desarmement 100-200ms apres l armement)');
+
+    (* 2.6s de plus (total 3.1s depuis l armement) : la grace vient de s ecouler ce scan meme --
+       NeutralHoldTimer ne fait que DEMARRER (son IN passe a TRUE ce scan), pas encore Q *)
+    ADVANCE_TIME(2600000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'grace tout juste ecoulee : NeutralHoldTimer demarre seulement ce scan (pas encore ecoule)');
+
+    (* 100ms de plus (NeutralHoldTime ecoule depuis la fin de la grace) : desarme *)
+    ADVANCE_TIME(100000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'grace ecoulee (3s) + neutre tenu (NeutralHoldTime) : desarmement');
+END_TEST
+
+TEST 'TC-P08-005 Changement de mode desarme le geste, nouvel appui exige'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+
+    (* arme en MAINT_N1 *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* changement de mode : desarmement immediat *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N2, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'changement de mode desarme immediatement');
+
+    (* mode stable ensuite, sans nouvel appui : reste desarme *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N2, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'pas de rearmement automatique apres changement de mode : nouvel appui conscient exige');
+END_TEST
+
+TEST 'TC-P08-011 Fin de cycle benne desarme le geste par defaut'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+
+    (* arme le geste *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* BenneBusy actif : ne desarme pas seul (attend le front descendant) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := TRUE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'BenneBusy actif seul ne desarme pas (attend le front descendant, fin de cycle)');
+
+    (* front descendant BenneBusy, sans exception : desarme immediatement *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'front descendant BenneBusy sans exception desarme immediatement (pas de M1/M2 surprise)');
+END_TEST
+
+TEST 'TC-P08-012 PreserveArmingAfterBucket protege l armement en fin de benne (exception CLOSING Extraction)'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+
+    (* arme le geste *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* BenneBusy actif, exception active *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := TRUE, PRESERVEARMINGAFTERBUCKET := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    (* front descendant BenneBusy, exception active : l armement doit etre conserve *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'PreserveArmingAfterBucket=TRUE : armement conserve malgre la fin de benne (exception documentee AF, alerte P1 : ne jamais elargir hors CLOSING Extraction)');
+END_TEST
+
+TEST 'TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu'
     diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
     diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
 
