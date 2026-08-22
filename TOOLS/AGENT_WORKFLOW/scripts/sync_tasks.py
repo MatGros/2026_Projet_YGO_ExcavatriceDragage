@@ -23,172 +23,17 @@ TASKS_YAML = WFLOW_DIR / "TASKS.yaml"
 PLAN_TASK_MD = WFLOW_DIR / "PLAN_TASK.md"
 
 
-def parse_plan_task_md(md_path: Path):
-    """Extrait fidèlement toutes les tâches du document Markdown."""
-    if not md_path.exists():
+def load_tasks_yaml(yaml_path: Path):
+    """Charge les tâches depuis TASKS.yaml (source de vérité unique)."""
+    if not yaml_path.exists():
         return []
-
-    with open(md_path, "r", encoding="utf-8") as f:
-        text = f.read()
-
-    tasks = []
-    seen = set()
-
-    for line in text.splitlines():
-        line = line.strip()
-        if not line.startswith("|") or "---" in line or "| Ordre |" in line or "| Sous-tâche |" in line or "| #" in line:
-            continue
-        cols = [c.strip() for c in line.split("|")[1:-1]]
-        if not cols:
-            continue
-
-        col0 = cols[0].replace("*", "").strip()
-        if re.match(r"^T\d+", col0):
-            t_id = col0
-            if t_id in seen:
-                continue
-            seen.add(t_id)
-
-            if len(cols) == 6:
-                # | Txx | Titre | Domaine | Statut | Lock Agent | Détails |
-                titre = cols[1].replace("**", "").replace("`", "")
-                domaine = cols[2].replace("`", "")
-                statut = cols[3].replace("`", "")
-                agent = cols[4].replace("`", "")
-                desc = cols[5].replace("`", "")
-            elif len(cols) == 7:
-                # | T122-A | Phase 1 | Description | Contrat | Statut | Lock | Valid |
-                titre = f"{cols[1]} — {cols[2]}".replace("**", "").replace("`", "")
-                domaine = "Refactor"
-                statut = cols[4].replace("`", "")
-                agent = cols[5].replace("`", "")
-                desc = f"Contrat: {cols[3]} | Valid: {cols[6]}".replace("`", "")
-            else:
-                continue
-
-            # Standardisation stricte des domaines (catégories claires et filtrables)
-            domaine_clean = "GÉNÉRAL"
-            d_lower = domaine.lower() + " " + titre.lower()
-            if "sécurité" in d_lower or " au" in d_lower or "arrêt d'urgence" in d_lower or "powercutoff" in d_lower:
-                domaine_clean = "SÉCURITÉ"
-            elif "codeur" in d_lower or "encoder" in d_lower or "homing" in d_lower:
-                domaine_clean = "CODEURS"
-            elif "joystick" in d_lower or "intention" in d_lower or "homme-mort" in d_lower:
-                domaine_clean = "JOYSTICK"
-            elif "cycle" in d_lower or "semi-auto" in d_lower or "kobold" in d_lower or "mode" in d_lower:
-                domaine_clean = "CYCLE"
-            elif "treuil" in d_lower or "winch" in d_lower or "benne" in d_lower or "frein" in d_lower or "synchro" in d_lower:
-                domaine_clean = "TREUILS"
-            elif "translation" in d_lower or " m3" in d_lower:
-                domaine_clean = "TRANSLATION"
-            elif "ihm" in d_lower or "supervision" in d_lower or "bandeau" in d_lower or "widget" in d_lower:
-                domaine_clean = "IHM"
-            elif "refactor" in d_lower or "dossier" in d_lower or "standardisation" in d_lower or "convention" in d_lower or "cqs" in d_lower:
-                domaine_clean = "STANDARDS"
-            elif "outillage" in d_lower or "workflow" in d_lower or "gate" in d_lower or "ci" in d_lower or "test" in d_lower:
-                domaine_clean = "OUTILLAGE"
-            elif "terrain" in d_lower or "mes" in d_lower or "mise en service" in d_lower:
-                domaine_clean = "TERRAIN"
-
-            # Raccourcissement intelligent du titre : extraire l'essence courte (< 60 car.)
-            titre_court = titre
-            # Supprimer les préfixes redondants ou séparateurs longs
-            if " — " in titre_court:
-                parts = titre_court.split(" — ")
-                titre_court = parts[0]
-                if len(titre_court) < 15 and len(parts) > 1:
-                    titre_court = f"{parts[0]} — {parts[1][:40]}"
-            elif " : " in titre_court:
-                parts = titre_court.split(" : ")
-                if len(parts[0]) <= 35:
-                    titre_court = f"{parts[0]} : {parts[1][:30]}..."
-                else:
-                    titre_court = parts[0]
-            
-            if len(titre_court) > 65:
-                titre_court = titre_court[:62] + "..."
-
-            # Détection de criticité
-            criticite = "C2"
-            if "C4" in titre or "C4" in desc or domaine_clean == "SÉCURITÉ":
-                criticite = "C4"
-            elif "C3" in titre or "C3" in desc:
-                criticite = "C3"
-            elif "C1" in titre or domaine_clean in ("STANDARDS", "OUTILLAGE"):
-                criticite = "C1"
-
-            # Recherche d'un contrat associé existant
-            contrat_rel = ""
-            for contract_file in CONTRACTS_DIR.glob(f"*{t_id}*.yaml"):
-                contrat_rel = f"DOC/WFLOW/CONTRACTS/{contract_file.name}"
-                break
-
-            # Détection de parent_id pour hiérarchie parent / enfant
-            parent_id = ""
-            if "-" in t_id:
-                parent_id = t_id.split("-")[0]
-            elif "." in t_id:
-                parent_id = t_id.split(".")[0]
-
-            # Découpage intelligent : Contexte vs Description vs Objectifs
-            contexte = ""
-            description_corps = desc
-            objectifs_list = []
-
-            # Si le titre d'origine était long, conserver le titre complet dans le contexte
-            if len(titre) > len(titre_court):
-                contexte = f"Intitulé complet : {titre}"
-
-            if "<br>" in desc:
-                parts = desc.split("<br>")
-                if not contexte:
-                    contexte = parts[0].replace("**", "")
-                else:
-                    contexte += " | " + parts[0].replace("**", "")
-                description_corps = "<br>".join(parts[1:])
-            
-            # Recherche d'objectifs ou puces numérotées
-            if "①" in desc or "1." in desc or "Objectif" in desc:
-                obj_matches = re.findall(r'[①②③④⑤⑥⑦⑧⑨]\s*([^①②③④⑤⑥⑦⑧⑨<]+)', desc)
-                if obj_matches:
-                    objectifs_list = [m.strip().replace("**", "") for m in obj_matches]
-
-            # Extraction fine de la date réelle d'historique (YYYY-MM-DD)
-            date_match = re.search(r'(2026-\d{2}-\d{2})', desc + " " + titre)
-            if date_match:
-                task_date = f"{date_match.group(1)}T12:00:00"
-            else:
-                # Dates par lots historiques connus
-                t_num = int(re.sub(r'\D', '', t_id)) if re.search(r'\d+', t_id) else 0
-                if t_num >= 140:
-                    task_date = "2026-08-22T21:46:00"
-                elif t_num >= 130:
-                    task_date = "2026-08-19T14:30:00"
-                elif t_num >= 120:
-                    task_date = "2026-08-18T10:00:00"
-                elif t_num >= 80:
-                    task_date = "2026-08-12T09:00:00"
-                else:
-                    task_date = "2026-07-20T08:00:00"
-
-            tasks.append({
-                "id": t_id,
-                "parent_id": parent_id,
-                "statut": statut,
-                "agent": agent,
-                "date": task_date,
-                "criticite": criticite,
-                "domaine": domaine_clean,
-                "titre": titre_court,
-                "contexte": contexte,
-                "description": description_corps,
-                "objectifs": objectifs_list,
-                "contrat": contrat_rel,
-                "bloque_par": []
-            })
-
-
-    return tasks
+    with open(yaml_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    if isinstance(data, dict) and "tasks" in data:
+        return data["tasks"]
+    elif isinstance(data, list):
+        return data
+    return []
 
 
 def save_tasks_yaml(tasks, output_path: Path):
@@ -1251,11 +1096,8 @@ def main():
     print("🔄 GÉNÉRATION DU CATALOGUE OFFICIEL (TASKS.yaml & TASKS.html)")
     print("=" * 60)
 
-    # 1. Si TASKS.yaml existe, c'est la source de vérité !
+    # TASKS.yaml est l'unique source de vérité officielle !
     tasks = load_tasks_yaml(TASKS_YAML)
-    if not tasks:
-        tasks = parse_plan_task_md(PLAN_TASK_MD)
-        save_tasks_yaml(tasks, TASKS_YAML)
     
     html_path = WFLOW_DIR / "TASK_VIEWER.html"
     save_tasks_html(tasks, html_path)
@@ -1269,6 +1111,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
