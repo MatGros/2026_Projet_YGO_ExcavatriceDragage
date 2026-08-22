@@ -29,17 +29,26 @@
 | <nobr><code>TC-P08-005</code></nobr> | Changement de mode ou fin benne désarme le joystick | `DeadmanArmed=FALSE` | `💻 AUTO` | <small>§4, §6</small> |
 | <nobr><code>TC-P08-006</code></nobr> | Calibration hors [2000;8000] ➔ alarme `ErrorId` | Bit0 actif, `Reset` sur cause disparue | `💻 AUTO` | <small>§5</small> |
 | <nobr><code>TC-P08-007</code></nobr> | Consigne `SpeedRef` signée [-100;+100] sur `ST_Joystick_AxisCmd` | Contrat FB respecté sans `SafeStop` | `💻 AUTO` | <small>§1, §2</small> |
-| <nobr><code>TC-P08-008</code></nobr> | Winch, Translation et Cycle exigent `DeadmanArmed` | ⚠️ hors périmètre `test_fb_joystick.st` — teste un AUTRE FB, voir `test_fb_winch/translation/cycle.st` (note ↓) | `❌ N/A` | <small>§6</small> |
+| <nobr><code>TC-P08-008</code></nobr> | Winch, Translation et Cycle exigent `DeadmanArmed` | ⚠️ gate câblé dans le PRG de collage, pas dans un FB — vérifié par `G375` (note ↓), pas par `test_fb_joystick.st` | `🔒 GATE` | <small>§6</small> |
 | <nobr><code>TC-P08-011</code></nobr> | Fin de cycle benne désarme par défaut (hors exception) | `DeadmanArmed=FALSE` | `💻 AUTO` | <small>§4, §6</small> |
 | <nobr><code>TC-P08-012</code></nobr> | `PreserveArmingAfterBucket` conserve l'armement en fin de benne (exception CLOSING Extraction) | `DeadmanArmed` conservé | `💻 AUTO` | <small>§6, alerte P1</small> |
 
-> ⚠️ **TC-P08-008 hors périmètre de `test_fb_joystick.st`** (décision 2026-08-22) : ce point
-> vérifie la **réaction** de Winch/Translation/Cycle à `DeadmanArmed`, pas le comportement du
-> Joystick lui-même — responsabilité unique. `FB_Joystick` ne peut que garantir qu'il *produit*
-> `DeadmanArmed` correctement (couvert par `TC-P08-002..005/011/012`) ; la vérification que les
-> consommateurs *réagissent* bien à cette intention appartient aux futures suites
-> `test_fb_winch.st` / `test_fb_translation.st` / `test_fb_cycle.st`. Exception déclarée dans
-> `TOOLS/TEST_AUTO_CI/registry.yaml` (`af_ignore`).
+> ⚠️ **TC-P08-008 — pourquoi ce n'est PAS un test de FB** (décision 2026-08-22, révisée)
+>
+> Le gate `AND (NOT TglJoystickMaster OR JoystickDeadmanArmed)` — celui qui interdit tout
+> mouvement Winch tant que l'homme-mort du Joystick n'est pas armé — n'est écrit **dans
+> aucun `.st` de FB**. Il est câblé directement dans le PRG qui fait communiquer les deux :
+> `PRG_04_Treuils_Benne.st`. Ni `FB_Joystick` (qui ignore l'existence de Winch, responsabilité
+> unique), ni un futur `FB_Winch` (le gate n'est pas dans son interface) ne peuvent donc le
+> prouver par un test qui les instancie isolément — `TEST_AUTO_CI` teste des FB, pas des PRG.
+>
+> | | Ce que ça vérifie | Comment | Où |
+> |---|---|---|---|
+> | <nobr><code>TC-P08-002..005/011/012</code></nobr> | `FB_Joystick` *produit* bien `DeadmanArmed` | Test dynamique (compile + instancie + assert) | `TEST_AUTO_CI`, `test_fb_joystick.st` |
+> | <nobr><code>TC-P08-008</code></nobr> (ce point) | Le PRG *consulte* bien `DeadmanArmed` avant d'autoriser un mouvement | Recherche textuelle dans le vrai code de production | `G375_check_deadman_arming_gate.py` (`TOOLS/AGENT_WORKFLOW/scripts/`), lancé par `run_all_gates.py` |
+>
+> D'où le type `🔒 GATE` (ni `AUTO` ni `SITE`) : un mécanisme automatisé existe bien et tourne
+> à chaque lot de code — ce n'est juste pas un test de `FB_Joystick`.
 
 ---
 
