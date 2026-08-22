@@ -371,6 +371,7 @@ def save_tasks_html(tasks, output_path: Path):
         <button class="filter-btn" onclick="setDomain('CYCLE', this)">⚙️ Cycle</button>
         
         <button class="btn-action btn-save" onclick="openNewTaskModal()">➕ Nouvelle Tâche</button>
+        <button class="btn-action btn-cancel" onclick="resetToOfficial()" title="Recharger les données fraîches de TASKS.yaml">🔄 Recharger du fichier</button>
         
         <div id="sync-warning-badge" style="display:none; align-items:center; gap:8px; background: rgba(255, 85, 85, 0.15); border: 1px solid #ff5555; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #ff5555; font-weight: bold;">
             <span style="width:10px; height:10px; background:#ff5555; border-radius:50%; box-shadow:0 0 10px #ff5555; animation: pulse 1.2s infinite; display:inline-block;"></span>
