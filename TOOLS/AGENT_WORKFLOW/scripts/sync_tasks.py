@@ -518,15 +518,26 @@ def save_tasks_html(tasks, output_path: Path):
 
     <script>
 
-        // Source unique directe et fraîche : les données injectées directement depuis TASKS.yaml
+        // Persistance locale tant que les modifications ne sont pas exportées
         const defaultTasks = {tasks_json};
-        let tasks = [...defaultTasks];
+        let tasks = [];
         let hasUnsavedChanges = false;
 
-        // Nettoyage immédiat de tout vieux cache polluant
         try {{
-            localStorage.clear();
-        }} catch(e) {{}}
+            const savedChanges = localStorage.getItem('TASK_VIEWER_UNSAVED');
+            const savedData = localStorage.getItem('TASK_VIEWER_DATA');
+            if (savedChanges === 'true' && savedData) {{
+                // L'utilisateur a des modifications en cours : ON GARDE SON TRAVAIL !
+                tasks = JSON.parse(savedData);
+                hasUnsavedChanges = true;
+            }} else {{
+                tasks = [...defaultTasks];
+                hasUnsavedChanges = false;
+            }}
+        }} catch(e) {{
+            tasks = [...defaultTasks];
+            hasUnsavedChanges = false;
+        }}
 
         function updateSyncIndicator() {{
             const badge = document.getElementById('sync-warning-badge');
@@ -547,16 +558,23 @@ def save_tasks_html(tasks, output_path: Path):
         function persistTasks() {{
             hasUnsavedChanges = true;
             updateSyncIndicator();
+            try {{
+                localStorage.setItem('TASK_VIEWER_DATA', JSON.stringify(tasks));
+                localStorage.setItem('TASK_VIEWER_UNSAVED', 'true');
+            }} catch(e) {{}}
         }}
 
         function resetToOfficial() {{
             if (confirm('Voulez-vous réinitialiser le catalogue avec les données officielles du fichier ?')) {{
+                localStorage.removeItem('TASK_VIEWER_DATA');
+                localStorage.removeItem('TASK_VIEWER_UNSAVED');
                 tasks = [...defaultTasks];
                 hasUnsavedChanges = false;
                 updateSyncIndicator();
                 render();
             }}
         }}
+
 
 
 
