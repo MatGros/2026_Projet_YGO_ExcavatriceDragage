@@ -292,9 +292,9 @@ jamais improvisé vu le volume et la criticité sécurité de certaines variable
 | T74 | Translation : temporiser escalade PowerCutOff sur `LimitSwitch` | Projet / Sécurité | ⬜ | — | `FB_Safety_Translation.st` |
 | T76 | `FB_Cycle.st` : raccorder `DrainingTime` au persistant/IHM | Projet | ⬜ | — | `FB_Cycle.st` |
 | T77 | POO Diagnostics : passer statuts bruts aux FB (retrait expressions) | Projet / Architecture | ⬜ | — | `PRG_02_Acquisition`, `FB_Diag_*` |
-| T78 | Rampe Treuils : passer à 10%/s par défaut et égaliser en couplé | Projet / Commande Treuils | ⬜ | — | `FB_Winch.st`, `PRG_04_Treuils_Benne.st` |
-| T79 | Configurer Trace CODESYS 10ms diagnostic arrêt différencié M1/M2 | Projet / Terrain | ⏳ | HUM | MES-008 |
 | T81 | Séquence détection fond Kobold à 4 étapes | Projet / Client | ⏳ | PI-01 | `AF_Partie-04`, `FB_DiveSearch` (codé, attente essais) |
+
+
 | T82 | Arrêt sécurisé si séquence Kobold invalide | Projet / Sécurité | ⏳ | PI-01 | `FB_ExtractionSequence` (codé, attente essais) |
 | T83 | Repasser `ST_BypassNetwork.IhmHeartbeat` à `FALSE` dès visu opérationnelle | Projet / IHM | ⏳ | HUM | `ST_BypassNetwork.st` |
 | T84 | Validation CODESYS/terrain mesure vitesse 50 ms (`FB_Encoder_SpeedMeasure`) | Projet / Sécurité | ⏳ | PI-01 | `FB_Encoder_SpeedMeasure.st` |
