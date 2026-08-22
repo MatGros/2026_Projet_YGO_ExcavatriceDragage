@@ -518,18 +518,22 @@ def save_tasks_html(tasks, output_path: Path):
 
     <script>
 
-        // Chargement intelligent : si des modifications locales non exportées existent, les conserver !
+        // Source fraîche absolue : les données officielles injectées directement dans le fichier
         const defaultTasks = {tasks_json};
-        let tasks = [];
+        let tasks = [...defaultTasks];
         let hasUnsavedChanges = false;
 
         try {{
             const savedChanges = localStorage.getItem('TASK_VIEWER_UNSAVED');
             const savedData = localStorage.getItem('TASK_VIEWER_DATA');
+            // Uniquement si l'utilisateur a des modifs EN COURS NON EXPORTÉES
             if (savedChanges === 'true' && savedData) {{
                 tasks = JSON.parse(savedData);
                 hasUnsavedChanges = true;
             }} else {{
+                // Sinon toujours la base fraîche du fichier HTML / YAML !
+                localStorage.removeItem('TASK_VIEWER_DATA');
+                localStorage.removeItem('TASK_VIEWER_UNSAVED');
                 tasks = [...defaultTasks];
                 hasUnsavedChanges = false;
             }}
@@ -537,6 +541,7 @@ def save_tasks_html(tasks, output_path: Path):
             tasks = [...defaultTasks];
             hasUnsavedChanges = false;
         }}
+
 
         function updateSyncIndicator() {{
             const badge = document.getElementById('sync-warning-badge');
