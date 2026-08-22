@@ -616,27 +616,68 @@ def save_tasks_html(tasks, output_path: Path):
                     <input type="text" id="edit-contrat" class="form-control" placeholder="DOC/WFLOW/CONTRACTS/TASK_CONTRACT_...yaml">
                 </div>
             </div>
-            <div class="modal-actions">
-                <button class="btn-action btn-cancel" onclick="closeModal()">Annuler</button>
-                <button class="btn-action btn-save" onclick="saveTaskModal()">💾 Enregistrer la Tâche</button>
+            <div class="modal-actions" style="justify-content: space-between;">
+                <div>
+                    <button class="btn-action" id="btn-modal-delete" style="background:#ff5555; color:#fff; display:none;" onclick="deleteFromModal()">🗑️ Supprimer</button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-action btn-cancel" onclick="closeModal()">Annuler</button>
+                    <button class="btn-action btn-save" onclick="saveTaskModal()">💾 Enregistrer la Tâche</button>
+                </div>
             </div>
         </div>
     </div>
-By('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier la ligne) ↕</th>
-                </tr>
-            </thead>
 
-            <tbody id="table-body"></tbody>
-        </table>
+
+    <!-- Modal d'Exportation des Données -->
+    <div class="modal-overlay" id="export-modal">
+        <div class="modal-box" style="width: 600px;">
+            <div class="modal-title">
+                <span>💾 Exporter / Sauvegarder les Tâches</span>
+                <button onclick="document.getElementById('export-modal').style.display='none'" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;">✖</button>
+            </div>
+            <div style="font-size: 13px; color: var(--subtext);">
+                Copiez le texte ci-dessous ou cliquez sur le bouton pour enregistrer directement le fichier :
+            </div>
+            <textarea id="export-text" class="form-control" style="height: 250px; font-family: monospace; font-size: 11px;" readonly></textarea>
+            <div class="modal-actions">
+                <button class="btn-action btn-cancel" onclick="document.getElementById('export-modal').style.display='none'">Fermer</button>
+                <button class="btn-action btn-save" onclick="copyExportText()">📋 Copier le YAML</button>
+                <button class="btn-action btn-primary" onclick="downloadExportFile()">💾 Enregistrer directement dans TASKS.yaml</button>
+            </div>
+
+        </div>
     </div>
 
+
     <script>
-        const tasks = {tasks_json};
+
+        // Toujours charger la base officielle fraîche injectée dans le fichier
+        const defaultTasks = {tasks_json};
+        let tasks = [...defaultTasks];
+
+        function persistTasks() {{
+            try {{
+                localStorage.setItem('TASK_VIEWER_DATA', JSON.stringify(tasks));
+            }} catch(e) {{}}
+        }}
+
+
+
+        function resetToOfficial() {{
+            if (confirm('Voulez-vous réinitialiser le catalogue avec les données officielles du projet ?')) {{
+                localStorage.removeItem('TASK_VIEWER_DATA');
+                tasks = [...defaultTasks];
+                render();
+            }}
+        }}
+
         let currentStatus = 'ALL';
         let currentDomain = 'ALL';
         let sortKey = 'date';
         let sortAsc = false;
         let expandedId = null;
+
 
         function render() {{
             const tbody = document.getElementById('table-body');
@@ -807,14 +848,21 @@ By('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier la ligne) ↕</
             }});
         }}
 
+        function deleteTask(taskId, event) {{
+            if (event) event.stopPropagation();
+            tasks = tasks.filter(t => t.id !== taskId);
+            persistTasks();
+            render();
+        }}
+
         // --- Fonctions d'Édition / Création / Duplication ---
         let editingIndex = -1;
 
         function openNewTaskModal() {{
             editingIndex = -1;
             document.getElementById('modal-heading').innerText = '➕ Création d\\'une Nouvelle Tâche';
+            document.getElementById('btn-modal-delete').style.display = 'none';
             
-            // Trouver le prochain numéro Txxx disponible
             let maxNum = 0;
             tasks.forEach(t => {{
                 const n = parseInt(t.id.replace(/\\D/g, '')) || 0;
@@ -845,6 +893,7 @@ By('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier la ligne) ↕</
             editingIndex = idx;
             const t = tasks[idx];
             document.getElementById('modal-heading').innerText = '✏️ Modification de la Tâche ' + t.id;
+            document.getElementById('btn-modal-delete').style.display = 'inline-block';
 
             document.getElementById('edit-id').value = t.id;
             document.getElementById('edit-parent').value = t.parent_id || '';
@@ -860,6 +909,16 @@ By('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier la ligne) ↕</
 
             document.getElementById('task-modal').style.display = 'flex';
         }}
+
+        function deleteFromModal() {{
+            if (editingIndex >= 0 && editingIndex < tasks.length) {{
+                const targetId = tasks[editingIndex].id;
+                deleteTask(targetId);
+                closeModal();
+            }}
+        }}
+
+
 
         function duplicateTask(taskId, event) {{
             if (event) event.stopPropagation();
@@ -925,19 +984,97 @@ By('titre')" id="th-titre">Titre (Cliquer pour trier ou déplier la ligne) ↕</
                 tasks.unshift(taskData);
             }}
 
+            persistTasks();
             closeModal();
             render();
             alert('✅ Tâche ' + idVal + ' enregistrée avec succès dans le visualiseur !\\n\\nCliquez sur "💾 Copier / Exporter" pour récupérer le YAML mis à jour.');
+
+        }}
+
+        function generateYamlText() {{
+            let yaml = '# ============================================================\\n';
+            yaml += '# CATALOGUE OFFICIEL DES TÂCHES — EXCAVATRICE DE DRAGAGE\\n';
+            yaml += '# ============================================================\\n';
+            yaml += '# 💡 Modifiable dans TASK_VIEWER.html ou directement ici.\\n';
+            yaml += '# 🔄 Synchronisé automatiquement.\\n\\n';
+            yaml += 'tasks:\\n';
+
+            tasks.forEach(t => {{
+                yaml += '  - id: "' + t.id + '"\\n';
+                yaml += '    parent_id: "' + (t.parent_id || '') + '"\\n';
+                yaml += '    statut: "' + t.statut + '"\\n';
+                yaml += '    criticite: "' + t.criticite + '"\\n';
+                yaml += '    domaine: "' + t.domaine + '"\\n';
+                yaml += '    agent: "' + (t.agent || '—') + '"\\n';
+                yaml += '    date: "' + (t.date || '') + '"\\n';
+                yaml += '    titre: ' + JSON.stringify(t.titre) + '\\n';
+                yaml += '    contexte: ' + JSON.stringify(t.contexte || '') + '\\n';
+                yaml += '    description: ' + JSON.stringify(t.description || '') + '\\n';
+                yaml += '    contrat: "' + (t.contrat || '') + '"\\n';
+                if (t.objectifs && t.objectifs.length > 0) {{
+                    yaml += '    objectifs:\\n';
+                    t.objectifs.forEach(o => {{
+                        yaml += '      - ' + JSON.stringify(o) + '\\n';
+                    }});
+                }} else {{
+                    yaml += '    objectifs: []\\n';
+                }}
+                yaml += '    bloque_par: []\\n\\n';
+            }});
+
+            return yaml;
         }}
 
         function exportJsonYaml() {{
-            const jsonText = JSON.stringify(tasks, null, 2);
-            navigator.clipboard.writeText(jsonText).then(() => {{
-                alert('📋 Les ' + tasks.length + ' tâches ont été copiées dans votre presse-papier au format JSON structuré !\\n\\nVous pouvez également utiliser le bouton ci-dessous pour télécharger le fichier de sauvegarde.');
-            }}).catch(() => {{
-                prompt('Copiez les données ci-dessous :', jsonText);
-            }});
+            const yamlText = generateYamlText();
+            document.getElementById('export-text').value = yamlText;
+            document.getElementById('export-modal').style.display = 'flex';
         }}
+
+        function copyExportText() {{
+            const textarea = document.getElementById('export-text');
+            textarea.select();
+            document.execCommand('copy');
+            alert('📋 Contenu TASKS.yaml copié dans le presse-papier !');
+        }}
+
+        async function downloadExportFile() {{
+            const yamlText = generateYamlText();
+
+            // Si le navigateur / VS Code autorise l'accès direct aux fichiers
+            if ('showSaveFilePicker' in window) {{
+                try {{
+                    const handle = await window.showSaveFilePicker({{
+                        suggestedName: 'TASKS.yaml',
+                        types: [{{
+                            description: 'Fichier YAML des Tâches',
+                            accept: {{ 'text/yaml': ['.yaml', '.yml'] }}
+                        }}]
+                    }});
+                    const writable = await handle.createWritable();
+                    await writable.write(yamlText);
+                    await writable.close();
+                    alert('✅ Fichier TASKS.yaml enregistré directement sur votre disque !');
+                    return;
+                }} catch (err) {{
+                    if (err.name === 'AbortError') return;
+                }}
+            }}
+
+            // Fallback classique : téléchargement automatique
+            const blob = new Blob([yamlText], {{ type: 'text/yaml;charset=utf-8' }});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'TASKS.yaml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }}
+
+
+
 
         function sortBy(key) {{
             if (sortKey === key) {{
