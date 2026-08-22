@@ -1,139 +1,213 @@
+(* ═══════════════════════════════════════════════════════════════════════
+   🕵️ TEST CI AD HOC — FB_Joystick / ArmingPermit (LOT_JOYSTICK_ARMINGPERMIT)
+   ───────────────────────────────────────────────────────────────────────
+   Prouve les critères d'acceptation AC1/AC2/AC3 du contrat
+   TASK_CONTRACT_JOYSTICK_ARMINGPERMIT.yaml :
+     • AC1 : ArmingPermit=FALSE + appui 110ms -> DeadmanArmed=FALSE ;
+             ArmingPermit=TRUE  + appui 110ms -> DeadmanArmed=TRUE.
+     • AC2 : ArmingPermit=FALSE -> AxisCmdX/Y.Enable=FALSE, SpeedRef=0,
+             warning "armement non permis" actif (sortie ArmingPermitDenied).
+     • AC3 : RawOutOfRange=TRUE -> Enable=FALSE même si ArmingPermit=TRUE ;
+             ArmingPermit=FALSE bloque l'armement même sans défaut capteur.
+   ⚠️ Chaque appel fb(...) = 1 scan (10ms) ; ADVANCE_TIME avance le temps simulé
+   sans faire tourner le FB. Un maintien de 110ms = front + ADVANCE_TIME + rappel.
+   ⚠️ STruCpp ne re-copie PAS la sortie VAR_IN_OUT (NeutralXMem/YMem) entre deux
+   appels -> nx/ny ré-injectés avant chaque appel (limite outillage documentée).
+   Chaque TEST remet l'état armement à zéro via un premier appel ENABLE:=FALSE
+   (le gate remet DeadmanArmed/DeadmanArmPending/ArmingPermitDenied/timers) pour
+   être autonome quelle que soit l'instance FB.
+   ═══════════════════════════════════════════════════════════════════════ *)
+
 SETUP
 VAR
-    fb : FB_SIM_JOYSTICK;
-    prevX : INT;
+    fb : FB_JOYSTICK;
+    nx : INT := 5000;
+    ny : INT := 5000;
+    diagOk : ST_DIAG_DEVICE;
 END_VAR
 END_SETUP
 
-TEST 'TC-SIM-001 Montee progressive : RawX augmente de scan en scan (pas un saut)'
-    (* RiseTimeS court (0.1s @10ms = 10 scans pour la pleine course 5000) : chaque scan ajoute
-       ~500 points + bruit. On verifie que RawX PROGRESSE (prevX < RawX), pas un saut direct. *)
-    prevX := 5000;
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_TRUE(fb.RAWX > prevX, 'scan 1 : RawX progresse (depasse le neutre), pas un saut');
-    prevX := fb.RAWX;
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_TRUE(fb.RAWX > prevX, 'scan 2 : RawX continue de monter (variation, pas figé)');
-    ASSERT_EQ(fb.RAWY, 5000, 'axe Y au neutre (bouton droite = axe X seul)');
+TEST 'AC1a : ArmingPermit=FALSE bloque l armement (appui maintenu 110ms)'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* reset etat armement via le gate Enable=FALSE *)
+    fb(ENABLE := FALSE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    (* front appui, ArmingPermit=FALSE : la permission refuse le démarrage du timer
+       d'armement -> DeadmanArmed ne doit JAMAIS passer à TRUE. *)
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);   (* maintien 110ms >= DeadmanArmHoldTime 100ms *)
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'AC1 : ArmingPermit=FALSE + appui 110ms -> DeadmanArmed reste FALSE (armement bloque)');
 END_TEST
 
-TEST 'TC-SIM-002 Bagotement : RawX varie apres le relachement (passe d un cote, puis de l autre)'
-    (* Monte a fond avec le bouton droit (RiseTimeS court), puis relache : la retombee
-       (FALL) puis le bagotement (OVERSHOOT) doivent faire VARIER RawX autour du neutre.
-       On observe plusieurs scans apres le relachement : RawX doit s ecarter de 5000
-       (depassement) puis varier, pas rester figé. *)
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := TRUE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_TRUE(fb.RETURNINGACTIVE = FALSE, 'pendant la montee, ReturningActive = FALSE');
+TEST 'AC1b : ArmingPermit=TRUE autorise l armement (appui maintenu 110ms)'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
 
-    (* Relâche : retour dynamique (FALL puis OVERSHOOT). Plusieurs scans pour voir la variation. *)
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := FALSE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := TRUE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_TRUE(fb.RETURNINGACTIVE, 'apres relachement : ReturningActive = TRUE (retour en cours)');
-    ASSERT_TRUE(fb.RAWX <> 5000, 'retour : RawX s ecarte du neutre (dynamique, pas figé)');
-    prevX := fb.RAWX;
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := FALSE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := TRUE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_TRUE(fb.RAWX <> prevX, 'scan suivant : RawX VARIE encore (bagotement/oscillation en cours)');
-    prevX := fb.RAWX;
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := FALSE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := TRUE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_TRUE(fb.RAWX <> prevX, 'scan 3 : RawX continue de varier (oscillation amortie)');
+    fb(ENABLE := FALSE, RESET := FALSE,
+       ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    (* front appui, ArmingPermit=TRUE : maintien complet -> armement normal *)
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);   (* maintien 110ms >= DeadmanArmHoldTime 100ms *)
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'AC1 : ArmingPermit=TRUE + appui 110ms -> DeadmanArmed=TRUE (armement autorise)');
 END_TEST
 
-TEST 'TC-SIM-003 Overshoot montee : RawX passe sous 10000 puis depasse (vers 10500)'
-    (* Overshoot : la cible depasse MaxRaw. Au 1er scan RawX < 10000 (progression), puis avec
-       plusieurs scans la cible >10000 est atteinte. On verifie la VARIATION vers le haut. *)
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_TRUE(fb.RAWX > 5000 AND fb.RAWX < 10000, 'scan 1 overshoot : RawX progresse (sous la butée)');
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_TRUE(fb.RAWX >= 10000, 'apres ~11 scans (RiseTimeS=0.1s @10ms) : RawX a atteint/depasse la butee (overshoot)');
+TEST 'AC2 : ArmingPermit=FALSE -> Enable=FALSE, SpeedRef=0, warning armement non permis actif'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    fb(ENABLE := FALSE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    (* appui maintenu, ArmingPermit=FALSE : armement bloqué. On pousse même l'axe X/Y
+       (RawX/Y=8000) pour prouver qu'AUCUNE commande de mouvement n'est émise. *)
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 8000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'AC2 : pre-requis - armement bloque (jamais arme)');
+    ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'AC2 : ArmingPermit=FALSE -> AxisCmdX.Enable=FALSE (pipeline neutralise)');
+    ASSERT_FALSE(fb.AXISCMDY.ENABLE, 'AC2 : ArmingPermit=FALSE -> AxisCmdY.Enable=FALSE');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'AC2 : SpeedRef axe X = 0 (aucune commande de mouvement)');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'AC2 : SpeedRef axe Y = 0');
+    ASSERT_TRUE(fb.ARMINGPERMITDENIED, 'AC2 : warning "armement non permis" actif (sortie dediee ArmingPermitDenied)');
 END_TEST
 
-TEST 'TC-SIM-004 Deux boutons simultanes = neutre (pas de diagonale implicite)'
-    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
-       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
-       BTNFWD_UP_CLOSE := TRUE, BTNREV_DOWN_OPEN := FALSE,
-       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := FALSE,
-       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
-    ASSERT_EQ(fb.RAWX, 5000, '2 boutons (droite+avant) : RawX au neutre');
-    ASSERT_EQ(fb.RAWY, 5000, '2 boutons (droite+avant) : RawY au neutre');
+TEST 'AC3a : defaut capteur (RawOutOfRange) neutralise Enable meme si ArmingPermit=TRUE'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    fb(ENABLE := FALSE, RESET := FALSE,
+       ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    (* arme d'abord avec ArmingPermit=TRUE *)
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'AC3a : pre-requis - geste arme avec ArmingPermit=TRUE');
+
+    (* défaut capteur (RawX/RawY hors plage ADC + marge) : Enable doit tomber à FALSE,
+       indépendamment d'ArmingPermit (mécanisme interne de perte de confiance) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 20000, RAWY := 20000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'AC3a : RawOutOfRange=TRUE -> AxisCmdX.Enable=FALSE meme si ArmingPermit=TRUE');
+    ASSERT_FALSE(fb.AXISCMDY.ENABLE, 'AC3a : meme comportement axe Y');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'AC3a : SpeedRef X coupee sur defaut capteur');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'AC3a : SpeedRef Y coupee');
+END_TEST
+
+TEST 'AC3b : ArmingPermit=FALSE bloque l armement meme sans defaut capteur'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    fb(ENABLE := FALSE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    (* capteur SAIN (RawX/RawY = 5000, dans plage) + ArmingPermit=FALSE : malgré un appui
+       maintenu 110ms, l'armement reste bloqué (la permission, pas un défaut capteur). *)
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE,
+       ARMINGPERMIT := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'AC3b : ArmingPermit=FALSE bloque l armement meme sans defaut capteur');
+    ASSERT_EQ(fb.ERRORID, 0, 'AC3b : capteur sain -> aucun defaut capteur leve (blocage purement par permission)');
 END_TEST

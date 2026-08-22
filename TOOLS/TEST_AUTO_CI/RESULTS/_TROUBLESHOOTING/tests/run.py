@@ -23,14 +23,25 @@ import run_tests  # noqa: E402
 # ===========================================================================
 # ⚙️ ENTRÉE AD HOC — à adapter à chaque dépannage
 # ===========================================================================
-FB_NAME = "FB_Sim_Joystick"
+FB_NAME = "FB_Joystick"
 DOMAIN = "_TROUBLESHOOTING"
 
+# Sources du domaine JOYSTICK (miroir du registry.yaml FB_Joystick) : FB_Joystick
+# + toutes ses dépendances (enum/DUT d'abord, FB en dernier). Couvre : E_Mode,
+# E_Diag_State, ST_Diag_Device, E_State, ST_FbStatus, FB_FbStatus,
+# ST_Joystick_AxisCmd, FB_AxisScale, FB_Joystick.
 ENTRY = {
     "domain": DOMAIN,
     "sources": [
-        "CODE/L_SIMULATION/FB_Sim_Joystick.st",
-        # ← ajouter ici les dépendances (DUT/enum d'abord, FB en dernier)
+        "CODE/F_MODES/E_Mode.st",
+        "CODE/C_DIAG_RESEAUX/E_Diag_State.st",
+        "CODE/C_DIAG_RESEAUX/ST_Diag_Device.st",
+        "CODE/A_COMMUN/E_State.st",
+        "CODE/A_COMMUN/ST_FbStatus.st",
+        "CODE/A_COMMUN/FB_FbStatus.st",
+        "CODE/D_JOYSTICK/ST_Joystick_AxisCmd.st",
+        "CODE/D_JOYSTICK/FB_AxisScale.st",
+        "CODE/D_JOYSTICK/FB_Joystick.st",
     ],
     "test": "TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/tests/test_fb_sim_joystick.st",
 }

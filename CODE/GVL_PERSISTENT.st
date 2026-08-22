@@ -108,8 +108,6 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickDeadbandRaw : INT := 300; // Zone morte joystick, compte brut ADC (0..10000) — bruit neutre observé ±200 → réglage direct en compte brut, 300 (marge ~1.5x le bruit mesuré)
     _JoystickAccelRate_Pct : REAL := 50.0; // Accélération rampe (%/s)
     _JoystickDecelRate_Pct : REAL := 150.0; // Décélération rampe (%/s)
-    _JoystickInvertX : BOOL := FALSE; // Inversion axe X
-    _JoystickInvertY : BOOL := FALSE; // Inversion axe Y
 
     // 🔄 CYCLE (dragage semi-automatique)
     _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5); // 🌉 Pont FB_CfgPersistBridge_CycleCfg

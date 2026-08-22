@@ -4,7 +4,9 @@
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
              Pipeline par axe : FB_AxisScale -> Homme-Mort -> ST_Joystick_AxisCmd.
    🔒 Sécurité : Armement homme-mort par maintien au neutre.
-                 Désarmement sur neutre prolongé, changement mode ou fin benne.
+                  Armement STRICTEMENT conditionné par ArmingPermit (permission
+                  externe, vue joystick) ; FALSE = armement bloqué + warning.
+                 Désarmement sur neutre prolongé ; le changement de mode / fin de cycle benne est géré par l'externe via ArmingPermit (vue joystick).
    📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
    ======================================================================= *)
@@ -14,9 +16,7 @@ VAR_INPUT
     // === PERMIS SÉCURITÉ & ETATS SYSTEME ===
     Enable                    : BOOL;       // --> [CMD]  Active la logique du bloc (TRUE=Autorise)
     Reset                     : BOOL;       // --> [CMD]  Acquittement defaut
-    Mode                      : E_Mode;     // --> [SAFE] Changement de mode desarme l'homme-mort
-    BenneBusy                 : BOOL;       // --> [SAFE] Fin de cycle benne (front descendant) desarme l'homme-mort
-    PreserveArmingAfterBucket : BOOL;       // --> [SAFE] Maintien armement pendant fermeture ExtractionSequence
+    ArmingPermit              : BOOL;       // --> [SAFE] Permission d'armement homme-mort ; FALSE = armement bloqué
 
     // === ACQUISITION MATERIELLE & DIAGNOSTIC ===
     BusCanOpenOP              : ST_Diag_Device; // --> [HW]   Etat presence noeud CAN
@@ -29,8 +29,6 @@ VAR_INPUT
     BtnCalibrate              : BOOL;       // --> [CMD]  Demande de recalage neutre
 
     // === REGLAGES & CONFIGURATION ===
-    InvertX                   : BOOL := FALSE;   // --> [CFG]  Inversion sens de l'axe X
-    InvertY                   : BOOL := FALSE;   // --> [CFG]  Inversion sens de l'axe Y
     DeadbandRaw               : INT := 300;      // --> [CFG]  Zone morte en points ADC bruts (0..10000)
     NeutralHoldTime           : TIME := T#100MS; // --> [CFG]  Maintien continu au neutre avant desarmement
     DeadmanArmHoldTime        : TIME := T#100MS; // --> [CFG]  Appui continu bouton requis pour armer
@@ -47,6 +45,7 @@ VAR_OUTPUT
     // === DIAGNOSTIC & ANOMALIES ===
     Error                     : BOOL;       // <-- [DIAG] Presence anomalie (miroir Status.Error)
     ErrorId                   : WORD;       // <-- [DIAG] Bit0: Echec calibration Joystick (RawX/Y hors plage)
+    ArmingPermitDenied        : BOOL;       // <-- [DIAG] Warning "armement non permis" : appui homme-mort mais ArmingPermit=FALSE (sortie dediee, AC2)
     Status                    : ST_FbStatus; // <-- [STAT] Statut standard complet (socle FB_FbStatus)
 
     // === CONSIGNES AXES NORMALISEES ===
@@ -77,14 +76,12 @@ VAR
     NeutralHoldTimer          : TON;                 // * [INST] Temporisation maintien au neutre
     DeadmanArmTimer           : TON;                 // * [INST] Temporisation maintien bouton armement
     DeadmanArmGraceTimer      : TON;                 // * [INST] Temporisation delai de grace post-armement
-    BenneBusyFallEdge         : F_TRIG;              // * [INST] Detecteur front descendant Fin de cycle benne
 
     // === VARIABLES LOCALES INTERNES ===
     CmdXVal                   : REAL;                // . [LOC]  Consigne axe X calculee apres filtrage/homme-mort
     CmdYVal                   : REAL;                // . [LOC]  Consigne axe Y calculee apres filtrage/homme-mort
     LastCalibrate             : BOOL;                // . [LOC]  Memorisation etat precedent bouton calibration
     DeadmanArmPending         : BOOL;                // . [LOC]  Armement en cours d'attente de la tempo maintien
-    LastMode                  : E_Mode;              // . [LOC]  Memorisation mode scan precedent pour detection changement
     RawOutOfRange             : BOOL;                // . [LOC]  Surveillance capteur continue (AF08 §5bis) : RawX/RawY hors plage nominale+marge
     ErrorIdCause              : WORD;                // . [LOC]  Cause brute agrégée alimentant le socle FB_FbStatus
     WarningMask               : WORD;                // . [LOC]  Masque des erreurs classées WARNING (bit=1) ; bit=0 -> FAULT à acquitter
@@ -105,12 +102,12 @@ IF NOT Enable OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     AtNeutral := TRUE;
     DeadmanArmed := FALSE;
     DeadmanArmPending := FALSE;
+    ArmingPermitDenied := FALSE;
     NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);
     DeadmanArmTimer(IN := FALSE, PT := DeadmanArmHoldTime);
     DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
-    LastMode := Mode;   // Pas de faux changement détecté à la réactivation
     // 🔎 AF08 §3 : perte bus CAN / device non-opérationnel -> ErrorId bit2 (16#0004),
     // Info/Warning auto-effacé dès le retour (pas un Fault à acquitter).
     // Distingué du gate générique (Enable/PowerContactor) qui, lui, ne lève pas d'erreur.
@@ -180,27 +177,6 @@ Error := (ErrorId <> 16#0000);
 
 {endregion}
 
-{region "§4 Desarmements changement mode et fin benne"}
-// 4ter-bis. CHANGEMENT DE MODE : désarme le homme-mort dès que Mode change
-// (MAINT_N1/N2/SEMI_AUTO/AUTO). Évite qu'une commande en cours traverse le changement
-// de mode et soit réinterprétée soudainement. Repassage par le neutre + nouvel appui exigé.
-IF Mode <> LastMode THEN
-    DeadmanArmed := FALSE;
-    DeadmanArmPending := FALSE;   // Nouvel appui exigé après changement de mode
-END_IF;
-LastMode := Mode;
-
-// 4ter-ter. FIN DE CYCLE BENNE : désarmement général pour qu'une fermeture manuelle
-// ne démarre jamais M1/M2 par surprise. Exception : ExtractionSequence garde l'armement
-// pendant sa fermeture (enchaînement palier 1 sous ses propres interlocks synchro/position).
-BenneBusyFallEdge(CLK := BenneBusy);
-IF BenneBusyFallEdge.Q AND NOT PreserveArmingAfterBucket THEN
-    DeadmanArmed := FALSE;
-    DeadmanArmPending := FALSE;   // Nouvel appui exigé après fin de cycle benne
-END_IF;
-
-{endregion}
-
 {region "§5 Armement homme mort"}
 // 4ter. BOUTON HOMME-MORT — armement par MAINTIEN (DeadmanArmHoldTime), indépendant de la
 // position des axes pendant l'appui.
@@ -220,13 +196,21 @@ IF NOT RawButton THEN
 END_IF;
 
 // 🛡️ SÉCURITÉ C4 (ISO 13849) : armement STRICTEMENT conditionné par DeadmanArmPending.
-// Tout désarmement (changement de mode, fin de cycle benne, passage neutre prolongé)
+// Tout désarmement (désarmement externe via ArmingPermit, passage neutre prolongé)
 // efface DeadmanArmPending et EXIGE un nouvel appui conscient (front montant de RawButton).
-DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed, PT := DeadmanArmHoldTime);
+// 🛡️ SÉCURITÉ (ISO 13849 / AC1) : l'armement n'est possible QUE si ArmingPermit est accordé.
+// ArmingPermit est une ENTRÉE (vue joystick, alimentée de n'importe où) : FALSE = armement
+// bloqué — le timer de maintien ne peut pas démarrer, DeadmanArmed ne passe jamais à TRUE.
+DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit, PT := DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
     DeadmanArmPending := FALSE;
 END_IF;
+
+// 🚫 WARNING "ARMEMENT NON PERMIS" (AC2) : l'opérateur appuie (RawButton) mais ArmingPermit
+// est refusé -> armement bloqué + warning visible exposé en sortie (pas de blocage muet).
+// Sortie dédiée ArmingPermitDenied (niveau, actif pendant tout l'appui non permis).
+ArmingPermitDenied := RawButton AND NOT ArmingPermit;
 
 // ⏱️ 4bis. GESTION DU DÉSARMEMENT PAR MAINTIEN AU NEUTRE
 DeadmanArmGraceTimer(IN := DeadmanArmed, PT := DeadmanArmGraceTime);
@@ -240,18 +224,15 @@ END_IF;
 
 {region "§6 Pipeline axe X"}
 // 🕹️ 5. PIPELINE TRAITEMENT — AXE X
-// Pas de filtre : le joystick est stable et ne doit pas être ralenti (décision 2026-08-22).
-// Inversion de sens appliquée directement sur la sortie normalisée.
+// Pas de filtre ni d'inversion : le joystick est stable et installé dans le bon sens.
 // Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
 // OU si le capteur est hors plage (RawOutOfRange) : confiance perdue dans tout le geste.
-IF InvertX THEN
-    CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, -ScaleX.OutPct);
-ELSE
-    CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
-END_IF;
+CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 // Mapping Sortie Standardisée Axe X
-AxisCmdX.Enable := NOT RawOutOfRange;
+// Enable = fonctionnel (capteur sain) ET permission d'armement accordée (AC2) :
+// ArmingPermit=FALSE -> Enable=FALSE (pipeline neutralisé) + SpeedRef=0 (jamais armé).
+AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdX.SpeedRef := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) > 0.1);
 
@@ -272,18 +253,15 @@ DirectionX := AxisCmdX.Direction;
 
 {region "§7 Pipeline axe Y et sorties"}
 // 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
-// Pas de filtre : le joystick est stable et ne doit pas être ralenti (décision 2026-08-22).
-// Inversion de sens appliquée directement sur la sortie normalisée.
+// Pas de filtre ni d'inversion : le joystick est stable et installé dans le bon sens.
 // Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
 // OU si le capteur est hors plage (RawOutOfRange) : confiance perdue dans tout le geste.
-IF InvertY THEN
-    CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, -ScaleY.OutPct);
-ELSE
-    CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
-END_IF;
+CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 // Mapping Sortie Standardisée Axe Y
-AxisCmdY.Enable := NOT RawOutOfRange;
+// Enable = fonctionnel (capteur sain) ET permission d'armement accordée (AC2) :
+// ArmingPermit=FALSE -> Enable=FALSE (pipeline neutralisé) + SpeedRef=0 (jamais armé).
+AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdY.SpeedRef := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) > 0.1);
 
@@ -305,6 +283,7 @@ NeutralXAct := NeutralXMem;
 NeutralYAct := NeutralYMem;
 Done := NOT Error;
 
+{region "§8 Statut socle (FB_FbStatus)"}
 // 🧩 SOCLE DE STATUT STANDARD (forme cible) — remplit Status : ST_FbStatus
 // Le joystick produit ErrorId (bit0 calib, bit1 capteur, bit2 bus) avec sa propre logique
 // (validée par les tests). On le passe au socle qui remplit Status (Warning, textes, Reset).
@@ -331,5 +310,8 @@ Ready := NOT Error;
 // synchrone sans cycle -> toujours FALSE (jamais "en cours" ni "terminé").
 Status.Busy := FALSE;
 Status.Done := FALSE;
+{endregion}
 
 {endregion}
+
+END_FUNCTION_BLOCK
