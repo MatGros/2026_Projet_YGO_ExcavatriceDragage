@@ -515,30 +515,16 @@ def save_tasks_html(tasks, output_path: Path):
     </div>
 
     <script>
-        // Base officielle et persistance locale
+        // Source officielle unique et pure (toujours fraîche au chargement/F5)
         const defaultTasks = {tasks_json};
-        let tasks = [];
+        let tasks = [...defaultTasks];
         let hasUnsavedChanges = false;
 
+        // Nettoyage immédiat de tout vieux cache localStorage résiduel
         try {{
-            const savedData = localStorage.getItem('TASK_VIEWER_DATA');
-            const unsaved = localStorage.getItem('TASK_VIEWER_UNSAVED');
-            if (savedData) {{
-                tasks = JSON.parse(savedData);
-                hasUnsavedChanges = (unsaved === 'true');
-            }} else {{
-                tasks = [...defaultTasks];
-                hasUnsavedChanges = false;
-            }}
-        }} catch (e) {{
-            tasks = [...defaultTasks];
-            hasUnsavedChanges = false;
-        }}
-
-
-
-
-
+            localStorage.removeItem('TASK_VIEWER_DATA');
+            localStorage.removeItem('TASK_VIEWER_UNSAVED');
+        }} catch(e) {{}}
 
         function updateSyncIndicator() {{
             const badge = document.getElementById('sync-warning-badge');
@@ -547,8 +533,8 @@ def save_tasks_html(tasks, output_path: Path):
 
             if (hasUnsavedChanges) {{
                 badge.style.display = 'inline-flex';
-                btn.style.background = '#bd93f9';
-                btn.style.color = '#000';
+                btn.style.background = '#ff5555';
+                btn.style.color = '#fff';
             }} else {{
                 badge.style.display = 'none';
                 btn.style.background = 'var(--primary)';
@@ -559,22 +545,16 @@ def save_tasks_html(tasks, output_path: Path):
         function persistTasks() {{
             hasUnsavedChanges = true;
             updateSyncIndicator();
-            try {{
-                localStorage.setItem('TASK_VIEWER_DATA', JSON.stringify(tasks));
-                localStorage.setItem('TASK_VIEWER_UNSAVED', 'true');
-            }} catch(e) {{}}
         }}
 
+
         function resetToOfficial() {{
-            if (confirm('Voulez-vous réinitialiser le catalogue avec les données officielles du fichier ?')) {{
-                localStorage.removeItem('TASK_VIEWER_DATA');
-                localStorage.removeItem('TASK_VIEWER_UNSAVED');
-                tasks = [...defaultTasks];
-                hasUnsavedChanges = false;
-                updateSyncIndicator();
-                render();
-            }}
+            tasks = [...defaultTasks];
+            hasUnsavedChanges = false;
+            updateSyncIndicator();
+            render();
         }}
+
 
 
 
