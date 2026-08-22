@@ -298,18 +298,16 @@ HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machi
 instJoystick(
     Enable                    := TRUE,
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
-    Mode                      := PRG_03_Modes_Cycle.Auth.Mode,
-    BenneBusy                 := PRG_04_Treuils_Benne.instBucket.Status.Busy,
-    PreserveArmingAfterBucket := PRG_04_Treuils_Benne.instExtractionSequence.Status.Busy
-                                 AND (PRG_04_Treuils_Benne.instExtractionSequence.ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET),
+    // 🚨 ArmingPermit = ENTRÉE du joystick (vue joystick), alimentée de n'importe où.
+    // 🔧 Câblage TEMPORAIRE : producteur à analyser plus tard (hors scope LOT_JOYSTICK_ARMINGPERMIT).
+    //    TRUE = armement autorisé en attendant la future chaîne de permission système.
+    ArmingPermit              := TRUE,
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
     RawY                      := HwIn.Operator.JoyYRaw_ANA2,
     RawButton                 := HwIn.Operator.JoyBtnRaw,
     BtnCalibrate              := GVL_IHM.JOY1Joystick.Cmd.BtnCalibrate,
-    InvertX                   := _JoystickInvertX,
-    InvertY                   := _JoystickInvertY,
     DeadbandRaw               := _JoystickDeadbandRaw,
     NeutralHoldTime           := T#100MS,
     DeadmanArmHoldTime        := T#100MS,
