@@ -20517,62 +20517,6 @@ Status.Done := FALSE;
           </data>
         </addData>
       </pou>
-      <pou name="FB_Output" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="Command">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET CONFIGURATION ===
---&gt; [CMD] Ordre logique issu du FB metier appelant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InvertLogic">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] TRUE = cablage NC (inversion de la sortie)</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="State">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES PHYSIQUES ===
-&lt;-- [ACT] Etat logique physique vers la carte de sortie</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   📤 FB_Output — Adaptateur de sortie physique TOR (inversion NO/NC)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Conditionnement et inversion optionnelle de la commande TOR
-   🔌 Interface : Interface directe vers carte de sortie physique
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §Câblage
-   =======================================================================</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-State := Command XOR InvertLogic;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b60dd37c-0508-57b7-805e-ba43b1805814</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_Ramp" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -37213,7 +37157,6 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_Acquisition_Preflight" ObjectId="78a087ce-501c-55a1-a50d-014fd4495703" />
           <Object Name="FB_Brake" ObjectId="c9125322-40ab-590a-8c7b-ddeec3eeeb70" />
           <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
-          <Object Name="FB_Output" ObjectId="b60dd37c-0508-57b7-805e-ba43b1805814" />
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
           <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
           <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />

@@ -25,6 +25,7 @@ import tempfile
 import yaml
 
 import chronogram
+from af_coverage import check_af_coverage
 from html_report import render_html_report
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -48,6 +49,13 @@ def _c(text: str, ok: bool) -> str:
         return text
     code = "32" if ok else "31"
     return f"\033[{code}m{text}\033[0m"
+
+
+def _warn(text: str) -> str:
+    """Jaune/orange -- ecart de perimetre AF<->tests (non bloquant), distinct du rouge FAIL."""
+    if not _COLOR_OK:
+        return text
+    return f"\033[33m{text}\033[0m"
 
 
 def _ensure_gpp_in_path(debug: bool = False) -> None:
@@ -167,6 +175,11 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                 _log(f"[chronogram] indisponible pour {fb_name} : {exc}")
                 trace_entries, field_types = [], {}
 
+        af_warnings = []
+        af_doc = entry.get("af_doc")
+        if af_doc:
+            af_warnings = check_af_coverage(REPO_ROOT / af_doc, test_file)
+
         reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
         reports_dir.mkdir(parents=True, exist_ok=True)
         _archive_previous(reports_dir, fb_name)
@@ -181,7 +194,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                                        sources=entry["sources"], json_data=json_data, text_report=text_report,
                                        test_st_path=test_file, trace_entries=trace_entries,
                                        source_paths=sources, cycle_time_ms=cycle_time_ms,
-                                       field_types=field_types)
+                                       field_types=field_types, af_warnings=af_warnings)
             base.with_suffix(".html").write_text(html, encoding="utf-8")
             report_path = base.with_suffix(".html")
         else:
@@ -201,7 +214,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         if not tests:
             tests = [{"name": "(pas de resultat JSON)", "passed": result.returncode == 0, "detail": ""}]
 
-        return {"ok": result.returncode == 0, "tests": tests, "report": report_path}
+        return {"ok": result.returncode == 0, "tests": tests, "report": report_path, "af_warnings": af_warnings}
 
 
 def main() -> int:
@@ -249,6 +262,8 @@ def main() -> int:
             if not t["passed"] and t["detail"]:
                 line += f"\n        {t['detail']}"
             print(line)
+        for tc_id, intention in res.get("af_warnings", []):
+            print(f"  {_warn('WARN')}  {tc_id} attendu par l AF (type AUTO) mais absent des tests -- {intention}")
         if res["report"]:
             print(f"  Rapport : {res['report']}")
     n_fail = sum(1 for res in results.values() if not res["ok"])

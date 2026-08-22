@@ -281,18 +281,22 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
     </div>"""
 
 
-def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
-                        json_data: dict, text_report: str, test_st_path=None,
+def _render_fb_section(fb_name: str, domain: str, sources: list,
+                        json_data: dict, text_report: str = "", test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
-                        field_types=None) -> str:
+                        field_types=None, af_warnings=None, extra_test_warnings=None) -> dict:
+    """Construit le contenu d'un FB (sous-titre + warning AF + cartes de test + details
+    sources) SANS l'enveloppe de page complete -- reutilise a l'identique par un rapport
+    mono-FB (render_html_report) et un rapport groupe multi-FB (render_group_report)."""
     field_types = field_types or {}
+    af_warnings = af_warnings or []
+    extra_test_warnings = extra_test_warnings or []
     summary = json_data.get("summary", {})
     results = json_data.get("results", [])
     total = summary.get("total", len(results))
     passed = summary.get("passed", sum(1 for r in results if r.get("passed")))
     failed = summary.get("failed", total - passed)
     all_pass = failed == 0
-    exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     checks_by_test = parse_test_checks(test_st_path) if test_st_path else {}
 
@@ -336,16 +340,56 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
             </details>""")
         source_blocks = "".join(blocks)
 
-    return f"""<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Rapport de test — {_html.escape(fb_name)} [{'PASS' if all_pass else 'FAIL'}]</title>
-<style>
-    :root {{
+    af_warning_html = ""
+    if af_warnings:
+        items = "".join(
+            f"<li><code>{_html.escape(tc_id)}</code> — {_html.escape(intention)}</li>"
+            for tc_id, intention in af_warnings
+        )
+        af_warning_html += f"""
+    <div class="af-warning-banner">
+        <div class="af-warning-title">⚠️ {len(af_warnings)} test(s) attendu(s) par l'AF (type AUTO) mais absent(s) de ce fichier de test</div>
+        <ul>{items}</ul>
+    </div>"""
+    if extra_test_warnings:
+        items2 = "".join(f"<li><code>{_html.escape(tc_id)}</code></li>" for tc_id in extra_test_warnings)
+        af_warning_html += f"""
+    <div class="af-warning-banner">
+        <div class="af-warning-title">⚠️ {len(extra_test_warnings)} test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
+        <ul>{items2}</ul>
+    </div>"""
+
+    body_html = f"""
+    <div class="subtitle">
+        Domaine <b>{_html.escape(domain)}</b> · {passed}/{total} vérifications OK
+    </div>
+    {af_warning_html}
+    {"".join(cards)}
+    <details>
+        <summary>Fichiers source compilés ({len(sources)})</summary>
+        <ul>{sources_list}</ul>
+    </details>
+    <details>
+        <summary>Code source ST original ({len(source_paths or [])})</summary>
+        {source_blocks}
+    </details>
+    <details>
+        <summary>Sortie brute strucpp</summary>
+        <pre>{_html.escape(text_report)}</pre>
+    </details>"""
+
+    return {
+        "fb_name": fb_name, "domain": domain, "all_pass": all_pass,
+        "passed": passed, "total": total, "body_html": body_html,
+    }
+
+
+_CSS = """
+    :root {
         --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
         --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
         --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
+        --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
     }}
     * {{ box-sizing: border-box; }}
     body {{ font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 0;
@@ -412,6 +456,11 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
     .wf-chip {{ opacity: 0.95; }}
     .wf-legend {{ font-size: 10px; fill: var(--muted); }}
     .wf-scale {{ font-size: 9px; fill: #cbd5e1; text-anchor: end; }}
+    .af-warning-banner {{ background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 13px; }}
+    .af-warning-banner .af-warning-title {{ font-weight: 600; margin-bottom: 6px; }}
+    .af-warning-banner ul {{ margin: 0; padding-left: 20px; }}
+    .af-warning-banner li {{ margin: 3px 0; }}
     .chrono-fail-note {{ background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
         border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }}
     .wf-fail-band {{ fill: #fecaca; opacity: 0.45; }}
@@ -433,6 +482,7 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
         Domaine <b>{_html.escape(domain)}</b> · {passed}/{total} vérifications OK
         · <b>{exec_time}</b>
     </div>
+    {af_warning_html}
     {"".join(cards)}
     <details>
         <summary>Fichiers source compilés ({len(sources)})</summary>

@@ -237,6 +237,60 @@ TEST 'TC-P08-005 Changement de mode desarme le geste, nouvel appui exige'
     ASSERT_FALSE(fb.DEADMANARMED, 'pas de rearmement automatique apres changement de mode : nouvel appui conscient exige');
 END_TEST
 
+TEST 'TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+
+    (* RawX/RawY hors zone neutre valide (2000..8000) + front BtnCalibrate *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, BTNCALIBRATE := TRUE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    ASSERT_TRUE(fb.ERROR, 'calibration hors zone doit lever Error');
+
+    (* Reset alors que la cause est toujours presente (axes toujours hors zone) : ne doit PAS acquitter *)
+    fb(ENABLE := TRUE, RESET := TRUE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    ASSERT_TRUE(fb.ERROR, 'Reset ne doit PAS acquitter tant que les axes restent hors zone (cause toujours presente)');
+
+    (* Reset retombe (front consomme) ; axes reviennent en zone ; nouveau front Reset : doit acquitter *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    fb(ENABLE := TRUE, RESET := TRUE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
+    ASSERT_FALSE(fb.ERROR, 'front Reset avec axes revenus en zone valide doit acquitter (cause disparue + appui conscient)');
+END_TEST
+
 TEST 'TC-P08-011 Fin de cycle benne desarme le geste par defaut'
     diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
     diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
@@ -324,58 +378,4 @@ TEST 'TC-P08-012 PreserveArmingAfterBucket protege l armement en fin de benne (e
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_TRUE(fb.DEADMANARMED, 'PreserveArmingAfterBucket=TRUE : armement conserve malgre la fin de benne (exception documentee AF, alerte P1 : ne jamais elargir hors CLOSING Extraction)');
-END_TEST
-
-TEST 'TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu'
-    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
-    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
-
-    (* RawX/RawY hors zone neutre valide (2000..8000) + front BtnCalibrate *)
-    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
-       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
-       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
-       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
-       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
-       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-
-    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
-       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
-       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, BTNCALIBRATE := TRUE,
-       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
-       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
-       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-
-    ASSERT_TRUE(fb.ERROR, 'calibration hors zone doit lever Error');
-
-    (* Reset alors que la cause est toujours presente (axes toujours hors zone) : ne doit PAS acquitter *)
-    fb(ENABLE := TRUE, RESET := TRUE, POWERCONTACTORENGAGED := TRUE,
-       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
-       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 9500, RAWY := 9500, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
-       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
-       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
-       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-
-    ASSERT_TRUE(fb.ERROR, 'Reset ne doit PAS acquitter tant que les axes restent hors zone (cause toujours presente)');
-
-    (* Reset retombe (front consomme) ; axes reviennent en zone ; nouveau front Reset : doit acquitter *)
-    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
-       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
-       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
-       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
-       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
-       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-
-    fb(ENABLE := TRUE, RESET := TRUE, POWERCONTACTORENGAGED := TRUE,
-       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
-       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
-       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
-       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
-       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
-       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-
-    ASSERT_FALSE(fb.ERROR, 'front Reset avec axes revenus en zone valide doit acquitter (cause disparue + appui conscient)');
 END_TEST
