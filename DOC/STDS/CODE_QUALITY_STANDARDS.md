@@ -322,38 +322,60 @@ STRUCT
 END_STRUCT
 END_TYPE
 ```
-> 💡 Le mapping IHM lis `Status.ErrorIdTxt`/`Status.WarningIdTxt` directement (textes pré-calculés),
-> et si **plusieurs** erreurs/warnings sont actifs, l'affichage **tourne toutes les 1 s** (rotation).
+> 💡 Le mapping IHM lit `Status.ErrorIdTxt`/`Status.WarningIdTxt` directement (textes pré-calculés).
+> Le socle sélectionne par parcours de liste la première cause active (index le plus bas) ; si
+> **plusieurs** erreurs/warnings sont actifs, c'est l'IHM (côté affichage) qui peut choisir sa
+> stratégie d'affichage (ex. rotation) — le socle ne fait pas de rotation.
 
 ### 3bis. `FB_FbStatus` — socle de remplissage standardisé (forme cible)
 Tout FB `standard` remplit son `Status : ST_FbStatus` **via** l'instance d'un socle unique `FB_FbStatus`
-(code et comportement standardisés, écrits une seule fois, réutilisés partout). Le bloc métier déclare
-**où vit chaque bit d'erreur** et le socle gère l'acquittement, la mémoire et la génération des textes.
+(code et comportement standardisés, écrits une seule fois, réutilisés partout). Le bloc métier fournit
+sa **liste de causes** (`Causes : ARRAY[0..15] OF ST_FbCause`, type `ST_FbCause`) et le socle gère
+l'acquittement, la mémoire et la génération des textes.
 
 ```pascal
+TYPE ST_FbCause :           (* type NOUVEAU : cause élémentaire en clair *)
+STRUCT
+    Active    : BOOL;      (* 1 = cause présente (interlock TOUJOURS sur la cause brute) *)
+    IsWarning : BOOL;      (* 1 = warning auto-effacé ; 0 = défaut à acquitter (fail-safe) *)
+    Texte     : STRING;    (* libellé IHM de la cause *)
+END_STRUCT
+END_TYPE
+
 FB_FbStatus
-  IN  Enable          : BOOL;    // autorisation générale
+  IN  Enable          : BOOL;    // autorisation générale (FALSE → sorties neutres, latch des défauts CONSERVÉ)
   IN  Reset           : BOOL;    // front acquittement (jamais conditionné, §9)
-  IN  ErrorIdCause    : WORD;    // bits d'erreur ACTIFS (cause brute)
-  IN  WarningMask     : WORD;    // bit=1 → cette erreur est WARNING (auto) ; bit=0 → FAULT (à acquitter)
+  IN  Causes          : ARRAY[0..15] OF ST_FbCause;  // liste des causes (Active/IsWarning/Texte)
   OUT Status          : ST_FbStatus;   // mappé 1:1 sur la sortie `Status` du bloc métier
   OUT Ready           : BOOL;    // en BOOL nu (contrat standard)
 ```
 
 **Règles de catégorisation (fail-safe)** :
-- `WarningMask = 0` (défaut) → **toutes** les erreurs sont des Fault à acquitter = **sécurité maximale**.
-- On **lève un bit à 1** dans `WarningMask` pour déclarer cette erreur **Warning** (auto-effacée).
-- Un bit est **exclusivement** warning **ou** fault — jamais les deux (un seul masque → pas d'incohérence possible).
+- Chaque cause (`Causes[i]`) est classée par **`IsWarning`** : `IsWarning=TRUE` → **Warning**
+  auto-effacé (ne lève jamais `Error`) ; `IsWarning=FALSE` (défaut) → **Fault** à acquitter (laté).
+- **Fail-safe** : toute cause **sans `IsWarning=TRUE`** (câblée à `FALSE` ou oubliée) est classée
+  **Fault** — retombe toujours côté acquittement = **sécurité maximale**.
+- Une cause est **exclusivement** warning **ou** fault — jamais les deux (un seul champ `IsWarning`
+  → pas d'incohérence possible).
 - ⚠️ **Exigence de sécurité à tester nommément** (pas seulement en conséquence incidente d'un autre
-  test) : `WarningMask` omis ou câblé à `0` doit classer **tout** bit d'`ErrorIdCause` en Fault, jamais
-  en Warning. Le nom du test doit porter l'exigence elle-même (ex. `'WarningMask non fourni/à 0 :
-  tout défaut classé Fault (fail-safe)'`), pas la déduire d'un test générique sur un autre sujet.
+  test) : une cause avec `IsWarning` câblé à `FALSE` (ou non renseigné) doit classer **tout**
+  défaut en Fault, jamais en Warning. Le nom du test doit porter l'exigence elle-même (ex.
+  `'cause sans IsWarning=TRUE : classée Fault (fail-safe)'`), pas la déduire d'un test générique
+  sur un autre sujet.
 
 **Comportement** :
-- `Warning` : s'affiche et s'efface **seul** avec la cause (`WarningIdCause`). Aucun `Reset` impliqué (§9).
-- `Error` : **laté** — reste `TRUE` même si la cause disparaît, jusqu'au front `Reset` ; ré-alarme si la cause revient.
-- `ErrorIdLatched` : code du défaut déclenchant **mémorisé** (ne disparaît pas avec la cause) → c'est la
-  mémoire nécessaire à l'acquittement.
+- **Décision (a) — `ErrorId` réservé aux défauts** : un warning n'est **jamais** écrit dans
+  `ErrorId` (ni ne lève `Error`). Un warning va dans `WarningId`/`WarningIdTxt`. `Error :=
+  (ErrorId <> 0)` ne voit donc jamais de faux défaut.
+- **Décision (b) — latch conservé sur `Enable=FALSE`** : le latch d'un défaut non acquitté survit à
+  un cycle `Enable=FALSE` (il n'est effacé que par un `Reset`). Au ré-enable, toute cause encore
+  active se relathe naturellement. Résout l'ancienne limite **T147**.
+- **Décision (c) — `StateAtError` gelé** : capturé **au premier défaut**, puis **figé** jusqu'au
+  `Reset` (`StateAtErrorArmed`) — jamais réécrit par une cause ultérieure.
+- `Warning` : s'affiche et s'efface **seul** avec la cause (`Causes[i].Active AND IsWarning`).
+  Aucun `Reset` impliqué (§9). Purge son latch résiduel en cas de reclassement en warning.
+- `Error` : **laté** — reste `TRUE` même si la cause disparaît, jusqu'au front `Reset` ; ré-alarme
+  si la cause revient.
 - `Reset` : **toujours effectif, jamais conditionné** (§9).
 - `State`/`StateAtError` : remplis par le socle (valeur par défaut `READY`) — le FB métier n'a **pas**
   besoin de machine d'état pour être `standard` (cf. §2, device qui remonte un défaut). Conséquence :
@@ -367,8 +389,9 @@ FB_FbStatus
   Le FB métier appelant reste responsable de renseigner `Status.Busy`/`Status.Done` selon son propre
   cycle : un conditionneur synchrone (ex. `FB_Joystick`) les laisse à `FALSE` ; un organe à cycle
   (ex. un treuil/séquenceur) les pilote lui-même après l'appel du socle.
-- Textes : `ErrorIdTxt`/`WarningIdTxt` générés à partir de **tableaux de chaînes** indexés par le code ;
-  si **plusieurs** erreurs/warnings actifs, le texte affiché **tourne toutes les 1 s** (rotation).
+- **Sélection du texte IHM — parcours de liste** : `ErrorIdTxt`/`WarningIdTxt` sont générés en
+  parcourant la liste (`FOR` sur `Causes[i].Active` → `Causes[i].Texte`), première cause active
+  d'index le plus bas. **Plus aucun `WHILE`, ni masque, ni `SHR`** pour la sélection.
 
 ---
 

@@ -1,0 +1,95 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — FB_FbStatus basculé sur une liste de causes (zéro bit/masque/constante)
+# Point 1 + 3 du contrat utilisateur : plus d'hexa illisible, plus de masque, « avec une liste ».
+# Point 4 : interface FB_Joystick conservée (Status:ST_FbStatus + miroirs maintenus).
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: LOT_JOYSTICK_FBSTATUS_LISTE_CAUSES
+  criticality: C2            # logique FB_Joystick + socle partagé, pas de mouvement direct
+  strategy: patch
+
+  objective: >
+    Remplacer le mécanisme bitfield WORD (ErrorIdCause/WarningMask + textes indexés par bit)
+    du socle FB_FbStatus par une LISTE de causes nommées (ST_FbCause : Active/IsWarning/Texte),
+    afin que FB_Joystick exprime ses défauts en booléens nommés sans littéral hexa, sans
+    constante CST_ ni masque. La sélection de texte devient un simple parcours de liste.
+
+  acceptance:
+    - id: AC1
+      statement: "FB_Joystick.st ne contient aucun littéral 16# ni aucune constante CST_ dans son corps (grep 16# et CST_ → 0)."
+      verified_by: "grep 16# et CST_ sur CODE/D_JOYSTICK/FB_Joystick.st"
+    - id: AC2
+      statement: "FB_FbStatus a pour entrées Enable, Reset, Causes : ARRAY[0..15] OF ST_FbCause (plus de ErrorIdCause/WarningMask/ErrorTexts/WarningTexts) ; sélection texte par FOR sur Causes[i].Active, aucun WHILE/SHR/masque."
+      verified_by: "lecture CODE/A_COMMUN/FB_FbStatus.st + grep WHILE/SHR/BitMask = 0"
+    - id: AC3
+      statement: "Sémantique préservée : Error=defaut laté/actif à acquitter, Warning=auto-effacé, ResetRequested=defaut laté, Reset=front toujours effectif, interlock sur la cause brute."
+      verified_by: "revue + bundle + G200"
+    - id: AC4
+      statement: "L'interface FB_Joystick conserve Ready + Status:ST_FbStatus ; les sorties plates Busy/Done/Error/ErrorId restent présentes car encore consommées (PRG_07). G200 PASS."
+      verified_by: "G200_check_linkage --report PASS 0 erreur"
+    - id: AC5
+      statement: "Bundle régénéré et gates liés au périmètre verts (G315/G330/G400/G390)."
+      verified_by: "generate_codesys_bundle + run_all_gates"
+
+  scope:
+    allowed:
+      - CODE/A_COMMUN/ST_FbCause.st
+      - CODE/A_COMMUN/FB_FbStatus.st
+      - CODE/A_COMMUN/ST_FbStatus.st
+      - CODE/D_JOYSTICK/FB_Joystick.st
+    forbidden:
+      - "DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md (autre agent en charge)"
+      - "PRJ_CODESYS/PROJ_Full_ImportExport/Device.export"
+
+  conservation:
+    must_survive:
+      - "ST_FbStatus conserve ses 11 champs (forme cible, point 4)."
+      - "FB_Joystick conserve ses miroirs DirectionX/Y:INT, Speed*Pct, DeadmanArmed, AtNeutral (consommés par PRG_02)."
+      - "Sémantique Error/Warning/Reset/State inchangée."
+    dropped_on_purpose:
+      - "littéraux hexa 16#0001/2/4 et constantes CST_JOY_ERR_* dans FB_Joystick"
+      - "ErrorTexts/WarningTexts indexés par bit dans FB_FbStatus (remplacés par le champ Texte de la cause)"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout problème constaté en cours (incohérence de spec, bug préexistant hors scope,
+    gates G340/G420/G430 pré-existants) est remonté à l'orchestrateur, pas silencieusement.
+    Les échecs G340/G420/G430 sont pré-existants au HEAD (vérifié par worktree) et hors périmètre.
+
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED
+
+execution:
+  executed_by: "DSH (deepseek-v4-flash:cloud)"
+  completed_at: "2026-08-22T21:05:00+02:00"
+  status: COMPLETED
+  summary: >
+    Refonte de FB_FbStatus vers une LISTE de causes ST_FbCause (Active/IsWarning/Texte) :
+    plus de bitfield WORD, plus de masque, plus de constante CST_ ni d'hexa dans FB_Joystick.
+    FB_Joystick exprime 3 causes en clair (CalibFail=fault, RawOutOfRange/BusLost=warning).
+    Corrections : séparation Error/Warning, latch conservé sur Enable=FALSE, StateAtError capturé
+    une fois, purge latch au reclassement warning. Point 4 : retrait Busy/Done (mort), miroirs
+    DirectionX/Y conservés (migration .Direction INT -> bits). Vérifs : bundle frais, G200 PASS,
+    G315 PASS, CI FB_Joystick 9/9, CI FB_FbStatus 11/11. Gates G340/G420/G430 pré-existants au
+    HEAD (hors périmètre T137).
+  evidence_submitted:
+    - "bundle: CODE_XML/CODE_Bundle.xml frais"
+    - "G200_check_linkage: PASS 0 erreur"
+    - "G315_check_fb_interface: PASS (Standard 19)"
+    - "CI FB_Joystick: 9/9 PASS"
+    - "CI FB_FbStatus: 11/11 PASS"
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "En attente de recettage humain / commit."

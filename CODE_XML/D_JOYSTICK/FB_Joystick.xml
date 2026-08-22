@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T17:04:55.005830" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T17:04:55.005830">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T18:59:15.923296" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T18:59:15.923296">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -87,6 +87,55 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
    📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_FbCause">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente (interlock sur la cause brute)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsWarning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = warning auto-effacé ; 0 = défaut à acquitter</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Texte">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM de la cause</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e181848e-e3f7-5266-a2aa-b519fd91dabc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FbCause — Cause élémentaire d'un FB standard (socle FB_FbStatus)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
+      sans bitfield ni masque. Le FB métier remplit une liste de causes
+      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
+   🧬 Contrat : remplacer l'ancien couple WORD bitfield + tableaux de textes
+      indexés par bit par une liste lisible (maintenance, « avec une liste »).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
+      l'acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -196,8 +245,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
       avec les textes prêts pour l'IHM (plus de conditions complexes
-      côté affichage). Évolution ADDITIVE de la forme historique : les
-      6 membres d'origine sont conservés (tolérance transitoire T137).
+      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
    🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
@@ -271,8 +319,8 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🕹️ ST_Joystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de consigne d'axe 4 champs produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedRef, Direction.
+   🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
+   📤 Champs : Enable, StartStop, SpeedRef + direction en bits (DirectionPositive/Negative, AtNeutral).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
    =======================================================================</xhtml>
         </documentation>
@@ -459,7 +507,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Valeur brute axe X (0..10000) TRANSLATION 5000=Neutre 0=Gauche/Trémie 10000=Droite/Maintenance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Valeur brute axe X (0..10000)</xhtml>
               </documentation>
             </variable>
             <variable name="RawY">
@@ -467,7 +515,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Valeur brute axe Y (0..10000) TREUILS 5000=Neutre 0=Plongée/Descente/Ouverture 10000=Extraction/Remontée/Fermeture</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Valeur brute axe Y (0..10000)</xhtml>
               </documentation>
             </variable>
             <variable name="RawButton">
@@ -551,16 +599,32 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; SYNOPTIQUE ===
-&lt;-- [STAT] FB pret a fonctionner</xhtml>
+&lt;-- [STAT] FB pret a fonctionner (Enable + bus OK + pas de defaut)</xhtml>
               </documentation>
             </variable>
-            <variable name="Status">
+            <variable name="Button">
               <type>
-                <derived name="ST_FbStatus" />
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Bouton homme-mort filtre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC &amp; ANOMALIES ===
-&lt;-- [STAT] Statut standard complet (socle FB_FbStatus)</xhtml>
+&lt;-- [DIAG] Presence defaut (miroir Status.Error)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Identifiant defaut courant (reconstruit par le socle)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingPermitDenied">
@@ -568,16 +632,81 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Warning "armement non permis" : appui homme-mort mais ArmingPermit=FALSE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Warning "armement non permis" : appui homme-mort mais ArmingPermit=FALSE (sortie dediee, AC2)</xhtml>
               </documentation>
             </variable>
-            <variable name="DeadmanButton">
+            <variable name="Status">
               <type>
-                <BOOL />
+                <derived name="ST_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BOUTON ET CONSIGNES AXES NORMALISEES ===
-&lt;-- [ACT] Bouton homme-mort</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Statut standard complet (socle FB_FbStatus)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisCmdX">
+              <type>
+                <derived name="ST_Joystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES AXES NORMALISEES ===
+&lt;-- [ACT]  Sortie normalisee axe X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisCmdY">
+              <type>
+                <derived name="ST_Joystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Sortie normalisee axe Y</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES &amp; MIROIRS MAINTENANCE ===
+&lt;-- [STAT] Point neutre X actuel pour IHM/Test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralYAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Point neutre Y actuel pour IHM/Test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedXPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe X signee (-100..+100 %), miroir AxisCmdX.SpeedRef</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sens axe X (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdX.DirectionPositive/Negative</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedYPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Consigne vitesse axe Y signee (-100..+100 %), miroir AxisCmdY.SpeedRef</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sens axe Y (-1=Rev/0=Neutre/+1=Fwd), derive des bits AxisCmdY.DirectionPositive/Negative</xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmed">
@@ -588,20 +717,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Geste arme (bouton appuye au neutre) - IHM/diagnostic</xhtml>
               </documentation>
             </variable>
-            <variable name="AxisCmdX">
+            <variable name="AtNeutral">
               <type>
-                <derived name="ST_Joystick_AxisCmd" />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Sortie normalisee axe X TRANSLATION</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AxisCmdY">
-              <type>
-                <derived name="ST_Joystick_AxisCmd" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Sortie normalisee axe Y TREUILS</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si les 2 axes sont en zone morte (position centrale)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -642,20 +763,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Normalisation et zone morte axe Y</xhtml>
               </documentation>
             </variable>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant Reset</xhtml>
-              </documentation>
-            </variable>
             <variable name="DeadmanEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant Bouton homme-mort</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant bouton homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralHoldTimer">
@@ -687,7 +800,7 @@
                 <derived name="FB_FbStatus" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle de statut standard</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle de statut standard (liste de causes)</xhtml>
               </documentation>
             </variable>
             <variable name="CmdXVal">
@@ -696,7 +809,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
-. [LOC]  Consigne axe X calculee apres homme-mort</xhtml>
+. [LOC]  Consigne axe X calculee apres filtrage/homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="CmdYVal">
@@ -704,7 +817,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Consigne axe Y calculee apres homme-mort</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Consigne axe Y calculee apres filtrage/homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="LastCalibrate">
@@ -720,7 +833,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Armement en cours d'attente de la tempo maintien</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Armement en cours d'attente de la temporisation maintien</xhtml>
               </documentation>
             </variable>
             <variable name="RawOutOfRange">
@@ -728,57 +841,36 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Surveillance capteur continue : RawX/RawY hors plage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Surveillance capteur continue (AF08 §5bis) : RawX/RawY hors plage nominale+marge</xhtml>
               </documentation>
             </variable>
-            <variable name="AtNeutral">
+            <variable name="CalibFail">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Position centrale (2 axes dans la zone morte)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Echec recalage neutre (front BtnCalibrate hors zone) - cause fault (liste)</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorIdCause">
+            <variable name="BusLost">
               <type>
-                <WORD />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Cause brute agregee alimentant le socle FB_FbStatus</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Perte liaison bus / device non operationnel - cause warning (liste)</xhtml>
               </documentation>
             </variable>
-            <variable name="WarningMask">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Masque des erreurs classees WARNING</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickErrorTexts">
+            <variable name="instCauses">
               <type>
                 <array>
                   <dimension lower="0" upper="15" />
                   <baseType>
-                    <derived name="STRING" />
+                    <derived name="ST_FbCause" />
                   </baseType>
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Textes IHM des erreurs joystick</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickWarningTexts">
-              <type>
-                <array>
-                  <dimension lower="0" upper="15" />
-                  <baseType>
-                    <derived name="STRING" />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Textes IHM des warnings joystick</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Liste des causes pour le socle FB_FbStatus</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -787,148 +879,171 @@
    🕹️ FB_Joystick — Acquisition &amp; conditionnement du geste opérateur
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
-             Pipeline par axe : FB_AxisScale -&gt; Homme-Mort -&gt; ST_Joystick_AxisCmd.
+              Pipeline par axe : FB_AxisScale -&gt; Homme-Mort -&gt; ST_Joystick_AxisCmd.
    🔒 Sécurité : Armement homme-mort par maintien au neutre.
-                 Armement STRICTEMENT conditionné par ArmingPermit (permission
-                 externe, vue joystick) ; FALSE = armement bloqué + warning.
-   📤 Sorties : AxisCmdX/Y, DeadmanArmed, DeadmanButton, Status (socle).
+                  Armement STRICTEMENT conditionné par ArmingPermit (permission
+                  externe, vue joystick) ; FALSE = armement bloqué + warning.
+                  Désarmement sur neutre prolongé ; le changement de mode / fin de
+                  cycle benne est géré par l'externe via ArmingPermit (vue joystick).
+   📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
-   =======================================================================</xhtml>
+   =====================================================================</xhtml>
           </documentation>
         </interface>
         <body>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Gate securite"}
-// 🛑 1. GATE — bus coupé / Enable=FALSE : tout neutralisé, sorties sûres
-IF NOT Enable OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
-    Ready := FALSE;
-    DeadmanButton := FALSE; DeadmanArmed := FALSE; DeadmanArmPending := FALSE;
-    AtNeutral := TRUE;
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
-    AxisCmdX.DirectionNegative := FALSE; AxisCmdX.DirectionPositive := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0;
-    AxisCmdY.DirectionNegative := FALSE; AxisCmdY.DirectionPositive := FALSE; AxisCmdY.AtNeutral := TRUE;
-    NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);
-    DeadmanArmTimer(IN := FALSE, PT := DeadmanArmHoldTime);
-    DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);
-    ErrorIdCause := ErrorIdCause OR 16#0004;   // perte bus visible (le socle gere l'acquittement)
-    RETURN;
-END_IF;
-Ready := TRUE;
-{endregion}
-
-{region "§2 Reset"}
-// 🔑 2. RESET DÉFAUT (front + cause disparue)
-ResetEdge(CLK := Reset);
-IF ResetEdge.Q AND (RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000) THEN
-    ErrorIdCause := ErrorIdCause AND (NOT 16#0001);   // efface bit0 (calibration)
-END_IF;
-// Bus revenu → nettoie bit2 (perte bus auto-efface)
-IF BusCanOpenOP.Operational AND JoystickOP.Operational THEN
-    ErrorIdCause := ErrorIdCause AND (NOT 16#0004);
-END_IF;
-{endregion}
-
-{region "§3 Calibration et mise a echelle"}
-// 🎯 4. CALIBRATION (Zone RETAIN)
-IF BtnCalibrate AND NOT LastCalibrate THEN
-    IF RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000 THEN
-        NeutralXMem := RawX;
-        NeutralYMem := RawY;
-    ELSE
-        ErrorIdCause := ErrorIdCause OR 16#0001;   // bit0 : echec calibration
-    END_IF;
-END_IF;
-LastCalibrate := BtnCalibrate;
-
-// 🧮 MISE À L'ÉCHELLE (deadband)
-ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
-ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
-AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);
-AxisCmdX.AtNeutral := AtNeutral;
-AxisCmdY.AtNeutral := AtNeutral;
-
-// 🛡️ SURVEILLANCE CAPTEUR CONTINUE (AF08 §5bis)
+{region "S0 CAUSES + SOCLE (appele AVANT le gate)"}
+// 🎯 CAUSES exprimées en CLAIR (liste ST_FbCause) — plus de bitfield WORD.
+//    - CalibFail : fault à acquitter (IsWarning=FALSE).
+//    - RawOutOfRange / BusLost : warning auto-effacés (décision utilisateur).
+//    Interlock sur la cause brute ; le socle gère latch/reset/textes.
 RawOutOfRange := (RawX &lt; (0 - RawOutOfRangeMargin))
               OR (RawX &gt; (10000 + RawOutOfRangeMargin))
               OR (RawY &lt; (0 - RawOutOfRangeMargin))
               OR (RawY &gt; (10000 + RawOutOfRangeMargin));
-IF RawOutOfRange THEN
-    ErrorIdCause := ErrorIdCause OR 16#0002;    // bit1 : capteur hors plage
-ELSE
-    ErrorIdCause := ErrorIdCause AND (NOT 16#0002);
+BusLost := (NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational);
+
+// Calibration : un front (BtnCalibrate) hors zone -&gt; fault. La cause reste active tant que les
+// axes sont HORS zone valide [2000..8000] : Reset ne l'acquitte que si la cause a disparu
+// (interlock socle sur la cause brute). Effacée par un Reset avec axes en zone.
+IF BtnCalibrate AND NOT LastCalibrate THEN
+    IF RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000 THEN
+        NeutralXMem := RawX;       // memorisation nouvelle position neutre X
+        NeutralYMem := RawY;       // memorisation nouvelle position neutre Y
+        CalibFail := FALSE;        // calibration valide : plus de cause
+    ELSE
+        CalibFail := TRUE;         // échec : cause fault (persistante tant que hors zone)
+    END_IF;
+END_IF;
+LastCalibrate := BtnCalibrate;
+// Ré-acquisition de la cause (front Reset + cause disparue) : n'efface la cause QUE si les
+// axes sont revenus en zone valide. Reste laté tant que hors zone (interlock sur cause brute).
+IF Reset AND (RawX &gt;= 2000 AND RawX &lt;= 8000 AND RawY &gt;= 2000 AND RawY &lt;= 8000) THEN
+    CalibFail := FALSE;
+END_IF;
+
+// Remplissage de la LISTE de causes pour le socle (index 0..2)
+// Cause en clair (Active/IsWarning/Texte) ; 3 causes fixes.
+instCauses[0].Active := CalibFail;     instCauses[0].IsWarning := FALSE;
+instCauses[0].Texte := 'Echec recalage neutre joystick (RawX/Y hors zone)';
+instCauses[1].Active := RawOutOfRange; instCauses[1].IsWarning := TRUE;
+instCauses[1].Texte := 'Capteur joystick hors plage ADC';
+instCauses[2].Active := BusLost;       instCauses[2].IsWarning := TRUE;
+instCauses[2].Texte := 'Perte liaison bus CAN joystick';
+
+// Appel du socle TOUJOURS (meme si le gate RETURN ensuite) : la cause bus doit etre vue.
+instFbStatus(Enable := Enable, Reset := Reset, Causes := instCauses);
+Status := instFbStatus.Status;
+Error := Status.Error;        // miroir (source de verite = socle)
+ErrorId := Status.ErrorId;    // miroir
+
+// Disponibilite = Enable + bus OK + pas de defaut. Un warning ne rend PAS indisponible.
+Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT Error;
+{endregion}
+
+{region "S1 Gate securite (neutralisation pipeline, n efface pas le statut)"}
+// 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
+IF NOT Enable OR BusLost THEN
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
+    AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0;
+    AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
+    SpeedXPct := 0.0; DirectionX := 0;
+    SpeedYPct := 0.0; DirectionY := 0;
+    Button := FALSE;
+    AtNeutral := TRUE;
+    DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;
+    ArmingPermitDenied := FALSE;
+    NeutralHoldTimer(IN := FALSE, PT := NeutralHoldTime);
+    DeadmanArmTimer(IN := FALSE, PT := DeadmanArmHoldTime);
+    DeadmanArmGraceTimer(IN := FALSE, PT := DeadmanArmGraceTime);
+    NeutralXAct := NeutralXMem;
+    NeutralYAct := NeutralYMem;
+    RETURN;
 END_IF;
 {endregion}
 
-{region "§4 Arming homme-mort"}
+{region "S2 Acquisition bouton + mise a l echelle"}
+Button := RawButton;
+
+// Mise a l'echelle (deadband) - le neutre s'evalue sur les 2 axes
+ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
+ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
+AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic - position centrale
+{endregion}
+
+{region "S5 Armement homme mort"}
+// Bouton homme-mort : armement par MAINTIEN (DeadmanArmHoldTime), independant de la position.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
 IF NOT RawButton THEN DeadmanArmPending := FALSE; END_IF;
 
-// SÉCURITÉ (AC1) : armement uniquement si ArmingPermit accordé
-DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit,
-                PT := DeadmanArmHoldTime);
+// Securite : armage UNIQUEMENT si DeadmanArmPending ET ArmingPermit.
+DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit, PT := DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
     DeadmanArmPending := FALSE;
 END_IF;
 
-// WARNING "armement non permis" (AC2)
+// Désarmement externe immédiat : le retrait d'ArmingPermit (changement de mode, fin de cycle
+// benne) désarme TOUT DE SUITE le geste — pas d'armement résiduel "surprise" à la ré-acquisition.
+IF NOT ArmingPermit THEN
+    DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;
+END_IF;
+
+// Avertissement "armage non autorise" (niveau, pendant l'appui non autorise)
 ArmingPermitDenied := RawButton AND NOT ArmingPermit;
 
-// Désarmement par neutre prolongé (après grâce)
+// Desarmage par maintien au neutre (apres grace)
 DeadmanArmGraceTimer(IN := DeadmanArmed, PT := DeadmanArmGraceTime);
-NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q,
-                 PT := NeutralHoldTime);
+NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q, PT := NeutralHoldTime);
 IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 {endregion}
 
-{region "§6 Pipeline axe X"}
+{region "S6 Pipeline axe X"}
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
+
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdX.SpeedRef := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
-IF CmdXVal &gt; 0.1 THEN
-    AxisCmdX.DirectionNegative := FALSE; AxisCmdX.DirectionPositive := TRUE;
-ELSIF CmdXVal &lt; -0.1 THEN
-    AxisCmdX.DirectionNegative := TRUE; AxisCmdX.DirectionPositive := FALSE;
-ELSE
-    AxisCmdX.DirectionNegative := FALSE; AxisCmdX.DirectionPositive := FALSE;
-END_IF;
+
+AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
+AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
+AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
+IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedRef := 0.0; END_IF;
+
+// Miroirs
+SpeedXPct := AxisCmdX.SpeedRef;
+IF AxisCmdX.DirectionPositive THEN DirectionX := 1;
+ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
+ELSE DirectionX := 0; END_IF;
 {endregion}
 
-{region "§7 Pipeline axe Y"}
+{region "S7 Pipeline axe Y et sorties"}
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
+
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdY.SpeedRef := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
-IF CmdYVal &gt; 0.1 THEN
-    AxisCmdY.DirectionNegative := FALSE; AxisCmdY.DirectionPositive := TRUE;
-ELSIF CmdYVal &lt; -0.1 THEN
-    AxisCmdY.DirectionNegative := TRUE; AxisCmdY.DirectionPositive := FALSE;
-ELSE
-    AxisCmdY.DirectionNegative := FALSE; AxisCmdY.DirectionPositive := FALSE;
-END_IF;
-{endregion}
 
-{region "§8 Statut socle"}
-// 🧩 SOCLE DE STATUT STANDARD — remplit Status
-WarningMask := 0;   // tous les bits restent en ErrorId (comportement joystick inchangé)
-ErrorIdCause := ErrorIdCause;
-JoystickErrorTexts[0] := 'Echec calibration joystick (RawX/Y hors zone)';
-JoystickErrorTexts[1] := 'Capteur joystick hors plage ADC';
-JoystickErrorTexts[2] := 'Perte liaison bus CAN joystick';
-JoystickWarningTexts[1] := 'Capteur joystick hors plage ADC (warning)';
-JoystickWarningTexts[2] := 'Perte liaison bus CAN joystick (warning)';
+AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
+AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
+AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
+IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedRef := 0.0; END_IF;
 
-instFbStatus(Enable := Enable, Reset := Reset,
-             ErrorIdCause := ErrorIdCause, WarningMask := WarningMask,
-             ErrorTexts := JoystickErrorTexts, WarningTexts := JoystickWarningTexts);
-Status := instFbStatus.Status;
-Ready := NOT Status.Error;
-Status.Busy := FALSE; Status.Done := FALSE;
+// Miroirs
+SpeedYPct := AxisCmdY.SpeedRef;
+IF AxisCmdY.DirectionPositive THEN DirectionY := 1;
+ELSIF AxisCmdY.DirectionNegative THEN DirectionY := -1;
+ELSE DirectionY := 0; END_IF;
+
+// Validation des sorties etat
+NeutralXAct := NeutralXMem;
+NeutralYAct := NeutralYMem;
 {endregion}
 </xhtml>
           </ST>
@@ -1058,48 +1173,18 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement défaut (jamais conditionné, §9)</xhtml>
               </documentation>
             </variable>
-            <variable name="ErrorIdCause">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES &amp; CLASSIFICATION (producteur = bloc métier) ===
---&gt; [HW]  Bits d'erreur ACTIFS (cause brute)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningMask">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] bit=1 → cette erreur est WARNING (auto) ; bit=0 → FAULT (à acquitter)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorTexts">
+            <variable name="Causes">
               <type>
                 <array>
                   <dimension lower="0" upper="15" />
                   <baseType>
-                    <derived name="STRING" />
+                    <derived name="ST_FbCause" />
                   </baseType>
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEXTES IHM (métier, indexés par bit) ===
---&gt; [CFG] Textes des erreurs (par bit)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningTexts">
-              <type>
-                <array>
-                  <dimension lower="0" upper="15" />
-                  <baseType>
-                    <derived name="STRING" />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Textes des warnings (par bit)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--- CAUSES (producteur = bloc métier, en clair) ---
+--&gt; [HW] Liste des causes (Active/IsWarning/Texte)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -1109,7 +1194,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ÉTAT &amp; SYNOPTIQUE (forme cible) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--- ÉTAT &amp; SYNOPTIQUE (forme cible) ---
 &lt;-- [STAT] FB prêt (Enable)</xhtml>
               </documentation>
             </variable>
@@ -1128,41 +1213,29 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES &amp; MEMOIRES ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--- SOUS-INSTANCES &amp; MEMOIRES ---
 * [INST] Front Reset</xhtml>
               </documentation>
             </variable>
-            <variable name="FaultEdge">
+            <variable name="Latch">
               <type>
-                <derived name="R_TRIG" />
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front apparition cause fault (ré-alarme)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut laté par cause (jusqu'au Reset)</xhtml>
               </documentation>
             </variable>
-            <variable name="FaultCause">
+            <variable name="StateAtErrorArmed">
               <type>
-                <WORD />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES ===
-. [LOC] bits Fault (cause brute)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WarningCause">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bits Warning (cause brute)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorIdLatched">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] code fault mémorisé (jusqu'au Reset)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Flag : StateAtError capturé UNE fois</xhtml>
               </documentation>
             </variable>
             <variable name="i">
@@ -1170,7 +1243,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] index de boucle (recherche du premier bit actif)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] index de parcours de la liste</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -1179,12 +1252,18 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
    🧩 FB_FbStatus — Socle de statut standard d'un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
-      (warning auto-effacé / défaut laté acquitté, textes IHM prêts).
+      à partir d'une LISTE de causes claires (ARRAY[0..15] OF ST_FbCause).
+      Plus de bitfield WORD en entrée, plus de masque, plus de tableau de
+      textes indexé par bit — le FB métier exprime ses défauts en clair.
    🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
       rempli via UNE instance de ce socle → même comportement partout.
-   🔒 Sécurité : WarningMask fail-safe (0 = tout fault à acquitter).
-      Reset TOUJOURS effectif, jamais conditionné (std §9).
-      Interlock toujours sur la cause brute, jamais sur l'acquittement.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur l'acquittement.
+      - Reset TOUJOURS effectif (std §9), jamais conditionné.
+      - IsWarning=1 → warning AUTO-EFFACÉ (ne lève jamais Error) ; IsWarning=0 → fault à acquitter (laté).
+      - une cause fault réapparue se re-lathe automatiquement (ré-alarme).
+      - une cause reclassée warning purge son latch résiduel (pas de défaut fantôme).
+      - StateAtError : capture UNIQUE au premier défaut, gelé jusqu'au Reset.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    =======================================================================</xhtml>
           </documentation>
@@ -1194,7 +1273,12 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
 {region "§1 Gate neutralisation"}
-// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr
+// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr.
+//    ⚠️ Les latches de défaut sont CONSERVÉS (décision utilisateur) : un défaut
+//    non acquitté ne doit pas être effacé silencieusement par une bascule Enable
+//    OFF→ON sans Reset (jamais de redémarrage auto après défaut). Au ré-enable,
+//    §3 relatche naturellement toute cause encore active ; un défaut laté persistant
+//    redevient visible jusqu'au Reset.
 Ready := Enable;
 IF NOT Enable THEN
     Status.Busy := FALSE; Status.Done := FALSE;
@@ -1202,73 +1286,86 @@ IF NOT Enable THEN
     Status.Warning := FALSE; Status.WarningId := 0;
     Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
     Status.ResetRequested := FALSE;
-    Status.WarningIdTxt := ''; Status.ErrorIdTxt := '';
-    ErrorIdLatched := 0; FaultCause := 0; WarningCause := 0;
+    Status.ErrorIdTxt := ''; Status.WarningIdTxt := '';
     RETURN;
 END_IF;
 Status.State := E_State.READY;
 {endregion}
 
-{region "§2 Classification des causes (exclusivité)"}
-// 2. Un bit est exclusivement warning OU fault (jamais les deux, §3bis)
-FaultCause   := ErrorIdCause AND (NOT WarningMask);  // bits fault (à acquitter)
-WarningCause := ErrorIdCause AND WarningMask;          // bits warning (auto-effacés)
-{endregion}
-
-{region "§3 Défaut laté + acquittement"}
-// 3. Front Reset : TOUJOURS effectif, jamais conditionné (std §9)
+{region "=== §2 Reset (front, toujours effectif) ==="}
+// 2. Front Reset : TOUJOURS effectif, jamais conditionné (std §9).
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    ErrorIdLatched := 0;
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+    StateAtErrorArmed := FALSE;
 END_IF;
-// 4. Ré-alarme : nouvelle apparition d'un fault non encore acquitté -&gt; relatte
-FaultEdge(CLK := (FaultCause &lt;&gt; 0));
-IF FaultEdge.Q THEN
-    ErrorIdLatched := ErrorIdLatched OR FaultCause;
-END_IF;
-// 5. Mémoire de l'état au défaut
-IF (FaultCause &lt;&gt; 0) THEN
-    Status.StateAtError := Status.State;
-END_IF;
-// 6. Sorties défaut : ErrorId = TOUS les bits (fault laté + warning auto-effacé).
-//    WarningId reste le sous-ensemble warning (affichage IHM orange).
-Status.ErrorId := ErrorIdLatched OR FaultCause OR WarningCause;
-Status.Error := (Status.ErrorId &lt;&gt; 0);
-Status.ResetRequested := (ErrorIdLatched &lt;&gt; 0);
 {endregion}
 
-{region "§4 Warning auto-effacé"}
-Status.WarningId := WarningCause;
-Status.Warning := (WarningCause &lt;&gt; 0);
-{endregion}
-
-{region "§5 Textes IHM"}
-// 8. Sélection du texte : on affiche le texte du premier bit actif (le plus bas).
-//    Parcours par boucle FOR + SHR (décalage) -&gt; on lit le bit directement, aucun masque.
-Status.ErrorIdTxt := '';
-Status.WarningIdTxt := '';
-
-// -- Texte ERROR : premier bit actif --
+{region "=== §3 Classification + latch par cause ==="}
+// 3. Parcours de la LISTE (source de vérité = cause brute Active).
+//    - IsWarning=TRUE  → warning : auto-effacé + purge d'un latch résiduel (reclassement, sans défaut fantôme).
+//    - IsWarning=FALSE → fault : laté dès qu'Active ; conservé après disparition ; re-laté s'il revient.
 FOR i := 0 TO 15 DO
-    IF (SHR(Status.ErrorId, i) AND 1) &lt;&gt; 0 THEN
-        Status.ErrorIdTxt := ErrorTexts[i];
-        EXIT;
+    IF Causes[i].IsWarning THEN
+        Latch[i] := FALSE;
+    ELSE
+        IF Causes[i].Active THEN Latch[i] := TRUE; END_IF;
     END_IF;
 END_FOR;
+{endregion}
 
-// -- Texte WARNING : premier bit actif --
+{region "=== §4 StateAtError — capture au premier défaut ==="}
+// 4. État mémorisé au moment de l'apparition du défaut (gelé jusqu'au Reset).
+IF NOT StateAtErrorArmed THEN
+    FOR i := 0 TO 15 DO
+        IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+            Status.StateAtError := Status.State;   // State déjà READY (§1)
+            StateAtErrorArmed := TRUE;
+            EXIT;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region "=== §5 Sorties Error / Warning / ResetRequested ==="}
+// 5. Sorties : ErrorId réservé aux DÉFAUTS (à acquitter) ; les warnings sont
+//    séparés dans WarningId. Un warning ne lève JAMAIS Error ni ne pollue ErrorId
+//    (décision utilisateur : un IHM qui lit ErrorId ne voit pas de faux défaut).
+Status.ErrorId := 0; Status.WarningId := 0;
+Status.Error := FALSE; Status.Warning := FALSE; Status.ResetRequested := FALSE;
 FOR i := 0 TO 15 DO
-    IF (SHR(Status.WarningId, i) AND 1) &lt;&gt; 0 THEN
-        Status.WarningIdTxt := WarningTexts[i];
-        EXIT;
+    // Défaut laté OU actif
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorId := Status.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Error := TRUE;
+        Status.ResetRequested := TRUE;
+    END_IF;
+    // Warning auto-effacé : uniquement dans WarningId (séparé de ErrorId)
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningId := Status.WarningId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Warning := TRUE;
+    END_IF;
+END_FOR;
+{endregion}
+
+{region "=== §6 Textes IHM — parcours de liste ==="}
+// 6. Sélection du texte par parcours de la LISTE (première cause active, index le plus bas).
+//    Plus de WHILE ni de masque. Hypothèse : `Causes[i].Texte` reste renseigné par l'appelant.
+Status.ErrorIdTxt := ''; Status.WarningIdTxt := '';
+FOR i := 0 TO 15 DO
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorIdTxt := Causes[i].Texte; EXIT;
+    END_IF;
+END_FOR;
+FOR i := 0 TO 15 DO
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningIdTxt := Causes[i].Texte; EXIT;
     END_IF;
 END_FOR;
 {endregion}
 
 // Busy/Done : pilotés par le FB MÉTIER (cycle propre), pas par le socle.
-// Le socle ne décide pas du cycle du FB métier — il gère Error/Warning/State/textes.
-// Un conditionneur synchrone (ex. joystick) les laisse à FALSE ; un organe à cycle
-// (treuil, séquenceur) les pilote lui-même après l'appel du socle.
+// Un conditionneur synchrone (joystick) les laisse à FALSE ; un organe à cycle les pilote lui-même.
 </xhtml>
           </ST>
         </body>
@@ -1293,6 +1390,7 @@ END_FOR;
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="FB_FbStatus" ObjectId="4ced8a0d-966a-58f2-989d-6c7942c5f7a8" />
+          <Object Name="ST_FbCause" ObjectId="e181848e-e3f7-5266-a2aa-b519fd91dabc" />
           <Object Name="ST_FbStatus" ObjectId="06c92900-1ebd-5fc9-b098-483d32a7b08a" />
           <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
         </Folder>

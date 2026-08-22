@@ -2,12 +2,18 @@
    🧩 FB_FbStatus — Socle de statut standard d'un FB métier
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
-      (warning auto-effacé / défaut laté acquitté, textes IHM prêts).
+      à partir d'une LISTE de causes claires (ARRAY[0..15] OF ST_FbCause).
+      Plus de bitfield WORD en entrée, plus de masque, plus de tableau de
+      textes indexé par bit — le FB métier exprime ses défauts en clair.
    🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
       rempli via UNE instance de ce socle → même comportement partout.
-   🔒 Sécurité : WarningMask fail-safe (0 = tout fault à acquitter).
-      Reset TOUJOURS effectif, jamais conditionné (std §9).
-      Interlock toujours sur la cause brute, jamais sur l'acquittement.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur l'acquittement.
+      - Reset TOUJOURS effectif (std §9), jamais conditionné.
+      - IsWarning=1 → warning AUTO-EFFACÉ (ne lève jamais Error) ; IsWarning=0 → fault à acquitter (laté).
+      - une cause fault réapparue se re-lathe automatiquement (ré-alarme).
+      - une cause reclassée warning purge son latch résiduel (pas de défaut fantôme).
+      - StateAtError : capture UNIQUE au premier défaut, gelé jusqu'au Reset.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
    ======================================================================= *)
 
@@ -17,33 +23,29 @@ VAR_INPUT
     Enable          : BOOL;    // --> [CMD] Autorisation générale FB
     Reset           : BOOL;    // --> [CMD] Front acquittement défaut (jamais conditionné, §9)
 
-    // === CAUSES & CLASSIFICATION (producteur = bloc métier) ===
-    ErrorIdCause    : WORD;    // --> [HW]  Bits d'erreur ACTIFS (cause brute)
-    WarningMask     : WORD;    // --> [CFG] bit=1 → cette erreur est WARNING (auto) ; bit=0 → FAULT (à acquitter)
-
-    // === TEXTES IHM (métier, indexés par bit) ===
-    ErrorTexts      : ARRAY[0..15] OF STRING;   // --> [CFG] Textes des erreurs (par bit)
-    WarningTexts    : ARRAY[0..15] OF STRING;  // --> [CFG] Textes des warnings (par bit)
+    // --- CAUSES (producteur = bloc métier, en clair) ---
+    Causes          : ARRAY[0..15] OF ST_FbCause;  // --> [HW] Liste des causes (Active/IsWarning/Texte)
 END_VAR
 VAR_OUTPUT
-    // === ÉTAT & SYNOPTIQUE (forme cible) ===
+    // --- ÉTAT & SYNOPTIQUE (forme cible) ---
     Ready           : BOOL;    // <-- [STAT] FB prêt (Enable)
     Status          : ST_FbStatus; // <-- [STAT] Statut complet (mappé 1:1 sur la sortie du bloc)
 END_VAR
 VAR
-    // === SOUS-INSTANCES & MEMOIRES ===
-    ResetEdge       : R_TRIG;  // * [INST] Front Reset
-    FaultEdge       : R_TRIG;  // * [INST] Front apparition cause fault (ré-alarme)
-
-    // === VARIABLES LOCALES ===
-    FaultCause      : WORD;    // . [LOC] bits Fault (cause brute)
-    WarningCause    : WORD;    // . [LOC] bits Warning (cause brute)
-    ErrorIdLatched  : WORD;    // . [LOC] code fault mémorisé (jusqu'au Reset)
-    i               : INT;     // . [LOC] index de boucle (recherche du premier bit actif)
+    // --- SOUS-INSTANCES & MEMOIRES ---
+    ResetEdge         : R_TRIG;              // * [INST] Front Reset
+    Latch             : ARRAY[0..15] OF BOOL;// . [LOC] Défaut laté par cause (jusqu'au Reset)
+    StateAtErrorArmed : BOOL;                // . [LOC] Flag : StateAtError capturé UNE fois
+    i                 : INT;                 // . [LOC] index de parcours de la liste
 END_VAR
 
 {region "§1 Gate neutralisation"}
-// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr
+// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr.
+//    ⚠️ Les latches de défaut sont CONSERVÉS (décision utilisateur) : un défaut
+//    non acquitté ne doit pas être effacé silencieusement par une bascule Enable
+//    OFF→ON sans Reset (jamais de redémarrage auto après défaut). Au ré-enable,
+//    §3 relatche naturellement toute cause encore active ; un défaut laté persistant
+//    redevient visible jusqu'au Reset.
 Ready := Enable;
 IF NOT Enable THEN
     Status.Busy := FALSE; Status.Done := FALSE;
@@ -51,73 +53,85 @@ IF NOT Enable THEN
     Status.Warning := FALSE; Status.WarningId := 0;
     Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
     Status.ResetRequested := FALSE;
-    Status.WarningIdTxt := ''; Status.ErrorIdTxt := '';
-    ErrorIdLatched := 0; FaultCause := 0; WarningCause := 0;
+    Status.ErrorIdTxt := ''; Status.WarningIdTxt := '';
     RETURN;
 END_IF;
 Status.State := E_State.READY;
 {endregion}
 
-{region "§2 Classification des causes (exclusivité)"}
-// 2. Un bit est exclusivement warning OU fault (jamais les deux, §3bis)
-FaultCause   := ErrorIdCause AND (NOT WarningMask);  // bits fault (à acquitter)
-WarningCause := ErrorIdCause AND WarningMask;          // bits warning (auto-effacés)
-{endregion}
-
-{region "§3 Défaut laté + acquittement"}
-// 3. Front Reset : TOUJOURS effectif, jamais conditionné (std §9)
+{region "=== §2 Reset (front, toujours effectif) ==="}
+// 2. Front Reset : TOUJOURS effectif, jamais conditionné (std §9).
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    ErrorIdLatched := 0;
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+    StateAtErrorArmed := FALSE;
 END_IF;
-// 4. Ré-alarme : nouvelle apparition d'un fault non encore acquitté -> relatte
-FaultEdge(CLK := (FaultCause <> 0));
-IF FaultEdge.Q THEN
-    ErrorIdLatched := ErrorIdLatched OR FaultCause;
-END_IF;
-// 5. Mémoire de l'état au défaut
-IF (FaultCause <> 0) THEN
-    Status.StateAtError := Status.State;
-END_IF;
-// 6. Sorties défaut : ErrorId = TOUS les bits (fault laté + warning auto-effacé).
-//    WarningId reste le sous-ensemble warning (affichage IHM orange).
-Status.ErrorId := ErrorIdLatched OR FaultCause OR WarningCause;
-Status.Error := (Status.ErrorId <> 0);
-Status.ResetRequested := (ErrorIdLatched <> 0);
 {endregion}
 
-{region "§4 Warning auto-effacé"}
-Status.WarningId := WarningCause;
-Status.Warning := (WarningCause <> 0);
-{endregion}
-
-{region "§5 Textes IHM"}
-// 8. Sélection du texte : on affiche le texte du premier bit actif (le plus bas).
-//    Parcours par boucle FOR + SHR (décalage) -> on lit le bit directement, aucun masque.
-Status.ErrorIdTxt := '';
-Status.WarningIdTxt := '';
-
-// -- Texte ERROR : premier bit actif --
+{region "=== §3 Classification + latch par cause ==="}
+// 3. Parcours de la LISTE (source de vérité = cause brute Active).
+//    - IsWarning=TRUE  → warning : auto-effacé + purge d'un latch résiduel (reclassement, sans défaut fantôme).
+//    - IsWarning=FALSE → fault : laté dès qu'Active ; conservé après disparition ; re-laté s'il revient.
 FOR i := 0 TO 15 DO
-    IF (SHR(Status.ErrorId, i) AND 1) <> 0 THEN
-        Status.ErrorIdTxt := ErrorTexts[i];
-        EXIT;
+    IF Causes[i].IsWarning THEN
+        Latch[i] := FALSE;
+    ELSE
+        IF Causes[i].Active THEN Latch[i] := TRUE; END_IF;
     END_IF;
 END_FOR;
+{endregion}
 
-// -- Texte WARNING : premier bit actif --
+{region "=== §4 StateAtError — capture au premier défaut ==="}
+// 4. État mémorisé au moment de l'apparition du défaut (gelé jusqu'au Reset).
+IF NOT StateAtErrorArmed THEN
+    FOR i := 0 TO 15 DO
+        IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+            Status.StateAtError := Status.State;   // State déjà READY (§1)
+            StateAtErrorArmed := TRUE;
+            EXIT;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region "=== §5 Sorties Error / Warning / ResetRequested ==="}
+// 5. Sorties : ErrorId réservé aux DÉFAUTS (à acquitter) ; les warnings sont
+//    séparés dans WarningId. Un warning ne lève JAMAIS Error ni ne pollue ErrorId
+//    (décision utilisateur : un IHM qui lit ErrorId ne voit pas de faux défaut).
+Status.ErrorId := 0; Status.WarningId := 0;
+Status.Error := FALSE; Status.Warning := FALSE; Status.ResetRequested := FALSE;
 FOR i := 0 TO 15 DO
-    IF (SHR(Status.WarningId, i) AND 1) <> 0 THEN
-        Status.WarningIdTxt := WarningTexts[i];
-        EXIT;
+    // Défaut laté OU actif
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorId := Status.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Error := TRUE;
+        Status.ResetRequested := TRUE;
+    END_IF;
+    // Warning auto-effacé : uniquement dans WarningId (séparé de ErrorId)
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningId := Status.WarningId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Warning := TRUE;
+    END_IF;
+END_FOR;
+{endregion}
+
+{region "=== §6 Textes IHM — parcours de liste ==="}
+// 6. Sélection du texte par parcours de la LISTE (première cause active, index le plus bas).
+//    Plus de WHILE ni de masque. Hypothèse : `Causes[i].Texte` reste renseigné par l'appelant.
+Status.ErrorIdTxt := ''; Status.WarningIdTxt := '';
+FOR i := 0 TO 15 DO
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorIdTxt := Causes[i].Texte; EXIT;
+    END_IF;
+END_FOR;
+FOR i := 0 TO 15 DO
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningIdTxt := Causes[i].Texte; EXIT;
     END_IF;
 END_FOR;
 {endregion}
 
 // Busy/Done : pilotés par le FB MÉTIER (cycle propre), pas par le socle.
-// Le socle ne décide pas du cycle du FB métier — il gère Error/Warning/State/textes.
-// Un conditionneur synchrone (ex. joystick) les laisse à FALSE ; un organe à cycle
-// (treuil, séquenceur) les pilote lui-même après l'appel du socle.
+// Un conditionneur synchrone (joystick) les laisse à FALSE ; un organe à cycle les pilote lui-même.
 
 END_FUNCTION_BLOCK
-

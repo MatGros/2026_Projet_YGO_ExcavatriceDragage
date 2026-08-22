@@ -23,11 +23,10 @@ class TestFbInterfaceGuard(unittest.TestCase):
         standard_fbs, light_fbs, documented_exceptions, unauthorized = analyze_fb_files(REPO_ROOT)
 
         total = len(standard_fbs) + len(light_fbs) + len(documented_exceptions) + len(unauthorized)
-        self.assertEqual(total, 56, f"Attendu 56 FB au total, obtenu {total}")
-        # REX 2026-08-20 : classifieur type-aware — 5 FB à « State » domaine retirés des standard.
-        self.assertEqual(len(standard_fbs), 17, f"Attendu 17 FB standard, obtenu {len(standard_fbs)}")
+        self.assertEqual(total, 57, f"Attendu 57 FB au total, obtenu {total}")
+        self.assertEqual(len(standard_fbs), 19, f"Attendu 19 FB standard, obtenu {len(standard_fbs)}")
         self.assertEqual(len(light_fbs), 30, f"Attendu 30 FB light, obtenu {len(light_fbs)}")
-        self.assertEqual(len(documented_exceptions), 9, f"Attendu 9 exceptions, obtenu {len(documented_exceptions)}")
+        self.assertEqual(len(documented_exceptions), 8, f"Attendu 8 exceptions, obtenu {len(documented_exceptions)}")
         self.assertEqual(len(unauthorized), 0, f"Aucun FB non autorisé attendu, obtenu {len(unauthorized)}")
 
     def test_documented_exceptions_presence(self):
@@ -40,7 +39,6 @@ class TestFbInterfaceGuard(unittest.TestCase):
             "FB_Safety_EmergencyManagementOutput",
             "FB_Diag_CanOpen",
             "FB_Diag_Ethercat",
-            "FB_Joystick",
             "FB_Cycle",
             "FB_WinchOutputInterlock",
             "FB_SimBench",
@@ -58,8 +56,8 @@ class TestFbInterfaceGuard(unittest.TestCase):
             "Cloture T137 : tous les FB standard sont migres en forme cible (plus de forme a plat)",
         )
         self.assertEqual(
-            len(cible), 17,
-            "Cloture T137 : les 17 FB standard sont en forme cible (Status : ST_FbStatus)",
+            len(cible), 19,
+            "Cloture T137 : les 19 FB standard sont en forme cible (Status : ST_FbStatus)",
         )
 
 
@@ -139,8 +137,8 @@ END_FUNCTION_BLOCK
             "Cloture T137 : tous les FB standard sont migres en forme cible (plus de forme a plat)",
         )
         self.assertEqual(
-            len(cible), 17,
-            "Cloture T137 : les 17 FB standard sont en forme cible (Status : ST_FbStatus)",
+            len(cible), 19,
+            "Cloture T137 : les 19 FB standard sont en forme cible (Status : ST_FbStatus)",
         )
 
 

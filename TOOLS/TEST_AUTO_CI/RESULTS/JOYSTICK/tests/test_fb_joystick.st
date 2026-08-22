@@ -1,3 +1,20 @@
+(* =======================================================================
+   🤖 Test CI FB_Joystick (STruCpp / TEST_AUTO_CI)
+   ───────────────────────────────────────────────────────────────
+   Sémantique des erreurs (socle FB_FbStatus, liste de causes) :
+   - BusLost   (perte bus, bit 4)   = WARNING auto-effacé
+             -> Status.Warning=TRUE / bit dans Status.WarningId, JAMAIS Error
+   - RawOutOfRange (capteur, bit 1) = WARNING auto-effacé
+             -> Status.Warning=TRUE / bit dans Status.WarningId, JAMAIS Error
+   - CalibFail (échec recalage neutre) = DÉFAUT à acquitter
+             -> Status.Error=TRUE / bit dans Status.ErrorId
+   Conséquence : Error/ErrorId ne portent QUE les vrais défauts (calibration).
+   Un warning seul : Error=FALSE, Status.Warning=TRUE, bit dans Status.WarningId.
+   Direction : ST_Joystick_AxisCmd expose les bits DirectionPositive/
+   DirectionNegative/AtNeutral ; le FB expose les miroirs INT DirectionX/DirectionY
+   (-1/0/+1), dérivés de ces bits.
+   ===================================================================== *)
+
 SETUP
 VAR
     fb : FB_JOYSTICK;
@@ -40,9 +57,9 @@ TEST 'TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et 
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 60.0, 0.01, 'mouvement actif : consigne non nulle (RawX=8000, Neutral=5000)');
-    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'sens avant pendant le mouvement');
+    ASSERT_EQ(fb.DIRECTIONX, 1, 'sens avant pendant le mouvement');
     ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'RawY au neutre : axe Y reste a 0, aucun couplage entre les axes');
-    ASSERT_EQ(fb.AXISCMDY.DIRECTION, 0, 'axe Y au neutre : Direction=0');
+    ASSERT_EQ(fb.DIRECTIONY, 0, 'axe Y au neutre : DirectionY=0');
 
     (* perte du bus CAN EN PLEIN MOUVEMENT : neutralisation immediate + desarmement *)
     ADVANCE_TIME(10000000);
@@ -53,8 +70,9 @@ TEST 'TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et 
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.READY, 'bus CAN non operationnel doit bloquer Ready');
-    ASSERT_TRUE(fb.ERROR, 'perte de comm doit lever Error (AF08)');
-    ASSERT_EQ(fb.ERRORID, 16#0004, 'bit2 : HW/bus non operationnel');
+    ASSERT_FALSE(fb.ERROR, 'perte bus = Warning auto-efface, PAS un defaut a acquitter (socle FB_FbStatus)');
+    ASSERT_TRUE(fb.STATUS.WARNING, 'perte de comm doit lever un Warning (liste de causes)');
+    ASSERT_EQ(fb.STATUS.WARNINGID, 16#0004, 'bit2 : HW/bus non operationnel porte par WarningId');
     ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'sorties axe X neutralisees des la perte du bus, meme en plein mouvement');
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'consigne X coupee immediatement, pas de decel progressive');
     ASSERT_FALSE(fb.AXISCMDY.ENABLE, 'sorties axe Y aussi neutralisees (gate global, pas seulement l axe en mouvement)');
@@ -70,8 +88,9 @@ TEST 'TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et 
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_TRUE(fb.READY, 'bus revenu : FB de nouveau pret');
-    ASSERT_FALSE(fb.ERROR, 'bus revenu : Error auto-effacee sans geste operateur (categorie Info/Warning, pas un Fault a acquitter)');
-    ASSERT_EQ(fb.ERRORID, 0, 'bit2 efface automatiquement');
+    ASSERT_FALSE(fb.ERROR, 'bus revenu : pas de defaut (bus = Warning, jamais un Fault a acquitter)');
+    ASSERT_FALSE(fb.STATUS.WARNING, 'bus revenu : Warning auto-efface sans geste operateur');
+    ASSERT_EQ(fb.STATUS.WARNINGID, 0, 'bit2 efface automatiquement');
     ASSERT_FALSE(fb.DEADMANARMED, 'pas de rearmement automatique au retour du bus : nouvel appui conscient exige');
 END_TEST
 
@@ -343,7 +362,7 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 100.0, 0.01, 'RawX au max nominal (10000) : SpeedRef sature a +100');
     ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 100.0, 0.01, 'meme comportement sur l axe Y');
-    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'Direction coherente avec le signe de la consigne');
+    ASSERT_EQ(fb.DIRECTIONX, 1, 'Direction coherente avec le signe de la consigne');
 
     (* RawX/RawY au minimum nominal (0) : saturation -100 *)
     ADVANCE_TIME(10000000);
@@ -354,7 +373,7 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, -100.0, 0.01, 'RawX au min nominal (0) : SpeedRef sature a -100');
-    ASSERT_EQ(fb.AXISCMDX.DIRECTION, -1, 'Direction coherente avec le signe de la consigne');
+    ASSERT_EQ(fb.DIRECTIONX, -1, 'Direction coherente avec le signe de la consigne');
 
     (* Depassement franc au-dela de la plage ADC nominale + marge de tolerance (defaut
        capteur/cablage Hall, ex: fil coupe -> ADC fige a une valeur aberrante) : neutre +
@@ -369,7 +388,9 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'RawX=20000 (hors plage ADC + marge, defaut capteur) : neutre, PAS une saturation a pleine vitesse');
     ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'meme garde-fou sur l axe Y');
-    ASSERT_EQ(fb.ERRORID, 16#0002, 'bit1 : defaut capteur hors plage pendant fonctionnement, visible operateur');
+    ASSERT_FALSE(fb.ERROR, 'capteur hors plage = Warning, PAS un defaut a acquitter (socle FB_FbStatus)');
+    ASSERT_TRUE(fb.STATUS.WARNING, 'capteur hors plage pendant fonctionnement : leve un Warning (visible operateur)');
+    ASSERT_EQ(fb.STATUS.WARNINGID, 16#0002, 'bit1 : capteur hors plage porte par WarningId');
     ASSERT_FALSE(fb.AXISCMDX.ENABLE, 'AF08 S5bis : Enable doit tomber a FALSE comme pour la perte bus (bit2), pas seulement SpeedRef=0 -- coherence de traitement entre les 2 causes de perte de confiance');
     ASSERT_FALSE(fb.AXISCMDY.ENABLE, 'meme coherence sur l axe Y');
 
@@ -394,7 +415,8 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 100.0, 0.01, 'RawX=10200 : dans la marge de tolerance (+500), toujours saturation normale +100, pas de defaut');
-    ASSERT_EQ(fb.ERRORID, 0, 'leger depassement tolere : aucun defaut leve');
+    ASSERT_FALSE(fb.STATUS.WARNING, 'leger depassement tolere : aucun warning leve');
+    ASSERT_EQ(fb.STATUS.WARNINGID, 0, 'aucun bit warning actif');
 END_TEST
 
 TEST 'TC-P08-011 Fin de cycle benne desarme le geste par defaut'
@@ -475,7 +497,7 @@ TEST 'TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l arm
        DEADBANDRAW := 300,
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
-    ASSERT_TRUE(fb.DEADMANARMED, 'ArmingPermit maintenu : armement conserve (l'exception CLOSING Extraction est gérée par l'externe qui maintient la permission — alerte P1 : ne jamais élargir hors CLOSING Extraction)');
+    ASSERT_TRUE(fb.DEADMANARMED, 'ArmingPermit maintenu : armement conserve (exception CLOSING Extraction gere par l externe qui maintient la permission - alerte P1 : ne jamais elargir hors CLOSING Extraction)');
 END_TEST
 
 TEST 'TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes'
@@ -508,7 +530,7 @@ TEST 'TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs interme
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 80.0, 0.01, 'RawX=9000 : proportionnel, 80% -- pas seulement correct aux bornes 0/10000');
-    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'sens avant coherent');
+    ASSERT_EQ(fb.DIRECTIONX, 1, 'sens avant coherent');
     ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 0.0, 0.01, 'RawY toujours au neutre : axe Y inchange');
 
     (* RawY=300 (en-deca du neutre 5000, hors zone morte) : OutPct = (300-5000)/5000*100 = -94% *)
@@ -520,6 +542,6 @@ TEST 'TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs interme
        NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
        NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, -94.0, 0.01, 'RawY=300 : proportionnel, -94% -- pas seulement correct aux bornes 0/10000');
-    ASSERT_EQ(fb.AXISCMDY.DIRECTION, -1, 'sens arriere coherent');
+    ASSERT_EQ(fb.DIRECTIONY, -1, 'sens arriere coherent');
     ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 0.0, 0.01, 'RawX revenu au neutre : axe X inchange');
 END_TEST
