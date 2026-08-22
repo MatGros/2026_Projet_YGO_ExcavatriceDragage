@@ -28,6 +28,7 @@ import yaml
 import chronogram
 import prod_wiring
 from af_coverage import check_af_coverage, check_extra_tests
+from encapsulation_check import check_encapsulation_chain
 from html_report import render_group_report, render_html_report
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -199,12 +200,17 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
         wiring = None
         prod_instance = entry.get("prod_instance")
-        if strucpp_temp_dir is not None and prod_instance:
+        if strucpp_temp_dir is not None:
+            # Extraction des pins (verite compilateur) toujours tentee, meme sans prod_instance :
+            # build_wiring degrade proprement en pinout nu (tous les pins "non cable en
+            # production") quand prod_file est None -- c'est le seul moyen de voir la boite
+            # noire IN/OUT d'un FB pas encore instancie dans un PRG (ex: FB_Encoder au 2026-08-22).
             print(f"\r{_progress_line('cablage production')}", end="", flush=True)
             try:
                 wiring = prod_wiring.build_wiring(
                     strucpp_temp_dir / "generated.hpp", fb_name.upper(),
-                    REPO_ROOT / prod_instance["file"], prod_instance["name"],
+                    REPO_ROOT / prod_instance["file"] if prod_instance else None,
+                    prod_instance["name"] if prod_instance else None,
                     search_root=REPO_ROOT / "CODE")
             except Exception as exc:  # cablage prod = bonus, ne doit jamais casser le run
                 _log(f"[prod_wiring] indisponible pour {fb_name} : {exc}")
@@ -218,6 +224,12 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         if af_doc:
             af_warnings = check_af_coverage(REPO_ROOT / af_doc, test_file, ignore=entry.get("af_ignore"))
             extra_test_warnings = check_extra_tests(REPO_ROOT / af_doc, test_file)
+
+        try:
+            encapsulation_report = check_encapsulation_chain(sources)
+        except Exception as exc:  # bonus, ne doit jamais casser le run
+            _log(f"[encapsulation_check] indisponible pour {fb_name} : {exc}")
+            encapsulation_report = []
 
         reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
         reports_dir.mkdir(parents=True, exist_ok=True)
@@ -233,7 +245,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                                test_st_path=test_file, trace_entries=trace_entries,
                                source_paths=sources, cycle_time_ms=cycle_time_ms,
                                field_types=field_types, af_warnings=af_warnings,
-                               extra_test_warnings=extra_test_warnings, wiring=wiring)
+                               extra_test_warnings=extra_test_warnings, wiring=wiring,
+                               encapsulation_report=encapsulation_report)
 
         if json_data is not None:
             (base.with_suffix(".json")).write_text(json.dumps(json_data, indent=2), encoding="utf-8")
@@ -264,6 +277,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
         return {"ok": result.returncode == 0, "tests": tests, "report": report_path,
                 "af_warnings": af_warnings, "extra_test_warnings": extra_test_warnings,
+                "encapsulation_report": encapsulation_report,
                 "report_group": report_group, "section_kwargs": section_kwargs}
 
 
@@ -337,6 +351,18 @@ def main() -> int:
             print(f"  {_warn('WARN')}  {tc_id} attendu par l AF (type AUTO) mais absent des tests -- {intention}")
         for tc_id in res.get("extra_test_warnings", []):
             print(f"  {_warn('WARN')}  {tc_id} teste mais absent du catalogue AF (ID inconnu ou retire)")
+        encaps = res.get("encapsulation_report", [])
+        if encaps:
+            print("  -- Encapsulation (interface FB) --")
+            for e in encaps:
+                ok = not e["has_violation"]
+                tag = _c("PASS" if ok else "FAIL", ok)
+                print(f"    {tag}  {e['fb_name']:24s} IN={e['n_input']} OUT={e['n_output']} "
+                      f"IN_OUT={e['n_inout']} LOCAL={e['n_local']}")
+                for w in e["external_writes"]:
+                    print(f"        ecriture externe non declaree : {w}")
+                for g in e["gvl_refs"]:
+                    print(f"        acces GVL direct (bypass interface) : {g}")
         if res["report"] and not res.get("report_group"):
             print(f"  Rapport : {res['report']}")
     for group_name, path in group_report_paths.items():

@@ -67,6 +67,27 @@ n'est pas approprie (ex: le point reste `AUTO` au sens large mais on documente u
 temporaire) -- dans le doute, preferer la methode "Type -> N/A" ci-dessus : une seule source de
 verite (le tableau AF), rien a synchroniser entre deux fichiers.
 
+## 🔒 Encapsulation FB (bonus, non bloquant)
+
+`encapsulation_check.py` verifie, pour chaque fichier de la chaine `sources` d'une entree
+`registry.yaml` (donc le FB teste **et** ses FB enfants, sans redecouverte de dependance --
+meme chaine que celle compilee), deux choses :
+
+1. **Ecriture externe** : toute affectation (`X := ...`) dont l'identifiant de base `X` n'est
+   pas declare dans les blocs `VAR_INPUT`/`VAR_OUTPUT`/`VAR_IN_OUT`/`VAR`/`VAR_TEMP`/`VAR_STAT`
+   de ce meme FB -- un FB ne doit jamais ecrire une variable qui ne lui appartient pas.
+2. **Acces GVL direct** : toute reference `GVL_*` dans le corps executable -- un global ne doit
+   jamais entrer/sortir d'un FB autrement que par son interface declaree, meme en lecture seule.
+
+Analyse purement textuelle (pas de compilation), integree automatiquement a `run_tests.py` --
+0 violation = rien dans le rapport HTML, sinon banniere orange `⚠️ Encapsulation : ...` sous le
+FB concerne, avec le detail par fichier/variable. Usage standalone :
+
+```bash
+python TOOLS/TEST_AUTO_CI/encapsulation_check.py                 # tous les FB du registre
+python TOOLS/TEST_AUTO_CI/encapsulation_check.py FB_Joystick     # un seul FB (+ ses enfants)
+```
+
 ## 🚀 Utilisation
 
 ```bash

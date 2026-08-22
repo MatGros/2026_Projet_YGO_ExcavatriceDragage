@@ -2,7 +2,7 @@
    🕹️ FB_Joystick — Acquisition & conditionnement du geste opérateur
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Acquisition 2 axes Hall + bouton homme-mort normatif.
-             Pipeline par axe : FB_AxisScale -> FB_Filter_PT1 -> Homme-Mort -> ST_Joystick_AxisCmd.
+             Pipeline par axe : FB_AxisScale -> Homme-Mort -> ST_Joystick_AxisCmd.
    🔒 Sécurité : Armement homme-mort par maintien au neutre.
                  Désarmement sur neutre prolongé, changement mode ou fin benne.
    📤 Sorties : AxisCmdX/Y, signaux de diagnostic et miroirs maintenance.
@@ -14,7 +14,6 @@ VAR_INPUT
     // === PERMIS SÉCURITÉ & ETATS SYSTEME ===
     Enable                    : BOOL;       // --> [CMD]  Active la logique du bloc (TRUE=Autorise)
     Reset                     : BOOL;       // --> [CMD]  Acquittement defaut
-    PowerContactorEngaged     : BOOL;       // --> [SAFE] Conditions globales OK (chaine AU rearmee)
     Mode                      : E_Mode;     // --> [SAFE] Changement de mode desarme l'homme-mort
     BenneBusy                 : BOOL;       // --> [SAFE] Fin de cycle benne (front descendant) desarme l'homme-mort
     PreserveArmingAfterBucket : BOOL;       // --> [SAFE] Maintien armement pendant fermeture ExtractionSequence
@@ -33,10 +32,10 @@ VAR_INPUT
     InvertX                   : BOOL := FALSE;   // --> [CFG]  Inversion sens de l'axe X
     InvertY                   : BOOL := FALSE;   // --> [CFG]  Inversion sens de l'axe Y
     DeadbandRaw               : INT := 300;      // --> [CFG]  Zone morte en points ADC bruts (0..10000)
-    FilterTime                : TIME := T#0MS;   // --> [CFG]  Filtrage premier ordre axe
     NeutralHoldTime           : TIME := T#100MS; // --> [CFG]  Maintien continu au neutre avant desarmement
     DeadmanArmHoldTime        : TIME := T#100MS; // --> [CFG]  Appui continu bouton requis pour armer
     DeadmanArmGraceTime       : TIME := T#3S;    // --> [CFG]  Delai de grace post-armement avant desarmement neutre
+    RawOutOfRangeMargin       : INT := 500;      // --> [CFG]  Marge tolerance ADC autour des bornes nominales [0..10000] avant defaut capteur (AF08 §5bis)
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & SYNOPTIQUE ===
@@ -46,8 +45,9 @@ VAR_OUTPUT
     Button                    : BOOL;       // <-- [STAT] Bouton homme-mort filtre
 
     // === DIAGNOSTIC & ANOMALIES ===
-    Error                     : BOOL;       // <-- [DIAG] Presence anomalie
+    Error                     : BOOL;       // <-- [DIAG] Presence anomalie (miroir Status.Error)
     ErrorId                   : WORD;       // <-- [DIAG] Bit0: Echec calibration Joystick (RawX/Y hors plage)
+    Status                    : ST_FbStatus; // <-- [STAT] Statut standard complet (socle FB_FbStatus)
 
     // === CONSIGNES AXES NORMALISEES ===
     AxisCmdX                  : ST_Joystick_AxisCmd; // <-- [ACT]  Sortie normalisee axe X
@@ -70,11 +70,8 @@ VAR_IN_OUT
 END_VAR
 VAR
     // === SOUS-INSTANCES FB & TIMERS ===
-    CycleTimeCalc             : FB_CycleTime;        // * [INST] Calcul du temps de cycle reel
     ScaleX                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe X
     ScaleY                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe Y
-    FilterX                   : FB_Filter_PT1;       // * [INST] Filtre passe-bas PT1 axe X
-    FilterY                   : FB_Filter_PT1;       // * [INST] Filtre passe-bas PT1 axe Y
     ResetEdge                 : R_TRIG;              // * [INST] Detecteur front montant Reset
     DeadmanEdge               : R_TRIG;              // * [INST] Detecteur front montant Bouton homme-mort
     NeutralHoldTimer          : TON;                 // * [INST] Temporisation maintien au neutre
@@ -88,11 +85,17 @@ VAR
     LastCalibrate             : BOOL;                // . [LOC]  Memorisation etat precedent bouton calibration
     DeadmanArmPending         : BOOL;                // . [LOC]  Armement en cours d'attente de la tempo maintien
     LastMode                  : E_Mode;              // . [LOC]  Memorisation mode scan precedent pour detection changement
+    RawOutOfRange             : BOOL;                // . [LOC]  Surveillance capteur continue (AF08 §5bis) : RawX/RawY hors plage nominale+marge
+    ErrorIdCause              : WORD;                // . [LOC]  Cause brute agrégée alimentant le socle FB_FbStatus
+    WarningMask               : WORD;                // . [LOC]  Masque des erreurs classées WARNING (bit=1) ; bit=0 -> FAULT à acquitter
+    instFbStatus              : FB_FbStatus;         // * [INST] Socle de statut standard (forme cible)
+    JoystickErrorTexts        : ARRAY[0..15] OF STRING;  // . [LOC] Textes IHM des erreurs joystick (par bit)
+    JoystickWarningTexts      : ARRAY[0..15] OF STRING;  // . [LOC] Textes IHM des warnings joystick (par bit)
 END_VAR
 
 {region "§1 Gate securite"}
 // 🛑 1. GATE (Sécurités et coupures prioritaires)
-IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
+IF NOT Enable OR NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
     Ready := FALSE; Busy := FALSE; Done := FALSE;
     AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0; AxisCmdX.Direction := 0;
     AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedRef := 0.0; AxisCmdY.Direction := 0;
@@ -108,6 +111,13 @@ IF NOT Enable OR NOT PowerContactorEngaged OR NOT BusCanOpenOP.Operational OR NO
     NeutralXAct := NeutralXMem;
     NeutralYAct := NeutralYMem;
     LastMode := Mode;   // Pas de faux changement détecté à la réactivation
+    // 🔎 AF08 §3 : perte bus CAN / device non-opérationnel -> ErrorId bit2 (16#0004),
+    // Info/Warning auto-effacé dès le retour (pas un Fault à acquitter).
+    // Distingué du gate générique (Enable/PowerContactor) qui, lui, ne lève pas d'erreur.
+    IF NOT BusCanOpenOP.Operational OR NOT JoystickOP.Operational THEN
+        ErrorId := ErrorId OR 16#0004;
+        Error := TRUE;   // le gate RETURN avant le calcul "Error := (ErrorId<>0)" -> forçage explicite
+    END_IF;
     RETURN;
 END_IF;
 
@@ -123,8 +133,13 @@ IF ResetEdge.Q AND (RawX >= 2000 AND RawX <= 8000 AND RawY >= 2000 AND RawY <= 8
 END_IF;
 
 // 📥 3. ACQUISITION TIMING & BOUTON
-CycleTimeCalc();
 Button := RawButton;
+
+// 🔎 AF08 §3 : dès le retour du bus CAN / device opérationnel, le bit2 (perte HW/bus)
+// s'auto-efface (Info/Warning, pas un Fault à acquitter). Ne touche pas aux autres bits.
+IF BusCanOpenOP.Operational AND JoystickOP.Operational THEN
+    ErrorId := ErrorId AND 16#FFFB;
+END_IF;
 
 {endregion}
 
@@ -146,6 +161,22 @@ LastCalibrate := BtnCalibrate;
 ScaleX(RawIn := RawX, Neutral := NeutralXMem, DeadbandRaw := DeadbandRaw);
 ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic — position centrale (zone morte)
+
+// 🛡️ 4ter. SURVEILLANCE CAPTEUR CONTINUE (AF08 §5bis) — défaut hors plage ADC.
+// Évaluée à CHAQUE scan (pas seulement au front BtnCalibrate). Si RawX OU RawY sort de la
+// plage nominale [0..10000] + marge de tolérance, confiance perdue dans TOUT le geste :
+// neutralisation des 2 axes + ErrorId bit1 (16#0002). Cause brute évaluée en continu
+// (interlock toujours sur la cause, jamais sur l'acquittement) → ré-alarme auto si persistante.
+RawOutOfRange := (RawX < (0 - RawOutOfRangeMargin))
+              OR (RawX > (10000 + RawOutOfRangeMargin))
+              OR (RawY < (0 - RawOutOfRangeMargin))
+              OR (RawY > (10000 + RawOutOfRangeMargin));
+IF RawOutOfRange THEN
+    ErrorId := ErrorId OR 16#0002;
+ELSE
+    ErrorId := ErrorId AND 16#FFFD;
+END_IF;
+Error := (ErrorId <> 16#0000);
 
 {endregion}
 
@@ -209,17 +240,18 @@ END_IF;
 
 {region "§6 Pipeline axe X"}
 // 🕹️ 5. PIPELINE TRAITEMENT — AXE X
+// Pas de filtre : le joystick est stable et ne doit pas être ralenti (décision 2026-08-22).
+// Inversion de sens appliquée directement sur la sortie normalisée.
+// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
+// OU si le capteur est hors plage (RawOutOfRange) : confiance perdue dans tout le geste.
 IF InvertX THEN
-    FilterX(ValueIn := -ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, -ScaleX.OutPct);
 ELSE
-    FilterX(ValueIn := ScaleX.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 END_IF;
 
-// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
-CmdXVal := SEL(DeadmanArmed, 0.0, FilterX.ValueOut);
-
 // Mapping Sortie Standardisée Axe X
-AxisCmdX.Enable := TRUE;
+AxisCmdX.Enable := NOT RawOutOfRange;
 AxisCmdX.SpeedRef := CmdXVal;
 AxisCmdX.StartStop := (ABS(CmdXVal) > 0.1);
 
@@ -240,17 +272,18 @@ DirectionX := AxisCmdX.Direction;
 
 {region "§7 Pipeline axe Y et sorties"}
 // 🕹️ 6. PIPELINE TRAITEMENT — AXE Y
+// Pas de filtre : le joystick est stable et ne doit pas être ralenti (décision 2026-08-22).
+// Inversion de sens appliquée directement sur la sortie normalisée.
+// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
+// OU si le capteur est hors plage (RawOutOfRange) : confiance perdue dans tout le geste.
 IF InvertY THEN
-    FilterY(ValueIn := -ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, -ScaleY.OutPct);
 ELSE
-    FilterY(ValueIn := ScaleY.OutPct, TimeConst := FilterTime, CycleTimeS := CycleTimeCalc.CycleTimeS);
+    CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 END_IF;
 
-// Consigne forcée à 0.0 tant que le geste n'est pas armé (homme-mort)
-CmdYVal := SEL(DeadmanArmed, 0.0, FilterY.ValueOut);
-
 // Mapping Sortie Standardisée Axe Y
-AxisCmdY.Enable := TRUE;
+AxisCmdY.Enable := NOT RawOutOfRange;
 AxisCmdY.SpeedRef := CmdYVal;
 AxisCmdY.StartStop := (ABS(CmdYVal) > 0.1);
 
@@ -271,5 +304,28 @@ DirectionY := AxisCmdY.Direction;
 NeutralXAct := NeutralXMem;
 NeutralYAct := NeutralYMem;
 Done := NOT Error;
+
+// 🧩 SOCLE DE STATUT STANDARD (forme cible) — remplit Status : ST_FbStatus
+// Le joystick produit ErrorId (bit0 calib, bit1 capteur, bit2 bus). On le passe au socle
+// qui classe : WarningMask bit=1 → warning auto, bit=0 → fault à acquitter.
+// Joystick : bit0 (calib) = FAULT à acquitter ; bit1 (capteur) + bit2 (bus) = WARNING auto.
+WarningMask := 16#0006;   // bits 1+2 = warning (auto-effacés) ; bit0 = fault
+ErrorIdCause := ErrorId;
+
+// Textes IHM (par bit) — stockés dans des tableaux locaux
+JoystickErrorTexts[0] := 'Echec calibration joystick (RawX/Y hors zone)';
+JoystickErrorTexts[1] := 'Capteur joystick hors plage ADC';
+JoystickErrorTexts[2] := 'Perte liaison bus CAN joystick';
+JoystickWarningTexts[1] := 'Capteur joystick hors plage ADC (warning)';
+JoystickWarningTexts[2] := 'Perte liaison bus CAN joystick (warning)';
+
+instFbStatus(Enable := Enable, Reset := Reset,
+             ErrorIdCause := ErrorIdCause, WarningMask := WarningMask,
+             ErrorTexts := JoystickErrorTexts, WarningTexts := JoystickWarningTexts,
+             RotatePeriod := T#1S);
+Status := instFbStatus.Status;
+Error := Status.Error;      // miroir (source de vérité = socle)
+ErrorId := Status.ErrorId;    // miroir
+Ready := NOT Error;
 
 {endregion}

@@ -106,7 +106,6 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)
     _JoystickNeutralY : INT := 5000; // Point neutre axe Y (0..10000)
     _JoystickDeadbandRaw : INT := 300; // Zone morte joystick, compte brut ADC (0..10000) — bruit neutre observé ±200 → réglage direct en compte brut, 300 (marge ~1.5x le bruit mesuré)
-    _JoystickFilterTime : TIME := T#0ms; // Constante de temps filtre PT1 — 0ms = pass-through exact (voir FB_Filter_PT1.st "Si TimeConst=0, sortie=entrée")
     _JoystickAccelRate_Pct : REAL := 50.0; // Accélération rampe (%/s)
     _JoystickDecelRate_Pct : REAL := 150.0; // Décélération rampe (%/s)
     _JoystickInvertX : BOOL := FALSE; // Inversion axe X

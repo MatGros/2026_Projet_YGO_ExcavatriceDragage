@@ -306,13 +306,14 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
                         json_data: dict, text_report: str = "", test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
                         field_types=None, af_warnings=None, extra_test_warnings=None,
-                        wiring=None) -> dict:
+                        wiring=None, encapsulation_report=None) -> dict:
     """Construit le contenu d'un FB (sous-titre + warning AF + cartes de test + details
     sources) SANS l'enveloppe de page complete -- reutilise a l'identique par un rapport
     mono-FB (render_html_report) et un rapport groupe multi-FB (render_group_report)."""
     field_types = field_types or {}
     af_warnings = af_warnings or []
     extra_test_warnings = extra_test_warnings or []
+    encapsulation_report = encapsulation_report or []
     summary = json_data.get("summary", {})
     results = json_data.get("results", [])
     total = summary.get("total", len(results))
@@ -385,6 +386,38 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         <div class="af-warning-title">⚠️ {len(extra_test_warnings)} test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
         <ul>{items2}</ul>
     </div>"""
+    encapsulation_html = ""
+    if encapsulation_report:
+        n_violations = sum(1 for e in encapsulation_report if e["has_violation"])
+        rows_html = []
+        for e in encapsulation_report:
+            ok = not e["has_violation"]
+            detail = "".join(
+                f"<li>ecriture externe non declaree : <code>{_html.escape(w)}</code></li>"
+                for w in e.get("external_writes", [])
+            ) + "".join(
+                f"<li>acces GVL direct (bypass interface) : <code>{_html.escape(g)}</code></li>"
+                for g in e.get("gvl_refs", [])
+            )
+            rows_html.append(f"""
+            <tr class="encaps-row-{'pass' if ok else 'fail'}">
+                <td>{_badge(ok)}</td>
+                <td><code>{_html.escape(e['fb_name'])}</code></td>
+                <td>{e['n_input']}</td><td>{e['n_output']}</td>
+                <td>{e['n_inout']}</td><td>{e['n_local']}</td>
+                <td>{f"<ul>{detail}</ul>" if detail else "—"}</td>
+            </tr>""")
+        summary_txt = (f"⚠️ {n_violations} violation(s) sur {len(encapsulation_report)} FB de la chaine"
+                        if n_violations else
+                        f"✅ {len(encapsulation_report)} FB de la chaine, encapsulation propre (0 violation)")
+        encapsulation_html = f"""
+    <details class="encaps-details" {"open" if n_violations else ""}>
+        <summary>🔒 Encapsulation (interface FB) — {summary_txt}</summary>
+        <table class="encaps-table">
+            <thead><tr><th></th><th>FB</th><th>IN</th><th>OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Detail</th></tr></thead>
+            <tbody>{"".join(rows_html)}</tbody>
+        </table>
+    </details>"""
 
     pin_diagram_html = _render_pin_diagram(fb_name, wiring)
 
@@ -394,6 +427,7 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     </div>
     {af_warning_html}
     {pin_diagram_html}
+    {encapsulation_html}
     {"".join(cards)}
     <details>
         <summary>Fichiers source compilés ({len(sources)})</summary>
@@ -498,6 +532,14 @@ _CSS = """
     .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
     .af-warning-banner ul { margin: 0; padding-left: 20px; }
     .af-warning-banner li { margin: 3px 0; }
+    .encaps-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 10px 16px; margin: 14px 0; }
+    .encaps-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; }
+    .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .encaps-table th { text-align: left; padding: 4px 8px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 4px 8px; border-top: 1px solid var(--border); }
+    .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
+    .encaps-table ul { margin: 0; padding-left: 16px; }
     .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
         border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
     .wf-fail-band { fill: #fecaca; opacity: 0.45; }
@@ -697,11 +739,11 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
                         json_data: dict, text_report: str, test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
                         field_types=None, af_warnings=None, extra_test_warnings=None,
-                        wiring=None) -> str:
+                        wiring=None, encapsulation_report=None) -> str:
     """Rapport HTML autonome pour UN SEUL FB."""
     section = _render_fb_section(fb_name, domain, sources, json_data, text_report, test_st_path,
                                   trace_entries, source_paths, cycle_time_ms, field_types,
-                                  af_warnings, extra_test_warnings, wiring)
+                                  af_warnings, extra_test_warnings, wiring, encapsulation_report)
     exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     toc_html = _render_toc([(None, section["toc_entries"])])
     inner = f"""

@@ -253,19 +253,23 @@ convention de façon cohérente avec le reste du projet, pas seulement localemen
 Tout bloc fonctionnel (`FB_*`) relève de l'un des deux contrats d'interface socle formalisés à partir du code existant :
 
 ### 1. Contrat `light` (Calculateurs, filtres, utilitaires)
-Destiné aux blocs sans cycle de vie complexe (filtres, mises à l'échelle, convertisseurs, utilitaires purs).
-- **`VAR_INPUT`** : `Enable : BOOL;` (en `BOOL` nu hors structure).
-- **`VAR_OUTPUT`** : `Ready : BOOL;` (en `BOOL` nu hors structure).
-- **Principe** : Si `Enable = FALSE`, les sorties retombent en état neutre/sûr et `Ready := FALSE`. Aucune machine d'état ni acquittement requis.
+Destiné aux blocs **sans cycle de vie** (filtres, mises à l'échelle, convertisseurs, utilitaires purs)
+et qui **ne remontent aucun défaut** — proche d'un FC de calcul.
+- **`VAR_INPUT`** : `Enable : BOOL;` (en `BOOL` nu).
+- **`VAR_OUTPUT`** : `Ready : BOOL;` (en `BOOL` nu).
+- **Principe** : `Enable = FALSE` → sorties neutres/sûres + `Ready := FALSE`. Aucune machine d'état,
+  aucun acquittement, aucune sortie d'erreur.
+- 🚫 Un bloc qui doit **remonter un défaut** (capteur, calibration, bus) n'est **pas** `light` — c'est
+  un `standard` (voir §2).
 
-### 2. Contrat `standard` (Composants métier, séquenceurs, organes)
-Destiné aux blocs procédant à une action, portant des états d'erreur ou orchestrant un équipement.
+### 2. Contrat `standard` (Composants métier, séquenceurs, organes, devices)
+Destiné aux blocs qui **remontent un défaut** (acquittable ou non) ou pilotent un organe.
 - **`VAR_INPUT`** (socle fixe — 2 champs) :
   - `Enable : BOOL;` (en `BOOL` nu : autorisation générale).
   - `Reset : BOOL;` (en `BOOL` nu : acquittement sur front).
 - **`VAR_OUTPUT`** :
   - `Ready : BOOL;` (en `BOOL` nu).
-  - `Status : ST_FbStatus;` — **forme cible**.
+  - `Status : ST_FbStatus;` — **forme cible**, remplie via le socle `FB_FbStatus` (§3bis).
 
 > ⚠️ **`PowerContactorEngaged` n'est PAS un champ du socle `standard`.** Ce n'est pas un troisième
 > `VAR_INPUT` imposé par défaut — c'est une entrée **conditionnelle**, à ajouter **seulement** si
@@ -280,28 +284,69 @@ Destiné aux blocs procédant à une action, portant des états d'erreur ou orch
 > piloter aucun actionneur, forçait le reset du timer d'armement homme-mort pendant toute la
 > séquence de réarmement AU). Décision au cas par cas, par FB — jamais par copie du tableau.
 
-> ⏳ **Tolérance transitoire (levée à la clôture de T137)** — les FB antérieurs exposent encore ces
-> six membres **à plat** (`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` déclarés
-> individuellement en `VAR_OUTPUT`). Cette forme reste acceptée **le temps de la migration T137**,
-> et **uniquement** pour les FB existants : tout FB **nouveau** porte `Status : ST_FbStatus`.
+> ⏳ **Tolérance transitoire (levée à la clôture de T137)** — les FB antérieurs exposent encore
+> l'état/le défaut **à plat** (`Busy`, `Done`, `Error`, `ErrorId`, `State`, `StateAtError` déclarés
+> individuellement en `VAR_OUTPUT`, sans `Warning`, sans textes). Cette forme reste acceptée **le
+> temps de la migration T137** et **uniquement** pour les FB existants : tout FB **nouveau** porte
+> `Status : ST_FbStatus` (forme cible enrichie §3) rempli via `FB_FbStatus` (§3bis).
 > Ce n'est pas une seconde forme de conformité permanente — arbitrage du 2026-08-19.
 > Le guard `G315_check_fb_interface.py` reconnaît les deux formes et publie leur décompte, ce qui
 > mesure l'avancement de T137.
 
 ### 3. Structure `ST_FbStatus` (Socle transverse de statut)
-La structure `ST_FbStatus` regroupe **exactement les six membres** nécessaires au suivi synoptique et diagnostic :
+La structure `ST_FbStatus` regroupe l'état, le défaut **et** le warning d'un FB `standard`, avec les
+**textes prêts pour l'IHM** (plus besoin de conditions complexes côté affichage). Évolution **additive**
+par rapport à la forme historique (les 6 membres d'origine sont **conservés** pour ne rien casser) :
 ```pascal
 TYPE ST_FbStatus :
 STRUCT
-    Busy         : BOOL;    // 1 = Bloc en cours d'exécution
-    Done         : BOOL;    // 1 = Action terminée avec succès
-    Error        : BOOL;    // 1 = Défaut actif présent
-    ErrorId      : WORD;    // Code d'erreur bitfield / enum diagnostic
-    State        : E_State; // État courant de la machine d'état
-    StateAtError : E_State; // État mémorisé lors de l'apparition du défaut
+    // ---- membres historiques (conservés, tolérance transitoire T137) ----
+    Busy         : BOOL;         // 1 = Bloc en cours d'exécution
+    Done         : BOOL;         // 1 = Action terminée avec succès
+    Error        : BOOL;         // 1 = défaut à acquitter (laté jusqu'au Reset, ré-alarme si cause revient)
+    ErrorId      : WORD;         // code défaut courant (bitfield)
+    State        : E_State;      // état courant : DISABLED/INIT/READY/BUSY/DONE/STOPPING
+    StateAtError : E_State;      // état mémorisé au moment du défaut
+    // ---- membres ajoutés (forme cible enrichie, socle FB_FbStatus §3bis) ----
+    Warning        : BOOL;       // 1 = warning actif (auto-effacé, aucun acquittement)
+    WarningId      : WORD;       // code warning courant (bitfield)
+    WarningIdTxt   : STRING;     // texte généré depuis WarningId (prêt IHM)
+    ErrorIdTxt     : STRING;     // texte généré depuis ErrorId
+    ResetRequested : BOOL;       // 1 = un Reset est nécessaire / en cours (défaut à acquitter)
 END_STRUCT
 END_TYPE
 ```
+> 💡 Le mapping IHM lis `Status.ErrorIdTxt`/`Status.WarningIdTxt` directement (textes pré-calculés),
+> et si **plusieurs** erreurs/warnings sont actifs, l'affichage **tourne toutes les 1 s** (rotation).
+
+### 3bis. `FB_FbStatus` — socle de remplissage standardisé (forme cible)
+Tout FB `standard` remplit son `Status : ST_FbStatus` **via** l'instance d'un socle unique `FB_FbStatus`
+(code et comportement standardisés, écrits une seule fois, réutilisés partout). Le bloc métier déclare
+**où vit chaque bit d'erreur** et le socle gère l'acquittement, la mémoire et la génération des textes.
+
+```pascal
+FB_FbStatus
+  IN  Enable          : BOOL;    // autorisation générale
+  IN  Reset           : BOOL;    // front acquittement (jamais conditionné, §9)
+  IN  ErrorIdCause    : WORD;    // bits d'erreur ACTIFS (cause brute)
+  IN  WarningMask     : WORD;    // bit=1 → cette erreur est WARNING (auto) ; bit=0 → FAULT (à acquitter)
+  OUT Status          : ST_FbStatus;   // mappé 1:1 sur la sortie `Status` du bloc métier
+  OUT Ready           : BOOL;    // en BOOL nu (contrat standard)
+```
+
+**Règles de catégorisation (fail-safe)** :
+- `WarningMask = 0` (défaut) → **toutes** les erreurs sont des Fault à acquitter = **sécurité maximale**.
+- On **lève un bit à 1** dans `WarningMask` pour déclarer cette erreur **Warning** (auto-effacée).
+- Un bit est **exclusivement** warning **ou** fault — jamais les deux (un seul masque → pas d'incohérence possible).
+
+**Comportement** :
+- `Warning` : s'affiche et s'efface **seul** avec la cause (`WarningIdCause`). Aucun `Reset` impliqué (§9).
+- `Error` : **laté** — reste `TRUE` même si la cause disparaît, jusqu'au front `Reset` ; ré-alarme si la cause revient.
+- `ErrorIdLatched` : code du défaut déclenchant **mémorisé** (ne disparaît pas avec la cause) → c'est la
+  mémoire nécessaire à l'acquittement.
+- `Reset` : **toujours effectif, jamais conditionné** (§9).
+- Textes : `ErrorIdTxt`/`WarningIdTxt` générés à partir de **tableaux de chaînes** indexés par le code ;
+  si **plusieurs** erreurs/warnings actifs, le texte affiché **tourne toutes les 1 s** (rotation).
 
 ---
 
