@@ -51,9 +51,10 @@ Démarche :
 1. **Mettre à jour le script** `run_troubleshooting.py` : définir l'entrée ad hoc `FB_NAME` + `ENTRY["sources"]` (DUT/enum d'abord, FB en dernier) + `ENTRY["test"]`.
 2. **Mettre à jour le test** `.st` (format `TEST '...'` + `ASSERT_*`, voir exemples dans `RESULTS/<domaine>/tests/`). Le test ne lit que les **sorties publiques** du FB (`VAR_INPUT`/`VAR_OUTPUT`/`VAR_IN_OUT`), jamais les internes.
 3. **Compiler + exécuter** :
+   ```bash
+   python TOOLS/TEST_AUTO_CI/run_tests.py
    ```
-   python TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/run_troubleshooting.py
-   ```
+
    → rapport dans `RESULTS/_TROUBLESHOOTING/reports/` + affichage PASS/FAIL par test.
 4. **Preuve** : PASS prouve le comportement attendu ; FAIL donne le message d'assertion exact (valeur attendue vs obtenue).
 

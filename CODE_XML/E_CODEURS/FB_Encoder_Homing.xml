@@ -195,8 +195,7 @@ TRUE des qu'un referencement a reussi</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
       avec les textes prêts pour l'IHM (plus de conditions complexes
-      côté affichage). Évolution ADDITIVE de la forme historique : les
-      6 membres d'origine sont conservés (tolérance transitoire T137).
+      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
    🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).

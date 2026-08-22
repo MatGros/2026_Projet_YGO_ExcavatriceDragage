@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T18:22:55.311921" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T18:22:55.311921">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_FbCause">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente (interlock sur la cause brute)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IsWarning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = warning auto-effacé ; 0 = défaut à acquitter</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Texte">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM de la cause</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e181848e-e3f7-5266-a2aa-b519fd91dabc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FbCause — Cause élémentaire d'un FB standard (socle FB_FbStatus)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
+      sans bitfield ni masque. Le FB métier remplit une liste de causes
+      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
+   🧬 Contrat : remplacer l'ancien couple WORD bitfield + tableaux de textes
+      indexés par bit par une liste lisible (maintenance, « avec une liste »).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
+      l'acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="A_COMMUN">
+          <Object Name="ST_FbCause" ObjectId="e181848e-e3f7-5266-a2aa-b519fd91dabc" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

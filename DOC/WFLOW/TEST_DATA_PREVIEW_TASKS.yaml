@@ -1,0 +1,48 @@
+# ==============================================================================
+# 🗂️ TEST CATALOGUE TÂCHES — Compatible "Data Preview" (Random Fractals Inc.)
+# ==============================================================================
+# Ouvrir ce fichier dans VS Code -> Clic-droit -> "Data Preview" ou icône grille en haut à droite.
+
+- id: "T146"
+  titre: "FB_Encoder objet codeur complet (Facade, HW & Homing)"
+  lot: "Lot 1"
+  domaine: "CODEURS"
+  criticite: "C4"
+  statut: "🔒"
+  agent: "DSH-02"
+  bloque_par: []
+  contrat: "DOC/WFLOW/CONTRACTS/TASK_CONTEXT_T146_C4_FBCODER_COMPLET.yaml"
+  description: "Regrouper tous les sous-blocs codeurs dans FB_Encoder et exposer bus ST_EncoderHw"
+
+- id: "T84"
+  titre: "Fiabilisation mesure Winch (Fenêtre 50ms)"
+  lot: "Lot 1"
+  domaine: "TREUILS"
+  criticite: "C3"
+  statut: "⏳"
+  agent: "PI-01"
+  bloque_par: []
+  contrat: "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T84.yaml"
+  description: "Filtrage et fenêtre 50ms sur mesure vitesse/position treuils"
+
+- id: "T81"
+  titre: "Assistants Kobold maintenance (FB_DiveSearch)"
+  lot: "Lot 2"
+  domaine: "CYCLE"
+  criticite: "C2"
+  statut: "⏳"
+  agent: "PI-01"
+  bloque_par: []
+  contrat: "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T81.yaml"
+  description: "Séquence recherche contact fond avec capteur Kobold"
+
+- id: "T240"
+  titre: "Idée / Nouvelle feature utilisateur (Exemple)"
+  lot: "Lot 15"
+  domaine: "SUPERVISION"
+  criticite: "C1"
+  statut: "⬜"
+  agent: "—"
+  bloque_par: ["T146"]
+  contrat: "DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T240.yaml"
+  description: "Exemple de tâche ajoutée pendant qu'un agent travaille sans le perturber"

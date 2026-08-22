@@ -147,8 +147,9 @@ END_VAR
 // === 🪨 §1 INTENTION MAINTENANCE & ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick.
-    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+    // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick (miroir DirectionY,
+    // dérivé des bits DirectionPositive/Negative du struct ST_Joystick_AxisCmd).
+    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
     CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
 
@@ -426,7 +427,7 @@ ELSE
     ELSE
         // Mode Joystick Maître
         IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
-            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
             M1LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
         ELSE
             M1LogicRequestDirection := 0;
@@ -470,7 +471,7 @@ ELSE
         ELSE
             // Mode Joystick Maître
             IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
-                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
                 M2LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
             ELSE
                 M2LogicRequestDirection := 0;

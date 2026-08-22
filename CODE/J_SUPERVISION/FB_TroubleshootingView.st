@@ -523,8 +523,22 @@ GVL_Troubleshooting.Joystick.RawX             := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.Joystick.RawY             := HwIn.Operator.JoyYRaw_ANA2;
 GVL_Troubleshooting.Joystick.DeflectionX_Pct  := JoystickHMI.State.AxisCmdX.SpeedRef;
 GVL_Troubleshooting.Joystick.DeflectionY_Pct  := JoystickHMI.State.AxisCmdY.SpeedRef;
-GVL_Troubleshooting.Joystick.DirectionX        := JoystickHMI.State.AxisCmdX.Direction;
-GVL_Troubleshooting.Joystick.DirectionY        := JoystickHMI.State.AxisCmdY.Direction;
+// Direction exprimée en bits (ST_Joystick_AxisCmd) : conversion locale bits→INT (-1/0/+1),
+// car ici on lit le struct (JoystickHMI.State.AxisCmdX/Y), pas le miroir FB DirectionX/Y.
+IF JoystickHMI.State.AxisCmdX.DirectionPositive THEN
+    GVL_Troubleshooting.Joystick.DirectionX := 1;
+ELSIF JoystickHMI.State.AxisCmdX.DirectionNegative THEN
+    GVL_Troubleshooting.Joystick.DirectionX := -1;
+ELSE
+    GVL_Troubleshooting.Joystick.DirectionX := 0;
+END_IF;
+IF JoystickHMI.State.AxisCmdY.DirectionPositive THEN
+    GVL_Troubleshooting.Joystick.DirectionY := 1;
+ELSIF JoystickHMI.State.AxisCmdY.DirectionNegative THEN
+    GVL_Troubleshooting.Joystick.DirectionY := -1;
+ELSE
+    GVL_Troubleshooting.Joystick.DirectionY := 0;
+END_IF;
 
 {endregion}
 

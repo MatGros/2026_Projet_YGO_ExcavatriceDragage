@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-21T23:53:28.756269" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-21T23:53:28.756269">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T18:16:22.963931" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T18:16:22.963931">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1661,8 +1661,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : regroupe l'état, le défaut et le warning d'un FB standard,
       avec les textes prêts pour l'IHM (plus de conditions complexes
-      côté affichage). Évolution ADDITIVE de la forme historique : les
-      6 membres d'origine sont conservés (tolérance transitoire T137).
+      côté affichage). Évolution additive : les 6 membres d'origine sont conservés.
    🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
       rempli via le socle `FB_FbStatus` (même comportement partout).
    ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
@@ -2764,8 +2763,9 @@ front descendant Kobold</xhtml>
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick.
-    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+    // Direction déjà mise à l'échelle (-1/0/+1) par instJoystick (miroir DirectionY,
+    // dérivé des bits DirectionPositive/Negative du struct ST_Joystick_AxisCmd).
+    CoupledUserRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
     CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0);
 
@@ -3043,7 +3043,7 @@ ELSE
     ELSE
         // Mode Joystick Maître
         IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 1) THEN
-            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+            M1LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
             M1LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
         ELSE
             M1LogicRequestDirection := 0;
@@ -3087,7 +3087,7 @@ ELSE
         ELSE
             // Mode Joystick Maître
             IF (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated = 2) THEN
-                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.AxisCmdY.Direction;
+                M2LogicRequestDirection := PRG_02_Acquisition.instJoystick.DirectionY;
                 M2LogicRequestSpeedRef_Pct  := ABS(PRG_02_Acquisition.instJoystick.AxisCmdY.SpeedRef);
             ELSE
                 M2LogicRequestDirection := 0;
