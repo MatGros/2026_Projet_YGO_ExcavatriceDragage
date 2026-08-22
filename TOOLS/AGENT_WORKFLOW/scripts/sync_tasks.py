@@ -510,74 +510,15 @@ def save_tasks_html(tasks, output_path: Path):
                 <button class="btn-action btn-save" onclick="copyExportText()">📋 Copier le YAML</button>
                 <button class="btn-action btn-primary" onclick="downloadExportFile()">💾 Enregistrer directement dans TASKS.yaml</button>
             </div>
-
         </div>
     </div>
 
-
-
     <script>
-
         // Base officielle ultra-rapide et stable
         const defaultTasks = {tasks_json};
         let tasks = [...defaultTasks];
         let hasUnsavedChanges = false;
 
-
-        function parseYamlTasks(yamlText) {{
-            const lines = yamlText.split('\\n');
-            const result = [];
-            let current = null;
-            let currentField = null;
-
-            for (let rawLine of lines) {{
-                const line = rawLine.replace(/\\r$/, '');
-                if (/^\\s*-\\s+id:\\s*"([^"]+)"/.test(line)) {{
-                    if (current) result.push(current);
-                    current = {{
-                        id: line.match(/^\\s*-\\s+id:\\s*"([^"]+)"/)[1],
-                        parent_id: '',
-                        statut: '⬜',
-                        criticite: 'C2',
-                        domaine: 'GÉNÉRAL',
-                        agent: '—',
-                        date: '2026-08-22T00:00:00',
-                        titre: '',
-                        contexte: '',
-                        description: '',
-                        contrat: '',
-                        objectifs: [],
-                        bloque_par: []
-                    }};
-                    currentField = null;
-                    continue;
-                }}
-                if (!current) continue;
-
-                const kv = line.match(/^\\s+([a-zA-Z0-9_]+):\\s*(.*)$/);
-                if (kv) {{
-                    const key = kv[1];
-                    let val = kv[2].trim();
-                    currentField = key;
-                    if (val.startsWith('"') && val.endsWith('"') && val.length >= 2) {{
-                        val = val.substring(1, val.length - 1).replace(/\\\\"/g, '"');
-                    }}
-                    if (key === 'objectifs' || key === 'bloque_par') {{
-                        if (val === '[]') current[key] = [];
-                    }} else {{
-                        current[key] = val;
-                    }}
-                    continue;
-                }}
-
-                const itemMatch = line.match(/^\\s+-\\s+"(.*)"$/);
-                if (itemMatch && currentField && Array.isArray(current[currentField])) {{
-                    current[currentField].push(itemMatch[1].replace(/\\\\"/g, '"'));
-                }}
-            }}
-            if (current) result.push(current);
-            return result;
-        }}
 
 
 
