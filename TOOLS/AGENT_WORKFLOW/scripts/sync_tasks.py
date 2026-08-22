@@ -648,13 +648,8 @@ def save_tasks_html(tasks, output_path: Path):
     </div>
 
 
-    <!-- Toast Notification Flottante -->
-    <div id="toast" style="display:none; position:fixed; top:20px; right:20px; z-index:9999; background:#50fa7b; color:#000; padding:12px 20px; border-radius:8px; font-weight:bold; font-size:14px; box-shadow:0 4px 20px rgba(0,0,0,0.5); align-items:center; gap:10px;">
-        <span>✅</span>
-        <span id="toast-msg">Synchronisation effective : TASKS.yaml mis à jour avec succès !</span>
-    </div>
-
     <!-- Modal d'Exportation des Données -->
+
     <div class="modal-overlay" id="export-modal">
         <div class="modal-box" style="width: 600px;">
             <div class="modal-title">
@@ -1101,17 +1096,6 @@ def save_tasks_html(tasks, output_path: Path):
             alert('📋 Contenu TASKS.yaml copié dans le presse-papier !');
         }}
 
-        function showToast(msg) {{
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-msg');
-            if (!toast || !msgEl) return;
-            msgEl.innerText = msg;
-            toast.style.display = 'inline-flex';
-            setTimeout(() => {{
-                toast.style.display = 'none';
-            }}, 3500);
-        }}
-
         let savedFileHandle = null;
 
         async function downloadExportFile() {{
@@ -1127,10 +1111,9 @@ def save_tasks_html(tasks, output_path: Path):
                     hasUnsavedChanges = false;
                     updateSyncIndicator();
                     document.getElementById('export-modal').style.display = 'none';
-                    showToast('🎉 Synchronisation effective : TASKS.yaml mis à jour avec succès !');
                     return;
                 }} catch (e) {{
-                    savedFileHandle = null; // En cas d'erreur de permission, réinitialiser
+                    savedFileHandle = null;
                 }}
             }}
 
@@ -1144,7 +1127,6 @@ def save_tasks_html(tasks, output_path: Path):
                             accept: {{ 'text/yaml': ['.yaml', '.yml'] }}
                         }}]
                     }});
-                    // L'utilisateur a choisi et validé le fichier dans Windows :
                     const writable = await handle.createWritable();
                     await writable.write(yamlText);
                     await writable.close();
@@ -1153,16 +1135,14 @@ def save_tasks_html(tasks, output_path: Path):
                     hasUnsavedChanges = false;
                     updateSyncIndicator();
                     document.getElementById('export-modal').style.display = 'none';
-                    showToast('🎉 Synchronisation effective : TASKS.yaml mis à jour avec succès !');
                     return;
                 }} catch (err) {{
                     if (err.name === 'AbortError') {{
-                        return; // Annulation utilisateur : on laisse le voyant rouge et on ne ferme pas
+                        return;
                     }}
                     console.warn('Fallback téléchargement :', err);
                 }}
             }}
-
 
             // 3. Fallback téléchargement direct classique
             const blob = new Blob([yamlText], {{ type: 'text/yaml;charset=utf-8' }});
@@ -1178,8 +1158,8 @@ def save_tasks_html(tasks, output_path: Path):
             hasUnsavedChanges = false;
             updateSyncIndicator();
             document.getElementById('export-modal').style.display = 'none';
-            showToast('📥 Fichier TASKS.yaml téléchargé avec succès !');
         }}
+
 
 
 
