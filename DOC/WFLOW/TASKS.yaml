@@ -663,20 +663,6 @@ tasks:
     objectifs: []
     bloque_par: []
 
-  - id: "T74"
-    parent_id: ""
-    statut: "⬜"
-    criticite: "C4"
-    domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-07-20T08:00:00"
-    titre: "Translation : temporiser escalade PowerCutOf..."
-    contexte: "Intitulé complet : Translation : temporiser escalade PowerCutOff sur LimitSwitch"
-    description: "FB_Safety_Translation.st"
-    contrat: ""
-    objectifs: []
-    bloque_par: []
-
   - id: "T81"
     parent_id: ""
     statut: "⏳"
