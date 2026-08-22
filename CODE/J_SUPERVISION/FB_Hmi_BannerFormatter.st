@@ -44,6 +44,7 @@ VAR_INPUT
     DescendPermit        : BOOL; // --> [SAFE] Agrégat M1/M2 par AND
     AscentPermit         : BOOL; // --> [SAFE] Agrégat M1/M2 par AND
     BucketIsOpen         : BOOL;   // --> [HW] Benne ouverte
+    BucketIsClosed       : BOOL;   // --> [HW] Benne fermee (montee non bridée)
     DiveActive           : BOOL;   // --> [HW] Plongée active
     TopLimitReached      : BOOL; // --> [SAFE] Agrégat M1/M2 par OR — toute limite haute affichée
     CoupledUserRequestDirection : INT;   // --> [CMD] Direction demandée couplée
@@ -313,6 +314,10 @@ ELSIF NOT BucketIsOpen AND CurrentDirection < 0 THEN
     OperatorActionCandidate := '[BENNE] Ouvrir la benne';
 ELSIF TopLimitReached AND CurrentDirection > 0 THEN
     OperatorActionCandidate := '[TREUIL] Limite haute';
+ELSIF NOT BucketIsClosed AND CurrentDirection > 0 THEN
+    // Sécurité : benne mal fermée (branche/caillou) → montee bridee palier 1 pour eviter un choc
+    // si la benne se refermait d'un coup en montant vite.
+    OperatorActionCandidate := '[BENNE] Benne non fermee - montee bridee palier 1 (securite)';
 ELSIF NOT DeadmanArmed THEN
     OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF CurrentMode = E_Mode.DISABLE THEN
