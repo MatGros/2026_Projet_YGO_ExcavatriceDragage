@@ -1094,20 +1094,39 @@ def save_tasks_html(tasks, output_path: Path):
             alert('📋 Contenu TASKS.yaml copié dans le presse-papier !');
         }}
 
+        let savedFileHandle = null;
+
         async function downloadExportFile() {{
             const yamlText = generateYamlText();
 
-            // Si le navigateur / VS Code autorise l'accès direct aux fichiers
+
+            // 1. Si on a déjà un handle ouvert, on écrit directement dedans sans ouvrir de fenêtre !
+            if (savedFileHandle) {{
+                try {{
+                    const writable = await savedFileHandle.createWritable();
+                    await writable.write(yamlText);
+                    await writable.close();
+                    localStorage.removeItem('TASK_VIEWER_UNSAVED');
+                    hasUnsavedChanges = false;
+                    updateSyncIndicator();
+                    alert('✅ Fichier TASKS.yaml mis à jour directement sur votre disque !');
+                    return;
+                }} catch (e) {{
+                    savedFileHandle = null; // En cas d'erreur de permission, réinitialiser
+                }}
+            }}
+
+            // 2. Si File System Access API est supportée
             if ('showSaveFilePicker' in window) {{
                 try {{
-                    const handle = await window.showSaveFilePicker({{
+                    savedFileHandle = await window.showSaveFilePicker({{
                         suggestedName: 'TASKS.yaml',
                         types: [{{
                             description: 'Fichier YAML des Tâches',
                             accept: {{ 'text/yaml': ['.yaml', '.yml'] }}
                         }}]
                     }});
-                    const writable = await handle.createWritable();
+                    const writable = await savedFileHandle.createWritable();
                     await writable.write(yamlText);
                     await writable.close();
                     localStorage.removeItem('TASK_VIEWER_UNSAVED');
@@ -1116,28 +1135,29 @@ def save_tasks_html(tasks, output_path: Path):
                     alert('✅ Fichier TASKS.yaml enregistré directement sur votre disque !');
                     return;
                 }} catch (err) {{
-                    // Si l'utilisateur clique sur "Annuler" dans Windows, ON S'ARRÊTE SANS RIEN TOUCHER
                     if (err.name === 'AbortError') {{
-                        return; // Le voyant rouge reste allumé !
+                        return; // Annulation utilisateur : on laisse le voyant rouge
                     }}
-
+                    console.warn('Fallback téléchargement :', err);
                 }}
-            }} else {{
-                // Fallback classique (si le navigateur ne supporte pas File System API)
-                const blob = new Blob([yamlText], {{ type: 'text/yaml;charset=utf-8' }});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'TASKS.yaml';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                localStorage.removeItem('TASK_VIEWER_UNSAVED');
-                hasUnsavedChanges = false;
-                updateSyncIndicator();
             }}
+
+            // 3. Fallback téléchargement direct classique
+            const blob = new Blob([yamlText], {{ type: 'text/yaml;charset=utf-8' }});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'TASKS.yaml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            localStorage.removeItem('TASK_VIEWER_UNSAVED');
+            hasUnsavedChanges = false;
+            updateSyncIndicator();
+            alert('📥 Fichier TASKS.yaml téléchargé dans vos Téléchargements !');
         }}
+
 
 
 
