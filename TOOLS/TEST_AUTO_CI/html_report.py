@@ -27,10 +27,11 @@ def parse_test_checks(test_st_path) -> dict:
     return out
 
 
-def _badge(passed: bool) -> str:
+def _badge(passed: bool, strong: bool = False) -> str:
     cls = "pass" if passed else "fail"
     label = "PASS" if passed else "FAIL"
-    return f'<span class="badge badge-{cls}">{label}</span>'
+    extra = " badge-strong" if strong else ""
+    return f'<span class="badge badge-{cls}{extra}">{label}</span>'
 
 
 def _failure_block(failure: dict) -> str:
@@ -301,8 +302,10 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
     checks_by_test = parse_test_checks(test_st_path) if test_st_path else {}
 
+    fb_slug = re.sub(r"[^a-zA-Z0-9]+", "-", fb_name).strip("-").lower()
     cards = []
-    for r in results:
+    toc_entries = []
+    for i, r in enumerate(results):
         name = r.get("name", "")
         passed_r = r.get("passed", False)
         info = checks_by_test.get(name, {"checks": [], "comments": []})
@@ -312,8 +315,11 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
         chrono_html = _render_chronogram(name, trace_entries or [], cycle_time_ms, field_types, passed_r)
 
+        anchor = f"test-{fb_slug}-{i}"
+        toc_entries.append((anchor, name, passed_r))
+
         cards.append(f"""
-        <article class="test-card test-card-{'pass' if passed_r else 'fail'}">
+        <article id="{anchor}" class="test-card test-card-{'pass' if passed_r else 'fail'}">
             <header>
                 {_badge(passed_r)}
                 <h3>{_html.escape(name)}</h3>
@@ -385,6 +391,7 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     return {
         "fb_name": fb_name, "domain": domain, "all_pass": all_pass,
         "passed": passed, "total": total, "body_html": body_html,
+        "toc_entries": toc_entries,
     }
 
 
@@ -399,15 +406,21 @@ _CSS = """
     body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 0;
         background: var(--bg); color: var(--text); line-height: 1.5; }
     .page { max-width: 1400px; margin: 0 auto; padding: 32px 24px 64px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start;
-        margin-bottom: 6px; gap: 16px; }
+    .header { display: flex; justify-content: flex-start; align-items: center;
+        margin-bottom: 6px; gap: 14px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 10px; padding: 16px 18px; }
     h1 { font-size: 22px; margin: 0; font-weight: 600; }
+    .header .badge, .fb-section-title .badge { font-size: 14px; padding: 5px 14px; }
     .subtitle { color: var(--muted); font-size: 13px; margin: 4px 0 24px; }
     .subtitle b { color: var(--text); font-weight: 600; }
     .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-weight: 600;
         font-size: 11px; letter-spacing: 0.3px; }
     .badge-pass { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
     .badge-fail { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
+    /* Sur fond de page pastel (meme teinte que badge-pass/fail), le badge se fondrait --
+       variante foncee/opaque pour les badges de titre (header, sommaire FB) qui ressortent. */
+    .badge-pass.badge-strong { background: var(--green-text); color: #ffffff; border-color: var(--green-text); }
+    .badge-fail.badge-strong { background: var(--red-text); color: #ffffff; border-color: var(--red-text); }
     details { margin-bottom: 20px; }
     summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
     summary:hover { color: var(--text); }
@@ -501,8 +514,23 @@ _CSS = """
     .pin-more { color: var(--muted); font-size: 10px; }
     .pin-row-unwired { background: #fffbeb; }
     .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
-        font-weight: 600; margin: 30px 0 10px; padding-top: 14px; border-top: 1px solid var(--border); }
-    .fb-section-title:first-of-type { border-top: none; padding-top: 0; margin-top: 6px; }
+        font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 10px; }
+    .fb-section-title:first-of-type { margin-top: 6px; }
+    .toc-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin-bottom: 16px; }
+    .toc-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .toc-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; margin: 12px 0 4px; }
+    .toc-group-title:first-of-type { margin-top: 10px; }
+    .toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+    .toc-item { font-size: 12.5px; padding: 2px 0; break-inside: avoid; }
+    .toc-item a { text-decoration: none; color: var(--text); }
+    .toc-item a:hover { text-decoration: underline; }
+    .toc-item::before { content: "●"; font-size: 8px; margin-right: 6px; }
+    .toc-pass::before { color: var(--green-text); }
+    .toc-fail::before { color: var(--red-text); }
+    .toc-fail a { color: var(--red-text); font-weight: 600; }
 """
 
 
@@ -523,14 +551,19 @@ function copyPinExpr(el) {
 """
 
 
-def _page_shell(title: str, inner_html: str) -> str:
-    """Enveloppe de page commune (mono-FB ou groupe) -- CSS partage via _CSS."""
+def _page_shell(title: str, inner_html: str, all_pass: bool = True) -> str:
+    """Enveloppe de page commune (mono-FB ou groupe) -- CSS partage via _CSS. Fond de page
+    pastel (vert/rouge tres attenue) selon le verdict global -- repere visuel immediat sans
+    avoir a lire le badge, sans etre agressif (mêmes tons --green-bg/--red-bg que les badges)."""
+    bg = "#ecfdf5" if all_pass else "#fef2f2"
     return f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <title>{_html.escape(title)}</title>
-<style>{_CSS}</style>
+<style>{_CSS}
+    body {{ background: {bg}; }}
+</style>
 </head>
 <body>
 <div class="page">
@@ -615,6 +648,30 @@ def _render_pin_diagram(fb_name: str, wiring: dict | None) -> str:
     </details>"""
 
 
+def _render_toc(groups: list) -> str:
+    """Sommaire cliquable en haut de page -- groups : [(titre_ou_None, [(anchor,name,passed),...]), ...].
+    titre_ou_None : None pour un rapport mono-FB (pas de sous-titre repete), sinon le nom du FB
+    (rapport groupe, un sous-titre par FB)."""
+    total = sum(len(entries) for _title, entries in groups)
+    if total == 0:
+        return ""
+    parts = []
+    for title, entries in groups:
+        if title:
+            parts.append(f'<div class="toc-group-title">{_html.escape(title)}</div>')
+        items = "".join(
+            f'<li class="toc-item toc-{"pass" if passed else "fail"}">'
+            f'<a href="#{anchor}">{_html.escape(name)}</a></li>'
+            for anchor, name, passed in entries
+        )
+        parts.append(f"<ul class='toc-list'>{items}</ul>")
+    return f"""
+    <details class="toc-details" open>
+        <summary>📋 Sommaire ({total} test{'s' if total > 1 else ''})</summary>
+        {"".join(parts)}
+    </details>"""
+
+
 def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
                         json_data: dict, text_report: str, test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
@@ -625,15 +682,17 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
                                   trace_entries, source_paths, cycle_time_ms, field_types,
                                   af_warnings, extra_test_warnings, wiring)
     exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    toc_html = _render_toc([(None, section["toc_entries"])])
     inner = f"""
     <div class="header">
         <h1>{_html.escape(fb_name)}</h1>
         {_badge(section['all_pass'])}
     </div>
     <div class="exec-time">{exec_time}</div>
+    {toc_html}
     {section['body_html']}"""
     title = f"Rapport de test — {fb_name} [{'PASS' if section['all_pass'] else 'FAIL'}]"
-    return _page_shell(title, inner)
+    return _page_shell(title, inner, all_pass=section["all_pass"])
 
 
 def render_group_report(group_name: str, fb_sections: list) -> str:
@@ -653,12 +712,15 @@ def render_group_report(group_name: str, fb_sections: list) -> str:
     <div class="fb-section-title">{_html.escape(s['fb_name'])} {_badge(s['all_pass'])}</div>
     {s['body_html']}""")
 
+    toc_html = _render_toc([(s["fb_name"], s["toc_entries"]) for s in sections])
+
     inner = f"""
     <div class="header">
         <h1>{_html.escape(group_name)}</h1>
         {_badge(all_pass)}
     </div>
     <div class="exec-time">{n_pass}/{len(sections)} FB OK · {exec_time}</div>
+    {toc_html}
     {"".join(body_parts)}"""
     title = f"Rapport de test — {group_name} [{'PASS' if all_pass else 'FAIL'}]"
-    return _page_shell(title, inner)
+    return _page_shell(title, inner, all_pass=all_pass)

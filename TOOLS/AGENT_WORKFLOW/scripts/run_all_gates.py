@@ -60,6 +60,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "350", "G350 — Collision noms HW (REX 2026-08-05)",       [sys.executable, f"{S}/G350_check_hw_name_collision.py", "."]),
     ("C", "360", "G360 — Interlock changement de sens (REX 2026-08-05)", [sys.executable, f"{S}/G360_check_direction_change_interlock.py", "."]),
     ("C", "370", "G370 — Cablage position calibree (REX 2026-08-06)", [sys.executable, f"{S}/G370_check_position_calibration_wiring.py", "."]),
+    ("C", "375", "G375 — Gate homme-mort mouvement (AF08 TC-P08-008)", [sys.executable, f"{S}/G375_check_deadman_arming_gate.py", "."]),
     ("A", "110", "G110 — Nommage IEC (NC-010 a NC-070, informatif)", [sys.executable, f"{S}/G110_check_naming_style.py", "CODE"]),
     ("C", "380", "G380 — Persistance config",                       [sys.executable, f"{S}/G380_check_config_persistence.py", "."]),
     ("C", "390", "G390 — Fraicheur bundle",                         [sys.executable, f"{S}/G390_check_bundle_freshness.py", "."]),
