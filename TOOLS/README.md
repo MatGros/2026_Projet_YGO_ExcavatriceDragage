@@ -21,7 +21,8 @@ TOOLS/
 ├── LINTER_ST/               # Linter ST CODESYS 3.5 (STruCpp vendoré, 100% encapsulé)
 │   ├── resolve_deps.py       # Résolveur de dépendances (types/FB) autonome
 │   ├── lint.py                # Orchestrateur : deps → conversion → compile → diagnostics JSON
-│   └── bin/win32-x64/         # strucpp.exe vendoré (copie propre)
+│   ├── bin/win32-x64/         # strucpp.exe vendoré (copie propre)
+│   └── vscode-extension/      # Extension VSCode : diagnostics live dans Problems (F5 pour tester)
 ├── COMPILER_ST2C_STruCpp/   # PoC compilation FB en C++17 pour tests boîte noire (STruCpp)
 ├── PROJECT_WORKSPACE/       # Environnement de travail du projet (AGY, Claude, Codex, OpenCode, Gates, Graph)
 │   ├── README.md             # Documentation et guide (terminaux VS Code)

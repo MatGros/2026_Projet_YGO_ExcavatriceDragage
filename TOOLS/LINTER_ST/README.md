@@ -77,7 +77,48 @@ avalé silencieusement. Vérifié empiriquement (session 2026-08-23, typo `INT_I
 - Binaire `strucpp.exe` vendoré = version figée. Mise à jour manuelle si besoin (voir
   [releases STruCpp](https://github.com/Autonomy-Logic/STruCpp/releases)).
 
+## 🖥️ Extension VSCode (`vscode-extension/`)
+
+Diagnostics live dans le panneau **Problems** à chaque sauvegarde d'un `.st` — pas de LSP, une
+extension simple (`vscode.languages.createDiagnosticCollection`) qui appelle `lint.py` en
+sous-processus. Un canal **Output → "Linter ST"** trace les analyses incomplètes (dépendance non
+résolue) sans jamais afficher de fausse alerte.
+
+### Tester en mode debug (F5)
+
+```powershell
+cd TOOLS/LINTER_ST/vscode-extension
+npm install
+npm run compile
+```
+
+Puis dans VSCode : **File → Open Folder** sur `TOOLS/LINTER_ST/vscode-extension/`, appuyer sur
+**F5** → ouvre une fenêtre "Extension Development Host" avec le linter actif et le projet complet
+chargé (racine du repo, pour que `CODE/` soit visible). Ouvrir un `.st`, sauvegarder (`Ctrl+S`) →
+les erreurs apparaissent dans Problems.
+
+### Installer en permanent (`.vsix`)
+
+```powershell
+npm install -g @vscode/vsce
+cd TOOLS/LINTER_ST/vscode-extension
+vsce package
+```
+
+Puis dans VSCode : `Ctrl+Shift+P` → **Extensions: Install from VSIX...** → sélectionner le
+`.vsix` généré.
+
+### Réglages (`Ctrl+,` → chercher "Linter ST")
+
+| Réglage | Défaut | Rôle |
+|---|---|---|
+| `linterSt.pythonPath` | `python` | Interpréteur Python utilisé pour lancer `lint.py` |
+| `linterSt.codeRoot` | `CODE` | Racine des sources ST, relative au workspace ouvert |
+
 ## 🗺️ Roadmap
 
-- **Lot 2** : extension VSCode (diagnostics live dans Problems panel à la sauvegarde) — pas
-  encore implémenté.
+- ✅ **Lot 1** : CLI Python (`resolve_deps.py`, `lint.py`) — fait, validé sur 7 FB réels.
+- ✅ **Lot 2** : extension VSCode (diagnostics live) — squelette fonctionnel, compile sans
+  erreur. Reste à tester en conditions réelles dans l'éditeur (F5) avant adoption.
+- Si le besoin de feedback à la frappe (pas juste à la sauvegarde) se confirme → migrer vers un
+  vrai LSP Python (`pygls`), pas anticipé pour l'instant.
