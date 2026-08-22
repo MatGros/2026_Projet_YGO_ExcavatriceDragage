@@ -42,6 +42,7 @@ function lintDocument(doc: vscode.TextDocument, context: vscode.ExtensionContext
     const config = vscode.workspace.getConfiguration('linterSt');
     const pythonPath = config.get<string>('pythonPath', 'python');
     const codeRootSetting = config.get<string>('codeRoot', 'CODE');
+    const lintScriptSetting = config.get<string>('lintScriptPath', 'TOOLS/LINTER_ST/lint.py');
 
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(doc.uri);
     if (!workspaceFolder) {
@@ -49,9 +50,17 @@ function lintDocument(doc: vscode.TextDocument, context: vscode.ExtensionContext
         return;
     }
 
-    // lint.py se trouve un niveau au-dessus de ce dossier extension (TOOLS/LINTER_ST/lint.py) --
-    // outil 100% encapsule, aucune dependance vers d'autres dossiers de TOOLS/.
-    const lintScript = path.join(context.extensionPath, '..', 'lint.py');
+    // lint.py est resolu relativement au WORKSPACE ouvert, pas au dossier d'installation de
+    // l'extension (context.extensionPath) : une fois installee via .vsix, l'extension tourne
+    // depuis ~/.vscode/extensions/... -- un dossier totalement separe du repo, qui ne contient
+    // que le TypeScript compile (le .vsix n'embarque jamais lint.py/resolve_deps.py/strucpp.exe,
+    // 58 Mo). Cet outil est fait pour UN repo precis (celui qui porte TOOLS/LINTER_ST/) : on
+    // suppose que le workspace ouvert EST ce repo, comme convert_codesys_to_iec et strucpp.exe
+    // deja verses dans TOOLS/LINTER_ST/ (bug verifie empiriquement, session 2026-08-23 : "python:
+    // can't open file '~/.vscode/extensions/lint.py'" apres install .vsix reelle).
+    const lintScript = path.isAbsolute(lintScriptSetting)
+        ? lintScriptSetting
+        : path.join(workspaceFolder.uri.fsPath, lintScriptSetting);
     const codeRoot = path.join(workspaceFolder.uri.fsPath, codeRootSetting);
 
     cp.execFile(
