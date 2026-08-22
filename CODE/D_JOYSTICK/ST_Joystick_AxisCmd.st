@@ -10,8 +10,11 @@ TYPE ST_Joystick_AxisCmd :
 STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --> [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
-    StartStop   : BOOL;   // --> [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration)
-    SpeedRef    : REAL;   // --> [CMD] Consigne vitesse signee (-100.0..+100.0 %, signe coherent avec Direction)
-    Direction   : INT;    // --> [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)
+    StartStop   : BOOL;   // --> [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)
+    SpeedRef    : REAL;   // --> [CMD] Consigne vitesse non signee (0...100 %, signe/sens donné par Direction)
+    DirectionNegative   : BOOL;   // --> [CMD] Direction joystick ou intension de gestuelle
+    DirectionPositive   : BOOL;   // --> [CMD] Direction joystick ou intension de gestuelle
+    AtNeutral   : BOOL;   // --> [CMD] TRUE si axes en zone morte (position centrale)
+    // Remplacé par bit qui donne la direction Direction   : INT;  // --> [CMD] Sens de mouvement (-1=Arriere/Descente, 0=Neutre, +1=Avant/Montee)
 END_STRUCT
 END_TYPE
