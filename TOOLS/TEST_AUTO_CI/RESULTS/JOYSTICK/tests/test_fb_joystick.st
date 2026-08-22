@@ -291,6 +291,81 @@ TEST 'TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause 
     ASSERT_FALSE(fb.ERROR, 'front Reset avec axes revenus en zone valide doit acquitter (cause disparue + appui conscient)');
 END_TEST
 
+TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    (* init explicite -- STruCpp n applique pas ":= 5000" du SETUP, cf. README limite outillage *)
+    nx := 5000; ny := 5000;
+
+    (* arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+
+    (* RawX/RawY au maximum nominal (10000) : saturation +100 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 10000, RAWY := 10000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 100.0, 0.01, 'RawX au max nominal (10000) : SpeedRef sature a +100');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 100.0, 0.01, 'meme comportement sur l axe Y');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'Direction coherente avec le signe de la consigne');
+
+    (* RawX/RawY au minimum nominal (0) : saturation -100 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 0, RAWY := 0, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, -100.0, 0.01, 'RawX au min nominal (0) : SpeedRef sature a -100');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, -1, 'Direction coherente avec le signe de la consigne');
+
+    (* Depassement franc au-dela de la plage ADC nominale (defaut capteur/cablage Hall) :
+       le garde-fou LIMIT(-100,OutPct,100) de FB_AxisScale doit clamper, jamais deborder *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 20000, RAWY := 20000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, 100.0, 0.01, 'RawX=20000 (hors plage ADC 0..10000, defaut capteur) : toujours clampe a +100, pas de debordement');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, 100.0, 0.01, 'meme garde-fou sur l axe Y');
+
+    (* Valeur negative (hors plage ADC, meme scenario defaut cablage) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, POWERCONTACTORENGAGED := TRUE,
+       MODE := E_MODE.MAINT_N1, BENNEBUSY := FALSE, PRESERVEARMINGAFTERBUCKET := FALSE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := -10000, RAWY := -10000, RAWBUTTON := FALSE, BTNCALIBRATE := FALSE,
+       INVERTX := FALSE, INVERTY := FALSE, DEADBANDRAW := 300, FILTERTIME := T#0MS,
+       NEUTRALHOLDTIME := T#100MS, DEADMANARMHOLDTIME := T#100MS, DEADMANARMGRACETIME := T#3S,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDREF, -100.0, 0.01, 'RawX negatif (hors plage ADC, defaut capteur) : toujours clampe a -100, pas de debordement');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDREF, -100.0, 0.01, 'meme garde-fou sur l axe Y');
+END_TEST
+
 TEST 'TC-P08-011 Fin de cycle benne desarme le geste par defaut'
     diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
     diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;

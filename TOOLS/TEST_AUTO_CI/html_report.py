@@ -284,7 +284,8 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
 def _render_fb_section(fb_name: str, domain: str, sources: list,
                         json_data: dict, text_report: str = "", test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
-                        field_types=None, af_warnings=None, extra_test_warnings=None) -> dict:
+                        field_types=None, af_warnings=None, extra_test_warnings=None,
+                        wiring=None) -> dict:
     """Construit le contenu d'un FB (sous-titre + warning AF + cartes de test + details
     sources) SANS l'enveloppe de page complete -- reutilise a l'identique par un rapport
     mono-FB (render_html_report) et un rapport groupe multi-FB (render_group_report)."""
@@ -359,11 +360,14 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         <ul>{items2}</ul>
     </div>"""
 
+    pin_diagram_html = _render_pin_diagram(fb_name, wiring)
+
     body_html = f"""
     <div class="subtitle">
         Domaine <b>{_html.escape(domain)}</b> · {passed}/{total} vérifications OK
     </div>
     {af_warning_html}
+    {pin_diagram_html}
     {"".join(cards)}
     <details>
         <summary>Fichiers source compilés ({len(sources)})</summary>
@@ -394,7 +398,7 @@ _CSS = """
     * { box-sizing: border-box; }
     body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 0;
         background: var(--bg); color: var(--text); line-height: 1.5; }
-    .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 32px 24px 64px; }
     .header { display: flex; justify-content: space-between; align-items: flex-start;
         margin-bottom: 6px; gap: 16px; }
     h1 { font-size: 22px; margin: 0; font-weight: 600; }
@@ -471,9 +475,51 @@ _CSS = """
     .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
     .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
     .exec-time { color: var(--muted); font-size: 12px; margin: 0 0 20px; }
+    .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 16px; margin-bottom: 16px; }
+    .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .pin-diagram { display: flex; align-items: stretch; gap: 0; margin-top: 12px; font-size: 12px; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1px; min-width: 0; }
+    .pin-block { flex: 0 0 140px; background: #eef2ff; border: 2px solid var(--accent); border-radius: 6px;
+        display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700;
+        font-size: 12px; margin: 0 10px; padding: 8px; align-self: stretch; color: var(--accent); }
+    .pin-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; border-bottom: 2px dashed #94a3b8;
+        min-width: 0; }
+    /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
+    .pin-col-in .pin-row { justify-content: flex-end; text-align: right; }
+    /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
+    .pin-col-out .pin-row { justify-content: flex-start; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 600; white-space: nowrap; color: var(--text); }
+    .pin-type { color: var(--muted); font-weight: 400; font-size: 10px; }
+    .pin-tag { font-size: 9px; background: #ddd6fe; color: #5b21b6; border-radius: 4px; padding: 1px 4px; margin-left: 4px; }
+    .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .pin-expr code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 11px;
+        cursor: pointer; }
+    .pin-expr code:hover { background: #e2e8f0; }
+    .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
+    .pin-missing { color: #b45309; font-style: italic; font-size: 11px; }
+    .pin-more { color: var(--muted); font-size: 10px; }
+    .pin-row-unwired { background: #fffbeb; }
     .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
         font-weight: 600; margin: 30px 0 10px; padding-top: 14px; border-top: 1px solid var(--border); }
     .fb-section-title:first-of-type { border-top: none; padding-top: 0; margin-top: 6px; }
+"""
+
+
+_COPY_JS = """
+function copyPinExpr(el) {
+    var text = el.getAttribute('title') || el.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    el.classList.add('pin-copied');
+    setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
 """
 
 
@@ -490,19 +536,94 @@ def _page_shell(title: str, inner_html: str) -> str:
 <div class="page">
 {inner_html}
 </div>
+<script>{_COPY_JS}</script>
 </body>
 </html>
 """
 
 
+def _render_pin_diagram(fb_name: str, wiring: dict | None) -> str:
+    """Bloc pinout FBD-like : pins IN/IN_OUT a gauche, OUT a droite, autour d'un rectangle
+    central portant le nom du FB. L'interface (liste/type/ordre des pins) vient exclusivement
+    du compilateur (generated.hpp, via prod_wiring.extract_pins) -- jamais du .st. Le cablage
+    affiche a cote de chaque pin (expression reelle en production) vient du point
+    d'instanciation .st -- seule source qui la connaisse. Non bloquant : degrade en pinout nu
+    si aucun cablage de production n'est configure/trouve."""
+    if not wiring or not any(wiring.get("pins", {}).values()):
+        return ""
+
+    pins = wiring["pins"]
+    call_args = wiring.get("call_args", {})
+    output_usages = wiring.get("output_usages", {})
+    unwired_inputs = set(wiring.get("unwired_inputs", []))
+    unwired_outputs = set(wiring.get("unwired_outputs", []))
+    orphan_args = wiring.get("orphan_args", [])
+
+    def _in_row(name: str, ftype: str, tag: str = "") -> str:
+        key = name.upper()
+        wired = call_args.get(key)
+        cls = "pin-row-unwired" if key in unwired_inputs else "pin-row-wired"
+        expr_html = (f'<code title="{_html.escape(wired)}" onclick="copyPinExpr(this)">{_html.escape(wired)}</code>'
+                     if wired else "<span class='pin-missing'>⚠ non câblé en production</span>")
+        tag_html = f"<span class='pin-tag'>{tag}</span>" if tag else ""
+        # Nom du pin en dernier -> reste colle au bloc (colonne IN justifiee a droite)
+        return f"""<div class="pin-row {cls}">
+            <div class="pin-expr">{expr_html}</div>
+            <div class="pin-name">{_html.escape(name)}{tag_html} <span class="pin-type">{_html.escape(ftype)}</span></div>
+        </div>"""
+
+    def _out_row(name: str, ftype: str) -> str:
+        key = name.upper()
+        usages = output_usages.get(key)
+        cls = "pin-row-unwired" if key in unwired_outputs else "pin-row-wired"
+        if usages:
+            file_label, ctx = usages[0]
+            first = _html.escape(f"{file_label}: {ctx}" if file_label else ctx)
+            more = f" <span class='pin-more'>(+{len(usages) - 1})</span>" if len(usages) > 1 else ""
+            expr_html = f'<code title="{first}" onclick="copyPinExpr(this)">{first}</code>{more}'
+        else:
+            expr_html = "<span class='pin-missing'>⚠ jamais lu en production</span>"
+        # Nom du pin en premier -> reste colle au bloc (colonne OUT justifiee a gauche)
+        return f"""<div class="pin-row {cls} pin-row-out">
+            <div class="pin-name">{_html.escape(name)} <span class="pin-type">{_html.escape(ftype)}</span></div>
+            <div class="pin-expr">{expr_html}</div>
+        </div>"""
+
+    left_html = "".join(_in_row(n, t) for n, t in pins["inputs"])
+    left_html += "".join(_in_row(n, t, tag="IN_OUT") for n, t in pins["in_out"])
+    right_html = "".join(_out_row(n, t) for n, t in pins["outputs"])
+
+    warnings_html = ""
+    n_warn = len(unwired_inputs) + len(unwired_outputs) + len(orphan_args)
+    if n_warn:
+        items = "".join(f"<li>Pin <code>{_html.escape(p)}</code> jamais câblé en production</li>" for p in sorted(unwired_inputs | unwired_outputs))
+        items += "".join(f"<li>Argument <code>{_html.escape(p)}</code> câblé en production mais absent de l'interface (interface modifiée ?)</li>" for p in orphan_args)
+        warnings_html = f"""<div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ {n_warn} écart(s) interface ↔ câblage production</div>
+            <ul>{items}</ul>
+        </div>"""
+
+    return f"""
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        {warnings_html}
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in">{left_html}</div>
+            <div class="pin-block">{_html.escape(fb_name)}</div>
+            <div class="pin-col pin-col-out">{right_html}</div>
+        </div>
+    </details>"""
+
+
 def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
                         json_data: dict, text_report: str, test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
-                        field_types=None, af_warnings=None, extra_test_warnings=None) -> str:
+                        field_types=None, af_warnings=None, extra_test_warnings=None,
+                        wiring=None) -> str:
     """Rapport HTML autonome pour UN SEUL FB."""
     section = _render_fb_section(fb_name, domain, sources, json_data, text_report, test_st_path,
                                   trace_entries, source_paths, cycle_time_ms, field_types,
-                                  af_warnings, extra_test_warnings)
+                                  af_warnings, extra_test_warnings, wiring)
     exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     inner = f"""
     <div class="header">

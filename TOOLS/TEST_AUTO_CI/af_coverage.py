@@ -55,22 +55,29 @@ def extract_test_ids(test_st_text: str) -> set:
     return ids
 
 
-def check_af_coverage(af_doc_path, test_st_path) -> list:
+def check_af_coverage(af_doc_path, test_st_path, ignore=None) -> list:
     """Retourne [(id, intention), ...] pour chaque ID de type AUTO/AUTO_PLC/SITE+AUTO du
     catalogue AF absent des tests. Jamais d'exception : AF/doc illisible -> liste vide (le
-    coverage-check est un bonus, pas une dependance dure du pipeline)."""
+    coverage-check est un bonus, pas une dependance dure du pipeline).
+
+    `ignore` : ID explicitement hors perimetre de CE fichier de test (ex: un point de
+    validation qui teste en realite la reaction d'un AUTRE FB consommateur -- responsabilite
+    unique, cf. registry.yaml). Toujours une decision humaine explicite et documentee (raison
+    en commentaire dans registry.yaml), jamais une omission silencieuse : l'ID reste visible
+    dans le catalogue AF, seul le WARN de CE FB est supprime."""
     try:
         af_text = af_doc_path.read_text(encoding="utf-8")
         test_text = test_st_path.read_text(encoding="utf-8")
     except OSError:
         return []
 
+    ignore = set(ignore or [])
     catalog = parse_af_catalog(af_text)
     tested_ids = extract_test_ids(test_text)
 
     missing = []
     for tc_id, type_str, intention in catalog:
-        if "AUTO" in type_str and tc_id not in tested_ids:
+        if "AUTO" in type_str and tc_id not in tested_ids and tc_id not in ignore:
             missing.append((tc_id, intention))
     return missing
 

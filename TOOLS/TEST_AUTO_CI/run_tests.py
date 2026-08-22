@@ -25,6 +25,7 @@ import tempfile
 import yaml
 
 import chronogram
+import prod_wiring
 from af_coverage import check_af_coverage, check_extra_tests
 from html_report import render_group_report, render_html_report
 
@@ -175,11 +176,23 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                 _log(f"[chronogram] indisponible pour {fb_name} : {exc}")
                 trace_entries, field_types = [], {}
 
+        wiring = None
+        prod_instance = entry.get("prod_instance")
+        if strucpp_temp_dir is not None and prod_instance:
+            try:
+                wiring = prod_wiring.build_wiring(
+                    strucpp_temp_dir / "generated.hpp", fb_name.upper(),
+                    REPO_ROOT / prod_instance["file"], prod_instance["name"],
+                    search_root=REPO_ROOT / "CODE")
+            except Exception as exc:  # cablage prod = bonus, ne doit jamais casser le run
+                _log(f"[prod_wiring] indisponible pour {fb_name} : {exc}")
+                wiring = None
+
         af_warnings = []
         extra_test_warnings = []
         af_doc = entry.get("af_doc")
         if af_doc:
-            af_warnings = check_af_coverage(REPO_ROOT / af_doc, test_file)
+            af_warnings = check_af_coverage(REPO_ROOT / af_doc, test_file, ignore=entry.get("af_ignore"))
             extra_test_warnings = check_extra_tests(REPO_ROOT / af_doc, test_file)
 
         reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
@@ -196,7 +209,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                                test_st_path=test_file, trace_entries=trace_entries,
                                source_paths=sources, cycle_time_ms=cycle_time_ms,
                                field_types=field_types, af_warnings=af_warnings,
-                               extra_test_warnings=extra_test_warnings)
+                               extra_test_warnings=extra_test_warnings, wiring=wiring)
 
         if json_data is not None:
             (base.with_suffix(".json")).write_text(json.dumps(json_data, indent=2), encoding="utf-8")
