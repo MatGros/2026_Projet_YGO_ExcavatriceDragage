@@ -1116,24 +1116,29 @@ def save_tasks_html(tasks, output_path: Path):
                     alert('✅ Fichier TASKS.yaml enregistré directement sur votre disque !');
                     return;
                 }} catch (err) {{
-                    if (err.name === 'AbortError') return;
-                }}
-            }}
+                    // Si l'utilisateur clique sur "Annuler" dans Windows, ON S'ARRÊTE SANS RIEN TOUCHER
+                    if (err.name === 'AbortError') {{
+                        return; // Le voyant rouge reste allumé !
+                    }}
 
-            // Fallback classique : téléchargement automatique
-            const blob = new Blob([yamlText], {{ type: 'text/yaml;charset=utf-8' }});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'TASKS.yaml';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            localStorage.removeItem('TASK_VIEWER_UNSAVED');
-            hasUnsavedChanges = false;
-            updateSyncIndicator();
+                }}
+            }} else {{
+                // Fallback classique (si le navigateur ne supporte pas File System API)
+                const blob = new Blob([yamlText], {{ type: 'text/yaml;charset=utf-8' }});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'TASKS.yaml';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                localStorage.removeItem('TASK_VIEWER_UNSAVED');
+                hasUnsavedChanges = false;
+                updateSyncIndicator();
+            }}
         }}
+
 
 
 
