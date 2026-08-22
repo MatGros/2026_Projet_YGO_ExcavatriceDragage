@@ -518,35 +518,11 @@ def save_tasks_html(tasks, output_path: Path):
 
     <script>
 
-        // Chargement direct et dynamique depuis TASKS.yaml
+        // Base officielle ultra-rapide et stable
         const defaultTasks = {tasks_json};
         let tasks = [...defaultTasks];
         let hasUnsavedChanges = false;
 
-        // Fonction de chargement dynamique depuis TASKS.yaml
-        async function loadFromYamlFile() {{
-            try {{
-                const res = await fetch('TASKS.yaml?' + new Date().getTime());
-                if (res.ok) {{
-                    const text = await res.text();
-                    const parsed = parseYamlTasks(text);
-                    if (parsed && parsed.length > 0) {{
-                        tasks = parsed;
-                        hasUnsavedChanges = false;
-                        updateSyncIndicator();
-                        render();
-                        return;
-                    }}
-                }}
-            }} catch(e) {{
-                console.warn('Chargement dynamique non disponible (mode local direct file://) :', e);
-            }}
-            // Fallback base injectée
-            tasks = [...defaultTasks];
-            hasUnsavedChanges = false;
-            updateSyncIndicator();
-            render();
-        }}
 
         function parseYamlTasks(yamlText) {{
             const lines = yamlText.split('\\n');
@@ -1139,10 +1115,12 @@ def save_tasks_html(tasks, output_path: Path):
             render();
         }}
 
-        loadFromYamlFile();
+        render();
+        updateSyncIndicator();
     </script>
 </body>
 </html>
+
 
 """
 
