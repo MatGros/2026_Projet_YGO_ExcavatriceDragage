@@ -18,6 +18,37 @@ FB_Joystick:
     - CODE/D_JOYSTICK/FB_Joystick.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/JOYSTICK/tests/test_fb_joystick.st
 
+FB_CycleTime:
+  domain: A_COMMUN
+  report_group: A_COMMUN
+  sources:
+    - CODE/A_COMMUN/FB_CycleTime.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_cycletime.st
+
+FB_Ramp:
+  domain: A_COMMUN
+  report_group: A_COMMUN
+  sources:
+    - CODE/A_COMMUN/FB_Ramp.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_ramp.st
+
+FB_Acquisition_Preflight:
+  domain: A_COMMUN
+  report_group: A_COMMUN
+  sources:
+    - CODE/A_COMMUN/FB_Acquisition_Preflight.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_acquisition_preflight.st
+
+FB_Brake:
+  domain: A_COMMUN
+  report_group: A_COMMUN
+  sources:
+    - CODE/A_COMMUN/E_State.st
+    - CODE/A_COMMUN/ST_FbStatus.st
+    - CODE/A_COMMUN/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_Brake.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_brake.st
+
 FB_Safety_EmergencyManagement:
   domain: AU_SECURITE
   af_doc: DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md

@@ -390,113 +390,154 @@ _CSS = """
         --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
         --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
         --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
-    }}
-    * {{ box-sizing: border-box; }}
-    body {{ font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 0;
-        background: var(--bg); color: var(--text); line-height: 1.5; }}
-    .page {{ max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }}
-    .header {{ display: flex; justify-content: space-between; align-items: flex-start;
-        margin-bottom: 6px; gap: 16px; }}
-    h1 {{ font-size: 22px; margin: 0; font-weight: 600; }}
-    .subtitle {{ color: var(--muted); font-size: 13px; margin: 4px 0 24px; }}
-    .subtitle b {{ color: var(--text); font-weight: 600; }}
-    .badge {{ display: inline-block; padding: 3px 10px; border-radius: 999px; font-weight: 600;
-        font-size: 11px; letter-spacing: 0.3px; }}
-    .badge-pass {{ background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }}
-    .badge-fail {{ background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }}
-    details {{ margin-bottom: 20px; }}
-    summary {{ cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }}
-    summary:hover {{ color: var(--text); }}
-    ul {{ font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }}
-    .test-card {{ background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 16px 18px; margin-bottom: 12px; }}
-    .test-card-fail {{ border-color: var(--red-border); }}
-    .test-card header {{ display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }}
-    .test-card h3 {{ font-size: 14px; margin: 0; font-weight: 600; }}
-    .comment {{ font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }}
-    .checks {{ margin-top: 8px; }}
-    .checks-label {{ font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        color: var(--muted); font-weight: 600; }}
-    .checks ul {{ list-style: none; padding-left: 0; margin-top: 6px; }}
-    .checks li {{ font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }}
-    .checks li::before {{ content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }}
-    .failure {{ margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
-        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }}
-    .failure-head {{ color: var(--red-text); font-weight: 600; }}
-    .failure-loc {{ color: var(--muted); margin-top: 2px; font-size: 11px; }}
-    .failure-msg {{ color: #92400e; margin-top: 4px; }}
-    .failure-diff {{ margin-top: 4px; }}
-    .failure-diff code {{ background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }}
-    pre {{ background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
-        overflow-x: auto; }}
-    .chronogram-group {{ margin-top: 12px; }}
-    .chronogram-group details {{ margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
-        padding: 8px 12px; }}
-    .chronogram-group summary {{ font-size: 12px; font-weight: 600; color: var(--text); }}
-    .chrono-scroll {{ overflow-x: auto; margin-top: 8px; }}
-    .chrono-table {{ border-collapse: collapse; font-size: 11px; white-space: nowrap; }}
-    .chrono-table th, .chrono-table td {{ padding: 4px 8px; border: 1px solid var(--border); text-align: center; }}
-    .chrono-table th {{ background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }}
-    .chrono-table .scan-idx {{ color: var(--muted); font-weight: 600; }}
-    .chrono-table .scan-t {{ color: var(--muted); }}
-    .chrono-table td.changed {{ background: #fef9c3; }}
-    .v-true {{ color: var(--green-text); font-weight: 600; }}
-    .v-false {{ color: #cbd5e1; }}
-    .wf-scroll {{ overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
-        border-radius: 8px; margin-top: 8px; padding: 4px 0; }}
-    .waveform {{ display: block; }}
-    .wf-grid {{ stroke: #f1f5f9; stroke-width: 1; }}
-    .wf-time {{ font-size: 9px; fill: var(--muted); text-anchor: middle; }}
-    .wf-scan {{ font-size: 9px; fill: #cbd5e1; text-anchor: middle; }}
-    .wf-label {{ font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }}
-    .wf-line {{ fill: none; stroke-width: 2; }}
-    .wf-num-line {{ stroke: #e2e8f0; stroke-width: 1; }}
-    .wf-num {{ font-size: 10px; fill: var(--muted); text-anchor: middle; }}
-    .wf-num-changed {{ font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }}
-    .wf-chip {{ opacity: 0.95; }}
-    .wf-legend {{ font-size: 10px; fill: var(--muted); }}
-    .wf-scale {{ font-size: 9px; fill: #cbd5e1; text-anchor: end; }}
-    .af-warning-banner {{ background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
-        border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 13px; }}
-    .af-warning-banner .af-warning-title {{ font-weight: 600; margin-bottom: 6px; }}
-    .af-warning-banner ul {{ margin: 0; padding-left: 20px; }}
-    .af-warning-banner li {{ margin: 3px 0; }}
-    .chrono-fail-note {{ background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
-        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }}
-    .wf-fail-band {{ fill: #fecaca; opacity: 0.45; }}
-    .wf-fail-marker {{ font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }}
-    tr.row-fail-scan {{ background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }}
-    .chronogram-static {{ margin-top: 10px; }}
-    .chronogram-static summary {{ font-size: 11px; }}
-    .static-table {{ font-size: 12px; margin-top: 6px; border-collapse: collapse; }}
-    .static-table td {{ padding: 3px 10px; border-bottom: 1px solid var(--border); }}
-</style>
+    }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 0;
+        background: var(--bg); color: var(--text); line-height: 1.5; }
+    .page { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start;
+        margin-bottom: 6px; gap: 16px; }
+    h1 { font-size: 22px; margin: 0; font-weight: 600; }
+    .subtitle { color: var(--muted); font-size: 13px; margin: 4px 0 24px; }
+    .subtitle b { color: var(--text); font-weight: 600; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-weight: 600;
+        font-size: 11px; letter-spacing: 0.3px; }
+    .badge-pass { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .badge-fail { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
+    details { margin-bottom: 20px; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary:hover { color: var(--text); }
+    ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px 18px; margin-bottom: 12px; }
+    .test-card-fail { border-color: var(--red-border); }
+    .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
+    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks { margin-top: 8px; }
+    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; }
+    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
+    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
+        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
+    .failure-head { color: var(--red-text); font-weight: 600; }
+    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
+    .failure-msg { color: #92400e; margin-top: 4px; }
+    .failure-diff { margin-top: 4px; }
+    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
+        overflow-x: auto; }
+    .chronogram-group { margin-top: 12px; }
+    .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 12px; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
+    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
+    .chrono-table .scan-t { color: var(--muted); }
+    .chrono-table td.changed { background: #fef9c3; }
+    .v-true { color: var(--green-text); font-weight: 600; }
+    .v-false { color: #cbd5e1; }
+    .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+    .waveform { display: block; }
+    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
+    .wf-line { fill: none; stroke-width: 2; }
+    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
+    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
+    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-chip { opacity: 0.95; }
+    .wf-legend { font-size: 10px; fill: var(--muted); }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 13px; }
+    .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
+    .af-warning-banner ul { margin: 0; padding-left: 20px; }
+    .af-warning-banner li { margin: 3px 0; }
+    .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
+        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+    .wf-fail-band { fill: #fecaca; opacity: 0.45; }
+    .wf-fail-marker { font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }
+    tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
+    .chronogram-static { margin-top: 10px; }
+    .chronogram-static summary { font-size: 11px; }
+    .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
+    .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
+    .exec-time { color: var(--muted); font-size: 12px; margin: 0 0 20px; }
+    .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
+        font-weight: 600; margin: 30px 0 10px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .fb-section-title:first-of-type { border-top: none; padding-top: 0; margin-top: 6px; }
+"""
+
+
+def _page_shell(title: str, inner_html: str) -> str:
+    """Enveloppe de page commune (mono-FB ou groupe) -- CSS partage via _CSS."""
+    return f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>{_html.escape(title)}</title>
+<style>{_CSS}</style>
 </head>
 <body>
 <div class="page">
-    <div class="header">
-        <h1>{_html.escape(fb_name)}</h1>
-        {_badge(all_pass)}
-    </div>
-    <div class="subtitle">
-        Domaine <b>{_html.escape(domain)}</b> · {passed}/{total} vérifications OK
-        · <b>{exec_time}</b>
-    </div>
-    {af_warning_html}
-    {"".join(cards)}
-    <details>
-        <summary>Fichiers source compilés ({len(sources)})</summary>
-        <ul>{sources_list}</ul>
-    </details>
-    <details>
-        <summary>Code source ST original ({len(source_paths or [])})</summary>
-        {source_blocks}
-    </details>
-    <details>
-        <summary>Sortie brute strucpp</summary>
-        <pre>{_html.escape(text_report)}</pre>
-    </details>
+{inner_html}
 </div>
 </body>
 </html>
 """
+
+
+def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
+                        json_data: dict, text_report: str, test_st_path=None,
+                        trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
+                        field_types=None, af_warnings=None, extra_test_warnings=None) -> str:
+    """Rapport HTML autonome pour UN SEUL FB."""
+    section = _render_fb_section(fb_name, domain, sources, json_data, text_report, test_st_path,
+                                  trace_entries, source_paths, cycle_time_ms, field_types,
+                                  af_warnings, extra_test_warnings)
+    exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    inner = f"""
+    <div class="header">
+        <h1>{_html.escape(fb_name)}</h1>
+        {_badge(section['all_pass'])}
+    </div>
+    <div class="exec-time">{exec_time}</div>
+    {section['body_html']}"""
+    title = f"Rapport de test — {fb_name} [{'PASS' if section['all_pass'] else 'FAIL'}]"
+    return _page_shell(title, inner)
+
+
+def render_group_report(group_name: str, fb_sections: list) -> str:
+    """Rapport HTML unique regroupant PLUSIEURS FB independants (meme fiche de rapport) --
+    chaque FB garde ses propres tests/compilation/chronogramme, seule la page est commune.
+    fb_sections : liste de dict, chacun avec les memes cles que les arguments de
+    _render_fb_section (fb_name, domain, sources, json_data, text_report, test_st_path,
+    trace_entries, source_paths, cycle_time_ms, field_types, af_warnings, extra_test_warnings)."""
+    sections = [_render_fb_section(**kw) for kw in fb_sections]
+    exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    all_pass = all(s["all_pass"] for s in sections)
+    n_pass = sum(1 for s in sections if s["all_pass"])
+
+    body_parts = []
+    for s in sections:
+        body_parts.append(f"""
+    <div class="fb-section-title">{_html.escape(s['fb_name'])} {_badge(s['all_pass'])}</div>
+    {s['body_html']}""")
+
+    inner = f"""
+    <div class="header">
+        <h1>{_html.escape(group_name)}</h1>
+        {_badge(all_pass)}
+    </div>
+    <div class="exec-time">{n_pass}/{len(sections)} FB OK · {exec_time}</div>
+    {"".join(body_parts)}"""
+    title = f"Rapport de test — {group_name} [{'PASS' if all_pass else 'FAIL'}]"
+    return _page_shell(title, inner)

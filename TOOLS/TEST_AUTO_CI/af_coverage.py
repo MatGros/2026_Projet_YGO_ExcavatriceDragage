@@ -73,3 +73,20 @@ def check_af_coverage(af_doc_path, test_st_path) -> list:
         if "AUTO" in type_str and tc_id not in tested_ids:
             missing.append((tc_id, intention))
     return missing
+
+
+def check_extra_tests(af_doc_path, test_st_path) -> list:
+    """Sens inverse de check_af_coverage : retourne les ID references par des TEST du .st mais
+    absents du catalogue AF (n'importe quel type, y compris SITE) -- on teste quelque chose qui
+    n'est plus (ou jamais ete) documente dans l'AF comme point de validation. Meme garantie
+    non-bloquante/jamais-d-exception que check_af_coverage."""
+    try:
+        af_text = af_doc_path.read_text(encoding="utf-8")
+        test_text = test_st_path.read_text(encoding="utf-8")
+    except OSError:
+        return []
+
+    catalog_ids = {tc_id for tc_id, _type, _intent in parse_af_catalog(af_text)}
+    tested_ids = extract_test_ids(test_text)
+
+    return sorted(tc_id for tc_id in tested_ids if tc_id not in catalog_ids)
