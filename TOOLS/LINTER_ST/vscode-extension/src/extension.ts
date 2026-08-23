@@ -71,16 +71,30 @@ function resolveLintInvocation(workspaceFolder: vscode.WorkspaceFolder): { pytho
  * deja loguee dans Output). */
 function runLint(fsPath: string, workspaceFolder: vscode.WorkspaceFolder): Promise<LintResult | null> {
     const { pythonPath, lintScript, codeRoot } = resolveLintInvocation(workspaceFolder);
+    const verbose = vscode.workspace.getConfiguration('linterSt').get<boolean>('verboseOutput', false);
+    const args = [lintScript, fsPath, '--code-root', codeRoot];
+
+    if (verbose) {
+        outputChannel.appendLine(`[CMD] ${pythonPath} ${args.map((a) => `"${a}"`).join(' ')}`);
+    }
 
     return new Promise((resolve) => {
         cp.execFile(
             pythonPath,
-            [lintScript, fsPath, '--code-root', codeRoot],
+            args,
             { cwd: workspaceFolder.uri.fsPath, maxBuffer: 10 * 1024 * 1024 },
             (_error, stdout, stderr) => {
                 // lint.py sort avec un code != 0 pour "errors" (1) et "incomplete" (2) --
                 // execFile remonte ca comme _error, mais stdout reste un JSON valide dans ces
                 // deux cas (seul le code 3, usage, n'a rien d'exploitable sur stdout).
+                if (verbose) {
+                    outputChannel.appendLine(`[STDOUT] ${fsPath} :`);
+                    outputChannel.appendLine(stdout);
+                    if (stderr) {
+                        outputChannel.appendLine(`[STDERR] ${fsPath} :`);
+                        outputChannel.appendLine(stderr);
+                    }
+                }
                 try {
                     resolve(JSON.parse(stdout));
                 } catch {
@@ -98,15 +112,16 @@ function runLint(fsPath: string, workspaceFolder: vscode.WorkspaceFolder): Promi
 
 async function lintFilePath(fsPath: string): Promise<LintResult | null> {
     const config = vscode.workspace.getConfiguration('linterSt');
+    const uri = vscode.Uri.file(fsPath);
+
     if (!config.get<boolean>('enableSyntaxCheck', true)) {
         // Interrupteur general : coupe la couche base (compilation STruCpp) sans desinstaller
         // l'extension. La couche standards projet (enableProjectRules) n'existe pas encore --
         // rien a executer dans ce cas non plus.
-        diagnosticCollection.delete(vscode.Uri.file(fsPath));
+        diagnosticCollection.delete(uri);
         return null;
     }
 
-    const uri = vscode.Uri.file(fsPath);
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
     if (!workspaceFolder) {
         outputChannel.appendLine(`[SKIP] ${fsPath} -- hors workspace, impossible de resoudre --code-root`);
@@ -115,8 +130,7 @@ async function lintFilePath(fsPath: string): Promise<LintResult | null> {
 
     const result = await runLint(fsPath, workspaceFolder);
     if (result) {
-        const doc = await vscode.workspace.openTextDocument(uri);
-        applyResult(doc, result);
+        await applyResult(uri, workspaceFolder, result);
     }
     return result;
 }
@@ -205,7 +219,29 @@ async function lintWorkspaceCommand(): Promise<void> {
     await lintBatch(files, codeRootSetting);
 }
 
-function applyResult(doc: vscode.TextDocument, result: LintResult) {
+function toVscodeDiagnostic(d: LintDiagnostic, doc: vscode.TextDocument): vscode.Diagnostic {
+    // lint.py fournit ligne/colonne 1-based (STruCpp) ; VSCode attend du 0-based.
+    // Une erreur de tokenisation brute (ex: caractere accentue invalide) peut remonter
+    // line=0 -- fallback sur le debut du document dans ce cas.
+    const line = Math.max(0, d.line - 1);
+    const col = Math.max(0, d.col - 1);
+    const lineLength = line < doc.lineCount ? doc.lineAt(line).text.length : col + 1;
+    const range = new vscode.Range(
+        new vscode.Position(line, col),
+        new vscode.Position(line, Math.max(col + 1, lineLength))
+    );
+    const severity = d.severity === 'warning' ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Error;
+    const diag = new vscode.Diagnostic(range, d.message, severity);
+    diag.source = 'linter-st';
+    return diag;
+}
+
+/** Applique un LintResult au(x) BON(S) fichier(s) -- un diagnostic peut concerner une
+ * DEPENDANCE de la cible (ex: erreur dans une GVL referencee), pas la cible elle-meme. Bug reel
+ * trouve (session 2026-08-23) : la version precedente collait TOUS les diagnostics sur l'URI de
+ * la cible quel que soit leur champ `file`, affichant par exemple une erreur de GVL_PERSISTENT.st
+ * sous le nom de PRG_02_Acquisition.st dans Problems -- totalement trompeur. */
+async function applyResult(targetUri: vscode.Uri, workspaceFolder: vscode.WorkspaceFolder, result: LintResult): Promise<void> {
     if (result.status === 'incomplete') {
         // Priorite "zero faux positif" MAINTENUE : ceci n'est jamais une erreur (pas de
         // vscode.DiagnosticSeverity.Error), juste un avertissement informatif -- le linter
@@ -216,35 +252,48 @@ function applyResult(doc: vscode.TextDocument, result: LintResult) {
         const message = `Analyse incomplete -- type(s) hors CODE/ non resolu(s), verification partielle seulement : ${result.unresolved_types.join(', ')}`;
         const diag = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
         diag.source = 'linter-st';
-        diagnosticCollection.set(doc.uri, [diag]);
-        outputChannel.appendLine(`[INCOMPLET] ${doc.fileName} -- ${message}`);
+        diagnosticCollection.set(targetUri, [diag]);
+        outputChannel.appendLine(`[INCOMPLET] ${targetUri.fsPath} -- ${message}`);
         return;
     }
 
     if (result.status === 'clean') {
-        diagnosticCollection.delete(doc.uri);
+        diagnosticCollection.delete(targetUri);
         return;
     }
 
-    const diagnostics: vscode.Diagnostic[] = result.diagnostics.map((d) => {
-        // lint.py fournit ligne/colonne 1-based (STruCpp) ; VSCode attend du 0-based.
-        // Une erreur de tokenisation brute (ex: caractere accentue invalide) peut remonter
-        // line=0 -- fallback sur le debut du document dans ce cas.
-        const line = Math.max(0, d.line - 1);
-        const col = Math.max(0, d.col - 1);
-        const lineLength = line < doc.lineCount ? doc.lineAt(line).text.length : col + 1;
-        const range = new vscode.Range(
-            new vscode.Position(line, col),
-            new vscode.Position(line, Math.max(col + 1, lineLength))
-        );
-        const severity =
-            d.severity === 'warning' ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Error;
-        const diag = new vscode.Diagnostic(range, d.message, severity);
-        diag.source = 'linter-st';
-        return diag;
-    });
+    // Regroupe les diagnostics par fichier REEL (result.diagnostics[].file), pas par cible.
+    const byFile = new Map<string, LintDiagnostic[]>();
+    for (const d of result.diagnostics) {
+        const group = byFile.get(d.file);
+        if (group) {
+            group.push(d);
+        } else {
+            byFile.set(d.file, [d]);
+        }
+    }
 
-    diagnosticCollection.set(doc.uri, diagnostics);
+    const touched = new Set<string>();
+    for (const [relFile, diags] of byFile) {
+        const absPath = path.isAbsolute(relFile) ? relFile : path.join(workspaceFolder.uri.fsPath, relFile);
+        const uri = vscode.Uri.file(absPath);
+        touched.add(uri.toString());
+
+        let doc: vscode.TextDocument;
+        try {
+            doc = await vscode.workspace.openTextDocument(uri);
+        } catch {
+            outputChannel.appendLine(`[ERREUR] Fichier introuvable pour un diagnostic : ${absPath}`);
+            continue;
+        }
+        diagnosticCollection.set(uri, diags.map((d) => toVscodeDiagnostic(d, doc)));
+    }
+
+    // La cible elle-meme peut n'avoir aucune erreur propre (tout vient d'une dependance) --
+    // s'assurer qu'elle n'affiche pas un vieux resultat perime d'un lint precedent.
+    if (!touched.has(targetUri.toString())) {
+        diagnosticCollection.delete(targetUri);
+    }
 }
 
 export function deactivate() {
