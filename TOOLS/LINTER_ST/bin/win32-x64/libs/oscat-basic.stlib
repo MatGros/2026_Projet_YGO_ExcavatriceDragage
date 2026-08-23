@@ -17774,21 +17774,21 @@
     {
       "name": "CONSTANTS_LANGUAGE",
       "kind": "type",
-      "header": "struct CONSTANTS_LANGUAGE {\n    IEC_INT DEFAULT = 1;\n    IEC_INT LMAX = 3;\n    Array2D<IECStringVar<254>, 1, 3, 1, 7> WEEKDAYS{};\n    Array2D<IECStringVar<254>, 1, 3, 1, 7> WEEKDAYS2{};\n    Array2D<IECStringVar<254>, 1, 3, 1, 12> MONTHS{};\n    Array2D<IECStringVar<254>, 1, 3, 1, 12> MONTHS3{};\n    Array2D<IECStringVar<254>, 1, 3, 0, 15> DIRS{};\n};\n\nusing IEC_CONSTANTS_LANGUAGE = CONSTANTS_LANGUAGE;\n",
+      "header": "struct CONSTANTS_LANGUAGE {\n    IEC_INT DEFAULT = 1;\n    IEC_INT LMAX = 3;\n    Array2D<IECStringVar<254>, 1, 3, 1, 7> WEEKDAYS = {\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Sunday\", \"Montag\", \"Dienstag\", \"Mittwoch\", \"Donnerstag\", \"Freitag\", \"Samstag\", \"Sonntag\", \"Lundi\", \"Mardi\", \"Mercredi\", \"Jeudi\", \"Vendredi\", \"Samedi\", \"Dimanche\"};\n    Array2D<IECStringVar<254>, 1, 3, 1, 7> WEEKDAYS2 = {\"Mo\", \"Tu\", \"We\", \"Th\", \"Fr\", \"Sa\", \"Su\", \"Mo\", \"Di\", \"Mi\", \"Do\", \"Fr\", \"Sa\", \"So\", \"Lu\", \"Ma\", \"Me\", \"Je\", \"Ve\", \"Sa\", \"Di\"};\n    Array2D<IECStringVar<254>, 1, 3, 1, 12> MONTHS = {\"January\", \"February\", \"March\", \"April\", \"May\", \"June\", \"July\", \"August\", \"September\", \"October\", \"November\", \"December\", \"Januar\", \"Februar\", \"März\", \"April\", \"Mai\", \"Juni\", \"Juli\", \"August\", \"September\", \"Oktober\", \"November\", \"Dezember\", \"Janvier\", \"Février\", \"mars\", \"Avril\", \"Mai\", \"Juin\", \"Juillet\", \"Août\", \"Septembre\", \"Octobre\", \"Novembre\", \"Decembre\"};\n    Array2D<IECStringVar<254>, 1, 3, 1, 12> MONTHS3 = {\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Oct\", \"Nov\", \"Dec\", \"Jan\", \"Feb\", \"Mrz\", \"Apr\", \"Mai\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Okt\", \"Nov\", \"Dez\", \"Jan\", \"Fev\", \"Mar\", \"Avr\", \"Mai\", \"Jun\", \"Jul\", \"Aou\", \"Sep\", \"Oct\", \"Nov\", \"Dec\"};\n    Array2D<IECStringVar<254>, 1, 3, 0, 15> DIRS = {\"N\", \"NNE\", \"NE\", \"ENE\", \"E\", \"ESE\", \"SE\", \"SSE\", \"S\", \"SSW\", \"SW\", \"WSW\", \"W\", \"WNW\", \"NW\", \"NNW\", \"N\", \"NNO\", \"NO\", \"ONO\", \"O\", \"OSO\", \"SO\", \"SSO\", \"S\", \"SSW\", \"SW\", \"WSW\", \"W\", \"WNW\", \"NW\", \"NNW\", \"N\", \"NNO\", \"NO\", \"ONO\", \"O\", \"OSO\", \"SO\", \"SSO\", \"S\", \"SSW\", \"SW\", \"WSW\", \"W\", \"WNW\", \"NW\", \"NNW\"};\n};\n\nusing IEC_CONSTANTS_LANGUAGE = CONSTANTS_LANGUAGE;\n",
       "cpp": "",
       "deps": []
     },
     {
       "name": "CONSTANTS_LOCATION",
       "kind": "type",
-      "header": "struct CONSTANTS_LOCATION {\n    IEC_INT DEFAULT = 1;\n    IEC_INT LMAX = 5;\n    Array1D<IEC_INT, 1, 5> LANGUAGE{};\n};\n\nusing IEC_CONSTANTS_LOCATION = CONSTANTS_LOCATION;\n",
+      "header": "struct CONSTANTS_LOCATION {\n    IEC_INT DEFAULT = 1;\n    IEC_INT LMAX = 5;\n    Array1D<IEC_INT, 1, 5> LANGUAGE = {2, 2, 3, 2, 2};\n};\n\nusing IEC_CONSTANTS_LOCATION = CONSTANTS_LOCATION;\n",
       "cpp": "",
       "deps": []
     },
     {
       "name": "CONSTANTS_MATH",
       "kind": "type",
-      "header": "struct CONSTANTS_MATH {\n    IEC_REAL PI = 3.141592653589793;\n    IEC_REAL PI2 = 6.283185307179586;\n    IEC_REAL PI4 = 12.566370614359172;\n    IEC_REAL PI05 = 1.5707963267949;\n    IEC_REAL PI025 = 0.785398163397448;\n    IEC_REAL PI_INV = 0.318309886183791;\n    IEC_REAL E = 2.718281828459045;\n    IEC_REAL E_INV = 0.367879441171442;\n    IEC_REAL SQ2 = 1.4142135623731;\n    Array1D<IEC_DINT, 0, 12> FACTS{};\n};\n\nusing IEC_CONSTANTS_MATH = CONSTANTS_MATH;\n",
+      "header": "struct CONSTANTS_MATH {\n    IEC_REAL PI = 3.141592653589793;\n    IEC_REAL PI2 = 6.283185307179586;\n    IEC_REAL PI4 = 12.566370614359172;\n    IEC_REAL PI05 = 1.5707963267949;\n    IEC_REAL PI025 = 0.785398163397448;\n    IEC_REAL PI_INV = 0.318309886183791;\n    IEC_REAL E = 2.718281828459045;\n    IEC_REAL E_INV = 0.367879441171442;\n    IEC_REAL SQ2 = 1.4142135623731;\n    Array1D<IEC_DINT, 0, 12> FACTS = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600};\n};\n\nusing IEC_CONSTANTS_MATH = CONSTANTS_MATH;\n",
       "cpp": "",
       "deps": []
     },
@@ -17802,7 +17802,7 @@
     {
       "name": "CONSTANTS_SETUP",
       "kind": "type",
-      "header": "struct CONSTANTS_SETUP {\n    IEC_BOOL EXTENDED_ASCII = true;\n    Array1D<IECStringVar<254>, 1, 4> CHARNAMES{};\n    Array1D<IEC_INT, 1, 12> MTH_OFS{};\n    Array1D<IEC_REAL, 0, 8> DECADES{};\n};\n\nusing IEC_CONSTANTS_SETUP = CONSTANTS_SETUP;\n",
+      "header": "struct CONSTANTS_SETUP {\n    IEC_BOOL EXTENDED_ASCII = true;\n    Array1D<IECStringVar<254>, 1, 4> CHARNAMES = {\";\\\"&quot;&&amp;<&lt;>&gt;€&euro; &nbsp;¡&iexcl;¢&cent;£&pound;¤&curren;¥&yen;¦&brvbar;§&sect;¨&uml;©&copy;ª&ordf;«&laquo;¬&not;­&shy;®&reg;¯&macr;°&deg;±&plusmn;²&sup2;³&sup3;´&acute;µ&micro;¶&para;·&middot;¸&cedil;¹&sup1;º&ordm;»&raquo;¼&frac14;Û&Ucirc;\", \";¾&frac34;¿&iquest;À&Agrave;Á&Aacute;Â&Acirc;Ã&Atilde;Ä&Auml;Å&Aring;Æ&AElig;Ç&Ccedil;È&Egrave;É&Eacute;Ê&Ecirc;Ë&Euml;Ì&Igrave;Í&Iacute;Î&Icirc;Ï&Iuml;Ð&ETH;Ñ&Ntilde;Ò&Ograve;Ó&Oacute;Ô&Ocirc;Õ&Otilde;Ö&Ouml;×&times;Ø&Oslash;Ù&Ugrave;Ú&Uacute;½&frac12;\", \";Ü&Uuml;Ý&Yacute;Þ&THORN;ß&szlig;à&agrave;á&aacute;â&acirc;ã&atilde;ä&auml;å&aring;æ&aelig;ç&ccedil;è&egrave;é&eacute;ê&ecirc;ë&euml;ì&igrave;í&iacute;î&icirc;ï&iuml;ð&eth;ñ&ntilde;ò&ograve;ó&oacute;ô&ocirc;õ&otilde;ö&ouml;÷&divide;ø&oslash;ù&ugrave;\", \";ú&uacute;û&ucirc;ü&uuml;ý&yacute;þ&thorn;ÿ&yuml;\"};\n    Array1D<IEC_INT, 1, 12> MTH_OFS = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};\n    Array1D<IEC_REAL, 0, 8> DECADES = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};\n};\n\nusing IEC_CONSTANTS_SETUP = CONSTANTS_SETUP;\n",
       "cpp": "",
       "deps": []
     },
