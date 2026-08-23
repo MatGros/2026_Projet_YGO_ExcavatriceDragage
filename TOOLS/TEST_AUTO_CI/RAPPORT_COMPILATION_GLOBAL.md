@@ -17,9 +17,9 @@
 | `G_CYCLE` | 6 | 6 | 0 | Non | 🟢 100% OK | [CYCLE.html](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/TOOLS/TEST_AUTO_CI/RESULTS/CYCLE/reports/CYCLE.html) |
 | `H_TREUILS_BENNE` | 19 | 19 | 0 | `HYSTERESIS` | 🟢 100% OK | [TREUILS.html](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/TOOLS/TEST_AUTO_CI/RESULTS/TREUILS/reports/TREUILS.html) |
 | `I_TRANSLATION` | 7 | 7 | 0 | Non | 🟢 100% OK | [TRANSLATION.html](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/TOOLS/TEST_AUTO_CI/RESULTS/TRANSLATION/reports/TRANSLATION.html) |
-| `J_SUPERVISION` | 105 | 105 | 0 | `DEVICE_STATE` | 🟢 100% OK | [FB_TroubleshootingView](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/CODE/J_SUPERVISION/FB_TroubleshootingView.st) |
+| `J_SUPERVISION` | 105 | 105 | 0 | `DEVICE_STATE` | 🟢 100% OK | [SUPERVISION.html](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/TOOLS/TEST_AUTO_CI/RESULTS/SUPERVISION/reports/SUPERVISION.html) |
 | `L_SIMULATION` | 7 | 7 | 0 | Non | 🟢 100% OK | [SIMULATION.html](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/TOOLS/TEST_AUTO_CI/RESULTS/SIMULATION/reports/SIMULATION.html) |
-| **TOTAL METIER** | **168** | **168** | **0** | **100% OK** | 🏆 **100% VALIDÉ C++ / STruCpp** | **9 Domaines** |
+| **TOTAL METIER** | **168** | **168** | **0** | **100% OK** | 🏆 **100% VALIDÉ C++ / STruCpp** | **10 Domaines** |
 
 ---
 
