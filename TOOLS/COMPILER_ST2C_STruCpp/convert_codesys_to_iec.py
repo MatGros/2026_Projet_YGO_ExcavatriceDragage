@@ -105,12 +105,72 @@ def _close_missing_pou_end(text: str, source_name: str, warnings: list) -> str:
     return text.rstrip() + f"\n{end_kw}\n"
 
 
+def _map_hysteresis(text: str) -> str:
+    """CODESYS Util library HYSTERESIS has (IN, HIGH, LOW -> OUT).
+    STruCpp builtin additional-function-blocks has Annex E HYSTERESIS (XIN1, XIN2, EPS -> Q).
+    Rename CODESYS HYSTERESIS to FB_Hysteresis_Util to use our matching mock without collision."""
+    # Remplacement du type dans les declarations : HYSTERESIS -> FB_Hysteresis_Util
+    text = re.sub(r"\bHYSTERESIS\b", "FB_Hysteresis_Util", text)
+    return text
+
+
+def _convert_nested_arrays(text: str) -> str:
+    """CODESYS ARRAY[1..5] OF ARRAY[1..5] OF REAL -> IEC standard ARRAY[1..5, 1..5] OF REAL."""
+    return re.sub(
+        r"ARRAY\s*\[\s*([^\]]+)\s*\]\s*OF\s+ARRAY\s*\[\s*([^\]]+)\s*\]\s*OF\s+([^;]+)",
+        r"ARRAY[\1, \2] OF \3",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+
+def _convert_binary_literals_in_case(text: str) -> str:
+    """STruCpp parser does not support 2#00111 binary literals in CASE labels. Convert 2#... to decimal/hex."""
+    def _bin_to_dec(match):
+        b = match.group(1)
+        return str(int(b, 2))
+    return re.sub(r"\b2#([01]+)\b", _bin_to_dec, text)
+
+
+def _convert_case_multiple_labels(text: str) -> str:
+    """STruCpp parser does not support comma-separated case labels (e.g. 31, 15, 7, 3, 1, 0:).
+    Split them or transform into IF/ELSIF."""
+    def _split_case(match):
+        labels = [lbl.strip() for lbl in match.group(1).split(',')]
+        res = []
+        for l in labels:
+            res.append(f"{l}:")
+        return '\n    '.join(res)
+    # Match lines like "    val1, val2, val3:" inside CASE
+    return re.sub(r"^\s*([0-9a-zA-Z_#]+(?:\s*,\s*[0-9a-zA-Z_#]+)+)\s*:", _split_case, text, flags=re.MULTILINE)
+
+
+
+def _convert_nested_array_access(text: str) -> str:
+    """CODESYS arr[i][j] -> IEC standard arr[i, j] for multi-dimensional arrays."""
+    # Match patterns like LoadPctByStepAndSpeedBand[i][j]
+    return re.sub(
+        r"(\b\w+(?:\.\w+)*)\[([^\]]+)\]\[([^\]]+)\]",
+        r"\1[\2, \3]",
+        text,
+    )
+
+
 def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _convert_enum_blocks(text, source_name, warnings)
     text = _strip_pragmas(text)
     text = _strip_pou_qualifiers(text)
     text = _close_missing_pou_end(text, source_name, warnings)
+    text = _map_hysteresis(text)
+    text = _convert_nested_arrays(text)
+    text = _convert_nested_array_access(text)
+    text = _convert_binary_literals_in_case(text)
+    text = _convert_case_multiple_labels(text)
     return text
+
+
+
+
 
 
 def convert_file(src: pathlib.Path, dst: pathlib.Path, warnings: list) -> None:
