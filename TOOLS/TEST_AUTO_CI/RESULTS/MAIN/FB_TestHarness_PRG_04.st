@@ -111,9 +111,10 @@ instSafetyWinchM2(
     JoystickOperational     := TRUE,
     HeartbeatIhmOk          := TRUE,
     EncoderAvailable        := NOT AcqData.M2_EncoderFault,
-    ThermalFeedback         := TRUE,
-    BrakeThermalFeedback    := TRUE,
+    ThermalFeedback         := FALSE,
+    BrakeThermalFeedback    := FALSE,
     SlackCableDetected      := FALSE,
+
     PhaseRotationOk         := TRUE,
     TopPositionSensor       := TRUE,
     FwdRevSpeedFeedbackOff  := M2_ContactorsReleased,
@@ -144,8 +145,9 @@ ELSIF BtnWinchM1Down THEN
     m1Direction := -1;
     m1SpeedRef  := 50.0;
 ELSIF AcqData.JoystickDeadmanArmed AND NOT AcqData.JoystickYNeutral THEN
-    m1Direction := SEL(AcqData.JoystickSpeedPctX > 0.0, 1, 1); // Sens derive
+    m1Direction := 1; // Commande de montée treuil M1
     m1SpeedRef  := 60.0;
+
 ELSE
     m1Direction := 0;
     m1SpeedRef  := 0.0;
