@@ -146,14 +146,36 @@ avalé silencieusement. Vérifié empiriquement (session 2026-08-23, typo `INT_I
   qualificatif à retirer. `lint.py` compare tout `Undeclared variable` contre l'index complet des
   noms déclarés du projet (`resolve_deps.build_declaration_index`) : si le nom existe bien dans
   `CODE/`, c'est cette limite d'accès qualifié, filtré en warning informatif — sinon vraie erreur.
-- ✅ **Variables `GVL_PERSISTENT` accédées sans préfixe (`_CommunCfgPersist`, convention NC-070)
-  — corrigé.** Contrairement aux autres GVL, `GVL_PERSISTENT.st` n'a pas de préfixe qualifié
-  devant ses membres (accès direct par convention projet) — `resolve_deps.py` ne les détectait ni
-  ne les indexait. Désormais : chaque membre `_XxX` d'une GVL est indexé individuellement (pas
-  que le nom du fichier), et `REF_RE` détecte les références `_Identifiant`. ⚠️ A révélé un 2e bug
-  au passage : plusieurs noms résolvant vers le même fichier dupliquaient ce fichier dans la
-  compilation (`Symbol already defined in scope 'global'`) — corrigé par dédoublonnage
-  (`dict.fromkeys`) dans `lint.py`.
+- ✅ **Variables GVL accédées sans préfixe (`_CommunCfgPersist`, `BypassTranslationGlobal`,
+  convention NC-070 ou non) — corrigé, approche revue deux fois.** Confirmé **documenté**, pas un
+  hasard : `DOC/STDS/NAMING_CONVENTION.md:394` précise que l'attribut `{attribute
+  'qualified_only'}` est **retiré volontairement** sur `GVL_PERSISTENT.st` pour permettre l'accès
+  direct partout dans l'application. Deux styles coexistent dans le projet :
+  `GVL_PERSISTENT.st` préfixe `_` (NC-070), `GVL_BypassRetain.st` PascalCase nu, aucun motif
+  commun fiable. **1ère tentative** (regex `_[A-Za-z]\w*` + indexation des membres `_Xxx`) :
+  trop large (capturait aussi les variables **locales** d'un FB — `FB_SpeedStep.st` se signalait
+  lui-même comme "incomplete" sur ses propres `VAR`) ET trop étroite (ratait
+  `BypassTranslationGlobal`, sans préfixe). **Approche retenue** : toutes les `GVL_*.st` du projet
+  sont désormais **incluses systématiquement** dans chaque compilation (`resolve_deps.resolve()`),
+  qu'une référence explicite soit détectée ou non — et passées par la même file d'attente que les
+  cibles pour que **leurs propres dépendances** de types soient aussi résolues (sinon :
+  `Undefined type 'ST_WinchHMI'` sur `GVL_IHM.st` lui-même). Coût : quelques GVL en plus par
+  compilation (négligeable) ; effet de bord accepté : une analyse peut se retrouver `"incomplete"`
+  plus souvent qu'avant (ex. `FB_Joystick.st` touche transitivement `DEVICE_STATE` via la chaîne
+  GVL_IHM même s'il n'en a pas besoin lui-même) — jamais `"errors"` à tort, juste plus prudent.
+- ✅ **`BLINK` (FB standard IEC, comme `TON`/`R_TRIG`) — corrigé.** Ajouté à
+  `KNOWN_EXTERNAL_TYPES` (même liste que `DEVICE_STATE`). 🔍 **Piste non explorée** :
+  [`src/library/codesys-import/`](https://github.com/Autonomy-Logic/STruCpp/tree/development/src/library/codesys-import)
+  de STruCpp permet d'**importer un vrai fichier `.lib`/`.library` CODESYS** (`--import-lib`) et
+  d'en faire une bibliothèque `.stlib` chargée via `-L` — remplacerait la liste blanche manuelle
+  par une vraie résolution de types, plus robuste que d'ajouter chaque nouveau type externe à la
+  main au fil des rencontres. Pas fait ici (pas de fichier `.lib` CODESYS officiel sous la main
+  dans ce repo pour tester).
+- ✅ **Crash d'encodage sur accents/emojis dans les GVL — corrigé.** `subprocess.run` utilisait
+  l'encodage système par défaut (`cp1252` sur Windows) pour lire la sortie de `strucpp.exe` — un
+  GVL contenant des accents/emojis (très courant dans ce projet) faisait planter `lint.py`
+  (`UnicodeDecodeError`) dès qu'il était inclus dans la compilation. Corrigé en forçant
+  `encoding="utf-8", errors="replace"` sur l'appel.
 
 ## 🖥️ Extension VSCode (`vscode-extension/`)
 

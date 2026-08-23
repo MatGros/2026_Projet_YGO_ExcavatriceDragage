@@ -65,7 +65,7 @@ UNDECLARED_VARIABLE_RE = re.compile(r"Undeclared variable '(?P<name>\w+)'")
 # passer INT_INCONNU (vrai bug de test) en "incomplete" au lieu d'errors -- une regression sur le
 # test de non-regression deja en place). Ajouter ici au cas par cas quand un vrai type externe
 # est rencontre (ex: DEVICE_STATE trouve sur FB_TroubleshootingView.st).
-KNOWN_EXTERNAL_TYPES = {"DEVICE_STATE"}
+KNOWN_EXTERNAL_TYPES = {"DEVICE_STATE", "BLINK"}
 
 
 def _run_strucpp(converted_files: list[Path], out_cpp: Path) -> str:
@@ -76,6 +76,8 @@ def _run_strucpp(converted_files: list[Path], out_cpp: Path) -> str:
         [str(STRUCPP_EXE), *[str(f) for f in converted_files], "-o", str(out_cpp)],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     return result.stdout + result.stderr
 
@@ -153,10 +155,10 @@ def lint(target: Path, code_root: Path, extra_external_types: set[str] | None = 
     # accepte pour rester simple plutot que de refactorer resolve() pour exposer son index.
     project_names = {name.upper() for name in resolve_deps.build_declaration_index(code_root)}
 
-    # dict.fromkeys plutot que list() : plusieurs NOMS distincts (ex: 20 membres GVL_PERSISTENT)
-    # peuvent resoudre vers le MEME fichier -- sans dedup, strucpp.exe recoit ce fichier plusieurs
-    # fois et leve "Symbol already defined in scope 'global'" (bug reel trouve session 2026-08-23,
-    # apres l'ajout de l'indexation des membres GVL individuels dans resolve_deps.py).
+    # resolve() inclut deja systematiquement toutes les GVL_*.st (voir resolve_deps.py) --
+    # dict.fromkeys plutot que list() : plusieurs NOMS peuvent resoudre vers le MEME fichier
+    # (ex: chaque membre d'une GVL) -- sans dedup, strucpp.exe recoit ce fichier plusieurs fois
+    # et leve "Symbol already defined in scope 'global'" (bug reel trouve session 2026-08-23).
     all_sources = list(dict.fromkeys([target] + list(resolved.values())))
 
     with tempfile.TemporaryDirectory(prefix="linter_st_") as tmp:

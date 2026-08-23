@@ -41,7 +41,6 @@ REF_RE = re.compile(
     r"|:\s+(?P<name_colon>(?:ST_|E_|FB_)\w+)\b"
     r"|\b(?P<name_call>(?:ST_|E_|FB_)\w+)\s*\("
     r"|\b(?P<name_gvl>GVL_\w+)\b"
-    r"|\b(?P<name_persist>_[A-Za-z]\w*)\b"
 )
 
 # GVL_*.st n'ont AUCUN mot-cle de declaration (pas de TYPE/FUNCTION_BLOCK/PROGRAM) -- juste
@@ -50,11 +49,17 @@ REF_RE = re.compile(
 # Verifie sur GVL_Global.st / GVL_IHM.st (session 2026-08-23).
 GVL_STEM_RE = re.compile(r"^GVL_\w+$")
 
-# Variables PERSISTENT (GVL_PERSISTENT.st, convention NC-070 : prefixe `_`) sont accedees SANS
-# aucun prefixe de GVL (pas de `GVL_PERSISTENT.` devant, contrairement aux autres GVL) -- il faut
-# donc indexer chaque MEMBRE individuellement, pas juste le nom du fichier GVL. Verifie sur
-# PRG_03_Modes_Cycle.st -> _CommunCfgPersist, _CycleSampleCount, session 2026-08-23.
-GVL_MEMBER_DECL_RE = re.compile(r"^\s*(_[A-Za-z]\w*)\s*:\s*[A-Za-z_]", re.MULTILINE)
+# NB (session 2026-08-23) : detecter par regex QUELS identifiants referencent un membre GVL
+# accede sans prefixe (GVL_PERSISTENT en `_Xxx`, GVL_BypassRetain en PascalCase nu) s'est avere
+# non fiable dans les deux sens :
+#   - trop large (`_[A-Za-z]\w*` capturait aussi les variables LOCALES d'un FB qui n'ont besoin
+#     d'aucune resolution -- FB_SpeedStep.st se signalait lui-meme comme "incomplete") ;
+#   - trop etroit (aucun motif ne couvre un nom PascalCase sans prefixe comme
+#     `BypassTranslationGlobal`, sans risquer de capturer n'importe quel identifiant du langage).
+# Solution retenue : toutes les GVL_*.st du projet sont desormais INCLUSES SYSTEMATIQUEMENT dans
+# chaque compilation (voir lint.py, all_sources), qu'une reference explicite soit detectee ou
+# non. Le cout (compiler quelques GVL en plus a chaque fois) est negligeable, la fiabilite est
+# totale -- plus besoin de deviner un motif de nommage.
 
 # Mots-cles/valeurs ST qui matchent accidentellement le prefixe (aucun aujourd'hui, garde pour
 # durcir la regex sans casser silencieusement si un jour un mot-cle standard commence par ces
@@ -74,9 +79,6 @@ def build_declaration_index(code_root: Path) -> dict[str, Path]:
     for st_file in code_root.rglob("*.st"):
         if GVL_STEM_RE.match(st_file.stem):
             index[st_file.stem] = st_file
-            gvl_text = _strip_comments(st_file.read_text(encoding="utf-8", errors="replace"))
-            for gm in GVL_MEMBER_DECL_RE.finditer(gvl_text):
-                index.setdefault(gm.group(1), st_file)
             continue
 
         text = _strip_comments(st_file.read_text(encoding="utf-8", errors="replace"))
@@ -97,7 +99,7 @@ def find_references(st_file: Path) -> set[str]:
     for m in REF_RE.finditer(text):
         name = (
             m.group("name_of") or m.group("name_colon") or m.group("name_call")
-            or m.group("name_gvl") or m.group("name_persist")
+            or m.group("name_gvl")
         )
         if name and name not in IGNORE_NAMES:
             refs.add(name)
@@ -111,6 +113,17 @@ def resolve(targets: list[Path], code_root: Path) -> tuple[dict[str, Path], set[
     unresolved: set[str] = set()
     seen_files: set[Path] = set()
     queue: list[Path] = list(targets)
+
+    # Toutes les GVL_*.st sont incluses SYSTEMATIQUEMENT (voir commentaire REF_RE plus haut :
+    # aucune regex fiable ne detecte un membre GVL accede sans prefixe). Passees par la meme
+    # queue que les cibles pour que LEURS PROPRES types references soient aussi resolus --
+    # les injecter directement dans all_sources sans passer par resolve() (essaye puis
+    # abandonne, session 2026-08-23) laisse les types internes des GVL non resolus (`Undefined
+    # type 'ST_WinchHMI'` etc. sur GVL_IHM.st).
+    for gvl_file in code_root.rglob("*.st"):
+        if GVL_STEM_RE.match(gvl_file.stem) and gvl_file not in targets:
+            resolved.setdefault(gvl_file.stem, gvl_file)
+            queue.append(gvl_file)
 
     while queue:
         current = queue.pop()
