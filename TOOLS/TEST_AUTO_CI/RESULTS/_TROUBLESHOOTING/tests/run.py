@@ -16,7 +16,7 @@ import sys
 
 # --- Racine du dépôt + accès aux modules du runner -------------------------
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[5]
-sys.path.insert(0, str(REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"))
+sys.path.insert(0, str(REPO_ROOT / "TOOLS" / "TEST_AUTO_CI" / "scripts"))
 
 import run_tests  # noqa: E402
 

@@ -1,4 +1,4 @@
-# 🕵️ Méthode de Recherche de Blocage / Diagnostic (Excavatrice Dragage)
+﻿# 🕵️ Méthode de Recherche de Blocage / Diagnostic (Excavatrice Dragage)
 
 > Prompt réutilisable pour diagnostiquer un blocage/bug dans le programme CODESYS.
 > L'agent NE PEUT PAS exécuter le PLC : il lit des variables de diagnostic et raisonne par arbre de décision.
@@ -52,7 +52,7 @@ Démarche :
 2. **Mettre à jour le test** `.st` (format `TEST '...'` + `ASSERT_*`, voir exemples dans `RESULTS/<domaine>/tests/`). Le test ne lit que les **sorties publiques** du FB (`VAR_INPUT`/`VAR_OUTPUT`/`VAR_IN_OUT`), jamais les internes.
 3. **Compiler + exécuter** :
    ```bash
-   python TOOLS/TEST_AUTO_CI/run_tests.py
+   python TOOLS/TEST_AUTO_CI/scripts/run_tests.py
    ```
 
    → rapport dans `RESULTS/_TROUBLESHOOTING/reports/` + affichage PASS/FAIL par test.

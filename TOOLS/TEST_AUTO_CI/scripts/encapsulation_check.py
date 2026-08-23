@@ -188,7 +188,7 @@ if __name__ == "__main__":
     import sys
     import yaml
 
-    repo_root = pathlib.Path(__file__).resolve().parents[2]
+    repo_root = pathlib.Path(__file__).resolve().parents[3]
     registry = yaml.safe_load((repo_root / "TOOLS/TEST_AUTO_CI/registry.yaml").read_text(encoding="utf-8"))
 
     target = sys.argv[1] if len(sys.argv) > 1 else None
