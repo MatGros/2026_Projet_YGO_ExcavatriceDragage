@@ -48,14 +48,14 @@ utilisateur 2026-08-23 -- pas de lien inter-outils, chaque outil porte sa propre
    "Expected Identifier, found ARRAY", `ARRAY[1..5, 1..5] OF REAL` compile. Trouve sur
    ST_WinchLoadEstimateTable.st (matrice 5x5). Applique en boucle pour gerer 3+ dimensions.)
 
-8. NomVar : Type := (Champ := Val, ...) -> NomVar : Type
-   (Initialiseur de struct/array par litteral nomme -- STruCpp ne le parse pas du tout (erreur
-   des le premier `:=` interne). Retire UNIQUEMENT dans une declaration (precede de `: Type`) ET
-   quand le contenu des parentheses contient lui-meme un `:=` (signature d'un litteral de
-   struct/array, jamais une expression booleenne d'un IF/assignment -- verification cruciale :
-   une regex plus large accrocherait aussi `X := (A > B) AND (C);` dans le CORPS d'un FB/PRG et
-   detruirait une vraie instruction). Verifie empiriquement, session 2026-08-23, sur
-   GVL_PERSISTENT.st (_WinchSpeedStepTable, _WinchM1CfgPersist, etc.).
+BINAIRE VENDORE : strucpp.exe v0.6.3 (mis a jour depuis v0.6.2, session 2026-08-23) -- le
+changelog GitHub n'est pas consulte, mais teste empiriquement AVANT/APRES sur les 4 limites
+connues (voir README.md). v0.6.3 corrige nativement les initialiseurs de struct/array par
+litteral nomme (`X : Type := (Champ := Val, ...)`, y compris imbriques) -- l'ancienne
+transformation 8 qui les retirait avant compilation a ete SUPPRIMEE car devenue inutile (moins de
+transformations = moins de risque de sur-filtrer une vraie erreur, cf. demande utilisateur
+"eviter d'inhiber des erreurs"). Les 3 autres limites (PERSISTENT, ARRAY imbrique, acces qualifie
+GVL/PROGRAM) restent identiques en v0.6.3, testees explicitement avant de mettre a jour.
 """
 
 import argparse
@@ -80,14 +80,6 @@ LITERAL_RE = re.compile(r"(?P<lit>\w+)\s*(?::=\s*(?P<val>-?\d+))?")
 GVL_QUALIFIER_RE = re.compile(r"\bGVL_\w+\.")
 
 VAR_GLOBAL_QUALIFIER_RE = re.compile(r"VAR_GLOBAL((?:\s+(?:PERSISTENT|RETAIN))*)", re.IGNORECASE)
-
-# Detecte le DEBUT d'un initialiseur de declaration `: Type := (` -- la fermeture est trouvee
-# par comptage de profondeur (voir _strip_struct_default_init), pas par regex, car ces
-# initialiseurs peuvent etre imbriques (ex: `Config := (Offset := 0.0, ...)` a l'interieur d'un
-# autre `(...)`, trouve sur GVL_PERSISTENT.st _BucketCfgPersist, session 2026-08-23).
-DECL_DEFAULT_INIT_START_RE = re.compile(
-    r"(?P<decl>:\s*[A-Za-z_]\w*(?:\s*\[[^\]\r\n]*\])?)\s*:=\s*\(",
-)
 
 NESTED_ARRAY_RE = re.compile(
     r"ARRAY\s*\[(?P<dim1>[^\]]+)\]\s+OF\s+ARRAY\s*\[(?P<dim2>[^\]]+)\]\s+OF\s+",
@@ -191,54 +183,6 @@ def _merge_nested_arrays(text: str, source_name: str, warnings: list) -> str:
     return text
 
 
-def _strip_struct_default_init(text: str, source_name: str, warnings: list) -> str:
-    """Retire `:= (...)` d'une declaration, parentheses IMBRIQUEES incluses (comptage de
-    profondeur -- une regex `[^()]*` ne peut pas suivre un `(...)` a l'interieur d'un autre).
-    Seulement si le contenu contient un `:=` (litteral de struct/array nomme) -- une expression
-    parenthesee simple ou une instruction du corps d'un FB (`X := (A > B) AND (C);`) n'est
-    jamais touchee car elle n'est jamais precedee de `: Type` (verification cruciale)."""
-    out = []
-    pos = 0
-    removed_any = False
-    while True:
-        m = DECL_DEFAULT_INIT_START_RE.search(text, pos)
-        if not m:
-            out.append(text[pos:])
-            break
-
-        open_paren = m.end() - 1
-        depth = 1
-        i = open_paren + 1
-        while i < len(text) and depth > 0:
-            if text[i] == "(":
-                depth += 1
-            elif text[i] == ")":
-                depth -= 1
-            i += 1
-
-        if depth != 0:
-            # Parenthese jamais fermee (fin de fichier atteinte) -- ne rien toucher, laisse
-            # STruCpp lever l'erreur normalement plutot que de mal transformer.
-            out.append(text[pos:m.end()])
-            pos = m.end()
-            continue
-
-        body = text[open_paren:i]
-        decl_end = m.end("decl")  # fin de `: Type`, avant le `:=` a retirer
-        if ":=" not in body:
-            out.append(text[pos:i])
-            pos = i
-            continue
-
-        out.append(text[pos:decl_end])
-        pos = i
-        removed_any = True
-
-    if removed_any:
-        warnings.append(f"{source_name}: initialiseur(s) de struct/array par litteral nomme retire(s) (non supporte par STruCpp)")
-    return "".join(out)
-
-
 def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _convert_enum_blocks(text, source_name, warnings)
     text = _strip_pragmas(text)
@@ -246,7 +190,6 @@ def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _strip_gvl_qualifiers(text)
     text = _strip_persistent_qualifier(text, source_name, warnings)
     text = _merge_nested_arrays(text, source_name, warnings)
-    text = _strip_struct_default_init(text, source_name, warnings)
     text = _close_missing_pou_end(text, source_name, warnings)
     return text
 
