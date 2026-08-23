@@ -8,6 +8,33 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 ---
 
+## 🎬 Démarrage de session — briefing obligatoire
+
+> Concerne **tout agent** (Claude Code, Codex, Pi, autre) et tout humain qui reprend le projet —
+> `AGENTS.md` est justement le point d'entrée commun, lu par tous les outils.
+
+**Déclenchement** : automatique au 1er message de toute session sur ce repo. Rejouable à la
+demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) — même séquence.
+
+**Séquence :**
+1. Lire les points d'entrée : `README.md` (racine), `DOC/README.md`, `TOOLS/README.md`,
+   `TOOLS/AGENT_WORKFLOW/README.md` — pas tout le détail, juste repérer où chercher ensuite.
+2. Restituer un briefing court :
+   - Tableau des 4 skills projet (`codesys-workflow`, `task-planner`, `troubleshooting`,
+     `create-pr`) — rôle + déclencheur, voir [DOC/README.md](DOC/README.md) et `.claude/skills/`.
+   - Snapshot rapide de [DOC/WFLOW/TASKS.yaml](DOC/WFLOW/TASKS.yaml) : combien de tâches
+     verrouillées 🔒 / en cours ⏳ / à faire ⬜.
+   - Rappel des guardrails essentiels : jamais de commit sans validation humaine, AU physique
+     + `PowerCutOff` séparés, jamais de redémarrage auto après défaut.
+3. **Niveau 1 (systématique)** : lister les documents lus à l'étape 1, chemin + 1 ligne sur leur
+   rôle réel — preuve de repérage, pas de lecture exhaustive.
+4. **Niveau 2 (si tâche C2+ ou ambiguë)** : répondre à une question précise liée à la tâche en
+   cours, avec du concret tiré des fichiers réels (pas une réponse générique apprise par cœur).
+   Signal d'alerte : si l'agent doit grep tout le repo pour répondre à une question simple/évidente
+   après le briefing → soit le briefing était insuffisant, soit l'agent a zappé l'étape 1.
+
+---
+
 ## 🎯 Avant de coder — lire dans cet ordre
 
 | # | Document | Ce qu'il porte |
