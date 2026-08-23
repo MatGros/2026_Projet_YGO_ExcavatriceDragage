@@ -594,6 +594,42 @@ PRG_04_Treuils_Benne:
     - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_04.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_04_treuils_benne.st
 
+PRG_05_Translation:
+  domain: MAIN
+  report_group: MAIN
+  sources:
+    - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
+    - CODE/A_COMMUN/E_State.st
+    - CODE/A_COMMUN/ST_FbStatus.st
+    - CODE/A_COMMUN/ST_FbCause.st
+    - CODE/A_COMMUN/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_CycleTime.st
+    - CODE/A_COMMUN/FB_Ramp.st
+    - CODE/A_COMMUN/FB_Acquisition_Preflight.st
+    - CODE/A_COMMUN/FB_FbStatus.st
+    - CODE/A_COMMUN/FB_Filter.st
+    - CODE/A_COMMUN/FB_Brake.st
+    - CODE/D_JOYSTICK/ST_Joystick_AxisCmd.st
+    - CODE/F_MODES/E_Mode.st
+    - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
+    - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
+
+    - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
+    - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
+    - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
+
+    - CODE/I_TRANSLATION/FB_Safety_Translation.st
+    - CODE/I_TRANSLATION/FB_Translation.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_05.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_05_translation.st
+
+
 
 
 
