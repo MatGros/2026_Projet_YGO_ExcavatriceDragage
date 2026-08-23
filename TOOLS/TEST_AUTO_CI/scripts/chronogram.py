@@ -145,13 +145,18 @@ def build_and_run_traced(temp_dir: pathlib.Path, runtime_include: pathlib.Path,
         str(traced_main), str(temp_dir / "generated.cpp"),
         "-o", str(traced_exe),
     ]
-    result = subprocess.run(compile_cmd, capture_output=True, text=True, encoding="utf-8", cwd=str(temp_dir))
+    import sys
+    subproc_flags = subprocess.BELOW_NORMAL_PRIORITY_CLASS if sys.platform == "win32" else 0
+
+    result = subprocess.run(compile_cmd, capture_output=True, text=True, encoding="utf-8",
+                            cwd=str(temp_dir), creationflags=subproc_flags)
     if result.returncode != 0:
         print("[chronogram] echec compilation instrumentee :")
         print(result.stdout, result.stderr)
         return [], field_types
 
-    run_result = subprocess.run([str(traced_exe)], capture_output=True, text=True, encoding="utf-8")
+    run_result = subprocess.run([str(traced_exe)], capture_output=True, text=True, encoding="utf-8",
+                                creationflags=subproc_flags)
     entries = []
     for line in run_result.stdout.splitlines():
         if line.startswith("SCANTRACE "):

@@ -412,9 +412,9 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     </details>"""
     else:
         contract_section_html = f"""
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.85;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#64748b;font-size:11px;font-weight:normal;margin-left:6px;">(0 test dédié)</span></summary>
-        <div style="padding: 12px; font-size: 12px; color: #64748b; font-style: italic;">
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
             ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
         </div>
     </details>"""
@@ -430,9 +430,9 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     </details>"""
     else:
         domain_section_html = f"""
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.85;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#64748b;font-size:11px;font-weight:normal;margin-left:6px;">(0 test métier)</span></summary>
-        <div style="padding: 12px; font-size: 12px; color: #64748b; font-style: italic;">
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test métier)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
             ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
         </div>
     </details>"""
@@ -444,11 +444,10 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
             ok = not e["has_violation"]
             if ok:
                 verified_invariants = [
-                    "✅ Étanchéité I/O (Zéro écriture externe clandestine)",
-                    "✅ Encapsulation POO (Variables locales protégées)",
-                    "✅ Isolation GVL (Aucun couplage global masqué)"
+                    f"<span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe ({e['n_local']} VAR locales protégées)</span>",
+                    f"<span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span>"
                 ]
-                detail_html = f"<div style='color:#15803d;font-size:11.5px;'>{' · '.join(verified_invariants)}</div>"
+                detail_html = f"<div style='font-size:12px;'>{' · '.join(verified_invariants)}</div>"
             else:
                 detail = "".join(
                     f"<li>🚨 <b>Écriture externe clandestine sur VAR locale :</b> <code>{_html.escape(w)}</code></li>"
@@ -457,7 +456,7 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
                     f"<li>⚠️ <b>Bypass interface (Dépendance GVL directe) :</b> <code>{_html.escape(g)}</code></li>"
                     for g in e.get("gvl_refs", [])
                 )
-                detail_html = f"<ul style='margin:0;padding-left:16px;color:#b91c1c;font-size:11.5px;'>{detail}</ul>"
+                detail_html = f"<ul style='margin:0;padding-left:16px;color:#f87171;font-size:12px;font-weight:600;'>{detail}</ul>"
 
             rows_html.append(f"""
             <tr class="encaps-row-{'pass' if ok else 'fail'}">
@@ -473,61 +472,61 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
                         f"✅ {len(encapsulation_report)} FB de la chaine, encapsulation propre (0 violation)")
         
         help_invariants_html = """
-        <details style="margin: 10px 0 14px 0; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px;">
-            <summary style="cursor: pointer; color: #1e40af; font-weight: 600; font-size: 12px;">
+        <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+            <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
                 ℹ️ Guide d'Audit : Les 7 Invariants & Règles d'Encapsulation Automatisme (Cliquez pour afficher)
             </summary>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; text-align: left;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: left;">
                 <thead>
-                    <tr style="background: #e2e8f0; color: #334155;">
-                        <th style="padding: 4px 6px;">#</th>
-                        <th style="padding: 4px 6px;">Règle / Invariant POO</th>
-                        <th style="padding: 4px 6px;">Risque Machine Réel</th>
-                        <th style="padding: 4px 6px;">Contrôle Automatique</th>
+                    <tr style="background: var(--surface); color: var(--text);">
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">#</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Règle / Invariant POO</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Risque Machine Réel</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Contrôle Automatique</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 4px 6px; font-weight: bold;">1</td>
-                        <td style="padding: 4px 6px;"><b>Écriture externe clandestine sur VAR locale</b></td>
-                        <td style="padding: 4px 6px; color: #b91c1c;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
-                        <td style="padding: 4px 6px; color: #15803d;">🚨 Violation d'encapsulation (External Write)</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">1</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Écriture externe clandestine sur VAR locale</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Violation d'encapsulation (External Write)</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 4px 6px; font-weight: bold;">2</td>
-                        <td style="padding: 4px 6px;"><b>Accès GVL direct sans passer par l'interface</b></td>
-                        <td style="padding: 4px 6px; color: #b91c1c;">FB non testable unitairement, couplage fort et masqué.</td>
-                        <td style="padding: 4px 6px; color: #15803d;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">2</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Accès GVL direct sans passer par l'interface</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">FB non testable unitairement, couplage fort et masqué.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 4px 6px; font-weight: bold;">3</td>
-                        <td style="padding: 4px 6px;"><b>Référence VAR_IN_OUT orpheline</b></td>
-                        <td style="padding: 4px 6px; color: #b91c1c;">Pointeur nul / crash automate lors de l'appel.</td>
-                        <td style="padding: 4px 6px; color: #15803d;">🚨 Invalidation appel de FB</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">3</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Référence VAR_IN_OUT orpheline</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Pointeur nul / crash automate lors de l'appel.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Invalidation appel de FB</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 4px 6px; font-weight: bold;">4</td>
-                        <td style="padding: 4px 6px;"><b>Reset sur front montant (R_TRIG)</b></td>
-                        <td style="padding: 4px 6px; color: #b91c1c;">Réarmement intempestif si le bouton reste coincé/actif.</td>
-                        <td style="padding: 4px 6px; color: #15803d;">🔒 Règle IEC Reset obligatoire</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">4</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Reset sur front montant (R_TRIG)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Réarmement intempestif si le bouton reste coincé/actif.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🔒 Règle IEC Reset obligatoire</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 4px 6px; font-weight: bold;">5</td>
-                        <td style="padding: 4px 6px;"><b>Profils standards (Enable / Ready / Status)</b></td>
-                        <td style="padding: 4px 6px; color: #b91c1c;">Composant impossible à chaîner en sécurité AU.</td>
-                        <td style="padding: 4px 6px; color: #15803d;">⚠️ Contrat AF03 §1bis</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">5</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Profils standards (Enable / Ready / Status)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Composant impossible à chaîner en sécurité AU.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Contrat AF03 §1bis</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 4px 6px; font-weight: bold;">6</td>
-                        <td style="padding: 4px 6px;"><b>Sorties VAR_OUTPUT orphelines</b></td>
-                        <td style="padding: 4px 6px; color: #b91c1c;">Information calculée mais oubliée dans le câblage global.</td>
-                        <td style="padding: 4px 6px; color: #15803d;">💡 Alerte Pinout non consommé</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">6</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Sorties VAR_OUTPUT orphelines</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Information calculée mais oubliée dans le câblage global.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">💡 Alerte Pinout non consommé</td>
                     </tr>
                     <tr>
-                        <td style="padding: 4px 6px; font-weight: bold;">7</td>
-                        <td style="padding: 4px 6px;"><b>Variables locales non initialisées</b></td>
-                        <td style="padding: 4px 6px; color: #b91c1c;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
-                        <td style="padding: 4px 6px; color: #15803d;">⚠️ Détection d'état initial indéfini</td>
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">7</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Variables locales non initialisées</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Détection d'état initial indéfini</td>
                     </tr>
                 </tbody>
             </table>
@@ -573,7 +572,7 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
             # Verification si c'est un Mock
             is_mock = "MOCKS" in str(p_obj.as_posix())
-            mock_badge = '<span style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">MOCK</span>' if is_mock else ''
+            mock_badge = '<span style="background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid #d97706;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">MOCK</span>' if is_mock else ''
 
             is_ok = len(file_errors) == 0
             if not is_ok:
@@ -645,9 +644,19 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         for item in (wirings or [])
     )
 
+    is_prg = fb_name.startswith("PRG_")
+    comp_type = "Programme POU" if is_prg else "Bloc Fonctionnel (FB)"
+    primary_source = pathlib.Path(source_paths[-1]).name if source_paths else f"{fb_name}.st"
+
     body_html = f"""
-    <div class="subtitle">
-        Domaine <b>{_html.escape(domain)}</b> · {passed}/{total} vérifications OK
+    <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
+        <div>
+            <span style="font-size:14px;color:var(--text);font-weight:700;">📁 <code style="color:var(--accent);font-size:14px;">CODE/{_html.escape(domain)}/{_html.escape(primary_source)}</code></span>
+            <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">({comp_type})</span>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);">
+            {passed}/{total} vérifications validées
+        </div>
     </div>
     {compilation_html}
     {af_warning_html}
@@ -678,40 +687,70 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
 _CSS = """
     :root {
-        --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+        --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
+        --accent: #818cf8; --green-bg: rgba(16, 185, 129, 0.15); --green-text: #34d399; --green-border: #059669;
+        --red-bg: rgba(239, 68, 68, 0.15); --red-text: #f87171; --red-border: #dc2626;
+        --warn-bg: rgba(245, 158, 11, 0.15); --warn-text: #fbbf24; --warn-border: #d97706;
+        --card-sub: #0f172a; --badge-prg-bg: rgba(59, 130, 246, 0.2); --badge-prg-txt: #93c5fd;
+        --badge-fb-bg: rgba(148, 163, 184, 0.15); --badge-fb-txt: #cbd5e1; --btn-bg: #1e293b; --btn-border: #334155;
+        --code-bg: #070a12; --code-border: #1e293b;
+        --neon-green-glow: 0 0 25px rgba(16, 185, 129, 0.65), 0 0 10px rgba(16, 185, 129, 0.4), inset 0 0 12px rgba(16, 185, 129, 0.15);
+        --neon-red-glow: 0 0 25px rgba(239, 68, 68, 0.65), 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 12px rgba(239, 68, 68, 0.15);
+        --neon-blue-glow: 0 0 25px rgba(99, 102, 241, 0.6), 0 0 10px rgba(99, 102, 241, 0.35);
+    }
+    [data-theme="light"] {
+        --bg: #f8fafc; --bg-grid: rgba(0, 0, 0, 0.03); --surface: #ffffff; --surface-card: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
         --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
         --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
         --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
+        --card-sub: #f8fafc; --badge-prg-bg: #dbeafe; --badge-prg-txt: #1e40af;
+        --badge-fb-bg: #f1f5f9; --badge-fb-txt: #475569; --btn-bg: #f8fafc; --btn-border: #cbd5e1;
+        --code-bg: #f1f5f9; --code-border: #e2e8f0;
+        --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
     }
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 0;
-        background: var(--bg); color: var(--text); line-height: 1.5; }
-    .page { max-width: 1400px; margin: 0 auto; padding: 32px 24px 64px; }
-    .header { display: flex; justify-content: flex-start; align-items: center;
-        margin-bottom: 6px; gap: 14px; background: var(--surface); border: 1px solid var(--border);
-        border-radius: 10px; padding: 16px 18px; }
-    h1 { font-size: 22px; margin: 0; font-weight: 600; }
-    .header .badge, .fb-section-title .badge { font-size: 14px; padding: 5px 14px; }
-    .subtitle { color: var(--muted); font-size: 13px; margin: 4px 0 24px; }
-    .subtitle b { color: var(--text); font-weight: 600; }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-weight: 600;
-        font-size: 11px; letter-spacing: 0.3px; }
-    .badge-pass { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
-    .badge-fail { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
-    /* Sur fond de page pastel (meme teinte que badge-pass/fail), le badge se fondrait --
-       variante foncee/opaque pour les badges de titre (header, sommaire FB) qui ressortent. */
-    .badge-pass.badge-strong { background: var(--green-text); color: #ffffff; border-color: var(--green-text); }
-    .badge-fail.badge-strong { background: var(--red-text); color: #ffffff; border-color: var(--red-text); }
+    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
+        background-color: var(--bg);
+        background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-position: -1px -1px;
+        color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .header { display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .theme-toggle-btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
+        padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .theme-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.4px; color: #cbd5e1; }
+    .header .badge, .fb-section-title .badge { font-size: 16px; padding: 8px 22px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin: 4px 0 26px; }
+    .subtitle b { color: var(--text); font-weight: 700; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 8px; font-weight: 800;
+        font-size: 13.5px; letter-spacing: 0.8px; font-family: monospace; text-transform: uppercase; }
+    .badge-pass, .badge-pass.badge-strong { background: rgba(16, 185, 129, 0.22); color: #ffffff; border: 2px solid #34d399; box-shadow: 0 0 16px rgba(16, 185, 129, 0.45); }
+    .badge-fail, .badge-fail.badge-strong { background: rgba(244, 63, 94, 0.22); color: #ffffff; border: 2px solid #fb7185; box-shadow: 0 0 16px rgba(244, 63, 94, 0.45); }
+    
+    /* Cartes modernes avec effets Neon Glow */
+    .card-neon-ok { border: 1px solid var(--green-border) !important; box-shadow: var(--neon-green-glow) !important; }
+    .card-neon-fail { border: 1px solid var(--red-border) !important; box-shadow: var(--neon-red-glow) !important; }
+    .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
+
     details { margin-bottom: 20px; }
     summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
     summary:hover { color: var(--text); }
     ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 16px 18px; margin-bottom: 12px; }
-    .test-card-fail { border-color: var(--red-border); }
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .test-card:hover { transform: translateY(-1px); }
+    .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
     /* Style distinct pour les tests de contrat et d'interface socle */
-    .test-card-contract { background: #f8fafc; border-left: 5px solid #6366f1; border-color: #cbd5e1 #cbd5e1 #cbd5e1 #6366f1; }
-    .test-card-contract header h3 { color: #312e81; }
+    .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
+    .test-card-contract header h3 { color: #818cf8; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
@@ -758,16 +797,17 @@ _CSS = """
     .wf-legend { font-size: 10px; fill: var(--muted); }
     .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
     .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
-        border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 13px; }
+        border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
     .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
     .af-warning-banner ul { margin: 0; padding-left: 20px; }
     .af-warning-banner li { margin: 3px 0; }
-    .encaps-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 10px 16px; margin: 14px 0; }
-    .encaps-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; }
+    .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
-    .encaps-table th { text-align: left; padding: 4px 8px; color: var(--muted); font-weight: 600; }
-    .encaps-table td { padding: 4px 8px; border-top: 1px solid var(--border); }
+    .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
     .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
     .encaps-table ul { margin: 0; padding-left: 16px; }
     .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
@@ -780,32 +820,27 @@ _CSS = """
     .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
     .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
     .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
-    .exec-time { color: var(--muted); font-size: 12px; margin: 0 0 20px; }
-    .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-        padding: 12px 16px; margin-bottom: 16px; }
-    .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
-    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; }
-    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 550px; overflow-y: auto; padding: 4px 8px; }
-    .pin-block { flex: 0 0 160px; background: #eef2ff; border: 2px solid var(--accent); border-radius: 8px;
-        display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-weight: 700;
-        font-size: 12px; margin: 0 12px; padding: 16px 8px; position: sticky; top: 10px; color: var(--accent); }
-    .pin-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px;
-        background: #f8fafc; min-width: 0; }
+    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; width: 100%; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 600px; overflow-y: auto; padding: 4px 8px;
+        scrollbar-width: none; -ms-overflow-style: none; }
+    .pin-col::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .pin-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+        background: var(--surface); min-width: 0; }
     /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
     .pin-col-in .pin-row { justify-content: space-between; text-align: right; }
     /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
     .pin-col-out .pin-row { justify-content: space-between; text-align: left; }
-    .pin-name { font-family: monospace; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
-    .pin-type { color: var(--muted); font-weight: 400; font-size: 10px; margin-left: 4px; }
-    .pin-tag { font-size: 9px; border-radius: 4px; padding: 1px 4px; margin-left: 4px; font-weight: 600; white-space: nowrap; }
+    .pin-name { font-family: monospace; font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f8fafc; }
+    .pin-type { color: var(--muted); font-weight: 500; font-size: 11px; margin-left: 4px; }
+    .pin-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; margin-left: 4px; font-weight: 700; white-space: nowrap; }
     .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-    .pin-expr code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 11px;
+    .pin-expr code { background: var(--code-bg); color: #93c5fd; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 11.5px;
         cursor: pointer; font-family: monospace; }
-    .pin-expr code:hover { background: #e2e8f0; }
+    .pin-expr code:hover { border-color: var(--accent); color: #ffffff; }
     .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
-    .pin-missing { color: #b45309; font-style: italic; font-size: 11px; }
-    .pin-more { color: var(--muted); font-size: 10px; }
-    .pin-row-unwired { background: #fffbeb; }
+    .pin-missing { color: #fbbf24; font-style: italic; font-size: 12px; }
+    .pin-more { color: var(--muted); font-size: 11px; }
+    .pin-row-unwired { background: var(--card-sub); }
     .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
         font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
         border: 1px solid var(--border); border-radius: 10px; }
@@ -841,22 +876,43 @@ function copyPinExpr(el) {
     el.classList.add('pin-copied');
     setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
 }
+
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('test_ci_theme', next); } catch (e) {}
+    updateThemeBtn(next);
+}
+
+function updateThemeBtn(theme) {
+    var btns = document.querySelectorAll('.theme-toggle-btn');
+    btns.forEach(function(b) {
+        b.innerHTML = theme === 'dark' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+    });
+}
+
+(function() {
+    try {
+        var saved = localStorage.getItem('test_ci_theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.addEventListener('DOMContentLoaded', function() { updateThemeBtn(saved); });
+        }
+    } catch (e) {}
+})();
 """
 
 
 def _page_shell(title: str, inner_html: str, all_pass: bool = True) -> str:
-    """Enveloppe de page commune (mono-FB ou groupe) -- CSS partage via _CSS. Fond de page
-    pastel (vert/rouge tres attenue) selon le verdict global -- repere visuel immediat sans
-    avoir a lire le badge, sans etre agressif (mêmes tons --green-bg/--red-bg que les badges)."""
-    bg = "#ecfdf5" if all_pass else "#fef2f2"
+    """Enveloppe de page commune (mono-FB ou groupe) -- CSS partage via _CSS.
+    Le fond sombre technique avec grille reste intact et les halos Neon font foi pour l'état."""
     return f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <title>{_html.escape(title)}</title>
-<style>{_CSS}
-    body {{ background: {bg}; }}
-</style>
+<style>{_CSS}</style>
 </head>
 <body>
 <div class="page">
@@ -887,9 +943,9 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
     # Entrées : regroupement clair par type et source
     left_items = []
     for v, t in var_in.items():
-        left_items.append(f'<div class="pin-row pin-row-wired" style="background:#f8fafc;border:1px solid #e2e8f0;margin:2px 0;"><div class="pin-expr"><span style="color:#475569;font-weight:700;font-size:10px;">[VAR_INPUT]</span></div><div class="pin-name" style="color:#1e293b;">{_html.escape(v)} <span class="pin-type" style="color:#64748b;">{_html.escape(t)}</span></div></div>')
+        left_items.append(f'<div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">{_html.escape(v)} <span class="pin-type" style="color:var(--muted);">{_html.escape(t)}</span></div></div>')
     for v, t in var_inout.items():
-        left_items.append(f'<div class="pin-row pin-row-wired" style="background:#f8fafc;border:1px solid #cbd5e1;margin:2px 0;"><div class="pin-expr"><span style="color:#64748b;font-weight:700;font-size:10px;">[VAR_IN_OUT]</span></div><div class="pin-name" style="color:#1e293b;">{_html.escape(v)} <span class="pin-type" style="color:#475569;">{_html.escape(t)}</span></div></div>')
+        left_items.append(f'<div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">{_html.escape(v)} <span class="pin-type" style="color:var(--muted);">{_html.escape(t)}</span></div></div>')
     
     # 1. Grouper les E/S physiques matérielles (Device_IO)
     hw_reads = reads.get("HW_IO", {})
@@ -900,16 +956,16 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
             dev = info.get("device", "")
             desc = info.get("desc", "")
             sub_rows.append(f"""
-            <div class="pin-row pin-row-wired" style="padding-left:16px;background:#f0fdfa;border-left:3px solid #0d9488;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#0f766e;background:#ccfbf1;font-size:10.5px;">{_html.escape(p)}</code> <span style="font-size:9.5px;color:#115e59;">[{_html.escape(iec)} · {_html.escape(dev)}]</span></div>
-                <div class="pin-name"><span class="pin-tag" style="background:#99f6e4;color:#134e4a;font-size:9px;">🔌 E/S Matérielle</span></div>
+            <div class="pin-row pin-row-wired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #14b8a6;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#2dd4bf;background:rgba(20,184,166,0.15);font-size:11px;">{_html.escape(p)}</code> <span style="font-size:10px;color:var(--muted);">[{_html.escape(iec)} · {_html.escape(dev)}]</span></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(20,184,166,0.2);color:#5eead4;font-size:10px;">🔌 E/S Matérielle</span></div>
             </div>""")
         left_items.append(f"""
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-wired" style="background:#ccfbf1;border:1px solid #5eead4;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#115e59;font-weight:700;font-size:11.5px;">🔌 Entrées Physiques / E/S Mappées</span> <span style="font-size:10px;color:#0f766e;">({len(hw_reads)} capteurs/adresses ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:#99f6e4;color:#134e4a;">Device_IO</span></div>
+                <div class="pin-row pin-row-wired" style="background:rgba(20,184,166,0.15);border:1px solid #14b8a6;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#5eead4;font-weight:700;font-size:12px;">🔌 Entrées Physiques / E/S Mappées</span> <span style="font-size:11px;color:#2dd4bf;">({len(hw_reads)} capteurs/adresses ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(20,184,166,0.25);color:#5eead4;">Device_IO</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
@@ -927,16 +983,16 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
         sub_rows = []
         for full_expr, sub_name in sorted(items):
             sub_rows.append(f"""
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#f0f9ff;border-left:3px solid #0284c7;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#0369a1;background:#e0f2fe;font-size:10.5px;">{_html.escape(full_expr)}</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:#bae6fd;color:#075985;font-size:9px;">🌐 GVL In</span></div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">{_html.escape(full_expr)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
             </div>""")
         left_items.append(f"""
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:#e0f2fe;border:1px solid #7dd3fc;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#075985;font-weight:700;font-size:11.5px;">🌐 {_html.escape(g_grp)}</span> <span style="font-size:10px;color:#0369a1;">({len(items)} signaux ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:#bae6fd;color:#075985;">Lecture Globale</span></div>
+                <div class="pin-row pin-row-unwired" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 {_html.escape(g_grp)}</span> <span style="font-size:11px;color:#38bdf8;">({len(items)} signaux ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Lecture Globale</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
@@ -954,16 +1010,16 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
         sub_rows = []
         for full_expr, sub_name in sorted(items):
             sub_rows.append(f"""
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#eff6ff;border-left:3px solid #2563eb;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#1d4ed8;background:#dbeafe;font-size:10.5px;">{_html.escape(full_expr)}</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:#bfdbfe;color:#1e40af;font-size:9px;">🔗 PRG In</span></div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">{_html.escape(full_expr)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>""")
         left_items.append(f"""
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:#dbeafe;border:1px solid #93c5fd;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#1e40af;font-weight:700;font-size:11.5px;">🔗 {_html.escape(p_grp)}</span> <span style="font-size:10px;color:#1d4ed8;">({len(items)} retours ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:#bfdbfe;color:#1e40af;">Inter-PRG</span></div>
+                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 {_html.escape(p_grp)}</span> <span style="font-size:11px;color:#818cf8;">({len(items)} retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
@@ -975,16 +1031,16 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
         sub_rows = []
         for p in dev_reads:
             sub_rows.append(f"""
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#f5f3ff;border-left:3px solid #7c3aed;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#6d28d9;background:#ede9fe;font-size:10.5px;">{_html.escape(p)}</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:#ddd6fe;color:#5b21b6;font-size:9px;">📡 Device CODESYS</span></div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #8b5cf6;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#a78bfa;background:rgba(139,92,246,0.15);font-size:11px;">{_html.escape(p)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(139,92,246,0.2);color:#ddd6fe;font-size:10px;">📡 Device CODESYS</span></div>
             </div>""")
         left_items.append(f"""
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:#ede9fe;border:1px solid #c4b5fd;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#5b21b6;font-weight:700;font-size:11.5px;">📡 Arbre Matériel / Devices ({len(dev_reads)} équipements ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:#ddd6fe;color:#5b21b6;">Nœud Système</span></div>
+                <div class="pin-row pin-row-unwired" style="background:rgba(139,92,246,0.15);border:1px solid #8b5cf6;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#ddd6fe;font-weight:700;font-size:12px;">📡 Arbre Matériel / Devices ({len(dev_reads)} équipements ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(139,92,246,0.25);color:#ddd6fe;">Nœud Système</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
@@ -996,16 +1052,16 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
         sub_rows = []
         for p in enum_reads:
             sub_rows.append(f"""
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#f8fafc;border-left:3px solid #64748b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#334155;background:#e2e8f0;font-size:10.5px;">{_html.escape(p)}</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:#e2e8f0;color:#334155;font-size:9px;">🏷️ Enum / Type</span></div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">{_html.escape(p)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
             </div>""")
         left_items.append(f"""
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:#f1f5f9;border:1px solid #cbd5e1;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#334155;font-weight:700;font-size:11.5px;">🏷️ Énumérations Globales ({len(enum_reads)} constantes ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:#e2e8f0;color:#334155;">Type Global</span></div>
+                <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">({len(enum_reads)} constantes ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.3);color:#f1f5f9;">Type Global</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
@@ -1017,16 +1073,16 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
         sub_rows = []
         for p in retain_reads:
             sub_rows.append(f"""
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#fffbeb;border-left:3px solid #f59e0b;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#b45309;background:#fef3c7;font-size:10.5px;">{_html.escape(p)}</code> <span style="font-size:9.5px;color:#92400e;">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
-                <div class="pin-name"><span class="pin-tag" style="background:#fde68a;color:#92400e;font-size:9px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #d97706;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fcd34d;background:rgba(217,119,6,0.2);font-size:11px;">{_html.escape(p)}</code> <span style="font-size:10px;color:var(--muted);">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;font-size:10px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
             </div>""")
         left_items.append(f"""
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:#fef3c7;border:1px solid #fde68a;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#92400e;font-weight:700;font-size:11.5px;">💾 Variables Rémanentes Persistantes / RETAIN ({len(retain_reads)} variables ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:#fde68a;color:#92400e;font-weight:700;">VAR PERSISTENT</span></div>
+                <div class="pin-row pin-row-unwired" style="background:rgba(217,119,6,0.18);border:1px solid #92400e;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#fde68a;font-weight:700;font-size:12px;">💾 Variables Rémanentes Persistantes / RETAIN</span> <span style="font-size:11px;color:#fcd34d;">({len(retain_reads)} variables ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.3);color:#fef3c7;font-weight:700;">VAR PERSISTENT</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
@@ -1038,16 +1094,16 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
         sub_rows = []
         for p in unres_reads:
             sub_rows.append(f"""
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#fff1f2;border-left:3px solid #e11d48;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#be123c;background:#ffe4e6;font-size:10.5px;">{_html.escape(p)}</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:#fecdd3;color:#9f1239;font-size:9px;">❓ Non Déclaré</span></div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">{_html.escape(p)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
             </div>""")
         left_items.append(f"""
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:#ffe4e6;border:1px solid #fda4af;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#9f1239;font-weight:700;font-size:11.5px;">❓ Inconnues / Non Déclarées ({len(unres_reads)} identifiants ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:#fecdd3;color:#9f1239;">Alerte</span></div>
+                <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#fecdd3;font-weight:700;font-size:12px;">❓ Inconnues / Non Déclarées</span> <span style="font-size:11px;color:#fda4af;">({len(unres_reads)} identifiants ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.3);color:#ffe4e6;">Alerte</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
@@ -1069,29 +1125,29 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
             children_rows = []
             for ch in sorted(children):
                 children_rows.append(f"""
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:#f8fafc;border-left:3px solid #6366f1;margin-top:2px;">
-                    <div class="pin-name" style="font-size:11px;color:#334155;">↳ <b>{_html.escape(v)}</b>.{_html.escape(ch)}</div>
-                    <div class="pin-expr"><span style="font-size:9.5px;color:#64748b;">champ de {_html.escape(t)}</span></div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>{_html.escape(v)}</b>.{_html.escape(ch)}</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de {_html.escape(t)}</span></div>
                 </div>""")
             
             right_items.append(f"""
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
-                    <div class="pin-row pin-row-wired pin-row-out" style="background:#eef2ff;border:1px solid #c7d2fe;cursor:pointer;">
-                        <div class="pin-name" style="color:#3730a3;font-size:12px;">📦 <b>{_html.escape(v)}</b> : <span class="pin-type" style="color:#4338ca;font-weight:700;">{_html.escape(t)}</span> <span style="font-size:10px;color:#6366f1;">({len(children)} champs ▾)</span></div>
-                        <div class="pin-expr"><span style="color:#059669;font-weight:600;font-size:10px;">[VAR_OUTPUT STRUCTURE]</span></div>
+                    <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>{_html.escape(v)}</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">{_html.escape(t)}</span> <span style="font-size:11px;color:#a5b4fc;">({len(children)} champs ▾)</span></div>
+                        <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
                 <div style="margin-top:2px;">{"".join(children_rows)}</div>
             </details>""")
         else:
             right_items.append(f"""
-            <div class="pin-row pin-row-wired pin-row-out" style="margin-top:4px;">
-                <div class="pin-name"><b>{_html.escape(v)}</b> <span class="pin-type" style="color:#4f46e5;font-weight:600;">{_html.escape(t)}</span></div>
-                <div class="pin-expr"><span style="color:#059669;font-weight:600;">[VAR_OUTPUT]</span></div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>{_html.escape(v)}</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">{_html.escape(t)}</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div>""")
 
-    # Écritures transverses vers GVL groupées par GVL cible (Même couleur bleu ciel que GVL In avec bordure cyan)
+    # Écritures transverses vers GVL groupées par GVL cible
     gvl_writes_by_group = {}
     for g in writes.get("GVL", []):
         parts = g.split(".", 1)
@@ -1103,16 +1159,16 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
         sub_rows = []
         for full_expr, sub_name in sorted(items):
             sub_rows.append(f"""
-            <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:#f0f9ff;border-left:3px solid #0284c7;margin-top:2px;">
-                <div class="pin-name"><span class="pin-tag" style="background:#bae6fd;color:#075985;font-size:9px;">🌐 GVL Out</span></div>
-                <div class="pin-expr"><code style="color:#0369a1;background:#e0f2fe;font-size:10.5px;">{_html.escape(full_expr)}</code></div>
+            <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL Out</span></div>
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">{_html.escape(full_expr)}</code></div>
             </div>""")
         right_items.append(f"""
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired pin-row-out" style="background:#e0f2fe;border:1px solid #7dd3fc;cursor:pointer;">
-                    <div class="pin-name"><span style="color:#075985;font-weight:700;font-size:11.5px;">🌐 {_html.escape(g_grp)}</span> <span style="font-size:10px;color:#0369a1;">({len(items)} écritures ▾)</span></div>
-                    <div class="pin-expr"><span class="pin-tag" style="background:#bae6fd;color:#075985;">Écriture Globale</span></div>
+                <div class="pin-row pin-row-unwired pin-row-out" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
+                    <div class="pin-name"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 {_html.escape(g_grp)}</span> <span style="font-size:11px;color:#38bdf8;">({len(items)} écritures ▾)</span></div>
+                    <div class="pin-expr"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Écriture Globale</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
@@ -1123,13 +1179,13 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
     if not right_items:
         right_items.append('<div class="pin-row pin-row-out"><div class="pin-missing">Aucune sortie directe</div></div>')
 
-    sub_inst_badges = "".join(f'<span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;font-size:11px;padding:2px 6px;border-radius:4px;margin:2px;display:inline-block;">⚙️ {_html.escape(inst)} ({_html.escape(t)})</span>' for inst, t in fb_instances.items())
+    sub_inst_badges = "".join(f'<span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ {_html.escape(inst)} <span style="color:var(--muted);font-weight:500;">({_html.escape(t)})</span></span>' for inst, t in fb_instances.items())
 
     var_const = decls.get("VAR_CONSTANT", {})
-    const_badges = "".join(f'<span style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;font-size:11px;padding:2px 6px;border-radius:4px;margin:2px;display:inline-block;">📐 <b>{_html.escape(c_name)}</b> : {_html.escape(c_val)}</span>' for c_name, c_val in var_const.items())
+    const_badges = "".join(f'<span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>{_html.escape(c_name)}</b> : {_html.escape(c_val)}</span>' for c_name, c_val in var_const.items())
 
     const_section = f"""
-        <div style="margin:6px 0;font-size:12px;color:var(--muted);">
+        <div style="margin:6px 0;font-size:13px;color:var(--muted);">
             <b>Constantes internes (VAR CONSTANT) :</b><br>
             <div style="margin-top:4px;">{const_badges}</div>
         </div>""" if const_badges else ""
@@ -1155,21 +1211,21 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
     contract_info_html = ""
     if not is_prg:
         if has_enable and has_ready and has_reset and has_status:
-            contract_badge = '<span style="background:#dcfce7;color:#166534;border:1px solid #86efac;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;">CONTRAT STANDARD AF03</span>'
+            contract_badge = '<span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span>'
             contract_desc = "✅ Enable + Reset + Ready + Status (ST_FbStatus complet)"
         elif has_enable and (has_ready or "DONE" in out_keys) and (has_reset or has_flat_error):
-            contract_badge = '<span style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;">CONTRAT STANDARD (Tolérance T137 Flat)</span>'
+            contract_badge = '<span style="background:rgba(245,158,11,0.18);color:#fbbf24;border:1px solid #d97706;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD (Tolérance T137 Flat)</span>'
             contract_desc = "⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_FbStatus"
         elif has_enable and has_ready:
-            contract_badge = '<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;">CONTRAT LIGHT AF03</span>'
+            contract_badge = '<span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT LIGHT AF03</span>'
             contract_desc = "✅ Enable + Ready (Calculateur / Brique sans défaut)"
         else:
-            contract_badge = '<span style="background:#f8fafc;color:#475569;border:1px solid #cbd5e1;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;">PROFIL TECHNIQUE SPÉCIFIQUE</span>'
+            contract_badge = '<span style="background:var(--card-sub);color:var(--text);border:1px solid var(--border);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">PROFIL TECHNIQUE SPÉCIFIQUE</span>'
             contract_desc = "Brique utilitaire / Interface sur-mesure"
 
         contract_info_html = f"""
-        <div style="margin: 6px 0 4px 0;">{contract_badge}</div>
-        <div style="font-size: 9.5px; color: #4338ca; margin-bottom: 8px; font-weight: normal;">{contract_desc}</div>"""
+        <div style="margin: 8px 0 4px 0;">{contract_badge}</div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">{contract_desc}</div>"""
 
     # Structure & Qualité du code ST (En-tête et bannières requises pour FB et PRG)
     sq = analysis.get("structure_quality", {})
@@ -1180,40 +1236,40 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
     all_struct_ok = hdr_ok and in_b_ok and out_b_ok and loc_b_ok
 
     struct_status_html = f"""
-    <div style="margin-top:6px;padding:4px 6px;background:{'#f0fdf4' if all_struct_ok else '#fff1f2'};border:1px solid {'#bbf7d0' if all_struct_ok else '#fecdd3'};border-radius:4px;font-size:9.5px;text-align:left;color:{'#166534' if all_struct_ok else '#9f1239'};font-weight:normal;">
-        <div style="font-weight:700;margin-bottom:2px;">📋 Structure ST (Cartouche & Bannières) :</div>
+    <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
+        <div style="font-weight:800;color:var(--accent);margin-bottom:4px;border-bottom:1px solid var(--border);padding-bottom:2px;font-size:11.5px;">📋 Structure ST :</div>
         <div>{'✅' if hdr_ok else '❌'} Cartouche En-tête <code>(* === *)</code></div>
         <div>{'✅' if in_b_ok else '❌'} Bannière <code>VAR_INPUT</code></div>
         <div>{'✅' if out_b_ok else '❌'} Bannière <code>VAR_OUTPUT</code></div>
         <div>{'✅' if loc_b_ok else '❌'} Bannière <code>VAR</code> locale</div>
     </div>"""
 
+    pou_badge_type = '<span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span>'
     return f"""
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>{_html.escape(pou_title)}</b> <span class="badge badge-pass" style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;margin-left:6px;">POU Principal</span> (📊 {total_in_count} flux entrants · {total_out_count} flux sortants)</summary>
-        <div style="margin:10px 0 6px 0;font-size:12px;color:var(--muted);">
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>{_html.escape(pou_title)}</b> {pou_badge_type} <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 {total_in_count} flux entrants · {total_out_count} flux sortants)</span></summary>
+        <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;">{sub_inst_badges or '(aucune)'}</div>
         </div>
         {const_section}
-        <div class="pin-diagram" style="background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
             <div class="pin-col pin-col-in">{"".join(left_items)}</div>
-            <div class="pin-block" style="min-width: 210px; background: #e0e7ff; border: 2px solid #4338ca; color: #312e81; font-size: 13px; letter-spacing: 0.3px; padding: 12px 6px;">
-                <span style="font-weight:700;font-size:13.5px;">{_html.escape(pou_title)}</span>
+            <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">{_html.escape(pou_title)}</span>
                 {contract_info_html}
                 
-                <div style="margin-top:4px;padding:6px;background:#ffffff;border:1px solid #c7d2fe;border-radius:6px;width:100%;font-size:10.5px;text-align:left;color:#334155;font-weight:normal;">
-                    <div style="color:#1e40af;font-weight:700;border-bottom:1px solid #e2e8f0;padding-bottom:2px;margin-bottom:4px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b>{len(var_in) + len(var_inout)}</b></div>
-                    <div>• Entrées Physiques : <b>{len(hw_reads)}</b></div>
-                    <div>• Lectures GVL : <b>{sum(len(items) for items in gvl_reads_by_group.values())}</b></div>
-                    <div>• Retours PRG : <b>{sum(len(items) for items in prg_reads_by_group.values())}</b></div>
-                    <div>• Devices CODESYS : <b>{len(dev_reads)}</b></div>
-                    <div>• Calibrations RETAIN : <b>{len(retain_reads)}</b></div>
-                    <div style="border-top:1px solid #e2e8f0;margin-top:4px;padding-top:2px;">• Structures Out : <b>{len(var_out)}</b></div>
-                    <div>• Champs Out : <b>{sum(len(children) for children in sub_writes_by_parent.values())}</b></div>
-                    <div>• Écritures GVL : <b>{sum(len(items) for items in gvl_writes_by_group.values())}</b></div>
-                    <div style="border-top:1px solid #e2e8f0;margin-top:4px;padding-top:2px;font-weight:700;color:#4338ca;">Total : <b>{total_in_count} IN</b> / <b>{total_out_count} OUT</b></div>
+                <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
+                    <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">{len(var_in) + len(var_inout)}</b></div>
+                    <div>• Entrées Physiques : <b style="color:#ffffff;">{len(hw_reads)}</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">{sum(len(items) for items in gvl_reads_by_group.values())}</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">{sum(len(items) for items in prg_reads_by_group.values())}</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">{len(retain_reads)}</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">{len(var_out)}</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">{sum(len(children) for children in sub_writes_by_parent.values())}</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">{sum(len(items) for items in gvl_writes_by_group.values())}</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">{total_in_count} IN</b> / <b style="color:#ffffff;">{total_out_count} OUT</b></div>
                 </div>
                 {struct_status_html}
             </div>
@@ -1309,7 +1365,8 @@ def _render_toc(groups: list) -> str:
     parts = []
     for title, entries in groups:
         if title:
-            parts.append(f'<div class="toc-group-title">{_html.escape(title)}</div>')
+            sec_id = f"fb-section-{title.lower()}"
+            parts.append(f'<div class="toc-group-title"><a href="#{sec_id}" style="color:var(--accent);text-decoration:none;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;">📦 {_html.escape(title)} <span style="font-size:11px;font-weight:normal;color:var(--muted);">➔ sauter au bloc</span></a></div>')
         items = "".join(
             f'<li class="toc-item toc-{"pass" if passed else "fail"}">'
             f'<a href="#{anchor}">{_html.escape(name)}</a></li>'
@@ -1336,8 +1393,13 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
     toc_html = _render_toc([(None, section["toc_entries"])])
     inner = f"""
     <div class="header">
-        <h1>{_html.escape(fb_name)}</h1>
-        {_badge(section['all_pass'])}
+        <div>
+            <h1>{_html.escape(fb_name)}</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
+            {_badge(section['all_pass'])}
+        </div>
     </div>
     <div class="exec-time">{exec_time}</div>
     {toc_html}
@@ -1352,26 +1414,158 @@ def render_group_report(group_name: str, fb_sections: list) -> str:
     fb_sections : liste de dict, chacun avec les memes cles que les arguments de
     _render_fb_section (fb_name, domain, sources, json_data, text_report, test_st_path,
     trace_entries, source_paths, cycle_time_ms, field_types, af_warnings, extra_test_warnings)."""
-    sections = [_render_fb_section(**kw) for kw in fb_sections]
+    # Tri rigoureusement identique à l'index (ordre alphabétique / hiérarchique uniforme)
+    sorted_sections_kw = sorted(fb_sections, key=lambda s: s.get("fb_name", ""))
+    sections = [_render_fb_section(**kw) for kw in sorted_sections_kw]
     exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     all_pass = all(s["all_pass"] for s in sections)
     n_pass = sum(1 for s in sections if s["all_pass"])
 
     body_parts = []
     for s in sections:
+        sec_id = f"fb-section-{s['fb_name'].lower()}"
         body_parts.append(f"""
-    <div class="fb-section-title">{_html.escape(s['fb_name'])} {_badge(s['all_pass'])}</div>
+    <div id="{sec_id}" class="fb-section-title" style="scroll-margin-top:20px;">
+        <span style="font-family:monospace;font-size:18px;font-weight:900;color:var(--text);">📦 {_html.escape(s['fb_name'])}</span> {_badge(s['all_pass'])}
+    </div>
     {s['body_html']}""")
 
     toc_html = _render_toc([(s["fb_name"], s["toc_entries"]) for s in sections])
 
     inner = f"""
     <div class="header">
-        <h1>{_html.escape(group_name)}</h1>
-        {_badge(all_pass)}
+        <div>
+            <h1>{_html.escape(group_name)}</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
+            {_badge(all_pass)}
+        </div>
     </div>
     <div class="exec-time">{n_pass}/{len(sections)} FB OK · {exec_time}</div>
     {toc_html}
     {"".join(body_parts)}"""
     title = f"Rapport de test — {group_name} [{'PASS' if all_pass else 'FAIL'}]"
     return _page_shell(title, inner, all_pass=all_pass)
+
+
+def render_index_dashboard(results: dict, group_report_paths: dict) -> str:
+    """Génère une page d'accueil / dashboard index.html à la racine de TEST_AUTO_CI
+    listant tous les domaines, programmes (PRG), briques (FB) et liens d'accès direct."""
+    exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    total_fbs = len(results)
+    n_pass = sum(1 for r in results.values() if r.get("ok"))
+    n_fail = total_fbs - n_pass
+    all_pass = n_fail == 0
+
+    # Découverte dynamique de l'ordre officiel des dossiers réels depuis CODE/
+    repo_root = pathlib.Path(__file__).resolve().parents[3]
+    code_dir = repo_root / "CODE"
+    if code_dir.exists():
+        official_code_folders = [p.name for p in sorted(code_dir.iterdir()) if p.is_dir()]
+    else:
+        official_code_folders = []
+
+    # Regroupement par domaine
+    by_domain = {}
+    for name, r in sorted(results.items()):
+        domain = r.get("section_kwargs", {}).get("domain", "AUTRES")
+        by_domain.setdefault(domain, []).append((name, r))
+
+    def _domain_sort_key(d: str):
+        if d in official_code_folders:
+            return (0, official_code_folders.index(d))
+        # Fallback si préfixe partiel ou nom sans lettre
+        for idx, f in enumerate(official_code_folders):
+            if d.lower() in f.lower() or f.lower() in d.lower():
+                return (0, idx)
+        return (1, d)
+
+    domain_cards = []
+    for domain, items in sorted(by_domain.items(), key=lambda kv: _domain_sort_key(kv[0])):
+        dom_pass = sum(1 for _, r in items if r.get("ok"))
+        dom_total = len(items)
+        dom_ok = dom_pass == dom_total
+
+        rows = []
+        for name, r in items:
+            ok = r.get("ok", False)
+            tests = r.get("tests", [])
+            n_t_pass = sum(1 for t in tests if t.get("passed"))
+            is_prg = name.startswith("PRG_")
+
+            report_file = r.get("report")
+            if report_file:
+                p_rep = pathlib.Path(report_file)
+                if "RESULTS" in p_rep.parts:
+                    idx_res = p_rep.parts.index("RESULTS")
+                    rel_link = "/".join(p_rep.parts[idx_res:])
+                else:
+                    rel_link = f"RESULTS/{domain}/reports/{p_rep.name}"
+            else:
+                rel_link = f"RESULTS/{domain}/reports/{name}.html"
+
+            type_badge = (
+                '<span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>'
+                if is_prg else
+                '<span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>'
+            )
+
+            rows.append(f"""
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;">{_badge(ok)}</td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        {type_badge}
+                        <a href="{rel_link}" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">{_html.escape(name)}</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">{n_t_pass}/{len(tests)} test(s) OK</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="{rel_link}" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>""")
+
+        domain_neon_cls = "card-neon-ok" if dom_ok else "card-neon-fail"
+        domain_cards.append(f"""
+        <div class="{domain_neon_cls}" style="background:var(--surface);border-radius:12px;padding:20px 24px;margin-bottom:22px;transition:all 0.2s ease;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+                <h2 style="margin:0;font-size:19px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px;">📁 <span style="color:var(--accent);font-family:monospace;font-weight:800;">CODE/{_html.escape(domain)}</span></h2>
+                <div style="display:flex;align-items:center;gap:10px;">{_badge(dom_ok)} <span style="font-size:14px;color:var(--muted);font-weight:700;">{dom_pass}/{dom_total} composant(s)</span></div>
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                <tbody>{"".join(rows)}</tbody>
+            </table>
+        </div>""")
+
+    header_neon = "card-neon-ok" if all_pass else "card-neon-fail"
+    inner = f"""
+    <div class="header {header_neon}" style="justify-content:space-between;">
+        <div>
+            <h1 style="display:flex;align-items:center;gap:14px;font-size:32px;font-weight:900;letter-spacing:-0.5px;">⚡ DASHBOARD <span style="font-size:20px;color:var(--accent);font-weight:800;font-family:monospace;">TEST_AUTO_CI</span></h1>
+            <div style="color:var(--muted);font-size:15px;font-weight:600;margin-top:6px;">Excavatrice de Dragage · Validation Automate CODESYS 3.5 & STruCpp</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()" style="font-size:14px;padding:9px 18px;">☀️ Mode Clair</button>
+            {_badge(all_pass, strong=True)}
+        </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;margin:24px 0;">
+        <div class="card-neon-blue" style="background:var(--surface);border-radius:12px;padding:18px;text-align:center;">
+            <div style="font-size:30px;font-weight:900;color:var(--accent);font-family:monospace;">{total_fbs}</div>
+            <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">POU & Composants</div>
+        </div>
+        <div class="card-neon-ok" style="background:var(--surface);border-radius:12px;padding:18px;text-align:center;">
+            <div style="font-size:30px;font-weight:900;color:var(--green-text);font-family:monospace;">{n_pass}</div>
+            <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Succès (PASS)</div>
+        </div>
+        <div class="{'card-neon-fail' if n_fail > 0 else ''}" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
+            <div style="font-size:30px;font-weight:900;color:{'var(--red-text)' if n_fail > 0 else 'var(--muted)'};font-family:monospace;">{n_fail}</div>
+            <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Échecs (FAIL)</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
+            <div style="font-size:16px;font-weight:800;color:var(--text);margin-top:8px;font-family:monospace;">{exec_time}</div>
+            <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Horodatage Exécution</div>
+        </div>
+    </div>
+    {"".join(domain_cards)}
+    """
+    return _page_shell("TEST_AUTO_CI — Tableau de Bord Global", inner, all_pass=all_pass)
