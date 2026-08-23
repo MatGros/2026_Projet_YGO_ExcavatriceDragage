@@ -134,7 +134,12 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
     def _log(*a):
         if debug:
-            print(*a)
+            try:
+                print(*a)
+            except UnicodeEncodeError:
+                safe_str = " ".join(str(x) for x in a).encode("ascii", errors="replace").decode("ascii")
+                print(safe_str)
+
 
     try:
         n_tests_declared = len(re.findall(r"^TEST\s+'", test_file.read_text(encoding="utf-8"), re.MULTILINE))
