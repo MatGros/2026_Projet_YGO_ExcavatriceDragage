@@ -89,6 +89,33 @@ avalé silencieusement. Vérifié empiriquement (session 2026-08-23, typo `INT_I
   automatique par absence de préfixe projet, tentée puis abandonnée (régression trouvée : ça
   avalait aussi `INT_INCONNU`, un vrai bug de test, comme faux "incomplete"). Un nouveau type
   externe rencontré doit être ajouté manuellement à cette liste.
+- ✅ **`VAR_GLOBAL PERSISTENT` — corrigé.** STruCpp ne supporte PAS du tout le qualificatif
+  `PERSISTENT` (même seul, sans `RETAIN`) — confirmé par test isolé. `RETAIN` seul compile.
+  `PERSISTENT` est retiré avant compilation (transformation 6), `RETAIN` conservé si présent.
+- ✅ **Initialiseurs de struct/array par litéral nommé (`Champ := Val, ...`) — corrigé.** STruCpp
+  ne les parse pas du tout, imbrication comprise (`Config := (Offset := 0.0, ...)` dans un autre
+  `(...)`). Retirés avant compilation UNIQUEMENT dans une déclaration (`: Type := (...)`) et
+  seulement si le contenu contient lui-même un `:=` — jamais dans le corps d'un FB/PRG, pour ne
+  pas détruire une vraie expression parenthésée comme `X := (A > B) AND (C);` (transformation 8,
+  scanner à profondeur équilibrée, pas une regex plate).
+- ✅ **`ARRAY[..] OF ARRAY[..] OF Type` (imbriqué) — corrigé.** Non supporté par STruCpp ; converti
+  en forme virgule standard IEC `ARRAY[..,..] OF Type` (même géométrie, syntaxe équivalente,
+  transformation 7).
+- ✅ **Accès qualifié à un autre PROGRAM (`PRG_02_Acquisition.Data.X`) — classé "incomplete",
+  jamais "corrigible" par simple transformation.** Contrairement aux GVL, STruCpp reconnaît bien
+  le PROGRAM mais refuse l'accès direct à ses membres (`Cannot access members of program 'X'
+  directly — declare a variable of type 'X' first`) — limite structurelle, pas un simple
+  qualificatif à retirer. `lint.py` compare tout `Undeclared variable` contre l'index complet des
+  noms déclarés du projet (`resolve_deps.build_declaration_index`) : si le nom existe bien dans
+  `CODE/`, c'est cette limite d'accès qualifié, filtré en warning informatif — sinon vraie erreur.
+- ✅ **Variables `GVL_PERSISTENT` accédées sans préfixe (`_CommunCfgPersist`, convention NC-070)
+  — corrigé.** Contrairement aux autres GVL, `GVL_PERSISTENT.st` n'a pas de préfixe qualifié
+  devant ses membres (accès direct par convention projet) — `resolve_deps.py` ne les détectait ni
+  ne les indexait. Désormais : chaque membre `_XxX` d'une GVL est indexé individuellement (pas
+  que le nom du fichier), et `REF_RE` détecte les références `_Identifiant`. ⚠️ A révélé un 2e bug
+  au passage : plusieurs noms résolvant vers le même fichier dupliquaient ce fichier dans la
+  compilation (`Symbol already defined in scope 'global'`) — corrigé par dédoublonnage
+  (`dict.fromkeys`) dans `lint.py`.
 
 ## 🖥️ Extension VSCode (`vscode-extension/`)
 
