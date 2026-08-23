@@ -8,6 +8,7 @@
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchLoadEstimator
+
 VAR_INPUT
     // === COMMANDES ET CONSIGNES ===
     Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB

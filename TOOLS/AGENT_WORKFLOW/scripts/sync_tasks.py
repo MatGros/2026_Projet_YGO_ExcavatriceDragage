@@ -370,6 +370,7 @@ def save_tasks_html(tasks, output_path: Path):
         <button class="filter-btn" onclick="setFilter('⬜', this)">⬜ À faire</button>
         <button class="filter-btn" onclick="setFilter('⏳', this)">⏳ En attente</button>
         <button class="filter-btn" onclick="setFilter('✅', this)">✅ Validés</button>
+        <button class="filter-btn" onclick="setFilter('❌', this)">❌ Annulés</button>
         <button class="filter-btn" onclick="setDomain('SÉCURITÉ', this)">🛡️ Sécurité</button>
         <button class="filter-btn" onclick="setDomain('CODEURS', this)">📏 Codeurs</button>
         <button class="filter-btn" onclick="setDomain('TREUILS', this)">🏗️ Treuils</button>
@@ -435,6 +436,7 @@ def save_tasks_html(tasks, output_path: Path):
                         <option value="⏳">⏳ En attente tests / MES</option>
                         <option value="⏸️">⏸️ Bloqué / Différé</option>
                         <option value="✅">✅ Clôturé & Validé</option>
+                        <option value="❌">❌ Annulé / Abandonné</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -588,10 +590,11 @@ def save_tasks_html(tasks, output_path: Path):
                 activeTh.innerText = activeTh.innerText.replace('↕', sortAsc ? '▲' : '▼');
             }}
 
-            let countDone = 0, countLock = 0, countOpen = 0;
+            let countDone = 0, countLock = 0, countOpen = 0, countCancel = 0;
             tasks.forEach(t => {{
                 if (t.statut === '✅') countDone++;
                 else if (t.statut === '🔒' || t.statut === '🔍') countLock++;
+                else if (t.statut === '❌') countCancel++;
                 else countOpen++;
             }});
             
@@ -599,6 +602,7 @@ def save_tasks_html(tasks, output_path: Path):
                 <span class="badge badge-done">✅ ${{countDone}} Validées</span>
                 <span class="badge badge-lock">🔒 ${{countLock}} En cours</span>
                 <span class="badge badge-open">⬜ ${{countOpen}} À traiter</span>
+                <span class="badge" style="background:#555; color:#fff;">❌ ${{countCancel}} Annulées</span>
                 <span class="badge" style="background:#44475a; color:#fff;">Total : ${{tasks.length}}</span>
             `;
 

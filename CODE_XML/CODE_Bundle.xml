@@ -32945,7 +32945,6 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimTranslationActive := FALSE;
     GVL_Simulation.SimOperatorActive := FALSE;
     GVL_Simulation.SimSafetyActive := FALSE;
-
     GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
     GVL_Simulation.SimM3SensorsWord := 16#07;
     GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active := FALSE;
