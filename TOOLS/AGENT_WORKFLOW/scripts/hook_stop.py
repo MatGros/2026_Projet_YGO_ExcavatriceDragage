@@ -1,22 +1,28 @@
 #!/usr/bin/env python3
-"""Hook Stop : empeche de conclure un tour sur du faux.
+"""Hook Stop : empeche de CONCLURE UN LOT sur du faux — pas de bloquer le WIP.
 
 Classe de bug couverte (REX 2026-07-29) : un lot a ete annonce termine alors que
 `PRG_10_Outputs_LD` n'etait relie a rien. Tous les controles etaient VOLONTAIRES —
 l'agent devait penser a les lancer. Ce hook les rend obligatoires au seul moment
-qui compte : celui ou l'agent veut dire « c'est fini ».
+qui compte : celui ou l'agent DECLARE la fin d'un lot (bannieres definies dans
+AGENTS.md, ex. "BUNDLE EXPORTE ET VALIDE", "lot termine").
 
 Ne se declenche QUE si des fichiers `CODE/**/*.st` ont ete modifies dans le
 depot. Une session de discussion, d'audit ou de documentation n'est jamais
-bloquee — on ne genera personne pour rien.
+bloquee. Pendant l'implementation (WIP), G200/le bundle peuvent etre rouges
+aussi longtemps que necessaire : coder, committer, pousser, iterer, s'arreter
+pour reflechir — rien de tout ca n'est bloque (REX 2026-08-23, l'utilisateur a
+explicitement rejete le blocage pendant le WIP). Seule la DECLARATION de fin
+de lot, texte a l'appui dans le transcript, active la verification.
 
-Verifications bloquantes quand du ST a bouge :
+Verifications bloquantes quand du ST a bouge ET que le dernier message de
+l'agent declare un lot termine :
   S1  G200_check_linkage.py vert (aucune instance orpheline, aucune ref cassee)
   S2  CODE_XML/CODE_Bundle.xml a jour vis-a-vis des sources
 
 Philosophie : echec d'INFRASTRUCTURE (git absent, script illisible) = on laisse
 passer, on ne bloque pas le travail sur un probleme d'outillage. Echec de
-VERIFICATION = on bloque.
+VERIFICATION au moment d'une declaration de fin = on bloque.
 """
 
 from __future__ import annotations
@@ -28,6 +34,51 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 SCRIPTS = ROOT / "TOOLS" / "AGENT_WORKFLOW" / "scripts"
+
+# Marqueurs de declaration de fin de lot — cf. AGENTS.md "Bandeau de restitution
+# obligatoire". Volontairement etroit : un "termine"/"fini" isole dans une phrase
+# de discussion normale (ex. "l'iteration est terminee pour ce soir") ne doit
+# PAS declencher le gate. Doit rester aligne avec les bannieres reellement demandees.
+COMPLETION_MARKERS = (
+    "bundle exporté",       # bandeaux 1 et 2 d'AGENTS.md commencent tous les deux ainsi
+    "lot terminé",
+)
+
+
+def last_assistant_text(transcript: Path) -> str:
+    """Texte du dernier message assistant du transcript (preuve non falsifiable)."""
+    text = ""
+    try:
+        with transcript.open(encoding="utf-8", errors="replace") as handle:
+            for line in handle:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                message = entry.get("message") or {}
+                if message.get("role") != "assistant":
+                    continue
+                content = message.get("content")
+                if not isinstance(content, list):
+                    continue
+                blocks = [b.get("text", "") for b in content if isinstance(b, dict) and b.get("type") == "text"]
+                if blocks:
+                    text = "\n".join(blocks)
+    except OSError:
+        return ""
+    return text
+
+
+def declares_completion(transcript_path: str | None) -> bool:
+    if not transcript_path:
+        return True  # transcript illisible : on ne peut pas prouver l'absence -> comportement prudent conserve
+    text = last_assistant_text(Path(transcript_path)).lower()
+    if not text:
+        return True
+    return any(marker in text for marker in COMPLETION_MARKERS)
 
 
 def run(cmd: list[str]) -> tuple[int, str]:
@@ -57,6 +108,11 @@ def main() -> int:
         return 0
 
     if not st_files_touched():
+        return 0
+
+    if not declares_completion(payload.get("transcript_path")):
+        # WIP : le code bouge mais l'agent ne declare pas de fin de lot.
+        # On n'alerte meme pas — pas de bruit pendant l'iteration normale.
         return 0
 
     problems: list[str] = []
