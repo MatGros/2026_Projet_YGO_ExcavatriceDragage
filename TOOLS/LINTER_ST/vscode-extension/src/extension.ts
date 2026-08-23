@@ -74,9 +74,14 @@ function runLint(fsPath: string, workspaceFolder: vscode.WorkspaceFolder): Promi
     const config = vscode.workspace.getConfiguration('linterSt');
     const verbose = config.get<boolean>('verboseOutput', false);
     const extraExternalTypes = config.get<string[]>('knownExternalTypes', []);
+    const applyCompatFixes = config.get<boolean>('applyCompatFixes', true);
     const args = [lintScript, fsPath, '--code-root', codeRoot];
     if (extraExternalTypes.length > 0) {
         args.push('--extra-external-types', extraExternalTypes.join(','));
+    }
+    if (!applyCompatFixes) {
+        // Mode STruCpp brut : voir le commentaire de lint.py --raw / linterSt.applyCompatFixes.
+        args.push('--raw');
     }
 
     if (verbose) {
