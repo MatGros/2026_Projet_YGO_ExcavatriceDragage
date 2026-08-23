@@ -14,6 +14,30 @@ lien inter-outils).
 le linter **ne remonte aucune alerte** plutôt que de signaler une fausse erreur — préférence
 explicite de l'utilisateur (mieux vaut un silence qu'une fausse alerte).
 
+📖 **Référence officielle STruCpp** : [IEC_COMPLIANCE.md](https://github.com/Autonomy-Logic/STruCpp/blob/development/docs/IEC_COMPLIANCE.md)
+— liste ce que le compilateur supporte/ne supporte pas. Lue **après coup** (session 2026-08-23,
+une fois les 3 correctifs déjà écrits par test empirique) — confirme la plupart de nos
+découvertes (init de struct valide seulement en déclaration, `ARRAY[..,..]` supporté,
+`PERSISTENT` absent de toute la doc), mais **contredit** un point : elle liste "Pragmas `{...}`
+— Supported" et "Namespace configuration — Supported — Via pragmas", alors qu'on a conclu que
+STruCpp ne gérait pas du tout `{...}`. 🔍 **Piste non explorée** : il existe peut-être un vrai
+mécanisme de pragma pour l'accès qualifié GVL/PROGRAM, plus propre que notre retrait de préfixe
+actuel — à tester avant d'ajouter de nouveaux correctifs de ce type.
+
+📖 **[ARCHITECTURE.md](https://github.com/Autonomy-Logic/STruCpp/blob/development/docs/ARCHITECTURE.md)**
+(lu après coup, session 2026-08-23) révèle que STruCpp est écrit en **TypeScript** et expose une
+**vraie API JS/TS publique** (`src/index.ts` : `compile()`, `parse()`, `getVersion()`) qui retourne
+des `CompileError[]` structurés (`message`, `line`, `column`, `severity: "error"|"warning"|"info"`,
+`file`) — pas juste une sortie CLI texte. 🔍 **Piste d'amélioration future non explorée** :
+`extension.ts` est déjà en TypeScript/Node.js — appeler l'API JS de STruCpp **directement**,
+sans sous-processus Python ni parsing regex de texte brut, serait plus robuste. Pas fait ici
+(architecture actuelle fonctionnelle et testée en profondeur, refonte non justifiée dans l'immédiat).
+
+📖 **[UNION_IMPLEMENTATION_PLAN.md](https://github.com/Autonomy-Logic/STruCpp/blob/development/docs/UNION_IMPLEMENTATION_PLAN.md)**
+: `UNION` CODESYS est **"Proposed" (pas encore implémenté)** côté STruCpp. Sans impact aujourd'hui
+— `UNION` n'est utilisé nulle part dans `CODE/` (vérifié par grep, session 2026-08-23) — mais à
+surveiller si le projet en introduit un jour : ça remonterait une vraie limite STruCpp, pas un bug.
+
 ## 📦 Contenu
 
 | Fichier | Rôle |
