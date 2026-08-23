@@ -56,3 +56,24 @@ TEST 'PRG_07_Supervision : Remontee Alarme Bandeau sur SafeStop Treuil'
     ASSERT_TRUE(harness.Banner.AlarmBanner.HasAlarm, 'Alarme active visible sur le bandeau IHM');
 END_TEST
 
+TEST 'PRG_07_Supervision : Coupure de Puissance AU (PowerCutOff) visible sur le bandeau'
+    // Stimulus : coupure brutale de puissance propagee (PRG_06 -> barriere AU)
+    winchData.WinchM1Safety.PowerCutOff := TRUE;
+    winchData.WinchM2Safety.PowerCutOff := TRUE;
+
+    harness(
+        AcqData := acqData,
+        ModesAuth := modesAuth,
+        WinchData := winchData,
+        TranslationData := translationData,
+        PowerContactorEngaged := TRUE,
+        PowerCutOffActive := TRUE
+    );
+
+    // Coupure de puissance = action operateur PRIORITAIRE sur le bandeau
+    // (PowerCutOff alimente OperatorActionText, pas AlarmBanner.HasAlarm qui ne
+    //  reflete que les Error* decodes).
+    ASSERT_TRUE(harness.Banner.OperatorActionText <> '', 'Action operateur renseignee en coupure puissance');
+    ASSERT_TRUE(harness.Banner.GlobalContextText <> '', 'Contexte IHM reste renseigne meme en coupure');
+END_TEST
+

@@ -33,7 +33,13 @@ _VAR_KIND_RE = re.compile(
 )
 _DECL_NAME_RE = re.compile(r"^\s*(\w+)\s*(?:AT\s*%\w+)?\s*:\s*[^:=]")
 _ASSIGN_RE = re.compile(r":=")
-_IDENT_PATH_TAIL_RE = re.compile(r"([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*$")
+# Chemin d'affectation : identifiant eventuellement suivi d'indexations tableau
+# (ex: `instCauses[0].Active`, `Tab[i].Field`, `Mat[1][2]`) puis eventuellement de segments
+# membres separes par des points. Le groupement capture TOUT le chemin pour en extraire la
+# base (premier identifiant), et non seulement le dernier segment de membre.
+_IDENT_PATH_TAIL_RE = re.compile(
+    r"([A-Za-z_]\w*(?:\s*\[[^\]\n]*\]\s*)*(?:\.[A-Za-z_]\w*(?:\s*\[[^\]\n]*\]\s*)*)*)\s*$"
+)
 _GVL_REF_RE = re.compile(r"\bGVL_\w+\b")
 
 _KIND_LABELS = {
@@ -111,6 +117,9 @@ def _assignment_targets(body: str) -> list:
             continue
         path = tail.group(1)
         base = path.split(".")[0]
+        # Depouille l'indexation tableau de la base : `instCauses[0].Active` -> `instCauses`
+        # (un tableau declare est l'identifiant de base legal, pas son index).
+        base = re.sub(r"\s*\[.*$", "", base)
         if base.upper() in _ST_RESERVED_LHS:
             continue
         targets.append(base)
