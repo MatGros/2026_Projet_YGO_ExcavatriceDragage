@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Runner de tests automatises pour FB CODESYS, base sur registry.yaml (source unique des
 dependances -- jamais devinees a la volee). Pipeline par FB :
 
@@ -267,14 +267,14 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                                source_paths=sources, cycle_time_ms=cycle_time_ms,
                                field_types=field_types, af_warnings=af_warnings,
                                extra_test_warnings=extra_test_warnings, wirings=wirings,
-                               encapsulation_report=encapsulation_report)
+                               encapsulation_report=encapsulation_report,
+                               source_prg=entry.get("source_prg"))
 
         if json_data is not None:
             (base.with_suffix(".json")).write_text(json.dumps(json_data, indent=2), encoding="utf-8")
-            if not report_group:
-                html = render_html_report(**section_kwargs, test_file=str(entry["test"]))
-                base.with_suffix(".html").write_text(html, encoding="utf-8")
-                report_path = base.with_suffix(".html")
+            html = render_html_report(**section_kwargs, test_file=str(entry["test"]))
+            base.with_suffix(".html").write_text(html, encoding="utf-8")
+            report_path = base.with_suffix(".html")
         else:
             base.with_suffix(".txt").write_text(text_report, encoding="utf-8")
             report_path = base.with_suffix(".txt")
@@ -348,16 +348,17 @@ def main() -> int:
             groups.setdefault(rg, []).append(name)
     group_report_paths = {}
     for group_name, members in groups.items():
-        domain = registry[members[0]]["domain"]
-        reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
-        reports_dir.mkdir(parents=True, exist_ok=True)
-        _archive_previous(reports_dir, group_name)
-        html = render_group_report(group_name, [results[m]["section_kwargs"] for m in members])
-        path = reports_dir / f"{group_name}.html"
-        path.write_text(html, encoding="utf-8")
-        for m in members:
-            results[m]["report"] = path
-        group_report_paths[group_name] = path
+        if len(members) > 1 or args.all or args.domain:
+            domain = registry[members[0]]["domain"]
+            reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
+            reports_dir.mkdir(parents=True, exist_ok=True)
+            _archive_previous(reports_dir, group_name)
+            html = render_group_report(group_name, [results[m]["section_kwargs"] for m in members])
+            path = reports_dir / f"{group_name}.html"
+            path.write_text(html, encoding="utf-8")
+            for m in members:
+                results[m]["report"] = path
+            group_report_paths[group_name] = path
 
     print("=== RESUME ===")
     for name, res in results.items():

@@ -509,6 +509,7 @@ PRG_02_Acquisition:
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
     - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_02.st
+  source_prg: CODE/M_MAIN/PRG_02_Acquisition.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_02_acquisition.st
 
 PRG_03_Modes_Cycle:
