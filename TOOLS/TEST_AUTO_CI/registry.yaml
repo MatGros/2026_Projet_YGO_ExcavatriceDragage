@@ -464,12 +464,53 @@ FB_Supervision:
     - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st
     - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st
     - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st
-    - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st
-    - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st
-    - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st
     - CODE/J_SUPERVISION/FB_AntiFlickerText.st
     - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/SUPERVISION/tests/test_fb_supervision.st
+
+PRG_02_Acquisition:
+  domain: MAIN
+  report_group: MAIN
+  sources:
+    - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
+    - CODE/A_COMMUN/E_State.st
+    - CODE/A_COMMUN/ST_FbStatus.st
+    - CODE/A_COMMUN/ST_FbCause.st
+    - CODE/A_COMMUN/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_CycleTime.st
+    - CODE/A_COMMUN/FB_Ramp.st
+    - CODE/A_COMMUN/FB_Acquisition_Preflight.st
+    - CODE/A_COMMUN/FB_FbStatus.st
+    - CODE/A_COMMUN/FB_Filter.st
+    - CODE/C_DIAG_RESEAUX/E_Diag_State.st
+    - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
+    - CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st
+    - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
+    - CODE/D_JOYSTICK/ST_Joystick_AxisCmd.st
+    - CODE/D_JOYSTICK/FB_AxisScale.st
+    - CODE/D_JOYSTICK/FB_Joystick.st
+    - CODE/E_CODEURS/ST_EncoderHw.st
+    - CODE/E_CODEURS/ST_Encoder_Calib.st
+    - CODE/E_CODEURS/ST_EncoderMeasurement.st
+    - CODE/E_CODEURS/FB_Encoder_Abs.st
+    - CODE/E_CODEURS/FB_Encoder_Homing.st
+    - CODE/E_CODEURS/FB_Encoder_Scale.st
+    - CODE/E_CODEURS/FB_Encoder_Safety.st
+    - CODE/E_CODEURS/FB_EncoderReliability.st
+    - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+    - CODE/E_CODEURS/FB_Encoder.st
+    - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
+    - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
+    - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
+    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_02.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_02_acquisition.st
+
 
 
 
