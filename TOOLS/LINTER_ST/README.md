@@ -14,6 +14,16 @@ lien inter-outils).
 le linter **ne remonte aucune alerte** plutôt que de signaler une fausse erreur — préférence
 explicite de l'utilisateur (mieux vaut un silence qu'une fausse alerte).
 
+📖 **Référence officielle STruCpp** : [IEC_COMPLIANCE.md](https://github.com/Autonomy-Logic/STruCpp/blob/development/docs/IEC_COMPLIANCE.md)
+— liste ce que le compilateur supporte/ne supporte pas. Lue **après coup** (session 2026-08-23,
+une fois les 3 correctifs déjà écrits par test empirique) — confirme la plupart de nos
+découvertes (init de struct valide seulement en déclaration, `ARRAY[..,..]` supporté,
+`PERSISTENT` absent de toute la doc), mais **contredit** un point : elle liste "Pragmas `{...}`
+— Supported" et "Namespace configuration — Supported — Via pragmas", alors qu'on a conclu que
+STruCpp ne gérait pas du tout `{...}`. 🔍 **Piste non explorée** : il existe peut-être un vrai
+mécanisme de pragma pour l'accès qualifié GVL/PROGRAM, plus propre que notre retrait de préfixe
+actuel — à tester avant d'ajouter de nouveaux correctifs de ce type.
+
 ## 📦 Contenu
 
 | Fichier | Rôle |
