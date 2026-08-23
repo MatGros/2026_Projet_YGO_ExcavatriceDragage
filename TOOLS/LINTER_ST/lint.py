@@ -39,8 +39,12 @@ STRUCPP_EXE = TOOL_ROOT / "bin" / "win32-x64" / "strucpp.exe"
 
 # Format d'erreur STruCpp confirme empiriquement (session 2026-08-23, sur FB_Joystick.st reel) :
 # "FB_Joystick.st:23:33: error: Undefined type 'ST_DIAG_DEVICE' in FUNCTION_BLOCK 'FB_JOYSTICK'"
+# La doc officielle (ARCHITECTURE.md, lue apres coup) precise que CompileError.severity a 3
+# valeurs possibles : "error" | "warning" | "info" -- seuls error/warning ont ete vus sur nos
+# fichiers reels a ce jour, mais "info" est inclus pour ne pas silencieusement ignorer une ligne
+# si STruCpp en emet un jour (ex: sur une future version vendoree).
 ERROR_LINE_RE = re.compile(
-    r"^(?P<file>[^:]+\.st):(?P<line>\d+):(?P<col>\d+):\s*(?P<severity>error|warning):\s*(?P<message>.+)$"
+    r"^(?P<file>[^:]+\.st):(?P<line>\d+):(?P<col>\d+):\s*(?P<severity>error|warning|info):\s*(?P<message>.+)$"
 )
 
 UNDEFINED_TYPE_RE = re.compile(r"Undefined type '(?P<name>\w+)'")
@@ -81,6 +85,7 @@ def _parse_diagnostics(
     converted_to_source: dict[str, Path],
     known_unresolved: set[str],
     project_names: set[str],
+    external_types: set[str],
 ) -> tuple[list[dict], set[str]]:
     """known_unresolved = types que resolve_deps() avait DEJA identifies comme absents de
     l'index CODE/ avant meme de compiler (prefixes projet detectes mais fichier introuvable).
@@ -114,7 +119,7 @@ def _parse_diagnostics(
             name = undef.group("name")
             if name.upper() in known_unresolved:
                 continue
-            if name.upper() in KNOWN_EXTERNAL_TYPES:
+            if name.upper() in external_types:
                 external.add(name)
                 continue
 
@@ -124,7 +129,7 @@ def _parse_diagnostics(
             # DEVICE_STATE.RUNNING (acces a un literal d'enum externe) peut remonter en
             # "Undeclared variable" plutot qu'"Undefined type" selon le contexte syntaxique --
             # verifie sur PRG_03_Modes_Cycle.st, session 2026-08-23.
-            if name.upper() in project_names or name.upper() in KNOWN_EXTERNAL_TYPES:
+            if name.upper() in project_names or name.upper() in external_types:
                 external.add(name)
                 continue
 
@@ -141,7 +146,7 @@ def _parse_diagnostics(
     return diagnostics, external
 
 
-def lint(target: Path, code_root: Path) -> dict:
+def lint(target: Path, code_root: Path, extra_external_types: set[str] | None = None) -> dict:
     resolved, unresolved = resolve_deps.resolve([target], code_root)
     # Reutilise le meme scan que resolve() (index complet CODE/) pour reperer les
     # "Undeclared variable" sur un nom EXISTANT dans le projet -- cout : un 2e scan de CODE/,
@@ -170,7 +175,10 @@ def lint(target: Path, code_root: Path) -> dict:
         raw_output = _run_strucpp(converted_files, out_cpp)
 
         known_unresolved = {name.upper() for name in unresolved}
-        diagnostics, external = _parse_diagnostics(raw_output, converted_to_source, known_unresolved, project_names)
+        external_types = KNOWN_EXTERNAL_TYPES | {n.upper() for n in (extra_external_types or set())}
+        diagnostics, external = _parse_diagnostics(
+            raw_output, converted_to_source, known_unresolved, project_names, external_types
+        )
 
     all_unresolved = sorted(set(unresolved) | external)
 
@@ -194,10 +202,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("target", help="Fichier .st a analyser")
     parser.add_argument("--code-root", default="CODE", help="Racine des sources ST (defaut: CODE)")
+    parser.add_argument(
+        "--extra-external-types",
+        default="",
+        help="Noms de types externes supplementaires (hors CODE/), separes par des virgules -- "
+        "vient de linterSt.knownExternalTypes cote extension VSCode. Fusionne avec la liste "
+        "KNOWN_EXTERNAL_TYPES en dur (DEVICE_STATE).",
+    )
     args = parser.parse_args()
 
     target = Path(args.target)
     code_root = Path(args.code_root)
+    extra_external_types = {n.strip() for n in args.extra_external_types.split(",") if n.strip()}
 
     if not target.is_file():
         print(f"ERROR: fichier cible introuvable: {target}", file=sys.stderr)
@@ -206,7 +222,7 @@ def main() -> int:
         print(f"ERROR: --code-root '{code_root}' introuvable", file=sys.stderr)
         return 3
 
-    result = lint(target, code_root)
+    result = lint(target, code_root, extra_external_types)
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
     if result["status"] == "incomplete":
