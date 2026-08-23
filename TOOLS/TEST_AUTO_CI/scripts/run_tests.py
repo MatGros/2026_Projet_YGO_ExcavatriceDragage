@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Runner de tests automatises pour FB CODESYS, base sur registry.yaml (source unique des
 dependances -- jamais devinees a la volee). Pipeline par FB :
 
@@ -6,8 +6,8 @@ dependances -- jamais devinees a la volee). Pipeline par FB :
                              --[strucpp.exe --test]--> compile C++ + execute les ASSERT
 
 Usage :
-    python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Joystick
-    python TOOLS/TEST_AUTO_CI/run_tests.py --all
+    python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Joystick
+    python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --all
 
 Necessite g++ (MinGW-w64) dans le PATH -- voir TOOLS/COMPILER_ST2C_STruCpp/README.md.
 """
@@ -31,7 +31,7 @@ from af_coverage import check_af_coverage, check_extra_tests
 from encapsulation_check import check_encapsulation_chain
 from html_report import render_group_report, render_html_report
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 TEST_AUTO_CI = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"
 COMPILER_DIR = REPO_ROOT / "TOOLS" / "COMPILER_ST2C_STruCpp"
 CONVERTER = COMPILER_DIR / "convert_codesys_to_iec.py"
