@@ -45,6 +45,16 @@ ERROR_LINE_RE = re.compile(
 
 UNDEFINED_TYPE_RE = re.compile(r"Undefined type '(?P<name>\w+)'")
 
+# "Undeclared variable" (distinct de "Undefined type") -- STruCpp l'emet notamment quand un PRG
+# accede aux membres d'un AUTRE PROGRAM par acces qualifie CODESYS (ex: PRG_02_Acquisition.Data.X)
+# : contrairement aux GVL, ce n'est PAS une histoire de qualificatif retirable -- teste isolement,
+# STruCpp reconnait bel et bien le PROGRAM mais refuse l'acces direct a ses membres ("Cannot
+# access members of program 'X' directly -- declare a variable of type 'X' first"). Limite
+# structurelle non contournable simplement, verifiee sur PRG_03_Modes_Cycle.st, session
+# 2026-08-23. resolve_deps.py ne detecte meme pas PRG_XX comme dependance (prefixe hors de son
+# REF_RE) -- le nom n'apparait donc jamais dans known_unresolved malgre le fichier existant.
+UNDECLARED_VARIABLE_RE = re.compile(r"Undeclared variable '(?P<name>\w+)'")
+
 # Types externes CONNUS (bibliotheques natives CODESYS/CANopen/EtherCAT, jamais declares dans
 # CODE/) -- liste blanche EXPLICITE, pas une deduction par absence de prefixe projet (tente puis
 # abandonnee, session 2026-08-23 : "pas de prefixe ST_/E_/FB_/GVL_ => externe" faisait aussi
@@ -67,18 +77,25 @@ def _run_strucpp(converted_files: list[Path], out_cpp: Path) -> str:
 
 
 def _parse_diagnostics(
-    raw_output: str, converted_to_source: dict[str, Path], known_unresolved: set[str]
+    raw_output: str,
+    converted_to_source: dict[str, Path],
+    known_unresolved: set[str],
+    project_names: set[str],
 ) -> tuple[list[dict], set[str]]:
     """known_unresolved = types que resolve_deps() avait DEJA identifies comme absents de
     l'index CODE/ avant meme de compiler (prefixes projet detectes mais fichier introuvable).
+    project_names = TOUS les noms declares dans CODE/ (TYPE/FUNCTION_BLOCK/PROGRAM/GVL), pour
+    reperer un "Undeclared variable" sur un nom qui EXISTE dans le projet (limite STruCpp
+    d'acces qualifie, jamais un vrai bug -- voir UNDECLARED_VARIABLE_RE ci-dessus).
 
-    Deux filtres complementaires pour un "Undefined type" NAME, dans cet ordre :
-    1. NAME dans known_unresolved -> bruit de tooling deja identifie, filtre.
-    2. NAME sans prefixe projet (PROJECT_PREFIXES) -> type externe hors CODE/ quasi-certain
-       (bibliotheque CODESYS/CANopen native, ex: DEVICE_STATE) -- filtre aussi, ajoute a
-       'external' pour affichage informatif (jamais une erreur).
-    Sinon (prefixe projet mais absent malgre tout) -> vraie erreur, jamais filtree (typo/bug,
-    verifie empiriquement sur INT_INCONNU, session 2026-08-23).
+    Filtres complementaires, dans cet ordre :
+    1. "Undefined type" NAME dans known_unresolved -> bruit de tooling deja identifie, filtre.
+    2. "Undefined type" NAME dans KNOWN_EXTERNAL_TYPES -> type externe hors CODE/ (ex:
+       DEVICE_STATE) -- filtre, ajoute a 'external' (jamais une erreur).
+    3. "Undeclared variable" NAME qui EST un nom declare du projet -> limite d'acces qualifie
+       STruCpp (GVL/PRG), filtre, ajoute a 'external'.
+    Sinon -> vraie erreur, jamais filtree (typo/bug, verifie empiriquement sur INT_INCONNU,
+    session 2026-08-23).
     """
     diagnostics: list[dict] = []
     external: set[str] = set()
@@ -89,15 +106,25 @@ def _parse_diagnostics(
             continue
 
         message = m.group("message")
+        # STruCpp normalise le nom en MAJUSCULES dans le message d'erreur (ST est
+        # case-insensitive par spec) -- comparaison insensible a la casse, verifie
+        # empiriquement (declar. 'ST_Diag_Device' -> "Undefined type 'ST_DIAG_DEVICE'").
         undef = UNDEFINED_TYPE_RE.search(message)
         if undef:
             name = undef.group("name")
-            # STruCpp normalise le nom en MAJUSCULES dans le message d'erreur (ST est
-            # case-insensitive par spec) -- comparaison insensible a la casse, verifie
-            # empiriquement (declar. 'ST_Diag_Device' -> "Undefined type 'ST_DIAG_DEVICE'").
             if name.upper() in known_unresolved:
                 continue
             if name.upper() in KNOWN_EXTERNAL_TYPES:
+                external.add(name)
+                continue
+
+        undeclared = UNDECLARED_VARIABLE_RE.search(message)
+        if undeclared:
+            name = undeclared.group("name")
+            # DEVICE_STATE.RUNNING (acces a un literal d'enum externe) peut remonter en
+            # "Undeclared variable" plutot qu'"Undefined type" selon le contexte syntaxique --
+            # verifie sur PRG_03_Modes_Cycle.st, session 2026-08-23.
+            if name.upper() in project_names or name.upper() in KNOWN_EXTERNAL_TYPES:
                 external.add(name)
                 continue
 
@@ -116,8 +143,16 @@ def _parse_diagnostics(
 
 def lint(target: Path, code_root: Path) -> dict:
     resolved, unresolved = resolve_deps.resolve([target], code_root)
+    # Reutilise le meme scan que resolve() (index complet CODE/) pour reperer les
+    # "Undeclared variable" sur un nom EXISTANT dans le projet -- cout : un 2e scan de CODE/,
+    # accepte pour rester simple plutot que de refactorer resolve() pour exposer son index.
+    project_names = {name.upper() for name in resolve_deps.build_declaration_index(code_root)}
 
-    all_sources = [target] + list(resolved.values())
+    # dict.fromkeys plutot que list() : plusieurs NOMS distincts (ex: 20 membres GVL_PERSISTENT)
+    # peuvent resoudre vers le MEME fichier -- sans dedup, strucpp.exe recoit ce fichier plusieurs
+    # fois et leve "Symbol already defined in scope 'global'" (bug reel trouve session 2026-08-23,
+    # apres l'ajout de l'indexation des membres GVL individuels dans resolve_deps.py).
+    all_sources = list(dict.fromkeys([target] + list(resolved.values())))
 
     with tempfile.TemporaryDirectory(prefix="linter_st_") as tmp:
         tmp_path = Path(tmp)
@@ -135,7 +170,7 @@ def lint(target: Path, code_root: Path) -> dict:
         raw_output = _run_strucpp(converted_files, out_cpp)
 
         known_unresolved = {name.upper() for name in unresolved}
-        diagnostics, external = _parse_diagnostics(raw_output, converted_to_source, known_unresolved)
+        diagnostics, external = _parse_diagnostics(raw_output, converted_to_source, known_unresolved, project_names)
 
     all_unresolved = sorted(set(unresolved) | external)
 
