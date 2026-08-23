@@ -22,7 +22,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import time as _time
 
 # Configuration encodage UTF-8 sous Windows
 if sys.platform == "win32":
@@ -32,11 +31,6 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-# Ajout du sous-dossier scripts au sys.path pour les modules internes
-SCRIPT_DIR = pathlib.Path(__file__).resolve().parent / "scripts"
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
-
 import yaml
 
 import chronogram
@@ -45,7 +39,7 @@ from af_coverage import check_af_coverage, check_extra_tests
 from encapsulation_check import check_encapsulation_chain
 from html_report import render_group_report, render_html_report
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 TEST_AUTO_CI = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"
 COMPILER_DIR = REPO_ROOT / "TOOLS" / "COMPILER_ST2C_STruCpp"
 CONVERTER = COMPILER_DIR / "convert_codesys_to_iec.py"
@@ -169,12 +163,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
     with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_") as tmp:
         converted_dir = pathlib.Path(tmp)
-        # Flag de priorité basse sous Windows pour préserver 100% de la réactivité du PC
-        subproc_flags = subprocess.BELOW_NORMAL_PRIORITY_CLASS if sys.platform == "win32" else 0
-
         convert_cmd = [sys.executable, str(CONVERTER), *[str(s) for s in sources], "--out", str(converted_dir)]
-        result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8",
-                                creationflags=subproc_flags)
+        result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8")
         _log(result.stdout)
         if result.returncode != 0:
             if debug:
@@ -191,8 +181,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             print(_progress_line("compilation"), flush=True)
         strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "--test", str(test_file)]
         proc = subprocess.Popen(strucpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                 text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1,
-                                 creationflags=subproc_flags)
+                                 text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1)
         lines = list(proc.stdout)
         proc.wait()
         result = subprocess.CompletedProcess(strucpp_cmd, proc.returncode, "".join(lines), "")
@@ -206,8 +195,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         if strucpp_temp_dir is not None:
             test_runner = strucpp_temp_dir / "test_runner.exe"
             if test_runner.exists():
-                json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8",
-                                             creationflags=subproc_flags)
+                json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8")
                 try:
                     json_data = json.loads(json_result.stdout)
                 except json.JSONDecodeError:
@@ -321,18 +309,13 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
 
 def main() -> int:
-    # Calibrage CPU puissant & fluide :
-    # Sur 16 threads logiques -> 12 workers en parallèle, 4 threads entièrement préservés pour Windows/IHM
-    cpu_total = os.cpu_count() or 4
-    default_workers = max(1, cpu_total - 4) if cpu_total > 4 else max(1, cpu_total - 1)
-
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--fb", help="Nom du FB a tester (cle du registry.yaml)")
     group.add_argument("--domain", help="Tester tous les FB d'un domaine (ex: AU_SECURITE, JOYSTICK)")
     group.add_argument("--all", action="store_true", help="Tester tous les FB du registre (defaut si aucune option)")
-    parser.add_argument("-j", "--jobs", type=int, default=default_workers,
-                        help=f"Nombre d'instances de test en parallele (defaut calibre : {default_workers} threads)")
+    parser.add_argument("-j", "--jobs", type=int, default=os.cpu_count() or 4,
+                        help="Nombre d'instances de test en parallele (defaut: CPU cores)")
     parser.add_argument("--debug", action="store_true",
                          help="Affiche tous les logs intermediaires (conversion, sortie brute strucpp). "
                               "Sans cette option : uniquement le resultat final.")
@@ -348,8 +331,6 @@ def main() -> int:
 
     registry = load_registry()
     cycle_time_ms = load_config().get("cycle_time_ms", 10)
-
-    start_time = _time.perf_counter()
 
     if args.domain:
         targets = {name: e for name, e in registry.items() if e["domain"] == args.domain}
@@ -370,7 +351,7 @@ def main() -> int:
     if len(targets) > 1 and not args.debug and args.jobs > 1:
         from concurrent.futures import ProcessPoolExecutor, as_completed
         workers = min(len(targets), args.jobs)
-        print(f">> Lancement de {len(targets)} tests en parallele sur {workers} threads CPU...\n")
+        print(f">> Lancement de {len(targets)} tests en parallele sur {workers} coeurs CPU...\n")
         with ProcessPoolExecutor(max_workers=workers) as executor:
             future_to_name = {
                 executor.submit(run_one, name, entry, cycle_time_ms, False): name
@@ -459,15 +440,9 @@ def main() -> int:
         except UnicodeEncodeError:
             print(f"\n[Dashboard global genere] : {index_path}")
 
-    elapsed = _time.perf_counter() - start_time
-    minutes = int(elapsed // 60)
-    seconds = elapsed % 60
-    time_str = f"{minutes}m {seconds:.2f}s" if minutes > 0 else f"{seconds:.2f}s"
-
     n_fail = sum(1 for res in results.values() if not res["ok"])
     summary = f"{len(results)} FB testes, {len(results) - n_fail} PASS, {n_fail} FAIL"
     print(f"\n{_c(summary, n_fail == 0)}")
-    print(f"⏱️  Temps d'execution : {time_str}")
 
     return 1 if n_fail else 0
 

@@ -1,5 +1,5 @@
 ﻿#!/usr/bin/env python3
-"""Raccourci : lance les tests du domaine A_COMMUN avec mesure du temps et calibrage multithread.
+"""Raccourci : lance les tests du domaine M_MAIN avec mesure du temps et calibrage multithread.
 """
 import pathlib
 import subprocess
@@ -10,10 +10,10 @@ RUN_TESTS = pathlib.Path(__file__).resolve().parents[3] / "run_tests.py"
 
 if __name__ == "__main__":
     start = time.perf_counter()
-    code = subprocess.call([sys.executable, str(RUN_TESTS), "--domain", "A_COMMUN", *sys.argv[1:]])
+    code = subprocess.call([sys.executable, str(RUN_TESTS), "--domain", "M_MAIN", *sys.argv[1:]])
     elapsed = time.perf_counter() - start
     minutes = int(elapsed // 60)
     seconds = elapsed % 60
     t_str = f"{minutes}m {seconds:.2f}s" if minutes > 0 else f"{seconds:.2f}s"
-    print(f"\n⏱️  Duree totale domaine A_COMMUN : {t_str}")
+    print(f"\n⏱️  Duree totale domaine M_MAIN : {t_str}")
     sys.exit(code)
