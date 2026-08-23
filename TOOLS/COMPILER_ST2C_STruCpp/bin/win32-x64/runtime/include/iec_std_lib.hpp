@@ -1264,10 +1264,15 @@ inline bool NOT(bool value) noexcept {
     return !value;
 }
 
+inline int NOT(int value) noexcept {
+    return !value;
+}
+
 template<>
 inline IEC_BOOL NOT(IEC_BOOL value) noexcept {
     return IEC_BOOL(!iec_unwrap(value));
 }
+
 
 /**
  * AND - Bitwise AND (variadic)

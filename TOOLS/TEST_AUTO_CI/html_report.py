@@ -422,6 +422,64 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         </table>
     </details>"""
 
+    # Bloc de compilation des composants sources
+    compilation_rows = []
+    compil_errors_total = 0
+    if source_paths:
+        for p in source_paths:
+            p_obj = pathlib.Path(p)
+            fname = p_obj.name
+            st_type = "DUT"
+            try:
+                txt = p_obj.read_text(encoding="utf-8", errors="ignore")
+                if re.search(r"\bFUNCTION_BLOCK\b", txt):
+                    st_type = "FB"
+                elif re.search(r"\bTYPE\s+\w+\s*:\s*ENUM\b|\bTYPE\s+\w+\s*:\s*\([^)]+\)\s*;?\s*END_TYPE", txt):
+                    st_type = "DUT (Enum)"
+                elif re.search(r"\bTYPE\s+\w+\s*:\s*STRUCT\b", txt):
+                    st_type = "DUT (Struct)"
+                elif re.search(r"\bPROGRAM\b", txt):
+                    st_type = "PRG"
+            except Exception:
+                pass
+
+            # Analyse des erreurs spécifiques à ce fichier dans text_report
+            file_errors = []
+            if text_report and fname in text_report:
+                for line in text_report.splitlines():
+                    if fname in line and ("error:" in line.lower() or "erreur" in line.lower()):
+                        file_errors.append(line.strip())
+
+            # Verification si c'est un Mock
+            is_mock = "MOCKS" in str(p_obj.as_posix())
+            mock_badge = '<span style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">MOCK</span>' if is_mock else ''
+
+            is_ok = len(file_errors) == 0
+            if not is_ok:
+                compil_errors_total += len(file_errors)
+
+            err_detail = f"<ul style='margin:0;padding-left:16px;'>{''.join(f'<li>{_html.escape(e)}</li>' for e in file_errors)}</ul>" if file_errors else ("Simulé pour environnement CI (hors CODESYS)" if is_mock else "Aucune erreur")
+            status_badge = _badge(is_ok)
+            compilation_rows.append(f"""
+            <tr class="compil-row-{'pass' if is_ok else 'fail'}">
+                <td><code>{_html.escape(fname)}</code>{mock_badge}</td>
+                <td>{_html.escape(st_type)}</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:{'var(--green-text)' if is_ok else 'var(--red-text)'};font-weight:600;">{'OK' if is_ok else 'FAIL'}</span></td>
+                <td>{status_badge}</td>
+                <td>{err_detail}</td>
+            </tr>""")
+
+    compil_summary_txt = f"⚠️ {compil_errors_total} erreur(s) de compilation" if compil_errors_total > 0 else f"✅ {len(source_paths or [])} composant(s) compilé(s) avec succès (0 erreur)"
+    compilation_html = f"""
+    <details class="encaps-details" {"open" if compil_errors_total > 0 else ""}>
+        <summary>⚙️ État de Compilation ST / C++ — {compil_summary_txt}</summary>
+        <table class="encaps-table">
+            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Transpilation ST2C</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
+            <tbody>{"".join(compilation_rows)}</tbody>
+        </table>
+    </details>"""
+
     pin_diagram_html = "".join(
         _render_pin_diagram(fb_name, item.get("wiring"), label=item.get("label"))
         for item in (wirings or [])
@@ -431,6 +489,7 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     <div class="subtitle">
         Domaine <b>{_html.escape(domain)}</b> · {passed}/{total} vérifications OK
     </div>
+    {compilation_html}
     {af_warning_html}
     {pin_diagram_html}
     {encapsulation_html}

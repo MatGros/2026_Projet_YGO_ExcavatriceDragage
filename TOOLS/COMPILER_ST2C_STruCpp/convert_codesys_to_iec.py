@@ -105,12 +105,23 @@ def _close_missing_pou_end(text: str, source_name: str, warnings: list) -> str:
     return text.rstrip() + f"\n{end_kw}\n"
 
 
+def _map_hysteresis(text: str) -> str:
+    """CODESYS Util library HYSTERESIS has (IN, HIGH, LOW -> OUT).
+    STruCpp builtin additional-function-blocks has Annex E HYSTERESIS (XIN1, XIN2, EPS -> Q).
+    Rename CODESYS HYSTERESIS to FB_Hysteresis_Util to use our matching mock without collision."""
+    # Remplacement du type dans les declarations : HYSTERESIS -> FB_Hysteresis_Util
+    text = re.sub(r"\bHYSTERESIS\b", "FB_Hysteresis_Util", text)
+    return text
+
+
 def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _convert_enum_blocks(text, source_name, warnings)
     text = _strip_pragmas(text)
     text = _strip_pou_qualifiers(text)
     text = _close_missing_pou_end(text, source_name, warnings)
+    text = _map_hysteresis(text)
     return text
+
 
 
 def convert_file(src: pathlib.Path, dst: pathlib.Path, warnings: list) -> None:
