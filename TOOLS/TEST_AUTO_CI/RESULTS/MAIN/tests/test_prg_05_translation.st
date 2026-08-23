@@ -56,6 +56,46 @@ TEST 'PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuil
     ASSERT_TRUE(harness.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest, 'Demande desserrage frein M3 generee');
     ASSERT_FALSE(harness.Data.TranslationSafety.SafeStop, 'Aucun SafeStop actif sur translation');
     ASSERT_EQ(harness.Data.TranslationState.ActiveDirection, 1, 'Sens translation avant arbitre');
+    ASSERT_GT(harness.Data.TranslationState.ActiveSpeedRef_Pct, 0.0, 'Consigne vitesse M3 arbitree non nulle');
+    ASSERT_NEQ(harness.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord, 16#0000, 'ControlWord variateur active pendant la commande');
+END_TEST
+
+TEST 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)'
+    modesAuth.Mode := E_Mode.MAINT_N1;
+    acqData.JoystickDeadmanArmed := TRUE;
+    acqData.JoystickDirectionX := -1;
+    acqData.JoystickSpeedPctX := -60.0;
+
+    harness(
+        AcqData := acqData,
+        ModesAuth := modesAuth,
+        WinchM1CablePosM := 5.0,
+        WinchM2CablePosM := 5.0,
+        PowerContactorEngaged := TRUE,
+        DriveOnline := TRUE,
+        DriveOperational := TRUE
+    );
+    harness(
+        AcqData := acqData,
+        ModesAuth := modesAuth,
+        WinchM1CablePosM := 5.0,
+        WinchM2CablePosM := 5.0,
+        PowerContactorEngaged := TRUE,
+        DriveOnline := TRUE,
+        DriveOperational := TRUE
+    );
+    harness(
+        AcqData := acqData,
+        ModesAuth := modesAuth,
+        WinchM1CablePosM := 5.0,
+        WinchM2CablePosM := 5.0,
+        PowerContactorEngaged := TRUE,
+        DriveOnline := TRUE,
+        DriveOperational := TRUE
+    );
+    ASSERT_EQ(harness.Data.TranslationState.ActiveDirection, -1, 'Sens translation arriere arbitre');
+    ASSERT_TRUE(harness.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest, 'Frein M3 desserre en arriere');
+    ASSERT_FALSE(harness.Data.TranslationSafety.SafeStop, 'Aucun SafeStop en commande arriere nominale');
 END_TEST
 
 TEST 'PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas'

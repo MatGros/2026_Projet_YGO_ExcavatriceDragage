@@ -38,6 +38,27 @@ TEST 'PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale'
     ASSERT_TRUE(harness.Data.TranslationBrakeCmd, 'Commande desserrage frein M3 active');
 END_TEST
 
+TEST 'PRG_06_Outputs : Transmission Ordre M2 en Marche Normale'
+    // Contexte M2 : Demande de montee (fermeture) active
+    winchData.WinchM2FinalInterlockRequest.Enable := TRUE;
+    winchData.WinchM2FinalInterlockRequest.PowerContactorEngaged := TRUE;
+    winchData.WinchM2FinalInterlockRequest.SafeStop := FALSE;
+    winchData.WinchM2FinalInterlockRequest.PowerCutOff := FALSE;
+    winchData.WinchM2FinalInterlockRequest.RequestedRelayFwd := TRUE;
+    winchData.WinchM2FinalInterlockRequest.RequestedContactor1 := TRUE;
+    winchData.WinchM2FinalInterlockRequest.RequestedStep := 1;
+    winchData.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff := TRUE;
+
+    harness(
+        WinchData := winchData,
+        TranslationData := translationData
+    );
+
+    ASSERT_TRUE(harness.Data.M2RelayFwd, 'Contacteur montee M2 active');
+    ASSERT_TRUE(harness.Data.M2SpeedContactor1, 'Palier 1 M2 active');
+    ASSERT_TRUE(harness.Data.M2BrakeCmd, 'Commande desserrage frein M2 active');
+END_TEST
+
 TEST 'PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1'
     // Stimulus : Demande de montée avec PowerCutOff actif sur M1
     winchData.WinchM1FinalInterlockRequest.PowerCutOff := TRUE;
