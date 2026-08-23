@@ -11,7 +11,7 @@ interface LintDiagnostic {
     file: string;
     line: number;
     col: number;
-    severity: 'error' | 'warning';
+    severity: 'error' | 'warning' | 'info';
     message: string;
 }
 
@@ -71,8 +71,13 @@ function resolveLintInvocation(workspaceFolder: vscode.WorkspaceFolder): { pytho
  * deja loguee dans Output). */
 function runLint(fsPath: string, workspaceFolder: vscode.WorkspaceFolder): Promise<LintResult | null> {
     const { pythonPath, lintScript, codeRoot } = resolveLintInvocation(workspaceFolder);
-    const verbose = vscode.workspace.getConfiguration('linterSt').get<boolean>('verboseOutput', false);
+    const config = vscode.workspace.getConfiguration('linterSt');
+    const verbose = config.get<boolean>('verboseOutput', false);
+    const extraExternalTypes = config.get<string[]>('knownExternalTypes', []);
     const args = [lintScript, fsPath, '--code-root', codeRoot];
+    if (extraExternalTypes.length > 0) {
+        args.push('--extra-external-types', extraExternalTypes.join(','));
+    }
 
     if (verbose) {
         outputChannel.appendLine(`[CMD] ${pythonPath} ${args.map((a) => `"${a}"`).join(' ')}`);
@@ -230,7 +235,14 @@ function toVscodeDiagnostic(d: LintDiagnostic, doc: vscode.TextDocument): vscode
         new vscode.Position(line, col),
         new vscode.Position(line, Math.max(col + 1, lineLength))
     );
-    const severity = d.severity === 'warning' ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Error;
+    // STruCpp (ARCHITECTURE.md officiel) a 3 niveaux : error/warning/info. Seuls error/warning
+    // ont ete observes sur nos fichiers reels a ce jour, mais info est mappe par completude.
+    const severity =
+        d.severity === 'info'
+            ? vscode.DiagnosticSeverity.Information
+            : d.severity === 'warning'
+            ? vscode.DiagnosticSeverity.Warning
+            : vscode.DiagnosticSeverity.Error;
     const diag = new vscode.Diagnostic(range, d.message, severity);
     diag.source = 'linter-st';
     return diag;
