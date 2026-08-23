@@ -661,9 +661,43 @@ PRG_06_Outputs:
     - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_06.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_06_outputs.st
 
-
-
-
+PRG_07_Supervision:
+  domain: MAIN
+  report_group: MAIN
+  sources:
+    - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
+    - CODE/A_COMMUN/E_State.st
+    - CODE/A_COMMUN/ST_FbStatus.st
+    - CODE/A_COMMUN/ST_FbCause.st
+    - CODE/A_COMMUN/ST_ContactorCheck.st
+    - CODE/A_COMMUN/FB_FbStatus.st
+    - CODE/F_MODES/E_Mode.st
+    - CODE/G_CYCLE/E_CycleStep.st
+    - CODE/G_CYCLE/E_DiveSearchState.st
+    - CODE/G_CYCLE/E_ExtractionSequenceState.st
+    - CODE/H_TREUILS_BENNE/BENNE/ST_BucketState.st
+    - CODE/H_TREUILS_BENNE/E_WinchFinalInterlockState.st
+    - CODE/H_TREUILS_BENNE/E_WinchFinalInterlockReason.st
+    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st
+    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st
+    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
+    - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st
+    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
+    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st
+    - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
+    - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st
+    - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st
+    - CODE/J_SUPERVISION/FB_AntiFlickerText.st
+    - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_07.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_07_supervision.st
 
 
 
