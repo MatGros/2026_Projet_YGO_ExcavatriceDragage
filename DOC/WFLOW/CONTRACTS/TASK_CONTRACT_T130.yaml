@@ -1,0 +1,79 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T130 : Standardiser le décodage d'intention joystick
+# Phase ÉTUDE / DESIGN (zéro code) — criticité C4 (sécurité)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# But : figer l'architecture « intention gestuelle → intention d'action/mouvement »
+# avant tout code. Livre un design validé, pas des FB.
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py TASK_CONTRACT_T130.yaml
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T130
+  criticality: C4
+  strategy: patch
+  objective: "Définir et faire valider l'architecture d'intention de mouvement : un bloc d'intention GESTUELLE (joystick réel/simulé, source agnostique) puis un bloc d'intention d'ACTION (geste + boutons IHM déjà orientés + contexte) qui produit des demandes Req* consommées par les treuils / translation / cycle. Phase étude : livrer le design figé, les interfaces FB, la matrice d'action et le plan de déploiement, sans toucher au code."
+
+  acceptance:
+    - id: AC1
+      statement: "L'architecture cible est figée en 2 blocs : FB_GestureIntention (intention gestuelle, source agnostique réel/simulé) puis FB_ActionIntention_Winch et FB_ActionIntention_Translation (intention d'action/mouvement). Les boutons IHM (déjà orientés action) entrent au Bloc 2, pas au Bloc 1."
+      verified_by: "Document de design validé par l'orchestrateur (revue DESIGN_INTENTION_ARCHITECTURE_v0.1.md + REVUE_CRITIQUE actée)."
+    - id: AC2
+      statement: "Interface des 2 blocs définie conforme AF_Partie-03 (profil light/standard). Sorties geste Gst* et action Req* = SpeedRef NON signée (0..100 %) + bits de direction (DirectionPositive/Negative) comme unique source de vérité ; aucune consigne signée redondante. Struct ST_ActionContext sans DiveActive/ExtractionActive, conserve DumpAtTremieActive."
+      verified_by: "Interface ST complète rédigée et relue ; polarité SpeedRef non signée actée (décision utilisateur)."
+    - id: AC3
+      statement: "Matrice d'intention d'action complète tracée : geste joystick + boutons IHM + contexte -> action Req*, cohérente avec AF_Partie-10 (treuils+benne) et AF_Partie-11 (translation). Chaque règle est numérotée et traçable."
+      verified_by: "Tableau matrice finalisé dans le design (treuil + translation + semi-auto)."
+    - id: AC4
+      statement: "Inventaire exhaustif des sources d'intention (joystick réel/simulé via FB_Joystick ; boutons IHM par treuil unitaire M1/M2 / both / benne / translation) et de leur point d'entrée (Bloc 1 ou Bloc 2). Cohérent avec l'état actuel du code (joystick migré Status:ST_FbStatus)."
+      verified_by: "Tableau des sources + chemins réels lus dans PRG_02/PRG_04/PRG_05/GVL_IHM."
+    - id: AC5
+      statement: "Plan de déploiement en jalons testables fourni : FB_GestureIntention isolé et testé en simulation avant tout refactor des consommateurs ; FB_ActionIntention_* ensuite ; refactor PRG_04/PRG_05 (T135) en dernier. Distinction palier d'intention (joystick, T131) vs palier de procédé (cycle) documentée."
+      verified_by: "Plan de déploiement + cartographie des fichiers impactés (blast-radius) validé."
+    - id: AC6
+      statement: "Points ouverts tranchés et tracés : SpeedRef non signée (acté), rôle Bloc 1 (normalisateur gestuel), boutons -> Bloc 2. ArmingPermit := TRUE (PRG_02:304) hors périmètre -> ticket sécurité séparé référencé."
+      verified_by: "Compte-rendu des décisions joint au design (tableau décisions/dates)."
+
+  scope:
+    allowed:
+      - DOC/WFLOW/AUDITS/DESIGN_INTENTION_ARCHITECTURE_v*.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T130.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/PLAN_TASK.md
+    forbidden:
+      - CODE/**/*.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Comportement joystick actuel (armement homme-mort, axes, ST_FbStatus)"
+      - "Polarité directionnelle existante (Fwd/Rev, Left/Right)"
+    dropped_on_purpose:
+      - "SpeedRef signée redondante (direction désormais portée par les bits seuls)"
+
+  evidence_required:
+    - design_review
+    - decision_trace
+    - plan_jalons
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: "Tout écart entre le design retenu et l'état réel du code (joystick migré, boutons, paliers, ArmingPermit) est remonté immédiatement à l'orchestrateur. Ne pas étendre le périmètre. Zéro code sans validation du design final."
+
+status: PENDING
+
+execution:
+  executed_by: "DSH-02"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "Orchestrateur / utilisateur"
+  validated_at: ""
+  notes: ""
