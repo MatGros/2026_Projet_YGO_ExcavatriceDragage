@@ -44,17 +44,29 @@ def _extract_structs(hpp_text: str) -> dict:
     return structs
 
 
-def extract_fb_fields(hpp_text: str, fb_class_name: str) -> list:
-    """Retourne une liste de (expression C++, label, is_bool) pour tous les champs scalaires
-    (et DUT imbriques sur 1 niveau) du FB teste, dans l'ordre de declaration. is_bool vient du
-    VRAI type declare (IEC_BOOL) -- ne JAMAIS le deduire des valeurs observees (un WORD qui ne
-    prend que 0/1 dans un test donne n'est pas un booleen, cf. ERRORID bit0)."""
+def extract_fb_fields(hpp_text: str, fb_class_name: str) -> tuple:
+    """Retourne (fields, effective_class_name, effective_var_name) :
+    fields = liste de (expression C++, label, is_bool) pour tous les champs scalaires
+    (et DUT imbriques sur 1 niveau) du FB teste ou du Harnais de test."""
     structs = _extract_structs(hpp_text)
 
+    # 1. Chercher la classe exacte
     class_re = re.compile(rf"class {fb_class_name} \{{\npublic:\n(.*?)\n\n    // Implicit", re.DOTALL)
     m = class_re.search(hpp_text)
+    effective_class = fb_class_name
+    effective_var = "FB"
+    
+    # 2. Si pas trouve (ex: PRG_02_Acquisition), chercher le TestHarness correspondant (FB_TESTHARNESS_PRG_02)
+    if not m and "PRG_" in fb_class_name:
+        harness_name = f"FB_TESTHARNESS_{fb_class_name.split('_')[0]}_{fb_class_name.split('_')[1]}"
+        class_re_harness = re.compile(rf"class {harness_name} \{{\npublic:\n(.*?)\n\n    // Implicit", re.DOTALL)
+        m = class_re_harness.search(hpp_text)
+        if m:
+            effective_class = harness_name
+            effective_var = "HARNESS"
+
     if not m:
-        return []
+        return [], fb_class_name, "FB"
 
     fields = []
     for line in m.group(1).splitlines():
@@ -70,8 +82,7 @@ def extract_fb_fields(hpp_text: str, fb_class_name: str) -> list:
         elif ftype in structs:
             for sub_name, sub_type in structs[ftype]:
                 fields.append((f"{fname}.{sub_name}", f"{fname}.{sub_name}", sub_type == "IEC_BOOL"))
-        # sinon (instance de FB imbrique) -- ignore pour ce 1er niveau de chronogramme
-    return fields
+    return fields, effective_class, effective_var
 
 
 def build_trace_helper(fb_class_name: str, fields: list) -> str:
@@ -87,7 +98,7 @@ static int __scan_id = 0;
 """
 
 
-def instrument_test_main(test_main_text: str, fb_class_name: str, fields: list) -> str:
+def instrument_test_main(test_main_text: str, fb_class_name: str, fields: list, effective_var: str = "FB") -> str:
     helper = build_trace_helper(fb_class_name, fields)
     text = test_main_text.replace('#include "iec_test.hpp"', '#include "iec_test.hpp"' + helper)
 
@@ -97,31 +108,32 @@ def instrument_test_main(test_main_text: str, fb_class_name: str, fields: list) 
 
     text = TEST_FUNC_RE.sub(_inject_reset, text)
 
+    # Detecter s.FB(); ou s.HARNESS();
+    scan_regex = re.compile(rf"(\n(\s*)s\.{effective_var}\(\);\n\s*s\.{effective_var}\.ENO = true;)")
     def _inject_trace(m):
         indent = m.group(2)
         return (
             f"{m.group(1)}\n{indent}printf(\"SCANTRACE {{\\\"test\\\":\\\"%s\\\",\\\"scan\\\":%d,"
             f"\\\"t_ns\\\":%lld,\\\"fields\\\":{{%s}}}}\\n\", __test_name, __scan_id++, "
-            f"(long long)strucpp::__CURRENT_TIME_NS, __trace_fields(s.FB).c_str());"
+            f"(long long)strucpp::__CURRENT_TIME_NS, __trace_fields(s.{effective_var}).c_str());"
         )
 
-    text = SCAN_CALL_RE.sub(_inject_trace, text)
+    text = scan_regex.sub(_inject_trace, text)
     return text
 
 
 def build_and_run_traced(temp_dir: pathlib.Path, runtime_include: pathlib.Path,
                           runtime_test: pathlib.Path, fb_class_name: str) -> tuple:
     """Retourne (entries, field_types) : entries = [{test, scan, t_ns, fields:{...}}, ...],
-    field_types = {label: bool} -- vrai type declare (IEC_BOOL ou non), a utiliser pour le
-    rendu au lieu de deviner depuis les valeurs observees."""
+    field_types = {label: bool} -- vrai type declare (IEC_BOOL ou non)."""
     hpp_text = (temp_dir / "generated.hpp").read_text(encoding="utf-8")
-    fields = extract_fb_fields(hpp_text, fb_class_name)
+    fields, effective_class, effective_var = extract_fb_fields(hpp_text, fb_class_name)
     field_types = {label: is_bool for _expr, label, is_bool in fields}
     if not fields:
         return [], field_types
 
     test_main_text = (temp_dir / "test_main.cpp").read_text(encoding="utf-8")
-    instrumented = instrument_test_main(test_main_text, fb_class_name, fields)
+    instrumented = instrument_test_main(test_main_text, effective_class, fields, effective_var=effective_var)
 
     traced_main = temp_dir / "test_main_traced.cpp"
     traced_main.write_text(instrumented, encoding="utf-8")

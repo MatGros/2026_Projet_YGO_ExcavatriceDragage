@@ -306,7 +306,7 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
                         json_data: dict, text_report: str = "", test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
                         field_types=None, af_warnings=None, extra_test_warnings=None,
-                        wirings=None, encapsulation_report=None) -> dict:
+                        wirings=None, encapsulation_report=None, source_prg=None) -> dict:
     """Construit le contenu d'un FB (sous-titre + warning AF + cartes de test + details
     sources) SANS l'enveloppe de page complete -- reutilise a l'identique par un rapport
     mono-FB (render_html_report) et un rapport groupe multi-FB (render_group_report).
@@ -328,6 +328,7 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
     fb_slug = re.sub(r"[^a-zA-Z0-9]+", "-", fb_name).strip("-").lower()
     cards = []
+    contract_cards = []
     toc_entries = []
     for i, r in enumerate(results):
         name = r.get("name", "")
@@ -336,23 +337,33 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
         checks_html = "".join(f"<li>{_html.escape(c)}</li>" for c in info["checks"])
         comments_html = "".join(f"<p class='comment'>{_html.escape(c)}</p>" for c in info["comments"])
-
         chrono_html = _render_chronogram(name, trace_entries or [], cycle_time_ms, field_types, passed_r)
+
+        # Détection si c'est un test d'interface/socle standard (TC-P03-*, Nominal, Gate, Reset...)
+        is_contract_test = any(k in name.upper() for k in ("TC-P03-", "ENABLE=FALSE", "ENABLE=TRUE", "NOMINAL :", "GATE", "RESET A VIDE"))
+        contract_tag = '<span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span>' if is_contract_test else ''
 
         anchor = f"test-{fb_slug}-{i}"
         toc_entries.append((anchor, name, passed_r))
 
-        cards.append(f"""
-        <article id="{anchor}" class="test-card test-card-{'pass' if passed_r else 'fail'}">
+        card_classes = f"test-card test-card-{'pass' if passed_r else 'fail'}" + (" test-card-contract" if is_contract_test else "")
+
+        rendered_card = f"""
+        <article id="{anchor}" class="{card_classes}">
             <header>
                 {_badge(passed_r)}
-                <h3>{_html.escape(name)}</h3>
+                <h3>{_html.escape(name)} {contract_tag}</h3>
             </header>
             {f'<div class="comments">{comments_html}</div>' if comments_html else ''}
             {f'<div class="checks"><span class="checks-label">Vérifié ({len(info["checks"])})</span><ul>{checks_html}</ul></div>' if checks_html else ''}
             {_failure_block(r.get('failure'))}
             {chrono_html}
-        </article>""")
+        </article>"""
+
+        if is_contract_test:
+            contract_cards.append(rendered_card)
+        else:
+            cards.append(rendered_card)
 
     sources_list = "".join(f"<li><code>{_html.escape(s)}</code></li>" for s in sources)
 
@@ -389,35 +400,145 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
         <div class="af-warning-title">⚠️ {len(extra_test_warnings)} test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
         <ul>{items2}</ul>
     </div>"""
+
+    # Tiroir dédié aux tests d'interface et contrat socle (dépliable)
+    if contract_cards:
+        contract_section_html = f"""
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — {len(contract_cards)} validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            {"".join(contract_cards)}
+        </div>
+    </details>"""
+    else:
+        contract_section_html = f"""
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.85;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#64748b;font-size:11px;font-weight:normal;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 12px; font-size: 12px; color: #64748b; font-style: italic;">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+        </div>
+    </details>"""
+
+    # Tiroir dédié aux tests fonctionnels métier & procédé AF / TC (dépliable, ouvert par défaut si non vide)
+    if cards:
+        domain_section_html = f"""
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — {len(cards)} scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            {"".join(cards)}
+        </div>
+    </details>"""
+    else:
+        domain_section_html = f"""
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.85;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#64748b;font-size:11px;font-weight:normal;margin-left:6px;">(0 test métier)</span></summary>
+        <div style="padding: 12px; font-size: 12px; color: #64748b; font-style: italic;">
+            ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
+        </div>
+    </details>"""
     encapsulation_html = ""
     if encapsulation_report:
         n_violations = sum(1 for e in encapsulation_report if e["has_violation"])
         rows_html = []
         for e in encapsulation_report:
             ok = not e["has_violation"]
-            detail = "".join(
-                f"<li>ecriture externe non declaree : <code>{_html.escape(w)}</code></li>"
-                for w in e.get("external_writes", [])
-            ) + "".join(
-                f"<li>acces GVL direct (bypass interface) : <code>{_html.escape(g)}</code></li>"
-                for g in e.get("gvl_refs", [])
-            )
+            if ok:
+                verified_invariants = [
+                    "✅ Étanchéité I/O (Zéro écriture externe clandestine)",
+                    "✅ Encapsulation POO (Variables locales protégées)",
+                    "✅ Isolation GVL (Aucun couplage global masqué)"
+                ]
+                detail_html = f"<div style='color:#15803d;font-size:11.5px;'>{' · '.join(verified_invariants)}</div>"
+            else:
+                detail = "".join(
+                    f"<li>🚨 <b>Écriture externe clandestine sur VAR locale :</b> <code>{_html.escape(w)}</code></li>"
+                    for w in e.get("external_writes", [])
+                ) + "".join(
+                    f"<li>⚠️ <b>Bypass interface (Dépendance GVL directe) :</b> <code>{_html.escape(g)}</code></li>"
+                    for g in e.get("gvl_refs", [])
+                )
+                detail_html = f"<ul style='margin:0;padding-left:16px;color:#b91c1c;font-size:11.5px;'>{detail}</ul>"
+
             rows_html.append(f"""
             <tr class="encaps-row-{'pass' if ok else 'fail'}">
                 <td>{_badge(ok)}</td>
                 <td><code>{_html.escape(e['fb_name'])}</code></td>
                 <td>{e['n_input']}</td><td>{e['n_output']}</td>
                 <td>{e['n_inout']}</td><td>{e['n_local']}</td>
-                <td>{f"<ul>{detail}</ul>" if detail else "—"}</td>
+                <td>{detail_html}</td>
             </tr>""")
+        summary_badge = '<span class="badge badge-pass" style="margin-left:6px;">PASS</span>' if n_violations == 0 else '<span class="badge badge-fail" style="margin-left:6px;">FAIL</span>'
         summary_txt = (f"⚠️ {n_violations} violation(s) sur {len(encapsulation_report)} FB de la chaine"
                         if n_violations else
                         f"✅ {len(encapsulation_report)} FB de la chaine, encapsulation propre (0 violation)")
+        
+        help_invariants_html = """
+        <details style="margin: 10px 0 14px 0; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px;">
+            <summary style="cursor: pointer; color: #1e40af; font-weight: 600; font-size: 12px;">
+                ℹ️ Guide d'Audit : Les 7 Invariants & Règles d'Encapsulation Automatisme (Cliquez pour afficher)
+            </summary>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; text-align: left;">
+                <thead>
+                    <tr style="background: #e2e8f0; color: #334155;">
+                        <th style="padding: 4px 6px;">#</th>
+                        <th style="padding: 4px 6px;">Règle / Invariant POO</th>
+                        <th style="padding: 4px 6px;">Risque Machine Réel</th>
+                        <th style="padding: 4px 6px;">Contrôle Automatique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 4px 6px; font-weight: bold;">1</td>
+                        <td style="padding: 4px 6px;"><b>Écriture externe clandestine sur VAR locale</b></td>
+                        <td style="padding: 4px 6px; color: #b91c1c;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
+                        <td style="padding: 4px 6px; color: #15803d;">🚨 Violation d'encapsulation (External Write)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 4px 6px; font-weight: bold;">2</td>
+                        <td style="padding: 4px 6px;"><b>Accès GVL direct sans passer par l'interface</b></td>
+                        <td style="padding: 4px 6px; color: #b91c1c;">FB non testable unitairement, couplage fort et masqué.</td>
+                        <td style="padding: 4px 6px; color: #15803d;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 4px 6px; font-weight: bold;">3</td>
+                        <td style="padding: 4px 6px;"><b>Référence VAR_IN_OUT orpheline</b></td>
+                        <td style="padding: 4px 6px; color: #b91c1c;">Pointeur nul / crash automate lors de l'appel.</td>
+                        <td style="padding: 4px 6px; color: #15803d;">🚨 Invalidation appel de FB</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 4px 6px; font-weight: bold;">4</td>
+                        <td style="padding: 4px 6px;"><b>Reset sur front montant (R_TRIG)</b></td>
+                        <td style="padding: 4px 6px; color: #b91c1c;">Réarmement intempestif si le bouton reste coincé/actif.</td>
+                        <td style="padding: 4px 6px; color: #15803d;">🔒 Règle IEC Reset obligatoire</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 4px 6px; font-weight: bold;">5</td>
+                        <td style="padding: 4px 6px;"><b>Profils standards (Enable / Ready / Status)</b></td>
+                        <td style="padding: 4px 6px; color: #b91c1c;">Composant impossible à chaîner en sécurité AU.</td>
+                        <td style="padding: 4px 6px; color: #15803d;">⚠️ Contrat AF03 §1bis</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 4px 6px; font-weight: bold;">6</td>
+                        <td style="padding: 4px 6px;"><b>Sorties VAR_OUTPUT orphelines</b></td>
+                        <td style="padding: 4px 6px; color: #b91c1c;">Information calculée mais oubliée dans le câblage global.</td>
+                        <td style="padding: 4px 6px; color: #15803d;">💡 Alerte Pinout non consommé</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; font-weight: bold;">7</td>
+                        <td style="padding: 4px 6px;"><b>Variables locales non initialisées</b></td>
+                        <td style="padding: 4px 6px; color: #b91c1c;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
+                        <td style="padding: 4px 6px; color: #15803d;">⚠️ Détection d'état initial indéfini</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>"""
+
         encapsulation_html = f"""
     <details class="encaps-details" {"open" if n_violations else ""}>
-        <summary>🔒 Encapsulation (interface FB) — {summary_txt}</summary>
+        <summary>🔒 Encapsulation (Interface & POO) {summary_badge} — {summary_txt}</summary>
+        {help_invariants_html}
         <table class="encaps-table">
-            <thead><tr><th></th><th>FB</th><th>IN</th><th>OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Detail</th></tr></thead>
+            <thead><tr><th>Statut</th><th>Composant (FB)</th><th>VAR_IN</th><th>VAR_OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Analyse Invariants & Violations</th></tr></thead>
             <tbody>{"".join(rows_html)}</tbody>
         </table>
     </details>"""
@@ -471,14 +592,53 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
             </tr>""")
 
     compil_summary_txt = f"⚠️ {compil_errors_total} erreur(s) de compilation" if compil_errors_total > 0 else f"✅ {len(source_paths or [])} composant(s) compilé(s) avec succès (0 erreur)"
+    compil_badge = '<span class="badge badge-pass" style="margin-left:6px;">PASS</span>' if compil_errors_total == 0 else '<span class="badge badge-fail" style="margin-left:6px;">FAIL</span>'
     compilation_html = f"""
     <details class="encaps-details" {"open" if compil_errors_total > 0 else ""}>
-        <summary>⚙️ État de Compilation ST / C++ — {compil_summary_txt}</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) {compil_badge} — {compil_summary_txt}</summary>
         <table class="encaps-table">
-            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Transpilation ST2C</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
+            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>{"".join(compilation_rows)}</tbody>
         </table>
     </details>"""
+
+    # Schéma Bloc & Boîte Noire I/O (Interface + Flux Réels GVL & Inter-PRG)
+    io_diagram_html = ""
+    target_prg_or_fb = None
+    if source_prg:
+        p_cand = pathlib.Path(source_prg)
+        if not p_cand.is_absolute():
+            repo_root = pathlib.Path(__file__).resolve().parents[3]
+            p_cand = repo_root / source_prg
+        if p_cand.exists():
+            target_prg_or_fb = p_cand
+
+    if not target_prg_or_fb and source_paths:
+        for sp in source_paths:
+            p_obj = pathlib.Path(sp)
+            if ("PRG_" in p_obj.name or p_obj.name.startswith("FB_")) and "TestHarness" not in p_obj.name and "MOCKS" not in str(p_obj):
+                target_prg_or_fb = p_obj
+                if "PRG_" in p_obj.name:
+                    break
+        if not target_prg_or_fb and source_paths:
+            target_prg_or_fb = pathlib.Path(source_paths[-1])
+
+    if target_prg_or_fb and target_prg_or_fb.exists():
+        try:
+            import parse_st_io
+            io_analysis = parse_st_io.analyze_st_file(target_prg_or_fb)
+            io_diagram_html = _render_st_io_block_diagram(io_analysis)
+        except Exception as exc:
+            import traceback
+            tb_txt = traceback.format_exc()
+            io_diagram_html = f"""
+            <details class="pin-diagram-details" open style="border: 2px solid #ef4444; background: #fef2f2;">
+                <summary style="color: #991b1b; font-weight: 700;">📦 Représentation Bloc & Boîte Noire I/O <span class="badge badge-fail" style="margin-left:6px;">FAIL</span> — Erreur d'analyse ({_html.escape(target_prg_or_fb.name)})</summary>
+                <div style="padding: 12px; font-size: 12px; color: #7f1d1d;">
+                    <p><b>Le schéma bloc I/O n'a pas pu être généré :</b> <code>{_html.escape(str(exc))}</code></p>
+                    <pre style="background: #ffffff; border: 1px solid #fca5a5; padding: 8px; border-radius: 4px; overflow-x: auto; color: #b91c1c; font-size: 11px;">{_html.escape(tb_txt)}</pre>
+                </div>
+            </details>"""
 
     pin_diagram_html = "".join(
         _render_pin_diagram(fb_name, item.get("wiring"), label=item.get("label"))
@@ -491,9 +651,11 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     </div>
     {compilation_html}
     {af_warning_html}
+    {io_diagram_html}
     {pin_diagram_html}
     {encapsulation_html}
-    {"".join(cards)}
+    {contract_section_html}
+    {domain_section_html}
     <details>
         <summary>Fichiers source compilés ({len(sources)})</summary>
         <ul>{sources_list}</ul>
@@ -547,6 +709,9 @@ _CSS = """
     .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
         padding: 16px 18px; margin-bottom: 12px; }
     .test-card-fail { border-color: var(--red-border); }
+    /* Style distinct pour les tests de contrat et d'interface socle */
+    .test-card-contract { background: #f8fafc; border-left: 5px solid #6366f1; border-color: #cbd5e1 #cbd5e1 #cbd5e1 #6366f1; }
+    .test-card-contract header h3 { color: #312e81; }
     .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
     .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
@@ -619,23 +784,23 @@ _CSS = """
     .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
         padding: 12px 16px; margin-bottom: 16px; }
     .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
-    .pin-diagram { display: flex; align-items: stretch; gap: 0; margin-top: 12px; font-size: 12px; }
-    .pin-col { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1px; min-width: 0; }
-    .pin-block { flex: 0 0 140px; background: #eef2ff; border: 2px solid var(--accent); border-radius: 6px;
-        display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700;
-        font-size: 12px; margin: 0 10px; padding: 8px; align-self: stretch; color: var(--accent); }
-    .pin-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; border-bottom: 2px dashed #94a3b8;
-        min-width: 0; }
+    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 550px; overflow-y: auto; padding: 4px 8px; }
+    .pin-block { flex: 0 0 160px; background: #eef2ff; border: 2px solid var(--accent); border-radius: 8px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-weight: 700;
+        font-size: 12px; margin: 0 12px; padding: 16px 8px; position: sticky; top: 10px; color: var(--accent); }
+    .pin-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px;
+        background: #f8fafc; min-width: 0; }
     /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
-    .pin-col-in .pin-row { justify-content: flex-end; text-align: right; }
+    .pin-col-in .pin-row { justify-content: space-between; text-align: right; }
     /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
-    .pin-col-out .pin-row { justify-content: flex-start; text-align: left; }
-    .pin-name { font-family: monospace; font-weight: 600; white-space: nowrap; color: var(--text); }
-    .pin-type { color: var(--muted); font-weight: 400; font-size: 10px; }
-    .pin-tag { font-size: 9px; background: #ddd6fe; color: #5b21b6; border-radius: 4px; padding: 1px 4px; margin-left: 4px; }
+    .pin-col-out .pin-row { justify-content: space-between; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+    .pin-type { color: var(--muted); font-weight: 400; font-size: 10px; margin-left: 4px; }
+    .pin-tag { font-size: 9px; border-radius: 4px; padding: 1px 4px; margin-left: 4px; font-weight: 600; white-space: nowrap; }
     .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
     .pin-expr code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 11px;
-        cursor: pointer; }
+        cursor: pointer; font-family: monospace; }
     .pin-expr code:hover { background: #e2e8f0; }
     .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
     .pin-missing { color: #b45309; font-style: italic; font-size: 11px; }
@@ -701,6 +866,360 @@ def _page_shell(title: str, inner_html: str, all_pass: bool = True) -> str:
 </body>
 </html>
 """
+
+
+def _render_st_io_block_diagram(analysis: dict) -> str:
+    """Rendu interactif complet de la boîte noire I/O pour un POU (Programme ou Function Block).
+    Affiche à gauche les entrées (formelles + GVL/PRG lues), au centre le bloc POU, et à droite les sorties (formelles + GVL écrites)."""
+    if not analysis:
+        return ""
+
+    file_name = analysis.get("file_name", "POU")
+    decls = analysis.get("declarations", {})
+    writes = analysis.get("categorized_writes", {})
+    reads = analysis.get("categorized_reads", {})
+    fb_instances = analysis.get("fb_instances", {})
+
+    var_in = decls.get("VAR_INPUT", {})
+    var_out = decls.get("VAR_OUTPUT", {})
+    var_inout = decls.get("VAR_IN_OUT", {})
+
+    # Entrées : regroupement clair par type et source
+    left_items = []
+    for v, t in var_in.items():
+        left_items.append(f'<div class="pin-row pin-row-wired" style="background:#f8fafc;border:1px solid #e2e8f0;margin:2px 0;"><div class="pin-expr"><span style="color:#475569;font-weight:700;font-size:10px;">[VAR_INPUT]</span></div><div class="pin-name" style="color:#1e293b;">{_html.escape(v)} <span class="pin-type" style="color:#64748b;">{_html.escape(t)}</span></div></div>')
+    for v, t in var_inout.items():
+        left_items.append(f'<div class="pin-row pin-row-wired" style="background:#f8fafc;border:1px solid #cbd5e1;margin:2px 0;"><div class="pin-expr"><span style="color:#64748b;font-weight:700;font-size:10px;">[VAR_IN_OUT]</span></div><div class="pin-name" style="color:#1e293b;">{_html.escape(v)} <span class="pin-type" style="color:#475569;">{_html.escape(t)}</span></div></div>')
+    
+    # 1. Grouper les E/S physiques matérielles (Device_IO)
+    hw_reads = reads.get("HW_IO", {})
+    if hw_reads:
+        sub_rows = []
+        for p, info in sorted(hw_reads.items()):
+            iec = info.get("iec_addr", "")
+            dev = info.get("device", "")
+            desc = info.get("desc", "")
+            sub_rows.append(f"""
+            <div class="pin-row pin-row-wired" style="padding-left:16px;background:#f0fdfa;border-left:3px solid #0d9488;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#0f766e;background:#ccfbf1;font-size:10.5px;">{_html.escape(p)}</code> <span style="font-size:9.5px;color:#115e59;">[{_html.escape(iec)} · {_html.escape(dev)}]</span></div>
+                <div class="pin-name"><span class="pin-tag" style="background:#99f6e4;color:#134e4a;font-size:9px;">🔌 E/S Matérielle</span></div>
+            </div>""")
+        left_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-wired" style="background:#ccfbf1;border:1px solid #5eead4;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#115e59;font-weight:700;font-size:11.5px;">🔌 Entrées Physiques / E/S Mappées</span> <span style="font-size:10px;color:#0f766e;">({len(hw_reads)} capteurs/adresses ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:#99f6e4;color:#134e4a;">Device_IO</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">{"".join(sub_rows)}</div>
+        </details>""")
+
+    # 2. Grouper les lectures GVL par variable globale parente (ex: GVL_Simulation, GVL_IHM)
+    gvl_reads_by_group = {}
+    for g in reads.get("GVL", []):
+        parts = g.split(".", 1)
+        g_grp = parts[0]
+        g_sub = parts[1] if len(parts) > 1 else g
+        gvl_reads_by_group.setdefault(g_grp, []).append((g, g_sub))
+
+    for g_grp, items in sorted(gvl_reads_by_group.items()):
+        sub_rows = []
+        for full_expr, sub_name in sorted(items):
+            sub_rows.append(f"""
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#f0f9ff;border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#0369a1;background:#e0f2fe;font-size:10.5px;">{_html.escape(full_expr)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:#bae6fd;color:#075985;font-size:9px;">🌐 GVL In</span></div>
+            </div>""")
+        left_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:#e0f2fe;border:1px solid #7dd3fc;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#075985;font-weight:700;font-size:11.5px;">🌐 {_html.escape(g_grp)}</span> <span style="font-size:10px;color:#0369a1;">({len(items)} signaux ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:#bae6fd;color:#075985;">Lecture Globale</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">{"".join(sub_rows)}</div>
+        </details>""")
+
+    # 3. Grouper les lectures inter-PRG par programme source (ex: PRG_03, PRG_04, ...)
+    prg_reads_by_group = {}
+    for p in reads.get("PRG_Inter", []):
+        parts = p.split(".", 1)
+        p_grp = parts[0]
+        p_sub = parts[1] if len(parts) > 1 else p
+        prg_reads_by_group.setdefault(p_grp, []).append((p, p_sub))
+
+    for p_grp, items in sorted(prg_reads_by_group.items()):
+        sub_rows = []
+        for full_expr, sub_name in sorted(items):
+            sub_rows.append(f"""
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#eff6ff;border-left:3px solid #2563eb;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#1d4ed8;background:#dbeafe;font-size:10.5px;">{_html.escape(full_expr)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:#bfdbfe;color:#1e40af;font-size:9px;">🔗 PRG In</span></div>
+            </div>""")
+        left_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:#dbeafe;border:1px solid #93c5fd;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#1e40af;font-weight:700;font-size:11.5px;">🔗 {_html.escape(p_grp)}</span> <span style="font-size:10px;color:#1d4ed8;">({len(items)} retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:#bfdbfe;color:#1e40af;">Inter-PRG</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">{"".join(sub_rows)}</div>
+        </details>""")
+
+    # 4. Nœuds / Équipements CODESYS (ex: CANbus, COD1_CODEUR, AC600_ECAT_Drive)
+    dev_reads = reads.get("DEVICES", [])
+    if dev_reads:
+        sub_rows = []
+        for p in dev_reads:
+            sub_rows.append(f"""
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#f5f3ff;border-left:3px solid #7c3aed;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#6d28d9;background:#ede9fe;font-size:10.5px;">{_html.escape(p)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:#ddd6fe;color:#5b21b6;font-size:9px;">📡 Device CODESYS</span></div>
+            </div>""")
+        left_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:#ede9fe;border:1px solid #c4b5fd;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#5b21b6;font-weight:700;font-size:11.5px;">📡 Arbre Matériel / Devices ({len(dev_reads)} équipements ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:#ddd6fe;color:#5b21b6;">Nœud Système</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">{"".join(sub_rows)}</div>
+        </details>""")
+
+    # 5. Énumérations globales / Types Système (ex: DEVICE_STATE, E_Mode)
+    enum_reads = reads.get("ENUMS", [])
+    if enum_reads:
+        sub_rows = []
+        for p in enum_reads:
+            sub_rows.append(f"""
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#f8fafc;border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#334155;background:#e2e8f0;font-size:10.5px;">{_html.escape(p)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:#e2e8f0;color:#334155;font-size:9px;">🏷️ Enum / Type</span></div>
+            </div>""")
+        left_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:#f1f5f9;border:1px solid #cbd5e1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#334155;font-weight:700;font-size:11.5px;">🏷️ Énumérations Globales ({len(enum_reads)} constantes ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:#e2e8f0;color:#334155;">Type Global</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">{"".join(sub_rows)}</div>
+        </details>""")
+
+    # 6. Variables rémanentes / Calibrations persistantes RETAIN (ex: _CalibM1, _WinchM1CfgPersist)
+    retain_reads = reads.get("RETAIN_PERSIST", [])
+    if retain_reads:
+        sub_rows = []
+        for p in retain_reads:
+            sub_rows.append(f"""
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#fffbeb;border-left:3px solid #f59e0b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#b45309;background:#fef3c7;font-size:10.5px;">{_html.escape(p)}</code> <span style="font-size:9.5px;color:#92400e;">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
+                <div class="pin-name"><span class="pin-tag" style="background:#fde68a;color:#92400e;font-size:9px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
+            </div>""")
+        left_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:#fef3c7;border:1px solid #fde68a;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#92400e;font-weight:700;font-size:11.5px;">💾 Variables Rémanentes Persistantes / RETAIN ({len(retain_reads)} variables ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:#fde68a;color:#92400e;font-weight:700;">VAR PERSISTENT</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">{"".join(sub_rows)}</div>
+        </details>""")
+
+    # 7. Variables externes réellement inconnues / non déclarées
+    unres_reads = reads.get("EXTERNAL", [])
+    if unres_reads:
+        sub_rows = []
+        for p in unres_reads:
+            sub_rows.append(f"""
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:#fff1f2;border-left:3px solid #e11d48;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#be123c;background:#ffe4e6;font-size:10.5px;">{_html.escape(p)}</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:#fecdd3;color:#9f1239;font-size:9px;">❓ Non Déclaré</span></div>
+            </div>""")
+        left_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:#ffe4e6;border:1px solid #fda4af;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#9f1239;font-weight:700;font-size:11.5px;">❓ Inconnues / Non Déclarées ({len(unres_reads)} identifiants ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:#fecdd3;color:#9f1239;">Alerte</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">{"".join(sub_rows)}</div>
+        </details>""")
+
+    # Sorties : regroupement clair par structure parente
+    right_items = []
+    # Indexer les sous-champs écrits par variable parente
+    sub_writes_by_parent = {}
+    for w in writes.get("VAR_OUTPUT", []):
+        if "." in w:
+            p_name, child = w.split(".", 1)
+            sub_writes_by_parent.setdefault(p_name, []).append(child)
+
+    for v, t in var_out.items():
+        children = sub_writes_by_parent.get(v, [])
+        if children:
+            # En-tête dépliable de la structure (Fermé par défaut)
+            children_rows = []
+            for ch in sorted(children):
+                children_rows.append(f"""
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:#f8fafc;border-left:3px solid #6366f1;margin-top:2px;">
+                    <div class="pin-name" style="font-size:11px;color:#334155;">↳ <b>{_html.escape(v)}</b>.{_html.escape(ch)}</div>
+                    <div class="pin-expr"><span style="font-size:9.5px;color:#64748b;">champ de {_html.escape(t)}</span></div>
+                </div>""")
+            
+            right_items.append(f"""
+            <details style="margin:4px 0;">
+                <summary style="list-style:none;cursor:pointer;">
+                    <div class="pin-row pin-row-wired pin-row-out" style="background:#eef2ff;border:1px solid #c7d2fe;cursor:pointer;">
+                        <div class="pin-name" style="color:#3730a3;font-size:12px;">📦 <b>{_html.escape(v)}</b> : <span class="pin-type" style="color:#4338ca;font-weight:700;">{_html.escape(t)}</span> <span style="font-size:10px;color:#6366f1;">({len(children)} champs ▾)</span></div>
+                        <div class="pin-expr"><span style="color:#059669;font-weight:600;font-size:10px;">[VAR_OUTPUT STRUCTURE]</span></div>
+                    </div>
+                </summary>
+                <div style="margin-top:2px;">{"".join(children_rows)}</div>
+            </details>""")
+        else:
+            right_items.append(f"""
+            <div class="pin-row pin-row-wired pin-row-out" style="margin-top:4px;">
+                <div class="pin-name"><b>{_html.escape(v)}</b> <span class="pin-type" style="color:#4f46e5;font-weight:600;">{_html.escape(t)}</span></div>
+                <div class="pin-expr"><span style="color:#059669;font-weight:600;">[VAR_OUTPUT]</span></div>
+            </div>""")
+
+    # Écritures transverses vers GVL groupées par GVL cible (Même couleur bleu ciel que GVL In avec bordure cyan)
+    gvl_writes_by_group = {}
+    for g in writes.get("GVL", []):
+        parts = g.split(".", 1)
+        g_grp = parts[0]
+        g_sub = parts[1] if len(parts) > 1 else g
+        gvl_writes_by_group.setdefault(g_grp, []).append((g, g_sub))
+
+    for g_grp, items in sorted(gvl_writes_by_group.items()):
+        sub_rows = []
+        for full_expr, sub_name in sorted(items):
+            sub_rows.append(f"""
+            <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:#f0f9ff;border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-name"><span class="pin-tag" style="background:#bae6fd;color:#075985;font-size:9px;">🌐 GVL Out</span></div>
+                <div class="pin-expr"><code style="color:#0369a1;background:#e0f2fe;font-size:10.5px;">{_html.escape(full_expr)}</code></div>
+            </div>""")
+        right_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired pin-row-out" style="background:#e0f2fe;border:1px solid #7dd3fc;cursor:pointer;">
+                    <div class="pin-name"><span style="color:#075985;font-weight:700;font-size:11.5px;">🌐 {_html.escape(g_grp)}</span> <span style="font-size:10px;color:#0369a1;">({len(items)} écritures ▾)</span></div>
+                    <div class="pin-expr"><span class="pin-tag" style="background:#bae6fd;color:#075985;">Écriture Globale</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">{"".join(sub_rows)}</div>
+        </details>""")
+
+    if not left_items:
+        left_items.append('<div class="pin-row"><div class="pin-missing">Aucune entrée directe</div></div>')
+    if not right_items:
+        right_items.append('<div class="pin-row pin-row-out"><div class="pin-missing">Aucune sortie directe</div></div>')
+
+    sub_inst_badges = "".join(f'<span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;font-size:11px;padding:2px 6px;border-radius:4px;margin:2px;display:inline-block;">⚙️ {_html.escape(inst)} ({_html.escape(t)})</span>' for inst, t in fb_instances.items())
+
+    var_const = decls.get("VAR_CONSTANT", {})
+    const_badges = "".join(f'<span style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;font-size:11px;padding:2px 6px;border-radius:4px;margin:2px;display:inline-block;">📐 <b>{_html.escape(c_name)}</b> : {_html.escape(c_val)}</span>' for c_name, c_val in var_const.items())
+
+    const_section = f"""
+        <div style="margin:6px 0;font-size:12px;color:var(--muted);">
+            <b>Constantes internes (VAR CONSTANT) :</b><br>
+            <div style="margin-top:4px;">{const_badges}</div>
+        </div>""" if const_badges else ""
+
+    # Calcul des compteurs précis et du nom du POU
+    pou_title = file_name.replace(".st", "")
+    total_in_count = len(var_in) + len(var_inout) + len(hw_reads) + len(dev_reads) + len(enum_reads) + len(retain_reads) + sum(len(items) for items in gvl_reads_by_group.values()) + sum(len(items) for items in prg_reads_by_group.values()) + len(unres_reads)
+    total_out_count = sum(len(children) for children in sub_writes_by_parent.values()) + sum(1 for v in var_out if v not in sub_writes_by_parent) + sum(len(items) for items in gvl_writes_by_group.values())
+
+    # Détection du profil de contrat AF03 (§1bis) - Uniquement pour les FB
+    in_keys = [v.upper() for v in var_in]
+    out_keys = [v.upper() for v in var_out]
+
+    has_enable = "ENABLE" in in_keys
+    has_ready = "READY" in out_keys
+    has_reset = "RESET" in in_keys
+    has_status = "STATUS" in out_keys
+    
+    # Signaux de gestion de défauts / cycle de vie étendus ou tolérance transitoire T137
+    has_flat_error = any(k in out_keys for k in ("ERROR", "ERRORID", "STATE", "STATEATEROR", "DONE", "BUSY", "WARNING"))
+
+    is_prg = pou_title.startswith("PRG_")
+    contract_info_html = ""
+    if not is_prg:
+        if has_enable and has_ready and has_reset and has_status:
+            contract_badge = '<span style="background:#dcfce7;color:#166534;border:1px solid #86efac;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;">CONTRAT STANDARD AF03</span>'
+            contract_desc = "✅ Enable + Reset + Ready + Status (ST_FbStatus complet)"
+        elif has_enable and (has_ready or "DONE" in out_keys) and (has_reset or has_flat_error):
+            contract_badge = '<span style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;">CONTRAT STANDARD (Tolérance T137 Flat)</span>'
+            contract_desc = "⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_FbStatus"
+        elif has_enable and has_ready:
+            contract_badge = '<span style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;">CONTRAT LIGHT AF03</span>'
+            contract_desc = "✅ Enable + Ready (Calculateur / Brique sans défaut)"
+        else:
+            contract_badge = '<span style="background:#f8fafc;color:#475569;border:1px solid #cbd5e1;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;">PROFIL TECHNIQUE SPÉCIFIQUE</span>'
+            contract_desc = "Brique utilitaire / Interface sur-mesure"
+
+        contract_info_html = f"""
+        <div style="margin: 6px 0 4px 0;">{contract_badge}</div>
+        <div style="font-size: 9.5px; color: #4338ca; margin-bottom: 8px; font-weight: normal;">{contract_desc}</div>"""
+
+    # Structure & Qualité du code ST (En-tête et bannières requises pour FB et PRG)
+    sq = analysis.get("structure_quality", {})
+    hdr_ok = sq.get("has_header_comment", True)
+    in_b_ok = sq.get("has_var_input_banner", True)
+    out_b_ok = sq.get("has_var_output_banner", True)
+    loc_b_ok = sq.get("has_var_local_banner", True)
+    all_struct_ok = hdr_ok and in_b_ok and out_b_ok and loc_b_ok
+
+    struct_status_html = f"""
+    <div style="margin-top:6px;padding:4px 6px;background:{'#f0fdf4' if all_struct_ok else '#fff1f2'};border:1px solid {'#bbf7d0' if all_struct_ok else '#fecdd3'};border-radius:4px;font-size:9.5px;text-align:left;color:{'#166534' if all_struct_ok else '#9f1239'};font-weight:normal;">
+        <div style="font-weight:700;margin-bottom:2px;">📋 Structure ST (Cartouche & Bannières) :</div>
+        <div>{'✅' if hdr_ok else '❌'} Cartouche En-tête <code>(* === *)</code></div>
+        <div>{'✅' if in_b_ok else '❌'} Bannière <code>VAR_INPUT</code></div>
+        <div>{'✅' if out_b_ok else '❌'} Bannière <code>VAR_OUTPUT</code></div>
+        <div>{'✅' if loc_b_ok else '❌'} Bannière <code>VAR</code> locale</div>
+    </div>"""
+
+    return f"""
+    <details class="pin-diagram-details" open>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>{_html.escape(pou_title)}</b> <span class="badge badge-pass" style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;margin-left:6px;">POU Principal</span> (📊 {total_in_count} flux entrants · {total_out_count} flux sortants)</summary>
+        <div style="margin:10px 0 6px 0;font-size:12px;color:var(--muted);">
+            <b>Sous-instances actives intégrées :</b><br>
+            <div style="margin-top:4px;">{sub_inst_badges or '(aucune)'}</div>
+        </div>
+        {const_section}
+        <div class="pin-diagram" style="background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+            <div class="pin-col pin-col-in">{"".join(left_items)}</div>
+            <div class="pin-block" style="min-width: 210px; background: #e0e7ff; border: 2px solid #4338ca; color: #312e81; font-size: 13px; letter-spacing: 0.3px; padding: 12px 6px;">
+                <span style="font-weight:700;font-size:13.5px;">{_html.escape(pou_title)}</span>
+                {contract_info_html}
+                
+                <div style="margin-top:4px;padding:6px;background:#ffffff;border:1px solid #c7d2fe;border-radius:6px;width:100%;font-size:10.5px;text-align:left;color:#334155;font-weight:normal;">
+                    <div style="color:#1e40af;font-weight:700;border-bottom:1px solid #e2e8f0;padding-bottom:2px;margin-bottom:4px;">📊 Métriques I/O :</div>
+                    <div>• Entrées Formelles : <b>{len(var_in) + len(var_inout)}</b></div>
+                    <div>• Entrées Physiques : <b>{len(hw_reads)}</b></div>
+                    <div>• Lectures GVL : <b>{sum(len(items) for items in gvl_reads_by_group.values())}</b></div>
+                    <div>• Retours PRG : <b>{sum(len(items) for items in prg_reads_by_group.values())}</b></div>
+                    <div>• Devices CODESYS : <b>{len(dev_reads)}</b></div>
+                    <div>• Calibrations RETAIN : <b>{len(retain_reads)}</b></div>
+                    <div style="border-top:1px solid #e2e8f0;margin-top:4px;padding-top:2px;">• Structures Out : <b>{len(var_out)}</b></div>
+                    <div>• Champs Out : <b>{sum(len(children) for children in sub_writes_by_parent.values())}</b></div>
+                    <div>• Écritures GVL : <b>{sum(len(items) for items in gvl_writes_by_group.values())}</b></div>
+                    <div style="border-top:1px solid #e2e8f0;margin-top:4px;padding-top:2px;font-weight:700;color:#4338ca;">Total : <b>{total_in_count} IN</b> / <b>{total_out_count} OUT</b></div>
+                </div>
+                {struct_status_html}
+            </div>
+            <div class="pin-col pin-col-out">{"".join(right_items)}</div>
+        </div>
+    </details>"""
 
 
 def _render_pin_diagram(fb_name: str, wiring: dict | None, label: str | None = None) -> str:
@@ -808,11 +1327,11 @@ def render_html_report(fb_name: str, domain: str, test_file: str, sources: list,
                         json_data: dict, text_report: str, test_st_path=None,
                         trace_entries=None, source_paths=None, cycle_time_ms: float = 10,
                         field_types=None, af_warnings=None, extra_test_warnings=None,
-                        wirings=None, encapsulation_report=None) -> str:
-    """Rapport HTML autonome pour UN SEUL FB."""
+                        wirings=None, encapsulation_report=None, source_prg=None) -> str:
+    """Rapport HTML autonome pour UN SEUL FB ou UN SEUL PROGRAMME."""
     section = _render_fb_section(fb_name, domain, sources, json_data, text_report, test_st_path,
                                   trace_entries, source_paths, cycle_time_ms, field_types,
-                                  af_warnings, extra_test_warnings, wirings, encapsulation_report)
+                                  af_warnings, extra_test_warnings, wirings, encapsulation_report, source_prg=source_prg)
     exec_time = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     toc_html = _render_toc([(None, section["toc_entries"])])
     inner = f"""

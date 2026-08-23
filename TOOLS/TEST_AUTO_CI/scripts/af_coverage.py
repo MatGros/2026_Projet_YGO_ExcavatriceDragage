@@ -96,4 +96,5 @@ def check_extra_tests(af_doc_path, test_st_path) -> list:
     catalog_ids = {tc_id for tc_id, _type, _intent in parse_af_catalog(af_text)}
     tested_ids = extract_test_ids(test_text)
 
-    return sorted(tc_id for tc_id in tested_ids if tc_id not in catalog_ids)
+    # Les tests transverses de contrat AF03 (TC-P03-*) sont universels et légitimes sur tout composant
+    return sorted(tc_id for tc_id in tested_ids if tc_id not in catalog_ids and not tc_id.startswith("TC-P03-"))

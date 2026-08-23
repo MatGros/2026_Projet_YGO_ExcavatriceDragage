@@ -1,4 +1,4 @@
-﻿# 🤖 TEST_AUTO_CI
+# 🤖 TEST_AUTO_CI
 
 Runner de tests automatisés pour FB CODESYS — 2e outil de la chaîne, **séparé** de
 `COMPILER_ST2C_STruCpp` (qui ne fait que la conversion ST → C++). Ici : registre figé +
