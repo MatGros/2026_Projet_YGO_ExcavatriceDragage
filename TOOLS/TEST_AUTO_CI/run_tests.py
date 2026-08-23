@@ -6,8 +6,8 @@ dependances -- jamais devinees a la volee). Pipeline par FB :
                              --[strucpp.exe --test]--> compile C++ + execute les ASSERT
 
 Usage :
-    python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Joystick
-    python TOOLS/TEST_AUTO_CI/run_tests.py --all
+    python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Joystick
+    python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --all
 
 Necessite g++ (MinGW-w64) dans le PATH -- voir TOOLS/COMPILER_ST2C_STruCpp/README.md.
 """
@@ -22,6 +22,20 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time as _time
+
+# Configuration encodage UTF-8 sous Windows
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
+# Ajout du sous-dossier scripts au sys.path pour les modules internes
+SCRIPT_DIR = pathlib.Path(__file__).resolve().parent / "scripts"
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
 
 import yaml
 
@@ -149,18 +163,23 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
     def _progress_line(phase: str) -> str:
         return f"-> {fb_name} ({domain})... {phase}".ljust(70)
 
-    print(_progress_line("conversion"), end="", flush=True)
+    if debug:
+        print(_progress_line("conversion"), flush=True)
     _log(f"\n=== {fb_name} (domaine {domain}) ===")
 
     with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_") as tmp:
         converted_dir = pathlib.Path(tmp)
+        # Flag de priorité basse sous Windows pour préserver 100% de la réactivité du PC
+        subproc_flags = subprocess.BELOW_NORMAL_PRIORITY_CLASS if sys.platform == "win32" else 0
+
         convert_cmd = [sys.executable, str(CONVERTER), *[str(s) for s in sources], "--out", str(converted_dir)]
-        result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8")
+        result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8",
+                                creationflags=subproc_flags)
         _log(result.stdout)
         if result.returncode != 0:
-            print()
-            print(f"[ERREUR] Conversion echouee pour {fb_name}")
-            print(result.stderr, file=sys.stderr)
+            if debug:
+                print(f"[ERREUR] Conversion echouee pour {fb_name}")
+                print(result.stderr, file=sys.stderr)
             return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}], "report": None}
 
         converted_files = [str(converted_dir / s.name) for s in sources]
@@ -168,15 +187,12 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         tmp_root = pathlib.Path(tempfile.gettempdir())
         before = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
 
-        # Lance en streaming (pas subprocess.run) pour afficher les etapes reelles en direct --
-        # la conversion/compilation C++ (strucpp+g++) est la partie longue ; l'execution des
-        # tests eux-memes est quasi instantanee (temps SIMULE via ADVANCE_TIME, pas du temps
-        # reel) -- donc pas de compteur test-par-test utile, seulement les phases qui prennent
-        # reellement du temps machine.
-        print(f"\r{_progress_line('compilation')}", end="", flush=True)
+        if debug:
+            print(_progress_line("compilation"), flush=True)
         strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "--test", str(test_file)]
         proc = subprocess.Popen(strucpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                 text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1)
+                                 text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1,
+                                 creationflags=subproc_flags)
         lines = list(proc.stdout)
         proc.wait()
         result = subprocess.CompletedProcess(strucpp_cmd, proc.returncode, "".join(lines), "")
@@ -190,12 +206,14 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         if strucpp_temp_dir is not None:
             test_runner = strucpp_temp_dir / "test_runner.exe"
             if test_runner.exists():
-                json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8")
+                json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8",
+                                             creationflags=subproc_flags)
                 try:
                     json_data = json.loads(json_result.stdout)
                 except json.JSONDecodeError:
                     json_data = None
-            print(f"\r{_progress_line('chronogramme')}", end="", flush=True)
+            if debug:
+                print(_progress_line("chronogramme"), flush=True)
             try:
                 trace_entries, field_types = chronogram.build_and_run_traced(
                     strucpp_temp_dir, RUNTIME_INCLUDE, RUNTIME_TEST, fb_name.upper())
@@ -267,14 +285,14 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                                source_paths=sources, cycle_time_ms=cycle_time_ms,
                                field_types=field_types, af_warnings=af_warnings,
                                extra_test_warnings=extra_test_warnings, wirings=wirings,
-                               encapsulation_report=encapsulation_report)
+                               encapsulation_report=encapsulation_report,
+                               source_prg=entry.get("source_prg"))
 
         if json_data is not None:
             (base.with_suffix(".json")).write_text(json.dumps(json_data, indent=2), encoding="utf-8")
-            if not report_group:
-                html = render_html_report(**section_kwargs, test_file=str(entry["test"]))
-                base.with_suffix(".html").write_text(html, encoding="utf-8")
-                report_path = base.with_suffix(".html")
+            html = render_html_report(**section_kwargs, test_file=str(entry["test"]))
+            base.with_suffix(".html").write_text(html, encoding="utf-8")
+            report_path = base.with_suffix(".html")
         else:
             base.with_suffix(".txt").write_text(text_report, encoding="utf-8")
             report_path = base.with_suffix(".txt")
@@ -303,11 +321,18 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
 
 def main() -> int:
+    # Calibrage CPU puissant & fluide :
+    # Sur 16 threads logiques -> 12 workers en parallèle, 4 threads entièrement préservés pour Windows/IHM
+    cpu_total = os.cpu_count() or 4
+    default_workers = max(1, cpu_total - 4) if cpu_total > 4 else max(1, cpu_total - 1)
+
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--fb", help="Nom du FB a tester (cle du registry.yaml)")
     group.add_argument("--domain", help="Tester tous les FB d'un domaine (ex: AU_SECURITE, JOYSTICK)")
     group.add_argument("--all", action="store_true", help="Tester tous les FB du registre (defaut si aucune option)")
+    parser.add_argument("-j", "--jobs", type=int, default=default_workers,
+                        help=f"Nombre d'instances de test en parallele (defaut calibre : {default_workers} threads)")
     parser.add_argument("--debug", action="store_true",
                          help="Affiche tous les logs intermediaires (conversion, sortie brute strucpp). "
                               "Sans cette option : uniquement le resultat final.")
@@ -324,20 +349,53 @@ def main() -> int:
     registry = load_registry()
     cycle_time_ms = load_config().get("cycle_time_ms", 10)
 
+    start_time = _time.perf_counter()
+
     if args.domain:
-        selected = {name: e for name, e in registry.items() if e["domain"] == args.domain}
-        if not selected:
+        targets = {name: e for name, e in registry.items() if e["domain"] == args.domain}
+        if not targets:
             domains = sorted({e["domain"] for e in registry.values()})
             print(f"[ERREUR] Aucun FB dans le domaine '{args.domain}' -- domaines disponibles : {', '.join(domains)}")
             return 1
-        results = {name: run_one(name, entry, cycle_time_ms, args.debug) for name, entry in selected.items()}
     elif args.fb:
         if args.fb not in registry:
             print(f"[ERREUR] '{args.fb}' absent de {REGISTRY} -- entrees disponibles : {', '.join(registry)}")
             return 1
-        results = {args.fb: run_one(args.fb, registry[args.fb], cycle_time_ms, args.debug)}
+        targets = {args.fb: registry[args.fb]}
     else:
-        results = {name: run_one(name, entry, cycle_time_ms, args.debug) for name, entry in registry.items()}
+        targets = registry
+
+    # Exécution des tests (Parallèle si plusieurs cibles, séquentiel si debug ou 1 seul)
+    results = {}
+    if len(targets) > 1 and not args.debug and args.jobs > 1:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+        workers = min(len(targets), args.jobs)
+        print(f">> Lancement de {len(targets)} tests en parallele sur {workers} threads CPU...\n")
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            future_to_name = {
+                executor.submit(run_one, name, entry, cycle_time_ms, False): name
+                for name, entry in targets.items()
+            }
+            completed_count = 0
+            total_count = len(targets)
+            for future in as_completed(future_to_name):
+                name = future_to_name[future]
+                completed_count += 1
+                try:
+                    res = future.result()
+                    results[name] = res
+                    ok = res.get("ok", False)
+                    status_tag = _c("PASS", ok) if ok else _c("FAIL", False)
+                    n_p = sum(1 for t in res.get("tests", []) if t.get("passed"))
+                    n_t = len(res.get("tests", []))
+                    print(f"  [{completed_count:2d}/{total_count:2d}] {status_tag} {name:28s} ({n_p}/{n_t} test(s) OK)")
+                except Exception as exc:
+                    print(f"  [{completed_count:2d}/{total_count:2d}] {_c('FAIL', False)} {name:28s} (Erreur : {exc})")
+                    results[name] = {"ok": False, "tests": [{"name": str(exc), "passed": False, "detail": ""}],
+                                     "report": None, "report_group": None, "section_kwargs": {}}
+        print()
+    else:
+        results = {name: run_one(name, entry, cycle_time_ms, args.debug) for name, entry in targets.items()}
 
     # Fiches de rapport groupees : plusieurs FB independants (compiles/testes separement)
     # partagent UNE seule page HTML -- registry.yaml en decide via "report_group".
@@ -348,16 +406,17 @@ def main() -> int:
             groups.setdefault(rg, []).append(name)
     group_report_paths = {}
     for group_name, members in groups.items():
-        domain = registry[members[0]]["domain"]
-        reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
-        reports_dir.mkdir(parents=True, exist_ok=True)
-        _archive_previous(reports_dir, group_name)
-        html = render_group_report(group_name, [results[m]["section_kwargs"] for m in members])
-        path = reports_dir / f"{group_name}.html"
-        path.write_text(html, encoding="utf-8")
-        for m in members:
-            results[m]["report"] = path
-        group_report_paths[group_name] = path
+        if len(members) > 1 or args.all or args.domain:
+            domain = registry[members[0]]["domain"]
+            reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
+            reports_dir.mkdir(parents=True, exist_ok=True)
+            _archive_previous(reports_dir, group_name)
+            html = render_group_report(group_name, [results[m]["section_kwargs"] for m in members])
+            path = reports_dir / f"{group_name}.html"
+            path.write_text(html, encoding="utf-8")
+            for m in members:
+                results[m]["report"] = path
+            group_report_paths[group_name] = path
 
     print("=== RESUME ===")
     for name, res in results.items():
@@ -388,9 +447,27 @@ def main() -> int:
             print(f"  Rapport : {res['report']}")
     for group_name, path in group_report_paths.items():
         print(f"Rapport groupe {group_name} : {path}")
+
+    # Génération du dashboard index.html à la racine de TEST_AUTO_CI
+    if len(results) > 1 or args.all or args.domain:
+        from html_report import render_index_dashboard
+        index_html = render_index_dashboard(results, group_report_paths)
+        index_path = TEST_AUTO_CI / "index.html"
+        index_path.write_text(index_html, encoding="utf-8")
+        try:
+            print(f"\n📊 Dashboard global généré : {index_path}")
+        except UnicodeEncodeError:
+            print(f"\n[Dashboard global genere] : {index_path}")
+
+    elapsed = _time.perf_counter() - start_time
+    minutes = int(elapsed // 60)
+    seconds = elapsed % 60
+    time_str = f"{minutes}m {seconds:.2f}s" if minutes > 0 else f"{seconds:.2f}s"
+
     n_fail = sum(1 for res in results.values() if not res["ok"])
     summary = f"{len(results)} FB testes, {len(results) - n_fail} PASS, {n_fail} FAIL"
     print(f"\n{_c(summary, n_fail == 0)}")
+    print(f"⏱️  Temps d'execution : {time_str}")
 
     return 1 if n_fail else 0
 

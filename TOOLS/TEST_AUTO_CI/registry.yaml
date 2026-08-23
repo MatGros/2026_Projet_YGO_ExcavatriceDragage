@@ -5,7 +5,7 @@
 # nouvelle entree se fait ici, jamais en modifiant run_tests.py.
 
 FB_Encoder:
-  domain: CODEURS
+  domain: E_CODEURS
   af_doc: DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
   # Deux instances production (un FB, deux treuils) -- le rapport affiche un bloc pinout par
   # instance avec son cablage reel propre (instEncoderM1 != instEncoderM2). Smoke test seul
@@ -31,10 +31,10 @@ FB_Encoder:
     - CODE/E_CODEURS/FB_EncoderReliability.st
     - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
     - CODE/E_CODEURS/FB_Encoder.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/CODEURS/tests/test_fb_encoder.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS/tests/test_fb_encoder.st
 
 FB_Joystick:
-  domain: JOYSTICK
+  domain: D_JOYSTICK
   af_doc: DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md
   # NB : TC-P08-008 n'a plus besoin d'exception ici -- son Type dans l'AF est passe a
   # "N/A ici" (pas "AUTO"), donc le coverage-check ne le detecte plus comme manquant tout
@@ -53,32 +53,28 @@ FB_Joystick:
     - CODE/D_JOYSTICK/ST_Joystick_AxisCmd.st
     - CODE/D_JOYSTICK/FB_AxisScale.st
     - CODE/D_JOYSTICK/FB_Joystick.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/JOYSTICK/tests/test_fb_joystick.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/D_JOYSTICK/tests/test_fb_joystick.st
 
 FB_CycleTime:
   domain: A_COMMUN
-  report_group: A_COMMUN
   sources:
     - CODE/A_COMMUN/FB_CycleTime.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_cycletime.st
 
 FB_Ramp:
   domain: A_COMMUN
-  report_group: A_COMMUN
   sources:
     - CODE/A_COMMUN/FB_Ramp.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_ramp.st
 
 FB_Acquisition_Preflight:
   domain: A_COMMUN
-  report_group: A_COMMUN
   sources:
     - CODE/A_COMMUN/FB_Acquisition_Preflight.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_acquisition_preflight.st
 
 FB_FbStatus:
   domain: A_COMMUN
-  report_group: A_COMMUN
   af_doc: DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
   # TC-P03-004 (pas de SafeStop/StartStop hors mouvement) et TC-P03-005 (encapsulation stricte)
   # sont des regles transverses a TOUS les composants du catalogue AF_Partie-03, pas specifiques
@@ -95,14 +91,12 @@ FB_FbStatus:
 
 FB_Filter:
   domain: A_COMMUN
-  report_group: A_COMMUN
   sources:
     - CODE/A_COMMUN/FB_Filter.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_filter.st
 
 FB_Brake:
   domain: A_COMMUN
-  report_group: A_COMMUN
   sources:
     - CODE/A_COMMUN/E_State.st
     - CODE/A_COMMUN/ST_FbStatus.st
@@ -111,7 +105,7 @@ FB_Brake:
   test: TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_brake.st
 
 FB_Safety_EmergencyManagement:
-  domain: AU_SECURITE
+  domain: B_AU_SECURITE
   af_doc: DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
   prod_instance:
     file: CODE/M_MAIN/PRG_06_Outputs.st
@@ -123,49 +117,44 @@ FB_Safety_EmergencyManagement:
     - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st
     - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st
     - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/AU_SECURITE/tests/test_fb_safety_emergency.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st
 
 FB_Diag_CanOpen:
-  domain: DIAG_RESEAUX
-  report_group: DIAG_RESEAUX
+  domain: C_DIAG_RESEAUX
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/DIAG_RESEAUX/tests/test_fb_diag_canopen.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_canopen.st
 
 FB_Diag_Ethercat:
-  domain: DIAG_RESEAUX
-  report_group: DIAG_RESEAUX
+  domain: C_DIAG_RESEAUX
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/DIAG_RESEAUX/tests/test_fb_diag_ethercat.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_ethercat.st
 
 FB_Diag_IhmHeartbeat:
-  domain: DIAG_RESEAUX
-  report_group: DIAG_RESEAUX
+  domain: C_DIAG_RESEAUX
   sources:
     - CODE/C_DIAG_RESEAUX/FB_Diag_IhmHeartbeat.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/DIAG_RESEAUX/tests/test_fb_diag_ihmheartbeat.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_ihmheartbeat.st
 
 FB_Modes:
-  domain: MODES
-  report_group: MODES
+  domain: F_MODES
   sources:
     - CODE/A_COMMUN/E_State.st
     - CODE/A_COMMUN/ST_FbStatus.st
     - CODE/F_MODES/E_Mode.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/F_MODES/FB_Modes.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/MODES/tests/test_fb_modes.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/F_MODES/tests/test_fb_modes.st
 
 FB_Cycle:
-  domain: CYCLE
-  report_group: CYCLE
+  domain: G_CYCLE
   sources:
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/E_CycleStep.st
@@ -173,33 +162,30 @@ FB_Cycle:
     - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
     - CODE/H_TREUILS_BENNE/BENNE/ST_BucketCmdDemand.st
     - CODE/G_CYCLE/FB_Cycle.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/CYCLE/tests/test_fb_cycle.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cycle.st
 
 FB_DiveSearch:
-  domain: CYCLE
-  report_group: CYCLE
+  domain: G_CYCLE
   sources:
     - CODE/A_COMMUN/E_State.st
     - CODE/A_COMMUN/ST_FbStatus.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/E_DiveSearchState.st
     - CODE/G_CYCLE/FB_DiveSearch.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/CYCLE/tests/test_fb_divesearch.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_divesearch.st
 
 FB_ExtractionSequence:
-  domain: CYCLE
-  report_group: CYCLE
+  domain: G_CYCLE
   sources:
     - CODE/A_COMMUN/E_State.st
     - CODE/A_COMMUN/ST_FbStatus.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/E_ExtractionSequenceState.st
     - CODE/G_CYCLE/FB_ExtractionSequence.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/CYCLE/tests/test_fb_extractionsequence.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_extractionsequence.st
 
 FB_Winch:
-  domain: TREUILS
-  report_group: TREUILS
+  domain: H_TREUILS_BENNE
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st
     - CODE/A_COMMUN/E_State.st
@@ -216,13 +202,12 @@ FB_Winch:
     - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
     - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
     - CODE/H_TREUILS_BENNE/FB_Winch.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/TREUILS/tests/test_fb_winch.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st
 
 
 
 FB_Bucket:
-  domain: TREUILS
-  report_group: TREUILS
+  domain: H_TREUILS_BENNE
   sources:
     - CODE/A_COMMUN/E_State.st
     - CODE/A_COMMUN/ST_FbStatus.st
@@ -230,11 +215,10 @@ FB_Bucket:
     - CODE/H_TREUILS_BENNE/BENNE/ST_BucketConfig.st
     - CODE/H_TREUILS_BENNE/BENNE/ST_BucketState.st
     - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/TREUILS/tests/test_fb_bucket.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
 
 FB_Translation:
-  domain: TRANSLATION
-  report_group: TRANSLATION
+  domain: I_TRANSLATION
   sources:
     - CODE/A_COMMUN/E_State.st
     - CODE/A_COMMUN/ST_FbStatus.st
@@ -247,11 +231,10 @@ FB_Translation:
     - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
     - CODE/I_TRANSLATION/FB_Safety_Translation.st
     - CODE/I_TRANSLATION/FB_Translation.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/TRANSLATION/tests/test_fb_translation.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
 
 FB_SimBench:
-  domain: SIMULATION
-  report_group: SIMULATION
+  domain: L_SIMULATION
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/E_State.st
@@ -360,11 +343,10 @@ FB_SimBench:
     - CODE/L_SIMULATION/FB_Sim_Safety.st
     - CODE/L_SIMULATION/FB_Sim_Translation.st
     - CODE/L_SIMULATION/FB_SimBench.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/SIMULATION/tests/test_fb_simbench.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
 
-FB_Supervision:
-  domain: SUPERVISION
-  report_group: SUPERVISION
+FB_Hmi_BannerFormatter:
+  domain: J_SUPERVISION
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/E_State.st
@@ -466,11 +448,10 @@ FB_Supervision:
     - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st
     - CODE/J_SUPERVISION/FB_AntiFlickerText.st
     - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/SUPERVISION/tests/test_fb_supervision.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/test_fb_hmi_bannerformatter.st
 
 PRG_02_Acquisition:
-  domain: MAIN
-  report_group: MAIN
+  domain: M_MAIN
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/E_State.st
@@ -508,12 +489,12 @@ PRG_02_Acquisition:
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_02.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_02_acquisition.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st
+  source_prg: CODE/M_MAIN/PRG_02_Acquisition.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_02_acquisition.st
 
 PRG_03_Modes_Cycle:
-  domain: MAIN
-  report_group: MAIN
+  domain: M_MAIN
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/E_State.st
@@ -537,12 +518,12 @@ PRG_03_Modes_Cycle:
     - CODE/G_CYCLE/FB_ExtractionSequence.st
     - CODE/G_CYCLE/FB_Cycle.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_03.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_03_modes_cycle.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st
+  source_prg: CODE/M_MAIN/PRG_03_Modes_Cycle.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_03_modes_cycle.st
 
 PRG_04_Treuils_Benne:
-  domain: MAIN
-  report_group: MAIN
+  domain: M_MAIN
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st
@@ -591,12 +572,12 @@ PRG_04_Treuils_Benne:
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_04.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_04_treuils_benne.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st
+  source_prg: CODE/M_MAIN/PRG_04_Treuils_Benne.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_04_treuils_benne.st
 
 PRG_05_Translation:
-  domain: MAIN
-  report_group: MAIN
+  domain: M_MAIN
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/E_State.st
@@ -613,11 +594,9 @@ PRG_05_Translation:
     - CODE/F_MODES/E_Mode.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
     - CODE/I_TRANSLATION/ST_TranslationCmdDemand.st
-
     - CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st
     - CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st
     - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
-
     - CODE/I_TRANSLATION/FB_Safety_Translation.st
     - CODE/I_TRANSLATION/FB_Translation.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
@@ -626,12 +605,12 @@ PRG_05_Translation:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_05.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_05_translation.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_05.st
+  source_prg: CODE/M_MAIN/PRG_05_Translation.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_05_translation.st
 
 PRG_06_Outputs:
-  domain: MAIN
-  report_group: MAIN
+  domain: M_MAIN
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/E_State.st
@@ -646,7 +625,6 @@ PRG_06_Outputs:
     - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
     - CODE/H_TREUILS_BENNE/BENNE/ST_BucketState.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st
-
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
@@ -658,12 +636,12 @@ PRG_06_Outputs:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_06.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_06_outputs.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st
+  source_prg: CODE/M_MAIN/PRG_06_Outputs.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_06_outputs.st
 
 PRG_07_Supervision:
-  domain: MAIN
-  report_group: MAIN
+  domain: M_MAIN
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/E_State.st
@@ -673,35 +651,18 @@ PRG_07_Supervision:
     - CODE/A_COMMUN/FB_FbStatus.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/E_CycleStep.st
-    - CODE/G_CYCLE/E_DiveSearchState.st
-    - CODE/G_CYCLE/E_ExtractionSequenceState.st
-    - CODE/H_TREUILS_BENNE/BENNE/ST_BucketState.st
-    - CODE/H_TREUILS_BENNE/E_WinchFinalInterlockState.st
-    - CODE/H_TREUILS_BENNE/E_WinchFinalInterlockReason.st
-    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st
-    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st
-    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st
-    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
-    - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st
-    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
-    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st
-    - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
-    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st
-    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
-    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
-    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
-    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
+    - CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st
+    - CODE/B_AU_SECURITE/ST_Safety_Emergency_State.st
     - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st
     - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st
     - CODE/J_SUPERVISION/FB_AntiFlickerText.st
     - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_07.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_prg_07_supervision.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st
+  source_prg: CODE/M_MAIN/PRG_07_Supervision.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_prg_07_supervision.st
 
 MAIN_GLOBAL:
-  domain: MAIN
-  report_group: MAIN
+  domain: M_MAIN
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/A_COMMUN/E_State.st
@@ -797,14 +758,14 @@ MAIN_GLOBAL:
     - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st
     - CODE/J_SUPERVISION/FB_AntiFlickerText.st
     - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_02.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_03.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_04.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_05.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_06.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_TestHarness_PRG_07.st
-    - TOOLS/TEST_AUTO_CI/RESULTS/MAIN/FB_Main_EndToEnd.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/MAIN/tests/test_main_end_to_end.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_05.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st
+    - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/test_main_end_to_end.st
 
 
 

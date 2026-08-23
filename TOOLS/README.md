@@ -2,7 +2,7 @@
 
 Ce dossier contient **deux outils indépendants** + **documentation/configuration workspace** :
 
-```
+```text
 TOOLS/
 ├── AGENT_WORKFLOW/       # Orchestration agents, gates, policies, skills
 │   ├── scripts/          # Gates Python (structure, style, bundle, compile, pre-edit)
@@ -55,6 +55,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
 ```
 
 **Alternative manuelle** (rarement) :
+
 ```powershell
 cd TOOLS/ST_PLCOPENXML_GENERATOR
 python -m pytest                          # 306 tests
@@ -81,7 +82,6 @@ Configuration et procédure : `TOOLS/PROJECT_WORKSPACE/README.md`.
 Le lancement est volontairement manuel : rien ne démarre à l’ouverture de VS Code.
 
 > Pour un démarrage automatique via session, utilisez également l’extension **Terminal Keeper** (Nguyen Ngoc Long) avec `.vscode/sessions.json`.
-
 
 ### Visualiser le workflow (Mermaid)
 
@@ -113,7 +113,7 @@ Code, seul `.claude/skills/` l'est) : `codesys-change`, `codesys-review`, `doc-s
 📌 **Gates** = filtres automatiques qui **bloquent le code cassé avant qu'il ne rentre en CODESYS** :
 
 | Gate | 🎯 Rôle | Bloque si... |
-|---|---|---|
+| --- | --- | --- |
 | **`check_linkage.py`** | 🔗 Câblage réel : chaque variable appelle une autre variable, chaque FB sort dans `PRG_*_Outputs` | Une variable n'est nulle part connectée · un module orphelin · un appel de FB manquant |
 | **`check_structure.py`** | 📦 Structure ST valide : pas de doublons FB, bonnes déclarations, interface FB conforme | Code ST mal formé · noms non-PascalCase · FB sans contrat (AF_Partie-03) |
 | **`check_style.py`** | 🎨 Respect des conventions : noms, indentation, zones de code (INPUT/VAR/METHOD) | Majuscules mal placées · underscore → PascalCase · mauvaise section |
@@ -166,6 +166,7 @@ indépendants qui vendorent chacun leur propre copie de STruCpp (pas de lien ent
 ### `PROJECT_WORKSPACE/` — Orchestration IDE
 
 🖥️ Config VS Code : lance AGY, Claude, Codex, OpenCode, Gates, Graph dans 10 terminaux parallèles (1 raccourci)
+
 - `README.md` → terminaux VS Code (`Ctrl+Shift+P` → **Terminals: Run**)
 - `MARKDOWN_WORKSPACE.md` → édition & cochage des fichiers Markdown (`Ctrl+K V` sans extension checkbox)
 
@@ -174,7 +175,7 @@ indépendants qui vendorent chacun leur propre copie de STruCpp (pas de lien ent
 ## Règle d'or
 
 | Outil | Indépendance | Dépendances |
-|---|---|---|
+| --- | --- | --- |
 | `ST_PLCOPENXML_GENERATOR` | **100% autonome** | Aucune (Python stdlib + pytest) |
 | `LINTER_ST` | **100% autonome** | Aucune — vendore sa propre copie de STruCpp, aucun lien vers `COMPILER_ST2C_STruCpp` |
 | `COMPILER_ST2C_STruCpp` | **100% autonome** | Aucune — vendore sa propre copie de STruCpp |
@@ -187,7 +188,7 @@ L'orchestrateur appelle le générateur comme un outil externe (`subprocess` / C
 
 ## Arborescence projet (contexte)
 
-```
+```text
 PROJET/
 ├── CODE/           # Sources ST (automate)
 ├── DOC/            # Spécifications fonctionnelles (AF_Partie-XX)
@@ -202,7 +203,7 @@ PROJET/
 ## Versioning
 
 | Outil | Version | Changelog |
-|---|---|---|
+| --- | --- | --- |
 | AGENT_WORKFLOW | Voir `TOOLS/AGENT_WORKFLOW/pyproject.toml` | `DOC/VERSION_HISTORY.md` |
 | ST_PLCOPENXML_GENERATOR | Voir `TOOLS/ST_PLCOPENXML_GENERATOR/pyproject.toml` | `DOC/VERSION_HISTORY.md` |
 

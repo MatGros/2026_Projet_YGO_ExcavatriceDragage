@@ -119,8 +119,16 @@ Sans lui, le lot est incomplet — quel que soit l'agent qui l'écrit.
 | `PostToolUse` | — signale liaison + liens doc à chaque édition |
 | `Stop` | **Conclure un tour** avec une liaison rouge ou un bundle périmé |
 
-🚫 Aucun gate ne lit `Device.export` : cet export est mis à jour au bon vouloir humain,
-c'est un outil de **débogage ponctuel**, jamais une référence de contrôle.
+🚫 **`Device.export` n'est JAMAIS une référence de contrôle.** C'est un **export du logiciel
+CODESYS**, produit **uniquement à des moments particuliers de diagnostic** — jamais un export
+valide de l'état actuel du projet.
+- ⛔ **Toujours considérer `Device.export` comme PÉRIMÉ** tant qu'il n'est pas fraîchement exporté.
+- ⛔ Aucun gate ni aucun agent ne doit **lire** un `Device.export` présent dans le dépôt : l'état
+  sur disque est au bon vouloir humain et peut dater de n'importe quand.
+- ✅ **Avant toute lecture, demander un export FRAIS** à l'humain (export CODESYS manuel du projet
+  courant) — jamais utiliser l'existant.
+- 🎯 La **source de vérité** reste le code source versionné (`CODE/*.st`) et ses interfaces
+  déclarées (`VAR_INPUT`/`VAR_OUTPUT`/`VAR_IN_OUT`), jamais un export ponctuel.
 
 ## 📝 Contrat de tâche — obligatoire dès C2
 

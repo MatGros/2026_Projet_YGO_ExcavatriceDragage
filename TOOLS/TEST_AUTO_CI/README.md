@@ -4,6 +4,25 @@ Runner de tests automatisés pour FB CODESYS — 2e outil de la chaîne, **sépa
 `COMPILER_ST2C_STruCpp` (qui ne fait que la conversion ST → C++). Ici : registre figé +
 exécution + rapports.
 
+## 🗂️ Organisation des fichiers
+
+| Dossier / fichier | Rôle |
+|---|---|
+| `scripts/` | **Scripts Python cœur** (exécutables) : `run_tests.py` (runner), `html_report.py` (rapports), `af_coverage.py` (couverture AF), `encapsulation_check.py` (encapsulation), `chronogram.py` (chronogrammes), `prod_wiring.py` (câblage prod) |
+| `config.yaml` | Temps de cycle réel automate |
+| `registry.yaml` | **Source unique de vérité** : quels FB tester, avec quoi |
+| `README.md` | Documentation |
+| `MOCKS/` | Mocks des types externes (`DEVICE_STATE`, `HYSTERESIS`) |
+| `RESULTS/` | Suites de tests versionnées (`tests/*.st`, harnais) + rapports gitignorés (`reports/`) |
+
+⚠️ **Les scripts `.py` vivent dans `scripts/`** (convention alignée sur les outils modernes type
+`AGENT_WORKFLOW`/`ST_PLCOPENXML_GENERATOR`). Lancement :
+```bash
+python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Joystick
+python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --all
+```
+Les raccourcis `RESULTS/<DOMAINE>/tests/run.py` pointent vers `scripts/run_tests.py`.
+
 ## 🔄 Les 2 outils, 2 rôles
 
 ```mermaid
@@ -84,16 +103,16 @@ Analyse purement textuelle (pas de compilation), integree automatiquement a `run
 FB concerne, avec le detail par fichier/variable. Usage standalone :
 
 ```bash
-python TOOLS/TEST_AUTO_CI/encapsulation_check.py                 # tous les FB du registre
-python TOOLS/TEST_AUTO_CI/encapsulation_check.py FB_Joystick     # un seul FB (+ ses enfants)
+python TOOLS/TEST_AUTO_CI/scripts/encapsulation_check.py                 # tous les FB du registre
+python TOOLS/TEST_AUTO_CI/scripts/encapsulation_check.py FB_Joystick     # un seul FB (+ ses enfants)
 ```
 
 ## 🚀 Utilisation
 
 ```bash
-python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Joystick
-python TOOLS/TEST_AUTO_CI/run_tests.py --domain AU_SECURITE
-python TOOLS/TEST_AUTO_CI/run_tests.py            # --all par defaut, sans option
+python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Joystick
+python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --domain AU_SECURITE
+python TOOLS/TEST_AUTO_CI/scripts/run_tests.py            # --all par defaut, sans option
 ```
 
 Nécessite `g++` (MinGW-w64) — voir `TOOLS/COMPILER_ST2C_STruCpp/README.md` pour l'installer.
