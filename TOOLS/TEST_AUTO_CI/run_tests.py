@@ -117,10 +117,10 @@ def _find_strucpp_temp_dir(before: set, tmp_root: pathlib.Path) -> pathlib.Path 
     celui de CET appel (pas un dossier residuel d'un run precedent)."""
     after = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
     new_dirs = after - before
-    candidates = new_dirs or after
-    if not candidates:
+    if not new_dirs:
         return None
-    return max(candidates, key=lambda p: p.stat().st_mtime)
+    return max(new_dirs, key=lambda p: p.stat().st_mtime)
+
 
 
 def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = False) -> dict:
@@ -134,7 +134,12 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
     def _log(*a):
         if debug:
-            print(*a)
+            try:
+                print(*a)
+            except UnicodeEncodeError:
+                safe_str = " ".join(str(x) for x in a).encode("ascii", errors="replace").decode("ascii")
+                print(safe_str)
+
 
     try:
         n_tests_declared = len(re.findall(r"^TEST\s+'", test_file.read_text(encoding="utf-8"), re.MULTILINE))
