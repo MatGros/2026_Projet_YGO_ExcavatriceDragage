@@ -76,14 +76,19 @@ avalé silencieusement. Vérifié empiriquement (session 2026-08-23, typo `INT_I
   serait pas résolu automatiquement.
 - Binaire `strucpp.exe` vendoré = version figée. Mise à jour manuelle si besoin (voir
   [releases STruCpp](https://github.com/Autonomy-Logic/STruCpp/releases)).
-- ⚠️ **GVL avec `{attribute 'qualified_only'}` (ex: `GVL_IHM`, `GVL_Global`)** : `resolve_deps.py`
-  les trouve et les inclut désormais dans la compilation (elles n'ont aucun mot-clé de
-  déclaration, indexées par nom de fichier), mais STruCpp lève ensuite `Undeclared variable
-  'GVL_XXX'` en cascade sur les PRG qui y accèdent en écriture qualifiée. Cause probable :
-  `linter_st_convert_codesys_to_iec.py` supprime `{attribute 'qualified_only'}` comme un pragma
-  cosmétique, alors qu'il change la sémantique d'accès (`GVL_IHM.Membre` vs `Membre` nu). **Pas
-  encore corrigé** (trouvé session 2026-08-23, sur `PRG_07_Supervision.st`) — un PRG qui lit/écrit
-  une GVL qualifiée remonte des faux positifs "Undeclared variable" tant que ce n'est pas réglé.
+- ✅ **GVL qualifiées (`GVL_IHM.Membre`, `GVL_Global.Membre`, ...) — corrigé.** Cause confirmée par
+  test isolé (session 2026-08-23) : STruCpp **ne comprend pas du tout** l'accès qualifié CODESYS
+  aux GVL, avec ou sans le pragma `{attribute 'qualified_only'}` (il ne parse même pas la syntaxe
+  `{...}` — erreur `unexpected character: ->{<-`). Seul l'accès **non qualifié** (`Membre` sans
+  préfixe) compile. `linter_st_convert_codesys_to_iec.py` retire donc `GVL_XXX.` de toutes les
+  références avant compilation (transformation 5, uniquement sur la copie temporaire — jamais sur
+  le fichier source réel).
+- **Types externes hors `CODE/`** (bibliothèques natives CODESYS/CANopen/EtherCAT, ex:
+  `DEVICE_STATE`) : classés en `"incomplete"` (warning informatif, jamais une erreur) via une
+  **liste blanche explicite** (`KNOWN_EXTERNAL_TYPES` dans `lint.py`) — pas une déduction
+  automatique par absence de préfixe projet, tentée puis abandonnée (régression trouvée : ça
+  avalait aussi `INT_INCONNU`, un vrai bug de test, comme faux "incomplete"). Un nouveau type
+  externe rencontré doit être ajouté manuellement à cette liste.
 
 ## 🖥️ Extension VSCode (`vscode-extension/`)
 
