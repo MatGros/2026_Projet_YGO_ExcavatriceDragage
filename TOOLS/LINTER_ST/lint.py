@@ -82,6 +82,27 @@ def _run_strucpp(converted_files: list[Path], out_cpp: Path) -> str:
     return result.stdout + result.stderr
 
 
+def _parse_diagnostics_raw(raw_output: str, converted_to_source: dict[str, Path]) -> list[dict]:
+    """Mode raw : AUCUN filtrage, chaque ligne d'erreur/warning de STruCpp devient un
+    diagnostic tel quel -- y compris les 'Undefined type'/'Undeclared variable' qu'on filtre
+    normalement (DEVICE_STATE, GVL/PROGRAM qualifie, etc.). C'est le point de comparaison."""
+    diagnostics: list[dict] = []
+    for line in raw_output.splitlines():
+        m = ERROR_LINE_RE.match(line.strip())
+        if not m:
+            continue
+        converted_name = m.group("file")
+        source_path = converted_to_source.get(converted_name, converted_name)
+        diagnostics.append({
+            "file": str(source_path),
+            "line": int(m.group("line")),
+            "col": int(m.group("col")),
+            "severity": m.group("severity"),
+            "message": m.group("message"),
+        })
+    return diagnostics
+
+
 def _parse_diagnostics(
     raw_output: str,
     converted_to_source: dict[str, Path],
@@ -148,12 +169,20 @@ def _parse_diagnostics(
     return diagnostics, external
 
 
-def lint(target: Path, code_root: Path, extra_external_types: set[str] | None = None) -> dict:
+def lint(
+    target: Path,
+    code_root: Path,
+    extra_external_types: set[str] | None = None,
+    raw: bool = False,
+) -> dict:
+    """raw=True : mode "STruCpp brut" -- AUCUNE transformation CODESYS->IEC (moulinette
+    court-circuitee, fichiers compiles tels quels) et AUCUN filtrage de diagnostic (pas de
+    liste blanche KNOWN_EXTERNAL_TYPES, pas de comparaison project_names, pas de statut
+    "incomplete") -- CHAQUE message de STruCpp remonte tel quel, meme sur un type externe
+    legitime (DEVICE_STATE, BLINK) ou une GVL/PROGRAM qualifiee. C'est le point de comparaison
+    demande explicitement par l'utilisateur (session 2026-08-23) : pouvoir voir ce que le
+    compilateur dit vraiment, sans nos correctifs, avant de decider de les activer."""
     resolved, unresolved = resolve_deps.resolve([target], code_root)
-    # Reutilise le meme scan que resolve() (index complet CODE/) pour reperer les
-    # "Undeclared variable" sur un nom EXISTANT dans le projet -- cout : un 2e scan de CODE/,
-    # accepte pour rester simple plutot que de refactorer resolve() pour exposer son index.
-    project_names = {name.upper() for name in resolve_deps.build_declaration_index(code_root)}
 
     # resolve() inclut deja systematiquement toutes les GVL_*.st (voir resolve_deps.py) --
     # dict.fromkeys plutot que list() : plusieurs NOMS peuvent resoudre vers le MEME fichier
@@ -169,20 +198,29 @@ def lint(target: Path, code_root: Path, extra_external_types: set[str] | None = 
 
         for src in all_sources:
             dst = converted_dir / src.name
-            converter.convert_file(src, dst, warnings)
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if raw:
+                dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+            else:
+                converter.convert_file(src, dst, warnings)
             converted_to_source[dst.name] = src
 
         out_cpp = tmp_path / "out.cpp"
         converted_files = [converted_dir / s.name for s in all_sources]
         raw_output = _run_strucpp(converted_files, out_cpp)
 
-        known_unresolved = {name.upper() for name in unresolved}
-        external_types = KNOWN_EXTERNAL_TYPES | {n.upper() for n in (extra_external_types or set())}
-        diagnostics, external = _parse_diagnostics(
-            raw_output, converted_to_source, known_unresolved, project_names, external_types
-        )
+        if raw:
+            diagnostics = _parse_diagnostics_raw(raw_output, converted_to_source)
+            external: set[str] = set()
+        else:
+            project_names = {name.upper() for name in resolve_deps.build_declaration_index(code_root)}
+            known_unresolved = {name.upper() for name in unresolved}
+            external_types = KNOWN_EXTERNAL_TYPES | {n.upper() for n in (extra_external_types or set())}
+            diagnostics, external = _parse_diagnostics(
+                raw_output, converted_to_source, known_unresolved, project_names, external_types
+            )
 
-    all_unresolved = sorted(set(unresolved) | external)
+    all_unresolved = sorted(set(unresolved) | external) if not raw else []
 
     if all_unresolved and not diagnostics:
         return {
@@ -211,6 +249,14 @@ def main() -> int:
         "vient de linterSt.knownExternalTypes cote extension VSCode. Fusionne avec la liste "
         "KNOWN_EXTERNAL_TYPES en dur (DEVICE_STATE).",
     )
+    parser.add_argument(
+        "--raw",
+        action="store_true",
+        help="Mode STruCpp brut : AUCUNE transformation CODESYS->IEC, AUCUN filtrage de "
+        "diagnostic -- chaque message du compilateur remonte tel quel, meme sur un type "
+        "externe legitime ou une GVL/PROGRAM qualifiee. Pour comparer avec le mode normal "
+        "et voir precisement ce que nos correctifs changent.",
+    )
     args = parser.parse_args()
 
     target = Path(args.target)
@@ -224,7 +270,7 @@ def main() -> int:
         print(f"ERROR: --code-root '{code_root}' introuvable", file=sys.stderr)
         return 3
 
-    result = lint(target, code_root, extra_external_types)
+    result = lint(target, code_root, extra_external_types, raw=args.raw)
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
     if result["status"] == "incomplete":

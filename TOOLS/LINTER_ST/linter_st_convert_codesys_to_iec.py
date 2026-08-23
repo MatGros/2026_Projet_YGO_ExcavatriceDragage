@@ -26,12 +26,10 @@ utilisateur 2026-08-23 -- pas de lien inter-outils, chaque outil porte sa propre
 5. GVL_Xxx.Membre -> Membre
    (Sans cette transformation, STruCpp traite `GVL_Test.Foo` comme une variable non declaree
    nommee 'GVL_TEST' -- seul l'acces non qualifie `Foo` compile. Verifie empiriquement par test
-   isole, session 2026-08-23. ATTENTION : la doc officielle STruCpp (IEC_COMPLIANCE.md, lue
-   apres coup) liste "Pragmas {...} -- Supported" ET "Namespace configuration -- Supported --
-   Via pragmas" -- il existe donc PEUT-ETRE un vrai mecanisme de pragma pour l'acces qualifie
-   qu'on n'a pas explore (piste non testee, cf. lien dans TOOLS/LINTER_ST/README.md). Notre test
-   isole a echoue sur {attribute 'qualified_only'} precisement, pas sur {...} en general -- le
-   contenu du pragma etait peut-etre juste le mauvais. Cette transformation ne touche jamais le
+   isole, session 2026-08-23. CONFIRME (pas juste suppose) : docs/strucpp_reference/
+   LIBRARY_NAMESPACES.md officiel dit "Status: Not Implemented" pour l'acces qualifie
+   Namespace.TypeName -- ce n'est pas un mecanisme existant qu'on aurait rate, ce retrait de
+   prefixe est la seule option possible aujourd'hui. Cette transformation ne touche jamais le
    fichier source -- uniquement la copie temporaire compilee par STruCpp.)
 
 6. VAR_GLOBAL PERSISTENT [RETAIN] -> VAR_GLOBAL [RETAIN]
