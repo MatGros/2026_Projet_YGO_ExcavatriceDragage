@@ -45,6 +45,14 @@ ERROR_LINE_RE = re.compile(
 
 UNDEFINED_TYPE_RE = re.compile(r"Undefined type '(?P<name>\w+)'")
 
+# Types externes CONNUS (bibliotheques natives CODESYS/CANopen/EtherCAT, jamais declares dans
+# CODE/) -- liste blanche EXPLICITE, pas une deduction par absence de prefixe projet (tente puis
+# abandonnee, session 2026-08-23 : "pas de prefixe ST_/E_/FB_/GVL_ => externe" faisait aussi
+# passer INT_INCONNU (vrai bug de test) en "incomplete" au lieu d'errors -- une regression sur le
+# test de non-regression deja en place). Ajouter ici au cas par cas quand un vrai type externe
+# est rencontre (ex: DEVICE_STATE trouve sur FB_TroubleshootingView.st).
+KNOWN_EXTERNAL_TYPES = {"DEVICE_STATE"}
+
 
 def _run_strucpp(converted_files: list[Path], out_cpp: Path) -> str:
     if not STRUCPP_EXE.is_file():
@@ -60,16 +68,20 @@ def _run_strucpp(converted_files: list[Path], out_cpp: Path) -> str:
 
 def _parse_diagnostics(
     raw_output: str, converted_to_source: dict[str, Path], known_unresolved: set[str]
-) -> list[dict]:
+) -> tuple[list[dict], set[str]]:
     """known_unresolved = types que resolve_deps() avait DEJA identifies comme absents de
-    l'index CODE/ avant meme de compiler. Seuls ceux-la sont filtres comme bruit de tooling.
+    l'index CODE/ avant meme de compiler (prefixes projet detectes mais fichier introuvable).
 
-    Un 'Undefined type' STruCpp sur un nom qui n'etait PAS dans known_unresolved est un signal
-    fort de vraie erreur (ex: typo hors des prefixes ST_/E_/FB_ que resolve_deps() surveille,
-    verifie empiriquement sur INT_INCONNU, session 2026-08-23) -- remonte comme diagnostic reel,
-    jamais avale silencieusement.
+    Deux filtres complementaires pour un "Undefined type" NAME, dans cet ordre :
+    1. NAME dans known_unresolved -> bruit de tooling deja identifie, filtre.
+    2. NAME sans prefixe projet (PROJECT_PREFIXES) -> type externe hors CODE/ quasi-certain
+       (bibliotheque CODESYS/CANopen native, ex: DEVICE_STATE) -- filtre aussi, ajoute a
+       'external' pour affichage informatif (jamais une erreur).
+    Sinon (prefixe projet mais absent malgre tout) -> vraie erreur, jamais filtree (typo/bug,
+    verifie empiriquement sur INT_INCONNU, session 2026-08-23).
     """
     diagnostics: list[dict] = []
+    external: set[str] = set()
 
     for line in raw_output.splitlines():
         m = ERROR_LINE_RE.match(line.strip())
@@ -78,13 +90,16 @@ def _parse_diagnostics(
 
         message = m.group("message")
         undef = UNDEFINED_TYPE_RE.search(message)
-        # STruCpp normalise le nom en MAJUSCULES dans le message d'erreur (ST est
-        # case-insensitive par spec) -- comparaison insensible a la casse, verifie
-        # empiriquement (declar. 'ST_Diag_Device' -> message "Undefined type 'ST_DIAG_DEVICE'").
-        if undef and undef.group("name").upper() in known_unresolved:
-            # Dependance deja identifiee manquante par resolve_deps() -- bruit de tooling,
-            # filtree (priorite "zero faux positif" en tete de fichier).
-            continue
+        if undef:
+            name = undef.group("name")
+            # STruCpp normalise le nom en MAJUSCULES dans le message d'erreur (ST est
+            # case-insensitive par spec) -- comparaison insensible a la casse, verifie
+            # empiriquement (declar. 'ST_Diag_Device' -> "Undefined type 'ST_DIAG_DEVICE'").
+            if name.upper() in known_unresolved:
+                continue
+            if name.upper() in KNOWN_EXTERNAL_TYPES:
+                external.add(name)
+                continue
 
         converted_name = m.group("file")
         source_path = converted_to_source.get(converted_name, converted_name)
@@ -96,7 +111,7 @@ def _parse_diagnostics(
             "message": message,
         })
 
-    return diagnostics
+    return diagnostics, external
 
 
 def lint(target: Path, code_root: Path) -> dict:
@@ -120,9 +135,9 @@ def lint(target: Path, code_root: Path) -> dict:
         raw_output = _run_strucpp(converted_files, out_cpp)
 
         known_unresolved = {name.upper() for name in unresolved}
-        diagnostics = _parse_diagnostics(raw_output, converted_to_source, known_unresolved)
+        diagnostics, external = _parse_diagnostics(raw_output, converted_to_source, known_unresolved)
 
-    all_unresolved = sorted(unresolved)
+    all_unresolved = sorted(set(unresolved) | external)
 
     if all_unresolved and not diagnostics:
         return {

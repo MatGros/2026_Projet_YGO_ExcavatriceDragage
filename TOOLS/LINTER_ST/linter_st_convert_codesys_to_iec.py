@@ -22,6 +22,14 @@ utilisateur 2026-08-23 -- pas de lien inter-outils, chaque outil porte sa propre
 
 4. END_xxx absent (fragments CODESYS colles dans l'editeur, qui fournit sa propre enveloppe)
    -> ajoute automatiquement
+
+5. GVL_Xxx.Membre -> Membre
+   (STruCpp ne comprend PAS l'acces qualifie CODESYS aux GVL -- meme sans le pragma
+   {attribute 'qualified_only'}, il traite `GVL_Test.Foo` comme une variable non declaree
+   nommee 'GVL_TEST'. Seul l'acces non qualifie `Foo` compile. Verifie empiriquement par test
+   isole, session 2026-08-23 : `GVL_Test.Foo := TRUE` echoue avec "Undeclared variable
+   'GVL_TEST'", `Foo := TRUE` compile. Cette transformation ne touche jamais le fichier source
+   -- uniquement la copie temporaire compilee par STruCpp.)
 """
 
 import argparse
@@ -42,6 +50,8 @@ POU_QUALIFIER_RE = re.compile(
 )
 
 LITERAL_RE = re.compile(r"(?P<lit>\w+)\s*(?::=\s*(?P<val>-?\d+))?")
+
+GVL_QUALIFIER_RE = re.compile(r"\bGVL_\w+\.")
 
 
 def _strip_comments(text: str) -> str:
@@ -110,10 +120,15 @@ def _close_missing_pou_end(text: str, source_name: str, warnings: list) -> str:
     return text.rstrip() + f"\n{end_kw}\n"
 
 
+def _strip_gvl_qualifiers(text: str) -> str:
+    return GVL_QUALIFIER_RE.sub("", text)
+
+
 def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _convert_enum_blocks(text, source_name, warnings)
     text = _strip_pragmas(text)
     text = _strip_pou_qualifiers(text)
+    text = _strip_gvl_qualifiers(text)
     text = _close_missing_pou_end(text, source_name, warnings)
     return text
 
