@@ -27,11 +27,13 @@ annonçait l'init de struct/array par litéral nommé comme "Supported", contred
 correctif. Vérifié contre la release `v0.6.3` (au lieu du v0.6.2 vendoré) : **le bug était
 effectivement corrigé** dans cette version plus récente → binaire mis à jour, transformation
 devenue inutile **supprimée** (moins de code = moins de risque de sur-filtrer une vraie erreur).
-Reste un point non résolu : la doc liste aussi "Pragmas `{...}` — Supported" et "Namespace
-configuration — Supported — Via pragmas", alors que notre test isolé sur `{attribute
-'qualified_only'}` échoue toujours même en v0.6.3. 🔍 **Piste non explorée** : un vrai mécanisme
-de pragma pour l'accès qualifié GVL/PROGRAM existe peut-être, plus propre que notre retrait de
-préfixe actuel — à tester avant d'ajouter de nouveaux correctifs de ce type.
+✅ **Point tranché** (était en suspens) : la doc liste "Namespace configuration — Supported — Via
+pragmas", mais [`docs/strucpp_reference/LIBRARY_NAMESPACES.md`](docs/strucpp_reference/LIBRARY_NAMESPACES.md)
+(doc dédiée, trouvée en explorant plus loin) précise noir sur blanc **"Status: Not Implemented"** —
+l'accès qualifié `Namespace.TypeName` n'existe pas encore dans le parser STruCpp, quelle que soit
+la syntaxe de pragma essayée. Confirme que notre retrait de préfixe `GVL_XXX.` **n'est pas un
+contournement d'un mécanisme existant qu'on aurait raté** — c'est la seule option possible
+aujourd'hui. Rien à changer ; piste fermée.
 
 📖 **[ARCHITECTURE.md](docs/strucpp_reference/ARCHITECTURE.md)**
 (lu après coup, session 2026-08-23) révèle que STruCpp est écrit en **TypeScript** et expose une
