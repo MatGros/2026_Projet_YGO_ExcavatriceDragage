@@ -19,6 +19,7 @@
 | `I_TRANSLATION` | 7 | 7 | 0 | Non | 🟢 100% OK | [TRANSLATION.html](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/TOOLS/TEST_AUTO_CI/RESULTS/TRANSLATION/reports/TRANSLATION.html) |
 | `J_SUPERVISION` | 105 | 105 | 0 | `DEVICE_STATE` | 🟢 100% OK | [FB_TroubleshootingView](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/CODE/J_SUPERVISION/FB_TroubleshootingView.st) |
 | `L_SIMULATION` | 7 | 7 | 0 | Non | 🟢 100% OK | [SIMULATION.html](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage.worktrees/compilation-test-auto-ci/TOOLS/TEST_AUTO_CI/RESULTS/SIMULATION/reports/SIMULATION.html) |
+| **TOTAL METIER** | **168** | **168** | **0** | **100% OK** | 🏆 **100% VALIDÉ C++ / STruCpp** | **9 Domaines** |
 
 ---
 
@@ -33,6 +34,12 @@
 3. **Bloc `HYSTERESIS` (lib Util CODESYS) :**
    - **Origine :** Conflit de signature entre le `HYSTERESIS` de CODESYS Util (`IN, HIGH, LOW -> OUT`) et celui de MatIEC/STruCpp Annexe E (`XIN1, XIN2, EPS -> Q`).
    - **Solution CI :** Mappage transparent en `FB_Hysteresis_Util` via `TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st` dans la moulinette ST2C sans toucher au code source `CODE/`.
+4. **Matrices 2D imbriquées (`ARRAY[1..5] OF ARRAY[1..5]` & `arr[i][j]`) :**
+   - **Origine :** Idiome CODESYS pour les matrices de charge `ST_WinchLoadEstimateTable`.
+   - **Solution CI :** Conversion automatique en `ARRAY[1..5, 1..5]` et `arr[i, j]` via la moulinette `convert_codesys_to_iec.py`.
+5. **Littéraux binaires dans les instructions `CASE` (`2#11111, 2#01111:`):**
+   - **Origine :** Syntaxe CODESYS dans `FB_Translation_PositionDecoder`.
+   - **Solution CI :** Conversion des littéraux binaires et séparation des labels multiples par la moulinette `convert_codesys_to_iec.py`.
 
 ---
 
@@ -130,10 +137,20 @@
 | `ST_SpeedStepTable.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
 | `E_WinchFinalInterlockReason.st` | DUT (Enum) | OK | OK | 🟢 **OK** | Aucune erreur |
 | `E_WinchFinalInterlockState.st` | DUT (Enum) | OK | OK | 🟢 **OK** | Aucune erreur |
+| `ST_WinchSpeedConfig.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
+| `ST_WinchLoadEstimateTable.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
+| `ST_Winch_SymmetryCfg.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
+| `ST_Winch_SymmetryData.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
+| `ST_WinchCmdDemand.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
 | `FB_SpeedStep.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
 | `FB_DriftGuard.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
 | `FB_WinchOutputInterlock.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
 | `FB_Safety_Winch.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
+| `FB_WinchLoadEstimator.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
+| `FB_Winch_Symmetry.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
+| `FB_WinchSync.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
+| `FB_SyncDeviation.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
+| `FB_SyncContactor.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
 | `FB_Winch.st` | FB (Top) | OK | OK | 🟢 **OK** | Aucune erreur |
 | `ST_BucketConfig.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
 | `ST_BucketState.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
@@ -147,6 +164,8 @@
 |---|---|:---:|:---:|:---:|---|
 | `E_TranslationFinalInterlockReason.st` | DUT (Enum) | OK | OK | 🟢 **OK** | Aucune erreur |
 | `ST_TranslationCmdDemand.st` | DUT (Struct) | OK | OK | 🟢 **OK** | Aucune erreur |
+| `FB_Translation_PositionDecoder.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
+| `FB_Translation_PositionEstimator.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
 | `FB_TranslationOutputInterlock.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
 | `FB_Safety_Translation.st` | FB | OK | OK | 🟢 **OK** | Aucune erreur |
 | `FB_Translation.st` | FB (Top) | OK | OK | 🟢 **OK** | Aucune erreur |
