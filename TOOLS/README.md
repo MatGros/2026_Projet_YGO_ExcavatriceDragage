@@ -4,31 +4,30 @@ Ce dossier contient **deux outils indépendants** + **documentation/configuratio
 
 ```text
 TOOLS/
-├── AGENT_WORKFLOW/       # Orchestration agents, gates, policies, skills
-│   ├── scripts/          # Gates Python (structure, style, bundle, compile, pre-edit)
-│   ├── skills/           # Skills (codesys-change, codesys-review, ...)
-│   ├── docs/             # Policies (SAFETY, WORKFLOW, TOKEN, DOC_WRITING, ...)
-│   ├── schemas/          # JSON schemas (requirement_intake)
-│   ├── templates/        # Templates ST & DOC
-│   ├── prompts/          # Prompts agents
-│   └── config/           # naming_baseline.json, workflow_diagram.json, Device_IO_*.csv
-├── CONVERTER_ST2XML_PLCopenXML/  # Convertisseur ST → PLCopenXML (autonome)
-    ├── generator/        # Code Python du générateur
-    ├── tests/            # Unitaires, intégration, golden files (306 tests)
-    ├── SAMPLES_XML_CODESYS/
-    ├── test_import_poc/
-    └── docs/
-├── LINTER_ST/               # Linter ST CODESYS 3.5 (STruCpp vendoré, 100% encapsulé)
-│   ├── resolve_deps.py       # Résolveur de dépendances (types/FB) autonome
-│   ├── lint.py                # Orchestrateur : deps → conversion → compile → diagnostics JSON
-│   ├── bin/win32-x64/         # strucpp.exe vendoré (copie propre)
-│   └── vscode-extension/      # Extension VSCode : diagnostics live dans Problems (F5 pour tester)
-├── COMPILER_ST2C_STruCpp/   # PoC compilation FB en C++17 pour tests boîte noire (STruCpp)
-├── PROJECT_WORKSPACE/       # Environnement de travail du projet (AGY, Claude, Codex, OpenCode, Gates, Graph)
-│   ├── README.md             # Documentation et guide (terminaux VS Code)
-│   ├── MARKDOWN_WORKSPACE.md # Édition & cochage des fichiers Markdown (Ctrl+K V)
-│   └── terminals.json        # Fichier de configuration modèle
-└── visualize_workflow.py    # Compatibilité et moteur commun Mermaid
+├── AGENT_WORKFLOW/                # Orchestration agents, gates, policies, skills
+│   ├── scripts/                   # Gates Python (structure, style, bundle, compile, pre-edit)
+│   ├── skills/                    # Skills (codesys-change, codesys-review, ...)
+│   ├── docs/                      # Policies (SAFETY, WORKFLOW, TOKEN, DOC_WRITING, ...)
+│   ├── templates/                 # Templates ST & DOC
+│   └── prompts/                   # Prompts agents
+├── COMPILER_ST2C_STruCpp/         # Compilation ST → C++17 & tests unitaires boîte noire (STruCpp)
+├── CONVERTER_ST2XML_PLCopenXML/   # Convertisseur ST → PLCopenXML (autonome)
+│   ├── generator/                 # Code Python du générateur
+│   ├── scripts/                   # Scripts CLI modulaires (st_to_ld, st_to_pou, build_bundle)
+│   ├── tests/                     # Tests Pytest unitaires, intégration, golden files (393 tests)
+│   └── docs/                      # Spécifications format PLCopenXML CODESYS
+├── LINTER_ST/                     # Linter ST CODESYS 3.5 (STruCpp vendoré, 100% encapsulé)
+│   ├── lint.py                    # Orchestrateur : deps → conversion → compile → diagnostics JSON
+│   ├── resolve_deps.py            # Résolveur de dépendances (types/FB) autonome
+│   └── bin/win32-x64/             # strucpp.exe vendoré (copie propre)
+├── LM_STUDIO/                     # Connecteur client streaming LLM distant
+├── PLC_CSV_SNAPSHOT/              # Capture & snapshot CSV des variables réelles CODESYS
+│   ├── codesys_console/           # Scripts exécutés dans la console CODESYS
+│   ├── variable_lists/            # Listes de variables à acquérir
+│   └── RESULTS/                   # Snapshots et acquisitions horodatées
+├── PROJECT_WORKSPACE/             # Environnement & terminaux VS Code
+├── SAMPLES_XML_CODESYS/           # Échantillons XML réels de référence CODESYS (24 fichiers)
+└── TEST_AUTO_CI/                  # Suites de validation & intégration continue
 ```
 
 ## 🚀 Utilisation rapide
