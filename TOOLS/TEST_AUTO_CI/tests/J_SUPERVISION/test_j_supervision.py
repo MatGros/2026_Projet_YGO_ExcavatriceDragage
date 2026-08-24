@@ -67,3 +67,8 @@ def test_J_SUPERVISION():
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
+
+@pytest.mark.ci_fb
+def test_FB_Hmi_BannerFormatter():
+    """Test CI automatisé pour FB_Hmi_BannerFormatter."""
+    _run_fb_test("FB_Hmi_BannerFormatter")

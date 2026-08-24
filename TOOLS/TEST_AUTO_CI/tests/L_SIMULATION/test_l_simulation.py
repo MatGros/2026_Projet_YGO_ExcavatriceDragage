@@ -67,3 +67,8 @@ def test_L_SIMULATION():
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
+
+@pytest.mark.ci_fb
+def test_FB_SimBench():
+    """Test CI automatisé pour FB_SimBench."""
+    _run_fb_test("FB_SimBench")
