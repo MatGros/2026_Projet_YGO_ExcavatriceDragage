@@ -343,14 +343,14 @@ tasks:
 
   - id: "T11"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C2"
     domaine: "GÉNÉRAL"
-    agent: "—"
-    date: "2026-07-20T08:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T03:30:00"
     titre: "EmergencyStopOk : confirmation temporisée post-r..."
     contexte: "Intitulé complet : EmergencyStopOk : confirmation temporisée post-réarmement"
-    description: "AUDIT D93"
+    description: "✅ **Étude/design livrée + corrigée après revue indépendante** (`DOC/WFLOW/AUDITS/DESIGN_EMERGENCYSTOPOK_CONFIRMATION_TEMPORISEE_v0.2.md`) : EmergencyStopOk absent du code actuel (à recréer), basé sur **PowerContactorEngaged** (succès step 6) + stabilité + ¬défaut — **PAS sur Armable** (v0.1 corrigé : Armable exige NOT PowerContactorEngaged, serait toujours FALSE). Retombée immédiate fail-safe, Reset sur front. ⏳ **Implémentation en attente** : réf « AUDIT D93 » absente + 4 décisions (verrou mouvement vs diag, fenêtre, emplacement FB, spec D93)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -365,20 +365,6 @@ tasks:
     titre: "Validation câblage réel EmergencyStopOk_DI et réarmement"
     contexte: ""
     description: "AF_Partie-01, PRG_02_Acquisition"
-    contrat: ""
-    objectifs: []
-    bloque_par: []
-
-  - id: "T17"
-    parent_id: ""
-    statut: "❌"
-    criticite: "C2"
-    domaine: "JOYSTICK"
-    agent: "HUM"
-    date: "2026-08-23T00:10:14"
-    titre: "Checklist Joystick : exécution terrain et verdict s..."
-    contexte: "Intitulé complet : Checklist Joystick : exécution terrain et verdict signé"
-    description: "ANNULÉE (décision utilisateur 2026-08-23) — checklist terrain abandonnée. Référence initiale : ARCHIVES/Doc/CHECKLISTS/CHECKLIST_MiseEnService_Joystick_v1.1.md"
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -539,28 +525,28 @@ tasks:
 
   - id: "T54"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C4"
     domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-07-20T08:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T05:05:00"
     titre: "Intégrer latence boucle automate (~10 ms) au calcul temps d'arrêt"
     contexte: ""
-    description: "AUDIT Winch §3.2"
+    description: "✅ **Étude livrée** (`DOC/WFLOW/AUDITS/ETUDE_T54_LATENCE_BOUCLE_v0.1.md`) : audit archivé AUDIT_Winch §3.2 (P1.2) confirme le retard d'un scan ~10ms → sous-estime la distance d'arrêt. Design : CST_ScanLatencyMs:=T#10ms à ajouter au CALCUL de distance (pas aux timeouts de coupure Méca). ⏳ **Implémentation en attente** : emplacement injection, tâche référence, impact seuils Méca, validation humaine."
     contrat: ""
     objectifs: []
     bloque_par: []
 
   - id: "T55"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C2"
     domaine: "TREUILS"
-    agent: "—"
-    date: "2026-07-20T08:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T03:00:00"
     titre: "Stratégie synchronisme unique (info / mineur / majeur / critique)"
     contexte: ""
-    description: "FB_WinchSync"
+    description: "✅ **Étude de conception livrée + corrigée après revue indépendante** (`DOC/WFLOW/AUDITS/DESIGN_SYNCHRONISME_UNIQUE_4NIVEAUX_v0.2.md`) : échelle unique info/mineur/majeur/critique, valeurs vérifiées code (Warn instantané+latch, Fault 800ms, Mismatch 500ms, Méca E 2.5m), E_SyncSeverity **diag-only** (ne pilote aucune coupure), TC renumérotés P10-037..039b (collisions ID résolues). ⏳ **Implémentation en attente** de décisions (remplacement vs addition, périmètre critique Méca E, variables mortes ProcessPermit*_Ascent)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -665,14 +651,14 @@ tasks:
 
   - id: "T88"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C2"
     domaine: "CYCLE"
-    agent: "—"
-    date: "2026-08-12T09:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:00:00"
     titre: "Bouclage TIME() (49,7j) dans FB_CycleTime"
     contexte: "Intitulé complet : Bouclage TIME() (49,7j) dans FB_CycleTime : garde-fou DeltaTimeMs > 1000"
-    description: "FB_CycleTime.st"
+    description: "✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_FB_CYCLETIME_GARDE_FOU_WRAP_v0.1.md`) : le code actuel n'accepte que DeltaTimeMs>0 (pas de plafond haut) → au wrap 49,7j un CycleTimeS aberrant peut être publié. Garde-fou proposé : secours si DeltaTimeMs>1000 (constante CST_). ⏳ **Implémentation en attente** (code, validation humaine)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -707,14 +693,14 @@ tasks:
 
   - id: "T91"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C4"
     domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-08-12T09:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T05:00:00"
     titre: "ÉTUDE : Séquence frein/puissance asymé..."
     contexte: "Intitulé complet : ÉTUDE : Séquence frein/puissance asymétrique (montée frein d'abord / descente immédiat)"
-    description: "MES-006, FB_Brake"
+    description: "✅ **Étude livrée** (`DOC/WFLOW/AUDITS/ETUDE_T91_SEQ_FREIN_PUISSANCE_v0.1.md`) : FB_Brake a une séquence actuelle (montée=puissance avant relâche frein, descente=fermeture immédiate) mais ne prend pas le sens (montée/descente) pour l'asymétrie. Cible : montée frein collé→puissance→relâche ; descente coupure immédiate. ⏳ **Implémentation en attente** (nécessite sens en entrée + validation humaine, MES-006)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -791,56 +777,56 @@ tasks:
 
   - id: "T98"
     parent_id: ""
-    statut: "⬜"
+    statut: "✅"
     criticite: "C2"
     domaine: "IHM"
-    agent: "—"
-    date: "2026-08-12T09:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:15:00"
     titre: "Câbler BrakeThermalFault/PhaseRotationFault vers GVL_IHM.Commun"
     contexte: ""
-    description: "PRG_07_Supervision.st"
+    description: "✅ **Vérifié déjà câblé 2026-08-24** : `GVL_IHM.Commun.BrakeThermalFault` (PRG_07:338) et `PhaseRotationFault` (PRG_07:339) alimentés depuis `PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI`/`PhaseRotationOk_DI`, eux-mêmes qualifiés dans PRG_02 et consommés par FB_Safety_Translation/Winch. Chaîne complète (source→safety→IHM) vérifiée. Constat déjà résolu."
     contrat: ""
     objectifs: []
     bloque_par: []
 
   - id: "T108"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C2"
     domaine: "TRANSLATION"
-    agent: "—"
-    date: "2026-08-12T09:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:30:00"
     titre: "Interlock Translation M3 si Trémie pleine (HopperFull_OR_GateR..."
     contexte: "Intitulé complet : Interlock Translation M3 si Trémie pleine (HopperFull_OR_GateRaised_DI)"
-    description: "PRG_05_Translation.st"
+    description: "✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T108_INTERLOCK_TREMIE_v0.1.md`) : constat vérifié — HopperFull_OR_GateRaised_DI déclaré+qualifié (PRG_02:160) mais NON consommé. Interlock proposé : blocage directionnel M3 vers Trémie (Direction=+1) si trémie pleine/grille levée, sortie libre (Direction=-1). ⏳ **Implémentation en attente** : choix injection A/B, impact cycle semi-auto (SelTarget=1), câblage électrique réel, validation humaine."
     contrat: ""
     objectifs: []
     bloque_par: []
 
   - id: "T109"
     parent_id: ""
-    statut: "⬜"
+    statut: "✅"
     criticite: "C1"
     domaine: "STANDARDS"
-    agent: "—"
-    date: "2026-08-12T09:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T02:45:00"
     titre: "Formaliser convention polarité positive (*Permit / Allowed) po..."
     contexte: "Intitulé complet : Formaliser convention polarité positive (*Permit / Allowed) pour arbitrages"
-    description: "NAMING_CONVENTION.md"
+    description: "✅ NAMING_CONVENTION.md : section « Polarité positive des arbitrages — *Permit / *Allowed (T109) » + taxonomie Permit treuils (SafetyPermit/ProcessPermit/ProcessAndSafetyPermit/EffectivePermit, D-P1..D-P11), règle anti-OR, anti-Forbid*/anti-polarité inversée, point NC-100."
     contrat: ""
     objectifs: []
     bloque_par: []
 
   - id: "T110"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C4"
     domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-08-12T09:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:50:00"
     titre: "Clarifier sémantique DriveStatusWord.0 AC600 (\"Power Ready\" vs..."
     contexte: "Intitulé complet : Clarifier sémantique DriveStatusWord.0 AC600 (\"Power Ready\" vs \"Mouvement\" Méca B)"
-    description: "FB_Safety_Translation.st"
+    description: "✅ **Fiche de clarification livrée** (`DOC/WFLOW/AUDITS/CLARIFICATION_T110_DRIVESTATUSWORD_v0.1.md`) : DriveStatusWord.0 utilisé comme preuve de mouvement (Méca B, FB_Safety_Translation L180-182) mais sémantique AC600 ambiguë (Power Ready vs mouvement). Proposition : baser Méca B sur ABS(DriveActualFreqHz)>0.5 (meilleure preuve). ⏳ **Résolution en attente** : doc AC600 du bit 0 + validation humaine (C4)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -987,29 +973,31 @@ tasks:
 
   - id: "T125"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C4"
     domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-08-18T12:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:40:00"
     titre: "Revue conception modes dragage (DiveSearch / ExtractionSequenc..."
     contexte: "Intitulé complet : Revue conception modes dragage (DiveSearch / ExtractionSequence / DumpAtTremie) — standard projet + fonctionnel après essais | Session 2026-08-18 : logique DumpAtTremie inline dans PRG_04 (violation « 1 FB = 1 responsabilité ») ; verrou translation à la trémie absent ; latch « une fois descendu → translation interdite » (P1/Maintenance) absent ; DiveSearch/ExtractionSequence à revoir (standard + fonctionnel). Traitement en 2e temps. "
-    description: "**Adossé (2026-08-21, décision utilisateur)** : regrouper les **types des séquences/cycles** (ST_DredgingAssistCfg/State/Cmd/HMI, et tout type ST_Cycle*) actuellement dans J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE et 3_CYCLE_ET_MODES, vers **G_CYCLE** (avec leurs FB DiveSearch/ExtractionSequence/Cycle déjà là). Cohérence : un cycle/séquence = son FB + ses types au même endroit. À faire **pendant** ce refactor (pas en tâche isolée)."
+    description: "✅ **Revue de conception livrée + corrigée après revue indépendante** (`DOC/WFLOW/AUDITS/REVUE_T125_MODES_DRAGAGE_v0.2.md`) : 3 constats confirmés (DumpAtTremie inline PRG_04 L170-172/337/796-798, verrou translation absent→recoupe T108, latch descente→translation absent = besoin neuf). 5 corrections intégrées (périmètre élargi, reformulation PRG pas FB, DescentLocked ≠ base latch translation, ST_Modes* à préciser, 2 commits isolés). ⏳ **Implémentation en attente** (code safety-adjacent, validation humaine)."
     contrat: ""
     objectifs: []
     bloque_par: []
 
   - id: "T126"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C2"
     domaine: "IHM"
-    agent: "—"
-    date: "2026-08-18T12:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:25:00"
     titre: "IHM : message « descente interdite »"
     contexte: "Intitulé complet : IHM : message « descente interdite » — préciser la cause + retirer champ figé « PILOTAGE DIRECT » → contexte [SIMU] [MAINT_N1] [M1+M2 COUPLÉS] [PILOTAGE MANUEL]"
-    description: "Session 2026-08-18, FB_Hmi_BannerFormatter / GVL_IHM — message actuel trop générique, champ PILOTAGE DIRECT statique inutile"
+    description: "✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T126_MSG_DESCENTE_INTERDITE_v0.1.md`) : message L258-262 générique sans cause → proposer texte cause dérivé des sorties FB safety (producteurs uniques) ; champ figé L191 'Manuel: PILOTAGE DIRECT' → contexte dynamique [SIMU][MAINT_Nx][COUPLÉS][MANUEL]. ⏳ **Implémentation en attente** (code, validation humaine)."
     contrat: ""
+    objectifs: []
+    bloque_par: []
     objectifs: []
     bloque_par: []
 
@@ -1029,29 +1017,31 @@ tasks:
 
   - id: "T128"
     parent_id: ""
-    statut: "⬜"
+    statut: "✅"
     criticite: "C2"
     domaine: "IHM"
-    agent: "—"
-    date: "2026-08-18T12:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T02:50:00"
     titre: "Mise en conformité des commentaires GVL_IHM (émoticônes non gé..."
     contexte: "Intitulé complet : Mise en conformité des commentaires GVL_IHM (émoticônes non gérés, commentaires vides, libellés pourris)"
-    description: "Session 2026-08-18 — audit commentaires GVL_IHM.st"
+    description: "✅ **Vérifié conforme 2026-08-24** : GVL_IHM.st et les 18 DUT ST_*HMI sont propres (émoticônes UTF-8 bien encodés, libellés explicites, aucun commentaire vide `(*)` ni TODO/FIXME/libellé pourri). Constat initial (session 2026-08-18) déjà résorbé par les restructurations ultérieures (T139/T140/T141)."
     contrat: ""
     objectifs: []
     bloque_par: []
 
   - id: "T129"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C2"
     domaine: "TRANSLATION"
-    agent: "—"
-    date: "2026-08-18T12:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:20:00"
     titre: "Trou dans la raquette troubleshooting"
     contexte: "Intitulé complet : Trou dans la raquette troubleshooting : exposer instSafetyTranslationM3.ErrorId + M3_Direction_Active dans GVL_Troubleshooting (absents des snapshots → impossible de diagnostiquer l'éjection SEMI_AUTO)"
-    description: "Session 2026-08-18, GVL_Troubleshooting.st, ST_ChainTranslation.st"
+    description: "✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T129_RAQUETTE_TRANSLATION_M3_v0.1.md`) : constat vérifié — la raquette Translation expose les 8 bits décapsulés (Idx309-316) mais NI `ErrorId` brut (masque/latch, source d'arbitrage PowerCutOff) NI `M3_Direction_Active` (sens réel). Câblage proposé : Idx317_ErrorId (WORD) + Idx408_DirectionActive (INT), sources producteurs uniques existants. ⏳ **Implémentation en attente** (code, validation humaine)."
     contrat: ""
+    objectifs: []
+    bloque_par: []
     objectifs: []
     bloque_par: []
 
@@ -1085,14 +1075,14 @@ tasks:
 
   - id: "T132"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C4"
     domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-08-19T12:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:45:00"
     titre: "Référencement benne fermée : étape cycle + mise à jour AF P..."
     contexte: "Intitulé complet : Référencement benne fermée : étape cycle + mise à jour AF P09 §5"
-    description: "Session 2026-08-19 — AF P09 §5 « benne ouverte » obsolète → benne fermée (précision visuelle, mâchoires tendues sur câbles) ; ajouter étape cycle où l'opérateur ferme/valide"
+    description: "✅ **AF P09 §5 corrigée (2026-08-24)** : §5 étape 1 « Confirmation visuelle benne ouverte » → **benne fermée** (mâchoires tendues sur câbles), conforme T132. ⚠️ Pas de bump v2.2 (≈120 refs CODE/bundle/Device.export → refactor disproportionné) — correction gardée dans la v2.1 active, à valider utilisateur. ⏳ **Étape cycle** (opérateur ferme/valide benne dans le grafcet) reste à implémenter (code, validation humaine)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -1258,14 +1248,14 @@ tasks:
 
   - id: "T144"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C2"
     domaine: "TRANSLATION"
-    agent: "—"
-    date: "2026-08-20T12:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T04:35:00"
     titre: "Assainir l'interface de PRG_06_Outputs (conformité esprit bus/..."
     contexte: "Intitulé complet : Assainir l'interface de PRG_06_Outputs (conformité esprit bus/encapsulation T142 + sorties M3 mortes) | Signalé 2026-08-20 (revue sim M3) : PRG_06 ne respecte pas l'esprit bus (T142). Faits vérifiés : ① M3_DriveControlWord/M3_DriveFreqRefWord (VAR_OUTPUT l.43-44) jamais assignés (morts, toujours 0) ; ② M3_CommandWord/M3_SetpointFrequencyHz (assignés l.215-216) non déclarés dans les .st (globals uniquement dans Device.export) → source non auto-consistant ; ③ la commande drive M3 n'est PAS dans le bus Data (ST_OutputsInterPrg ne porte que TranslationBrakeCmd) ; ④ diag plats en VAR_OUTPUT (M3BlockedBySafetyInfo, EmergencyState, EmergencyDiag…) au lieu d'un struct/bus diag propre. "
-    description: "**Objectif** : aligner PRG_06 sur l'encapsulation (bus Data + struct diag), assigner/supprimer les sorties mortes, déclarer les globals dans les .st, exposer la commande drive M3 via Data (source sim fiable aussi). **Lot séparé** de la sim (qui utilise déjà PRG_05.Data.TranslationFinalInterlockRequest)."
+    description: "✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T144_ASSAINIR_PRG06_v0.1.md`) : 4 faits confirmés (sorties mortes L51-52, globals non déclarés L270-271, commande M3 absente du bus Data, diag plats). Plan : ① supprimer/réassigner mortes, ② déclarer globals .st, ③ étendre ST_OutputsInterPrg (commande drive M3, producteur unique), ④ struct ST_OutputsDiag. ⏳ **Implémentation en attente** : choix supprimer/réassigner, impact sim, validation humaine."
     contrat: ""
     objectifs:
       - "M3_DriveControlWord/M3_DriveFreqRefWord (VAR_OUTPUT l.43-44) jamais assignés (morts, toujours 0) ;"
@@ -1276,14 +1266,14 @@ tasks:
 
   - id: "T145"
     parent_id: ""
-    statut: "⬜"
+    statut: "✅"
     criticite: "C1"
     domaine: "OUTILLAGE"
-    agent: "—"
-    date: "2026-08-21T12:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T05:10:00"
     titre: "Refonte du suivi des tâches : Source unique YAML (TASKS.yaml..."
     contexte: "Intitulé complet : Refonte du suivi des tâches : Source unique YAML (TASKS.yaml) + Vue tableur CSV en lecture seule | Étude 2026-08-21 : Remplacer le suivi Markdown par un fichier source structuré unique DOC/WFLOW/TASKS.yaml (élimine le non-déterminisme des LLM sur les tableaux .md et les conflits d'édition) couplé à une génération automatique d'une vue de consultation DOC/WFLOW/TASKS_VIEW.csv (filtrable et triable dans VS Code via l'extension Edit CSV ou Excel). Garde-fou associé : Gate CI G350 de validation d'intégrité. "
-    description: "**Décision** : Mise en réserve, à introduire ultérieurement si le volume de pilotage le nécessite."
+    description: "✅ **Décision confirmée 2026-08-24** : mise en réserve actée par l'utilisateur (« c'est la nouvelle gestion des tâches projet, donc fini »). TASKS.yaml est déjà la source unique — la vue CSV/G350 n'est pas nécessaire actuellement. Tâche clôturée (réserve)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -1321,14 +1311,14 @@ tasks:
 
   - id: "T148"
     parent_id: ""
-    statut: "⬜"
+    statut: "⏳"
     criticite: "C4"
     domaine: "SÉCURITÉ"
-    agent: "—"
-    date: "2026-08-22T12:00:00"
+    agent: "DSH-02"
+    date: "2026-08-24T05:15:00"
     titre: "FB_FbStatus : Reset simplement MAINTENU (san..."
     contexte: "Intitulé complet : FB_FbStatus : Reset simplement MAINTENU (sans nouveau front) + disparition de la cause pendant ce maintien = acquittement silencieux | Découvert en écrivant les tests étendus test_fb_fbstatus.st (2026-08-22) — même famille que T147, faille distincte (pas de code touché, TOOLS/ uniquement). "
-    description: "**Constat** : ResetEdge(CLK:=Reset) ne (re)vide ErrorIdLatched qu'au **front montant** de Reset — mais rien n'empêche ce vidage de se produire alors que la cause brute (FaultCause) est **encore active** à cet instant précis (le test TC \"Reset ne doit pas acquitter tant que la cause persiste\" ne le voit pas car il ne teste qu'1 seul cycle : Error reste bien TRUE cette scan-là grâce à l'union sur la cause brute, pas grâce au latch). Séquence qui casse la garantie : Reset **maintenu à TRUE** plusieurs scans pendant que la cause est active (le latch est vidé au 1er front et jamais réarmé, faute de nouveau front FaultEdge puisque la cause reste constante) → si la cause **disparaît** À CE MOMENT-LÀ (Reset toujours haut, donc **aucun nouveau front Reset**), Error retombe silencieusement à FALSE — sans confirmation opérateur au moment réel où le défaut se résout. <br>**Scénario concret** : opérateur bloque/maintient le bouton Reset (bouton collé, séquence auto qui garde Reset actif) pendant qu'un défaut réel est encore présent ; le défaut se résout tout seul (cause disparaît) pendant ce maintien → l'IHM efface le défaut sans qu'aucun nouveau geste conscient n'ait eu lieu à l'instant de la résolution. Prouvé par test (TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_fbstatus.st, test *\"Reset MAINTENU plusieurs scans...\"*), comportement actuel documenté dans le test, pas un choix de spec validé. <br>**Piste de correctif à trancher** (pas encore décidée) : ne vider ErrorIdLatched sur le front Reset que si FaultCause = 0 à cet instant (sinon ignorer le front tant que la cause est active), pour que seul un **nouveau** front Reset survenant **après** disparition de la cause puisse acquitter — cohérent avec le test déjà existant \"Reset ne doit pas acquitter tant que la cause persiste\" mais étendu à Reset maintenu. À trancher avec la même décision de spec que T147."
+    description: "✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T148_FBFSTATUS_RESET_MAINTENU_v0.1.md`) : faille confirmée — cause disparaît pendant Reset maintenu (pas de nouveau front) → Latch reste FALSE → Error retombe silencieusement. Correctif : ne vider le latch au front Reset QUE si cause à 0. Tests TC-P03-014/015 à ajouter. ⏳ **Implémentation en attente** (code + test, validation humaine C4)."
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -1354,4 +1344,137 @@ tasks:
       - "IHM ErrorIdTxt/WarningIdTxt si enrichissement adopté ;"
       - "T130 standardiser décodage d'intention → {Direction, Palier} (étape d'intention de mouvement, après l'intention de geste validée ici)."
     bloque_par: []
+
+  - id: "T150"
+    parent_id: ""
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "DSH-02"
+    date: "2026-08-24T02:30:00"
+    titre: "Audit incohérences outillage agent (skills/config/docs)"
+    contexte: "Audit session 2026-08-24 (lecture seule, rien corrigé) : doublons de skills, bannières incohérentes, doc périmée vs réalité disque, scripts/config orphelins dans TOOLS/AGENT_WORKFLOW, .claude/skills, .dsh/skills."
+    description: "Parent de 7 constats soulevés par l'utilisateur sur la cohérence de l'outillage agent. Ne touche pas CODE/ ni la sécurité machine — dette documentaire/outillage. ✅ Clôturé 2026-08-24 : les 7 sous-tâches (T150-A→G) traitées + gate anti-dérive G440 (check_skill_stubs.py) + gabarit bannière unique."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T150-A"
+    parent_id: "T150"
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "DSH-02"
+    date: "2026-08-24T02:30:00"
+    titre: "Doublon skill troubleshooting + bannières incohérentes"
+    contexte: "`.claude/skills/troubleshooting/SKILL.md` et `.dsh/skills/troubleshooting/SKILL.md` sont une copie identique (154 lignes), pas un lien."
+    description: "✅ Pilote **stub + canonique** (décision expert + web) : canonique `TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md`, stubs courts `.claude/` et `.dsh/` (zéro duplication). Gate anti-dérive **G440** `check_skill_stubs.py` ajouté au palier C + 5 tests. Bannières unifiées (60 `=`) via gabarit `DOC/WFLOW/TEMPLATE/SKILL_BANNER_TEMPLATE.md` appliqué à task-planner, troubleshooting, codesys-workflow, briefing AGENTS.md."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T150-B"
+    parent_id: "T150"
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "DSH-02"
+    date: "2026-08-24T02:30:00"
+    titre: "Fraîcheur naming_baseline.json / workflow_diagram.json"
+    contexte: "TOOLS/AGENT_WORKFLOW/config/naming_baseline.json (référencé par G110_check_naming_style.py, TASK_VIEWER.html, TASKS.yaml, VERSION_HISTORY.md) et workflow_diagram.json (source du diagramme Mermaid, régénéré par TOOLS/visualize_workflow.py)."
+    description: "✅ Documenté dans TOOLS/README.md (§ Config fraîcheur) : naming_baseline.json = lu par G110 (manuelle) ; workflow_diagram.json = **aucun script ne le régénère** (visualize_workflow.py n'existe pas) — maintenu manuellement, TASK_VIEWER l'embarque en dur et ne le lit pas à l'exécution."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T150-C"
+    parent_id: "T150"
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "DSH-02"
+    date: "2026-08-24T02:30:00"
+    titre: "README AGENT_WORKFLOW décrit un package inexistant"
+    contexte: "TOOLS/AGENT_WORKFLOW/README.md documente pyproject.toml, src/agent_workflow/, pip install -e — aucun des trois n'existe sur disque (vérifié). Les scripts sont des fichiers plats dans scripts/*.py appelés directement."
+    description: "✅ README réécrit pour refléter la réalité disque : scripts plats `scripts/*.py` lancés par `python`, pas de package `src/`/`pyproject.toml`/`pip install -e`. Gates palier C décrits, tests `pytest TOOLS/AGENT_WORKFLOW/tests/`."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T150-D"
+    parent_id: "T150"
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "DSH-02"
+    date: "2026-08-24T02:30:00"
+    titre: "Doublon contenu skill troubleshooting / prompts/troubleshooting.md"
+    contexte: "TOOLS/AGENT_WORKFLOW/prompts/troubleshooting.md duplique du contenu avec .claude/skills/troubleshooting/SKILL.md (orientation méthode, test CI ad hoc, etc.)."
+    description: "✅ Répartition clarifiée dans les 3 fichiers : stubs = déclencheurs courts, canonique `skills/.../SKILL.md` = procédure exécutable, `prompts/troubleshooting.md` = méthode détaillée référencée. Gate G440 garantit l'unicité de la méthode (zéro doublon complet)."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T150-E"
+    parent_id: "T150"
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "DSH-02"
+    date: "2026-08-24T02:30:00"
+    titre: "Validité docs/ AGENT_WORKFLOW (SAFETY, WORKFLOW, MODEL_ROUTING...)"
+    contexte: "TOOLS/AGENT_WORKFLOW/docs/ : SAFETY_POLICY, WORKFLOW.md, CODE_WRITING_POLICY, DOC_WRITING_POLICY, RELEASE_PROCESS, STRUCTURE_AND_CLEANUP, TOKEN_POLICY, MODEL_ROUTING.md, TASK_CONTEXT.md, DSH_PROVIDERS.md."
+    description: "✅ **Délégué à T151** (Nettoyage Pi, verrouillée par AGY-01) : les mentions « Pi Subagents » dans MODEL_ROUTING.md (déjà révisé 2026-08-17), codesys-change/SKILL.md:15 et ACCEPTANCE_REPORT sont nettoyées par T151. Aucun changement ici pour éviter la collision d'édition."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T150-F"
+    parent_id: "T150"
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "DSH-02"
+    date: "2026-08-24T02:30:00"
+    titre: "templates/project_tracking.md mort"
+    contexte: "TOOLS/AGENT_WORKFLOW/templates/project_tracking.md n'est référencé nulle part dans DOC/ — superseded par DOC/WFLOW/TASKS.yaml + skill task-planner."
+    description: "✅ **Archivé** dans `ARCHIVES/Tools/AGENT_WORKFLOW/templates/project_tracking.md` (décision utilisateur)."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T150-G"
+    parent_id: "T150"
+    statut: "✅"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "DSH-02"
+    date: "2026-08-24T02:30:00"
+    titre: "Emplacement templates/ (standards projet dans TOOLS au lieu de DOC)"
+    contexte: "TOOLS/AGENT_WORKFLOW/templates/ héberge des gabarits qui sont en fait des standards projet (fb_header.st, naming, etc.)."
+    description: "✅ Dossier **`DOC/WFLOW/TEMPLATE/`** créé (+ README de placement) : gabarits/standards projet y vivent, gabarits d'outillage d'agent restent dans `TOOLS/AGENT_WORKFLOW/templates/`. Gabarit bannière unique `SKILL_BANNER_TEMPLATE.md` ajouté."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T151"
+    parent_id: ""
+    statut: "🔒"
+    criticite: "C1"
+    domaine: "OUTILLAGE"
+    agent: "AGY-01"
+    date: "2026-08-24T02:03:00"
+    titre: "Nettoyage et abandon définitif de Pi Coding"
+    contexte: "Abandon complet de l'environnement Pi Coding / sous-agents Pi au profit des agents actifs Antigravity, Claude Code et Codex."
+    description: "Purger les artéfacts .pi-subagents/, nettoyer les mentions textuelles dans AGENTS.md, DOC/STDS/CODE_QUALITY_STANDARDS.md, .claude/skills/, TOOLS/AGENT_WORKFLOW/ et .vscode/sessions.json."
+    contrat: "TASK_CONTRACT_T151_NETTOYAGE_PI_CODING.yaml"
+    objectifs:
+      - "Archiver ou supprimer le répertoire d'artéfacts .pi-subagents/"
+      - "Nettoyer les mentions Pi dans AGENTS.md et DOC/STDS/CODE_QUALITY_STANDARDS.md"
+      - "Nettoyer les mentions Pi dans .claude/skills/codesys-workflow/ et TOOLS/AGENT_WORKFLOW/"
+      - "Nettoyer l'entrée session 'pi' dans .vscode/sessions.json"
+      - "Valider la non-régression outillage (run_all_gates.py)"
+    bloque_par: []
+
+
 

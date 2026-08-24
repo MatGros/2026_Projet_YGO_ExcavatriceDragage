@@ -258,7 +258,9 @@ Questions ouvertes à instruire, avec preuve de code à l'appui :
 | `CfgCableLimitAscent_M` | 7.5 m | **7.5 m** |
 
 **Nominal** :
-1. **Confirmation visuelle benne ouverte** (opérateur, avant tout mouvement) — tant que M1/M2 ne
+1. **Confirmation visuelle benne fermée** (opérateur, avant tout mouvement) — ⚠️ **corrigé
+   2026-08-24 (T132)** : la configuration de référencement est la **benne fermée** (mâchoires
+   tendues sur câbles, précision visuelle), plus « benne ouverte » (obsolète). Tant que M1/M2 ne
    sont pas référencés, `CablePosM` est potentiellement faux : aucun interlock automatique basé
    sur la position (y compris l'état benne côté `FB_Bucket`) n'est fiable à ce stade. Seule une
    vérification visuelle permet de lancer les 2 moteurs ensemble en confiance.

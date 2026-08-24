@@ -17,6 +17,14 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 demande à tout moment (« rappelle-moi le briefing workflow » ou équivalent) — même séquence.
 
 **Séquence :**
+0. **Afficher immédiatement la bannière de briefing** (format standard, gabarit
+   `DOC/WFLOW/TEMPLATE/SKILL_BANNER_TEMPLATE.md`) :
+   ```text
+   ============================================================
+   🎬 BRIEFING SESSION / AGENTS.MD ACTIF
+   ============================================================
+   ```
+   Puis 1 ligne : *« Briefing session <projet> — reprise par <agent> »*.
 1. Lire les points d'entrée : `README.md` (racine), `DOC/README.md`, `TOOLS/README.md`,
    `TOOLS/AGENT_WORKFLOW/README.md` — pas tout le détail, juste repérer où chercher ensuite.
 2. Restituer un briefing court :

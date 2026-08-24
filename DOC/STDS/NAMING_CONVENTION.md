@@ -27,6 +27,7 @@
 | <nobr><code>NC-070</code></nobr> | Variable `PERSISTENT` préfixée `_` | Déclaration dans `GVL_PERSISTENT.st` commence par `_` | 🤖 AUTO | §Variables globales persistantes |
 | <nobr><code>NC-080</code></nobr> | Repère matériel (M1/M2/M3) juste après le préfixe dans une GVL plate | Motif `<Préfixe><Repère><Fonction>` respecté | 👁️ MANUEL | §Repère juste après le préfixe |
 | <nobr><code>NC-090</code></nobr> | Une notion = un seul nom dans tout le projet (pas de synonyme parallèle) | Revue sémantique, pas mécanisable | 👁️ MANUEL | `CODE_QUALITY_STANDARDS.md §1` |
+| <nobr><code>NC-100</code></nobr> | Polarité positive des arbitrages `*Permit`/`*Allowed` : `TRUE` = autorisé, `FALSE` = bloqué | Tout signal d'arbitrage répond à « que signifie `TRUE` ? » = autorisation positive ; jamais d'`OR` d'autorisations | 👁️ MANUEL | §Polarité positive des arbitrages (T109) |
 
 ---
  
@@ -280,6 +281,64 @@ doit être **initialisée explicitement à `TRUE`** dans sa déclaration (`VAR_G
 jamais laissée à la valeur par défaut du langage — sinon un capteur "pas encore câblé" se lit
 comme "défaut détecté". La famille "information classique" n'a pas ce besoin : son repos naturel
 (`FALSE`) est déjà la bonne valeur par défaut.
+
+### 🔐 Polarité positive des arbitrages — `*Permit` / `*Allowed` (T109)
+
+**Règle absolue pour TOUT signal d'arbitrage** (permission, autorisation, interlock, gate) :
+`TRUE` = **mouvement/action autorisé(e)**, `FALSE` = **bloqué(e)**. C'est la **polarité positive
+fail-safe** : une liaison rompue, un FB désactivé (`Enable=FALSE`) ou un bloc non calculé retombe
+naturellement à `FALSE` → aucune action n'est possible sans une autorisation **explicitement
+positive**. On ne passe jamais à travers un `NOT Permit` pour autoriser.
+
+Les noms portent le suffixe sémantique `*Permit` (autorisation calculée, famille "sortie de
+commande") ou `*Allowed` (état/predicat consommé par une chaîne diag/IHM — voir `Idx401_MotionAllowed`,
+`Step6_DirectionAllowed`, `Step5_ArmingAllowed`).
+
+#### Taxonomie `Permit` de l'arbitrage treuils (D-P1 → D-P11, `PRG_04_Treuils_Benne`)
+
+L'arbitrage distingue **jusqu'à 4 niveaux** de permission, tous en polarité positive. ⚠️ **La
+chaîne est ASYMÉTRIQUE** (vérifié code, revue 2026-08-24) : le niveau **Process** n'existe que
+pour la **descente** ; la **montée** passe **Safety → Effectif directement** (pas de Process).
+Ne pas inventer un `ProcessPermit*_Ascent` — ces variables **n'existent pas** à l'usage réel
+(2 mortes à retirer, voir question).
+
+| Sens | Chaîne réelle |
+|---|---|
+| **Descend** | `SafetyPermit<M>_Descend` → `ProcessPermit<M>_Descend` → `ProcessAndSafetyPermit<M>_Descend` → `EffectivePermit<M>_Descend` |
+| **Ascent** | `SafetyPermit<M>_Ascent` → **`ProcessAndSafetyPermit<M>_Ascent`** (sans étage Process) → `EffectivePermit<M>_Ascent` |
+
+| Niveau | Nom | Sémantique | Production |
+|---|---|---|---|
+| 1. Safety | `SafetyPermit<Repère>_<Sens>` | Autorisation **safety pure** (limites, contacteur, chaîne) | sortie d'un `FB_Safety_<Metier>` (`AscentPermit`/`DescendPermit`) |
+| 2. Process (descente) | `ProcessPermit<Repère>_Descend` | Autorisation **process pur** (interlocks de séquence, benne, trémie) — descente uniquement | logique de séquence / interlock |
+| 3. Combiné | `ProcessAndSafetyPermit<Repère>_<Sens>` | `SafetyPermit AND ProcessPermit` (descente) **ou** `SafetyPermit` seul (montée) | nœud de fusion explicitement nommé |
+| 4. Effectif | `EffectivePermit<Repère>_<Sens>` | Combiné + couplage synchro (anti-télescopage) | alimente l'entrée `AscentPermit`/`DescendPermit` du FB de mouvement |
+
+```
+EffectivePermit = ProcessAndSafetyPermit (et couplage synchro)   →  TRUE = mouvement autorisé
+```
+
+- **Règle `AND`, exception `OR` de couplage** : deux permissions **safety/process** s'agrègent par
+  `AND`. ⚠️ **Exception LÉGITIME** : l'`OR` de **couplage synchro** dans `EffectivePermit`
+  (`EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND (NOT SyncActive OR
+  ProcessAndSafetyPermitM2_Descend)`, `PRG_04_Treuils_Benne.st:810`) — il reste **sous le `AND`
+  de son propre `ProcessAndSafetyPermit`**, donc il ne court-circuite jamais le Safety individuel.
+  → **Interdit** : un `OR` qui court-circuite le Safety d'un axe. **Permis** : un `OR` de couplage
+  synchro, sous `AND` du Safety de chaque treuil. Un `OR` d'autorisation sans Safety = cas d'arrêt.
+- Le nom **porte toujours le niveau** (`SafetyPermit` ≠ `EffectivePermit`) — ne pas écrire un
+  `Permit` générique qui cache le niveau réel.
+- Chaque niveau suit `<Niveau>Permit<Repère>_<Sens>` (`_Ascent`/`_Descend` en suffixe,
+  l'axe `M1/M2` juste après `Permit`, cf. NC-080).
+
+#### `*Allowed` — chaînes de diagnostic / IHM (lecture seule)
+
+Les flags `*Allowed` exposent le **résultat** d'un arbitrage pour le diag, l'IHM ou le
+troubleshooting (jamais comme source d'autorisation) : `us401_MotionAllowed`, `Step6_DirectionAllowed`,
+`Step5_ArmingAllowed`. Même polarité positive (`TRUE` = autorisé/possible).
+
+**Règle anti-ambiguïté (REX C1)** : ne **jamais** nommer une permission de façon inversée (`CutOff`
+pour dire "je ne coupe pas", `ForbidX` pour un "PermitX") — voir le contre-exemple
+`PowerCutOff_A_RQ` plus haut et la décision T117 (élimination des `Forbid*`).
 
 ### Consignes (références)
 ```

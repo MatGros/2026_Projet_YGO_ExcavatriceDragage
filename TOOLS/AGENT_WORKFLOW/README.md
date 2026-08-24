@@ -1,180 +1,134 @@
 # AGENT_WORKFLOW — Orchestration, Gates & Policies
 
-Package Python pour automatiser et fiabiliser le workflow CODESYS.
+Outillage agent du projet : **scripts de gate** (fichiers plats appelés directement par Python),
+**skills de référence**, **prompts**, **policies**, **gabarits** et **config**.
+
+> ⚠️ **Réalité disque (T150-C)** : il n'existe **pas** de package Python installable ici.
+> Il n'y a **ni `pyproject.toml`, ni `src/agent_workflow/`**. Les scripts sont des **fichiers
+> plats** dans `scripts/*.py`, exécutés directement :
+> ```powershell
+> python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+> ```
 
 ```text
 TOOLS/AGENT_WORKFLOW/
-├── src/agent_workflow/          # Code importable (scripts, gates, utils)
-├── scripts/                     # Points d'entrée CLI (installés via pyproject.toml)
-├── skills/                      # Skills (codesys-change, codesys-review, ...)
-├── prompts/                     # Prompts standardisés (requirement-intake, release-check, ...)
+├── scripts/                     # Gates Python (structure, style, bundle, compile, pre-edit, skills)
+├── skills/                      # Skills de référence (codesys-change, codesys-review, doc-sync, ...)
+├── prompts/                     # Prompts standardisés (troubleshooting, release-check, subagent_preamble, ...)
 ├── schemas/                     # JSON Schemas (requirement_intake)
 ├── docs/                        # Policies (SAFETY, WORKFLOW, TOKEN, DOC_WRITING, CODE_WRITING, ...)
-└── templates/                   # Gabarits (FB, PRG, GVL, spec, validation, ...)
+├── templates/                   # Gabarits de projet (FB, PRG, GVL, spec, ...) — voir DOC/WFLOW/TEMPLATE
+├── config/                      # naming_baseline.json, workflow_diagram.json
+├── hooks/                       # Hooks Git partagés (pre-push)
+└── tests/                       # Tests unitaires des gates (pytest)
 ```
 
 ---
 
-## Installation
+## 🚀 Utilisation
+
+Tous les scripts se lancent **depuis la racine du projet** via `python` :
 
 ```powershell
-pip install -e TOOLS/AGENT_WORKFLOW
+# ✅ Tous les gates : liaison + structure + style (fin de lot)
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+
+# 🎯 Par palier (GUIDE_GATES_ET_TESTS §2) : A=bloc isolé, B=liens, C=fin de lot, D=sur demande
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C
+
+# 🔗 BLOQUANT : vérifier que TOUT est câblé (REX 2026-07-29)
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
+
+# Générer le bundle PLCopenXML
+python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
+
+# Gate anti-dérive des skills agents (stub + canonique, T150-A)
+python TOOLS/AGENT_WORKFLOW/scripts/check_skill_stubs.py .
 ```
 
-Cela installe les commandes CLI ci-dessous et rend le package importable :
-```python
-from agent_workflow.scripts import check_code_style, run_all_gates
-```
+## 🗂️ Gates (dans `scripts/`)
 
----
+Les gates G1xx–G5xx sont des filtres automatiques qui **bloquent le code cassé avant qu'il
+n'entre en CODESYS**. Ils sont regroupés par palier dans `run_all_gates.py` (voir le docstring
+du fichier et `docs/WORKFLOW.md`).
 
-## Outils associés au workflow
-
-- [TOOLS/ST_PLCOPENXML_GENERATOR/README.md](../ST_PLCOPENXML_GENERATOR/README.md) : générateur de bundle PLCopenXML à partir des sources ST et des POU XML natifs/CFC. Le workflow l'appelle pour produire `CODE_XML/CODE_Bundle.xml` avant import CODESYS.
-- [TOOLS/OUTILS_ST2PY/README.md](../OUTILS_ST2PY/README.md) : pont ST/XML → Python pour simulation, tests fonctionnels hors-PLC et non-régression. Outil d'aide, pas source de vérité ni substitut à la validation CODESYS/terrain.
-
----
-
-## Commandes CLI (entry points)
-
-| Commande | Description |
+| Gate | Rôle |
 |---|---|
-| `run-all-gates [--skip-codesys] [--codesys-log LOG] [--strict]` | Lance tous les gates : structure, style, bundle, pytest, (compilation CODESYS) |
-| `check-structure` | Vérifie l'arborescence `CODE/` conforme |
-| `check-code-style <scope>` | Tokens interdits, refs DOC, écritures `VAR_OUTPUT` illégales |
-| `check-bundle-freshness <project_root>` | Compare `CODE_Bundle.xml` vs régénération déterministe |
-| `pre-edit-gate --check <file.st> [--mark-read SPEC...]` | Bloque si specs DOC non lues avant modification CODE |
-| `check-codesys-compile --log <build.log> [--strict] [--max-warnings N]` | Valide log de compilation CODESYS (0 erreur) |
+| `G100`–`G110` | Structure/style du code ST (palier A) |
+| `G200`–`G210` | **Liaison réelle** + câblage CFC natif (palier B, **bloquant**) |
+| `G300`–`G430` | Structure dépôt, bundle, types, docs, commentaires REX (palier C) |
+| `G440` | Skills agents stub + canonique (anti-dérive, T150-A) |
+| `G500` | Compilation CODESYS (palier D, sur demande, `--codesys-log`) |
 
-### Exemples
+Détail de chaque gate : docstring du fichier + `docs/WORKFLOW.md`.
 
-```powershell
-# Gates complets (sans CODESYS)
-run-all-gates --skip-codesys
+## 🧪 Tests unitaires des gates
 
-# Gates + validation compilation CODESYS
-run-all-gates --codesys-log build.log --strict
+```bash
+python -m pytest TOOLS/AGENT_WORKFLOW/tests/ -q
+```
 
-# Vérification style sur un fichier
-check-code-style CODE/H_TREUILS_BENNE/FB_Winch.st
+## 🔌 Vérification de compilation CODESYS (optionnelle)
 
-# Pre-edit gate : spécifications lues ?
-pre-edit-gate --check CODE/I_TRANSLATION/FB_Translation.st
-pre-edit-gate --mark-read DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
-
-# Validation compilation CODESYS
-check-codesys-compile --log build.log --strict
+```bash
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --codesys-log build.log --strict
 ```
 
 ---
 
-## Gates — Détails
+## 📚 Skills (référence dans `skills/`, auto-découvertes dans `.claude/skills/`)
 
-### 1. Structure (`check-structure`)
-- Arborescence `CODE/` : dossiers obligatoires, noms PascalCase, pas de fichiers orphelins
-
-### 2. Code Style (`check-code-style`)
-- Tokens interdits : `CoupeEnable`, `FB_Watchdog`
-- Références `DOC/*.md` dans l'en-tête (obligatoire pour FB/PRG/GVL métier)
-- **Écriture sur `VAR_OUTPUT` détectée** : `instFB.Ready := ...` → ERROR (sauf baseline connue)
-
-### 3. Bundle fraîcheur (`check-bundle-freshness`)
-- Régénère le bundle dans un répertoire temporaire avec le même timestamp
-- Compare binaire vs `CODE_XML/CODE_Bundle.xml` versionné
-- Échoue si diff → bundle périmé
-
-### 4. PyTest (générateur)
-- 306 tests : unitaires, intégration, golden files
-- Doit passer avant tout commit
-
-### 5. Compilation CODESYS (`check-codesys-compile`)
-- Parse le log `build.log` exporté depuis CODESYS
-- Patterns détectés : `[ERREUR]`, `Cxxxx:`, `Error N`
-- `--strict` = warnings = erreurs
-
-### 6. Pre-edit gate (`pre-edit-gate`)
-- État persistant dans `.pi/spec_read_state.json`
-- `--mark-read` : marque une spec comme lue
-- `--check` : bloque si specs requises non lues pour le fichier cible
-
----
-
-## Skills (dans `skills/`)
+Les skills « de référence » (`skills/`) ne sont **pas** auto-découvertes par les outils — ce sont
+des procédures pointées par `AGENTS.md`/`WORKFLOW.md`. Les skills **déclenchables** vivent dans
+`.claude/skills/` (Claude Code) et `.dsh/skills/` (DSH), sous forme de **stub** pointant vers une
+source canonique (cf. `check_skill_stubs.py`, T150-A).
 
 | Skill | Rôle |
 |---|---|
 | `codesys-change` | Modification CODE/ : lecture specs, plan, gates, bundle, validation humaine |
 | `codesys-review` | Revue read-only CODE/DOC/tests |
 | `doc-sync` | Maj DOC après modification CODE |
-| `release-check` | Checklist fin de tâche avant intégration manuelle |
+| `release-check` | Checklist fin de tâche |
 | `requirement-intake` | Qualification `NEW_INFORMATION` avant tout code |
 
-📌 Ces skills ne sont pas découvertes automatiquement par Claude Code (seul `.claude/skills/`
-l'est) — ce sont des procédures de référence, pointées par `AGENTS.md`/`WORKFLOW.md`, pas
-chargées par un mécanisme de package.
-
----
-
-## Policies (dans `docs/`)
+## 📚 Policies (dans `docs/`)
 
 | Fichier | Sujet |
 |---|---|
-| `SAFETY_POLICY.md` | Interdiction Ponytail safety, validation humaine obligatoire, `humanValidationRequired` |
+| `SAFETY_POLICY.md` | Interdiction Ponytail safety, validation humaine obligatoire |
 | `WORKFLOW.md` | Flux `CODE_CHANGE` / `NEW_INFORMATION`, criticité C0–C4 |
-| `TOKEN_POLICY.md` | Gestion budget tokens, context window, compression |
-| `DOC_WRITING_POLICY.md` | Style docs projet (concision, emoji, versioning) |
-| `CODE_WRITING_POLICY.md` | Style ST (headers, naming, contrats FB, sécurité) |
-| `RELEASE_PROCESS.md` | Checklist fin de tâche |
+| `TOKEN_POLICY.md` | Gestion budget tokens |
+| `DOC_WRITING_POLICY.md` | Style docs projet |
+| `CODE_WRITING_POLICY.md` | Style ST (headers, naming, contrats FB) |
+| `MODEL_ROUTING.md` | Routage des modèles (Pi Subagents abandonnés 2026-08-17) |
+| `DSH_PROVIDERS.md` | Provider `omniroute` + délégation multi-modèles |
+| `TASK_CONTEXT.md` | Contexte de tâche / contract |
 | `STRUCTURE_AND_CLEANUP.md` | Arborescence, archivage, nettoyage |
+| `RELEASE_PROCESS.md` | Checklist fin de tâche |
 
----
+## 📦 Templates (dans `templates/`)
 
-## Templates (dans `templates/`)
+Décision T150-G (2026-08-24) : les **gabarits de projet** (en-têtes ST, spec AF, fiche requise,
+bannière...) sont rattachés au pilotage projet sous **`DOC/WFLOW/TEMPLATE/`** (ex. gabarit de
+bannière `SKILL_BANNER_TEMPLATE.md`). Le dossier `templates/` de `AGENT_WORKFLOW` conserve les
+gabarits d'outillage/agents (task_contract, etc.). Si un gabarit est en fait un *standard projet*,
+il doit vivre sous `DOC/WFLOW/TEMPLATE/` ou `DOC/STDS/` et être référencé, jamais dupliqué.
 
-| Template | Usage |
-|---|---|
-| `fb_header.st` | En-tête standard Function Block |
-| `motion_fb_header.st` | En-tête FB de mouvement (StartStop/SafeStop) |
-| `program_header.st` | En-tête PRG |
-| `gvl_header.st` | En-tête GVL |
-| `type_header.st` | En-tête TYPE/STRUCT/ENUM |
-| `af_spec.md` | Spécification fonctionnelle (AF_Partie-N) |
-| `requirement_intake.md` | Fiche qualification nouvelle info |
-| `validation_checklist.md` | Checklist validation humaine |
-| `project_tracking.md` | Suivi tâche (PLAN_TASK) |
-| `tool_readme.md` | README standard pour outil |
-
----
-
-## Schémas JSON (dans `schemas/`)
+## 📋 Schemas (dans `schemas/`)
 
 | Schema | Validation |
 |---|---|
-| `requirement_intake.schema.json` | Entrée `NEW_INFORMATION` : id, source, TBD, décision humaine obligatoire |
+| `requirement_intake.schema.json` | Entrée `NEW_INFORMATION` |
 
----
+## 🗂️ Config (dans `config/`)
 
-## Exécution des tests internes
-
-```powershell
-python -m pytest TOOLS/AGENT_WORKFLOW/scripts/ -v
-```
-
-Tests : structure, style, bundle, pre-edit gate, compile check.
-
----
-
-## Variables d'environnement utiles
-
-| Variable | Défaut | Rôle |
+| Fichier | Rôle | Fraîcheur |
 |---|---|---|
-| `AGENT_WORKFLOW_PROJECT_ROOT` | CWD | Racine projet (pour chemins relatifs) |
-| `PYTEST_ADDOPTS` | `-q` | Options pytest par défaut |
+| `naming_baseline.json` | Baseline de nommage (lu par `G110_check_naming_style.py`, `TASK_VIEWER.html`) | Régénéré quand le nommage `CODE/` évolue (T150-B) |
+| `workflow_diagram.json` | Source du diagramme Mermaid du workflow | Manuelle (le script visualize_workflow.py n'existe pas) |
 
----
+## Versioning
 
-## Versioning & Changelog
-
-- Version dans `pyproject.toml`
-- Historique dans `DOC/VERSION_HISTORY.md`
-- Tags git : `tools/agent-workflow/vX.Y.Z`
+- Les scripts et gates n'ont **pas de version propre** : leur évolution est tracée dans
+  `DOC/VERSION_HISTORY.md`.
+- Les gates sont nommés `G<id>_<nom>.py` (numérotation décrite dans `docs/WORKFLOW.md`).

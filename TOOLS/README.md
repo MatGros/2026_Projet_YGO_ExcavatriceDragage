@@ -170,6 +170,18 @@ indépendants qui vendorent chacun leur propre copie de STruCpp (pas de lien ent
 - `README.md` → terminaux VS Code (`Ctrl+Shift+P` → **Terminals: Run**)
 - `MARKDOWN_WORKSPACE.md` → édition & cochage des fichiers Markdown (`Ctrl+K V` sans extension checkbox)
 
+### 🗂️ Config — fraîcheur des fichiers (T150-B)
+
+| Fichier | Producteur réel | Consommateur réel | Fraîcheur |
+|---|---|---|---|
+| `AGENT_WORKFLOW/config/naming_baseline.json` | `AGENT_WORKFLOW/scripts/G110_check_naming_style.py` (lit) — régénéré manuellement via son flag baseline | `G110_check_naming_style.py` | À régénérer quand le nommage `CODE/` évolue (normes IEC NC-010..070). |
+| `AGENT_WORKFLOW/config/workflow_diagram.json` | ⚠️ **Aucun script ne le génère** — le fichier `visualize_workflow.py` (mentionné dans certains README) n'existe pas. Fichier maintenu manuellement. | `PROJECT_WORKSPACE/README.md` (cité), `DOC/WFLOW/TASK_VIEWER.html` (texte embarqué, pas un fetch) | Manuelle — aucun outil de regénération actif. Le diagramme Mermaid est généré par `TOOLS/DIAGRAM_GENERATORS/generate_all.py`. |
+
+> ⚠️ **Audit T150-B (2026-08-24)** : `workflow_diagram.json` est référencé par 2 docs mais
+> **aucun script ne le régénère** — c'est un fichier de configuration manuelle. `TASK_VIEWER.html`
+> embarque ses données (JSON en dur dans `defaultTasks`) et **ne lit pas** ces fichiers `.json`
+> à l'exécution.
+
 ---
 
 ## Règle d'or
