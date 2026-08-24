@@ -10,7 +10,7 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 
 ## 🎬 Démarrage de session — briefing obligatoire
 
-> Concerne **tout agent** (Claude Code, Codex, Pi, autre) et tout humain qui reprend le projet —
+> Concerne **tout agent** (Claude Code, Codex, autre) et tout humain qui reprend le projet —
 > `AGENTS.md` est justement le point d'entrée commun, lu par tous les outils.
 
 **Déclenchement** : automatique au 1er message de toute session sur ce repo. Rejouable à la
@@ -181,14 +181,14 @@ un garde-fou automatique dans `TOOLS/AGENT_WORKFLOW/scripts/`. Une réponse pure
 
 ---
 
-## 🤝 Délégation (Gemini/antigravity, Codex, sous-agents Pi)
+## 🤝 Délégation (Gemini/antigravity, Codex, sous-agents)
 
 Coller `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` **en tête de chaque tâche déléguée** :
 l'agent distant n'a pas le contexte de la conversation. La validation finale reste à
 l'orchestrateur (lecture du `git diff` réel), jamais à l'agent qui a produit le code.
 
 Plugin antigravity : `antigravity:delegate` · `antigravity:resume` · `antigravity:review`.
-Workflow multi-agents Pi et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`.
+Workflow multi-agents et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`.
 
 ⚠️ **Aucun commit sans validation humaine explicite** — pour tout agent, sans exception.
 

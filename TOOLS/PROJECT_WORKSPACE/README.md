@@ -4,7 +4,7 @@ Configuration et mode d’emploi de l’environnement de développement du proje
 **Claude Code**, **Codex**, **OpenCode** (avec agents Orchestrateur, Codeur & Vérificateur intégrés),
 gates et visualisation du workflow.
 
-> 📌 **Pi** et **Herdr** retirés le 2026-08-17 (workflow abandonné, voir `AGENTS.md` — délégation
+> 📌 **Herdr** retiré le 2026-08-17 (workflow abandonné, voir `AGENTS.md` — délégation
 > désormais antigravity/Codex/agents Claude Code natifs).
 
 L’extension VS Code **Terminals Manager** est le mécanisme recommandé pour ouvrir manuellement des terminaux configurés dans ce projet.

@@ -70,7 +70,7 @@ status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLE
 
 # ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
 execution:
-  executed_by: "..."         # Ex: sonnet-5 (Pi / antigravity)
+  executed_by: "..."         # Ex: sonnet-5 (antigravity)
   completed_at: "..."        # Timestamp ISO (ex: 2026-08-12T06:27:00+02:00)
   status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
   summary: >

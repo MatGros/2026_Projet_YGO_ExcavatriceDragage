@@ -104,9 +104,10 @@ prévient explicitement qu'ils seront rejoués sur le bundle complet au palier C
 | <nobr><code>200</code></nobr> | <small><code>G200_check_linkage.py</code></small> | Liaison — **seule preuve de câblage réel**, `§3` |
 | <nobr><code>210</code></nobr> | <small><code>G210_check_cfc_wiring.py</code></small> | Câblage CFC natif |
 
-📌 `G220_check_model_routing.py` (routage modèle Pi Subagents) archivé 2026-08-17 avec l'abandon
-de Pi/Herdr — voir `ARCHIVES/Tools/AGENT_WORKFLOW/scripts/README.md`. La garantie "modèle fort en
-C4" repose désormais sur `human_validation_required` + double revue A/B (`SAFETY_POLICY.md`).
+📌 `G220_check_model_routing.py` (routage modèle de l'ancien environnement de sous-agents)
+archivé 2026-08-17 avec l'abandon de Herdr — voir `ARCHIVES/Tools/AGENT_WORKFLOW/scripts/README.md`.
+La garantie "modèle fort en C4" repose désormais sur `human_validation_required` + double revue
+A/B (`SAFETY_POLICY.md`).
 
 ### Palier C — `300`-`420`
 

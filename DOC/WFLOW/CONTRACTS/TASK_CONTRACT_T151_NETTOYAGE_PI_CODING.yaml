@@ -67,9 +67,10 @@ contract:
     - grep_report             # Rapport grep montrant 0 trace active
     - run_all_gates           # Validation de non-régression outillage
 
-status: LOCKED
+status: COMPLETED
 
 execution:
-  executed_by: "AGY-01"
+  executed_by: "DSH-02"
   locked_at: "2026-08-24T02:03:00"
-  completed_at: ""
+  taken_over_at: "2026-08-24T05:45:00"
+  completed_at: "2026-08-24T06:00:00"

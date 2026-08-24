@@ -12,7 +12,7 @@ description: Prépare et exécute une modification ciblée CODESYS en respectant
    calcul dupliqué, canal GVL caché ou fusion anarchique de sources par `OR`.
 4. Pour C3/C4, safety, SafeStop ou PowerCutOff : exiger un `TASK_CONTEXT` avec `human_validation_required: true` et des critères d'acceptation vérifiables. Test PLC automatique optionnel (décision 2026-08-01, plus d'obligation) — si déclaré (`tests_automated_required: true`), exécuter `check_task_test_contract.py <TASK_CONTEXT>` avant le plan pour le tenir à sa parole.
 5. Pour C3 et C4, collecter avant le plan les avis read-only exigés par
-   `docs/MODEL_ROUTING.md` via Pi Subagents, puis en synthétiser les accords, divergences et
+   `docs/MODEL_ROUTING.md`, puis en synthétiser les accords, divergences et
    risques. Les sous-agents ne modifient ni ne commitent.
 6. Présenter un plan court : flux `producteur → interface → consommateurs`, structures
    éventuelles, fichiers de test et correspondance critères d'acceptation → tests. **Arrêt

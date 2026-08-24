@@ -1,6 +1,6 @@
 ---
 name: codesys-workflow
-description: Workflow obligatoire pour toute modification du programme automate CODESYS 3.5. Impose lecture des règles, analyse de l'existant, plan validé, code ST commenté FR, vérification mécanique de liaison, bundle PLCopenXML et REX versionné. Déclencher dès que l'utilisateur demande de modifier/créer/analyser un FB, un PRG, des variables, ou « le programme automate » — y compris quand le travail est délégué à un autre agent (Gemini/antigravity, Codex, sous-agent Pi).
+description: Workflow obligatoire pour toute modification du programme automate CODESYS 3.5. Impose lecture des règles, analyse de l'existant, plan validé, code ST commenté FR, vérification mécanique de liaison, bundle PLCopenXML et REX versionné. Déclencher dès que l'utilisateur demande de modifier/créer/analyser un FB, un PRG, des variables, ou « le programme automate » — y compris quand le travail est délégué à un autre agent (Gemini/antigravity, Codex).
 ---
 
 # 🏗️ Workflow CODESYS — Excavatrice de Dragage
@@ -42,7 +42,7 @@ jamais de refactor caché.
 - **« délègue à Gemini »** → skill `antigravity:delegate`. Coller d'abord
   `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` en tête de la tâche : l'agent distant n'a
   pas le contexte de cette conversation.
-- **Sous-agent Pi / agent Claude** → même préambule obligatoire.
+- **Agent Claude / autre** → même préambule obligatoire.
 - **Sinon** → exécution directe, étapes ci-dessous.
 
 Dans tous les cas, **c'est l'orchestrateur qui valide le résultat** (lecture du `git diff` réel),
@@ -122,7 +122,7 @@ pour des preuves jamais réellement exécutées en CODESYS (`CODE/TESTS/` archiv
 📁 **Double sortie obligatoire** :
 
 1. 📂 **`CODE/<DOSSIER>/<NomDuPOU>.st`** — source unique exécutable que l'utilisateur copie
-   (ex. `CODE/JOYSTICK/FB_Joystick.st`, `CODE/TREUILS/FB_Winch.st`).
+   (ex. `CODE/D_JOYSTICK/FB_Joystick.st`, `CODE/H_TREUILS_BENNE/FB_Winch.st`).
 2. 📄 **`DOC/AF_Partie-N_Fonction_<Metier>_vX.Y.md`** (N ≥ 8) — rôle métier, pipeline, interface
    IN/OUT, mapping E/S, **référence** au fichier `CODE/*.st`, note d'application, REX.
 

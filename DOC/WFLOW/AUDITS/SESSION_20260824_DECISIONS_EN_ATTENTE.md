@@ -3,6 +3,11 @@
 > 📄 **Handoff** produit après l'avancement autonome (18 tâches, 5 challenges d'experts intégrés)
 > **et les réponses utilisateur reçues** (Q1-Q5). 🔗 Tâches : [`../TASKS.yaml`](../TASKS.yaml).
 > Prochaine étape : **T130/T135 (intention geste/action)** + implémentation T148 (validation humaine).
+>
+> ⚠️ **Correction de rapport (revue experte 2026-08-24)** : les modifications sont **directement
+> dans l'arbre de travail principal** (pas un worktree isolé — `git worktree list` = 1 seul).
+> `.vscode/sessions.json` n'est **pas modifié** (déjà propre, aucune mention Pi) — le rapport
+> initial lui attribuait à tort une modification.
 
 ---
 
@@ -67,12 +72,16 @@ E1 fenêtre · E2 emplacement FB · E3 base PowerContactorEngaged ✓ · E4 verr
 - T91 : FB_Brake sens en entrée · descente immédiate ✓ conforme MES-006 ?
 - T54 : où injecter CST_ScanLatencyMs · tâche référence · impact seuils Méca
 
-## 5bis. Décision T148 (FB_FbStatus Reset maintenu) — EN ATTENTE
-- Correctif proposé : ne vider le latch au front Reset QUE si cause à 0 (D3).
-- Tests TC-P03-014/015 à ajouter. → **validation humaine** (code C4).
+## 5bis. T148 (FB_FbStatus Reset maintenu) — ✅ CLÔTURÉ (revue experte)
+- **Faille NON REPRODUCTIBLE** : Latch est une VAR retenue entre scans → Error reste TRUE.
+- Correctif v0.1 = no-op → **aucun code C4 à écrire**.
+- ✅ **Test de verrou TC-P03-014 ajouté** dans `test_fb_fbstatus.st` (garde-fou posé).
 
 ## 6. État non-régression
-- Gate G440 : PASS · tests 5/5 · G340 : seul lien mort pré-existant (`test_fb_joystick.st`, fichier non touché)
+- Gate G440 : PASS · tests 5/5
+- G340 : **2 liens morts introduits par la canonique codesys-workflow → CORRIGÉS** (chemins
+  `CODE/D_JOYSTICK/`, `CODE/H_TREUILS_BENNE/`). Ne reste que le lien mort pré-existant
+  (`test_fb_joystick.st`, fichier non touché).
 - **T151 intact** (🔒 AGY-01) · YAML `TASKS.yaml` valide
 
 > **Réponse attendue** : cochez / renseignez les questions Q1-Q5 et décisions §3-5 — je reprends

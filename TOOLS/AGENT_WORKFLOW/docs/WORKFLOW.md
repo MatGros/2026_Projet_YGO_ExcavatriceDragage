@@ -76,7 +76,7 @@ devoir d'alerte.
 écriture. `G310_check_code_structure.py` contrôle ensuite leur réalité dans le code et le bundle.
 
 🔁 **Il traverse les trois runtimes** — c'est son intérêt principal : les hooks ne couvrent que
-l'orchestrateur Claude Code, le contrat s'applique aussi aux sous-agents Pi (ses critères
+l'orchestrateur Claude Code, le contrat s'applique aussi aux sous-agents (ses critères
 remplacent le boilerplate de l'*acceptance contract*) et aux agents externes.
 
 ## 🔀 3 Voies selon criticité

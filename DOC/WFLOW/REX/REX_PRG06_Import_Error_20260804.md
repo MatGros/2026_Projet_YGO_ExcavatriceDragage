@@ -160,6 +160,6 @@ contact pointé sur la broche du bloc producteur.
 
 ---
 
-**Rédigé par** : Agent Pi (orchestrateur)  
+**Rédigé par** : Agent orchestrateur  
 **Validé par** : Utilisateur (import + ouverture + simulation PRG_01/PRG_06 OK)  
 **Date de validation** : 2026-08-04

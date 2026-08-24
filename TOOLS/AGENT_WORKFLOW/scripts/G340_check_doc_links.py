@@ -24,7 +24,7 @@ from pathlib import Path
 
 # Scan global : docs, standards, outillage, consignes et code ST.
 SCAN_GLOBS = ("*.md", ".claude/skills/*.md", "DOC/**/*.md", "TOOLS/**/*.md", "CODE/**/*.st")
-EXCLUDED_PARTS = {"ARCHIVES", "node_modules", ".venv", "venv", ".git", ".pi-subagents"}
+EXCLUDED_PARTS = {"ARCHIVES", "node_modules", ".venv", "venv", ".git"}
 
 # Journaux historiques : ils citent des documents tels qu'ils existaient a la date
 # de l'entree. Un lien vers un document depuis archive n'y est pas une erreur.

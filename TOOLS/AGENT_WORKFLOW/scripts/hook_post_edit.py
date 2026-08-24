@@ -3,7 +3,7 @@
 
 Objectif : l'agent n'a plus a « penser » a verifier le cablage — le controle
 part tout seul et lui revient dans le contexte. C'est ce qui rend la regle
-robuste quel que soit le modele, le workflow (Claude, Codex, Pi) ou la fatigue
+robuste quel que soit le modele, le workflow (Claude, Codex, antigravity) ou la fatigue
 de l'orchestrateur.
 
 Declenche uniquement sur les fichiers qui le meritent :

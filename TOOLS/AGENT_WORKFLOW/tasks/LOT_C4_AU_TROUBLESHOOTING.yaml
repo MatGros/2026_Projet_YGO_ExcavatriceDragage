@@ -87,7 +87,7 @@ contract:
 
 status: IN_PROGRESS
 execution:
-  executed_by: "Pi orchestrateur"
+  executed_by: "orchestrateur"
   completed_at: "2026-08-14"
   status: IMPLEMENTED_PENDING_HUMAN_WATCH
   summary: "Projection GVL corrigée et documentée ; logique AU inchangée. Validation finale requise par essai Watch CODESYS."
@@ -96,7 +96,7 @@ execution:
     - "Contrat vérifié : check_task_contract.py PASS."
     - "Garde-fou pytest : 2 passed ; gates palier C : PASS ; bundle 170/170 ; G200 : 0 KO."
     - "G100 après renommage ArmingErrorId : PASS ; aucun changement PRJ_CODESYS/Device.export."
-    - "Revue agent visible impossible : exécutable Pi/Claude absent dans herdr ; revue effectuée directement par l'orchestrateur, à compléter par validation humaine."
+    - "Revue agent visible impossible : exécutable absent dans herdr ; revue effectuée directement par l'orchestrateur, à compléter par validation humaine."
 validation:
   status: PENDING_HUMAN_WATCH
   validated_by: ""

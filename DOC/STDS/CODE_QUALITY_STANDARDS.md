@@ -1,7 +1,7 @@
 # 🧭 Standards Qualité Code — Référentiel Universel
 
 > 📌 **Propriétaire unique** des règles de déclaration, de liaison et de POO du projet.
-> Tout autre document (skill CODESYS, `CODE_WRITING_POLICY`, prompts Pi) **renvoie ici**
+> Tout autre document (skill CODESYS, `CODE_WRITING_POLICY`, prompts agents) **renvoie ici**
 > au lieu de reformuler — une règle écrite deux fois dérive toujours.
 > Portée : tout agent (Claude, Codex, Gemini/antigravity), tout workflow, et l'humain.
 
@@ -842,7 +842,7 @@ fait plus partie des nouveaux contrats LD.
 - `AGENTS.md` (point d'entrée unique) y renvoie au même niveau que `NAMING_CONVENTION.md`.
 - `.claude/skills/codesys-workflow.md` **applique** ce référentiel, ne le recopie pas.
 - `TOOLS/AGENT_WORKFLOW/docs/CODE_WRITING_POLICY.md` renvoie ici pour §POO et §organisation.
-- Les prompts de sous-agents Pi le citent via `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`.
+- Les prompts de sous-agents le citent via `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md`.
 - Toute règle ajoutée ici après un incident vient **avec son garde-fou** dans
   `TOOLS/AGENT_WORKFLOW/scripts/` (règle `fix:` + `guard:`, `docs/WORKFLOW.md`).
 
