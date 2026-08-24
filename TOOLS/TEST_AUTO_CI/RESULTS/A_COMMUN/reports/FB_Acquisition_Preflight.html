@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 07:57:15</div>
+    <div class="exec-time">2026-08-24 08:00:59</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (11 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-0">TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-1">Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-2">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-3">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-4">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-5">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-6">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-7">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-8">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-9">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-10">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-0">Gate : Enable=FALSE colle le frein immediatement (securite positive)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-1">Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-2">Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable)</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-3">Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture</a></li><li class="toc-item toc-pass"><a href="#test-fb-acquisition-preflight-4">Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +204,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            11/11 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -358,23 +358,13 @@
     </details>
     
     <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-acquisition-preflight-0" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-1" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>Gate : Enable=FALSE colle le frein immediatement (securite positive) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
             
             
@@ -385,13 +375,23 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
+        <article id="test-fb-acquisition-preflight-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
         <article id="test-fb-acquisition-preflight-2" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour) </h3>
+                <h3>Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable) </h3>
             </header>
             
             
@@ -401,7 +401,7 @@
         <article id="test-fb-acquisition-preflight-3" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant </h3>
+                <h3>Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture </h3>
             </header>
             
             
@@ -411,67 +411,7 @@
         <article id="test-fb-acquisition-preflight-4" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-8" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-9" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-acquisition-preflight-10" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
+                <h3>Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu </h3>
             </header>
             
             
