@@ -2,7 +2,7 @@
   "name": "linter-st",
   "displayName": "Linter ST (CODESYS)",
   "description": "Diagnostics live pour ST CODESYS 3.5 via STruCpp -- panneau Problems a la sauvegarde.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "publisher": "excavatrice-dragage",
   "engines": {
     "vscode": "^1.90.0"
@@ -56,6 +56,11 @@
           "type": "boolean",
           "default": true,
           "description": "true (defaut) = applique nos correctifs de compatibilite CODESYS (retrait GVL_XXX./PERSISTENT, fusion ARRAY imbrique...) et filtre les faux positifs connus (DEVICE_STATE, GVL/PROGRAM qualifie...) avant d'afficher un diagnostic. false = mode STruCpp BRUT, aucune transformation ni filtrage -- chaque message du compilateur remonte tel quel, meme sur ce qu'on sait etre un faux positif. Utile pour comparer et voir precisement ce que nos correctifs changent (equivaut a lint.py --raw)."
+        },
+        "linterSt.showIncompleteWarnings": {
+          "type": "boolean",
+          "default": false,
+          "description": "true = affiche un avertissement dans le panneau Problems quand un type externe inconnu empeche la resolution complete. false (defaut) = silence dans Problems (visible uniquement dans la sortie Output > Linter ST)."
         },
         "linterSt.enableProjectRules": {
           "type": "boolean",
