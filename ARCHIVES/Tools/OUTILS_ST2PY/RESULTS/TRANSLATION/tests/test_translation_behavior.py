@@ -16,7 +16,7 @@ from data_contracts import build_position_decoder_contract, validate_contract
 
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[6]
-BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_Bundle.xml'
+BUNDLE_PATH = REPO_ROOT / 'CODE_XML' / 'CODE_Bundle.xml'
 
 
 def _load_generated_module(pou_name):

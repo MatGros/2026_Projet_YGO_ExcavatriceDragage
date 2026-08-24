@@ -12,7 +12,7 @@ import simulation_bench
 
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[6]
-BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_Bundle.xml'
+BUNDLE_PATH = REPO_ROOT / 'CODE_XML' / 'CODE_Bundle.xml'
 
 
 def test_safety_translation_bench_reports_fault_then_reset():

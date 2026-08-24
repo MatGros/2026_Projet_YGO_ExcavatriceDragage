@@ -68,9 +68,9 @@ python -m generator.cli --bundle CODE_Bundle --project-name "MGS_v0.4.18" --time
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --codesys-log build.log --strict
 ```
 
-### Lancer les terminaux VS Code (AGY + Claude + Codex + OpenCode + Gates + Graph)
+### Lancer les terminaux VS Code (AGY + Claude + Codex + OpenCode + Gates)
 
-L’extension **Terminals Manager** ouvre les dix onglets dans le terminal intégré :
+L’extension **Terminals Manager** ouvre les neuf onglets dans le terminal intégré :
 
 ```text
 Ctrl+Shift+P → Terminals: Run
@@ -159,7 +159,7 @@ indépendants qui vendorent chacun leur propre copie de STruCpp (pas de lien ent
 
 ### `PROJECT_WORKSPACE/` — Orchestration IDE
 
-🖥️ Config VS Code : lance AGY, Claude, Codex, OpenCode, Gates, Graph dans 10 terminaux parallèles (1 raccourci)
+🖥️ Config VS Code : lance AGY, Claude, Codex, OpenCode, Gates dans 9 terminaux parallèles (1 raccourci)
 
 - `README.md` → terminaux VS Code (`Ctrl+Shift+P` → **Terminals: Run**)
 - `MARKDOWN_WORKSPACE.md` → édition & cochage des fichiers Markdown (`Ctrl+K V` sans extension checkbox)
