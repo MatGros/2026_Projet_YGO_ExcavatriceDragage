@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_winch.st",
+  "file": "test_fb_hmi_bannerformatter.st",
   "results": [
     {
-      "name": "Safety_Winch : Enable=FALSE neutralise les autorisations",
+      "name": "AntiFlickerText : affichage instantane force",
       "passed": true
     },
     {
-      "name": "Winch : Enable=FALSE neutralise les sorties",
+      "name": "BannerFormatter : formatage nominal",
       "passed": true
     }
   ],

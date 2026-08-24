@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:30:19</div>
+    <div class="exec-time">2026-08-24 15:33:16</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (2 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-0">AntiFlickerText : affichage instantane force</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-1">BannerFormatter : formatage nominal</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-fb-hmi-bannerformatter-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -1143,168 +1143,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 50 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ALARMHOLDTIME</code> jamais câblé en production</li><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BANNER</code> jamais câblé en production</li><li>Pin <code>BOTHAXESCOUPLED</code> jamais câblé en production</li><li>Pin <code>BUCKETERRORID</code> jamais câblé en production</li><li>Pin <code>BUCKETISCLOSED</code> jamais câblé en production</li><li>Pin <code>BUCKETISOPEN</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBALACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSSYNCACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSTRANSLATION</code> jamais câblé en production</li><li>Pin <code>BYPASSWINCHM1ACTIVE</code> jamais câblé en production</li><li>Pin <code>BYPASSWINCHM2ACTIVE</code> jamais câblé en production</li><li>Pin <code>COUPLEDUSERREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>CURRENTMODE</code> jamais câblé en production</li><li>Pin <code>CYCLEAUTOBUSY</code> jamais câblé en production</li><li>Pin <code>CYCLEERRORID</code> jamais câblé en production</li><li>Pin <code>CYCLEREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>CYCLESTATESTR</code> jamais câblé en production</li><li>Pin <code>CYCLESTEP</code> jamais câblé en production</li><li>Pin <code>CYCLESTEPATERROR</code> jamais câblé en production</li><li>Pin <code>DEADMANARMED</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIVEACTIVE</code> jamais câblé en production</li><li>Pin <code>DIVEERRORID</code> jamais câblé en production</li><li>Pin <code>DIVESTATE</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMINGFAILED</code> jamais câblé en production</li><li>Pin <code>EMERGENCYCHAINCLOSED</code> jamais câblé en production</li><li>Pin <code>EMERGENCYERRORID</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>EXTRACTIONERRORID</code> jamais câblé en production</li><li>Pin <code>EXTRACTIONSTATE</code> jamais câblé en production</li><li>Pin <code>HOMINGACTIVE</code> jamais câblé en production</li><li>Pin <code>HOMINGSTEPM1</code> jamais câblé en production</li><li>Pin <code>HOMINGSTEPM2</code> jamais câblé en production</li><li>Pin <code>JOYSTICKATNEUTRAL</code> jamais câblé en production</li><li>Pin <code>LEGALLIMITREACHED</code> jamais câblé en production</li><li>Pin <code>M1LOGICREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>M2LOGICREQUESTDIRECTION</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFFACTIVEANY</code> jamais câblé en production</li><li>Pin <code>REDUNDANCYTESTFAILED</code> jamais câblé en production</li><li>Pin <code>SAFESTOPACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMULATIONMODEACTIVE</code> jamais câblé en production</li><li>Pin <code>SYNCDEGRADEDACTIVE</code> jamais câblé en production</li><li>Pin <code>SYNCERRORID</code> jamais câblé en production</li><li>Pin <code>TOPLIMITREACHED</code> jamais câblé en production</li><li>Pin <code>TRANSLATIONSAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHM1SAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHM2SAFETY</code> jamais câblé en production</li><li>Pin <code>WINCHSELECTED</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMULATIONMODEACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CURRENTMODE <span class="pin-type">IEC_E_MODE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BOTHAXESCOUPLED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">WINCHSELECTED <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLESTEP <span class="pin-type">IEC_E_CYCLESTEP</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLESTATESTR <span class="pin-type">IECStringVar&lt;80&gt;</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLEERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLESTEPATERROR <span class="pin-type">IEC_E_CYCLESTEP</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIVESTATE <span class="pin-type">IEC_E_DIVESEARCHSTATE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EXTRACTIONSTATE <span class="pin-type">IEC_E_EXTRACTIONSEQUENCESTATE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGSTEPM1 <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGSTEPM2 <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSGLOBALACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSWINCHM1ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSWINCHM2ACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSTRANSLATION <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSSYNCACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SYNCDEGRADEDACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">LEGALLIMITREACHED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYCHAINCLOSED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCUTOFFACTIVEANY <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SAFESTOPACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DESCENDPERMIT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETISOPEN <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETISCLOSED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIVEACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TOPLIMITREACHED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">COUPLEDUSERREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1LOGICREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2LOGICREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLEREQUESTDIRECTION <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DEADMANARMED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">JOYSTICKATNEUTRAL <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLEAUTOBUSY <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">WINCHM1SAFETY <span class="pin-type">ST_SAFETYWINCH</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">WINCHM2SAFETY <span class="pin-type">ST_SAFETYWINCH</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TRANSLATIONSAFETY <span class="pin-type">ST_SAFETYTRANSLATION</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BUCKETERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SYNCERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIVEERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EXTRACTIONERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYERRORID <span class="pin-type">IEC_WORD</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">REDUNDANCYTESTFAILED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYARMINGFAILED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ALARMHOLDTIME <span class="pin-type">IEC_TIME</span></div>
-        </div></div>
-            <div class="pin-block">FB_Hmi_BannerFormatter</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BANNER <span class="pin-type">ST_HMIBANNER</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 2 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -1402,20 +1240,20 @@
         <article id="test-fb-hmi-bannerformatter-0" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>AntiFlickerText : affichage instantane force </h3>
+                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (1)</span><ul><li>Texte instantane</li></ul></div>
+            
             
             
         </article>
         <article id="test-fb-hmi-bannerformatter-1" class="test-card test-card-pass">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>BannerFormatter : formatage nominal </h3>
+                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (1)</span><ul><li>GlobalContextText non vide</li></ul></div>
+            
             
             
         </article>
