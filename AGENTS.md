@@ -190,6 +190,15 @@ l'orchestrateur (lecture du `git diff` réel), jamais à l'agent qui a produit l
 Plugin antigravity : `antigravity:delegate` · `antigravity:resume` · `antigravity:review`.
 Workflow multi-agents et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`.
 
+### 🛡️ Pattern de commit en 2 temps (Checkpoint & Sécurité)
+
+Afin d'éviter toute perte de travail et d'avoir un point de retour immédiat :
+1. **Étape 1 — Sauvegarde immédiate (avant tests longs)** : Dès qu'une édition de code ou de configuration est achevée, effectuer un commit de checkpoint :
+   `wip(scope): <description> [NON TESTE]` (ou `wip: ... [WIP]`).
+2. **Étape 2 — Validation & Rapports** : Exécution des tests CI / gates mécaniques et génération des artefacts de rapport.
+3. **Étape 3 — Validation finale** : Dès que les tests sont validés :
+   `test(scope): validation CI 100% PASS et mise a jour des rapports`.
+
 ⚠️ **Aucun commit sans validation humaine explicite** — pour tout agent, sans exception.
 
 🚨 **Premier réflexe avant commit/push** : si un fichier que tu n'as **pas** modifié apparaît dans
