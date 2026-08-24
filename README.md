@@ -57,9 +57,16 @@ excavatrice-dragage/
 │   ├── COMMUN/ · TESTS/           # FB_Ramp, FB_Brake, FB_Acquisition_Preflight… · bancs de test
 │   └── CODE_Bundle.xml           # bundle PLCopenXML généré, voir TOOLS/
 │
-├── TOOLS/                       # 🔧 Outillage
-│   ├── CONVERTER_ST2XML_PLCopenXML/  # Génération du bundle PLCopenXML depuis CODE/*.st
-│   └── AGENT_WORKFLOW/           # Scripts de gate (check_linkage, check_doc_links, …), skills, workflow multi-agents
+├── TOOLS/                         # 🔧 Outillage de développement & validation
+│   ├── AGENT_WORKFLOW/            # Scripts de gates (G100..G440), skills, workflow multi-agents
+│   ├── COMPILER_ST2C_STruCpp/     # Compilateur ST → C++17 pour tests unitaires hors automate
+│   ├── CONVERTER_ST2XML_PLCopenXML/ # Génération du bundle PLCopenXML depuis CODE/*.st
+│   ├── LINTER_ST/                 # Linter syntaxique & typage strict IEC 61131-3 (STruCpp)
+│   ├── LM_STUDIO/                 # Client LLM streaming local/distant
+│   ├── PLC_CSV_SNAPSHOT/          # Capture & snapshots CSV temps réel CODESYS
+│   ├── PROJECT_WORKSPACE/         # Configuration de l'environnement VS Code
+│   ├── SAMPLES_XML_CODESYS/       # Échantillons XML de référence exportés depuis CODESYS
+│   └── TEST_AUTO_CI/              # Intégration continue & suites de tests Pytest
 │
 ├── ARCHIVES/Tools/OUTILS_ST2PY/ # Suites de test Python générées depuis le ST (archivé, toujours exécutable — voir TOOLS/README.md)
 │
