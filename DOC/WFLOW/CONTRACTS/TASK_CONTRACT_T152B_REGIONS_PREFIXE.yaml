@@ -1,0 +1,72 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T152-B : Renumérotation des régions §N
+# (FB_Joystick, FB_Encoder) — Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T152-B
+  parent_id: T152
+  criticality: C1            # pur formalisme, 0 changement de logique
+  strategy: patch
+
+  # ── 1. Objectif ───────────────────────────────────────────────────────────
+  objective: >
+    Renuméroter les libellés de region (mot-clé ST region) de FB_Joystick.st et FB_Encoder.st
+    au format normatif imposé par CODE_QUALITY_STANDARDS.md §2bis (prefixe §N + description),
+    numérotation contiguë sans saut — aucune autre modification.
+
+  # ── 2. Critères d'acceptation ─────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Toutes les regions de FB_Joystick.st portent le prefixe §N (N contigu de 1 a N, sans saut) suivi d'une description courte."
+      verified_by: "Relecture manuelle intégrale du fichier"
+    - id: AC2
+      statement: "Toutes les regions de FB_Encoder.st portent le prefixe §N (N contigu de 1 a N, sans saut) suivi d'une description courte."
+      verified_by: "Relecture manuelle intégrale du fichier"
+    - id: AC3
+      statement: "0 diff logique : seuls les libelles de region sont modifies, verifie par lecture du diff ligne par ligne (aucune ligne hors declaration de region ne change)."
+      verified_by: "git diff sur les 2 fichiers, revue ligne par ligne"
+    - id: AC4
+      statement: "Gates Palier A et C 100% PASS (non-régression)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  # ── 3. Périmètre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - CODE/E_CODEURS/FB_Encoder.st
+    forbidden:
+      - Toute modification de logique, d'interface ou de nommage de variable
+      - Les 6 sous-FB de FB_Encoder (FB_Encoder_Abs/_Homing/_Safety/_Scale/_SpeedMeasure/_SpeedMonitor) — hors scope de cette tâche
+
+  # ── 4. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+
+  # ── 5. Modèles autorisés ───────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route est remonté IMMÉDIATEMENT à l'orchestrateur,
+    pas à la fin et jamais silencieusement. Signaler n'est pas élargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

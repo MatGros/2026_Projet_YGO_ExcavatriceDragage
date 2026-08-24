@@ -1,0 +1,93 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T152-D : Extraction FC motif dupliqué bypass IHM↔RETAIN
+# (PRG_07_Supervision) — Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T152-D
+  parent_id: T152
+  criticality: C2            # comportement-préservé mais touche la persistance des bypass
+  strategy: patch
+
+  # ── 1. Objectif ───────────────────────────────────────────────────────────
+  objective: >
+    Extraire le motif dupliqué ~10 fois de synchronisation bidirectionnelle bypass IHM↔RETAIN
+    (PRG_07_Supervision.st §2b/§2c, lignes 169-295 de la version auditée) en une FC dédiée,
+    appelée à chaque site au lieu de la logique inline répétée — comportement strictement
+    identique, conformité à l'esprit "orchestration = câblage" (CODE_QUALITY_STANDARDS.md §10).
+
+  # ── 2. Critères d'acceptation ─────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Une FC dédiée existe (ex. FC_SyncBypassRetain(Hmi, Retain)), contrat IN/OUT documenté en en-tête."
+      verified_by: "Lecture du fichier créé"
+    - id: AC2
+      statement: "Les ~10 blocs dupliqués de PRG_07_Supervision.st §2b/§2c sont remplacés par des appels à cette FC."
+      verified_by: "Relecture manuelle de §2b/§2c post-édition, comptage des sites"
+    - id: AC3
+      statement: "Comportement bit-à-bit strictement identique avant/après pour chacun des ~10 sites (même sortie pour les mêmes entrées bypass Hmi/Retain)."
+      verified_by: "Relecture manuelle exhaustive site par site (avant/après côte à côte) + G200_check_linkage.py --report = PASS"
+    - id: AC4
+      statement: "Gates Palier C 100% PASS, bundle régénéré frais."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . && python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+    - id: AC5
+      statement: "Validation manuelle exhaustive CODESYS (Watch/forçage bypass sur au moins 2 domaines) avant tout chargement en production — non négociable (Étape 3bis codesys-workflow, human_validation_required)."
+      verified_by: "Compte-rendu de validation manuelle par l'utilisateur, consigné dans ce contrat avant clôture"
+    - id: AC6
+      statement: "PRG_07_Supervision.st n'est ni renommé ni déplacé : le nom de fichier reste égal au nom de POU tout au long de la tâche."
+      verified_by: "git diff --stat : aucun rename sur PRG_07_Supervision.st"
+    - id: AC7
+      statement: "Le suffixe reste identique au langage genere dans le bundle : aucun suffixe de langage n'est ajoute ou retire pour ce POU (pas de _LD ni _CFC)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . puis inspection du type de POU produit pour PRG_07_Supervision dans CODE_XML/CODE_Bundle.xml"
+
+  # ── 3. Périmètre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - Un nouveau fichier FC dédié (emplacement à proposer conforme à la convention du dossier CODE/J_SUPERVISION/, à valider avant écriture si ambigu)
+    forbidden:
+      - Le calcul inline de LimitLegalReached (Q4 de QUESTIONS_OUVERTES_PRG02_v0.1.md — tâche séparée, non tranchée)
+      - Toute autre logique de PRG_07_Supervision.st hors §2b/§2c
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  # ── 4. Contrat de conservation ─────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Comportement de synchronisation bypass IHM↔RETAIN identique pour les 2 sens (IHM→RETAIN et RETAIN→IHM) sur chacun des ~10 domaines"
+    dropped_on_purpose:
+      - "Rien — refactor structurel pur, aucun comportement abandonné"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - validation_manuelle_codesys
+
+  # ── 6. Modèles autorisés ───────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, bug préexistant, risque
+    hors scope) est remonté IMMÉDIATEMENT à l'orchestrateur, pas à la fin et jamais
+    silencieusement. Signaler n'est pas élargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

@@ -1374,3 +1374,89 @@ tasks:
       - "Valider la non-régression outillage (run_all_gates.py)"
     bloque_par: []
 
+  - id: "T152"
+    parent_id: ""
+    statut: "⬜"
+    criticite: "C2"
+    domaine: "STANDARDS"
+    agent: "—"
+    date: "2026-08-24T20:00:00"
+    titre: "Nettoyage formalisme/style issu de la revue PRG_02 (commentaires, régions, nommage, duplication)"
+    contexte: "Intitulé complet : Nettoyage formalisme/style issu de la revue indépendante PRG_02 (mise en forme, commentaires, régions, vocabulaire abandonné, duplication) — 4 sous-tâches, chacune isolée et testable. Source : DOC/WFLOW/AUDITS/PRG02_20260824/REVUE_PRG02_ACQUISITION_v0.1.md et REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md, questions Q9/Q10/Q11/Q12/Q13/Q16 de QUESTIONS_OUVERTES_PRG02_v0.1.md."
+    description: "Tâche parapluie — aucun code à toucher directement ici. Voir les 4 sous-tâches T152-A à T152-D. ⚠️ Distinct des 2 trous de sécurité Q1/Q2 (ArmingPermit, homing arrêt confirmé) et des points d'architecture Q3-Q6 — ceux-là ne sont PAS du formalisme, non repris ici, en attente d'arbitrage séparé."
+    contrat: ""
+    objectifs: []
+    bloque_par: []
+
+  - id: "T152-A"
+    parent_id: "T152"
+    statut: "⬜"
+    criticite: "C2"
+    domaine: "IHM"
+    agent: "—"
+    date: "2026-08-24T20:00:00"
+    titre: "Purger commentaires-journal + décomposer condition 5 termes (FB_Hmi_BannerFormatter)"
+    contexte: "Q9+Q10 de QUESTIONS_OUVERTES_PRG02_v0.1.md : 3 blocs de commentaires type journal de chantier interdits par CODE_QUALITY_STANDARDS.md §2ter (lignes 478-479, 527-528, 539-540), et CriticalActionActive (ligne 341-342) dépasse le seuil de 3 termes OR imposé par §2quater."
+    description: ""
+    contrat: "TASK_CONTRACT_T152A_BANNERFORMATTER_STYLE.yaml"
+    objectifs:
+      - "Purger les 3 blocs de commentaires-journal (§2ter) dans FB_Hmi_BannerFormatter.st, historique reporté dans DOC/VERSION_HISTORY.md si utile"
+      - "Décomposer CriticalActionActive en variables intermédiaires nommées (≤3 termes par expression, §2quater)"
+      - "0 changement de comportement logique — G200_check_linkage + run_all_gates Palier C = PASS"
+    bloque_par: []
+
+  - id: "T152-B"
+    parent_id: "T152"
+    statut: "⬜"
+    criticite: "C1"
+    domaine: "STANDARDS"
+    agent: "—"
+    date: "2026-08-24T20:00:00"
+    titre: "Renuméroter les régions sans préfixe §N (FB_Joystick, FB_Encoder)"
+    contexte: "Q13 de QUESTIONS_OUVERTES_PRG02_v0.1.md : régions {region \"...\"} sans préfixe §N contraire au format imposé par CODE_QUALITY_STANDARDS.md §2bis, dans FB_Joystick.st (saut S2→S5) et FB_Encoder.st (aucune region préfixée)."
+    description: ""
+    contrat: "TASK_CONTRACT_T152B_REGIONS_PREFIXE.yaml"
+    objectifs:
+      - "Renuméroter les regions de FB_Joystick.st en {region \"§N ...\"} contigu (pas de saut de numéro)"
+      - "Renuméroter les regions de FB_Encoder.st en {region \"§N ...\"} contigu"
+      - "0 diff logique — uniquement les libellés de region changent"
+    bloque_par: []
+
+  - id: "T152-C"
+    parent_id: "T152"
+    statut: "⬜"
+    criticite: "C1"
+    domaine: "STANDARDS"
+    agent: "—"
+    date: "2026-08-24T20:00:00"
+    titre: "Vocabulaire de POU abandonné dans les commentaires (_TYPES/) + commentaire cassé ST_TranslationHMI"
+    contexte: "Q12+Q16 de QUESTIONS_OUVERTES_PRG02_v0.1.md : 4 fichiers _TYPES/ référencent en commentaire des POU abandonnés (PRG_TREUILS_CFC, PRG_10_Outputs_LD, PRG_MODES_CFC ×2, PRG_AUXILIARY_CFC, PRG_SUPERVISION_CFC) — vocabulaire interdit par NAMING_CONVENTION.md. ST_TranslationHMI.st:16 porte un commentaire syntaxiquement cassé (reliquat d'édition)."
+    description: ""
+    contrat: "TASK_CONTRACT_T152C_VOCABULAIRE_ABANDONNE.yaml"
+    objectifs:
+      - "Remplacer PRG_TREUILS_CFC/PRG_10_Outputs_LD (ST_WinchFinalInterlockRequest.st:4-5) par PRG_04_Treuils_Benne/PRG_06_Outputs"
+      - "Remplacer PRG_10_Outputs_LD (ST_TranslationCmd.st:14) par PRG_06_Outputs"
+      - "Remplacer PRG_MODES_CFC ×2 (ST_Modes_Autorisations.st:6,8) par PRG_03_Modes_Cycle"
+      - "Remplacer PRG_AUXILIARY_CFC/PRG_SUPERVISION_CFC (ST_CommunHMI.st:22,42) par PRG_02_Acquisition/PRG_07_Supervision"
+      - "Reformuler le commentaire cassé ST_TranslationHMI.st:16"
+      - "0 changement fonctionnel — commentaires uniquement, gates palier A/C = PASS"
+    bloque_par: []
+
+  - id: "T152-D"
+    parent_id: "T152"
+    statut: "⬜"
+    criticite: "C2"
+    domaine: "GÉNÉRAL"
+    agent: "—"
+    date: "2026-08-24T20:00:00"
+    titre: "Extraire le motif dupliqué ×10 bypass IHM↔RETAIN en FC dédiée (PRG_07_Supervision)"
+    contexte: "Q11 de QUESTIONS_OUVERTES_PRG02_v0.1.md : ~10 blocs IF/ELSE quasi identiques de synchronisation bidirectionnelle bypass IHM↔RETAIN dans PRG_07_Supervision.st §2b/§2c (lignes 169-295) — contraire à l'esprit 'orchestration = câblage, pas logique' (CODE_QUALITY_STANDARDS.md §10)."
+    description: "⚠️ Refactor comportement-préservé mais touche la persistance des bypass — validation humaine exhaustive exigée avant clôture (pas de test PLC auto obligatoire, Étape 3bis codesys-workflow)."
+    contrat: "TASK_CONTRACT_T152D_EXTRACT_FC_BYPASS_RETAIN.yaml"
+    objectifs:
+      - "Créer une FC dédiée (ex. FC_SyncBypassRetain(Hmi, Retain)) portant le motif de synchro bidirectionnelle"
+      - "Remplacer les ~10 blocs dupliqués de PRG_07_Supervision.st §2b/§2c par des appels à cette FC"
+      - "Comportement bit-à-bit strictement identique avant/après (relecture manuelle exhaustive des 10 sites + G200 + gates Palier C)"
+      - "human_validation_required=true : validation manuelle CODESYS avant tout chargement"
+    bloque_par: []
+
