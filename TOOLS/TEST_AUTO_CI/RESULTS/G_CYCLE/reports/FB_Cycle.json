@@ -1,19 +1,31 @@
 {
   "version": 1,
-  "file": "test_prg_04_treuils_benne.st",
+  "file": "test_fb_cycle.st",
   "results": [
     {
-      "name": "PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth",
+      "name": "TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape",
       "passed": true
     },
     {
-      "name": "PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)",
+      "name": "TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC",
       "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 5,
+    "passed": 5,
     "failed": 0
   }
 }

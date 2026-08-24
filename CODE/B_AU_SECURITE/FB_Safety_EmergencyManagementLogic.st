@@ -149,14 +149,11 @@ END_IF;
 
 {region "§4 Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-// ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
-// pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
-// la nouvelle tentative re-latchera Cause:=TRUE et Ack:=FALSE (TC-P01-009).
+// ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause brute n'est levée que par
+// une nouvelle tentative d'armement réussie (interlock reste sur Cause, AF 3.4bis).
 IF ResetEdge.Q THEN
     RedundancyTestFailedAck := TRUE;
     EmergencyArmingFailedAck := TRUE;
-    RedundancyTestFailedCause := FALSE;
-    EmergencyArmingFailedCause := FALSE;
     StartupFail := FALSE;
     ErrorId := 16#0000;
 END_IF;
@@ -164,6 +161,14 @@ END_IF;
 {endregion}
 
 {region "§5 Sequence rearmement AU"}
+// 🛑 Coupure immédiate de toute séquence en cours si demande de coupure d'urgence
+IF (ArmingSeqStep <> 0) AND (BtnEmergencyCutOff OR PowerCutOffRequest) THEN
+    ArmingSeqStep := 0;
+END_IF;
+IF (ArmingSeqStep = 5 OR ArmingSeqStep = 6) AND NOT EmergencyChainClosed THEN
+    ArmingSeqStep := 0;
+END_IF;
+
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -> Ack remis a FALSE,
@@ -232,7 +237,7 @@ END_IF;
 
 // ⏱️ Étape 5 : Les 2 canaux validés -> impulsion réarmement physique (1s)
 TonArmingPulse(IN := (ArmingSeqStep = 5), PT := CST_ArmingPulseDuration);
-Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5);
+Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
 IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
     ArmingSeqStep := 6;
 END_IF;

@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_diag_canopen.st",
+  "file": "test_fb_diag_ethercat.st",
   "results": [
     {
-      "name": "CanOpen : Enable=FALSE desactive le diagnostic",
+      "name": "Ethercat : Enable=FALSE desactive le diagnostic",
       "passed": true
     },
     {
-      "name": "CanOpen : Enable=TRUE et Bus OK -> Ready et State=READY",
+      "name": "Ethercat : Enable=TRUE et Esclaves OK -> Ready et State=READY",
       "passed": true
     }
   ],

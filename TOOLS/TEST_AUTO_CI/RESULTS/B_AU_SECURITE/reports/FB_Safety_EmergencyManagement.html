@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_Safety_EmergencyManagement [FAIL]</title>
+<title>Rapport de test — FB_Safety_EmergencyManagement [PASS]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -188,14 +188,14 @@
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-fail">FAIL</span>
+            <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 15:25:39</div>
+    <div class="exec-time">2026-08-24 15:28:00</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (7 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-0">TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-1">TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -&gt; pulse 1s puis confirmation</a></li><li class="toc-item toc-fail"><a href="#test-fb-safety-emergencymanagement-2">TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-3">TC-P01-006 canal colle bloque le reamement (echec auto-test)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-4">TC-P01-007 timeout confirmation contacteur -&gt; lockout 5s</a></li><li class="toc-item toc-fail"><a href="#test-fb-safety-emergencymanagement-5">TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-6">TC-P01-008 PowerCutOffRequest coupe A et B sans armer</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-0">TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-1">TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -&gt; pulse 1s puis confirmation</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-2">TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-3">TC-P01-006 canal colle bloque le reamement (echec auto-test)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-4">TC-P01-007 timeout confirmation contacteur -&gt; lockout 5s</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-5">TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-6">TC-P01-008 PowerCutOffRequest coupe A et B sans armer</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +204,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            5/7 vérifications validées
+            7/7 vérifications validées
         </div>
     </div>
     
@@ -557,9 +557,9 @@
             
             
         </article>
-        <article id="test-fb-safety-emergencymanagement-2" class="test-card test-card-fail">
+        <article id="test-fb-safety-emergencymanagement-2" class="test-card test-card-pass">
             <header>
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3>TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste </h3>
             </header>
             <div class="comments"><p class='comment'>reproduit l etat &quot;canal colle&quot; de TC-P01-006 -- setup independant, propre a ce test</p><p class='comment'>Reset : doit acquitter l affichage sans redemarrage auto (TC-P01-004) -- +1 cycle</p><p class='comment'>Complete TC-P01-004 : sa colonne &quot;Comportement attendu&quot; precise &quot;Reset efface l affichage
@@ -568,7 +568,7 @@
        ne doit PAS etre restaure par le seul Reset (AF 3.4bis : interlock sur Cause brute,
        jamais sur l Ack).</p><p class='comment'>nouvel essai : cause toujours presente (canal toujours colle) -&gt; doit re-alarmer (TC-P01-009) -- +1 cycle</p></div>
             <div class="checks"><span class="checks-label">Vérifié (6)</span><ul><li>precondition : canal colle doit avoir leve une erreur</li><li>Reset doit effacer l affichage du defaut</li><li>Reset seul ne relance jamais de sequence (pas de redemarrage auto)</li><li>TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF 3.4bis)</li><li>un nouveau front ArmRequest doit relancer TestA</li><li>cause persistante doit re-alarmer au nouvel essai, meme apres Reset</li></ul></div>
-            <div class='failure'><div class='failure-head'>ASSERT_FALSE — FB.MAINTAINA_RQ expected FALSE, got TRUE</div><div class='failure-loc'>test_fb_safety_emergency.st:135</div><div class='failure-msg'>TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF 3.4bis)</div></div>
+            
             
         </article>
         <article id="test-fb-safety-emergencymanagement-3" class="test-card test-card-pass">
@@ -594,9 +594,9 @@
             
             
         </article>
-        <article id="test-fb-safety-emergencymanagement-5" class="test-card test-card-fail">
+        <article id="test-fb-safety-emergencymanagement-5" class="test-card test-card-pass">
             <header>
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3>TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien </h3>
             </header>
             <div class="comments"><p class='comment'>Meme montee en sequence que TC-P01-003 jusqu au pulse (step 5)</p><p class='comment'>Operateur appuie sur la coupure d urgence IHM PENDANT l impulsion mecanique de reamement</p><p class='comment'>Coherence attendue : si la coupure d urgence IHM coupe le maintien de puissance, elle doit
@@ -605,7 +605,7 @@
        conditionne par aucune des memes gardes que Cmd.MaintainA/B_Cmd dans
        FB_Safety_EmergencyManagementLogic.st §7 -- ecart releve par l audit du 2026-08-22).</p></div>
             <div class="checks"><span class="checks-label">Vérifié (5)</span><ul><li>les 2 canaux valides -&gt; pulse (step 5)</li><li>precondition : pulse actif</li><li>BtnEmergencyCutOff coupe bien le maintien canal A (comportement attendu, deja correct)</li><li>BtnEmergencyCutOff coupe bien le maintien canal B (comportement attendu, deja correct)</li><li>BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)</li></ul></div>
-            <div class='failure'><div class='failure-head'>ASSERT_FALSE — FB.ARMPULSE_RQ expected FALSE, got TRUE</div><div class='failure-loc'>test_fb_safety_emergency.st:269</div><div class='failure-msg'>BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)</div></div>
+            
             
         </article>
         <article id="test-fb-safety-emergencymanagement-6" class="test-card test-card-pass">
@@ -841,14 +841,11 @@ END_IF;
 
 {region &quot;§4 Acquittement defauts&quot;}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-// ⚠️ Reset TOUJOURS effectif, efface l&#x27;affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
-// pour permettre une nouvelle tentative d&#x27;armement sans blocage IHM. Si le défaut persiste,
-// la nouvelle tentative re-latchera Cause:=TRUE et Ack:=FALSE (TC-P01-009).
+// ⚠️ Reset acquitte l&#x27;affichage (Ack:=TRUE). La cause brute n&#x27;est levée que par
+// une nouvelle tentative d&#x27;armement réussie (interlock reste sur Cause, AF 3.4bis).
 IF ResetEdge.Q THEN
     RedundancyTestFailedAck := TRUE;
     EmergencyArmingFailedAck := TRUE;
-    RedundancyTestFailedCause := FALSE;
-    EmergencyArmingFailedCause := FALSE;
     StartupFail := FALSE;
     ErrorId := 16#0000;
 END_IF;
@@ -856,6 +853,14 @@ END_IF;
 {endregion}
 
 {region &quot;§5 Sequence rearmement AU&quot;}
+// 🛑 Coupure immédiate de toute séquence en cours si demande de coupure d&#x27;urgence
+IF (ArmingSeqStep &lt;&gt; 0) AND (BtnEmergencyCutOff OR PowerCutOffRequest) THEN
+    ArmingSeqStep := 0;
+END_IF;
+IF (ArmingSeqStep = 5 OR ArmingSeqStep = 6) AND NOT EmergencyChainClosed THEN
+    ArmingSeqStep := 0;
+END_IF;
+
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 // 🩹 Une nouvelle tentative repart d&#x27;une Cause propre : si le probleme persiste, il sera
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
@@ -924,7 +929,7 @@ END_IF;
 
 // ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
 TonArmingPulse(IN := (ArmingSeqStep = 5), PT := CST_ArmingPulseDuration);
-Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5);
+Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
 IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
     ArmingSeqStep := 6;
 END_IF;
@@ -1220,20 +1225,14 @@ EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
 test_fb_safety_emergency.st
   [PASS] TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu
   [PASS] TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -&gt; pulse 1s puis confirmation
-         ASSERT_FALSE failed: FB.MAINTAINA_RQ expected FALSE, got TRUE
-         at test_fb_safety_emergency.st:135
-         Message: TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF 3.4bis)
-  [FAIL] TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste
+  [PASS] TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste
   [PASS] TC-P01-006 canal colle bloque le reamement (echec auto-test)
   [PASS] TC-P01-007 timeout confirmation contacteur -&gt; lockout 5s
-         ASSERT_FALSE failed: FB.ARMPULSE_RQ expected FALSE, got TRUE
-         at test_fb_safety_emergency.st:269
-         Message: BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)
-  [FAIL] TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien
+  [PASS] TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien
   [PASS] TC-P01-008 PowerCutOffRequest coupe A et B sans armer
 
 -----------------------------------------
-7 tests, 5 passed, 2 failed
+7 tests, 7 passed, 0 failed
 </pre>
     </details>
 </div>
