@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 08:00:13</div>
+    <div class="exec-time">2026-08-24 08:00:59</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (12 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-0">TC-P03-001 Enable=FALSE neutralise le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-1">Nominal : Enable=TRUE sans cause -&gt; Ready, aucun defaut ni warning</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-2">TC-P03-007 Warning auto-efface sans Reset des que la cause disparait</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-3">TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-4">TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute)</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-5">TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-6">TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-7">TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-8">TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-9">TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-10">TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage)</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-11">TC-P03-014 Reset MAINTENU + cause disparait pendant le maintien : PAS d acquittement silencieux (T148, verrou)</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-0">Gate : Enable=FALSE colle le frein immediatement (securite positive)</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-1">Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms)</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-2">Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable)</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-3">Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-4">Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +204,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            12/12 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
@@ -392,30 +392,6 @@
         </div>
     </details>
     
-    <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
-        <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 4 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li></ul>
-        </div>
-        <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
-        </div></div>
-            <div class="pin-block">FB_FbStatus</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div></div>
-        </div>
-    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -493,140 +469,66 @@
     </details>
     
     <details class="encaps-details" style="margin-top: 16px;">
-        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 12 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 1 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-fbstatus-0" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Enable=FALSE neutralise le statut (gate) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>Gate : Enable=FALSE colle le frein immediatement (securite positive) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
             
-            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>Enable=FALSE -&gt; Ready=FALSE</li><li>Enable=FALSE -&gt; Error=FALSE (statut neutre)</li><li>Enable=FALSE -&gt; Warning=FALSE (statut neutre)</li><li>Enable=FALSE -&gt; ErrorId=0</li></ul></div>
             
-            
-        </article>
-        <article id="test-fb-fbstatus-1" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>Nominal : Enable=TRUE sans cause -&gt; Ready, aucun defaut ni warning <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>Enable=TRUE -&gt; Ready=TRUE</li><li>aucune cause active -&gt; Error=FALSE</li><li>aucune cause active -&gt; Warning=FALSE</li><li>ErrorId=0</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-2" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-007 Warning auto-efface sans Reset des que la cause disparait <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>cause 1 = warning (IsWarning=TRUE), auto-efface : jamais de latch, jamais de Reset</p><p class='comment'>cause disparait, AUCUN Reset : doit s effacer tout seul</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (7)</span><ul><li>cause1 IsWarning=TRUE -&gt; classe warning</li><li>WarningId = bit1</li><li>texte IHM peuple depuis Causes[1].Texte</li><li>DECISION utilisateur : un warning ne leve JAMAIS Error</li><li>un warning seul ne demande pas de Reset</li><li>cause disparue -&gt; Warning auto-efface sans Reset</li><li>WarningId retombe a 0</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-3" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>cause disparait, PAS de Reset : doit rester memorise</p><p class='comment'>Reset alors que la cause est deja partie : acquitte</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (9)</span><ul><li>cause3 fault actif -&gt; Error=TRUE</li><li>ErrorId = bit3</li><li>texte IME peuple depuis Causes[3].Texte</li><li>fault actif -&gt; Reset demande</li><li>cause disparue mais PAS de Reset -&gt; Error reste memorise (latche, std 9)</li><li>ErrorId latche conserve le bit3</li><li>Reset avec cause disparue -&gt; acquitte</li><li>ErrorId retombe a 0 apres Reset</li><li>plus rien a acquitter</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-4" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>precondition : fault actif</li><li>Reset avec cause toujours presente -&gt; ne doit PAS acquitter</li><li>bit5 toujours leve, interlock sur la cause brute jamais sur l acquittement</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-5" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>scan 1 : cause3 seule active</p><p class='comment'>scan 2 : cause3 disparait, aucun Reset -&gt; reste latche</p><p class='comment'>scan 3 : cause5 apparait -&gt; cumul avec le latch existant</p><p class='comment'>scan 4 : cause5 disparait aussi, toujours aucun Reset -&gt; les deux restent latches</p><p class='comment'>scan 5 : Reset acquitte le cumul complet</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (5)</span><ul><li>scan 1 : cause3 seule</li><li>scan 2 : cause3 toujours memorisee</li><li>scan 3 : cause3 latchee + cause5 active = cumul (0x28)</li><li>scan 4 : les 2 causes disparues mais aucun Reset -&gt; cumul conserve</li><li>scan 5 : Reset acquitte le cumul complet</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-6" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>fault + warning actifs -&gt; Error=TRUE (fault present)</li><li>le texte Error est celui du fault (un warning ne fournit pas le texte Error)</li><li>texte Warning correct</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-7" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>cause0 relachee AVANT le Reset, sinon l interlock cause brute empeche l acquittement (TC-P03-006)</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (5)</span><ul><li>cause0 (borne basse) correctement levee</li><li>texte cause0 correctement selectionne</li><li>Reset avec cause disparue -&gt; acquitte</li><li>cause15 (borne haute) correctement levee</li><li>texte cause15 correctement selectionne (pas de depassement array)</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-8" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            
-            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>Reset sans historique : aucun effet, pas d erreur fantome</li><li>ErrorId reste a 0</li><li>rien a acquitter</li><li>apres relachement du Reset a vide : toujours propre</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-9" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>Reset maintenu a TRUE sur 3 scans, cause TOUJOURS presente : re-latch immediat a chaque scan</p><p class='comment'>cause disparait puis nouveau front Reset -&gt; acquitte</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (6)</span><ul><li>precondition : fault actif</li><li>scan 1 Reset maintenu, cause presente : ne doit pas acquitter</li><li>scan 2 Reset maintenu, cause presente : toujours pas acquitte</li><li>scan 3 Reset maintenu, cause presente : toujours pas acquitte</li><li>cause7 toujours leve apres 3 scans de Reset maintenu</li><li>cause disparue + nouveau front Reset -&gt; acquitte enfin</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-10" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>Texte non rempli</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>cause9 active -&gt; Error=TRUE meme sans texte configure</li><li>aucun texte configure -&gt; chaine vide, pas de plantage</li></ul></div>
-            
-            
-        </article>
-        <article id="test-fb-fbstatus-11" class="test-card test-card-pass test-card-contract">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-014 Reset MAINTENU + cause disparait pendant le maintien : PAS d acquittement silencieux (T148, verrou) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
-            </header>
-            <div class="comments"><p class='comment'>T148 : verrou de non-regression — le latch est une VAR retenue entre scans, jamais remise a zero
-       implicitement. Si la cause disparait pendant que Reset reste maintenu (sans nouveau front), Error
-       doit RESTER TRUE (le latch garde sa valeur). Un futur refactor qui casserait la retention du latch
-       ferait echouer ce test.</p><p class='comment'>Reset maintenu a TRUE sur 3 scans, cause TOUJOURS presente : re-latch immediat a chaque scan</p><p class='comment'>LA FAILLE T148 : cause disparait PENDANT que Reset reste maintenu (aucun nouveau front).
-       Le latch (VAR retenue) doit garder TRUE -&gt; Error reste TRUE, PAS d acquittement silencieux.</p><p class='comment'>Seul un NOUVEAU front Reset (apres relachement) acquitte</p></div>
-            <div class="checks"><span class="checks-label">Vérifié (7)</span><ul><li>precondition : fault actif</li><li>scan 1 Reset maintenu, cause presente : ne doit pas acquitter</li><li>scan 2 Reset maintenu, cause presente : toujours pas acquitte</li><li>scan 3 Reset maintenu, cause presente : toujours pas acquitte</li><li>cause disparue pendant Reset maintenu : PAS d acquittement silencieux (latch retenu)</li><li>cause7 toujours leve (latch retenu) apres disparition pendant Reset maintenu</li><li>cause disparue + nouveau front Reset -&gt; acquitte enfin</li></ul></div>
             
             
         </article>
         </div>
     </details>
     
-    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
-        <summary style="color:#94a3b8;font-size:13px;">🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test métier)</span></summary>
-        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
-            ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 4 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-fbstatus-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Sequence ouverture : le frein ne s ouvre qu apres DelayMagnetise+DelayContactClose (400ms) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-fbstatus-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Comportement actuel : fermeture immediate sans attendre DelayMotorDecel (TonDecel jamais cable) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-fbstatus-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Double verification contacteur : StuckClosed si le retour ne confirme jamais l ouverture </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-fbstatus-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Reset n acquitte le defaut contacteur que si la cause (retour) a reellement disparu </h3>
+            </header>
+            
+            
+            
+            
+        </article>
         </div>
     </details>
     <details>
