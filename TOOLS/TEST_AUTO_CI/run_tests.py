@@ -493,15 +493,15 @@ def main() -> int:
                     print(f"        acces GVL direct (bypass interface) : {g}")
         timings = res.get("timings")
         if timings:
-            print("  -- ⏱️ Profiling des étapes --")
-            print(f"    • Conversion ST->IEC        : {timings['conversion']:.2f}s")
-            print(f"    • Compilation STruCpp/g++   : {timings['compilation']:.2f}s (CPU)")
-            print(f"    • Exécution binaire ASSERTs : {timings['execution']:.2f}s")
+            print("  -- [PROFILING] Temps des etapes --")
+            print(f"    * Conversion ST->IEC        : {timings['conversion']:.2f}s")
+            print(f"    * Compilation STruCpp/g++   : {timings['compilation']:.2f}s (CPU)")
+            print(f"    * Execution binaire ASSERTs : {timings['execution']:.2f}s")
             if timings['chronogram'] > 0:
-                print(f"    • Chronogramme (recomp g++) : {timings['chronogram']:.2f}s")
-            print(f"    • Câblage production        : {timings['wiring']:.2f}s")
-            print(f"    • Rapport HTML / JSON       : {timings['report_generation']:.2f}s")
-            print(f"    • Total FB                  : {timings['total']:.2f}s")
+                print(f"    * Chronogramme (recomp g++) : {timings['chronogram']:.2f}s")
+            print(f"    * Cablage production        : {timings['wiring']:.2f}s")
+            print(f"    * Rapport HTML / JSON       : {timings['report_generation']:.2f}s")
+            print(f"    * Total FB                  : {timings['total']:.2f}s")
         if res["report"] and not res.get("report_group"):
             print(f"  Rapport : {res['report']}")
     for group_name, path in group_report_paths.items():
@@ -513,10 +513,7 @@ def main() -> int:
         index_html = render_index_dashboard(results, group_report_paths)
         index_path = TEST_AUTO_CI / "index.html"
         index_path.write_text(index_html, encoding="utf-8")
-        try:
-            print(f"\n📊 Dashboard global généré : {index_path}")
-        except UnicodeEncodeError:
-            print(f"\n[Dashboard global genere] : {index_path}")
+        print(f"\n[DASHBOARD GLOBAL] : {index_path}")
 
     elapsed = _time.perf_counter() - start_time
     minutes = int(elapsed // 60)
@@ -526,7 +523,7 @@ def main() -> int:
     n_fail = sum(1 for res in results.values() if not res["ok"])
     summary = f"{len(results)} FB testes, {len(results) - n_fail} PASS, {n_fail} FAIL"
     print(f"\n{_c(summary, n_fail == 0)}")
-    print(f"⏱️  Temps d'execution : {time_str}")
+    print(f"[TEMPS D'EXECUTION] : {time_str}")
 
     return 1 if n_fail else 0
 

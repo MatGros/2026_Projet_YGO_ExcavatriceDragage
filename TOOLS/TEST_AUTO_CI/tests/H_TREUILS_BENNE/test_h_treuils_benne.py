@@ -21,9 +21,15 @@ def _run_fb_test(fb_name: str):
     )
     # Affichage du rapport complet dans la console VS Code Testing
     if proc.stdout:
-        print(proc.stdout)
+        try:
+            print(proc.stdout)
+        except UnicodeEncodeError:
+            print(proc.stdout.encode("ascii", errors="replace").decode("ascii"))
     if proc.stderr:
-        print(proc.stderr, file=sys.stderr)
+        try:
+            print(proc.stderr, file=sys.stderr)
+        except UnicodeEncodeError:
+            print(proc.stderr.encode("ascii", errors="replace").decode("ascii"), file=sys.stderr)
 
     if proc.returncode != 0:
         error_msg = f"Échec des tests CI pour {fb_name} (code {proc.returncode}) :\n"
