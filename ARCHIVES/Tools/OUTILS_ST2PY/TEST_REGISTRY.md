@@ -10,7 +10,7 @@
 |---|---|
 | **Fonction** | Nom du POU/domaine métier réel (`CODE/...`) |
 | **TC** | Identifiant test critique (référence AF, ex. `TC-P01-003`) — `AUTO` si test outillage sans TC métier |
-| **Test Python** | Fichier + fonction exacte dans `TOOLS/OUTILS_ST2PY/RESULTS/<DOMAINE>/tests/` |
+| **Test Python** | Fichier + fonction exacte dans `ARCHIVES/Tools/OUTILS_ST2PY/RESULTS/<DOMAINE>/tests/` |
 | **Statut** | 🟢 actif · 🟡 en migration · ⚫ retiré (historique, ne pas supprimer la ligne) |
 
 ---
@@ -66,7 +66,7 @@
 ## Vérification (gate)
 
 ```powershell
-python TOOLS/OUTILS_ST2PY/scripts/check_test_registry.py
+python ARCHIVES/Tools/OUTILS_ST2PY/scripts/check_test_registry.py
 ```
 
 Vérifie mécaniquement :

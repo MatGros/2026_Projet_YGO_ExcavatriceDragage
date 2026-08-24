@@ -39,7 +39,7 @@ Puis poser la question d'orientation (adaptée au symptôme) :
 - **Canal unique = snapshot CSV** du script `codesys_snapshot_troubleshooting.py` (lit `troubleshooting_variables.txt`). **Jamais de lecture Watch variable par variable.**
 - **Règle de vérification avant demande** : pour chaque variable de décision, **vérifier d'abord** qu'elle est :
   1. implémentée dans `GVL_Troubleshooting` (grep `CODE/J_SUPERVISION/GVL_Troubleshooting.st` + types `_TYPES/ST_*.st` + câblage `FB_TroubleshootingView.st`) ;
-  2. présente dans la liste du script `TOOLS/PLC_LIVE_READER/variable_lists/troubleshooting_variables.txt`.
+  2. présente dans la liste du script `TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt`.
 - **Si présente** dans les deux → demander **un seul snapshot** (« lance `Ctrl+W` / `execfile(codesys_snapshot_troubleshooting.py)` et renvoie le CSV »).
 - **Si manquante** → **ne pas demander de valeur live** : proposer d'ajouter la variable dans `GVL_Troubleshooting`, régénérer la liste (`generate_variable_list_from_code.py`), **validation humaine**, puis compiler + snapshot.
 - ⚠️ Si la cause exige > 2-3 structures → le troubleshooting est **mal conçu** OU il faut **créer une structure dédiée** à ce type de problématique. Le signaler.

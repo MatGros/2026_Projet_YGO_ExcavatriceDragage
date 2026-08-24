@@ -208,7 +208,7 @@ Ajouter au call existant (les `ErrorId` WORD viennent des bus/structs IHM déjà
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
 python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C
-python TOOLS/PLC_LIVE_READER/variable_lists/generate_variable_list_from_code.py
+python TOOLS/PLC_CSV_SNAPSHOT/variable_lists/generate_variable_list_from_code.py
 ```
 Coller le bloc `Auto-vérification liaison` (G200) dans la restitution.
 

@@ -5,13 +5,13 @@ A executer DANS la console de scripting CODESYS (Tools > Scripting), projet en l
 (Login fait). Produit UN SEUL CSV "large" : une ligne par variable, une colonne par instant
 de lecture (plus facile a analyser pour un agent qu'une serie de fichiers separes).
 
-Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_LIVE_READER/README.md.
+Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_CSV_SNAPSHOT/README.md.
 """
 import os
 import time
 
-VARIABLE_LIST_FILE = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\variable_lists\troubleshooting_variables.txt"
-OUTPUT_DIR = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\RESULTS\acquisition"
+VARIABLE_LIST_FILE = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\variable_lists\troubleshooting_variables.txt"
+OUTPUT_DIR = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\RESULTS\acquisition"
 BATCH_SIZE = 100  # nombre de variables par appel read_values() groupe
 
 DURATION_SECONDS = 10

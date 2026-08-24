@@ -708,7 +708,7 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 > 📌 **Portée** : cette structure produit un bloc opérateur compact multi-entrées dans le réseau Ladder.
 > Utilisé lorsque le code ST contient explicitement `Target := OR(A, B, C, ...)` ou `Target := AND(A, B, C, ...)`.
 
-Structure exacte confirmée par export réel CODESYS V3.5 SP19 Patch 1 (`TOOLS/SAMPLES_CODESYS/PRG_OR_AND_BLOC.xml`) :
+Structure exacte confirmée par export réel CODESYS V3.5 SP19 Patch 1 (`TOOLS/XML_SAMPLES_CODESYS/PRG_OR_AND_BLOC.xml`) :
 
 | Élément | Règle |
 |---|---|

@@ -39,12 +39,12 @@ Configuration type du provider custom dans l'interface / settings de DeepSeek Ha
 
 ## 🐍 Utilisation en Python (`stream_lmstudio.py`)
 
-Le script [`stream_lmstudio.py`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/TOOLS/LMStudioDistant/stream_lmstudio.py) fournit un exemple complet d'appel en streaming avec gestion du TTFT (*Time To First Token*) et calcul de la vitesse de génération en tokens/s.
+Le script [`stream_lmstudio.py`](stream_lmstudio.py) fournit un exemple complet d'appel en streaming avec gestion du TTFT (*Time To First Token*) et calcul de la vitesse de génération en tokens/s.
 
 ### Lancement
 
 ```powershell
-python TOOLS/LMStudioDistant/stream_lmstudio.py
+python TOOLS/LM_STUDIO/stream_lmstudio.py
 ```
 
 ### Extrait du payload

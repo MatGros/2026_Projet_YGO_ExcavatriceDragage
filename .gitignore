@@ -22,11 +22,11 @@ __pycache__/
 # Artefacts generes par l'outil ST2PY : un dossier par domaine machine.
 # Jamais commites : ils sont reproductibles par `fb_gen.py` a partir du bundle.
 # Exception : RESULTS/<DOMAINE>/tests/*.py est du CODE de test versionne, pas un artefact genere.
-TOOLS/OUTILS_ST2PY/RESULTS/*
-!TOOLS/OUTILS_ST2PY/RESULTS/*/tests/
-!TOOLS/OUTILS_ST2PY/RESULTS/*/tests/*.py
-!TOOLS/OUTILS_ST2PY/RESULTS/conftest.py
-TOOLS/OUTILS_ST2PY/.st2py_cache.json
+ARCHIVES/Tools/OUTILS_ST2PY/RESULTS/*
+!ARCHIVES/Tools/OUTILS_ST2PY/RESULTS/*/tests/
+!ARCHIVES/Tools/OUTILS_ST2PY/RESULTS/*/tests/*.py
+!ARCHIVES/Tools/OUTILS_ST2PY/RESULTS/conftest.py
+ARCHIVES/Tools/OUTILS_ST2PY/.st2py_cache.json
 
 # Claude Code local settings
 .claude/settings.local.json

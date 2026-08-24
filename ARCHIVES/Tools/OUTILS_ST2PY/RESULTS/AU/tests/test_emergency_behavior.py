@@ -15,7 +15,7 @@ CHRONICLES_DIR = results_dir('FB_Safety_EmergencyManagement', 'chronicles')
 import fb_gen
 from test_tracer import ExecutionTracer
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[5]
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[6]
 BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_Bundle.xml'
 
 

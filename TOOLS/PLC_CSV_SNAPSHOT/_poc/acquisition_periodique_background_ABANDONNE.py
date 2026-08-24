@@ -11,14 +11,14 @@ d'arriere-plan gere le minutage (time.sleep), et ne repasse sur le thread princi
 pour les tres breves lectures read_values() - la console CODESYS reste utilisable entre
 deux lectures.
 
-Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_LIVE_READER/README.md.
+Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_CSV_SNAPSHOT/README.md.
 """
 import os
 import threading
 import time
 
-VARIABLE_LIST_FILE = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\troubleshooting_variables.txt"
-OUTPUT_DIR = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\snapshots"
+VARIABLE_LIST_FILE = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\troubleshooting_variables.txt"
+OUTPUT_DIR = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\snapshots"
 BATCH_SIZE = 100  # nombre de variables par appel read_values() groupe
 
 DURATION_SECONDS = 10

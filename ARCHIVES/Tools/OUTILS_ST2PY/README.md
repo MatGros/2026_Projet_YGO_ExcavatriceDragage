@@ -15,7 +15,7 @@ la logique métier sans matériel. Prototype, pas un outil de production.
 | Vérifier le registre de tests | `python scripts/check_test_registry.py --report` |
 | Générer les diagrammes UML/FSM | `python scripts/visualize_py_module.py` |
 
-Toutes les commandes se lancent depuis `TOOLS/OUTILS_ST2PY/`.
+Toutes les commandes se lancent depuis `ARCHIVES/Tools/OUTILS_ST2PY/`.
 
 ## Architecture — 3 dossiers, 3 rôles
 

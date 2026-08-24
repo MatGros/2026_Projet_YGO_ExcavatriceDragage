@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Prototype sélectif ST/PLCopen -> Python
 
-Usage (depuis TOOLS/OUTILS_ST2PY/) :
+Usage (depuis ARCHIVES/Tools/OUTILS_ST2PY/) :
   python scripts/st_to_py.py --bundle ../../CODE/CODE_Bundle.xml --list
   python scripts/st_to_py.py --bundle ../../CODE/CODE_Bundle.xml --pou PRG_07_TranslationControl --out out/modules/
 

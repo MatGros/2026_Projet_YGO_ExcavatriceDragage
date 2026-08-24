@@ -59,8 +59,9 @@ excavatrice-dragage/
 │
 ├── TOOLS/                       # 🔧 Outillage
 │   ├── ST_PLCOPENXML_GENERATOR/  # Génération du bundle PLCopenXML depuis CODE/*.st
-│   ├── AGENT_WORKFLOW/           # Scripts de gate (check_linkage, check_doc_links, …), skills, workflow multi-agents
-│   └── OUTILS_ST2PY/             # Suites de test Python générées depuis le ST
+│   └── AGENT_WORKFLOW/           # Scripts de gate (check_linkage, check_doc_links, …), skills, workflow multi-agents
+│
+├── ARCHIVES/Tools/OUTILS_ST2PY/ # Suites de test Python générées depuis le ST (archivé, toujours exécutable — voir TOOLS/README.md)
 │
 ├── PRJ_CODESYS/                # 📦 Projet CODESYS
 │   └── PROJ_Full_ImportExport/Device.export  (export ponctuel — jamais une référence de contrôle)

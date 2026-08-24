@@ -5,13 +5,13 @@ A executer DANS la console de scripting CODESYS (Tools > Scripting), projet en l
 (Login fait). Lit la liste de variables generee par generate_variable_list.py et ecrit un
 CSV horodate dans le meme dossier.
 
-Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_LIVE_READER/README.md.
+Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_CSV_SNAPSHOT/README.md.
 """
 import os
 import time
 
-VARIABLE_LIST_FILE = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\variable_lists\troubleshooting_variables.txt"
-OUTPUT_DIR = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\RESULTS\snapshot"
+VARIABLE_LIST_FILE = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\variable_lists\troubleshooting_variables.txt"
+OUTPUT_DIR = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\RESULTS\snapshot"
 
 
 def load_variable_list(path):
@@ -64,7 +64,7 @@ def take_snapshot():
     print(str(len(rows)) + " variables lues")
     if error_count:
         print("⚠️ " + str(error_count) + " variable(s) en ERREUR (chemin perime ?) — regenerer la liste :")
-        print("   python TOOLS/PLC_LIVE_READER/variable_lists/generate_variable_list_from_code.py")
+        print("   python TOOLS/PLC_CSV_SNAPSHOT/variable_lists/generate_variable_list_from_code.py")
     else:
         print("✅ 0 variable en ERREUR")
     print("Temps lecture (read_values, " + str(len(variables) // BATCH_SIZE + 1) + " appels groupes) : {:.3f} s".format(read_time_total))
