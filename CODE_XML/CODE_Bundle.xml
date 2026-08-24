@@ -32643,11 +32643,11 @@ IF Stopping THEN
     IF (M1Speed_Mps &lt; Config.MinimumSpeed_Mps) AND NOT StopCapturedM1 THEN StopMsM1:=TIME_TO_UDINT(StopTimer.ET); StopCapturedM1:=TRUE; END_IF;
     IF (M2Speed_Mps &lt; Config.MinimumSpeed_Mps) AND NOT StopCapturedM2 THEN StopMsM2:=TIME_TO_UDINT(StopTimer.ET); StopCapturedM2:=TRUE; END_IF;
     IF StopCapturedM1 AND StopCapturedM2 THEN
-        Data.DeltaStartDelay_Ms := ABS(UDINT_TO_DINT(StartMsM1)-UDINT_TO_DINT(StartMsM2));
-        Data.DeltaBrakeReleaseTime_Ms := ABS(UDINT_TO_DINT(ReleaseMsM1)-UDINT_TO_DINT(ReleaseMsM2));
-        Data.DeltaBrakeApplyTime_Ms := ABS(UDINT_TO_DINT(ApplyMsM1)-UDINT_TO_DINT(ApplyMsM2));
-        Data.DeltaStopDistance_Mm := REAL_TO_UDINT(ABS(ABS(M1Position_M-StopStartM1_M)-ABS(M2Position_M-StopStartM2_M))*1000.0);
-        Data.DeltaStopTime_Ms := ABS(UDINT_TO_DINT(StopMsM1)-UDINT_TO_DINT(StopMsM2)); Stopping:=FALSE; SymmetryValid:=TRUE;
+        Data.DeltaStartDelay_Ms := DINT_TO_UDINT(ABS(UDINT_TO_DINT(StartMsM1) - UDINT_TO_DINT(StartMsM2)));
+        Data.DeltaBrakeReleaseTime_Ms := DINT_TO_UDINT(ABS(UDINT_TO_DINT(ReleaseMsM1) - UDINT_TO_DINT(ReleaseMsM2)));
+        Data.DeltaBrakeApplyTime_Ms := DINT_TO_UDINT(ABS(UDINT_TO_DINT(ApplyMsM1) - UDINT_TO_DINT(ApplyMsM2)));
+        Data.DeltaStopDistance_Mm := REAL_TO_UDINT(ABS(ABS(M1Position_M - StopStartM1_M) - ABS(M2Position_M - StopStartM2_M)) * 1000.0);
+        Data.DeltaStopTime_Ms := DINT_TO_UDINT(ABS(UDINT_TO_DINT(StopMsM1) - UDINT_TO_DINT(StopMsM2))); Stopping := FALSE; SymmetryValid := TRUE;
     END_IF;
 END_IF;
 {endregion}
