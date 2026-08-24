@@ -210,7 +210,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         if debug:
             print(_progress_line("compilation"), flush=True)
         t_comp_start = _time.perf_counter()
-        strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "--test", str(test_file)]
+        strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "-O", "0", "--cxx-flags", "-O0 -pipe", "--test", str(test_file)]
         proc = subprocess.Popen(strucpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                  text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1,
                                  creationflags=subproc_flags)
