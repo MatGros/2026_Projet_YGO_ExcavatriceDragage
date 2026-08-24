@@ -68,7 +68,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "405", "G405 — Littéraux STRING ASCII (REX 2026-08-17)",   [sys.executable, f"{S}/G405_check_st_string_ascii.py", "."]),
     ("C", "410", "G410 — Invariants LD (tous les POU `_LD`, REX 2026-08-04/13)", [sys.executable, f"{S}/G410_check_ld_invariants.py", "."]),
     ("C", "420", "G420 — PyTest (gates + convertisseur)",           [str(_py313()), "-m", "pytest",
-                                                                     "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
+                                                                     "TOOLS/CONVERTER_ST2XML_PLCopenXML/tests",
                                                                      "TOOLS/AGENT_WORKFLOW/tests", "-q"]),
     ("C", "430", "G430 — Commentaires REX (Zéro journal intime, §2ter)", [sys.executable, f"{S}/G430_check_comments_rex.py", "."]),
     ("C", "440", "G440 — Skills agents (stub + canonique, anti-derive)", [sys.executable, f"{S}/check_skill_stubs.py", "."]),

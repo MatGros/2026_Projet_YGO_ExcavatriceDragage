@@ -13,6 +13,6 @@
 TYPE ST_WinchLoadEstimateTable :
 STRUCT
     IsConfigured                  : BOOL;
-    LoadPctByStepAndSpeedBand     : ARRAY[1..5] OF ARRAY[1..5] OF REAL; // 🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/ST_PLCOPENXML_GENERATOR
+    LoadPctByStepAndSpeedBand     : ARRAY[1..5] OF ARRAY[1..5] OF REAL; // 🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/CONVERTER_ST2XML_PLCopenXML
 END_STRUCT
 END_TYPE

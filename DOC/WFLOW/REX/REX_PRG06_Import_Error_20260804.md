@@ -122,7 +122,7 @@ dans le bloc lui-même** (`outputVariables/variable/connectionPointOut/expressio
 via son propre réseau séparé (ex. coil de recopie `GVL_Global.*`), jamais via un
 contact pointé sur la broche du bloc producteur.
 
-**Fichier concerné** : `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`
+**Fichier concerné** : `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`
 
 **Preuve de non-régression** : vérifier après toute génération qu'aucun
 `<contact>` du bundle ne porte `connection[@formalParameter]` pointant vers un
@@ -144,9 +144,9 @@ contact pointé sur la broche du bloc producteur.
 
 | Fichier | Rôle |
 |---|---|
-| `TOOLS/ST_PLCOPENXML_GENERATOR/generator/file_discovery.py` | filtre `Bundle_*` (cause #1) |
-| `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | coils→blocs, outputs dans bloc (causes 2-3) |
-| `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | Le convertisseur universel ST→LD traite désormais directement l'ensemble des POU `_LD`. |
+| `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/file_discovery.py` | filtre `Bundle_*` (cause #1) |
+| `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py` | coils→blocs, outputs dans bloc (causes 2-3) |
+| `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py` | Le convertisseur universel ST→LD traite désormais directement l'ensemble des POU `_LD`. |
 | `TOOLS/AGENT_WORKFLOW/scripts/G390_check_bundle_freshness.py` | vérifie le bundle frais |
 | `CODE/M_MAIN/PRG_06_Outputs.st` | outputs directs du FB (au lieu de chemins nested) |
 
@@ -154,7 +154,7 @@ contact pointé sur la broche du bloc producteur.
 
 ## 🔗 Références
 
-- Oracles CODESYS : `TOOLS/XML_SAMPLES_CODESYS/PRG_06_Outputs_LD.xml`, `PRG_Oracle_Nested.xml`
+- Oracles CODESYS : `TOOLS/SAMPLES_XML_CODESYS/PRG_06_Outputs_LD.xml`, `PRG_Oracle_Nested.xml`
 - Tests dichotomiques : `CODE/CODE_Bundle_{6invar,2networks,3networks,nocoil180,minimal}.xml`
 - Spec PLCopenXML : `DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md`
 

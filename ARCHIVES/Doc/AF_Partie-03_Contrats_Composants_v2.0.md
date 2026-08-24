@@ -119,7 +119,7 @@ ne le convertit pas depuis un `.st`. Le bundle decouvre et fusionne ce fichier
 XML natif tel quel dans la sequence canonique de l'etape 6 ci-dessous.
 
 **Reference de syntaxe reelle :**
-`TOOLS/ST_PLCOPENXML_GENERATOR/samples_reference_codesys/PRG_CFC_3FB.xml`
+`TOOLS/CONVERTER_ST2XML_PLCopenXML/samples_reference_codesys/PRG_CFC_3FB.xml`
 (export CODESYS V3.5 SP19 Patch 1, trois FB). Ce sample est une reference de
 **structure XML**, pas de geometrie : ses connecteurs en `(0,0)` ne doivent pas
 etre recopies (regle de visibilite ci-dessous).
@@ -194,7 +194,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
 > `DOC/CODE_QUALITY_STANDARDS.md §11`.
 
 Un programme suffixe `_LD` est une **source ST** convertie en `<LD>` dans le
-bundle PLCopenXML par `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`.
+bundle PLCopenXML par `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`.
 
 ### Rung complet obligatoire
 

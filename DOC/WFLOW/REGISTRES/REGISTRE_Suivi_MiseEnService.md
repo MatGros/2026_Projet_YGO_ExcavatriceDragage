@@ -101,7 +101,7 @@
 - 🎯 **Périmètre** : Capteur Kobold — activation contacteur mesure (`M1_M2_KoboldMeasureEnable_DQ`)
 - 🚦 **Statut** : 🟢 **Corrigé**
 - 🔍 **Constat** : `KoboldContactorCmd` (`PRG_06_Outputs`) déclaré mais **jamais assigné** — chaîne `instDiveSearch.KoboldMeasureEnable → KoboldContactorCmdArbitrated` s'arrêtait net, aucune erreur de compilation/gate pour le signaler. Même classe de bug que le fix frein M3 du 2026-08-05.
-- 🛠️ **Solution** : `KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;` + coil directe sur `M1_M2_KoboldMeasureEnable_DQ` (même pattern validé M1/M2/M3). Preuve : `CODE/M_MAIN/PRG_06_Outputs.st` | Générateur PLCopenXML ST→LD | `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py` | 🟢 Généralisé (Ladder standard) | `DIRECT_HW_COILS`.
+- 🛠️ **Solution** : `KoboldContactorCmd := PRG_04_Treuils_Benne.KoboldContactorCmdArbitrated;` + coil directe sur `M1_M2_KoboldMeasureEnable_DQ` (même pattern validé M1/M2/M3). Preuve : `CODE/M_MAIN/PRG_06_Outputs.st` | Générateur PLCopenXML ST→LD | `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py` | 🟢 Généralisé (Ladder standard) | `DIRECT_HW_COILS`.
 - 📌 **Action** : confirmer import CODESYS propre (risque connu, REX 2026-08-04, validé sur M1/M2/M3).
 
 ### MES-022 — 🔴 Coupe-circuit séquencement auto benne (Fiche 01) après blocages répétés terrain

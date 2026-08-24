@@ -35,7 +35,7 @@ contract:
       - .claude/skills/codesys-workflow.md
       - TOOLS/converter/st_parser.py
       - TOOLS/converter/test_st_parser.py
-      - TOOLS/ST_PLCOPENXML_GENERATOR/tests/unit/test_st_parser_program.py
+      - TOOLS/CONVERTER_ST2XML_PLCopenXML/tests/unit/test_st_parser_program.py
       - TOOLS/AGENT_WORKFLOW/tests/test_region_pragmas.py
       - DOC/WFLOW/CONTRACTS/TASK_CONTEXT_20260814_REGIONS_PRAGMA_PROJECT.yaml
     forbidden:

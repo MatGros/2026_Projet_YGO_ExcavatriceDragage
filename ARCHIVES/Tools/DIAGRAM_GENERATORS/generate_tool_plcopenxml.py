@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the explanatory pipeline diagram for TOOLS/ST_PLCOPENXML_GENERATOR."""
+"""Generate the explanatory pipeline diagram for TOOLS/CONVERTER_ST2XML_PLCopenXML."""
 
 import sys
 from pathlib import Path
@@ -20,7 +20,7 @@ skinparam ranksep 50
 !pragma layout smetana
 left to right direction
 
-title Outil - ST_PLCOPENXML_GENERATOR (CODE/*.st -> PLCopenXML)
+title Outil - CONVERTER_ST2XML_PLCopenXML (CODE/*.st -> PLCopenXML)
 
 rectangle "📄 CODE/*.st" as INPUT #BBDEFB
 
@@ -81,7 +81,7 @@ DISCOVER ..> DIAG : erreurs parsing
 BUILDER ..> DIAG : erreurs deps/types
 DIAG ..> CLI : rapport final\\n(warning/error count)
 
-footer Genere depuis TOOLS/ST_PLCOPENXML_GENERATOR/generator/*.py (imports reels cli.py)
+footer Genere depuis TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/*.py (imports reels cli.py)
 @enduml"""
 
 if __name__ == "__main__":
@@ -90,6 +90,6 @@ if __name__ == "__main__":
     out_dir.mkdir(parents=True, exist_ok=True)
     output = out_dir / "DIAG_TOOL_PLCopenXmlGenerator.png"
 
-    print("Generation diagramme ST_PLCOPENXML_GENERATOR...")
+    print("Generation diagramme CONVERTER_ST2XML_PLCopenXML...")
     ok = render_puml(PUML, output)
     sys.exit(0 if ok else 1)

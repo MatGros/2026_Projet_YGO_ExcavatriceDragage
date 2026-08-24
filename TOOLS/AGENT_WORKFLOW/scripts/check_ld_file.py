@@ -21,7 +21,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-ST_TO_LD = ROOT / "TOOLS" / "ST_PLCOPENXML_GENERATOR" / "scripts" / "st_to_ld.py"
+ST_TO_LD = ROOT / "TOOLS" / "CONVERTER_ST2XML_PLCopenXML" / "scripts" / "st_to_ld.py"
 G410 = ROOT / "TOOLS" / "AGENT_WORKFLOW" / "scripts" / "G410_check_ld_invariants.py"
 
 

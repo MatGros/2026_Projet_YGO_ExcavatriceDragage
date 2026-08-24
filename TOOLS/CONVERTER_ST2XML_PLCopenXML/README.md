@@ -7,7 +7,7 @@ Outil autonome de conversion des sources `CODE/**/*.st` vers PLCopenXML importab
 ```text
 CODE/*.st
    ↓
-ST_PLCOPENXML_GENERATOR
+CONVERTER_ST2XML_PLCopenXML
    ↓
 CODE_XML/CODE_Bundle.xml
    ↓
@@ -64,7 +64,7 @@ sont importés automatiquement dans le bundle.
 
 - `generator/` : code Python du convertisseur
 - `tests/` : tests unitaires, intégration et golden
-- `XML_SAMPLES_CODESYS/` : exports CODESYS de référence
+- `SAMPLES_XML_CODESYS/` : exports CODESYS de référence
 - `test_import_poc/` : preuve de concept d'import réel
 - `docs/PLCOPENXML_FORMAT.md` : documentation technique détaillée
 

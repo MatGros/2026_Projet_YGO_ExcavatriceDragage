@@ -21,7 +21,7 @@ def main() -> int:
     code_dir = root / "CODE"
     out_dir = root / "CODE_XML"
     bundle = out_dir / "CODE_Bundle.xml"
-    generator_dir = root / "TOOLS" / "ST_PLCOPENXML_GENERATOR"
+    generator_dir = root / "TOOLS" / "CONVERTER_ST2XML_PLCopenXML"
     if not code_dir.is_dir() or not bundle.is_file():
         print("ERROR: CODE/ or CODE_XML/CODE_Bundle.xml missing", file=sys.stderr)
         return 2

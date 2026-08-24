@@ -432,7 +432,7 @@ Une restitution sans ce bloc est incomplète, quel que soit l'agent qui l'écrit
 > heures de diagnostic terrain avant identification. Le même schéma touchait aussi la
 > **chaîne AU** (`PowerKeepAlive_A_RQ`/`PowerKeepAlive_B_RQ`/`EmergencyArming_RQ`, confirmé
 > câblé réel par l'utilisateur) — corrigé dans le même lot. Détail complet et fix :
-> `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`.
+> `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`.
 
 **Règle** : un `PROGRAM` ne déclare **jamais** de variable (`VAR`/`VAR_INPUT`/`VAR_OUTPUT`)
 portant le **nom exact** d'un point matériel du mapping E/S (`TOOLS/AGENT_WORKFLOW/config/
@@ -656,7 +656,7 @@ Règles obligatoires pour tout programme d'orchestration ST :
 ## 11. Règles de génération Ladder (`_LD.st` → `<LD>`) — REX 2026-08
 
 > 🚩 Trois bugs d'import CODESYS sur l'ancien `PRG_01_Inputs_LD` ont révélé que le générateur
-> ST→LD (`TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`) produisait du
+> ST→LD (`TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`) produisait du
 > PLCopenXML invalide. Les règles ci-dessous restent obligatoires pour toute
 > source `_LD.st` active, notamment `PRG_06_Outputs`, et sont vérifiées par `test_ld_import_guard.py`.
 
@@ -708,7 +708,7 @@ CODESYS **rejette** les rungs incomplets (sans coil, sans rightPowerRail).
 > 📌 **Portée** : cette structure produit un bloc opérateur compact multi-entrées dans le réseau Ladder.
 > Utilisé lorsque le code ST contient explicitement `Target := OR(A, B, C, ...)` ou `Target := AND(A, B, C, ...)`.
 
-Structure exacte confirmée par export réel CODESYS V3.5 SP19 Patch 1 (`TOOLS/XML_SAMPLES_CODESYS/PRG_OR_AND_BLOC.xml`) :
+Structure exacte confirmée par export réel CODESYS V3.5 SP19 Patch 1 (`TOOLS/SAMPLES_XML_CODESYS/PRG_OR_AND_BLOC.xml`) :
 
 | Élément | Règle |
 |---|---|

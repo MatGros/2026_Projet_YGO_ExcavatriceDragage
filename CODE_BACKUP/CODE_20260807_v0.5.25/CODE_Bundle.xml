@@ -8296,7 +8296,7 @@ TRUE = relais sens + C1..C4 tous retombés</html:xhtml>
                 </array>
               </type>
               <documentation>
-                <html:xhtml>🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/ST_PLCOPENXML_GENERATOR</html:xhtml>
+                <html:xhtml>🔧 Tableau imbriqué (accès [palier][bande]) — le multi-dim ARRAY[x,y] n'est pas supporté par TOOLS/CONVERTER_ST2XML_PLCopenXML</html:xhtml>
               </documentation>
             </variable>
           </struct>

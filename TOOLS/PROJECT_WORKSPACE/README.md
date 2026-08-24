@@ -137,4 +137,4 @@ Vérifier que le fichier contient :
 - Aucun lanceur PowerShell externe nécessaire.
 - Aucun `runOn: folderOpen` dans les tasks.
 - Aucun split forcé.
-- `TOOLS/ST_PLCOPENXML_GENERATOR/` reste totalement autonome et n’est pas modifié par cette configuration.
+- `TOOLS/CONVERTER_ST2XML_PLCopenXML/` reste totalement autonome et n’est pas modifié par cette configuration.

@@ -12,10 +12,10 @@ TOOLS/
 │   ├── templates/        # Templates ST & DOC
 │   ├── prompts/          # Prompts agents
 │   └── config/           # naming_baseline.json, workflow_diagram.json, Device_IO_*.csv
-├── ST_PLCOPENXML_GENERATOR/  # Convertisseur ST → PLCopenXML (autonome)
+├── CONVERTER_ST2XML_PLCopenXML/  # Convertisseur ST → PLCopenXML (autonome)
     ├── generator/        # Code Python du générateur
     ├── tests/            # Unitaires, intégration, golden files (306 tests)
-    ├── XML_SAMPLES_CODESYS/
+    ├── SAMPLES_XML_CODESYS/
     ├── test_import_poc/
     └── docs/
 ├── LINTER_ST/               # Linter ST CODESYS 3.5 (STruCpp vendoré, 100% encapsulé)
@@ -56,7 +56,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
 **Alternative manuelle** (rarement) :
 
 ```powershell
-cd TOOLS/ST_PLCOPENXML_GENERATOR
+cd TOOLS/CONVERTER_ST2XML_PLCopenXML
 python -m pytest                          # 306 tests
 python -m generator.cli --bundle CODE_Bundle --project-name "MGS_v0.4.18" --timestamp "2026-07-18T00:05:50"
 ```
@@ -149,7 +149,7 @@ résolue → silence, pas d'erreur inventée).
 `TOOLS/COMPILER_ST2C_STruCpp/README.md`. Ne pas confondre avec `LINTER_ST/` : deux outils
 indépendants qui vendorent chacun leur propre copie de STruCpp (pas de lien entre eux).
 
-### `ST_PLCOPENXML_GENERATOR/` — Compilateur maison
+### `CONVERTER_ST2XML_PLCopenXML/` — Compilateur maison
 
 🏭 **Convertisseur autonome** : ST (notre dialecte) → PLCopenXML (format CODESYS universal) :
 
@@ -182,7 +182,7 @@ indépendants qui vendorent chacun leur propre copie de STruCpp (pas de lien ent
 
 | Outil | Indépendance | Dépendances |
 | --- | --- | --- |
-| `ST_PLCOPENXML_GENERATOR` | **100% autonome** | Aucune (Python stdlib + pytest) |
+| `CONVERTER_ST2XML_PLCopenXML` | **100% autonome** | Aucune (Python stdlib + pytest) |
 | `LINTER_ST` | **100% autonome** | Aucune — vendore sa propre copie de STruCpp, aucun lien vers `COMPILER_ST2C_STruCpp` |
 | `COMPILER_ST2C_STruCpp` | **100% autonome** | Aucune — vendore sa propre copie de STruCpp |
 | `AGENT_WORKFLOW` | Orchestration | Appelle le générateur via CLI, n'intègre pas son code |
@@ -200,7 +200,7 @@ PROJET/
 ├── DOC/            # Spécifications fonctionnelles (AF_Partie-XX)
 ├── TOOLS/          # Outils (ce dossier)
 │   ├── AGENT_WORKFLOW/
-│   └── ST_PLCOPENXML_GENERATOR/
+│   └── CONVERTER_ST2XML_PLCopenXML/
 └── ARCHIVES/       # Docs & outils obsolètes
 ```
 
@@ -211,6 +211,6 @@ PROJET/
 | Outil | Version | Changelog |
 | --- | --- | --- |
 | AGENT_WORKFLOW | Voir `TOOLS/AGENT_WORKFLOW/pyproject.toml` | `DOC/VERSION_HISTORY.md` |
-| ST_PLCOPENXML_GENERATOR | Voir `TOOLS/ST_PLCOPENXML_GENERATOR/pyproject.toml` | `DOC/VERSION_HISTORY.md` |
+| CONVERTER_ST2XML_PLCopenXML | Voir `TOOLS/CONVERTER_ST2XML_PLCopenXML/pyproject.toml` | `DOC/VERSION_HISTORY.md` |
 
 Chaque outil gère son propre versioning. Le projet principal référence les versions dans `DOC/VERSION_HISTORY.md`.

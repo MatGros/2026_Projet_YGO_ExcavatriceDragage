@@ -238,7 +238,7 @@ de cycle de vie du FB.
 
 > 🚩 **Décision 2026-08-16** : la conversion CFC natif (lot M8) est **abandonnée**.
 > Le code est écrit en **ST** (`CODE/MAIN/PRG_XX_*.st`) et converti en PLCopenXML par
-> `TOOLS/ST_PLCOPENXML_GENERATOR`. Aucune page CFC native `.xml` n'est produite.
+> `TOOLS/CONVERTER_ST2XML_PLCopenXML`. Aucune page CFC native `.xml` n'est produite.
 
 Les programmes sont des sources ST ; le générateur produit le bundle PLCopenXML
 (`<ST>`, `<LD>`, `<FBD>` selon le suffixe). La renumérotation 7 POU (`PRG_02`→`PRG_07`)
@@ -248,7 +248,7 @@ est soldée. Historique de la migration : `ARCHIVES/Doc/AUDITS/Architecture_Migr
 
 > 🚩 Référentiel complet & règles de génération : voir [`DOC/STDS/CODE_QUALITY_STANDARDS.md §11`](../STDS/CODE_QUALITY_STANDARDS.md).
 
-Un programme suffixé `_LD` est une **source ST** convertie en `<LD>` dans le bundle PLCopenXML par `TOOLS/ST_PLCOPENXML_GENERATOR/generator/ld_builder.py`.
+Un programme suffixé `_LD` est une **source ST** convertie en `<LD>` dans le bundle PLCopenXML par `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/ld_builder.py`.
 
 ### Câblage `FB_Output` et retrait de `FB_Input`
 

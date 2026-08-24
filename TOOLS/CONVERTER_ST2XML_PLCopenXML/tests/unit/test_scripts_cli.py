@@ -19,7 +19,7 @@ import pytest
 import sys
 import os
 
-_TOOL_ROOT = Path(__file__).resolve().parent.parent.parent  # ST_PLCOPENXML_GENERATOR/
+_TOOL_ROOT = Path(__file__).resolve().parent.parent.parent  # CONVERTER_ST2XML_PLCopenXML/
 if str(_TOOL_ROOT) not in sys.path:
     sys.path.insert(0, str(_TOOL_ROOT))
 

@@ -14,7 +14,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-GENERATOR_ROOT = Path(__file__).resolve().parents[2] / "ST_PLCOPENXML_GENERATOR"
+GENERATOR_ROOT = Path(__file__).resolve().parents[2] / "CONVERTER_ST2XML_PLCopenXML"
 sys.path.insert(0, str(GENERATOR_ROOT))
 
 from generator.ld_builder import build_ld_body
