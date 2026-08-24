@@ -1,58 +1,22 @@
 Error compiling source files:
 
-FB_Hmi_BannerFormatter.st:24:28: error: Undefined type 'E_DIVESEARCHSTATE' in FUNCTION_BLOCK 'FB_HMI_BANNERFORMATTER'
-  24 |     DiveState            : E_DiveSearchState;   // --> [HW] État plongée
-     |                            ^
-
-FB_Hmi_BannerFormatter.st:25:28: error: Undefined type 'E_EXTRACTIONSEQUENCESTATE' in FUNCTION_BLOCK 'FB_HMI_BANNERFORMATTER'
-  25 |     ExtractionState      : E_ExtractionSequenceState;   // --> [HW] État extraction
-     |                            ^
-
-FB_Hmi_BannerFormatter.st:59:28: error: Undefined type 'ST_SAFETYWINCH' in FUNCTION_BLOCK 'FB_HMI_BANNERFORMATTER'
-  59 |     WinchM1Safety        : ST_SafetyWinch;       // --> [SAFE] Diagnostic sécurité treuil M1
-     |                            ^
-
-FB_Hmi_BannerFormatter.st:60:28: error: Undefined type 'ST_SAFETYWINCH' in FUNCTION_BLOCK 'FB_HMI_BANNERFORMATTER'
-  60 |     WinchM2Safety        : ST_SafetyWinch;       // --> [SAFE] Diagnostic sécurité treuil M2
-     |                            ^
-
-FB_Hmi_BannerFormatter.st:61:28: error: Undefined type 'ST_SAFETYTRANSLATION' in FUNCTION_BLOCK 'FB_HMI_BANNERFORMATTER'
-  61 |     TranslationSafety    : ST_SafetyTranslation; // --> [SAFE] Diagnostic sécurité translation M3
-     |                            ^
-
-FB_TestHarness_PRG_07.st:13:31: error: Undefined type 'ST_ACQUISITIONINTERPRG' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_07'
-  13 |     AcqData                 : ST_AcquisitionInterPrg;
+ST_WinchState.st:37:31: error: Undefined type 'E_WINCHFINALINTERLOCKSTATE' in STRUCT 'ST_WINCHSTATE'
+  37 |     FinalInterlockState     : E_WinchFinalInterlockState; (* 🛡️ État final _LD lecture seule *)
      |                               ^
 
-FB_TestHarness_PRG_07.st:16:31: error: Undefined type 'ST_MODES_AUTORISATIONS' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_07'
-  16 |     ModesAuth               : ST_Modes_Autorisations;
+ST_WinchState.st:38:31: error: Undefined type 'E_WINCHFINALINTERLOCKREASON' in STRUCT 'ST_WINCHSTATE'
+  38 |     FinalInterlockReason    : E_WinchFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
      |                               ^
 
-FB_TestHarness_PRG_07.st:19:31: error: Undefined type 'ST_WINCHINTERPRG' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_07'
-  19 |     WinchData               : ST_WinchInterPrg;
+ST_WinchState.st:49:31: error: Undefined type 'ST_ENCODERHMI' in STRUCT 'ST_WINCHSTATE'
+  49 |     Encoder                 : ST_EncoderHMI;    (* 🧲 Données d'échange et diagnostic du codeur — porte aussi les 9 champs Homing* (voir ST_EncoderHMI) *)
      |                               ^
 
-FB_TestHarness_PRG_07.st:22:31: error: Undefined type 'ST_TRANSLATIONINTERPRG' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_07'
-  22 |     TranslationData         : ST_TranslationInterPrg;
+ST_BucketHMIState.st:6:27: error: Undefined type 'ST_BUCKETSTATE' in STRUCT 'ST_BUCKETHMISTATE'
+   6 |     MechState           : ST_BucketState; (* 🚥 État mécanique mémorisé (IsOpen, IsClosed...) *)
+     |                           ^
+
+ST_TranslationState.st:26:31: error: Undefined type 'E_TRANSLATIONFINALINTERLOCKREASON' in STRUCT 'ST_TRANSLATIONSTATE'
+  26 |     FinalInterlockReason    : E_TranslationFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
      |                               ^
-
-FB_Hmi_BannerFormatter.st:168:32: error: Undeclared variable 'E_DIVESEARCHSTATE'
- 168 |                 IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
-     |                                ^
-
-FB_Hmi_BannerFormatter.st:170:35: error: Undeclared variable 'E_DIVESEARCHSTATE'
- 170 |                 ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
-     |                                   ^
-
-FB_Hmi_BannerFormatter.st:172:35: error: Undeclared variable 'E_DIVESEARCHSTATE'
- 172 |                 ELSIF DiveState = E_DiveSearchState.BOTTOM_CONFIRMED THEN
-     |                                   ^
-
-FB_TestHarness_PRG_07.st:56:30: error: Undeclared variable 'E_DIVESEARCHSTATE'
-  56 |     DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS,
-     |                              ^
-
-FB_TestHarness_PRG_07.st:57:30: error: Undeclared variable 'E_EXTRACTIONSEQUENCESTATE'
-  57 |     ExtractionState       := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION,
-     |                              ^
 

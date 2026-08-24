@@ -191,11 +191,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-24 07:57:16</div>
+    <div class="exec-time">2026-08-24 15:28:21</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (11 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-encoder-0">TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-1">Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-2">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-3">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-4">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-5">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-6">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-7">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-8">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-9">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-10">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-encoder-0">Smoke : Enable=FALSE neutralise (population rapport, pas un TC-P09)</a></li><li class="toc-item toc-pass"><a href="#test-fb-encoder-1">Smoke : Enable=TRUE sans capteur (population rapport, pas un TC-P09)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -204,7 +204,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            11/11 vérifications validées
+            2/2 vérifications validées
         </div>
     </div>
     
@@ -493,6 +493,184 @@
         </div>
     </details>
     
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production — M1</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 5 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>POSITIONMAXM</code> jamais câblé en production</li><li>Pin <code>POSITIONMINM</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li><li>Argument <code>CALIB</code> câblé en production mais absent de l'interface (interface modifiée ?)</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="PRG_07_Supervision.FaultMachineReset_IHM" onclick="copyPinExpr(this)">PRG_07_Supervision.FaultMachineReset_IHM</code></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="(PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2)" onclick="copyPinExpr(this)">(PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 2)</code></div>
+            <div class="pin-name">HOMINGPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M1TreuilRetenue.Cmd.BtnHome" onclick="copyPinExpr(this)">GVL_IHM.M1TreuilRetenue.Cmd.BtnHome</code></div>
+            <div class="pin-name">HOMINGATTARGETM <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero" onclick="copyPinExpr(this)">GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero</code></div>
+            <div class="pin-name">HOMINGATZERO <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence" onclick="copyPinExpr(this)">GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence</code></div>
+            <div class="pin-name">CONFIRMCOHERENCE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="_WinchM1CfgPersist.CfgHomingTarget_M" onclick="copyPinExpr(this)">_WinchM1CfgPersist.CfgHomingTarget_M</code></div>
+            <div class="pin-name">CFGHOMINGTARGETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="_WinchM1CfgPersist.CfgTopSensorPos_M" onclick="copyPinExpr(this)">_WinchM1CfgPersist.CfgTopSensorPos_M</code></div>
+            <div class="pin-name">CFGTOPSENSORPOSM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="FALSE" onclick="copyPinExpr(this)">FALSE</code></div>
+            <div class="pin-name">USEDYNAMICTARGET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="0.0" onclick="copyPinExpr(this)">0.0</code></div>
+            <div class="pin-name">DYNAMICHOMINGTARGETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="HwIn.Winch.M1M2_TopPositionFree_DI" onclick="copyPinExpr(this)">HwIn.Winch.M1M2_TopPositionFree_DI</code></div>
+            <div class="pin-name">TOPPOSITIONSENSOR <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="HwM1" onclick="copyPinExpr(this)">HwM1</code></div>
+            <div class="pin-name">HW <span class="pin-type">ST_ENCODERHW</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="ENCODER_POINTS_PER_REV" onclick="copyPinExpr(this)">ENCODER_POINTS_PER_REV</code></div>
+            <div class="pin-name">POINTSPERREV <span class="pin-type">IEC_UDINT</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="WINCH_CABLE_M_PER_REV" onclick="copyPinExpr(this)">WINCH_CABLE_M_PER_REV</code></div>
+            <div class="pin-name">CABLEM_PERREV <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONMINM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONMAXM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M1TreuilRetenue.Bypass.Global" onclick="copyPinExpr(this)">GVL_IHM.M1TreuilRetenue.Bypass.Global</code></div>
+            <div class="pin-name">BYPASSGLOBAL <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Encoder (M1)</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HWOUT <span class="pin-type">ST_ENCODERHW</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd," onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: M1_PresetTriggerCmd      := instEncoderM1.HwOut.PresetTriggerCmd,</code> <span class='pin-more'>(+6)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">MEASUREMENT <span class="pin-type">ST_ENCODERMEASUREMENT</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.CablePosM1           := instEncoderM1.Measurement.CablePosM;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.CablePosM1           := instEncoderM1.Measurement.CablePosM;</code> <span class='pin-more'>(+18)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_03_Modes_Cycle.st: HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed," onclick="copyPinExpr(this)">M_MAIN/PRG_03_Modes_Cycle.st: HomedM1                 := PRG_02_Acquisition.instEncoderM1.Homed,</code> <span class='pin-more'>(+6)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMINGSUSPECT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_04_Treuils_Benne.st: HomingSuspect          := PRG_02_Acquisition.instEncoderM1.HomingSuspect," onclick="copyPinExpr(this)">M_MAIN/PRG_04_Treuils_Benne.st: HomingSuspect          := PRG_02_Acquisition.instEncoderM1.HomingSuspect,</code> <span class='pin-more'>(+3)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">ENCODERFAULT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.M1_EncoderFault      := instEncoderM1.EncoderFault;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.M1_EncoderFault      := instEncoderM1.EncoderFault;</code></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMEDANDRELIABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.M1_HomedAndReliable  := instEncoderM1.HomedAndReliable;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.M1_HomedAndReliable  := instEncoderM1.HomedAndReliable;</code></div>
+        </div></div>
+        </div>
+    </details>
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production — M2</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 5 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>POSITIONMAXM</code> jamais câblé en production</li><li>Pin <code>POSITIONMINM</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li><li>Argument <code>CALIB</code> câblé en production mais absent de l'interface (interface modifiée ?)</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="PRG_07_Supervision.FaultMachineReset_IHM" onclick="copyPinExpr(this)">PRG_07_Supervision.FaultMachineReset_IHM</code></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="(PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1)" onclick="copyPinExpr(this)">(PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Auth.Mode = E_Mode.MAINT_N2)
+                             AND (PRG_03_Modes_Cycle.Auth.JoystickWinchSelectArbitrated &lt;&gt; 1)</code></div>
+            <div class="pin-name">HOMINGPERMIT <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested" onclick="copyPinExpr(this)">GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR M2BucketRefRequested</code></div>
+            <div class="pin-name">HOMINGATTARGETM <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero" onclick="copyPinExpr(this)">GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero</code></div>
+            <div class="pin-name">HOMINGATZERO <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence" onclick="copyPinExpr(this)">GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence</code></div>
+            <div class="pin-name">CONFIRMCOHERENCE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="_WinchM2CfgPersist.CfgHomingTarget_M" onclick="copyPinExpr(this)">_WinchM2CfgPersist.CfgHomingTarget_M</code></div>
+            <div class="pin-name">CFGHOMINGTARGETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="_WinchM2CfgPersist.CfgTopSensorPos_M" onclick="copyPinExpr(this)">_WinchM2CfgPersist.CfgTopSensorPos_M</code></div>
+            <div class="pin-name">CFGTOPSENSORPOSM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="M2BucketRefRequested" onclick="copyPinExpr(this)">M2BucketRefRequested</code></div>
+            <div class="pin-name">USEDYNAMICTARGET <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="M2BucketRefTargetM" onclick="copyPinExpr(this)">M2BucketRefTargetM</code></div>
+            <div class="pin-name">DYNAMICHOMINGTARGETM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="HwIn.Winch.M1M2_TopPositionFree_DI" onclick="copyPinExpr(this)">HwIn.Winch.M1M2_TopPositionFree_DI</code></div>
+            <div class="pin-name">TOPPOSITIONSENSOR <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="HwM2" onclick="copyPinExpr(this)">HwM2</code></div>
+            <div class="pin-name">HW <span class="pin-type">ST_ENCODERHW</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="ENCODER_POINTS_PER_REV" onclick="copyPinExpr(this)">ENCODER_POINTS_PER_REV</code></div>
+            <div class="pin-name">POINTSPERREV <span class="pin-type">IEC_UDINT</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="WINCH_CABLE_M_PER_REV" onclick="copyPinExpr(this)">WINCH_CABLE_M_PER_REV</code></div>
+            <div class="pin-name">CABLEM_PERREV <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONMINM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">POSITIONMAXM <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><code title="GVL_IHM.M2TreuilBenne.Bypass.Global" onclick="copyPinExpr(this)">GVL_IHM.M2TreuilBenne.Bypass.Global</code></div>
+            <div class="pin-name">BYPASSGLOBAL <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_Encoder (M2)</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HWOUT <span class="pin-type">ST_ENCODERHW</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd," onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: M2_PresetTriggerCmd      := instEncoderM2.HwOut.PresetTriggerCmd,</code> <span class='pin-more'>(+6)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">MEASUREMENT <span class="pin-type">ST_ENCODERMEASUREMENT</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.CablePosM2           := instEncoderM2.Measurement.CablePosM;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.CablePosM2           := instEncoderM2.Measurement.CablePosM;</code> <span class='pin-more'>(+18)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_03_Modes_Cycle.st: HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed," onclick="copyPinExpr(this)">M_MAIN/PRG_03_Modes_Cycle.st: HomedM2                 := PRG_02_Acquisition.instEncoderM2.Homed,</code> <span class='pin-more'>(+6)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMINGSUSPECT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_04_Treuils_Benne.st: HomingSuspect          := PRG_02_Acquisition.instEncoderM2.HomingSuspect," onclick="copyPinExpr(this)">M_MAIN/PRG_04_Treuils_Benne.st: HomingSuspect          := PRG_02_Acquisition.instEncoderM2.HomingSuspect,</code> <span class='pin-more'>(+3)</span></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">ENCODERFAULT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.M2_EncoderFault      := instEncoderM2.EncoderFault;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.M2_EncoderFault      := instEncoderM2.EncoderFault;</code></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">HOMEDANDRELIABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><code title="M_MAIN/PRG_02_Acquisition.st: Data.M2_HomedAndReliable  := instEncoderM2.HomedAndReliable;" onclick="copyPinExpr(this)">M_MAIN/PRG_02_Acquisition.st: Data.M2_HomedAndReliable  := instEncoderM2.HomedAndReliable;</code></div>
+        </div></div>
+        </div>
+    </details>
     
     <details class="encaps-details" >
         <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 7 FB de la chaine, encapsulation propre (0 violation)</summary>
@@ -618,120 +796,30 @@
         <article id="test-fb-encoder-0" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>Smoke : Enable=FALSE neutralise (population rapport, pas un TC-P09) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
             
-            
+            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>Enable=FALSE -&gt; Ready=FALSE</li><li>Enable=FALSE -&gt; EncoderFault=TRUE (gate neutralisation)</li></ul></div>
             
             
         </article>
         <article id="test-fb-encoder-1" class="test-card test-card-pass test-card-contract">
             <header>
                 <span class="badge badge-pass">PASS</span>
-                <h3>Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3>Smoke : Enable=TRUE sans capteur (population rapport, pas un TC-P09) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
             </header>
             
-            
+            <div class="checks"><span class="checks-label">Vérifié (1)</span><ul><li>Enable=TRUE -&gt; Ready=TRUE</li></ul></div>
             
             
         </article>
         </div>
     </details>
     
-    <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 scénario(s) métier & sécurité machine</summary>
-        <div style="margin-top: 12px;">
-            
-        <article id="test-fb-encoder-2" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-encoder-3" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-encoder-4" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-encoder-5" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-encoder-6" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-encoder-7" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-encoder-8" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-encoder-9" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
-            </header>
-            
-            
-            
-            
-        </article>
-        <article id="test-fb-encoder-10" class="test-card test-card-pass">
-            <header>
-                <span class="badge badge-pass">PASS</span>
-                <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
-            </header>
-            
-            
-            
-            
-        </article>
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🎯 Tests Fonctionnels Métier & Procédé AF / TC <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test métier)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Composant technique / socle transverse : non rattaché à un catalogue de tests métier ou de procédé spécifique.
         </div>
     </details>
     <details>

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "file": "test_fb_hmi_bannerformatter.st",
+  "results": [
+    {
+      "name": "AntiFlickerText : affichage instantane force",
+      "passed": true
+    },
+    {
+      "name": "BannerFormatter : formatage nominal",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0
+  }
+}
