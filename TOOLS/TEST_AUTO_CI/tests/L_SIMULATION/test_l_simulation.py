@@ -19,7 +19,6 @@ def _run_fb_test(fb_name: str):
         errors="replace",
         cwd=str(REPO_ROOT),
     )
-    # Affichage du rapport complet dans la console VS Code Testing
     if proc.stdout:
         try:
             print(proc.stdout)
@@ -32,7 +31,7 @@ def _run_fb_test(fb_name: str):
             print(proc.stderr.encode("ascii", errors="replace").decode("ascii"), file=sys.stderr)
 
     if proc.returncode != 0:
-        error_msg = f"Échec des tests CI pour {fb_name} (code {proc.returncode}) :\n"
+        error_msg = f"Échec du test pour {fb_name} (code {proc.returncode}) :\n"
         error_msg += proc.stdout[-1500:] if proc.stdout else ""
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
@@ -40,6 +39,31 @@ def _run_fb_test(fb_name: str):
 
 
 @pytest.mark.ci_fb
-def test_FB_SimBench():
-    """Test CI automatisé (C++ + ASSERT + Rapport HTML) pour FB_SimBench."""
-    _run_fb_test("FB_SimBench")
+def test_L_SIMULATION():
+    """Test global du domaine L_SIMULATION (compilation parallèle multi-cœurs)."""
+    cmd = [sys.executable, str(RUN_TESTS_PY), "--domain", "L_SIMULATION", "--fast", "-j", "1"]
+    proc = subprocess.run(
+        cmd,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        cwd=str(REPO_ROOT),
+    )
+    if proc.stdout:
+        try:
+            print(proc.stdout)
+        except UnicodeEncodeError:
+            print(proc.stdout.encode("ascii", errors="replace").decode("ascii"))
+    if proc.stderr:
+        try:
+            print(proc.stderr, file=sys.stderr)
+        except UnicodeEncodeError:
+            print(proc.stderr.encode("ascii", errors="replace").decode("ascii"), file=sys.stderr)
+
+    if proc.returncode != 0:
+        error_msg = f"Échec des tests pour le domaine L_SIMULATION (code {proc.returncode}) :\n"
+        error_msg += proc.stdout[-2000:] if proc.stdout else ""
+        error_msg += proc.stderr[-1000:] if proc.stderr else ""
+        pytest.fail(error_msg)
+    assert proc.returncode == 0
