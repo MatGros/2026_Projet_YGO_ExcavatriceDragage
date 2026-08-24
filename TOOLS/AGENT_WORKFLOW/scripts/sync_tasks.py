@@ -378,7 +378,8 @@ def save_tasks_html(tasks, output_path: Path):
         <button class="filter-btn" onclick="setDomain('CYCLE', this)">⚙️ Cycle</button>
         
         <button class="btn-action btn-save" onclick="openNewTaskModal()">➕ Nouvelle Tâche</button>
-        <button class="btn-action btn-cancel" onclick="resetToOfficial()" title="Recharger les données fraîches de TASKS.yaml">🔄 Recharger du fichier</button>
+        <button class="btn-action btn-cancel" onclick="reloadFromYamlFile()" title="Recharger directement depuis le fichier TASKS.yaml">🔄 Recharger TASKS.yaml</button>
+        <input type="file" id="yaml-file-input" accept=".yaml,.yml" style="display:none;" onchange="handleYamlFileSelect(event)">
         
         <div id="sync-warning-badge" style="display:none; align-items:center; gap:8px; background: rgba(255, 85, 85, 0.15); border: 1px solid #ff5555; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #ff5555; font-weight: bold;">
             <span style="width:10px; height:10px; background:#ff5555; border-radius:50%; box-shadow:0 0 10px #ff5555; animation: pulse 1.2s infinite; display:inline-block;"></span>
@@ -556,12 +557,170 @@ def save_tasks_html(tasks, output_path: Path):
         }}
 
 
-        function resetToOfficial() {{
-            tasks = [...defaultTasks];
-            hasUnsavedChanges = false;
-            updateSyncIndicator();
-            render();
+        function showToast(message) {{
+            let toast = document.getElementById('task-toast');
+            if (!toast) {{
+                toast = document.createElement('div');
+                toast.id = 'task-toast';
+                toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#50fa7b; color:#1e1e2e; padding:10px 18px; border-radius:8px; font-weight:bold; font-size:13px; box-shadow:0 4px 15px rgba(0,0,0,0.4); z-index:9999; transition:all 0.3s ease; opacity:0; transform:translateY(10px);';
+                document.body.appendChild(toast);
+            }}
+            toast.innerText = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+            setTimeout(() => {{
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+            }}, 3000);
         }}
+
+        function parseYamlTasks(yamlText) {{
+            const lines = yamlText.split(/\\r?\\n/);
+            const taskList = [];
+            let currentTask = null;
+            let currentListKey = null;
+
+            for (let i = 0; i < lines.length; i++) {{
+                const line = lines[i];
+                const trimmed = line.trim();
+                if (!trimmed || trimmed.startsWith('#')) continue;
+
+                const taskStart = line.match(/^(\\s*)-\\s+id:\\s*"?([^"\\r\\n]+)"?/);
+                if (taskStart) {{
+                    if (currentTask) taskList.push(currentTask);
+                    currentTask = {{
+                        id: taskStart[2].trim(),
+                        parent_id: "",
+                        statut: "⬜",
+                        criticite: "C2",
+                        domaine: "GÉNÉRAL",
+                        agent: "—",
+                        date: "",
+                        titre: "",
+                        contexte: "",
+                        description: "",
+                        contrat: "",
+                        objectifs: [],
+                        bloque_par: []
+                    }};
+                    currentListKey = null;
+                    continue;
+                }}
+
+                if (!currentTask) continue;
+
+                const listItem = line.match(/^\\s+-\\s*"?([^"\\r\\n]*)"?/);
+                if (listItem && currentListKey) {{
+                    if (Array.isArray(currentTask[currentListKey])) {{
+                        currentTask[currentListKey].push(listItem[1].trim());
+                    }}
+                    continue;
+                }}
+
+                const kv = line.match(/^\\s+([a-zA-Z0-9_]+):\\s*(.*)$/);
+                if (kv) {{
+                    const key = kv[1];
+                    let val = kv[2].trim();
+                    currentListKey = null;
+
+                    if (val === '[]') {{
+                        currentTask[key] = [];
+                    }} else if (val === '' || val === '>-' || val === '>' || val === '|') {{
+                        if (key === 'objectifs' || key === 'bloque_par') {{
+                            currentTask[key] = [];
+                            currentListKey = key;
+                        }} else {{
+                            currentTask[key] = '';
+                        }}
+                    }} else {{
+                        val = val.replace(/^["'](.*)["']$/, '$1');
+                        currentTask[key] = val;
+                    }}
+                }}
+            }}
+            if (currentTask) taskList.push(currentTask);
+            return taskList;
+        }}
+
+        async function reloadFromYamlFile() {{
+            // 1. Tenter fetch sur TASKS.yaml direct
+            try {{
+                const res = await fetch('TASKS.yaml?' + Date.now());
+                if (res.ok) {{
+                    const text = await res.text();
+                    const parsed = parseYamlTasks(text);
+                    if (parsed && parsed.length > 0) {{
+                        tasks = parsed;
+                        hasUnsavedChanges = false;
+                        updateSyncIndicator();
+                        render();
+                        showToast(`✅ ${{tasks.length}} tâches rechargées directement depuis TASKS.yaml !`);
+                        return;
+                    }}
+                }}
+            }} catch (e) {{
+                // Ignore fetch fail on local file://
+            }}
+
+            // 2. Fallback File System Access API
+            if ('showOpenFilePicker' in window) {{
+                try {{
+                    const [fileHandle] = await window.showOpenFilePicker({{
+                        types: [{{
+                            description: 'Fichier TASKS.yaml',
+                            accept: {{ 'text/yaml': ['.yaml', '.yml'] }}
+                        }}],
+                        multiple: false
+                    }});
+                    const file = await fileHandle.getFile();
+                    const text = await file.text();
+                    const parsed = parseYamlTasks(text);
+                    if (parsed && parsed.length > 0) {{
+                        savedFileHandle = fileHandle;
+                        tasks = parsed;
+                        hasUnsavedChanges = false;
+                        updateSyncIndicator();
+                        render();
+                        showToast(`✅ ${{tasks.length}} tâches rechargées depuis ${{file.name}} !`);
+                        return;
+                    }}
+                }} catch (err) {{
+                    if (err.name === 'AbortError') return;
+                }}
+            }}
+
+            // 3. Fallback sélecteur input
+            const input = document.getElementById('yaml-file-input');
+            if (input) {{
+                input.value = '';
+                input.click();
+            }}
+        }}
+
+        function handleYamlFileSelect(event) {{
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {{
+                const text = e.target.result;
+                const parsed = parseYamlTasks(text);
+                if (parsed && parsed.length > 0) {{
+                    tasks = parsed;
+                    hasUnsavedChanges = false;
+                    updateSyncIndicator();
+                    render();
+                    showToast(`✅ ${{tasks.length}} tâches rechargées depuis ${{file.name}} !`);
+                }} else {{
+                    alert('Format de fichier YAML non reconnu ou vide.');
+                }}
+            }};
+            reader.readAsText(file, 'utf-8');
+        }}
+
+        function resetToOfficial() {{
+            reloadFromYamlFile();
+        }}
+
 
 
 
