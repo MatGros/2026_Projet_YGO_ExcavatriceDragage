@@ -103,7 +103,11 @@ def resolve(targets: list[Path], code_root: Path) -> tuple[dict[str, Path], set[
     # les injecter directement dans all_sources sans passer par resolve() (essaye puis
     # abandonne, session 2026-08-23) laisse les types internes des GVL non resolus (`Undefined
     # type 'ST_WinchHMI'` etc. sur GVL_IHM.st).
-    for gvl_file in code_root.rglob("*.st"):
+    all_gvl = list(code_root.rglob("*.st"))
+    if STUBS_DIR.is_dir():
+        all_gvl.extend(STUBS_DIR.glob("*.st"))
+
+    for gvl_file in all_gvl:
         if GVL_STEM_RE.match(gvl_file.stem) and gvl_file not in targets:
             resolved.setdefault(gvl_file.stem, gvl_file)
             queue.append(gvl_file)

@@ -183,6 +183,7 @@ def _merge_nested_arrays(text: str, source_name: str, warnings: list) -> str:
 
 BINARY_LITERAL_RE = re.compile(r"\b2#([01]+)\b")
 CASE_MULTI_LABEL_RE = re.compile(r"^\s*([0-9a-zA-Z_#]+(?:\s*,\s*[0-9a-zA-Z_#]+)+)\s*:", re.MULTILINE)
+SEL_STMT_RE = re.compile(r"^\s*([A-Za-z0-9_.]+)\s*:=\s*SEL\s*\(([^,]+),\s*([^,]+),\s*([^)]+)\)\s*;", re.MULTILINE)
 
 
 def _convert_binary_literals(text: str, source_name: str, warnings: list) -> str:
@@ -201,10 +202,22 @@ def _split_case_labels(text: str, source_name: str, warnings: list) -> str:
     return CASE_MULTI_LABEL_RE.sub(_replace, text)
 
 
+def _convert_sel_statements(text: str, source_name: str, warnings: list) -> str:
+    """Convertit target := SEL(G, IN0, IN1); en IF/ELSE pour supporter les structures complexes sous STruCpp."""
+    def _replace(m):
+        dst = m.group(1).strip()
+        cond = m.group(2).strip()
+        in0 = m.group(3).strip()
+        in1 = m.group(4).strip()
+        return f"IF {cond} THEN {dst} := {in1}; ELSE {dst} := {in0}; END_IF;"
+    return SEL_STMT_RE.sub(_replace, text)
+
+
 def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _convert_enum_blocks(text, source_name, warnings)
     text = _convert_binary_literals(text, source_name, warnings)
     text = _split_case_labels(text, source_name, warnings)
+    text = _convert_sel_statements(text, source_name, warnings)
     text = _strip_pragmas(text)
     text = _strip_pou_qualifiers(text)
     text = _strip_gvl_qualifiers(text)
