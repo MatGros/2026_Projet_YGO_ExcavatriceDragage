@@ -56,15 +56,6 @@
       "color": "terminal.ansiGreen"
     },
     {
-      "name": "📊 Workflow Graph",
-      "cwd": "${workspaceFolder}",
-      "command": "python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header",
-      "open": true,
-      "focus": false,
-      "icon": "graph",
-      "color": "terminal.ansiMagenta"
-    },
-    {
       "name": "🌐 OmniRoute Server",
       "cwd": "${workspaceFolder}",
       "command": "omniroute",

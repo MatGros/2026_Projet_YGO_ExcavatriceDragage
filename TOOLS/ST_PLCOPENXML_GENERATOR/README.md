@@ -64,7 +64,7 @@ sont importés automatiquement dans le bundle.
 
 - `generator/` : code Python du convertisseur
 - `tests/` : tests unitaires, intégration et golden
-- `SAMPLES_CODESYS/` : exports CODESYS de référence
+- `XML_SAMPLES_CODESYS/` : exports CODESYS de référence
 - `test_import_poc/` : preuve de concept d'import réel
 - `docs/PLCOPENXML_FORMAT.md` : documentation technique détaillée
 

@@ -11,7 +11,7 @@ import fb_gen
 import simulation_bench
 
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[5]
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[6]
 BUNDLE_PATH = REPO_ROOT / 'CODE' / 'CODE_Bundle.xml'
 
 

@@ -13,8 +13,8 @@ Controles :
       (les tests doivent utiliser le temp systeme, jamais l'arborescence de resultats)
 
 Usage :
-  python TOOLS/OUTILS_ST2PY/scripts/check_test_registry.py
-  python TOOLS/OUTILS_ST2PY/scripts/check_test_registry.py --report
+  python ARCHIVES/Tools/OUTILS_ST2PY/scripts/check_test_registry.py
+  python ARCHIVES/Tools/OUTILS_ST2PY/scripts/check_test_registry.py --report
 """
 
 from __future__ import annotations

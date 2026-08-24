@@ -4,7 +4,7 @@
 > pas du code machine). C'est un **outil de travail** pour permettre un import sélectif d'un
 > FB/PROGRAM/STRUCT/ENUM/GVL dans CODESYS sans réimporter tout le projet.
 >
-> **Statut : schéma quasi entièrement confirmé sur échantillons réels** (`SAMPLES_CODESYS/`,
+> **Statut : schéma quasi entièrement confirmé sur échantillons réels** (`XML_SAMPLES_CODESYS/`,
 > exportés depuis **CODESYS V3.5 SP19 Patch 1**, projet `Programme MGS_v0.3.10_Simulation`) :
 > `FB_Winch.xml` / `FB_Grappin.xml` / `FB_Cycle.xml` (FUNCTION_BLOCK), `PRG_MAIN.xml` (PROGRAM),
 > `E_Diag_State.xml` / `E_CycleStep.xml` (ENUM), `ST_WinchHMI.xml` / `ST_SpeedStepTable.xml` (STRUCT),
@@ -64,7 +64,7 @@ programme (ou d'un fragment) d'un outil à un autre.
 | Version | Année | Namespace | Remarque |
 |---|---|---|---|
 | v1.01 | 2005 | — | Première publication du schéma XSD par PLCopen. |
-| **v2.0** | 2008 | **`tc6_0200`** | "Official Release". **C'est celle utilisée par CODESYS 3.5 SP19 Patch 1** (confirmé sur les 11 échantillons de `SAMPLES_CODESYS/`). |
+| **v2.0** | 2008 | **`tc6_0200`** | "Official Release". **C'est celle utilisée par CODESYS 3.5 SP19 Patch 1** (confirmé sur les 11 échantillons de `XML_SAMPLES_CODESYS/`). |
 | v2.01 | 2009 | `tc6_0201` | Changements mineurs. Version documentée sur le site public PLCopen actuel — **mais pas celle que CODESYS 3.5 SP19 émet réellement** (voir §1). |
 | IEC 61131-10 | 2019 | — | En 2014, PLCopen transfère la propriété intellectuelle du schéma à l'IEC ; le travail aboutit à la norme internationale **IEC 61131-10** ("PLCopen XML exchange format"), qui intègre officiellement le format dans la suite IEC 61131. |
 
@@ -559,7 +559,7 @@ Génère un fichier `.xml` individuel par objet ST, en reproduisant la structure
                                            |--> génère GUID via [guid.py]
                                            |--> convertit l'IR en structure XML
 [cli.py] <-- (4. XML Tree) ------------ [xml_builder.py]
-[cli.py] -- (5. write_file) ---------> [xml_serializer.py] --> Écrit sur disque (ex: TOOLS/SAMPLES_CODESYS/FB_Winch.xml)
+[cli.py] -- (5. write_file) ---------> [xml_serializer.py] --> Écrit sur disque (ex: TOOLS/XML_SAMPLES_CODESYS/FB_Winch.xml)
 ```
 
 #### Usage 2 : Mode Bundle (génération groupée via `--bundle`)
@@ -586,14 +586,14 @@ La suite de tests est configurée dans [pyproject.toml](file:///c:/_MGS/DEV/2026
     *   Valident les flux de bout en bout en simulant l'exécution du CLI (appel de `main` avec divers arguments).
     *   Vérifient la bonne reproduction de l'arborescence physique ou l'incorporation correcte des dépendances dans un fichier unique de bundle.
 3.  **Tests Golden (`tests/golden/`)** :
-    *   Comparent structurellement le XML généré à partir du code de `CODE/` avec les exports originaux stockés dans `TOOLS/SAMPLES_CODESYS/`.
+    *   Comparent structurellement le XML généré à partir du code de `CODE/` avec les exports originaux stockés dans `TOOLS/XML_SAMPLES_CODESYS/`.
     *   *Note de robustesse* : Afin de tolérer l'évolution naturelle du code et des commentaires de mise en service, les tests ignorent les valeurs brutes fluctuantes (`simpleValue`) et valident la simple présence du texte (`xhtml`) sans blocage strict de contenu textuel.
 
 ---
 
 ## 📚 Sources
 
-- Échantillons réels : `TOOLS/SAMPLES_CODESYS/*.xml` (CODESYS V3.5 SP19 Patch 1)
+- Échantillons réels : `TOOLS/XML_SAMPLES_CODESYS/*.xml` (CODESYS V3.5 SP19 Patch 1)
 - [Command: Export PLCopenXML](https://content.helpme-codesys.com/en/CODESYS%20Development%20System/_cds_cmd_export_plcopenxml.html)
 - [Command: Import PLCopenXML](https://content.helpme-codesys.com/en/CODESYS%20Development%20System/_cds_cmd_import_plcopenxml.html)
 - [Exporting and Importing Projects (CODESYS)](https://content.helpme-codesys.com/en/CODESYS%20Development%20System/_cds_project_export_import.html)

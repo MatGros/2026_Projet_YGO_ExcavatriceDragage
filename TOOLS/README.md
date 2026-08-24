@@ -15,7 +15,7 @@ TOOLS/
 ├── ST_PLCOPENXML_GENERATOR/  # Convertisseur ST → PLCopenXML (autonome)
     ├── generator/        # Code Python du générateur
     ├── tests/            # Unitaires, intégration, golden files (306 tests)
-    ├── SAMPLES_CODESYS/
+    ├── XML_SAMPLES_CODESYS/
     ├── test_import_poc/
     └── docs/
 ├── LINTER_ST/               # Linter ST CODESYS 3.5 (STruCpp vendoré, 100% encapsulé)
@@ -28,7 +28,6 @@ TOOLS/
 │   ├── README.md             # Documentation et guide (terminaux VS Code)
 │   ├── MARKDOWN_WORKSPACE.md # Édition & cochage des fichiers Markdown (Ctrl+K V)
 │   └── terminals.json        # Fichier de configuration modèle
-├── DIAGRAM_GENERATORS/      # Générateurs spécialisés de diagrammes Mermaid
 └── visualize_workflow.py    # Compatibilité et moteur commun Mermaid
 ```
 
@@ -85,12 +84,7 @@ Le lancement est volontairement manuel : rien ne démarre à l’ouverture de VS
 
 ### Visualiser le workflow (Mermaid)
 
-```powershell
-# Générer diagramme Mermaid
-python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header
-
-# Voir dans VS Code (Markdown preview) ou Mermaid Live Editor
-```
+🗄️ **Archivé** (diagrammes plus à jour, plus utilisé) : `ARCHIVES/Tools/DIAGRAM_GENERATORS/generate_all.py`
 
 ### Skills du workflow
 
@@ -175,7 +169,7 @@ indépendants qui vendorent chacun leur propre copie de STruCpp (pas de lien ent
 | Fichier | Producteur réel | Consommateur réel | Fraîcheur |
 |---|---|---|---|
 | `AGENT_WORKFLOW/config/naming_baseline.json` | `AGENT_WORKFLOW/scripts/G110_check_naming_style.py` (lit) — régénéré manuellement via son flag baseline | `G110_check_naming_style.py` | À régénérer quand le nommage `CODE/` évolue (normes IEC NC-010..070). |
-| `AGENT_WORKFLOW/config/workflow_diagram.json` | ⚠️ **Aucun script ne le génère** — le fichier `visualize_workflow.py` (mentionné dans certains README) n'existe pas. Fichier maintenu manuellement. | `PROJECT_WORKSPACE/README.md` (cité), `DOC/WFLOW/TASK_VIEWER.html` (texte embarqué, pas un fetch) | Manuelle — aucun outil de regénération actif. Le diagramme Mermaid est généré par `TOOLS/DIAGRAM_GENERATORS/generate_all.py`. |
+| `AGENT_WORKFLOW/config/workflow_diagram.json` | ⚠️ **Aucun script ne le génère** — le fichier `visualize_workflow.py` (mentionné dans certains README) n'existe pas. Fichier maintenu manuellement. | `PROJECT_WORKSPACE/README.md` (cité), `DOC/WFLOW/TASK_VIEWER.html` (texte embarqué, pas un fetch) | Manuelle — aucun outil de regénération actif. Le diagramme Mermaid était généré par `generate_all.py`, désormais archivé (`ARCHIVES/Tools/DIAGRAM_GENERATORS/`). |
 
 > ⚠️ **Audit T150-B (2026-08-24)** : `workflow_diagram.json` est référencé par 2 docs mais
 > **aucun script ne le régénère** — c'est un fichier de configuration manuelle. `TASK_VIEWER.html`

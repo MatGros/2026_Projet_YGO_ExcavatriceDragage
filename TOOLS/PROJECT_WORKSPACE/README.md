@@ -15,7 +15,7 @@ Extension : `fabiospampinato.vscode-terminals`
 
 ## 🎯 Rôle
 
-Cet environnement ouvre, dans le terminal intégré VS Code, dix onglets indépendants :
+Cet environnement ouvre, dans le terminal intégré VS Code, neuf onglets indépendants :
 
 | Onglet | Commande | Rôle |
 |---|---|---|
@@ -25,7 +25,6 @@ Cet environnement ouvre, dans le terminal intégré VS Code, dix onglets indépe
 | **🔓 OpenCode** | `opencode --agent orchestrateur` | Interface OpenCode unique avec agents Orchestrateur, Codeur (`@codeur`) et Vérificateur (`@verificateur`) |
 | **🦙 OpenCode (Ollama)** | `ollama launch opencode --model gemma4:e4b` | Agent OpenCode local via Ollama (`gemma4:e4b`) |
 | **✅ Gates** | `python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --skip-codesys` | Contrôles Python du workflow |
-| **📊 Workflow Graph** | `python TOOLS/DIAGRAM_GENERATORS/generate_all.py --no-header` | Génération de tous les diagrammes Mermaid |
 | **🌐 OmniRoute Server** | `omniroute` | Serveur OmniRoute |
 | **🤖 Codex (OpenAI)** | `codex` | Agent Codex CLI dans le projet |
 | **🦙 DSH (Ollama)** | `ollama launch dsh` | Agent DSH local via Ollama |

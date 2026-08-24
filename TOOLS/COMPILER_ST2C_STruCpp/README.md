@@ -5,7 +5,7 @@ pour tester des FB **en boîte noire** (IN/OUT), hors CODESYS, en VS Code ou en 
 
 🎯 Le corps du FB **n'est jamais réécrit à la main** — même la composition de sous-FB
 (`instXxx(...)`) est câblée automatiquement, garantie fidèle au source. Complémentaire à
-`TOOLS/OUTILS_ST2PY` (Python, logique réécrite manuellement).
+`ARCHIVES/Tools/OUTILS_ST2PY` (Python, logique réécrite manuellement — archivé, toujours exécutable).
 
 ## 🔄 Flux de travail
 

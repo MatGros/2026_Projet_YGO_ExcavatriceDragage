@@ -100,7 +100,7 @@ Type de symptôme (sortie ne s'émet pas / ne se coupe pas / valeur fausse / ét
 
 Avant de demander quoi que ce soit à l'utilisateur, pour **chaque variable de décision** nécessaire :
 1. ✅ **Vérifier qu'elle est implémentée dans `GVL_Troubleshooting`** — grep du chemin dans `CODE/J_SUPERVISION/GVL_Troubleshooting.st` + ses types `_2.._TYPES/ST_*.st` (et le câblage dans `FB_TroubleshootingView.st`).
-2. ✅ **Vérifier qu'elle est dans la liste du script** — grep du chemin exact dans `TOOLS/PLC_LIVE_READER/variable_lists/troubleshooting_variables.txt`.
+2. ✅ **Vérifier qu'elle est dans la liste du script** — grep du chemin exact dans `TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt`.
 
 Selon le résultat :
 - **Présente dans les deux** → demander **UN seul snapshot** : « Lance `Ctrl+W` (ou `execfile(codesys_snapshot_troubleshooting.py)`) et renvoie-moi le CSV ».
@@ -138,8 +138,8 @@ Cause racine + correction proposée. Remplir la **section 8 (Proposition de corr
 ### Étape 7 — Vérification / non-régression
 Après correction (validée), remplir la **section 9** : le symptôme est-il résolu ? rien d'autre cassé ? (aligné `fix:` + `guard:`).
 
-### Étape 8 — Clôturer la fiche : archiver les acquisitions PLC_LIVE_READER
-Si des CSV ont été produits pendant la session (`TOOLS/PLC_LIVE_READER/RESULTS/snapshot/` et `RESULTS/acquisition/`) : les déplacer vers `ARCHIVES/Tools/PLC_LIVE_READER/RESULTS/<Sujet>_<AAAAMMJJ>/` (même `<Sujet>_<date>` que la fiche). But : éviter l'accumulation de CSV non triés dans `RESULTS/snapshot/`+`acquisition/`, qui sont trackés en Git. Ne déplacer que les CSV horodatés pendant la fenêtre de la session ; en cas d'ambiguïté (plusieurs fiches le même jour), demander avant de trier.
+### Étape 8 — Clôturer la fiche : archiver les acquisitions PLC_CSV_SNAPSHOT
+Si des CSV ont été produits pendant la session (`TOOLS/PLC_CSV_SNAPSHOT/RESULTS/snapshot/` et `RESULTS/acquisition/`) : les déplacer vers `ARCHIVES/Tools/PLC_CSV_SNAPSHOT/RESULTS/<Sujet>_<AAAAMMJJ>/` (même `<Sujet>_<date>` que la fiche). But : éviter l'accumulation de CSV non triés dans `RESULTS/snapshot/`+`acquisition/`, qui sont trackés en Git. Ne déplacer que les CSV horodatés pendant la fenêtre de la session ; en cas d'ambiguïté (plusieurs fiches le même jour), demander avant de trier.
 
 ---
 
@@ -164,4 +164,4 @@ Si des CSV ont été produits pendant la session (`TOOLS/PLC_LIVE_READER/RESULTS
 - [ ] Cause racine + correction proposée
 - [ ] Aucun code modifié / aucune variable forcée sans validation
 - [ ] `_TROUBLESHOOTING/` nettoyé après usage (dossier jetable)
-- [ ] CSV `PLC_LIVE_READER/RESULTS/` de la session archivés dans `ARCHIVES/Tools/PLC_LIVE_READER/RESULTS/<Sujet>_<date>/`
+- [ ] CSV `PLC_CSV_SNAPSHOT/RESULTS/` de la session archivés dans `ARCHIVES/Tools/PLC_CSV_SNAPSHOT/RESULTS/<Sujet>_<date>/`

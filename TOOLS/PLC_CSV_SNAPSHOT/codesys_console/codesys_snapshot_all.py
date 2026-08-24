@@ -4,16 +4,16 @@
 A executer DANS la console de scripting CODESYS (Tools > Scripting), projet en ligne
 (Login fait). Reutilise la meme session en ligne pour les deux GVL (un seul login).
 
-Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_LIVE_READER/README.md.
+Encodage CSV (separateur ";", decimale ".", fin de ligne CRLF) — cf. TOOLS/PLC_CSV_SNAPSHOT/README.md.
 """
 import os
 import time
 
 SNAPSHOTS = [
-    ("Troubleshooting", r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\variable_lists\troubleshooting_variables.txt"),
-    ("IHM", r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\variable_lists\ihm_variables.txt"),
+    ("Troubleshooting", r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\variable_lists\troubleshooting_variables.txt"),
+    ("IHM", r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\variable_lists\ihm_variables.txt"),
 ]
-OUTPUT_DIR = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\RESULTS\snapshot"
+OUTPUT_DIR = r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\RESULTS\snapshot"
 BATCH_SIZE = 100  # nombre de variables par appel read_values() groupe
 
 

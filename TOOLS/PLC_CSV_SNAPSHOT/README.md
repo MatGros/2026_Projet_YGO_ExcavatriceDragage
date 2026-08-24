@@ -1,4 +1,4 @@
-# PLC_LIVE_READER — lecture live variables CODESYS pour dépannage
+# PLC_CSV_SNAPSHOT — lecture live variables CODESYS pour dépannage
 
 > 🎯 Objectif : lire en live des variables du programme (HW réel ou simulation) et produire un
 > CSV pour un agent de dépannage.
@@ -12,7 +12,7 @@
 ## 📁 Organisation
 
 ```
-PLC_LIVE_READER/
+PLC_CSV_SNAPSHOT/
 ├── codesys_console/        scripts a executer DANS la console de scripting CODESYS
 │                           (Tools > Scripting > execfile(...)) — mode Simulation interne
 ├── external_python/        scripts a executer dans un terminal classique (python ...)
@@ -31,7 +31,7 @@ PLC_LIVE_READER/
 ⚠️ Les CSV de `RESULTS/snapshot/` et `RESULTS/acquisition/` sont **trackés en Git** (historisation) —
 sans tri, ils s'accumulent indéfiniment. À la clôture d'une fiche de troubleshooting, la skill
 `troubleshooting` (étape 8) déplace les CSV produits pendant la session vers
-`ARCHIVES/Tools/PLC_LIVE_READER/RESULTS/<Sujet>_<date>/` (miroir racine, voir `ARCHIVES/Tools/`).
+`ARCHIVES/Tools/PLC_CSV_SNAPSHOT/RESULTS/<Sujet>_<date>/` (miroir racine, voir `ARCHIVES/Tools/`).
 
 ## ⚠️ Deux modes distincts — diagnostiqué le 2026-08-16 sur ce projet
 
@@ -54,7 +54,7 @@ qu'en poursuivant sur la simulation.
 Rien à installer. Projet ouvert, **Login fait** (Online), puis **Tools → Scripting**, coller :
 
 ```python
-execfile(r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_LIVE_READER\codesys_console\codesys_snapshot_all.py")
+execfile(r"C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\PLC_CSV_SNAPSHOT\codesys_console\codesys_snapshot_all.py")
 ```
 
 | Script | Usage |
@@ -86,19 +86,19 @@ Référence API utilisée (stubs installés avec l'IDE, lues pour ce projet — 
 ### Installation
 
 ```powershell
-pip install -r TOOLS/PLC_LIVE_READER/external_python/requirements.txt
+pip install -r TOOLS/PLC_CSV_SNAPSHOT/external_python/requirements.txt
 ```
 
 ### Étape 1 — trouver le NodeId exact de la variable
 
 ```powershell
-python TOOLS/PLC_LIVE_READER/external_python/list_nodes.py opc.tcp://localhost:4840 --filter MaVariable
+python TOOLS/PLC_CSV_SNAPSHOT/external_python/list_nodes.py opc.tcp://localhost:4840 --filter MaVariable
 ```
 
 ### Étape 2 — lecture d'une variable BOOL
 
 ```powershell
-python TOOLS/PLC_LIVE_READER/external_python/read_bool.py opc.tcp://localhost:4840 "ns=4;s=|var|Application.GVL_Test.MaVariable"
+python TOOLS/PLC_CSV_SNAPSHOT/external_python/read_bool.py opc.tcp://localhost:4840 "ns=4;s=|var|Application.GVL_Test.MaVariable"
 ```
 
 `--watch` pour relire en boucle (1 s par défaut) — c'est la voie qui permettra une acquisition
@@ -110,8 +110,8 @@ Si la structure de `GVL_Troubleshooting` ou `GVL_IHM` change dans le projet (nou
 nouvelle chaîne de diagnostic) : réexporter la Symbol Configuration depuis l'IDE, puis :
 
 ```powershell
-python TOOLS/PLC_LIVE_READER/variable_lists/generate_variable_list.py "<export>.xml" --root "Application.GVL_Troubleshooting" --output "TOOLS/PLC_LIVE_READER/variable_lists/troubleshooting_variables.txt"
-python TOOLS/PLC_LIVE_READER/variable_lists/generate_variable_list.py "<export>.xml" --root "Application.GVL_IHM" --output "TOOLS/PLC_LIVE_READER/variable_lists/ihm_variables.txt"
+python TOOLS/PLC_CSV_SNAPSHOT/variable_lists/generate_variable_list.py "<export>.xml" --root "Application.GVL_Troubleshooting" --output "TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt"
+python TOOLS/PLC_CSV_SNAPSHOT/variable_lists/generate_variable_list.py "<export>.xml" --root "Application.GVL_IHM" --output "TOOLS/PLC_CSV_SNAPSHOT/variable_lists/ihm_variables.txt"
 ```
 
 ## 🚧 Statut

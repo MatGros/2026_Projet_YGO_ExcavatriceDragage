@@ -2,7 +2,7 @@
 """POC - lit une variable BOOL en live via l'API de scripting native CODESYS (scriptengine).
 
 Contexte : ce script s'utilise quand le projet tourne en mode Simulation interne a l'IDE
-(aucun port reseau ouvert, pas d'OPC UA/Modbus disponible - cf. TOOLS/PLC_LIVE_READER/README.md
+(aucun port reseau ouvert, pas d'OPC UA/Modbus disponible - cf. TOOLS/PLC_CSV_SNAPSHOT/README.md
 "Mode A"). Il pilote directement l'application en cours dans l'IDE via son API officielle,
 gratuite, sans bibliotheque tierce (pas de pip install).
 

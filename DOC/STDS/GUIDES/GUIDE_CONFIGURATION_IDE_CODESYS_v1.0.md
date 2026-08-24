@@ -94,8 +94,8 @@ Le raccourci **Snapshot Live Troubleshooting** (`Ctrl+W`) s'assigne sur la comma
 
 ## 🖱️ 6. Ajouter un bouton de barre d'outils pour lancer un script Python
 
-> 📌 Ajouté le 2026-08-16, utilisé pour les scripts `TOOLS/PLC_LIVE_READER/codesys_console/`
-> (voir [`TOOLS/PLC_LIVE_READER/README.md`](../../../TOOLS/PLC_LIVE_READER/README.md) pour
+> 📌 Ajouté le 2026-08-16, utilisé pour les scripts `TOOLS/PLC_CSV_SNAPSHOT/codesys_console/`
+> (voir [`TOOLS/PLC_CSV_SNAPSHOT/README.md`](../../../TOOLS/PLC_CSV_SNAPSHOT/README.md) pour
 > le détail des scripts eux-mêmes — cette section ne couvre que la config IDE générique,
 > réutilisable pour n'importe quel script de scripting engine).
 
@@ -118,7 +118,7 @@ chaque fois.
         "Name": "Snapshot Troubleshooting",
         "Desc": "Lance codesys_snapshot_troubleshooting.py",
         "Icon": "snapshot_troubleshooting.ico",
-        "Path": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\PLC_LIVE_READER\\codesys_console\\codesys_snapshot_troubleshooting.py"
+        "Path": "C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\PLC_CSV_SNAPSHOT\\codesys_console\\codesys_snapshot_troubleshooting.py"
     }
 ]
 ```
@@ -141,4 +141,4 @@ chaque fois.
 | [`DOC/STDS/CODE_QUALITY_STANDARDS.md §7bis`](DOC/STDS/CODE_QUALITY_STANDARDS.md) | Convention d'écriture des Regions Pragma |
 | [`DOC/STDS/NAMING_CONVENTION.md`](DOC/STDS/NAMING_CONVENTION.md) | Nommage des sections commentées ST |
 | [`DOC/WFLOW/CONTRACTS/TASK_CONTEXT_20260814_REGIONS_PRAGMA_PROJECT.yaml`](DOC/WFLOW/CONTRACTS/TASK_CONTEXT_20260814_REGIONS_PRAGMA_PROJECT.yaml) | Contrat du lot d'introduction des Regions |
-| [`TOOLS/PLC_LIVE_READER/README.md`](../../../TOOLS/PLC_LIVE_READER/README.md) | Scripts concrets utilisant le bouton toolbar (§6) |
+| [`TOOLS/PLC_CSV_SNAPSHOT/README.md`](../../../TOOLS/PLC_CSV_SNAPSHOT/README.md) | Scripts concrets utilisant le bouton toolbar (§6) |
