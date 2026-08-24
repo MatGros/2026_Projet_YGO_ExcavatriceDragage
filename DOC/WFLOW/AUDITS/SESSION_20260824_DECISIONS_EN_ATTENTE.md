@@ -1,22 +1,25 @@
-# ❓ T150+ — Handoff final : décisions & questions en attente utilisateur (session 2026-08-24)
+# ✅ Handoff session 2026-08-24 — décisions utilisateur reçues, suite à donner
 
-> 📄 **Handoff définitif** produit à l'issue de l'avancement autonome (16 tâches, 4 challenges
-> d'experts intégrés). 🔗 Tâches : [`../TASKS.yaml`](../TASKS.yaml).
-> Objectif : vous permettre de **répondre en un seul endroit** ; à chaque réponse, on avance.
+> 📄 **Handoff** produit après l'avancement autonome (18 tâches, 5 challenges d'experts intégrés)
+> **et les réponses utilisateur reçues** (Q1-Q5). 🔗 Tâches : [`../TASKS.yaml`](../TASKS.yaml).
+> Prochaine étape : **T130/T135 (intention geste/action)** + implémentation T148 (validation humaine).
 
 ---
 
-## 1. Tâches traitées en autonomie (16)
+## 1. Tâches traitées (18)
 
-### ✅ Clôturées (4)
+### ✅ Clôturées / vérifiées (7)
 | Tâche | Livrable |
 |---|---|
 | T150 (C1) | Skills stub+canonique + gate G440 + gabarit bannière + README AGENT_WORKFLOW + config fraîcheur + archive project_tracking + DOC/WFLOW/TEMPLATE |
 | T109 (C1) | Polarité positive arbitrages + NC-100 (corrigé après revue) |
 | T128 (C2) | Commentaires GVL_IHM vérifiés conformes |
 | T98 (C2) | BrakeThermal/PhaseRotation déjà câblés (PRG_07:338-339) |
+| T145 (C1) | Clôturée (réserve actée utilisateur) |
+| T147 (C4) | Vérifié corrigé dans le code (latches conservés sur Enable=FALSE) |
+| Q3 (skills) | Pattern stub+canonique étendu à task-planner + codesys-workflow (G440 PASS) |
 
-### ⏳ Études / design / revues livrées (12)
+### ⏳ Études / design / revues livrées (13)
 | Tâche | Livrable (doc dans `DOC/WFLOW/AUDITS/`) |
 |---|---|
 | T55 (C2) | Design synchro 4 niveaux v0.2 + spec `FB_WinchSync_v1.1` |
@@ -31,32 +34,26 @@
 | T110 (C4) | Clarification DriveStatusWord.0 AC600 |
 | T91 (C4) | Étude séquence frein/puissance asymétrique |
 | T54 (C4) | Étude latence boucle (~10 ms) |
+| T148 (C4) | Design Reset maintenu FB_FbStatus |
 
-### 🧠 Challenges d'experts indépendants intégrés (4)
+### 🧠 Challenges d'experts indépendants intégrés (5)
 T55 · T109 · T11 · T125 — tous « À CORRIGER » → **corrections intégrées** (v0.2 etc.), liens morts
 G340 vérifiés.
 
 ---
 
-## 2. ❓ Questions bloquantes (à répondre pour avancer)
+## 2. ❓ Questions bloquantes (RÉPONSES UTILISATEUR 2026-08-24 reçues)
 
-### Q1 — T11 : spec « AUDIT D93 » absente du dépôt
-T11 (EmergencyStopOk) se base sur « AUDIT D93 » **inexistant dans le repo** (réf externe/client).
-→ **Fournir la spec D93** (fenêtre de confirmation, cas limites) ?
+| # | Question | Réponse utilisateur | Traitement |
+|---|---|---|---|
+| Q1 | Spec « AUDIT D93 » de T11 | « pas sûr mais je crois que c'est devenu `PowerContactorEngaged_DI` » | ✅ Design T11 v0.2 base déjà sur `PowerContactorEngaged` (pas Armable) — confirmé |
+| Q2 | T145 réserve confirmé ? | « oui c'est la nouvelle gestion des tâches projet donc fini » | ✅ T145 clôturée (réserve actée) |
+| Q3 | Étendre stub+canonique ? | « oui » | ✅ Appliqué : canoniques task-planner + codesys-workflow, G440 PASS |
+| Q4 | Priorités C4 | « finaliser FB_FbStatus puis intention geste/action » | ✅ T147 vérifié corrigé ✅ · T148 étude livrée ⏳ · prochaine étape = T130/T135 intention |
+| Q5 | Variables mortes + corrections doc | « laisser en commentaire dans le code, on verra au refactor PRG04 » | ✅ Non supprimées — laissées telles, à traiter au refactor PRG04 |
 
 ### Q2 — T145 : « en réserve » confirmé ?
 → Confirmer que T145 (source unique YAML) reste en réserve, ou la retraiter ?
-
-### Q3 — Étendre le pattern stub+canonique ?
-Pilote `troubleshooting` fait. → Étendre à `task-planner` et `codesys-workflow` ?
-
-### Q4 — Priorités C4 restantes ?
-Les tâches C4 restantes (code, spec + validation requises) : quelle(s) prioriser en premier
-(T130 intention · T135 · T143 DriftGuard · T147/T148 FB_FbStatus · …) ?
-
-### Q5 — Points code/AF à corriger (si vous validez)
-- **Variables mortes** `ProcessM1/M2_Ascent` (PRG_04:101-102, NC-090) : supprimer ?
-- **(fait)** spec `FB_WinchSync_v1.0`→`v1.1` corrigée ; **AF P09 §5** « benne fermée » corrigée (T132).
 
 ## 3. Décisions T55 (échelle synchro 4 niveaux)
 D1 majeur 2-sous-états · D2 diag-only · D3 critique→Méca E · D4 variables mortes · D5 généralisable ?
@@ -69,6 +66,10 @@ E1 fenêtre · E2 emplacement FB · E3 base PowerContactorEngaged ✓ · E4 verr
 - T108 : injection A (directionnel) vs B (global) · impact cycle · câblage électrique réel
 - T91 : FB_Brake sens en entrée · descente immédiate ✓ conforme MES-006 ?
 - T54 : où injecter CST_ScanLatencyMs · tâche référence · impact seuils Méca
+
+## 5bis. Décision T148 (FB_FbStatus Reset maintenu) — EN ATTENTE
+- Correctif proposé : ne vider le latch au front Reset QUE si cause à 0 (D3).
+- Tests TC-P03-014/015 à ajouter. → **validation humaine** (code C4).
 
 ## 6. État non-régression
 - Gate G440 : PASS · tests 5/5 · G340 : seul lien mort pré-existant (`test_fb_joystick.st`, fichier non touché)

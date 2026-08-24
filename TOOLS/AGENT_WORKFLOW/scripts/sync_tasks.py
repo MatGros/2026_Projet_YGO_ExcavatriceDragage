@@ -617,13 +617,10 @@ def save_tasks_html(tasks, output_path: Path):
                 let valA = a[sortKey] || '';
                 let valB = b[sortKey] || '';
 
-                if (sortKey === 'id' || sortKey === 'parent_id') {{
-                    valA = parseInt(valA.replace(/\\D/g, '')) || 0;
-                    valB = parseInt(valB.replace(/\\D/g, '')) || 0;
-                }}
-
                 let res = 0;
-                if (typeof valA === 'number') {{
+                if (sortKey === 'id' || sortKey === 'parent_id') {{
+                    res = valA.toString().localeCompare(valB.toString(), undefined, {{ numeric: true, sensitivity: 'base' }});
+                }} else if (typeof valA === 'number') {{
                     res = valA - valB;
                 }} else {{
                     res = valA.toString().localeCompare(valB.toString());
@@ -765,7 +762,7 @@ def save_tasks_html(tasks, output_path: Path):
                 const n = parseInt(t.id.replace(/\\D/g, '')) || 0;
                 if (n > maxNum) maxNum = n;
             }});
-            const nextId = 'T' + (maxNum + 1);
+            const nextId = 'T' + String(maxNum + 1).padStart(3, '0');
 
             document.getElementById('edit-id').value = nextId;
             document.getElementById('edit-parent').value = '';
