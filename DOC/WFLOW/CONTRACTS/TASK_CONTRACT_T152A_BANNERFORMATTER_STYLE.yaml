@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T152-A : Purger commentaires-journal + décomposer condition
+# (FB_Hmi_BannerFormatter.st) — Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T152-A
+  parent_id: T152
+  criticality: C2            # comportement-préservé mais touche affichage bandeau alarme
+  strategy: patch
+
+  # ── 1. Objectif ───────────────────────────────────────────────────────────
+  objective: >
+    Purger les 3 blocs de commentaires-journal interdits (CODE_QUALITY_STANDARDS.md §2ter)
+    et décomposer la condition composée CriticalActionActive (5 termes OR, > seuil de 3
+    imposé par §2quater) en variables intermédiaires nommées — sans aucun changement de
+    comportement logique.
+
+  # ── 2. Critères d'acceptation ─────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "0 commentaire de type journal de chantier restant dans FB_Hmi_BannerFormatter.st (motifs identifiés lignes 478-479, 527-528, 539-540 de la version auditée)."
+      verified_by: "Relecture manuelle intégrale du fichier post-édition"
+    - id: AC2
+      statement: "CriticalActionActive est décomposé en variables intermédiaires nommées, chaque expression comportant au plus 3 termes."
+      verified_by: "Relecture code ligne concernée (ex. 341-342 version auditée)"
+    - id: AC3
+      statement: "Comportement logique strictement identique avant/après (même valeur de sortie pour les mêmes entrées)."
+      verified_by: "Table de vérité manuelle sur les 5 termes d'origine + G200_check_linkage.py --report = PASS"
+    - id: AC4
+      statement: "Bundle régénéré frais, gates Palier C 100% PASS."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . && python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+
+  # ── 3. Périmètre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+    forbidden:
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - Toute modification de la logique d'alarme autre que la décomposition demandée
+
+  # ── 4. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 5. Modèles autorisés ───────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, bug préexistant, risque
+    hors scope) est remonté IMMÉDIATEMENT à l'orchestrateur, pas à la fin et jamais
+    silencieusement. Signaler n'est pas élargir le scope.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.
