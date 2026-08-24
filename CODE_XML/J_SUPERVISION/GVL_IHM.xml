@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T23:36:32.435209" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T23:36:32.435209">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.376700" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.376700">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalReached">
@@ -63,7 +63,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: défaut/perte thermique centrale hydraulique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopSensorBypassActive">
@@ -156,7 +156,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
 struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
-(doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
+(doctrine reset=front, PRG_07_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
 ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
               </documentation>
             </variable>
@@ -215,7 +215,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-: granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
+🔒 Granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -601,7 +601,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — , manquait (contrairement à ST_WinchHMI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — champ Cfg manquait initialement (contrairement à ST_WinchHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -2884,7 +2884,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_06_Outputs</xhtml>
               </documentation>
             </variable>
             <variable name="InvertDirection">
@@ -3069,7 +3069,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">
@@ -4121,7 +4121,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <derived name="E_WinchFinalInterlockState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">

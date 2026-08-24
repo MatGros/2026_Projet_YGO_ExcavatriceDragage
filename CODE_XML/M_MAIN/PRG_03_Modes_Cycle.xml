@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T23:35:53.724707" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T23:35:53.724707">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.449915" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.449915">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -95,9 +95,9 @@
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
                    DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §2
-   🎯 Produit par FB_Modes (via PRG_MODES_CFC)
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>

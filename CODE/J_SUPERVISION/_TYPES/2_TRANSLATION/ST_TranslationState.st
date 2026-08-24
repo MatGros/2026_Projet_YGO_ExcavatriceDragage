@@ -22,7 +22,7 @@ STRUCT
     DriveFreqRef_Hz         : REAL;    (* 🎯 Consigne fréquence réellement appliquée *)
     ActiveDirection         : INT;     (* ↔️ Sens arbitré : -1 / 0 / +1 *)
     ActiveSpeedRef_Pct      : REAL;    (* 📊 Consigne active après arbitrage *)
-    FinalInterlockState     : E_State; (* 🛡️ État final _LD lecture seule *)
+    FinalInterlockState     : E_State; (* 🛡️ État final lecture seule *)
     FinalInterlockReason    : E_TranslationFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
     FinalInterlockError     : BOOL;    (* 🛡️ Défaut final mémorisé *)
     FinalInterlockErrorId   : WORD;    (* 🛡️ Bitfield final *)

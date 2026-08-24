@@ -34,7 +34,7 @@ STRUCT
     Contactor3              : BOOL;             (* 🔌 Contacteur vitesse palier 3 *)
     Contactor4              : BOOL;             (* 🔌 Contacteur vitesse palier 4 *)
     BrakeCmd                : BOOL;             (* 🔓 Commande frein (TRUE = desserré / libre) *)
-    FinalInterlockState     : E_WinchFinalInterlockState; (* 🛡️ État final _LD lecture seule *)
+    FinalInterlockState     : E_WinchFinalInterlockState; (* 🛡️ État final lecture seule *)
     FinalInterlockReason    : E_WinchFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
     FinalInterlockError     : BOOL;             (* 🛡️ Défaut final mémorisé *)
     FinalInterlockErrorId   : WORD;             (* 🛡️ Bitfield final *)

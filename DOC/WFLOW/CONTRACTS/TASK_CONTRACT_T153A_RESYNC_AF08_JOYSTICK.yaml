@@ -1,0 +1,72 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T153-A : Resynchronisation AF_Partie-08 Joystick
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T153-A
+  parent_id: T153
+  criticality: C1            # documentaire pur, 0 risque fonctionnel
+  strategy: patch
+
+  # ── 1. Objectif ───────────────────────────────────────────────────────────
+  objective: >
+    Produire AF_Partie-08_Fonction_Joystick_v2.1.md dont les sections interface
+    (§3/§4) decrivent l'interface reelle de FB_Joystick.st (entree unique
+    ArmingPermit) au lieu de l'ancienne interface v2.0 (Mode, BenneBusy,
+    PreserveArmingAfterBucket, DeadmanReconfEnable, DeadmanRearmTimeout) qui
+    n'existe plus dans le code. Aucune modification de CODE/.
+
+  # ── 2. Critères d'acceptation ─────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md existe et documente ArmingPermit comme seule entree de permission d'armement, sans Mode/BenneBusy/PreserveArmingAfterBucket/DeadmanReconfEnable/DeadmanRearmTimeout."
+      verified_by: "Lecture du fichier v2.1, comparaison a la section VAR_INPUT reelle de CODE/D_JOYSTICK/FB_Joystick.st"
+    - id: AC2
+      statement: "AF_Partie-08_Fonction_Joystick_v2.0.md est deplace dans ARCHIVES/Doc/ (pas supprime, pas ecrase)."
+      verified_by: "git status : rename ou move visible, fichier present sous ARCHIVES/Doc/"
+    - id: AC3
+      statement: "Tous les renvois vers AF-08 (DOC/README.md et en-tetes CODE/*.st) pointent vers la v2.1, aucun lien mort ni double version active."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py = PASS 0 erreur"
+
+  # ── 3. Périmètre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - DOC/AF/AF_Partie-08_Fonction_Joystick_v2.1.md
+      - ARCHIVES/Doc/AF_Partie-08_Fonction_Joystick_v2.0.md
+      - DOC/README.md
+    forbidden:
+      - CODE/D_JOYSTICK/FB_Joystick.st (lecture seule, source de verite - ne pas modifier)
+      - Toute autre CODE/*.st
+
+  # ── 4. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - doc_links_check
+
+  # ── 5. Modèles autorisés ───────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 6. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout ecart constate entre le code reel et la doc precedente au-dela du
+    perimetre ArmingPermit (ex. autre section AF-08 perimee) est remonte
+    IMMEDIATEMENT a l'orchestrateur, sans elargir le scope de cette tache.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

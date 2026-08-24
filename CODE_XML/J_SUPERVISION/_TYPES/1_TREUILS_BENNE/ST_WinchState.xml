@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:15:44.225651" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:15:44.225651">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T22:23:17.406358" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T22:23:17.406358">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -241,7 +241,7 @@
                 <derived name="E_WinchFinalInterlockState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">

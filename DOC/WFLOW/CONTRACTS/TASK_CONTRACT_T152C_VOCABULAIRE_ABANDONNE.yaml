@@ -11,9 +11,11 @@ contract:
 
   # ── 1. Objectif ───────────────────────────────────────────────────────────
   objective: >
-    Remplacer dans les commentaires les références à des POU abandonnés (vocabulaire interdit
-    par NAMING_CONVENTION.md/AGENTS.md) par les noms cibles réels de l'architecture 7 POU, et
-    reformuler un commentaire syntaxiquement cassé — aucune modification fonctionnelle.
+    Remplacer dans les commentaires les références à des POU abandonnés, y compris le résidu
+    abrégé _LD (vocabulaire interdit par NAMING_CONVENTION.md/AGENTS.md), par les noms cibles
+    réels de l'architecture 7 POU, et reformuler les commentaires syntaxiquement cassés (motif
+    "(* :" / "// :" orphelin) — aucune modification fonctionnelle. Périmètre élargi par le 3e
+    challenge indépendant (2026-08-25, exhaustif sur les 77 fichiers de _TYPES/).
 
   # ── 2. Critères d'acceptation ─────────────────────────────────────────────
   acceptance:
@@ -33,9 +35,12 @@ contract:
       statement: "ST_TranslationHMI.st:16 — commentaire cassé reformulé, sens clair et correct."
       verified_by: "Relecture de la ligne citée"
     - id: AC6
-      statement: "0 occurrence résiduelle de PRG_TREUILS_CFC / PRG_10_Outputs_LD / PRG_MODES_CFC / PRG_AUXILIARY_CFC / PRG_SUPERVISION_CFC dans CODE/J_SUPERVISION/_TYPES/."
-      verified_by: "grep -ri sur CODE/J_SUPERVISION/_TYPES/"
+      statement: "0 occurrence residuelle des motifs PRG_TREUILS_CFC / PRG_10_Outputs_LD / PRG_MODES_CFC / PRG_AUXILIARY_CFC / PRG_SUPERVISION_CFC / _LD (limite de mot) dans CODE/J_SUPERVISION/_TYPES/, y compris ST_Chain_Winch_Control.st:7, ST_WinchState.st:37, ST_Chain_Translation_Control.st:6, ST_TranslationState.st:25."
+      verified_by: "grep -riE sur CODE/J_SUPERVISION/_TYPES/ avec le motif '_LD\\b' inclus, pas seulement les 5 noms complets"
     - id: AC7
+      statement: "Les 6 commentaires cassés (motif deux-points orphelin en tête, ex. \"(* : texte\") sont reformules avec un sens clair : ST_TranslationHMI.st:16, ST_CommunHMI.st:18, ST_CommunHMI.st:21, ST_CommunHMI.st:57, ST_Chain_Winch_Control.st:14, ST_Chain_Winch_Control.st:15."
+      verified_by: "Relecture des 6 lignes citees post-edition"
+    - id: AC8
       statement: "Gates Palier A/C 100% PASS (0 changement fonctionnel attendu)."
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
 
@@ -43,8 +48,12 @@ contract:
   scope:
     allowed:
       - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
       - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st
       - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st
+      - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
       - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st
     forbidden:

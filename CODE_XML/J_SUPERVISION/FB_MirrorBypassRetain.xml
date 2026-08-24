@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T22:41:38.445930" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T22:41:38.445930">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_MirrorBypassRetain" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars />
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIR BIDIRECTIONNEL ===
+&lt;-&gt; [BUS] Valeur bypass côté IHM (GVL_IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Retain">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Valeur bypass côté RETAIN (GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Prev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Mémoire du cycle précédent (détection front IHM)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔄 FB_MirrorBypassRetain — Miroir bidirectionnel IHM ↔ RETAIN (bypass)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Synchronise un bypass IHM (volatile) avec sa copie RETAIN
+             (survit à une coupure) — dernier-écrit-gagne : si l'IHM a
+             changé depuis le cycle précédent, le RETAIN suit ; sinon
+             l'IHM est réaligné sur le RETAIN (ex. redémarrage à chaud).
+   🔌 Architecture : Brique technique sans cycle de vie (pas de défaut à remonter)
+   📍 Domaine : CODE/J_SUPERVISION (seul consommateur actuel : PRG_07_Supervision §2c)
+   📄 Doc métier : DOC/STDS/CODE_QUALITY_STANDARDS.md §10
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF Hmi &lt;&gt; Prev THEN
+    Retain := Hmi;
+ELSE
+    Hmi := Retain;
+END_IF;
+Prev := Hmi;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6b38f222-bba1-53c3-99fb-b91a23d65b9a</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Object Name="FB_MirrorBypassRetain" ObjectId="6b38f222-bba1-53c3-99fb-b91a23d65b9a" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

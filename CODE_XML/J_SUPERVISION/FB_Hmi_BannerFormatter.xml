@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T23:36:35.170574" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T23:36:35.170574">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T22:23:27.609441" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T22:23:27.609441">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1293,6 +1293,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins un bypass actif</xhtml>
               </documentation>
             </variable>
+            <variable name="PowerOrChainFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut chaîne AU ou contacteur puissance absent</xhtml>
+              </documentation>
+            </variable>
             <variable name="CriticalActionActive">
               <type>
                 <BOOL />
@@ -1662,8 +1670,8 @@ END_IF;
 
 // Interlock = mouvement demandé mais permit absent : c'est une cause
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
-CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged
-                     OR PowerCutOffActiveAny OR SafeStopActive OR DirectionBlocked);
+PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
+CriticalActionActive := (PowerOrChainFault OR SafeStopActive OR DirectionBlocked);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -1799,8 +1807,7 @@ IF TranslationSafety.ErrorSensorIncoherent AND (AlarmCount &lt; CST_NbMaxAlarmes
     AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5d. Collecte — benne (FB_Bucket.ErrorId, bits vérifiés à la lecture du FB source :
-// diffèrent du brouillon initial du plan, corrigés ici bit à bit)
+// 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
 IF ((BucketErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -1848,8 +1855,7 @@ IF ((ExtractionErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_N
     AlarmArray[AlarmCount] := '[EXTRACTION] config'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId, bit3
-// "Startup" absent du brouillon initial du plan, ajouté ici après lecture du FB source)
+// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId)
 IF ((EmergencyErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[AU] redondance contacteurs'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -1860,8 +1866,7 @@ IF ((EmergencyErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_Nb
     AlarmArray[AlarmCount] := '[AU] echec autotest demarrage'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId, dictionnaire absent du plan,
-// construit ici après lecture complète du FB source)
+// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
 IF ((CycleErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;

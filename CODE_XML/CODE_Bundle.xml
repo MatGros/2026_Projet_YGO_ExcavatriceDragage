@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T01:51:35.943984" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T01:51:35.943984">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.348500" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.348500">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3089,7 +3089,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État frontière _LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État frontière</xhtml>
               </documentation>
             </variable>
             <variable name="Idx405_FinalInterlockReason">
@@ -3505,7 +3505,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <derived name="E_WinchFinalInterlockState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État frontière _LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État frontière</xhtml>
               </documentation>
             </variable>
             <variable name="Idx406_FinalInterlockReason">
@@ -3561,7 +3561,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Palier plafonné à 1, approche limite haute</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Palier plafonné à 1, approche limite haute</xhtml>
               </documentation>
             </variable>
             <variable name="Idx413_InBottomSlowdownZone">
@@ -3569,7 +3569,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Palier plafonné à 1, approche limite basse (câble ou légale)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Palier plafonné à 1, approche limite basse (câble ou légale)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx414_BottomLimitActiveM">
@@ -4207,7 +4207,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Rotation de phase incorrecte — retour unique commun M1/M2/M3</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalReached">
@@ -4223,7 +4223,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: défaut/perte thermique centrale hydraulique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🌡️ Défaut/perte thermique centrale hydraulique</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopSensorBypassActive">
@@ -4316,7 +4316,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
 struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
-(doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
+(doctrine reset=front, PRG_07_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
 ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier</xhtml>
               </documentation>
             </variable>
@@ -4375,7 +4375,7 @@ Front Kobold confirmé dans la fenêtre d'immersion</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive))
-: granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
+🔒 Granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -7244,9 +7244,9 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
                    DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §2
-   🎯 Produit par FB_Modes (via PRG_MODES_CFC)
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -8997,7 +8997,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_06_Outputs</xhtml>
               </documentation>
             </variable>
             <variable name="InvertDirection">
@@ -9183,7 +9183,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — , manquait (contrairement à ST_WinchHMI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — champ Cfg manquait initialement (contrairement à ST_WinchHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -9406,7 +9406,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">
@@ -9976,8 +9976,8 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🪝 ST_WinchFinalInterlockRequest — Demande brute vers frontière Q M1/M2
    ───────────────────────────────────────────────────────────────
-   📤 Producteur unique : PRG_TREUILS_CFC (VAR_OUTPUT).
-   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock.
+   📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT).
+   📥 Consommateur unique : PRG_06_Outputs, avant FB_WinchOutputInterlock.
    🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
       demandes exactes de FB_Winch / ST_SpeedStepTable.
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -10478,7 +10478,7 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <derived name="E_WinchFinalInterlockState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">
@@ -15962,7 +15962,7 @@ END_IF;
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "Gate neutralisation"}
+{region "§1 Gate neutralisation"}
 IF NOT Enable THEN
     Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE; Status.Error := FALSE; Status.ErrorId := 16#0000;
     Status.State := E_State.DISABLED;
@@ -15977,7 +15977,7 @@ Ready := TRUE;
 Status.State := E_State.READY;
 {endregion}
 
-{region "Abs"}
+{region "§2 Abs"}
 instAbs(
     Enable              := Enable,
     Reset               := Reset,
@@ -15991,7 +15991,7 @@ instAbs(
 );
 {endregion}
 
-{region "Homing"}
+{region "§3 Homing"}
 instHoming(
     Enable               := Enable,
     Reset                := Reset,
@@ -16015,7 +16015,7 @@ instHoming(
 );
 {endregion}
 
-{region "Scale"}
+{region "§4 Scale"}
 instScale(
     RawPos       := instAbs.RawPos,
     HomingRefRaw := instHoming.HomingRefRaw,
@@ -16024,7 +16024,7 @@ instScale(
 );
 {endregion}
 
-{region "Safety"}
+{region "§5 Safety"}
 instSafety(
     Enable             := Enable,
     Reset              := Reset,
@@ -16036,7 +16036,7 @@ instSafety(
 );
 {endregion}
 
-{region "Reliability"}
+{region "§6 Reliability"}
 instRel(
     EncoderAvailable  := instAbs.EncoderAvailable,
     Homed             := instHoming.Homed,
@@ -16044,7 +16044,7 @@ instRel(
 );
 {endregion}
 
-{region "Speed"}
+{region "§7 Speed"}
 instSpeed(
     Enable        := Enable,
     Reset         := Reset,
@@ -16053,7 +16053,7 @@ instSpeed(
 );
 {endregion}
 
-{region "Remplissage struct et synthese"}
+{region "§8 Remplissage struct et synthese"}
 Measurement.RawPos            := instAbs.RawPos;
 Measurement.EncoderAvailable  := instAbs.EncoderAvailable;
 Measurement.CablePosM         := instSafety.CablePosMSafe;
@@ -19206,6 +19206,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins un bypass actif</xhtml>
               </documentation>
             </variable>
+            <variable name="PowerOrChainFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Défaut chaîne AU ou contacteur puissance absent</xhtml>
+              </documentation>
+            </variable>
             <variable name="CriticalActionActive">
               <type>
                 <BOOL />
@@ -19575,8 +19583,8 @@ END_IF;
 
 // Interlock = mouvement demandé mais permit absent : c'est une cause
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
-CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged
-                     OR PowerCutOffActiveAny OR SafeStopActive OR DirectionBlocked);
+PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
+CriticalActionActive := (PowerOrChainFault OR SafeStopActive OR DirectionBlocked);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -19712,8 +19720,7 @@ IF TranslationSafety.ErrorSensorIncoherent AND (AlarmCount &lt; CST_NbMaxAlarmes
     AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5d. Collecte — benne (FB_Bucket.ErrorId, bits vérifiés à la lecture du FB source :
-// diffèrent du brouillon initial du plan, corrigés ici bit à bit)
+// 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
 IF ((BucketErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -19761,8 +19768,7 @@ IF ((ExtractionErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_N
     AlarmArray[AlarmCount] := '[EXTRACTION] config'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId, bit3
-// "Startup" absent du brouillon initial du plan, ajouté ici après lecture du FB source)
+// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId)
 IF ((EmergencyErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[AU] redondance contacteurs'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -19773,8 +19779,7 @@ IF ((EmergencyErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_Nb
     AlarmArray[AlarmCount] := '[AU] echec autotest demarrage'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId, dictionnaire absent du plan,
-// construit ici après lecture complète du FB source)
+// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
 IF ((CycleErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -20269,7 +20274,7 @@ END_IF;
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "S0 CAUSES + SOCLE (appele AVANT le gate)"}
+{region "§1 CAUSES + SOCLE (appele AVANT le gate)"}
 // 🎯 CAUSES exprimées en CLAIR (liste ST_FbCause) — plus de bitfield WORD.
 //    - CalibFail : fault à acquitter (IsWarning=FALSE).
 //    - RawOutOfRange / BusLost : warning auto-effacés (décision utilisateur).
@@ -20318,7 +20323,7 @@ ErrorId := Status.ErrorId;    // miroir
 Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT Error;
 {endregion}
 
-{region "S1 Gate securite (neutralisation pipeline, n efface pas le statut)"}
+{region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
     AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
@@ -20341,7 +20346,7 @@ IF NOT Enable OR BusLost THEN
 END_IF;
 {endregion}
 
-{region "S2 Acquisition bouton + mise a l echelle"}
+{region "§3 Acquisition bouton + mise a l echelle"}
 Button := RawButton;
 
 // Mise a l'echelle (deadband) - le neutre s'evalue sur les 2 axes
@@ -20350,7 +20355,7 @@ ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic - position centrale
 {endregion}
 
-{region "S5 Armement homme mort"}
+{region "§4 Armement homme mort"}
 // Bouton homme-mort : armement par MAINTIEN (DeadmanArmHoldTime), independant de la position.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
@@ -20379,7 +20384,7 @@ NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q, PT
 IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 {endregion}
 
-{region "S6 Pipeline axe X"}
+{region "§5 Pipeline axe X"}
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
@@ -20398,7 +20403,7 @@ ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
 ELSE DirectionX := 0; END_IF;
 {endregion}
 
-{region "S7 Pipeline axe Y et sorties"}
+{region "§6 Pipeline axe Y et sorties"}
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
@@ -20426,6 +20431,70 @@ NeutralYAct := NeutralYMem;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>a4d06470-35ad-55a9-9871-fdd3a74327dd</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_MirrorBypassRetain" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars />
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIR BIDIRECTIONNEL ===
+&lt;-&gt; [BUS] Valeur bypass côté IHM (GVL_IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Retain">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Valeur bypass côté RETAIN (GVL_PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Prev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Mémoire du cycle précédent (détection front IHM)</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔄 FB_MirrorBypassRetain — Miroir bidirectionnel IHM ↔ RETAIN (bypass)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Synchronise un bypass IHM (volatile) avec sa copie RETAIN
+             (survit à une coupure) — dernier-écrit-gagne : si l'IHM a
+             changé depuis le cycle précédent, le RETAIN suit ; sinon
+             l'IHM est réaligné sur le RETAIN (ex. redémarrage à chaud).
+   🔌 Architecture : Brique technique sans cycle de vie (pas de défaut à remonter)
+   📍 Domaine : CODE/J_SUPERVISION (seul consommateur actuel : PRG_07_Supervision §2c)
+   📄 Doc métier : DOC/STDS/CODE_QUALITY_STANDARDS.md §10
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF Hmi &lt;&gt; Prev THEN
+    Retain := Hmi;
+ELSE
+    Hmi := Retain;
+END_IF;
+Prev := Hmi;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6b38f222-bba1-53c3-99fb-b91a23d65b9a</ObjectId>
           </data>
         </addData>
       </pou>
@@ -21625,14 +21694,11 @@ END_IF;
 
 {region "§4 Acquittement defauts"}
 // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-// ⚠️ Reset TOUJOURS effectif, efface l'affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
-// pour permettre une nouvelle tentative d'armement sans blocage IHM. Si le défaut persiste,
-// la nouvelle tentative re-latchera Cause:=TRUE et Ack:=FALSE (TC-P01-009).
+// ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause brute n'est levée que par
+// une nouvelle tentative d'armement réussie (interlock reste sur Cause, AF 3.4bis).
 IF ResetEdge.Q THEN
     RedundancyTestFailedAck := TRUE;
     EmergencyArmingFailedAck := TRUE;
-    RedundancyTestFailedCause := FALSE;
-    EmergencyArmingFailedCause := FALSE;
     StartupFail := FALSE;
     ErrorId := 16#0000;
 END_IF;
@@ -21640,6 +21706,14 @@ END_IF;
 {endregion}
 
 {region "§5 Sequence rearmement AU"}
+// 🛑 Coupure immédiate de toute séquence en cours si demande de coupure d'urgence
+IF (ArmingSeqStep &lt;&gt; 0) AND (BtnEmergencyCutOff OR PowerCutOffRequest) THEN
+    ArmingSeqStep := 0;
+END_IF;
+IF (ArmingSeqStep = 5 OR ArmingSeqStep = 6) AND NOT EmergencyChainClosed THEN
+    ArmingSeqStep := 0;
+END_IF;
+
 // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
 // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
 // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
@@ -21708,7 +21782,7 @@ END_IF;
 
 // ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
 TonArmingPulse(IN := (ArmingSeqStep = 5), PT := CST_ArmingPulseDuration);
-Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5);
+Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
 IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
     ArmingSeqStep := 6;
 END_IF;
@@ -36456,6 +36530,86 @@ PowerCutOffActive := PowerCutOffReq;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Vue troubleshooting (diagnostic IHM)</xhtml>
               </documentation>
             </variable>
+            <variable name="instMirrorBypassTranslation">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass Translation IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassM1">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass M1 IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassM2">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass M2 IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassSync">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass Sync IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassCommun">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass Commun IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassLimitLegal">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass LimitLegal IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassTopLimitSwitch">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass TopLimitSwitch IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassTopLimitSoftware">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass TopLimitSoftware IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassCableLimitSwitch">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass CableLimitSwitch IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instMirrorBypassSlackCable">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass SlackCable IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
             <variable name="PrevTranslationBypass">
               <type>
                 <BOOL />
@@ -36741,76 +36895,18 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
 END_IF;
 
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
-// 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
-IF GVL_IHM.TranslationM3.Bypass.Global &lt;&gt; PrevTranslationBypass THEN
-    BypassTranslationGlobal := GVL_IHM.TranslationM3.Bypass.Global;
-ELSE
-    GVL_IHM.TranslationM3.Bypass.Global := BypassTranslationGlobal;
-END_IF;
-PrevTranslationBypass := GVL_IHM.TranslationM3.Bypass.Global;
-
-IF GVL_IHM.M1TreuilRetenue.Bypass.Global &lt;&gt; PrevM1Bypass THEN
-    BypassWinchM1Global := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-ELSE
-    GVL_IHM.M1TreuilRetenue.Bypass.Global := BypassWinchM1Global;
-END_IF;
-PrevM1Bypass := GVL_IHM.M1TreuilRetenue.Bypass.Global;
-
-IF GVL_IHM.M2TreuilBenne.Bypass.Global &lt;&gt; PrevM2Bypass THEN
-    BypassWinchM2Global := GVL_IHM.M2TreuilBenne.Bypass.Global;
-ELSE
-    GVL_IHM.M2TreuilBenne.Bypass.Global := BypassWinchM2Global;
-END_IF;
-PrevM2Bypass := GVL_IHM.M2TreuilBenne.Bypass.Global;
-
-IF GVL_IHM.M1M2Sync.Bypass.Global &lt;&gt; PrevSyncBypass THEN
-    BypassSyncGlobal := GVL_IHM.M1M2Sync.Bypass.Global;
-ELSE
-    GVL_IHM.M1M2Sync.Bypass.Global := BypassSyncGlobal;
-END_IF;
-PrevSyncBypass := GVL_IHM.M1M2Sync.Bypass.Global;
-
-IF GVL_IHM.Commun.Bypass.Global &lt;&gt; PrevCommunBypass THEN
-    BypassCommunGlobal := GVL_IHM.Commun.Bypass.Global;
-ELSE
-    GVL_IHM.Commun.Bypass.Global := BypassCommunGlobal;
-END_IF;
-PrevCommunBypass := GVL_IHM.Commun.Bypass.Global;
-
-IF GVL_IHM.Commun.Bypass.LimitLegal &lt;&gt; PrevLimitLegal THEN
-    BypassLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
-ELSE
-    GVL_IHM.Commun.Bypass.LimitLegal := BypassLimitLegal;
-END_IF;
-PrevLimitLegal := GVL_IHM.Commun.Bypass.LimitLegal;
-
-IF GVL_IHM.Commun.Bypass.TopLimitSwitch &lt;&gt; PrevTopLimitSwitch THEN
-    BypassTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
-ELSE
-    GVL_IHM.Commun.Bypass.TopLimitSwitch := BypassTopLimitSwitch;
-END_IF;
-PrevTopLimitSwitch := GVL_IHM.Commun.Bypass.TopLimitSwitch;
-
-IF GVL_IHM.Commun.Bypass.TopLimitSoftware &lt;&gt; PrevTopLimitSoftware THEN
-    BypassTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
-ELSE
-    GVL_IHM.Commun.Bypass.TopLimitSoftware := BypassTopLimitSoftware;
-END_IF;
-PrevTopLimitSoftware := GVL_IHM.Commun.Bypass.TopLimitSoftware;
-
-IF GVL_IHM.Commun.Bypass.CableLimitSwitch &lt;&gt; PrevCableLimitSwitch THEN
-    BypassCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
-ELSE
-    GVL_IHM.Commun.Bypass.CableLimitSwitch := BypassCableLimitSwitch;
-END_IF;
-PrevCableLimitSwitch := GVL_IHM.Commun.Bypass.CableLimitSwitch;
-
-IF GVL_IHM.Commun.Bypass.SlackCable &lt;&gt; PrevSlackCable THEN
-    BypassSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
-ELSE
-    GVL_IHM.Commun.Bypass.SlackCable := BypassSlackCable;
-END_IF;
-PrevSlackCable := GVL_IHM.Commun.Bypass.SlackCable;
+// 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
+// (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
+instMirrorBypassTranslation(Hmi := GVL_IHM.TranslationM3.Bypass.Global, Retain := BypassTranslationGlobal, Prev := PrevTranslationBypass);
+instMirrorBypassM1(Hmi := GVL_IHM.M1TreuilRetenue.Bypass.Global, Retain := BypassWinchM1Global, Prev := PrevM1Bypass);
+instMirrorBypassM2(Hmi := GVL_IHM.M2TreuilBenne.Bypass.Global, Retain := BypassWinchM2Global, Prev := PrevM2Bypass);
+instMirrorBypassSync(Hmi := GVL_IHM.M1M2Sync.Bypass.Global, Retain := BypassSyncGlobal, Prev := PrevSyncBypass);
+instMirrorBypassCommun(Hmi := GVL_IHM.Commun.Bypass.Global, Retain := BypassCommunGlobal, Prev := PrevCommunBypass);
+instMirrorBypassLimitLegal(Hmi := GVL_IHM.Commun.Bypass.LimitLegal, Retain := BypassLimitLegal, Prev := PrevLimitLegal);
+instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, Retain := BypassTopLimitSwitch, Prev := PrevTopLimitSwitch);
+instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, Retain := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
+instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, Retain := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
+instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, Retain := BypassSlackCable, Prev := PrevSlackCable);
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
@@ -37908,6 +38004,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
         <Folder Name="J_SUPERVISION">
           <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
           <Object Name="FB_Hmi_BannerFormatter" ObjectId="84039c85-4845-567a-8eb6-932818f2daf4" />
+          <Object Name="FB_MirrorBypassRetain" ObjectId="6b38f222-bba1-53c3-99fb-b91a23d65b9a" />
           <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
           <Object Name="GVL_IHM" ObjectId="978cfa54-3431-5207-985f-5b2fcc137a7b" />
           <Object Name="GVL_Troubleshooting" ObjectId="bc4eb3d9-a87c-5e82-816b-4cd345ae97ab" />
