@@ -19,6 +19,12 @@ def _run_fb_test(fb_name: str):
         errors="replace",
         cwd=str(REPO_ROOT),
     )
+    # Affichage du rapport complet dans la console VS Code Testing
+    if proc.stdout:
+        print(proc.stdout)
+    if proc.stderr:
+        print(proc.stderr, file=sys.stderr)
+
     if proc.returncode != 0:
         error_msg = f"Échec des tests CI pour {fb_name} (code {proc.returncode}) :\n"
         error_msg += proc.stdout[-1500:] if proc.stdout else ""
