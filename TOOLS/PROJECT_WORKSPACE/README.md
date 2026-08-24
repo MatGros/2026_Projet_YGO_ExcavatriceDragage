@@ -63,7 +63,7 @@ deux fichiers doit être reportée à l'identique dans l'autre dans le même ges
 
 L’ouverture de VS Code ne lance rien automatiquement (`autorun: false`).
 
-Pour lancer les dix onglets :
+Pour lancer les neuf onglets :
 
 1. `Ctrl+Shift+P`
 2. Exécuter **Terminals: Run**
@@ -87,18 +87,6 @@ Terminals: Kill
 - `command` : commande exécutée dans l’onglet.
 - `open: true` : ouvre l’onglet après exécution.
 - Aucun champ `split` n’est utilisé : les terminaux restent des onglets indépendants.
-
-## 👁️ Afficher le graphe
-
-Le terminal **Workflow Graph** génère les deux diagrammes à partir des sources du projet. Il n’affiche pas le dessin dans le terminal.
-
-La mise en page applique ces règles :
-- le workflow utilise l’ordre `BT` défini dans `workflow_diagram.json` ;
-- la structure affiche uniquement les dossiers principaux et leurs compteurs ;
-- les dossiers vides sont masqués pour garder une vue lisible ;
-- les fichiers détaillés ne sont pas affichés dans la vue globale.
-
-Ouvre ensuite ce fichier dans VS Code avec une extension de prévisualisation Mermaid, par exemple **Markdown Preview Mermaid Support**, puis utilise l’aperçu Markdown.
 
 ## 🔧 Dépannage
 
