@@ -11,10 +11,14 @@ contract:
 
   # ── 1. Objectif ───────────────────────────────────────────────────────────
   objective: >
-    Extraire le motif dupliqué ~10 fois de synchronisation bidirectionnelle bypass IHM↔RETAIN
-    (PRG_07_Supervision.st §2b/§2c, lignes 169-295 de la version auditée) en une FC dédiée,
-    appelée à chaque site au lieu de la logique inline répétée — comportement strictement
-    identique, conformité à l'esprit "orchestration = câblage" (CODE_QUALITY_STANDARDS.md §10).
+    Extraire le motif dupliqué 10 fois de synchronisation bidirectionnelle bypass IHM↔RETAIN
+    dans PRG_07_Supervision.st §2c SEUL (lignes 227-295 de la version auditée, un bloc par
+    variable Prev* déclarée lignes 39-48) en une FC dédiée, appelée à chaque site au lieu de la
+    logique inline répétée — comportement strictement identique, conformité à l'esprit
+    "orchestration = câblage" (CODE_QUALITY_STANDARDS.md §10). ⚠️ CORRIGÉ par le 3e challenge
+    indépendant (2026-08-25) : §2b (lignes 174-223, 6 blocs) est un ALGORITHME DIFFÉRENT
+    (restauration boot one-shot conditionnée par Initialized, pas une synchro bidirectionnelle
+    continue) — explicitement HORS SCOPE de cette tâche, ne pas fusionner avec §2c.
 
   # ── 2. Critères d'acceptation ─────────────────────────────────────────────
   acceptance:
@@ -22,11 +26,11 @@ contract:
       statement: "Une FC dédiée existe (ex. FC_SyncBypassRetain(Hmi, Retain)), contrat IN/OUT documenté en en-tête."
       verified_by: "Lecture du fichier créé"
     - id: AC2
-      statement: "Les ~10 blocs dupliqués de PRG_07_Supervision.st §2b/§2c sont remplacés par des appels à cette FC."
-      verified_by: "Relecture manuelle de §2b/§2c post-édition, comptage des sites"
+      statement: "Les 10 blocs dupliqués de PRG_07_Supervision.st §2c (lignes 227-295, un par variable Prev*) sont remplacés par des appels à cette FC — et EUX SEULS : les 6 blocs de §2b (lignes 174-223) restent inline, inchangés."
+      verified_by: "Relecture manuelle de §2b ET §2c post-édition : §2b identique au diff pres, §2c = 10 appels FC, comptage des sites"
     - id: AC3
-      statement: "Comportement bit-à-bit strictement identique avant/après pour chacun des ~10 sites (même sortie pour les mêmes entrées bypass Hmi/Retain)."
-      verified_by: "Relecture manuelle exhaustive site par site (avant/après côte à côte) + G200_check_linkage.py --report = PASS"
+      statement: "Comportement bit-à-bit strictement identique avant/après pour chacun des 10 sites §2c (même sortie pour les mêmes entrées bypass Hmi/Retain) ; §2b non modifié donc non-régression garantie par construction."
+      verified_by: "Relecture manuelle exhaustive des 10 sites §2c (avant/après côte à côte) + G200_check_linkage.py --report = PASS"
     - id: AC4
       statement: "Gates Palier C 100% PASS, bundle régénéré frais."
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . && python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
@@ -47,13 +51,15 @@ contract:
       - Un nouveau fichier FC dédié (emplacement à proposer conforme à la convention du dossier CODE/J_SUPERVISION/, à valider avant écriture si ambigu)
     forbidden:
       - Le calcul inline de LimitLegalReached (Q4 de QUESTIONS_OUVERTES_PRG02_v0.1.md — tâche séparée, non tranchée)
-      - Toute autre logique de PRG_07_Supervision.st hors §2b/§2c
+      - "§2b de PRG_07_Supervision.st (lignes 174-223, 6 blocs restauration boot one-shot) — algorithme différent, HORS SCOPE, ne pas toucher"
+      - Toute autre logique de PRG_07_Supervision.st hors §2c
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
 
   # ── 4. Contrat de conservation ─────────────────────────────────────────────
   conservation:
     must_survive:
-      - "Comportement de synchronisation bypass IHM↔RETAIN identique pour les 2 sens (IHM→RETAIN et RETAIN→IHM) sur chacun des ~10 domaines"
+      - "Comportement de synchronisation bypass IHM↔RETAIN identique pour les 2 sens (IHM→RETAIN et RETAIN→IHM) sur chacun des 10 domaines §2c"
+      - "§2b (restauration boot one-shot) intégralement préservé tel quel, non touché"
     dropped_on_purpose:
       - "Rien — refactor structurel pur, aucun comportement abandonné"
 

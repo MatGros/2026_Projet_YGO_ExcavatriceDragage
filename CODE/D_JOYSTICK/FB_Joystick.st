@@ -87,7 +87,7 @@ VAR
     instCauses                : ARRAY[0..15] OF ST_FbCause;   // . [LOC] Liste des causes pour le socle FB_FbStatus
 END_VAR
 
-{region "S0 CAUSES + SOCLE (appele AVANT le gate)"}
+{region "§1 CAUSES + SOCLE (appele AVANT le gate)"}
 // 🎯 CAUSES exprimées en CLAIR (liste ST_FbCause) — plus de bitfield WORD.
 //    - CalibFail : fault à acquitter (IsWarning=FALSE).
 //    - RawOutOfRange / BusLost : warning auto-effacés (décision utilisateur).
@@ -136,7 +136,7 @@ ErrorId := Status.ErrorId;    // miroir
 Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT Error;
 {endregion}
 
-{region "S1 Gate securite (neutralisation pipeline, n efface pas le statut)"}
+{region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
     AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedRef := 0.0;
@@ -159,7 +159,7 @@ IF NOT Enable OR BusLost THEN
 END_IF;
 {endregion}
 
-{region "S2 Acquisition bouton + mise a l echelle"}
+{region "§3 Acquisition bouton + mise a l echelle"}
 Button := RawButton;
 
 // Mise a l'echelle (deadband) - le neutre s'evalue sur les 2 axes
@@ -168,7 +168,7 @@ ScaleY(RawIn := RawY, Neutral := NeutralYMem, DeadbandRaw := DeadbandRaw);
 AtNeutral := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // IHM/diagnostic - position centrale
 {endregion}
 
-{region "S5 Armement homme mort"}
+{region "§4 Armement homme mort"}
 // Bouton homme-mort : armement par MAINTIEN (DeadmanArmHoldTime), independant de la position.
 DeadmanEdge(CLK := RawButton);
 IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
@@ -197,7 +197,7 @@ NeutralHoldTimer(IN := DeadmanArmed AND AtNeutral AND DeadmanArmGraceTimer.Q, PT
 IF NeutralHoldTimer.Q THEN DeadmanArmed := FALSE; END_IF;
 {endregion}
 
-{region "S6 Pipeline axe X"}
+{region "§5 Pipeline axe X"}
 CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
@@ -216,7 +216,7 @@ ELSIF AxisCmdX.DirectionNegative THEN DirectionX := -1;
 ELSE DirectionX := 0; END_IF;
 {endregion}
 
-{region "S7 Pipeline axe Y et sorties"}
+{region "§6 Pipeline axe Y et sorties"}
 CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;

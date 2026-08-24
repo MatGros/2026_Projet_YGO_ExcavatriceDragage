@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-18T12:52:51.333863" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-18T12:52:51.333863">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T22:23:26.847133" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T22:23:26.847133">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -47,7 +47,7 @@
                 <derived name="ST_TranslationCfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — , manquait (contrairement à ST_WinchHMI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Configurations et limites — champ Cfg manquait initialement (contrairement à ST_WinchHMI)</xhtml>
               </documentation>
             </variable>
             <variable name="Bypass">
@@ -464,7 +464,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_10_Outputs_LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Consigne fréquence manuelle [Hz], limitée par PRG_06_Outputs</xhtml>
               </documentation>
             </variable>
             <variable name="InvertDirection">
@@ -649,7 +649,7 @@
                 <derived name="E_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final _LD lecture seule</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État final lecture seule</xhtml>
               </documentation>
             </variable>
             <variable name="FinalInterlockReason">

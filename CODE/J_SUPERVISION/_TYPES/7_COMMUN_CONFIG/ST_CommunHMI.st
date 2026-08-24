@@ -15,11 +15,11 @@ TYPE ST_CommunHMI :
 STRUCT
     TopPositionSensorActive   : BOOL; (* ⚠️ Capteur de position haute commun M1+M2 détecté *)
     BrakeThermalFault         : BOOL; (* 🌡️ Défaut/perte thermique frein — retour unique commun M1/M2/M3, escalade PowerCutOff *)
-    PhaseRotationFault        : BOOL; (* : rotation de phase incorrecte — retour unique commun M1/M2/M3
+    PhaseRotationFault        : BOOL; (* ⚡ Rotation de phase incorrecte — retour unique commun M1/M2/M3
                                           (auparavant invisible IHM, seulement décodable via SafetyErrorId bit4/bit2) *)
     LimitLegalReached         : BOOL; (* 📐 Limite légale de profondeur de dragage atteinte (globale) *)
-    HydraulicThermalFault     : BOOL; (* : défaut/perte thermique centrale hydraulique
-                                          (PRG_AUXILIARY_CFC, diagnostic seul — aucune commande PLC) *)
+    HydraulicThermalFault     : BOOL; (* 🌡️ Défaut/perte thermique centrale hydraulique
+                                          (PRG_02_Acquisition, diagnostic seul — aucune commande PLC) *)
 
     (* 🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur *)
     SimTopSensorBypassActive  : BOOL; (* 🩺 Capteur haut ignoré car simulation active *)
@@ -39,7 +39,7 @@ STRUCT
 
     // Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
     // struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
-    // (doctrine reset=front, PRG_SUPERVISION_CFC.st §2bis). Vérifier les valeurs avant reprise cycle.
+    // (doctrine reset=front, PRG_07_Supervision.st §2bis). Vérifier les valeurs avant reprise cycle.
     ConfigRestoredFromPersistent : BOOL; (* ⚠️ PLC→IHM : restauration détectée ce boot, à vérifier *)
     BtnAckConfigRestored         : BOOL; (* 🔘 IHM→PLC : acquittement opérateur (front) *)
 
@@ -54,6 +54,6 @@ STRUCT
     Cfg : ST_CommunCfg;
 
     (* 🔒 Bypass maintenance de capteurs COMMUNS (voir REGISTRE_ACTIONS_Bypass_v1.0 (archive)) *)
-    Bypass : ST_BypassCommun;    (* : granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04 *)
+    Bypass : ST_BypassCommun;    (* 🔒 Granulaire, applique le bypass aux 2 treuils simultanément (pilotage "both") — OR avec le bypass individuel M1/M2 dans PRG_04 *)
 END_STRUCT
 END_TYPE

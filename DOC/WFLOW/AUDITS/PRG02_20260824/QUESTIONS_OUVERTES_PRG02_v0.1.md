@@ -27,14 +27,15 @@ comme demandé.
 |---|---|---|
 | Q7 | `AF_Partie-08_Fonction_Joystick_v2.0.md` périmée vis-à-vis du `FB_Joystick.st` réel (interface entière disparue) — mise à jour à planifier, distincte de Q1. | `AF_Partie-08...md` |
 | Q8 | `FB_Encoder_Homing_v1.0.md §2/§3ter` documente une interface qui n'existe plus (`Mode`/`UnitaryMode`/`WinchSelected`). | fiche AF-09 |
-| Q9 | Commentaires-journal interdits (§2ter) dans `FB_Hmi_BannerFormatter.st:478-540` — à purger, historique → `VERSION_HISTORY.md`. | `FB_Hmi_BannerFormatter.st` |
-| Q10 | Condition composée 5 termes `CriticalActionActive` (>3, seuil §2quater) — à décomposer. | `FB_Hmi_BannerFormatter.st:341-342` |
-| Q11 | Duplication ×10 du motif bypass IHM↔RETAIN dans `PRG_07_Supervision §2b/§2c` — candidate à extraction FC. | `PRG_07_Supervision.st` |
-| Q12 | 4 références à du vocabulaire de POU abandonné dans des commentaires (`PRG_TREUILS_CFC`, `PRG_10_Outputs_LD`, `PRG_MODES_CFC`, `PRG_AUXILIARY_CFC`, `PRG_SUPERVISION_CFC`) — remplacement mécanique par les noms cibles. | `_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st`, `_TYPES/2_TRANSLATION/ST_TranslationCmd.st`, `_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st`, `_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st` |
-| Q13 | Régions sans préfixe `§N` dans `FB_Encoder.st` et `FB_Joystick.st` — renumérotation. | `FB_Encoder.st`, `FB_Joystick.st` |
 | Q14 | `Reset` quasi/totalement inerte dans `FB_Diag_CanOpen.st` et `FB_Diag_Ethercat.st` (auto-clear déjà en place, port redondant) — clarifier ou retirer. | `FB_Diag_CanOpen.st`, `FB_Diag_Ethercat.st` |
 | Q15 | `FB_Encoder_SpeedMonitor.st` : `PowerContactorEngaged` en entrée alors que ce FB ne pilote aucun organe (anti-pattern déjà cité pour Joystick dans `CODE_QUALITY_STANDARDS.md`), et `Mode` jamais lu. | `FB_Encoder_SpeedMonitor.st` |
-| Q16 | Commentaire syntaxiquement cassé (reliquat d'édition). | `ST_TranslationHMI.st:16` |
+
+✅ **Traitées et closes (T152, 2026-08-25)** : Q9 (commentaires-journal), Q10 (condition 5 termes),
+Q11 (duplication ×10 bypass), Q12 (vocabulaire abandonné), Q13 (régions sans `§N`), Q16
+(commentaire cassé) — voir `DOC/WFLOW/TASKS.yaml` T152/T152-A..D et
+[REVUE_PRG02_ACQUISITION_v0.1.md](REVUE_PRG02_ACQUISITION_v0.1.md) /
+[REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md](REVUE_PRG02_HMI_TROUBLESHOOTING_v0.1.md) pour le détail
+d'origine.
 
 ---
 
@@ -59,5 +60,50 @@ mécanisme compensatoire trouvé pour les 3 points de sécurité — Q1/Q2/Q3 re
 à trancher par l'utilisateur, sans filet de rattrapage ailleurs dans le programme.
 
 ---
-*Ce document + les 2 revues ont été soumis à un sous-agent challenger indépendant. Clôture de la
-phase de revue read-only.*
+
+## 🕵️ 3ᵉ challenge indépendant — exhaustif, y compris les tâches T152 (2026-08-25)
+
+Un 4ᵉ sous-agent a relu intégralement les 4 documents + les tâches T152/T152-A..D + leurs
+contrats, et surtout **élargi la couverture `_TYPES/` de 14/77 à 77/77 fichiers** (18%→100%) —
+la revue d'origine et le 2ᵉ challenge n'avaient ouvert qu'une fraction de ce dossier.
+
+### ✅ Tout ce qui avait été confirmé reste confirmé
+Aucun finding BLOCK/MAJOR/MINOR des 2 revues n'est faux, exagéré ou doublonné. Un seul point
+nuancé (formulation, pas le fond) : `PowerContactorEngaged` dans `FB_Encoder_SpeedMonitor.st`
+n'est pas mort (il gate bien la ligne 56) — le vrai problème est l'anti-pattern (diagnostic pur
+gaté comme un FB de mouvement), pas une variable inutilisée.
+
+### 🕳️ 3 angles morts trouvés en allant plus loin
+
+1. **`ArretConfirme` (`FB_Encoder_Homing.st:77`) — variable locale totalement morte**, jamais
+   assignée ni lue. Preuve supplémentaire que la logique d'arrêt confirmé (Q2) a été retirée du
+   corps du FB sans nettoyer sa déclaration. N'ouvre pas de nouvelle question — vient enrichir Q2.
+2. **4 fichiers `_TYPES/` supplémentaires** portent un résidu abrégé `_LD` du vocabulaire abandonné
+   (`ST_Chain_Winch_Control.st:7`, `ST_WinchState.st:37`, `ST_Chain_Translation_Control.st:6`,
+   `ST_TranslationState.st:25`) — non couverts par la revue d'origine (échantillon 14/77) ni par
+   T152-C dans sa version initiale. **Corrigé** : scope T152-C étendu (voir ci-dessous).
+3. **5 commentaires cassés supplémentaires** du même motif que `ST_TranslationHMI.st:16` (deux-points
+   orphelin en tête, reliquat d'un search-replace) : `ST_CommunHMI.st:18,21,57`,
+   `ST_Chain_Winch_Control.st:14,15`. **Corrigé** : scope T152-C étendu.
+
+### 🛠️ Corrections appliquées aux tâches (justifiées, appliquées immédiatement)
+
+- **T152-C** : scope étendu de 5 à 9 fichiers (les 4 fichiers `_LD` + les 5 commentaires cassés
+  supplémentaires), critère de grep élargi (`_LD\b` en plus des 5 noms complets — l'ancien critère
+  AC6 aurait pu passer au vert sans purge réelle, fausse confiance de complétude).
+- **T152-D** : scope **restreint à §2c seul** (lignes 227-295, les 10 blocs `Prev*` réellement
+  identiques). §2b (lignes 174-223, 6 blocs) s'est révélé être un **algorithme différent**
+  (restauration boot one-shot conditionnée par `Initialized`, pas une synchro bidirectionnelle
+  continue) — le fusionner aurait cassé la sémantique boot-only. Explicitement listé en
+  `forbidden` désormais. Précédent de conception noté pour info (`FB_CfgPersistBridge_*`,
+  7 instances dans `_BRIDGES/`) — algorithme différent (Hmi-gagne-toujours), à ne pas copier tel
+  quel mais utile comme référence de forme.
+- **T152-A / T152-B** : aucune correction nécessaire, confirmées lançables telles quelles.
+
+### Verdict final
+Documents 1-4 fiables. Tâches T152-A/B/C/D toutes lançables après corrections (C et D corrigées
+ci-dessus, contrats re-validés `check_task_contract.py` = PASS 0 erreur).
+
+---
+*Ce document + les 2 revues + les 4 tâches T152 ont été soumis à 3 rounds de challenge
+indépendant successifs. Clôture de la phase de revue read-only.*

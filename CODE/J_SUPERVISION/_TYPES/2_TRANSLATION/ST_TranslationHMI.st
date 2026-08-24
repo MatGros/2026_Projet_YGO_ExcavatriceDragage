@@ -13,7 +13,7 @@ STRUCT
     (* 🚦 États & diagnostics *)
     State                   : ST_TranslationState;
 
-    (* Configurations et limites — , manquait (contrairement à ST_WinchHMI) *)
+    (* Configurations et limites — champ Cfg manquait initialement (contrairement à ST_WinchHMI) *)
     Cfg                     : ST_TranslationCfg;
 
     (* Bypass maintenance *)

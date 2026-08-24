@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-27T13:44:41.144048" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-27T13:44:41.144048">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.387537" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.387537">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -99,7 +99,7 @@
                 <derived name="E_WinchFinalInterlockState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État frontière _LD</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État frontière</xhtml>
               </documentation>
             </variable>
             <variable name="Idx406_FinalInterlockReason">
@@ -155,7 +155,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Palier plafonné à 1, approche limite haute</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Palier plafonné à 1, approche limite haute</xhtml>
               </documentation>
             </variable>
             <variable name="Idx413_InBottomSlowdownZone">
@@ -163,7 +163,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Palier plafonné à 1, approche limite basse (câble ou légale)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Palier plafonné à 1, approche limite basse (câble ou légale)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx414_BottomLimitActiveM">

@@ -78,6 +78,7 @@ VAR
     CurrentDirection     : INT;   // . [LOC] Direction courante
     DirectionBlocked     : BOOL; // . [LOC] Interlock métier : mouvement demandé mais permit absent
     AnyBypassActive      : BOOL;   // . [LOC] Au moins un bypass actif
+    PowerOrChainFault    : BOOL; // . [LOC] Défaut chaîne AU ou contacteur puissance absent
     CriticalActionActive : BOOL; // . [LOC] Défaut/interlock critique : affiché immédiatement (sans maintien)
     SpecialConditionCandidate : STRING(120);   // . [LOC] Texte condition spéciale
     OperatorActionCandidate   : STRING(120);   // . [LOC] Texte action opérateur
@@ -338,8 +339,8 @@ END_IF;
 
 // Interlock = mouvement demandé mais permit absent : c'est une cause
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
-CriticalActionActive := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged
-                     OR PowerCutOffActiveAny OR SafeStopActive OR DirectionBlocked);
+PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
+CriticalActionActive := (PowerOrChainFault OR SafeStopActive OR DirectionBlocked);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -475,8 +476,7 @@ IF TranslationSafety.ErrorSensorIncoherent AND (AlarmCount < CST_NbMaxAlarmes) T
     AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5d. Collecte — benne (FB_Bucket.ErrorId, bits vérifiés à la lecture du FB source :
-// diffèrent du brouillon initial du plan, corrigés ici bit à bit)
+// 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
 IF ((BucketErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -524,8 +524,7 @@ IF ((ExtractionErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarm
     AlarmArray[AlarmCount] := '[EXTRACTION] config'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId, bit3
-// "Startup" absent du brouillon initial du plan, ajouté ici après lecture du FB source)
+// 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId)
 IF ((EmergencyErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[AU] redondance contacteurs'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -536,8 +535,7 @@ IF ((EmergencyErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarme
     AlarmArray[AlarmCount] := '[AU] echec autotest demarrage'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId, dictionnaire absent du plan,
-// construit ici après lecture complète du FB source)
+// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
 IF ((CycleErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
