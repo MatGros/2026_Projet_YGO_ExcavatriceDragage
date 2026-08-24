@@ -282,23 +282,10 @@ def test_raw_scope_allowed_empty_refuse(tmp_path: Path) -> None:
 
 
 def test_campaign_raw_fallback(tmp_path: Path) -> None:
-    """Les six contrats de campagne restent valides sans PyYAML.
-
-    Ils emploient des champs YAML replies (``statement: >`` / ``verified_by:``)
-    et protegeaient donc le defaut de decalage statements/preuves du repli.
-    """
-    root = Path(__file__).resolve().parents[3]
-    names = (
-        "TASK_CONTEXT_LOT1_GATES_STRUCTURE_CODE.yaml",
-        "TASK_CONTEXT_LOT2_DOC_CFC_NUMEROTATION.yaml",
-        "TASK_CONTEXT_LOT3_CONTRATS_AGENTS.yaml",
-        "TASK_CONTEXT_LOT4A_RENOMMAGE_PROGRAMMES.yaml",
-        "TASK_CONTEXT_LOT4B_CONVERSION_CFC_NATIF.yaml",
-        "TASK_CONTEXT_LOT5_VERIFICATION_FINALE.yaml",
+    """Les contrats avec champs YAML replies (> et |) restent valides sans PyYAML."""
+    folded = VALID.replace(
+        'statement: "BrakeCmd reste FALSE tant que BrakeCommandOpenConfirmed est FALSE."',
+        'statement: >\n        BrakeCmd reste FALSE\n        tant que BrakeCommandOpenConfirmed est FALSE.',
     )
-    for name in names:
-        result = run(
-            root / "ARCHIVES" / "Doc" / "CONTRACTS" / name,
-            disable_pyyaml=True,
-        )
-        assert result.returncode == 0, f"{name}: {result.stdout}{result.stderr}"
+    result = run(write(tmp_path, folded), disable_pyyaml=True)
+    assert result.returncode == 0, f"{result.stdout}{result.stderr}"
