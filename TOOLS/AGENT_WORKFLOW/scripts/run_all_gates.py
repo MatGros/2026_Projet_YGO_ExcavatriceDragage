@@ -71,6 +71,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
                                                                      "TOOLS/ST_PLCOPENXML_GENERATOR/tests",
                                                                      "TOOLS/AGENT_WORKFLOW/tests", "-q"]),
     ("C", "430", "G430 — Commentaires REX (Zéro journal intime, §2ter)", [sys.executable, f"{S}/G430_check_comments_rex.py", "."]),
+    ("C", "440", "G440 — Skills agents (stub + canonique, anti-derive)", [sys.executable, f"{S}/check_skill_stubs.py", "."]),
     # Palier D — sur demande (G500)
     ("D", "500", "G500 — Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

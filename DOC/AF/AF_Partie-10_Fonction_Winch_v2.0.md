@@ -26,7 +26,7 @@ dupliqué ici) :
 |---|---|
 | [`FB_Winch`](AF_Partie-10_FB_Winch_v1.0.md) | <nobr><code>TC-P10-011</code></nobr>, 017, 018, 019 |
 | [`FB_Safety_Winch`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | <nobr><code>TC-P10-001</code></nobr> à 010 |
-| [`FB_WinchSync`](AF_Partie-10_FB_WinchSync_v1.0.md) | <nobr><code>TC-P10-014</code></nobr>, 015, 016 |
+| [`FB_WinchSync`](AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md) | <nobr><code>TC-P10-014</code></nobr>, 015, 016 |
 | [`FB_WinchOutputInterlock`](AF_Partie-10_FB_WinchOutputInterlock_v1.0.md) | <nobr><code>TC-P10-012</code></nobr>, 013, 020, 021, 022 |
 | [`FB_Bucket`](AF_Partie-10_FB_Bucket_v1.0.md) | <nobr><code>TC-P10-023</code></nobr> à 034 |
 | [`FB_Winch_Symmetry`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md) | Diagnostic MES-008, symétrie |
@@ -42,7 +42,7 @@ dupliqué ici) :
 |---|---|---|
 | [`AF_Partie-10_FB_Winch_v1.0.md`](AF_Partie-10_FB_Winch_v1.0.md) | `FB_Winch` | Mouvement, palier, sens (🔧 2026-08-06 : frein retiré, voir §1bis) |
 | [`AF_Partie-10_FB_Safety_Winch_v1.0.md`](AF_Partie-10_FB_Safety_Winch_v1.0.md) | `FB_Safety_Winch` | 7 mécanismes A-G, masques, bypass |
-| [`AF_Partie-10_FB_WinchSync_v1.0.md`](AF_Partie-10_FB_WinchSync_v1.0.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
+| [`AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md`](AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
 | [`AF_Partie-10_FB_WinchOutputInterlock_v1.0.md`](AF_Partie-10_FB_WinchOutputInterlock_v1.0.md) | `FB_WinchOutputInterlock` | Barrière finale, watchdog frein, anti-redémarrage |
 | [`AF_Partie-10_FB_Bucket_v1.0.md`](AF_Partie-10_FB_Bucket_v1.0.md) | `FB_Bucket` (+ `FB_DiveSearch`, `FB_ExtractionSequence`) | Benne, désynchronisation M1/M2, glissement, assistants |
 | [`AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Winch_Symmetry_v1.0.md) | `FB_Winch_Symmetry` | Diagnostic passif symétrie & décalages M1/M2 |

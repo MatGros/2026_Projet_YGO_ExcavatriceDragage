@@ -1,8 +1,14 @@
-﻿# 🕵️ Méthode de Recherche de Blocage / Diagnostic (Excavatrice Dragage)
+# 🕵️ Méthode de Recherche de Blocage / Diagnostic (Excavatrice Dragage)
 
 > Prompt réutilisable pour diagnostiquer un blocage/bug dans le programme CODESYS.
 > L'agent NE PEUT PAS exécuter le PLC : il lit des variables de diagnostic et raisonne par arbre de décision.
 > Fiche de session : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_<Sujet>_<AAAAMMJJ>.md` (depuis `TEMPLATE_Troubleshooting.md`).
+
+> 🧭 **Répartition (T150-A / T150-D)** : ce fichier est la **méthode détaillée de référence**.
+> Il est référencé par la source canonique `TOOLS/AGENT_WORKFLOW/skills/troubleshooting/SKILL.md`
+> (procédure exécutable) et par les stubs `.claude/.dsh/skills/troubleshooting/SKILL.md`
+> (déclencheurs). **Une seule copie de la méthode** — ne pas dupliquer ce contenu ailleurs.
+> Garde-fou : `TOOLS/AGENT_WORKFLOW/scripts/check_skill_stubs.py` (G440).
 
 ## 0. 🎯 ORIENTATION MÉTHODE (obligatoire au lancement — AUCUNE voie imposée)
 

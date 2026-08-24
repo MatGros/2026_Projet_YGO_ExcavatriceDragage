@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T151 : Nettoyage et abandon définitif de Pi Coding
+# Projet Excavatrice Dragage — CODESYS 3.5
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T151
+  parent_id: ""
+  criticality: C1            # dette documentaire et outillage agent (aucun impact CODE automate)
+  strategy: patch            # suppression des résidus Pi, mise à jour docs/prompts/scripts
+
+  # ── 1. Objectif ───────────────────────────────────────────────────────────
+  objective: >
+    Purger l'ensemble du projet de toutes les références actives, répertoires d'artéfacts
+    et configurations résiduelles liés à l'environnement Pi Coding / sous-agents Pi abandonné.
+    Consolider l'orchestration multi-agents autour des environnements cibles actifs
+    (Antigravity, Claude Code, Codex).
+
+  # ── 2. Périmètre d'intervention ───────────────────────────────────────────
+  scope:
+    allowed:
+      # 1. Artéfacts physiques et répertoires
+      - .pi-subagents/                                  # Archivage ou suppression du répertoire d'artéfacts
+
+      # 2. Directives agents & Workflows
+      - AGENTS.md                                       # Nettoyage mentions Pi (L13, L176, L183)
+      - .claude/skills/codesys-workflow/SKILL.md        # Nettoyage mention Pi (L29)
+
+      # 3. Standards & Guides
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md              # Nettoyage mentions Pi (L4, L845)
+      - DOC/STDS/GUIDES/GUIDE_GATES_ET_TESTS_v1.2.md    # Consolidation note historique Pi/Herdr
+      - DOC/WFLOW/TASKS.yaml                            # Mise à jour historique agents si nécessaire
+
+      # 4. Outillage & Scripts TOOLS/AGENT_WORKFLOW/
+      - TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md           # Purge mentions sous-agents Pi
+      - TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py # Mise à jour exclusions
+      - TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py  # Mise à jour commentaire
+      - TOOLS/AGENT_WORKFLOW/scripts/hook_post_edit.py       # Nettoyage docstring
+      - TOOLS/AGENT_WORKFLOW/skills/codesys-change/SKILL.md  # Retrait référence Pi Subagents
+      - TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml   # Exemple agent sans Pi
+
+      # 5. Configurations IDE & Workspace
+      - .vscode/sessions.json                           # Nettoyage entrée session "pi"
+      - TOOLS/PROJECT_WORKSPACE/README.md               # Clarification retrait
+
+    forbidden:
+      - CODE/                                           # Aucune modification du code automate ST
+      - CODE_XML/                                       # Aucune modification du XML automate
+
+  # ── 3. Critères d'acceptation ─────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Le répertoire .pi-subagents/ est supprimé ou complètement archivé hors de l'arborescence active."
+      verified_by: "Test d'existence de dossier .pi-subagents/"
+    - id: AC2
+      statement: "0 mention active de Pi dans AGENTS.md, CODE_QUALITY_STANDARDS.md et les skills .claude/."
+      verified_by: "Grep case-insensitive sur AGENTS.md et .claude/"
+    - id: AC3
+      statement: "Les scripts TOOLS/AGENT_WORKFLOW ne font plus référence à l'outillage Pi pour leurs contrôles."
+      verified_by: "Grep sur TOOLS/AGENT_WORKFLOW/"
+    - id: AC4
+      statement: "Toutes les gates du palier A/B/C restent 100% PASS (non-régression)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py"
+
+  # ── 4. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - grep_report             # Rapport grep montrant 0 trace active
+    - run_all_gates           # Validation de non-régression outillage
+
+status: LOCKED
+
+execution:
+  executed_by: "AGY-01"
+  locked_at: "2026-08-24T02:03:00"
+  completed_at: ""
