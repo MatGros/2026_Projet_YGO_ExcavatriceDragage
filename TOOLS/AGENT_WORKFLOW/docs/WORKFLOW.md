@@ -231,3 +231,14 @@ Commit unique : fix + guard ensemble
 | C2 | code métier | modèle code + tests |
 | C3 | mouvement/interlock | modèle fort + review read-only |
 | C4 | AU, PowerCutOff, redondance | plan humain obligatoire, Ponytail interdit |
+
+---
+
+## 🛡️ Stratégie de commits en 2 temps (Checkpoint / WIP)
+
+Pour sécuriser l'historique sans risquer de blocage ou de perte lors de phases de tests ou d'analyses :
+1. **Étape 1 — Sauvegarde immédiate (WIP)** : Dès qu'une modification de code ou de configuration est achevée, effectuer un commit de checkpoint :
+   `wip(scope): <description> [NON TESTE]`
+2. **Étape 2 — Validation & Rapports** : Exécution des tests CI / gates mécaniques et mise à jour des artefacts de rapport (`.html`, `.json`, `.st`, dashboard).
+3. **Étape 3 — Validation finale** : Dès que les tests sont 100% verts :
+   `test(scope): validation CI 100% PASS et mise a jour des rapports`
