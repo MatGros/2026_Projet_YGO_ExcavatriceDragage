@@ -103,4 +103,4 @@ Aucun écart majeur identifié — comportement conforme au code (`FB_WinchSync.
 | AF10 / FB_Safety_Winch | Méca E — défense en profondeur niveau 2 |
 | AF05 | Modes — `SyncEnable` |
 | Code | `CODE/H_TREUILS_BENNE/FB_WinchSync.st`, `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (ST) |
-| Étude T55 | `DOC/WFLOW/AUDITS/DESIGN_SYNCHRONISME_UNIQUE_4NIVEAUX_v0.2.md` |
+| Étude T55 | `DOC/WFLOW/AUDITS/DESIGN/DESIGN_SYNCHRONISME_UNIQUE_4NIVEAUX_v0.2.md` |

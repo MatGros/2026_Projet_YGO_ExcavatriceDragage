@@ -4,7 +4,7 @@
 > Les sorties physiques restent hors de ce document.
 > 🆕 v3.0 : refonte du sequenceur conforme `GUIDE_SEQUENCEUR_v1.2.md` (§11bis R1-R9), deux
 > instances (maintenance + semi-auto), homme-mort fenetre 3 s, tempo max d'etape, `STABILIZING`.
-> Conception : `DOC/WFLOW/AUDITS/DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.
+> Conception : `DOC/WFLOW/AUDITS/DESIGN/DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.
 
 ## 🧭 Sommaire
 
@@ -231,4 +231,4 @@ Le format exact des messages est porte par la Partie 07.
 - Partie 05 : modes et droits.
 - Partie 10/11/12 : treuils, benne, translation.
 - Partie 01 : AU et coupure puissance.
-- Conception : `DOC/WFLOW/AUDITS/DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.
+- Conception : `DOC/WFLOW/AUDITS/DESIGN/DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.
