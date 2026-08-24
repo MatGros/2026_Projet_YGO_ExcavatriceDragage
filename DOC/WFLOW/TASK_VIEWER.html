@@ -1163,8 +1163,28 @@
             render();
         }
 
+        // Rendu initial immédiat
         render();
         updateSyncIndicator();
+
+        // 🔄 Chargement automatique en direct depuis TASKS.yaml (rafraîchissement automatique au F5)
+        (async function autoLoadFreshYaml() {
+            try {
+                const res = await fetch('TASKS.yaml?' + Date.now());
+                if (res.ok) {
+                    const text = await res.text();
+                    const parsed = parseYamlTasks(text);
+                    if (parsed && parsed.length > 0) {
+                        tasks = parsed;
+                        hasUnsavedChanges = false;
+                        updateSyncIndicator();
+                        render();
+                    }
+                }
+            } catch (e) {
+                // Fallback silencieux sur defaultTasks si protocole file:// strict
+            }
+        })();
     </script>
 </body>
 </html>
