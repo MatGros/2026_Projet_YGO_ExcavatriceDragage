@@ -42,7 +42,7 @@ FB_Joystick:
   domain: JOYSTICK                     # -> RESULTS/JOYSTICK/
   af_doc: DOC/AF/AF_Partie-08_...md    # optionnel : active la verification de coherence AF<->tests
   sources: [...]                       # ordre exact de compilation (DUT/enum -> sous-FB -> FB composite)
-  test: TOOLS/TEST_AUTO_CI/RESULTS/JOYSTICK/tests/test_fb_joystick.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/D_JOYSTICK/tests/test_fb_joystick.st
   report_group: A_COMMUN               # optionnel : plusieurs FB independants -> UNE seule fiche de rapport
 ```
 

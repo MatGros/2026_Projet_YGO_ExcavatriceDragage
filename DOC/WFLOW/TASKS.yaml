@@ -1558,6 +1558,6 @@ tasks:
   - Archiver ou supprimer le répertoire d'artéfacts .pi-subagents/
   - Nettoyer les mentions Pi dans AGENTS.md et DOC/STDS/CODE_QUALITY_STANDARDS.md
   - Nettoyer les mentions Pi dans .claude/skills/codesys-workflow/ et TOOLS/AGENT_WORKFLOW/
-  - Nettoyer l'entrée session 'pi' dans .vscode/sessions.json
+  - Nettoyer l'entrée session 'pi' dans .vscode/sessions.json (⚠️ déjà propre — aucune entrée Pi, rien à nettoyer)
   - Valider la non-régression outillage (run_all_gates.py)
   bloque_par: []
