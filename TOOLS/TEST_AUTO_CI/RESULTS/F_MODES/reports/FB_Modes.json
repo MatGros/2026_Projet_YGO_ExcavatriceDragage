@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_modes.st",
+  "file": "test_fb_hmi_bannerformatter.st",
   "results": [
     {
-      "name": "Modes : Enable=FALSE desactive le FB",
+      "name": "AntiFlickerText : affichage instantane force",
       "passed": true
     },
     {
-      "name": "Modes : Nominal Maint N1",
+      "name": "BannerFormatter : formatage nominal",
       "passed": true
     }
   ],
