@@ -59,7 +59,7 @@ contract:
       - PRJ_CODESYS/**
       - DOC/**
       - TOOLS/AGENT_WORKFLOW/scripts/check_bundle_st_syntax.py (deja cree par l'orchestrateur)
-      - TOOLS/ST_PLCOPENXML_GENERATOR/generator/st_sections.py (deja fixe par l'orchestrateur)
+      - TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/st_sections.py (deja fixe par l'orchestrateur)
       - ARCHIVES/**
       - Tout POU autre que les 2 cibles (pas de renommage de FB, pas de renommage d'autres PRG)
 
@@ -85,7 +85,7 @@ contract:
     a l'orchestrateur, pas a la fin. Signaler n'est pas elargir le scope.
 
 # Contexte technique pour le sous-agent :
-# - Le generateur de bundle (TOOLS/ST_PLCOPENXML_GENERATOR) utilise le NOM DECLARE
+# - Le generateur de bundle (TOOLS/CONVERTER_ST2XML_PLCopenXML) utilise le NOM DECLARE
 #   dans le .st (PROGRAM XXX) comme nom de POU, pas le nom de fichier. Pour les
 #   .xml natifs, le nom vient de <pou name="...">. Donc renommer un fichier
 #   necessite aussi de renommer la declaration/attribut interne.

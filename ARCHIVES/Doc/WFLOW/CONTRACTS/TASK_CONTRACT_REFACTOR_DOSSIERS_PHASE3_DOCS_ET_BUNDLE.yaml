@@ -11,7 +11,7 @@ contract:
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G340_check_doc_links.py"
     - id: AC2
       statement: "Le bundle PLCopenXML CODE_XML/CODE_Bundle.xml est régénéré sans erreur à partir de la nouvelle arborescence."
-      verified_by: "python TOOLS/ST_PLCOPENXML_GENERATOR/scripts/build_bundle.py CODE -o CODE_XML/CODE_Bundle.xml"
+      verified_by: "python TOOLS/CONVERTER_ST2XML_PLCopenXML/scripts/build_bundle.py CODE -o CODE_XML/CODE_Bundle.xml"
 
   scope:
     allowed:

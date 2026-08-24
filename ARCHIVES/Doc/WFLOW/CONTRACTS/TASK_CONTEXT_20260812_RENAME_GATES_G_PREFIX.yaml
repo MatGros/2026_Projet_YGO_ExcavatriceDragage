@@ -33,9 +33,9 @@ contract:
       statement: >
         Tous les fichiers de test qui importaient un module renomme (ex: import
         check_hw_name_collision) sont mis a jour vers le nouveau nom de module, et
-        python -m pytest TOOLS/AGENT_WORKFLOW/tests/ TOOLS/ST_PLCOPENXML_GENERATOR/tests/ passe
+        python -m pytest TOOLS/AGENT_WORKFLOW/tests/ TOOLS/CONVERTER_ST2XML_PLCopenXML/tests/ passe
         integralement.
-      verified_by: "python -m pytest TOOLS/AGENT_WORKFLOW/tests/ TOOLS/ST_PLCOPENXML_GENERATOR/tests/ -q : 0 echec"
+      verified_by: "python -m pytest TOOLS/AGENT_WORKFLOW/tests/ TOOLS/CONVERTER_ST2XML_PLCopenXML/tests/ -q : 0 echec"
     - id: AC5
       statement: >
         Toute mention en dur de l'ancien nom de script (ex: 'check_code_style.py') dans

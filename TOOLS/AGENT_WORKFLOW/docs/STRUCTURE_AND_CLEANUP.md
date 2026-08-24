@@ -52,7 +52,7 @@ abandonné. Aucune extension
 
 ### Outil existant
 
-`TOOLS/ST_PLCOPENXML_GENERATOR/` est autonome et possède sa propre structure. Ne pas mélanger
+`TOOLS/CONVERTER_ST2XML_PLCopenXML/` est autonome et possède sa propre structure. Ne pas mélanger
 ses modules dans `AGENT_WORKFLOW/`.
 
 ## 2. Nommage des fichiers

@@ -1,4 +1,4 @@
-"""Shared helpers for ST_PLCOPENXML_GENERATOR CLI scripts.
+"""Shared helpers for CONVERTER_ST2XML_PLCopenXML CLI scripts.
 
 This module ensures the ``generator`` package is importable when scripts are
 run directly (``python scripts/st_to_ld.py ...``) and provides small parsing
@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 # ── Path bootstrap: make ``generator`` importable ──────────────────────────
-# scripts/  →  parent  =  TOOLS/ST_PLCOPENXML_GENERATOR/  (contains generator/)
+# scripts/  →  parent  =  TOOLS/CONVERTER_ST2XML_PLCopenXML/  (contains generator/)
 _TOOL_ROOT = Path(__file__).resolve().parent.parent
 if str(_TOOL_ROOT) not in sys.path:
     sys.path.insert(0, str(_TOOL_ROOT))

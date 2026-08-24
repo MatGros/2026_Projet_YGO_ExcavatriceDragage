@@ -23,8 +23,8 @@ contract:
       statement: "G310 check_code_structure valide l'arborescence indexee avec 0 erreur."
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py"
     - id: AC3
-      statement: "La suite de tests unitaires et integration ST_PLCOPENXML_GENERATOR est verte."
-      verified_by: "python -m pytest TOOLS/ST_PLCOPENXML_GENERATOR/tests -q"
+      statement: "La suite de tests unitaires et integration CONVERTER_ST2XML_PLCopenXML est verte."
+      verified_by: "python -m pytest TOOLS/CONVERTER_ST2XML_PLCopenXML/tests -q"
     - id: AC4
       statement: "Le contrat de tache est valide par check_task_contract.py."
       verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_REFACTOR_DOSSIERS_PHASE2_PATCH_OUTILLAGE.yaml"
@@ -35,7 +35,7 @@ contract:
       - TOOLS/AGENT_WORKFLOW/scripts/
       - TOOLS/AGENT_WORKFLOW/config/
       - TOOLS/AGENT_WORKFLOW/tests/
-      - TOOLS/ST_PLCOPENXML_GENERATOR/
+      - TOOLS/CONVERTER_ST2XML_PLCopenXML/
       - TOOLS/OUTILS_ST2PY/
       - DOC/WFLOW/
     forbidden:
@@ -65,7 +65,7 @@ contract:
 
   # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
   alert_duty: >
-    Extension de scope validee par l'orchestrateur pour inclure ST_PLCOPENXML_GENERATOR,
+    Extension de scope validee par l'orchestrateur pour inclure CONVERTER_ST2XML_PLCopenXML,
     OUTILS_ST2PY et G200.
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -81,12 +81,12 @@ execution:
   summary: >
     Tous les scripts d'outillage (Gates G100/G200/G310/G320/G350/G370/G380, hooks, check_task_contract),
     la baseline de nommage (naming_baseline.json 241 entrees) et l'ensemble des tests pytest de
-    ST_PLCOPENXML_GENERATOR et AGENT_WORKFLOW ont ete adaptes a la nouvelle structure CODE/ indexee.
+    CONVERTER_ST2XML_PLCopenXML et AGENT_WORKFLOW ont ete adaptes a la nouvelle structure CODE/ indexee.
   evidence_submitted:
     - "check_task_contract: PASS"
     - "G110_check_naming_style: PASS (0 nouveau)"
     - "G310_check_code_structure: PASS (0 erreur)"
-    - "pytest ST_PLCOPENXML_GENERATOR: PASS (381 passed, 8 skipped)"
+    - "pytest CONVERTER_ST2XML_PLCopenXML: PASS (381 passed, 8 skipped)"
 
 # ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
 validation:

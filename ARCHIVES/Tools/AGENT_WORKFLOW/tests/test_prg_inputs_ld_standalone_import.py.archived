@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-GENERATOR_ROOT = ROOT / "TOOLS" / "ST_PLCOPENXML_GENERATOR"
+GENERATOR_ROOT = ROOT / "TOOLS" / "CONVERTER_ST2XML_PLCopenXML"
 sys.path.insert(0, str(GENERATOR_ROOT))
 
 from generator.diagnostics import DiagnosticCollector

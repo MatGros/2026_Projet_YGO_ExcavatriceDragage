@@ -125,7 +125,7 @@ A/B (`SAFETY_POLICY.md`).
 | <nobr><code>390</code></nobr> | <small><code>G390_check_bundle_freshness.py</code></small> | Fraîcheur du bundle vs. sources |
 | <nobr><code>400</code></nobr> | <small><code>G400_check_bundle_st_syntax.py</code></small> | Syntaxe ST du bundle (no terminator) |
 | <nobr><code>410</code></nobr> | <small><code>G410_check_ld_invariants.py</code></small> | Invariants LD — tous les POU `_LD` du bundle (`PRG_06_Outputs`, `PRG_02_Acquisition_LD`, …) |
-| <nobr><code>420</code></nobr> | <small><code>pytest</code></small> | Tests gates (`AGENT_WORKFLOW/tests/`) + convertisseur ST→XML (`ST_PLCOPENXML_GENERATOR/tests/`) |
+| <nobr><code>420</code></nobr> | <small><code>pytest</code></small> | Tests gates (`AGENT_WORKFLOW/tests/`) + convertisseur ST→XML (`CONVERTER_ST2XML_PLCopenXML/tests/`) |
 
 ### Palier D — `500`-`510`
 
@@ -149,7 +149,7 @@ Outils de génération, pas de vérification — pas d'`ID Gate` :
 | <small><code>build_bundle.py</code></small> | Agrège les XML granulaires en un bundle | Fin de lot (palier C), **cible : lit `CODE_XML/`, écrit `CODE_XML/CODE_Bundle.xml`** |
 | <small><code>codesys_compilation_diag.py</code></small> | Traduit un code d'erreur `C0xxx` en français + correctif suggéré | Sur un log/texte d'erreur, à la demande (palier D) |
 
-<small>Chemins complets : `TOOLS/AGENT_WORKFLOW/scripts/` pour les 4 derniers, `TOOLS/ST_PLCOPENXML_GENERATOR/scripts/` (ou `generator/`) pour les 3 premiers.</small>
+<small>Chemins complets : `TOOLS/AGENT_WORKFLOW/scripts/` pour les 4 derniers, `TOOLS/CONVERTER_ST2XML_PLCopenXML/scripts/` (ou `generator/`) pour les 3 premiers.</small>
 
 ### 📍 Emplacement cible du bundle — `CODE_XML/CODE_Bundle.xml` uniquement
 
@@ -174,7 +174,7 @@ liaison — chantier à faire ensemble, pas en isolation.
 - **Palier B en pratique** : `G200_check_linkage.py` existe et fonctionne déjà mid-édition, mais rien
   n'automatise son déclenchement dès qu'un lien apparaît — c'est aujourd'hui une discipline
   documentée, pas un hook.
-- **Audit du nombre de tests** (`AGENT_WORKFLOW/tests/` : 13 fichiers · `ST_PLCOPENXML_GENERATOR/tests/` : ~15 fichiers) : pas revu fichier par fichier pour identifier d'éventuels tests redondants ou obsolètes — chantier distinct, à traiter un par un plutôt qu'à la louche.
+- **Audit du nombre de tests** (`AGENT_WORKFLOW/tests/` : 13 fichiers · `CONVERTER_ST2XML_PLCopenXML/tests/` : ~15 fichiers) : pas revu fichier par fichier pour identifier d'éventuels tests redondants ou obsolètes — chantier distinct, à traiter un par un plutôt qu'à la louche.
 
 ---
 

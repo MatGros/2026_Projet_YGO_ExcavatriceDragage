@@ -1,4 +1,4 @@
-"""CLI scripts for ST_PLCOPENXML_GENERATOR.
+"""CLI scripts for CONVERTER_ST2XML_PLCopenXML.
 
 Modular, orchestrable scripts that each produce a small, focused PLCopenXML
 artifact by reusing the existing ``generator`` package internals

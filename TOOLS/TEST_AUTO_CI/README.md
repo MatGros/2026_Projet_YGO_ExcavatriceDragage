@@ -16,7 +16,7 @@ exécution + rapports.
 | `RESULTS/` | Suites de tests versionnées (`tests/*.st`, harnais) + rapports gitignorés (`reports/`) |
 
 ⚠️ **Les scripts `.py` vivent dans `scripts/`** (convention alignée sur les outils modernes type
-`AGENT_WORKFLOW`/`ST_PLCOPENXML_GENERATOR`). Lancement :
+`AGENT_WORKFLOW`/`CONVERTER_ST2XML_PLCopenXML`). Lancement :
 ```bash
 python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_Joystick
 python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --all

@@ -22,7 +22,7 @@ description: Prépare et exécute une modification ciblée CODESYS en respectant
    sont pas rendus réglables de l’extérieur sans exigence validée. Vérifier avant toute écriture si
    un POU XML natif/CFC est concerné et préserver la cohérence des noms, interfaces et références
    avec les sources ST.
-8. **Si au moins un fichier `CODE/**/*.st` a changé : générer obligatoirement `CODE_XML/CODE_Bundle.xml`** via `TOOLS/ST_PLCOPENXML_GENERATOR` avant toute restitution. Ce n'est pas une option et il ne faut jamais proposer un import fichier-par-fichier. Si un POU XML natif/CFC est concerné, le conserver comme source métier et ne jamais éditer le XML final du bundle à la main.
+8. **Si au moins un fichier `CODE/**/*.st` a changé : générer obligatoirement `CODE_XML/CODE_Bundle.xml`** via `TOOLS/CONVERTER_ST2XML_PLCopenXML` avant toute restitution. Ce n'est pas une option et il ne faut jamais proposer un import fichier-par-fichier. Si un POU XML natif/CFC est concerné, le conserver comme source métier et ne jamais éditer le XML final du bundle à la main.
 9. Exécuter obligatoirement `G390_check_bundle_freshness.py <project_root>` après génération ; un bundle absent ou stale bloque la restitution.
 10. Pour C3/C4/safety, la validation humaine (Watch/forçage CODESYS avant chargement) est obligatoire, même si CODESYS compile. Si un test PLC automatique a été déclaré (`tests_automated_required: true`), exécuter aussi `check_task_test_contract.py <TASK_CONTEXT> --release` — sans `implemented` + preuve d'exécution, le lot reste **incomplet**.
 11. Si ST2PY est utilisé pour la simulation ou la non-régression, le rapporter comme outil hors-PLC complémentaire ; il ne remplace pas la validation CODESYS ni les essais terrain.

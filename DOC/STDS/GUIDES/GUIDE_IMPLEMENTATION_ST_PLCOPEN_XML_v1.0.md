@@ -10,7 +10,7 @@
   contrôle, `addData`. Ne couvre pas les sections `<configuration>`/`<resource>`/`<task>` de la
   norme (§7 de la spec source) — hors périmètre volontaire, voir le guide LD pour la même note.
 - **Type de composant** : référence technique normative, source secondaire consommée par
-  `TOOLS/ST_PLCOPENXML_GENERATOR/generator/` (parsing ST → XML) et par tout agent
+  `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/` (parsing ST → XML) et par tout agent
   lisant/écrivant du ST en PLCopen XML.
 
 > Origine : extraction agent de la spec officielle **PLCopen Technical Committee 6 — XML Formats
@@ -613,4 +613,4 @@ fbPompe1(
 - [`GUIDE_IMPLEMENTATION_LADDER_PLCOPEN_XML_v1.0.md`](GUIDE_IMPLEMENTATION_LADDER_PLCOPEN_XML_v1.0.md) — pendant LD de ce guide.
 - [`tc6_xml_v201_technical_doc.md`](tc6_xml_v201_technical_doc.md) — spec source intégrale (PLCopen TC6 XML v2.01), y compris les sections hors périmètre ici (§7 configuration/resource/task).
 - [`CODE_QUALITY_STANDARDS.md`](../CODE_QUALITY_STANDARDS.md) — référentiel universel de déclaration/liaison/nommage appliqué au-dessus de ce format XML.
-- `TOOLS/ST_PLCOPENXML_GENERATOR/generator/` — implémentation Python consommant ces règles pour convertir `CODE/**/*.st` en PLCopen XML.
+- `TOOLS/CONVERTER_ST2XML_PLCopenXML/generator/` — implémentation Python consommant ces règles pour convertir `CODE/**/*.st` en PLCopen XML.
