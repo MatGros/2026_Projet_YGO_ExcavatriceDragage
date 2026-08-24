@@ -107,8 +107,9 @@ def resolve(targets: list[Path], code_root: Path) -> tuple[dict[str, Path], set[
     if STUBS_DIR.is_dir():
         all_gvl.extend(STUBS_DIR.glob("*.st"))
 
+    target_resolved = {t.resolve() for t in targets}
     for gvl_file in all_gvl:
-        if GVL_STEM_RE.match(gvl_file.stem) and gvl_file not in targets:
+        if GVL_STEM_RE.match(gvl_file.stem) and gvl_file.resolve() not in target_resolved:
             resolved.setdefault(gvl_file.stem, gvl_file)
             queue.append(gvl_file)
 

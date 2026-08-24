@@ -183,12 +183,13 @@ def lint(
     demande explicitement par l'utilisateur (session 2026-08-23) : pouvoir voir ce que le
     compilateur dit vraiment, sans nos correctifs, avant de decider de les activer."""
     resolved, unresolved = resolve_deps.resolve([target], code_root)
-
-    # resolve() inclut deja systematiquement toutes les GVL_*.st (voir resolve_deps.py) --
-    # dict.fromkeys plutot que list() : plusieurs NOMS peuvent resoudre vers le MEME fichier
-    # (ex: chaque membre d'une GVL) -- sans dedup, strucpp.exe recoit ce fichier plusieurs fois
-    # et leve "Symbol already defined in scope 'global'" (bug reel trouve session 2026-08-23).
-    all_sources = list(dict.fromkeys([target] + list(resolved.values())))
+    seen_srcs: set[Path] = set()
+    all_sources: list[Path] = []
+    for s in [target] + list(resolved.values()):
+        r = s.resolve()
+        if r not in seen_srcs:
+            seen_srcs.add(r)
+            all_sources.append(s)
 
     with tempfile.TemporaryDirectory(prefix="linter_st_") as tmp:
         tmp_path = Path(tmp)
@@ -206,7 +207,7 @@ def lint(
             converted_to_source[dst.name] = src
 
         out_cpp = tmp_path / "out.cpp"
-        converted_files = [converted_dir / s.name for s in all_sources]
+        converted_files = list(dict.fromkeys([converted_dir / s.name for s in all_sources]))
         raw_output = _run_strucpp(converted_files, out_cpp)
 
         if raw:
