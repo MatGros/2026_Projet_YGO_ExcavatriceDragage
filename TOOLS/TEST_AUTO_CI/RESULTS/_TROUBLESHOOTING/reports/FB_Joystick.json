@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_joystick.st",
+  "results": [
+    {
+      "name": "AC1a : ArmingPermit=FALSE bloque l armement (appui maintenu 110ms)",
+      "passed": true
+    },
+    {
+      "name": "AC1b : ArmingPermit=TRUE autorise l armement (appui maintenu 110ms)",
+      "passed": true
+    },
+    {
+      "name": "AC2 : ArmingPermit=FALSE -> Enable=FALSE, SpeedRef=0, warning armement non permis actif",
+      "passed": true
+    },
+    {
+      "name": "AC3a : defaut capteur (RawOutOfRange) neutralise Enable meme si ArmingPermit=TRUE",
+      "passed": true
+    },
+    {
+      "name": "AC3b : ArmingPermit=FALSE bloque l armement meme sans defaut capteur",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0
+  }
+}

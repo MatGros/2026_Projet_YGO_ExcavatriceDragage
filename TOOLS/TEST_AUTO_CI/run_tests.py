@@ -113,10 +113,8 @@ import threading
 
 
 def _archive_previous(reports_dir: pathlib.Path, fb_name: str) -> None:
-    """Deplace le dernier rapport (html/json) + le .st de test qui l'a produit vers
-    reports/archive/, horodates ensemble -- pour que la racine reports/ ne contienne toujours
-    que le DERNIER run, tout en gardant l'historique complet et tracable (quel .st a produit
-    quel rapport, meme si le .st a ete modifie depuis)."""
+    """Archive une copie du rapport precedent vers reports/archive/ avec horodatage,
+    tout en maintenant le dernier rapport actif a la racine pour le suivi Git."""
     existing = [p for p in reports_dir.glob(f"{fb_name}.*") if p.is_file()] + \
                [p for p in reports_dir.glob(f"{fb_name}_test.*") if p.is_file()]
     if not existing:
@@ -126,7 +124,7 @@ def _archive_previous(reports_dir: pathlib.Path, fb_name: str) -> None:
     timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
     for p in existing:
         try:
-            p.rename(archive_dir / f"{timestamp}_{p.name}")
+            shutil.copy2(p, archive_dir / f"{timestamp}_{p.name}")
         except Exception:
             pass
 

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_joystick.st",
+  "results": [
+    {
+      "name": "TC-SIM-001 Montee progressive : RawX augmente de scan en scan (pas un saut)",
+      "passed": true
+    },
+    {
+      "name": "TC-SIM-002 Bagotement : RawX varie apres le relachement (passe d un cote, puis de l autre)",
+      "passed": true
+    },
+    {
+      "name": "TC-SIM-003 Overshoot montee : RawX passe sous 10000 puis depasse (vers 10500)",
+      "passed": true
+    },
+    {
+      "name": "TC-SIM-004 Deux boutons simultanes = neutre (pas de diagonale implicite)",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0
+  }
+}

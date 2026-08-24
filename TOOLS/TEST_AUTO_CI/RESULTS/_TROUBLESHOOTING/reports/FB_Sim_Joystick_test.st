@@ -1,0 +1,139 @@
+SETUP
+VAR
+    fb : FB_SIM_JOYSTICK;
+    prevX : INT;
+END_VAR
+END_SETUP
+
+TEST 'TC-SIM-001 Montee progressive : RawX augmente de scan en scan (pas un saut)'
+    (* RiseTimeS court (0.1s @10ms = 10 scans pour la pleine course 5000) : chaque scan ajoute
+       ~500 points + bruit. On verifie que RawX PROGRESSE (prevX < RawX), pas un saut direct. *)
+    prevX := 5000;
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_TRUE(fb.RAWX > prevX, 'scan 1 : RawX progresse (depasse le neutre), pas un saut');
+    prevX := fb.RAWX;
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_TRUE(fb.RAWX > prevX, 'scan 2 : RawX continue de monter (variation, pas figé)');
+    ASSERT_EQ(fb.RAWY, 5000, 'axe Y au neutre (bouton droite = axe X seul)');
+END_TEST
+
+TEST 'TC-SIM-002 Bagotement : RawX varie apres le relachement (passe d un cote, puis de l autre)'
+    (* Monte a fond avec le bouton droit (RiseTimeS court), puis relache : la retombee
+       (FALL) puis le bagotement (OVERSHOOT) doivent faire VARIER RawX autour du neutre.
+       On observe plusieurs scans apres le relachement : RawX doit s ecarter de 5000
+       (depassement) puis varier, pas rester figé. *)
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := TRUE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_TRUE(fb.RETURNINGACTIVE = FALSE, 'pendant la montee, ReturningActive = FALSE');
+
+    (* Relâche : retour dynamique (FALL puis OVERSHOOT). Plusieurs scans pour voir la variation. *)
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := FALSE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := TRUE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_TRUE(fb.RETURNINGACTIVE, 'apres relachement : ReturningActive = TRUE (retour en cours)');
+    ASSERT_TRUE(fb.RAWX <> 5000, 'retour : RawX s ecarte du neutre (dynamique, pas figé)');
+    prevX := fb.RAWX;
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := FALSE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := TRUE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_TRUE(fb.RAWX <> prevX, 'scan suivant : RawX VARIE encore (bagotement/oscillation en cours)');
+    prevX := fb.RAWX;
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := FALSE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := TRUE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_TRUE(fb.RAWX <> prevX, 'scan 3 : RawX continue de varier (oscillation amortie)');
+END_TEST
+
+TEST 'TC-SIM-003 Overshoot montee : RawX passe sous 10000 puis depasse (vers 10500)'
+    (* Overshoot : la cible depasse MaxRaw. Au 1er scan RawX < 10000 (progression), puis avec
+       plusieurs scans la cible >10000 est atteinte. On verifie la VARIATION vers le haut. *)
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_TRUE(fb.RAWX > 5000 AND fb.RAWX < 10000, 'scan 1 overshoot : RawX progresse (sous la butée)');
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := FALSE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := TRUE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_TRUE(fb.RAWX >= 10000, 'apres ~11 scans (RiseTimeS=0.1s @10ms) : RawX a atteint/depasse la butee (overshoot)');
+END_TEST
+
+TEST 'TC-SIM-004 Deux boutons simultanes = neutre (pas de diagonale implicite)'
+    fb(ENABLE := TRUE, NEUTRALRAW := 5000, MAXRAW := 10000,
+       BTNLEFT_REV_TREMIE := FALSE, BTNRIGHT_FWD_MAINT := TRUE,
+       BTNFWD_UP_CLOSE := TRUE, BTNREV_DOWN_OPEN := FALSE,
+       OVERSHOOTACTIVE := FALSE, BAGOTEMENTACTIVE := FALSE,
+       RISETIMES := 0.1, FALLTIMEMS := T#200MS, CYCLETIMES := 0.010);
+    ASSERT_EQ(fb.RAWX, 5000, '2 boutons (droite+avant) : RawX au neutre');
+    ASSERT_EQ(fb.RAWY, 5000, '2 boutons (droite+avant) : RawY au neutre');
+END_TEST
