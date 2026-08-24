@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport de test — A_COMMUN [PASS]</title>
+<style>
+    :root {
+        --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+        --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
+        --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
+        --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 0;
+        background: var(--bg); color: var(--text); line-height: 1.5; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 32px 24px 64px; }
+    .header { display: flex; justify-content: flex-start; align-items: center;
+        margin-bottom: 6px; gap: 14px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 10px; padding: 16px 18px; }
+    h1 { font-size: 22px; margin: 0; font-weight: 600; }
+    .header .badge, .fb-section-title .badge { font-size: 14px; padding: 5px 14px; }
+    .subtitle { color: var(--muted); font-size: 13px; margin: 4px 0 24px; }
+    .subtitle b { color: var(--text); font-weight: 600; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-weight: 600;
+        font-size: 11px; letter-spacing: 0.3px; }
+    .badge-pass { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .badge-fail { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
+    /* Sur fond de page pastel (meme teinte que badge-pass/fail), le badge se fondrait --
+       variante foncee/opaque pour les badges de titre (header, sommaire FB) qui ressortent. */
+    .badge-pass.badge-strong { background: var(--green-text); color: #ffffff; border-color: var(--green-text); }
+    .badge-fail.badge-strong { background: var(--red-text); color: #ffffff; border-color: var(--red-text); }
+    details { margin-bottom: 20px; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary:hover { color: var(--text); }
+    ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px 18px; margin-bottom: 12px; }
+    .test-card-fail { border-color: var(--red-border); }
+    .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
+    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks { margin-top: 8px; }
+    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; }
+    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
+    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
+        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
+    .failure-head { color: var(--red-text); font-weight: 600; }
+    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
+    .failure-msg { color: #92400e; margin-top: 4px; }
+    .failure-diff { margin-top: 4px; }
+    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
+        overflow-x: auto; }
+    .chronogram-group { margin-top: 12px; }
+    .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 12px; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
+    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
+    .chrono-table .scan-t { color: var(--muted); }
+    .chrono-table td.changed { background: #fef9c3; }
+    .v-true { color: var(--green-text); font-weight: 600; }
+    .v-false { color: #cbd5e1; }
+    .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+    .waveform { display: block; }
+    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
+    .wf-line { fill: none; stroke-width: 2; }
+    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
+    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
+    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-chip { opacity: 0.95; }
+    .wf-legend { font-size: 10px; fill: var(--muted); }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 13px; }
+    .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
+    .af-warning-banner ul { margin: 0; padding-left: 20px; }
+    .af-warning-banner li { margin: 3px 0; }
+    .encaps-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 10px 16px; margin: 14px 0; }
+    .encaps-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; }
+    .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .encaps-table th { text-align: left; padding: 4px 8px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 4px 8px; border-top: 1px solid var(--border); }
+    .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
+    .encaps-table ul { margin: 0; padding-left: 16px; }
+    .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
+        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+    .wf-fail-band { fill: #fecaca; opacity: 0.45; }
+    .wf-fail-marker { font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }
+    tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
+    .chronogram-static { margin-top: 10px; }
+    .chronogram-static summary { font-size: 11px; }
+    .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
+    .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
+    .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
+    .exec-time { color: var(--muted); font-size: 12px; margin: 0 0 20px; }
+    .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 16px; margin-bottom: 16px; }
+    .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .pin-diagram { display: flex; align-items: stretch; gap: 0; margin-top: 12px; font-size: 12px; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1px; min-width: 0; }
+    .pin-block { flex: 0 0 140px; background: #eef2ff; border: 2px solid var(--accent); border-radius: 6px;
+        display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700;
+        font-size: 12px; margin: 0 10px; padding: 8px; align-self: stretch; color: var(--accent); }
+    .pin-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; border-bottom: 2px dashed #94a3b8;
+        min-width: 0; }
+    /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
+    .pin-col-in .pin-row { justify-content: flex-end; text-align: right; }
+    /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
+    .pin-col-out .pin-row { justify-content: flex-start; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 600; white-space: nowrap; color: var(--text); }
+    .pin-type { color: var(--muted); font-weight: 400; font-size: 10px; }
+    .pin-tag { font-size: 9px; background: #ddd6fe; color: #5b21b6; border-radius: 4px; padding: 1px 4px; margin-left: 4px; }
+    .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .pin-expr code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 11px;
+        cursor: pointer; }
+    .pin-expr code:hover { background: #e2e8f0; }
+    .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
+    .pin-missing { color: #b45309; font-style: italic; font-size: 11px; }
+    .pin-more { color: var(--muted); font-size: 10px; }
+    .pin-row-unwired { background: #fffbeb; }
+    .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
+        font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 10px; }
+    .fb-section-title:first-of-type { margin-top: 6px; }
+    .toc-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin-bottom: 16px; }
+    .toc-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .toc-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; margin: 12px 0 4px; }
+    .toc-group-title:first-of-type { margin-top: 10px; }
+    .toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+    .toc-item { font-size: 12.5px; padding: 2px 0; break-inside: avoid; }
+    .toc-item a { text-decoration: none; color: var(--text); }
+    .toc-item a:hover { text-decoration: underline; }
+    .toc-item::before { content: "●"; font-size: 8px; margin-right: 6px; }
+    .toc-pass::before { color: var(--green-text); }
+    .toc-fail::before { color: var(--red-text); }
+    .toc-fail a { color: var(--red-text); font-weight: 600; }
+
+    body { background: #ecfdf5; }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <h1>A_COMMUN</h1>
+        <span class="badge badge-pass">PASS</span>
+    </div>
+    <div class="exec-time">1/1 FB OK · 2026-08-22 21:01:06</div>
+    
+    <details class="toc-details" open>
+        <summary>📋 Sommaire (11 tests)</summary>
+        <div class="toc-group-title">FB_FbStatus</div><ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-0">TC-P03-001 Enable=FALSE neutralise le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-1">Nominal : Enable=TRUE sans cause -&gt; Ready, aucun defaut ni warning</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-2">TC-P03-007 Warning auto-efface sans Reset des que la cause disparait</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-3">TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-4">TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute)</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-5">TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-6">TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-7">TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-8">TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-9">TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste</a></li><li class="toc-item toc-pass"><a href="#test-fb-fbstatus-10">TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage)</a></li></ul>
+    </details>
+    
+    <div class="fb-section-title">FB_FbStatus <span class="badge badge-pass">PASS</span></div>
+    
+    <div class="subtitle">
+        Domaine <b>A_COMMUN</b> · 11/11 vérifications OK
+    </div>
+    
+    
+    <details class="pin-diagram-details">
+        <summary>🔌 Interface & câblage production</summary>
+        <div class="af-warning-banner">
+            <div class="af-warning-title">⚠️ 4 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>STATUS</code> jamais câblé en production</li></ul>
+        </div>
+        <div class="pin-diagram">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+        </div></div>
+            <div class="pin-block">FB_FbStatus</div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div><div class="pin-row pin-row-unwired pin-row-out">
+            <div class="pin-name">STATUS <span class="pin-type">ST_FBSTATUS</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+        </div></div>
+        </div>
+    </details>
+    
+    <details class="encaps-details" >
+        <summary>🔒 Encapsulation (interface FB) — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <table class="encaps-table">
+            <thead><tr><th></th><th>FB</th><th>IN</th><th>OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Detail</th></tr></thead>
+            <tbody>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FbStatus</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>4</td>
+                <td>—</td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+        <article id="test-fb-fbstatus-0" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Enable=FALSE neutralise le statut (gate)</h3>
+            </header>
+            
+            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>Enable=FALSE -&gt; Ready=FALSE</li><li>Enable=FALSE -&gt; Error=FALSE (statut neutre)</li><li>Enable=FALSE -&gt; Warning=FALSE (statut neutre)</li><li>Enable=FALSE -&gt; ErrorId=0</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (6)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATEATERRORARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>I</code></td><td>0</td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Nominal : Enable=TRUE sans cause -&gt; Ready, aucun defaut ni warning</h3>
+            </header>
+            
+            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>Enable=TRUE -&gt; Ready=TRUE</li><li>aucune cause active -&gt; Error=FALSE</li><li>aucune cause active -&gt; Warning=FALSE</li><li>ErrorId=0</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (6)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATEATERRORARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-007 Warning auto-efface sans Reset des que la cause disparait</h3>
+            </header>
+            <div class="comments"><p class='comment'>cause 1 = warning (IsWarning=TRUE), auto-efface : jamais de latch, jamais de Reset</p><p class='comment'>cause disparait, AUCUN Reset : doit s effacer tout seul</p></div>
+            <div class="checks"><span class="checks-label">Vérifié (7)</span><ul><li>cause1 IsWarning=TRUE -&gt; classe warning</li><li>WarningId = bit1</li><li>texte IHM peuple depuis Causes[1].Texte</li><li>DECISION utilisateur : un warning ne leve JAMAIS Error</li><li>un warning seul ne demande pas de Reset</li><li>cause disparue -&gt; Warning auto-efface sans Reset</li><li>WarningId retombe a 0</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 1 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="132" viewBox="0 0 332 132" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="126" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">I</text><circle cx="192" cy="82.0" r="4" fill="#2563eb"/><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="219.0" y="68.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">1</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><rect x="275.0" y="68.0" width="18" height="13" rx="3" fill="#2563eb" class="wf-chip"/><text x="284.0" y="77.0" class="wf-num-changed">16</text></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>I</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>1</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'>16</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (5)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATEATERRORARMED</code></td><td><span class="v-false">FALSE</span></td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset</h3>
+            </header>
+            <div class="comments"><p class='comment'>cause disparait, PAS de Reset : doit rester memorise</p><p class='comment'>Reset alors que la cause est deja partie : acquitte</p></div>
+            <div class="checks"><span class="checks-label">Vérifié (9)</span><ul><li>cause3 fault actif -&gt; Error=TRUE</li><li>ErrorId = bit3</li><li>texte IME peuple depuis Causes[3].Texte</li><li>fault actif -&gt; Reset demande</li><li>cause disparue mais PAS de Reset -&gt; Error reste memorise (latche, std 9)</li><li>ErrorId latche conserve le bit3</li><li>Reset avec cause disparue -&gt; acquitte</li><li>ErrorId retombe a 0 apres Reset</li><li>plus rien a acquitter</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 2 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="172" viewBox="0 0 388 172" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="154" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="166" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="154" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="166" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="154" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="166" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L312,94L312,68L368,68" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">STATEATERRORARMED</text><circle cx="192" cy="122.0" r="4" fill="#dc2626"/><path d="M200,108L256,108L312,108L312,108L312,134L368,134" class="wf-line" stroke="#dc2626"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>STATEATERRORARMED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (4)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute)</h3>
+            </header>
+            
+            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>precondition : fault actif</li><li>Reset avec cause toujours presente -&gt; ne doit PAS acquitter</li><li>bit5 toujours leve, interlock sur la cause brute jamais sur l acquittement</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 1 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="132" viewBox="0 0 332 132" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="126" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68" class="wf-line" stroke="#111827"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (5)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATEATERRORARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-5" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche</h3>
+            </header>
+            <div class="comments"><p class='comment'>scan 1 : cause3 seule active</p><p class='comment'>scan 2 : cause3 disparait, aucun Reset -&gt; reste latche</p><p class='comment'>scan 3 : cause5 apparait -&gt; cumul avec le latch existant</p><p class='comment'>scan 4 : cause5 disparait aussi, toujours aucun Reset -&gt; les deux restent latches</p><p class='comment'>scan 5 : Reset acquitte le cumul complet</p></div>
+            <div class="checks"><span class="checks-label">Vérifié (5)</span><ul><li>scan 1 : cause3 seule</li><li>scan 2 : cause3 toujours memorisee</li><li>scan 3 : cause3 latchee + cause5 active = cumul (0x28)</li><li>scan 4 : les 2 causes disparues mais aucun Reset -&gt; cumul conserve</li><li>scan 5 : Reset acquitte le cumul complet</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (5 scans, 2 variables actives)</summary>
+            <div class="wf-scroll"><svg width="500" height="172" viewBox="0 0 500 172" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="154" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="166" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="154" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="166" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="154" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="166" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="154" class="wf-grid"/><text x="396.0" y="52" class="wf-time">30ms</text><text x="396.0" y="166" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="154" class="wf-grid"/><text x="452.0" y="52" class="wf-time">40ms</text><text x="452.0" y="166" class="wf-scan">#4</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L312,94L368,94L424,94L424,94L424,68L480,68" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">STATEATERRORARMED</text><circle cx="192" cy="122.0" r="4" fill="#dc2626"/><path d="M200,108L256,108L312,108L368,108L424,108L424,108L424,134L480,134" class="wf-line" stroke="#dc2626"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (5 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>STATEATERRORARMED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>30 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>40 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (4)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-6" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe</h3>
+            </header>
+            
+            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>fault + warning actifs -&gt; Error=TRUE (fault present)</li><li>le texte Error est celui du fault (un warning ne fournit pas le texte Error)</li><li>texte Warning correct</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (6)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATEATERRORARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>I</code></td><td>1</td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-7" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees</h3>
+            </header>
+            <div class="comments"><p class='comment'>cause0 relachee AVANT le Reset, sinon l interlock cause brute empeche l acquittement (TC-P03-006)</p></div>
+            <div class="checks"><span class="checks-label">Vérifié (5)</span><ul><li>cause0 (borne basse) correctement levee</li><li>texte cause0 correctement selectionne</li><li>Reset avec cause disparue -&gt; acquitte</li><li>cause15 (borne haute) correctement levee</li><li>texte cause15 correctement selectionne (pas de depassement array)</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (3 scans, 2 variables actives)</summary>
+            <div class="wf-scroll"><svg width="388" height="172" viewBox="0 0 388 172" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="154" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="166" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="154" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="166" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="154" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="166" class="wf-scan">#2</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L312,68L312,94L368,94" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">STATEATERRORARMED</text><circle cx="192" cy="122.0" r="4" fill="#dc2626"/><path d="M200,108L256,108L256,108L256,134L312,134L312,134L312,108L368,108" class="wf-line" stroke="#dc2626"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (3 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>STATEATERRORARMED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td class='changed'><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (4)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-8" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite</h3>
+            </header>
+            
+            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>Reset sans historique : aucun effet, pas d erreur fantome</li><li>ErrorId reste a 0</li><li>rien a acquitter</li><li>apres relachement du Reset a vide : toujours propre</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (2 scans, 1 variables actives)</summary>
+            <div class="wf-scroll"><svg width="332" height="132" viewBox="0 0 332 132" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="126" class="wf-scan">#1</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,68L256,68L256,68L256,94L312,94" class="wf-line" stroke="#111827"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (2 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (5)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATEATERRORARMED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-9" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste</h3>
+            </header>
+            <div class="comments"><p class='comment'>Reset maintenu a TRUE sur 3 scans, cause TOUJOURS presente : re-latch immediat a chaque scan</p><p class='comment'>cause disparait puis nouveau front Reset -&gt; acquitte</p></div>
+            <div class="checks"><span class="checks-label">Vérifié (6)</span><ul><li>precondition : fault actif</li><li>scan 1 Reset maintenu, cause presente : ne doit pas acquitter</li><li>scan 2 Reset maintenu, cause presente : toujours pas acquitte</li><li>scan 3 Reset maintenu, cause presente : toujours pas acquitte</li><li>cause7 toujours leve apres 3 scans de Reset maintenu</li><li>cause disparue + nouveau front Reset -&gt; acquitte enfin</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <details >
+            <summary>📊 Chronogramme graphique (6 scans, 2 variables actives)</summary>
+            <div class="wf-scroll"><svg width="556" height="172" viewBox="0 0 556 172" xmlns="http://www.w3.org/2000/svg" class="waveform"><circle cx="200" cy="14" r="4" fill="#111827"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#dc2626"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#ea580c"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#2563eb"/><text x="418" y="17" class="wf-legend">Autres (palette)</text><line x1="200" y1="56" x2="200" y2="154" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="166" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="154" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="166" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="154" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="166" class="wf-scan">#2</text><line x1="368" y1="56" x2="368" y2="154" class="wf-grid"/><text x="396.0" y="52" class="wf-time">30ms</text><text x="396.0" y="166" class="wf-scan">#3</text><line x1="424" y1="56" x2="424" y2="154" class="wf-grid"/><text x="452.0" y="52" class="wf-time">40ms</text><text x="452.0" y="166" class="wf-scan">#4</text><line x1="480" y1="56" x2="480" y2="154" class="wf-grid"/><text x="508.0" y="52" class="wf-time">50ms</text><text x="508.0" y="166" class="wf-scan">#5</text><text x="182" y="86.0" class="wf-label">RESET</text><circle cx="192" cy="82.0" r="4" fill="#111827"/><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L368,68L424,68L424,68L424,94L480,94L480,94L480,68L536,68" class="wf-line" stroke="#111827"/><text x="182" y="126.0" class="wf-label">STATEATERRORARMED</text><circle cx="192" cy="122.0" r="4" fill="#dc2626"/><path d="M200,108L256,108L312,108L368,108L424,108L480,108L480,108L480,134L536,134" class="wf-line" stroke="#dc2626"/></svg></div>
+        </details>
+        <details >
+            <summary>📋 Chronogramme tableau (6 scans)</summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th>Scan</th><th>Temps</th><th>RESET</th><th>STATEATERRORARMED</th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#3</td><td class='scan-t'>30 ms</td><td><span class="v-true">TRUE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#4</td><td class='scan-t'>40 ms</td><td class='changed'><span class="v-false">FALSE</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#5</td><td class='scan-t'>50 ms</td><td class='changed'><span class="v-true">TRUE</span></td><td class='changed'><span class="v-false">FALSE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (4)</summary>
+        <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+    </details>
+    </div>
+        </article>
+        <article id="test-fb-fbstatus-10" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage)</h3>
+            </header>
+            <div class="comments"><p class='comment'>Texte non rempli</p></div>
+            <div class="checks"><span class="checks-label">Vérifié (2)</span><ul><li>cause9 active -&gt; Error=TRUE meme sans texte configure</li><li>aucun texte configure -&gt; chaine vide, pas de plantage</li></ul></div>
+            
+            
+    <div class="chronogram-group">
+        
+        <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
+        <details class="chronogram-static">
+            <summary>🔒 Valeurs du scan unique (6)</summary>
+            <table class="static-table"><tbody><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>STATUS.BUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>STATEATERRORARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>I</code></td><td>16</td></tr></tbody></table>
+        </details>
+    </div>
+        </article>
+    <details>
+        <summary>Fichiers source compilés (4)</summary>
+        <ul><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/A_COMMUN/ST_FbCause.st</code></li><li><code>CODE/A_COMMUN/FB_FbStatus.st</code></li></ul>
+    </details>
+    <details>
+        <summary>Code source ST original (4)</summary>
+        
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des phases opérationnelles d&#x27;un FB métier
+   ⚙️ Machine d&#x27;état : Un seul état actif à la fois (orthogonal à Error)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   ======================================================================= *)
+
+TYPE E_State :
+ENUM
+    DISABLED := 0,   (* Enable faux, neutralisé *)
+    INIT     := 1,   (* Démarrage / vérifs *)
+    READY    := 2,   (* Prêt, attend ordre *)
+    BUSY     := 3,   (* Action en cours *)
+    DONE     := 4,   (* Action terminée *)
+    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
+      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
+      côté affichage). Évolution ADDITIVE de la forme historique : les
+      6 membres d&#x27;origine sont conservés (tolérance transitoire T137).
+   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+      rempli via le socle `FB_FbStatus` (même comportement partout).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ======================================================================= *)
+
+TYPE ST_FbStatus :
+STRUCT
+    (* ---- membres historiques (conservés) ---- *)
+    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
+    Done         : BOOL;    (* 1 = Action terminée avec succès *)
+    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
+    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
+    State        : E_State; (* État courant de la machine d&#x27;état *)
+    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
+    (* ---- membres ajoutés (forme cible enrichie) ---- *)
+    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
+    WarningId      : WORD;  (* Code warning courant (bitfield) *)
+    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
+    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
+    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
+      sans bitfield ni masque. Le FB métier remplit une liste de causes
+      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
+   🧬 Contrat : remplacer l&#x27;ancien couple WORD bitfield + tableaux de textes
+      indexés par bit par une liste lisible (maintenance, « avec une liste »).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
+      l&#x27;acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FbCause :
+STRUCT
+    Active     : BOOL;   (* 1 = cause présente (interlock sur la cause brute) *)
+    IsWarning  : BOOL;   (* 1 = warning auto-effacé ; 0 = défaut à acquitter *)
+    Texte      : STRING; (* libellé prêt IHM de la cause *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
+      à partir d&#x27;une LISTE de causes claires (ARRAY[0..15] OF ST_FbCause).
+      Plus de bitfield WORD en entrée, plus de masque, plus de tableau de
+      textes indexé par bit — le FB métier exprime ses défauts en clair.
+   🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
+      rempli via UNE instance de ce socle → même comportement partout.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur l&#x27;acquittement.
+      - Reset TOUJOURS effectif (std §9), jamais conditionné.
+      - IsWarning=1 → warning AUTO-EFFACÉ (ne lève jamais Error) ; IsWarning=0 → fault à acquitter (laté).
+      - une cause fault réapparue se re-lathe automatiquement (ré-alarme).
+      - une cause reclassée warning purge son latch résiduel (pas de défaut fantôme).
+      - StateAtError : capture UNIQUE au premier défaut, gelé jusqu&#x27;au Reset.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FbStatus
+VAR_INPUT
+    // === PERMIS &amp; ACQUITTEMENT ===
+    Enable          : BOOL;    // --&gt; [CMD] Autorisation générale FB
+    Reset           : BOOL;    // --&gt; [CMD] Front acquittement défaut (jamais conditionné, §9)
+
+    // --- CAUSES (producteur = bloc métier, en clair) ---
+    Causes          : ARRAY[0..15] OF ST_FbCause;  // --&gt; [HW] Liste des causes (Active/IsWarning/Texte)
+END_VAR
+VAR_OUTPUT
+    // --- ÉTAT &amp; SYNOPTIQUE (forme cible) ---
+    Ready           : BOOL;    // &lt;-- [STAT] FB prêt (Enable)
+    Status          : ST_FbStatus; // &lt;-- [STAT] Statut complet (mappé 1:1 sur la sortie du bloc)
+END_VAR
+VAR
+    // --- SOUS-INSTANCES &amp; MEMOIRES ---
+    ResetEdge         : R_TRIG;              // * [INST] Front Reset
+    Latch             : ARRAY[0..15] OF BOOL;// . [LOC] Défaut laté par cause (jusqu&#x27;au Reset)
+    StateAtErrorArmed : BOOL;                // . [LOC] Flag : StateAtError capturé UNE fois
+    i                 : INT;                 // . [LOC] index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Gate neutralisation&quot;}
+// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr.
+//    ⚠️ Les latches de défaut sont CONSERVÉS (décision utilisateur) : un défaut
+//    non acquitté ne doit pas être effacé silencieusement par une bascule Enable
+//    OFF→ON sans Reset (jamais de redémarrage auto après défaut). Au ré-enable,
+//    §3 relatche naturellement toute cause encore active ; un défaut laté persistant
+//    redevient visible jusqu&#x27;au Reset.
+Ready := Enable;
+IF NOT Enable THEN
+    Status.Busy := FALSE; Status.Done := FALSE;
+    Status.Error := FALSE; Status.ErrorId := 0;
+    Status.Warning := FALSE; Status.WarningId := 0;
+    Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
+    Status.ResetRequested := FALSE;
+    Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
+    RETURN;
+END_IF;
+Status.State := E_State.READY;
+{endregion}
+
+{region &quot;=== §2 Reset (front, toujours effectif) ===&quot;}
+// 2. Front Reset : TOUJOURS effectif, jamais conditionné (std §9).
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+    StateAtErrorArmed := FALSE;
+END_IF;
+{endregion}
+
+{region &quot;=== §3 Classification + latch par cause ===&quot;}
+// 3. Parcours de la LISTE (source de vérité = cause brute Active).
+//    - IsWarning=TRUE  → warning : auto-effacé + purge d&#x27;un latch résiduel (reclassement, sans défaut fantôme).
+//    - IsWarning=FALSE → fault : laté dès qu&#x27;Active ; conservé après disparition ; re-laté s&#x27;il revient.
+FOR i := 0 TO 15 DO
+    IF Causes[i].IsWarning THEN
+        Latch[i] := FALSE;
+    ELSE
+        IF Causes[i].Active THEN Latch[i] := TRUE; END_IF;
+    END_IF;
+END_FOR;
+{endregion}
+
+{region &quot;=== §4 StateAtError — capture au premier défaut ===&quot;}
+// 4. État mémorisé au moment de l&#x27;apparition du défaut (gelé jusqu&#x27;au Reset).
+IF NOT StateAtErrorArmed THEN
+    FOR i := 0 TO 15 DO
+        IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+            Status.StateAtError := Status.State;   // State déjà READY (§1)
+            StateAtErrorArmed := TRUE;
+            EXIT;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;=== §5 Sorties Error / Warning / ResetRequested ===&quot;}
+// 5. Sorties : ErrorId réservé aux DÉFAUTS (à acquitter) ; les warnings sont
+//    séparés dans WarningId. Un warning ne lève JAMAIS Error ni ne pollue ErrorId
+//    (décision utilisateur : un IHM qui lit ErrorId ne voit pas de faux défaut).
+Status.ErrorId := 0; Status.WarningId := 0;
+Status.Error := FALSE; Status.Warning := FALSE; Status.ResetRequested := FALSE;
+FOR i := 0 TO 15 DO
+    // Défaut laté OU actif
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorId := Status.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Error := TRUE;
+        Status.ResetRequested := TRUE;
+    END_IF;
+    // Warning auto-effacé : uniquement dans WarningId (séparé de ErrorId)
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningId := Status.WarningId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Warning := TRUE;
+    END_IF;
+END_FOR;
+{endregion}
+
+{region &quot;=== §6 Textes IHM — parcours de liste ===&quot;}
+// 6. Sélection du texte par parcours de la LISTE (première cause active, index le plus bas).
+//    Plus de WHILE ni de masque. Hypothèse : `Causes[i].Texte` reste renseigné par l&#x27;appelant.
+Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
+FOR i := 0 TO 15 DO
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorIdTxt := Causes[i].Texte; EXIT;
+    END_IF;
+END_FOR;
+FOR i := 0 TO 15 DO
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningIdTxt := Causes[i].Texte; EXIT;
+    END_IF;
+END_FOR;
+{endregion}
+
+// Busy/Done : pilotés par le FB MÉTIER (cycle propre), pas par le socle.
+// Un conditionneur synchrone (joystick) les laisse à FALSE ; un organe à cycle les pilote lui-même.
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+    </details>
+    <details>
+        <summary>Sortie brute strucpp</summary>
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_fbstatus.st
+  [PASS] TC-P03-001 Enable=FALSE neutralise le statut (gate)
+  [PASS] Nominal : Enable=TRUE sans cause -&gt; Ready, aucun defaut ni warning
+  [PASS] TC-P03-007 Warning auto-efface sans Reset des que la cause disparait
+  [PASS] TC-P03-002/003 Fault : reste memorise (latche) apres disparition de la cause, jusqu au Reset
+  [PASS] TC-P03-006 Reset ne doit PAS acquitter tant que la cause fault reste presente (interlock sur la cause brute)
+  [PASS] TC-P03-008 Cumul multi-causes latches : un second fault apparait pendant que le premier reste latche
+  [PASS] TC-P03-009 Fault et Warning actifs simultanement : texte du fault affiche, warning separe
+  [PASS] TC-P03-010 Bornes 16 causes : cause0 et cause15 correctement gerees
+  [PASS] TC-P03-011 Reset a vide (aucun defaut jamais existe) : aucun effet parasite
+  [PASS] TC-P03-012 Reset MAINTENU plusieurs scans avec cause active : jamais d acquittement tant que la cause persiste
+  [PASS] TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas de plantage)
+
+-----------------------------------------
+11 tests, 11 passed, 0 failed
+</pre>
+    </details>
+</div>
+<script>
+function copyPinExpr(el) {
+    var text = el.getAttribute('title') || el.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    el.classList.add('pin-copied');
+    setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+</script>
+</body>
+</html>

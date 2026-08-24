@@ -1,2 +1,2 @@
-# Rapports regeneres a chaque run -- seuls les tests/*.st sont versionnes (comme du code)
-RESULTS/*/reports/
+# Ignorer uniquement les archives horodatées (les derniers rapports actifs restent versionnés dans Git)
+RESULTS/*/reports/archive/

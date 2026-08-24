@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport de test — FB_Modes [PASS]</title>
+<style>
+    :root {
+        --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
+        --accent: #818cf8; --green-bg: rgba(16, 185, 129, 0.15); --green-text: #34d399; --green-border: #059669;
+        --red-bg: rgba(239, 68, 68, 0.15); --red-text: #f87171; --red-border: #dc2626;
+        --warn-bg: rgba(245, 158, 11, 0.15); --warn-text: #fbbf24; --warn-border: #d97706;
+        --card-sub: #0f172a; --badge-prg-bg: rgba(59, 130, 246, 0.2); --badge-prg-txt: #93c5fd;
+        --badge-fb-bg: rgba(148, 163, 184, 0.15); --badge-fb-txt: #cbd5e1; --btn-bg: #1e293b; --btn-border: #334155;
+        --code-bg: #070a12; --code-border: #1e293b;
+        --neon-green-glow: 0 0 25px rgba(16, 185, 129, 0.65), 0 0 10px rgba(16, 185, 129, 0.4), inset 0 0 12px rgba(16, 185, 129, 0.15);
+        --neon-red-glow: 0 0 25px rgba(239, 68, 68, 0.65), 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 12px rgba(239, 68, 68, 0.15);
+        --neon-blue-glow: 0 0 25px rgba(99, 102, 241, 0.6), 0 0 10px rgba(99, 102, 241, 0.35);
+    }
+    [data-theme="light"] {
+        --bg: #f8fafc; --bg-grid: rgba(0, 0, 0, 0.03); --surface: #ffffff; --surface-card: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+        --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
+        --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
+        --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
+        --card-sub: #f8fafc; --badge-prg-bg: #dbeafe; --badge-prg-txt: #1e40af;
+        --badge-fb-bg: #f1f5f9; --badge-fb-txt: #475569; --btn-bg: #f8fafc; --btn-border: #cbd5e1;
+        --code-bg: #f1f5f9; --code-border: #e2e8f0;
+        --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
+    }
+    * { box-sizing: border-box; }
+    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
+        background-color: var(--bg);
+        background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-position: -1px -1px;
+        color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .header { display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .theme-toggle-btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
+        padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .theme-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.4px; color: #cbd5e1; }
+    .header .badge, .fb-section-title .badge { font-size: 16px; padding: 8px 22px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin: 4px 0 26px; }
+    .subtitle b { color: var(--text); font-weight: 700; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 8px; font-weight: 800;
+        font-size: 13.5px; letter-spacing: 0.8px; font-family: monospace; text-transform: uppercase; }
+    .badge-pass, .badge-pass.badge-strong { background: rgba(16, 185, 129, 0.22); color: #ffffff; border: 2px solid #34d399; box-shadow: 0 0 16px rgba(16, 185, 129, 0.45); }
+    .badge-fail, .badge-fail.badge-strong { background: rgba(244, 63, 94, 0.22); color: #ffffff; border: 2px solid #fb7185; box-shadow: 0 0 16px rgba(244, 63, 94, 0.45); }
+    
+    /* Cartes modernes avec effets Neon Glow */
+    .card-neon-ok { border: 1px solid var(--green-border) !important; box-shadow: var(--neon-green-glow) !important; }
+    .card-neon-fail { border: 1px solid var(--red-border) !important; box-shadow: var(--neon-red-glow) !important; }
+    .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
+
+    details { margin-bottom: 20px; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary:hover { color: var(--text); }
+    ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .test-card:hover { transform: translateY(-1px); }
+    .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    /* Style distinct pour les tests de contrat et d'interface socle */
+    .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
+    .test-card-contract header h3 { color: #818cf8; }
+    .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
+    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks { margin-top: 8px; }
+    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; }
+    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
+    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
+        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
+    .failure-head { color: var(--red-text); font-weight: 600; }
+    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
+    .failure-msg { color: #92400e; margin-top: 4px; }
+    .failure-diff { margin-top: 4px; }
+    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
+        overflow-x: auto; }
+    .chronogram-group { margin-top: 12px; }
+    .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 12px; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
+    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
+    .chrono-table .scan-t { color: var(--muted); }
+    .chrono-table td.changed { background: #fef9c3; }
+    .v-true { color: var(--green-text); font-weight: 600; }
+    .v-false { color: #cbd5e1; }
+    .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+    .waveform { display: block; }
+    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
+    .wf-line { fill: none; stroke-width: 2; }
+    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
+    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
+    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-chip { opacity: 0.95; }
+    .wf-legend { font-size: 10px; fill: var(--muted); }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
+    .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
+    .af-warning-banner ul { margin: 0; padding-left: 20px; }
+    .af-warning-banner li { margin: 3px 0; }
+    .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
+    .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
+    .encaps-table ul { margin: 0; padding-left: 16px; }
+    .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
+        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+    .wf-fail-band { fill: #fecaca; opacity: 0.45; }
+    .wf-fail-marker { font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }
+    tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
+    .chronogram-static { margin-top: 10px; }
+    .chronogram-static summary { font-size: 11px; }
+    .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
+    .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
+    .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
+    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; width: 100%; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 600px; overflow-y: auto; padding: 4px 8px;
+        scrollbar-width: none; -ms-overflow-style: none; }
+    .pin-col::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .pin-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+        background: var(--surface); min-width: 0; }
+    /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
+    .pin-col-in .pin-row { justify-content: space-between; text-align: right; }
+    /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
+    .pin-col-out .pin-row { justify-content: space-between; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f8fafc; }
+    .pin-type { color: var(--muted); font-weight: 500; font-size: 11px; margin-left: 4px; }
+    .pin-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; margin-left: 4px; font-weight: 700; white-space: nowrap; }
+    .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .pin-expr code { background: var(--code-bg); color: #93c5fd; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 11.5px;
+        cursor: pointer; font-family: monospace; }
+    .pin-expr code:hover { border-color: var(--accent); color: #ffffff; }
+    .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
+    .pin-missing { color: #fbbf24; font-style: italic; font-size: 12px; }
+    .pin-more { color: var(--muted); font-size: 11px; }
+    .pin-row-unwired { background: var(--card-sub); }
+    .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
+        font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 10px; }
+    .fb-section-title:first-of-type { margin-top: 6px; }
+    .toc-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin-bottom: 16px; }
+    .toc-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .toc-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; margin: 12px 0 4px; }
+    .toc-group-title:first-of-type { margin-top: 10px; }
+    .toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+    .toc-item { font-size: 12.5px; padding: 2px 0; break-inside: avoid; }
+    .toc-item a { text-decoration: none; color: var(--text); }
+    .toc-item a:hover { text-decoration: underline; }
+    .toc-item::before { content: "●"; font-size: 8px; margin-right: 6px; }
+    .toc-pass::before { color: var(--green-text); }
+    .toc-fail::before { color: var(--red-text); }
+    .toc-fail a { color: var(--red-text); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <div>
+            <h1>FB_Modes</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
+            <span class="badge badge-pass">PASS</span>
+        </div>
+    </div>
+    <div class="exec-time">2026-08-24 07:57:31</div>
+    
+    <details class="toc-details" open>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-modes-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-fb-modes-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+    </details>
+    
+    <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
+        <div>
+            <span style="font-size:14px;color:var(--text);font-weight:700;">📁 <code style="color:var(--accent);font-size:14px;">CODE/F_MODES/FB_Modes.st</code></span>
+            <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);">
+            2/2 vérifications validées
+        </div>
+    </div>
+    
+    <details class="encaps-details" >
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 5 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <table class="encaps-table">
+            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
+            <tbody>
+            <tr class="compil-row-pass">
+                <td><code>E_State.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FbStatus.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_Mode.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Modes_Autorisations.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Modes.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    
+    <details class="pin-diagram-details" open>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Modes</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 16 flux entrants · 14 flux sortants)</span></summary>
+        <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
+            <b>Sous-instances actives intégrées :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ErrorEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span></div>
+        </div>
+        
+        <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SelMode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SelSyncEnable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InhibitM1Request <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InhibitM2Request <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SelHomingApproachEnable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoystickWinchSelectRequest <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SelMaintenanceZoneAccess <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EncoderFaultPresent <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(5 constantes ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.3);color:#f1f5f9;">Type Global</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_Mode.DISABLE</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_Mode.MAINT_N1</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_Mode.MAINT_N2</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.DISABLED</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_State.READY</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div></div>
+        </details></div>
+            <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Modes</span>
+                
+        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(16,185,129,0.18);color:#34d399;border:1px solid #059669;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD AF03</span></div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">✅ Enable + Reset + Ready + Status (ST_FbStatus complet)</div>
+                
+                <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
+                    <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">11</b></div>
+                    <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">3</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">13</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">16 IN</b> / <b style="color:#ffffff;">14 OUT</b></div>
+                </div>
+                
+    <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
+        <div style="font-weight:800;color:var(--accent);margin-bottom:4px;border-bottom:1px solid var(--border);padding-bottom:2px;font-size:11.5px;">📋 Structure ST :</div>
+        <div>✅ Cartouche En-tête <code>(* === *)</code></div>
+        <div>✅ Bannière <code>VAR_INPUT</code></div>
+        <div>✅ Bannière <code>VAR_OUTPUT</code></div>
+        <div>✅ Bannière <code>VAR</code> locale</div>
+    </div>
+            </div>
+            <div class="pin-col pin-col-out">
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Ready</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <details style="margin:4px 0;">
+                <summary style="list-style:none;cursor:pointer;">
+                    <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Status</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_FbStatus</span> <span style="font-size:11px;color:#a5b4fc;">(6 champs ▾)</span></div>
+                        <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
+                    </div>
+                </summary>
+                <div style="margin-top:2px;">
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Busy</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Done</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.Error</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.ErrorId</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.State</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Status</b>.StateAtError</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_FbStatus</span></div>
+                </div></div>
+            </details>
+            <details style="margin:4px 0;">
+                <summary style="list-style:none;cursor:pointer;">
+                    <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Auth</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_Modes_Autorisations</span> <span style="font-size:11px;color:#a5b4fc;">(7 champs ▾)</span></div>
+                        <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
+                    </div>
+                </summary>
+                <div style="margin-top:2px;">
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Auth</b>.HomingApproachEnable</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Modes_Autorisations</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Auth</b>.InhibitM1</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Modes_Autorisations</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Auth</b>.InhibitM2</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Modes_Autorisations</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Auth</b>.JoystickWinchSelectArbitrated</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Modes_Autorisations</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Auth</b>.MaintenanceM3TargetEnable</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Modes_Autorisations</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Auth</b>.Mode</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Modes_Autorisations</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Auth</b>.SyncEnable</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_Modes_Autorisations</span></div>
+                </div></div>
+            </details></div>
+        </div>
+    </details>
+    
+    
+    <details class="encaps-details" >
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
+        
+        <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+            <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
+                ℹ️ Guide d'Audit : Les 7 Invariants & Règles d'Encapsulation Automatisme (Cliquez pour afficher)
+            </summary>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: left;">
+                <thead>
+                    <tr style="background: var(--surface); color: var(--text);">
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">#</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Règle / Invariant POO</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Risque Machine Réel</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Contrôle Automatique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">1</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Écriture externe clandestine sur VAR locale</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Violation d'encapsulation (External Write)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">2</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Accès GVL direct sans passer par l'interface</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">FB non testable unitairement, couplage fort et masqué.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">3</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Référence VAR_IN_OUT orpheline</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Pointeur nul / crash automate lors de l'appel.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Invalidation appel de FB</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">4</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Reset sur front montant (R_TRIG)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Réarmement intempestif si le bouton reste coincé/actif.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🔒 Règle IEC Reset obligatoire</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">5</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Profils standards (Enable / Ready / Status)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Composant impossible à chaîner en sécurité AU.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Contrat AF03 §1bis</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">6</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Sorties VAR_OUTPUT orphelines</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Information calculée mais oubliée dans le câblage global.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">💡 Alerte Pinout non consommé</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">7</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Variables locales non initialisées</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Détection d'état initial indéfini</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+        <table class="encaps-table">
+            <thead><tr><th>Statut</th><th>Composant (FB)</th><th>VAR_IN</th><th>VAR_OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Analyse Invariants & Violations</th></tr></thead>
+            <tbody>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Modes</code></td>
+                <td>11</td><td>3</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+        </div>
+    </details>
+    
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-modes-0" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-modes-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        </div>
+    </details>
+    <details>
+        <summary>Fichiers source compilés (5)</summary>
+        <ul><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li></ul>
+    </details>
+    <details>
+        <summary>Code source ST original (5)</summary>
+        
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des phases opérationnelles d&#x27;un FB métier
+   ⚙️ Machine d&#x27;état : Un seul état actif à la fois (orthogonal à Error)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   ======================================================================= *)
+
+TYPE E_State :
+ENUM
+    DISABLED := 0,   (* Enable faux, neutralisé *)
+    INIT     := 1,   (* Démarrage / vérifs *)
+    READY    := 2,   (* Prêt, attend ordre *)
+    BUSY     := 3,   (* Action en cours *)
+    DONE     := 4,   (* Action terminée *)
+    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
+      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
+      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
+   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+      rempli via le socle `FB_FbStatus` (même comportement partout).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ======================================================================= *)
+
+TYPE ST_FbStatus :
+STRUCT
+    (* ---- membres historiques (conservés) ---- *)
+    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
+    Done         : BOOL;    (* 1 = Action terminée avec succès *)
+    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
+    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
+    State        : E_State; (* État courant de la machine d&#x27;état *)
+    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
+    (* ---- membres ajoutés (forme cible enrichie) ---- *)
+    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
+    WarningId      : WORD;  (* Code warning courant (bitfield) *)
+    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
+    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
+    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_Mode — Modes de marche de la machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des modes d&#x27;exploitation et maintenance
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+   ======================================================================= *)
+TYPE E_Mode :
+ENUM
+    DISABLE     := 0,   (* Mode Désactivé / Veille de sécurité (sorties bloquées) *)
+    MAINT_N1    := 1,   (* Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives *)
+    MAINT_N2    := 2,   (* Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés) *)
+    SEMI_AUTO   := 3    (* Mode Semi-Automatique (séquenceur automatique) *)
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_Modes_Autorisations.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🎚️ ST_Modes_Autorisations — Bus d&#x27;autorisations du mode machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §2
+   🎯 Produit par FB_Modes (via PRG_MODES_CFC)
+      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_Modes_Autorisations :
+STRUCT
+    Mode                        : E_Mode;     // Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)
+    SyncEnable                  : BOOL;       // Synchro M1/M2 (logique positive)
+    InhibitM1                   : BOOL;       // Inhibition M1 (MAINT_N2 only)
+    InhibitM2                   : BOOL;       // Inhibition M2 (MAINT_N2 only)
+    JoystickWinchSelectArbitrated : INT;      // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)
+    HomingApproachEnable        : BOOL;       // Dépassement butée haut (N2)
+    MaintenanceM3TargetEnable   : BOOL;       // Cible Translation Maintenance (N2 only)
+END_STRUCT
+END_TYPE</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\FB_Modes.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_Modes — Arbitrage du mode machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Source unique du mode arbitré et calcul du bus d&#x27;autorisations
+   🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur
+   🔌 Interface : Standard composant d&#x27;arbitrage applicatif
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_Modes
+VAR_INPUT
+    // === GESTION FB &amp; AUTORISATIONS ===
+    Enable                  : BOOL;   // --&gt; [CMD] Autorisation generale FB (TRUE = active)
+    Reset                   : BOOL;   // --&gt; [CMD] Front acquittement defauts
+    PowerContactorEngaged   : BOOL;   // --&gt; [SAFE] Chaine AU OK (TRUE = armee)
+
+    // === SELECTIONS IHM &amp; COMMANDES MODES ===
+    SelMode                 : E_Mode; // --&gt; [CMD] Selecteur de mode IHM
+    SelSyncEnable           : BOOL;   // --&gt; [CMD] Selection synchro treuils IHM
+    InhibitM1Request        : BOOL;   // --&gt; [CMD] Demande inhibition treuil M1
+    InhibitM2Request        : BOOL;   // --&gt; [CMD] Demande inhibition treuil M2
+    SelHomingApproachEnable : BOOL;   // --&gt; [CMD] Selection approche homing IHM
+    JoystickWinchSelectRequest : INT; // --&gt; [CMD] Selection treuils joystick (0=Couple, 1=M1, 2=M2)
+    SelMaintenanceZoneAccess: BOOL;   // --&gt; [CMD] Autorisation acces zone maintenance M3
+
+    // === RETOURS CAPTEURS &amp; DIAGNOSTICS ===
+    EncoderFaultPresent     : BOOL;   // --&gt; [HW] Defaut codeur agrege (1 cycle retard)
+END_VAR
+VAR_OUTPUT
+    // === ETATS &amp; DIAGNOSTICS IEC ===
+    Ready                   : BOOL;   // &lt;-- [STAT] FB pret a fonctionner
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: &quot;Semi-Auto refusé (défaut codeur)&quot;.
+    Status                  : ST_FbStatus;
+
+    // === BUS D&#x27;AUTORISATIONS ARBITREES ===
+    Auth                    : ST_Modes_Autorisations; // &lt;-- [STAT] Bus d&#x27;autorisations typees machine
+END_VAR
+VAR
+    // === SOUS-INSTANCES FB ===
+    ResetEdge               : R_TRIG; // * [INST] Detecteur front montant Reset
+    ErrorEdge               : R_TRIG; // * [INST] Detecteur front montant Error
+
+    // === VARIABLES LOCALES &amp; MEMOIRES ===
+    PrevInhibitM1           : BOOL;   // . [LOC] Memoire etat inhibition M1 (exclusion mutuelle)
+    PrevInhibitM2           : BOOL;   // . [LOC] Memoire etat inhibition M2 (exclusion mutuelle)
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Gate neutralisation&quot;}
+// 1. GATE — neutralisation si désactivé ou AU non armé
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Auth.Mode := E_Mode.DISABLE;
+    Auth.SyncEnable := TRUE;
+    Auth.InhibitM1 := FALSE;
+    Auth.InhibitM2 := FALSE;
+    Auth.HomingApproachEnable := FALSE;
+    Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
+    Auth.MaintenanceM3TargetEnable := FALSE;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
+    PrevInhibitM1 := FALSE;
+    PrevInhibitM2 := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+Status.State := E_State.READY;
+
+{endregion}
+
+{region &quot;§2 Reset et arbitrage mode&quot;}
+// 2. RESET FRONT (bit0 = défaut codeur)
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
+END_IF;
+
+// 3. GARDE-FOU — refus SEMI_AUTO si défaut codeur
+IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+    Status.ErrorId := Status.ErrorId OR 16#0001;  // bit0 : défaut codeur
+ELSIF ResetEdge.Q THEN
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
+END_IF;
+
+// 4. ARBITRAGE DU MODE
+// MAINT_N2 accepté directement (authentification côté IHM).
+IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+    Auth.Mode := E_Mode.MAINT_N1;
+ELSE
+    Auth.Mode := SelMode;
+END_IF;
+
+{endregion}
+
+{region &quot;§3 Calcul autorisations machine&quot;}
+// 5. SYNC ENABLE — actionnable en MAINT_N1 ou MAINT_N2
+// FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
+Auth.SyncEnable := NOT ((Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
+
+// 5bis. EXCLUSION MUTUELLE INHIBITIONS + RESET SYNC ENABLE
+// Inhibition M1/M2 mutuellement exclusives (soit l&#x27;un, soit l&#x27;autre, jamais les deux).
+// Si les deux demandés simultanément : on garde celle déjà active, sinon on rejette les deux.
+// Reset SelSyncEnable si une inhibition devient active (synchro incompatible avec inhibit).
+// Mémorisation états précédents pour détection front montant.
+
+// Détection fronts montants inhibitions
+IF InhibitM1Request AND NOT PrevInhibitM1 THEN
+    // Front montant M1
+    IF PrevInhibitM2 THEN
+        // M2 déjà actif → rejette M1
+        Auth.InhibitM1 := FALSE;
+    ELSE
+        // M2 inactif → active M1, désactive M2
+        Auth.InhibitM1 := TRUE;
+        Auth.InhibitM2 := FALSE;
+        // Synchro incompatible avec inhibition → reset case IHM
+        SelSyncEnable := FALSE;
+    END_IF;
+ELSIF InhibitM2Request AND NOT PrevInhibitM2 THEN
+    // Front montant M2
+    IF PrevInhibitM1 THEN
+        // M1 déjà actif → rejette M2
+        Auth.InhibitM2 := FALSE;
+    ELSE
+        // M1 inactif → active M2, désactive M1
+        Auth.InhibitM2 := TRUE;
+        Auth.InhibitM1 := FALSE;
+        SelSyncEnable := FALSE;
+    END_IF;
+ELSE
+    // Pas de front montant → maintenir états actuels
+    // Mais si les deux demandes sont TRUE sans front (cas synchrone sans transition)
+    IF InhibitM1Request AND InhibitM2Request THEN
+        // Les deux demandées simultanément sans transition : repli sécurité
+        Auth.InhibitM1 := FALSE;
+        Auth.InhibitM2 := FALSE;
+    END_IF;
+END_IF;
+
+// Mise à jour mémoires pour prochaine détection front
+PrevInhibitM1 := InhibitM1Request;
+PrevInhibitM2 := InhibitM2Request;
+
+// 5bis-bis. Sortie inhibitions effectives (calculées ci-dessus)
+Auth.InhibitM1 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM1;
+Auth.InhibitM2 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM2;
+
+// 5ter. AUTORISATION ARRÊT HAUT (HomingApproach)
+// Uniquement actionnable en MAINT_N2.
+Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
+
+// 5quater. SÉLECTEUR JOYSTICK TREUIL
+// M1 seul ou M2 seul autorisé en MAINT_N1 et MAINT_N2. Forcé à Couplé (=0) sinon.
+IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
+    Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+ELSE
+    Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
+END_IF;
+
+// 5quinquies. CIBLE TRANSLATION MAINTENANCE
+// MAINT_N2 ou MAINT_N1 + bit IHM dédié (SelMaintenanceZoneAccess) exigé EN PLUS
+Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
+
+// GATE — désactivation inhibitions/sync si mode change (sortie N1/N2)
+IF (Auth.Mode &lt;&gt; E_Mode.MAINT_N2) AND (Auth.Mode &lt;&gt; E_Mode.MAINT_N1) THEN
+    Auth.InhibitM1 := FALSE;
+    Auth.InhibitM2 := FALSE;
+    Auth.HomingApproachEnable := FALSE;
+    Auth.MaintenanceM3TargetEnable := FALSE;
+    Auth.JoystickWinchSelectArbitrated := 0;
+END_IF;
+
+{endregion}
+
+{region &quot;§4 Etats et defauts&quot;}
+// 6. SORTIES ÉTAT
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
+IF ErrorEdge.Q THEN
+    Status.StateAtError := Status.State;
+END_IF;
+
+Status.Busy := FALSE;
+Status.Done := FALSE;
+
+{endregion}
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+    </details>
+    <details>
+        <summary>Sortie brute strucpp</summary>
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_modes.st
+  [PASS] Modes : Enable=FALSE desactive le FB
+  [PASS] Modes : Nominal Maint N1
+
+-----------------------------------------
+2 tests, 2 passed, 0 failed
+</pre>
+    </details>
+</div>
+<script>
+function copyPinExpr(el) {
+    var text = el.getAttribute('title') || el.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    el.classList.add('pin-copied');
+    setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('test_ci_theme', next); } catch (e) {}
+    updateThemeBtn(next);
+}
+
+function updateThemeBtn(theme) {
+    var btns = document.querySelectorAll('.theme-toggle-btn');
+    btns.forEach(function(b) {
+        b.innerHTML = theme === 'dark' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+    });
+}
+
+(function() {
+    try {
+        var saved = localStorage.getItem('test_ci_theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.addEventListener('DOMContentLoaded', function() { updateThemeBtn(saved); });
+        }
+    } catch (e) {}
+})();
+</script>
+</body>
+</html>

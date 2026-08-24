@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport de test — FB_Safety_EmergencyManagement [PASS]</title>
+<style>
+    :root {
+        --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
+        --accent: #818cf8; --green-bg: rgba(16, 185, 129, 0.15); --green-text: #34d399; --green-border: #059669;
+        --red-bg: rgba(239, 68, 68, 0.15); --red-text: #f87171; --red-border: #dc2626;
+        --warn-bg: rgba(245, 158, 11, 0.15); --warn-text: #fbbf24; --warn-border: #d97706;
+        --card-sub: #0f172a; --badge-prg-bg: rgba(59, 130, 246, 0.2); --badge-prg-txt: #93c5fd;
+        --badge-fb-bg: rgba(148, 163, 184, 0.15); --badge-fb-txt: #cbd5e1; --btn-bg: #1e293b; --btn-border: #334155;
+        --code-bg: #070a12; --code-border: #1e293b;
+        --neon-green-glow: 0 0 25px rgba(16, 185, 129, 0.65), 0 0 10px rgba(16, 185, 129, 0.4), inset 0 0 12px rgba(16, 185, 129, 0.15);
+        --neon-red-glow: 0 0 25px rgba(239, 68, 68, 0.65), 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 12px rgba(239, 68, 68, 0.15);
+        --neon-blue-glow: 0 0 25px rgba(99, 102, 241, 0.6), 0 0 10px rgba(99, 102, 241, 0.35);
+    }
+    [data-theme="light"] {
+        --bg: #f8fafc; --bg-grid: rgba(0, 0, 0, 0.03); --surface: #ffffff; --surface-card: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+        --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
+        --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
+        --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
+        --card-sub: #f8fafc; --badge-prg-bg: #dbeafe; --badge-prg-txt: #1e40af;
+        --badge-fb-bg: #f1f5f9; --badge-fb-txt: #475569; --btn-bg: #f8fafc; --btn-border: #cbd5e1;
+        --code-bg: #f1f5f9; --code-border: #e2e8f0;
+        --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
+    }
+    * { box-sizing: border-box; }
+    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
+        background-color: var(--bg);
+        background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-position: -1px -1px;
+        color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .header { display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .theme-toggle-btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
+        padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .theme-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.4px; color: #cbd5e1; }
+    .header .badge, .fb-section-title .badge { font-size: 16px; padding: 8px 22px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin: 4px 0 26px; }
+    .subtitle b { color: var(--text); font-weight: 700; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 8px; font-weight: 800;
+        font-size: 13.5px; letter-spacing: 0.8px; font-family: monospace; text-transform: uppercase; }
+    .badge-pass, .badge-pass.badge-strong { background: rgba(16, 185, 129, 0.22); color: #ffffff; border: 2px solid #34d399; box-shadow: 0 0 16px rgba(16, 185, 129, 0.45); }
+    .badge-fail, .badge-fail.badge-strong { background: rgba(244, 63, 94, 0.22); color: #ffffff; border: 2px solid #fb7185; box-shadow: 0 0 16px rgba(244, 63, 94, 0.45); }
+    
+    /* Cartes modernes avec effets Neon Glow */
+    .card-neon-ok { border: 1px solid var(--green-border) !important; box-shadow: var(--neon-green-glow) !important; }
+    .card-neon-fail { border: 1px solid var(--red-border) !important; box-shadow: var(--neon-red-glow) !important; }
+    .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
+
+    details { margin-bottom: 20px; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary:hover { color: var(--text); }
+    ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .test-card:hover { transform: translateY(-1px); }
+    .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    /* Style distinct pour les tests de contrat et d'interface socle */
+    .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
+    .test-card-contract header h3 { color: #818cf8; }
+    .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
+    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks { margin-top: 8px; }
+    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; }
+    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
+    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
+        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
+    .failure-head { color: var(--red-text); font-weight: 600; }
+    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
+    .failure-msg { color: #92400e; margin-top: 4px; }
+    .failure-diff { margin-top: 4px; }
+    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
+        overflow-x: auto; }
+    .chronogram-group { margin-top: 12px; }
+    .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 12px; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
+    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
+    .chrono-table .scan-t { color: var(--muted); }
+    .chrono-table td.changed { background: #fef9c3; }
+    .v-true { color: var(--green-text); font-weight: 600; }
+    .v-false { color: #cbd5e1; }
+    .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+    .waveform { display: block; }
+    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
+    .wf-line { fill: none; stroke-width: 2; }
+    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
+    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
+    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-chip { opacity: 0.95; }
+    .wf-legend { font-size: 10px; fill: var(--muted); }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
+    .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
+    .af-warning-banner ul { margin: 0; padding-left: 20px; }
+    .af-warning-banner li { margin: 3px 0; }
+    .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
+    .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
+    .encaps-table ul { margin: 0; padding-left: 16px; }
+    .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
+        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+    .wf-fail-band { fill: #fecaca; opacity: 0.45; }
+    .wf-fail-marker { font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }
+    tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
+    .chronogram-static { margin-top: 10px; }
+    .chronogram-static summary { font-size: 11px; }
+    .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
+    .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
+    .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
+    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; width: 100%; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 600px; overflow-y: auto; padding: 4px 8px;
+        scrollbar-width: none; -ms-overflow-style: none; }
+    .pin-col::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .pin-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+        background: var(--surface); min-width: 0; }
+    /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
+    .pin-col-in .pin-row { justify-content: space-between; text-align: right; }
+    /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
+    .pin-col-out .pin-row { justify-content: space-between; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f8fafc; }
+    .pin-type { color: var(--muted); font-weight: 500; font-size: 11px; margin-left: 4px; }
+    .pin-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; margin-left: 4px; font-weight: 700; white-space: nowrap; }
+    .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .pin-expr code { background: var(--code-bg); color: #93c5fd; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 11.5px;
+        cursor: pointer; font-family: monospace; }
+    .pin-expr code:hover { border-color: var(--accent); color: #ffffff; }
+    .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
+    .pin-missing { color: #fbbf24; font-style: italic; font-size: 12px; }
+    .pin-more { color: var(--muted); font-size: 11px; }
+    .pin-row-unwired { background: var(--card-sub); }
+    .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
+        font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 10px; }
+    .fb-section-title:first-of-type { margin-top: 6px; }
+    .toc-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin-bottom: 16px; }
+    .toc-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .toc-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; margin: 12px 0 4px; }
+    .toc-group-title:first-of-type { margin-top: 10px; }
+    .toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+    .toc-item { font-size: 12.5px; padding: 2px 0; break-inside: avoid; }
+    .toc-item a { text-decoration: none; color: var(--text); }
+    .toc-item a:hover { text-decoration: underline; }
+    .toc-item::before { content: "●"; font-size: 8px; margin-right: 6px; }
+    .toc-pass::before { color: var(--green-text); }
+    .toc-fail::before { color: var(--red-text); }
+    .toc-fail a { color: var(--red-text); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <div>
+            <h1>FB_Safety_EmergencyManagement</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
+            <span class="badge badge-pass">PASS</span>
+        </div>
+    </div>
+    <div class="exec-time">2026-08-24 07:57:16</div>
+    
+    <details class="toc-details" open>
+        <summary>📋 Sommaire (11 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-0">TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-1">Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-2">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-3">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-4">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-5">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-6">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-7">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-8">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-9">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-emergencymanagement-10">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
+    </details>
+    
+    <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
+        <div>
+            <span style="font-size:14px;color:var(--text);font-weight:700;">📁 <code style="color:var(--accent);font-size:14px;">CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st</code></span>
+            <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);">
+            11/11 vérifications validées
+        </div>
+    </div>
+    
+    <details class="encaps-details" >
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 6 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <table class="encaps-table">
+            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
+            <tbody>
+            <tr class="compil-row-pass">
+                <td><code>ST_Safety_Emergency_InternalCmd.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Safety_Emergency_State.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Safety_Emergency_Diag.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Safety_EmergencyManagementLogic.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Safety_EmergencyManagementOutput.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Safety_EmergencyManagement.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    
+    <details class="pin-diagram-details" open>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Safety_EmergencyManagement</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 7 flux entrants · 14 flux sortants)</span></summary>
+        <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
+            <b>Sous-instances actives intégrées :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ Logic <span style="color:var(--muted);font-weight:500;">(FB_Safety_EmergencyManagementLogic)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ Output <span style="color:var(--muted);font-weight:500;">(FB_Safety_EmergencyManagementOutput)</span></span></div>
+        </div>
+        
+        <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ArmRequest <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerCutOffRequest <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyCutOff <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyChainClosed <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div></div>
+            <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Safety_EmergencyManagement</span>
+                
+        <div style="margin: 8px 0 4px 0;"><span style="background:rgba(245,158,11,0.18);color:#fbbf24;border:1px solid #d97706;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">CONTRAT STANDARD (Tolérance T137 Flat)</span></div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">⚠️ Signaux à plat (Reset/Error/Busy/Done) sans ST_FbStatus</div>
+                
+                <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
+                    <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">7</b></div>
+                    <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">14</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">7 IN</b> / <b style="color:#ffffff;">14 OUT</b></div>
+                </div>
+                
+    <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
+        <div style="font-weight:800;color:var(--accent);margin-bottom:4px;border-bottom:1px solid var(--border);padding-bottom:2px;font-size:11.5px;">📋 Structure ST :</div>
+        <div>✅ Cartouche En-tête <code>(* === *)</code></div>
+        <div>✅ Bannière <code>VAR_INPUT</code></div>
+        <div>✅ Bannière <code>VAR_OUTPUT</code></div>
+        <div>✅ Bannière <code>VAR</code> locale</div>
+    </div>
+            </div>
+            <div class="pin-col pin-col-out">
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Ready</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Busy</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Done</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Error</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ErrorId</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">WORD</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>MaintainA_RQ</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>MaintainB_RQ</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ArmPulse_RQ</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>State</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Safety_Emergency_State</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Diag</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Safety_Emergency_Diag</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ArmingSeqStep</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">INT</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>RedundancyTestFailed</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>EmergencyArmingFailed</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>EmergencyArmingLockoutActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div></div>
+        </div>
+    </details>
+    
+    
+    <details class="encaps-details" >
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 3 FB de la chaine, encapsulation propre (0 violation)</summary>
+        
+        <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+            <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
+                ℹ️ Guide d'Audit : Les 7 Invariants & Règles d'Encapsulation Automatisme (Cliquez pour afficher)
+            </summary>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: left;">
+                <thead>
+                    <tr style="background: var(--surface); color: var(--text);">
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">#</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Règle / Invariant POO</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Risque Machine Réel</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Contrôle Automatique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">1</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Écriture externe clandestine sur VAR locale</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Violation d'encapsulation (External Write)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">2</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Accès GVL direct sans passer par l'interface</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">FB non testable unitairement, couplage fort et masqué.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">3</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Référence VAR_IN_OUT orpheline</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Pointeur nul / crash automate lors de l'appel.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Invalidation appel de FB</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">4</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Reset sur front montant (R_TRIG)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Réarmement intempestif si le bouton reste coincé/actif.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🔒 Règle IEC Reset obligatoire</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">5</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Profils standards (Enable / Ready / Status)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Composant impossible à chaîner en sécurité AU.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Contrat AF03 §1bis</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">6</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Sorties VAR_OUTPUT orphelines</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Information calculée mais oubliée dans le câblage global.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">💡 Alerte Pinout non consommé</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">7</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Variables locales non initialisées</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Détection d'état initial indéfini</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+        <table class="encaps-table">
+            <thead><tr><th>Statut</th><th>Composant (FB)</th><th>VAR_IN</th><th>VAR_OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Analyse Invariants & Violations</th></tr></thead>
+            <tbody>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Safety_EmergencyManagementLogic</code></td>
+                <td>7</td><td>10</td>
+                <td>0</td><td>27</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (27 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Safety_EmergencyManagementOutput</code></td>
+                <td>12</td><td>5</td>
+                <td>0</td><td>0</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (0 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Safety_EmergencyManagement</code></td>
+                <td>7</td><td>14</td>
+                <td>0</td><td>2</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-safety-emergencymanagement-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-1" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        </div>
+    </details>
+    
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-safety-emergencymanagement-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-5" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-6" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-7" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-8" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-9" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-safety-emergencymanagement-10" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        </div>
+    </details>
+    <details>
+        <summary>Fichiers source compilés (6)</summary>
+        <ul><li><code>CODE/B_AU_SECURITE/ST_Safety_Emergency_InternalCmd.st</code></li><li><code>CODE/B_AU_SECURITE/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st</code></li><li><code>CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st</code></li><li><code>CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st</code></li></ul>
+    </details>
+    <details>
+        <summary>Code source ST original (6)</summary>
+        
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_InternalCmd.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ ST_Safety_Emergency_InternalCmd — Structure de commande interne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
+   🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
+
+TYPE ST_Safety_Emergency_InternalCmd :
+STRUCT
+    MaintainA_Cmd    : BOOL; // Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandee)
+    MaintainB_Cmd    : BOOL; // Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandee)
+    ArmPulse_Cmd     : BOOL; // Ordre impulsion de rearmement (TRUE = bobine rearmement activee)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_State.st</code></summary>
+                <pre>(* =======================================================================
+   📊 ST_Safety_Emergency_State — État public de la chaîne d&#x27;arrêt d&#x27;urgence
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Bus d&#x27;état public de la chaîne d&#x27;arrêt d&#x27;urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
+
+TYPE ST_Safety_Emergency_State :
+STRUCT
+    ChainOk     : BOOL; // Boucle AU fermee (EmergencyChainClosed = TRUE)
+    ContactorOk : BOOL; // Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)
+    Step        : INT;  // Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm
+    Armable     : BOOL; // Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance
+    ArmingBusy  : BOOL; // Sequence armement OU lockout en cours (nouvelle demande ignoree)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\ST_Safety_Emergency_Diag.st</code></summary>
+                <pre>(* =======================================================================
+   📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d&#x27;arrêt d&#x27;urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
+
+TYPE ST_Safety_Emergency_Diag :
+STRUCT
+    Error                : BOOL; // Synthese defaut active : (ErrorId &lt;&gt; 0)
+    ErrorId              : WORD; // Bitfield erreurs : bit0=Redundancy, bit1=Arming, bit3=Startup
+    RedundancyTestFailed : BOOL; // Canal A ou B reste colle/shunte detecte a l&#x27;auto-test (Reset requis)
+    ArmFailed            : BOOL; // Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)
+    LockoutActive        : BOOL; // Verrouillage temporel de 5s entre tentatives de rearmement echouees
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagementLogic.st</code></summary>
+                <pre>(* =======================================================================
+   🛡️ FB_Safety_EmergencyManagementLogic — Décision &amp; Séquencement AU
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Machine d&#x27;état, fronts Reset/Arm, calcul ErrorId &amp; consignes logiques
+   🔒 Pattern Cause/Ack : Reset non conditionné, interlock sur Cause brute, debounce IHM + Ack
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementLogic
+VAR_INPUT
+    // === COMMANDES &amp; CONSIGNES ===
+    Enable                  : BOOL; // --&gt; [CMD]  Active la surveillance (TRUE = autorise)
+    Reset                   : BOOL; // --&gt; [CMD]  Front acquittement defauts
+    ArmRequest              : BOOL; // --&gt; [CMD]  Demande de rearmement (BtnEmergencyArming)
+    PowerCutOffRequest      : BOOL; // --&gt; [SAFE] Requete de coupure logique issue des metiers
+    BtnEmergencyCutOff      : BOOL; // --&gt; [CMD]  Commande d&#x27;ouverture d&#x27;urgence depuis l&#x27;IHM
+
+    // === RETOURS MATERIELS (HW) ===
+    EmergencyChainClosed    : BOOL; // --&gt; [HW]   Retour physique boucle d&#x27;urgence amont contacteur
+    PowerContactorEngaged   : BOOL; // --&gt; [HW]   Confirmation contacteur de puissance principal
+END_VAR
+VAR_OUTPUT
+    // === ERREURS &amp; CONSIGNES LOGIQUES ===
+    Error                   : BOOL; // &lt;-- [DIAG] Synthese defaut actif
+    ErrorId                 : WORD; // &lt;-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)
+    Cmd                     : ST_Safety_Emergency_InternalCmd; // &lt;-- [STAT] Structure de commande logique produite
+
+    // === DIAGNOSTICS &amp; RETOURS D&#x27;ETAT ===
+    ArmingSeqStep                : INT;  // &lt;-- [DIAG] Etape sequence (0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm)
+    RedundancyTestFailed         : BOOL; // &lt;-- [DIAG] Defaut auto-test redondance (Cause lissee OR NOT Ack)
+    EmergencyArmingFailed        : BOOL; // &lt;-- [DIAG] Defaut rearmement contacteur (Cause lissee OR NOT Ack)
+    EmergencyArmingLockoutActive : BOOL; // &lt;-- [DIAG] Verrouillage temporel 5s entre essais
+    Armable                      : BOOL; // &lt;-- [STAT] Rearmement possible actuellement
+    ArmingBusy                   : BOOL; // &lt;-- [STAT] Sequence ou lockout en cours
+    StartupFail                  : BOOL; // &lt;-- [DIAG] Autotest demarrage echoue
+END_VAR
+VAR
+    // === DETECTEURS DE FRONT INTERNES ===
+    ResetEdge               : R_TRIG; // . [LOC] Detecteur front montant Reset
+    ArmReqEdge              : R_TRIG; // . [LOC] Detecteur front montant ArmRequest
+    EnableRising            : R_TRIG; // . [LOC] Detecteur front montant Enable
+    RedundancyCauseEdge     : R_TRIG; // . [LOC] Detecteur nouvelle occurrence cause redondance
+    ArmingFailedCauseEdge   : R_TRIG; // . [LOC] Detecteur nouvelle occurrence cause rearmement
+
+    // === DRAPEAUX &amp; FORCAGES LOGIQUES ===
+    ForceTestA              : BOOL; // . [LOC] Forcage coupure canal A pendant test
+    ForceTestB              : BOOL; // . [LOC] Forcage coupure canal B pendant test
+    StartupCheckDone        : BOOL; // . [LOC] Autotest demarrage effectue
+    StartupCheckOK          : BOOL; // . [LOC] Resultat autotest demarrage (latche)
+
+    // === CAUSE &amp; ACK DEFAUT REDONDANCE ===
+    RedundancyTestFailedCause : BOOL;         // . [LOC] Cause brute : canal colle detecte a l&#x27;auto-test
+    RedundancyTestFailedAck   : BOOL := TRUE; // . [LOC] Accuse operateur (TRUE = pas d&#x27;alarme a afficher)
+
+    // === CAUSE &amp; ACK DEFAUT REARMEMENT ===
+    EmergencyArmingFailedCause : BOOL;         // . [LOC] Cause brute : contacteur non confirme sous 2s
+    EmergencyArmingFailedAck   : BOOL := TRUE; // . [LOC] Accuse operateur (TRUE = pas d&#x27;alarme a afficher)
+
+    // === TEMPORISATEURS LOGIQUES ===
+    TonTestA                : TON; // . [LOC] Timer auto-test canal A
+    TonRestoreA             : TON; // . [LOC] Timer restauration canal A
+    TonTestB                : TON; // . [LOC] Timer auto-test canal B
+    TonRestoreB             : TON; // . [LOC] Timer restauration canal B
+    TonArmingPulse          : TON; // . [LOC] Timer impulsion rearmement
+    TonArmingConfirm        : TON; // . [LOC] Timer attente confirmation contacteur
+    TonArmingLockout        : TON; // . [LOC] Timer lockout anti-reessai
+    TonRedundancyDisplay    : TON; // . [LOC] Timer debounce affichage IHM redondance
+    TonArmingFailedDisplay  : TON; // . [LOC] Timer debounce affichage IHM rearmement
+END_VAR
+VAR CONSTANT
+    // === TEMPORISATIONS NORMATIVES DE SECURITE (FIXES) ===
+    CST_TestDuration         : TIME := T#200ms; // Duree auto-test canal A ou B
+    CST_ArmingPulseDuration  : TIME := T#1s;    // Duree impulsion rearmement contacteur
+    CST_ArmingConfirmTimeout : TIME := T#2s;    // Timeout confirmation engagement contacteur
+    CST_ArmingLockout        : TIME := T#5s;    // Duree verrouillage anti-reessai apres echec
+    CST_FaultDisplayDebounce : TIME := T#200ms; // Anti-clignotement affichage IHM uniquement
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Fronts de commande&quot;}
+// 🔄 Fronts
+EnableRising(CLK := Enable);
+ResetEdge(CLK := Reset);
+ArmReqEdge(CLK := ArmRequest);
+
+{endregion}
+
+{region &quot;§2 Gate neutralisation&quot;}
+// 🛑 1. GATE — neutralisation si désactivé
+IF NOT Enable THEN
+    Error := FALSE;
+    ErrorId := 16#0000;
+    Cmd.MaintainA_Cmd := FALSE;
+    Cmd.MaintainB_Cmd := FALSE;
+    Cmd.ArmPulse_Cmd := FALSE;
+    ArmingSeqStep := 0;
+    RedundancyTestFailed := FALSE;
+    EmergencyArmingFailed := FALSE;
+    EmergencyArmingLockoutActive := FALSE;
+    ForceTestA := FALSE;
+    ForceTestB := FALSE;
+    Armable := FALSE;
+    ArmingBusy := FALSE;
+    StartupFail := FALSE;
+    StartupCheckDone := FALSE;
+    StartupCheckOK := FALSE;
+    // 🩹 Neutralisation = coupure surveillance, pas un defaut : Cause et Ack repartent propres
+    RedundancyTestFailedCause := FALSE;
+    RedundancyTestFailedAck := TRUE;
+    EmergencyArmingFailedCause := FALSE;
+    EmergencyArmingFailedAck := TRUE;
+    TonTestA(IN := FALSE);
+    TonRestoreA(IN := FALSE);
+    TonTestB(IN := FALSE);
+    TonRestoreB(IN := FALSE);
+    TonArmingPulse(IN := FALSE);
+    TonArmingConfirm(IN := FALSE);
+    TonArmingLockout(IN := FALSE);
+    TonRedundancyDisplay(IN := FALSE);
+    TonArmingFailedDisplay(IN := FALSE);
+    RETURN;
+END_IF;
+
+{endregion}
+
+{region &quot;§3 Autotest demarrage&quot;}
+// 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01)
+// Vérifications synchrones 1 cycle au premier passage Enable=TRUE
+IF EnableRising.Q THEN
+    StartupCheckDone := FALSE;
+END_IF;
+
+IF NOT StartupCheckDone THEN
+    // Exécute les 4 contrôles en 1 cycle
+    StartupCheckOK := EmergencyChainClosed          // 1. Boucle AU fermée
+                      AND NOT PowerContactorEngaged // 2. Contacteur au repos
+                      AND (ArmingSeqStep = 0);      // 4. Pas de séquence résiduelle
+    StartupCheckDone := TRUE;
+    StartupFail := NOT StartupCheckOK;
+    IF NOT StartupCheckOK THEN
+        ErrorId := 16#0008; // bit3 = startup autotest fail
+        Error := TRUE;
+    END_IF;
+    RETURN; // 1 cycle pour laisser le temps aux entrées de se stabiliser
+END_IF;
+
+{endregion}
+
+{region &quot;§4 Acquittement defauts&quot;}
+// 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
+// ⚠️ Reset TOUJOURS effectif, efface l&#x27;affichage (Ack:=TRUE) et réinitialise Cause:=FALSE
+// pour permettre une nouvelle tentative d&#x27;armement sans blocage IHM. Si le défaut persiste,
+// la nouvelle tentative re-latchera Cause:=TRUE et Ack:=FALSE (TC-P01-009).
+IF ResetEdge.Q THEN
+    RedundancyTestFailedAck := TRUE;
+    EmergencyArmingFailedAck := TRUE;
+    RedundancyTestFailedCause := FALSE;
+    EmergencyArmingFailedCause := FALSE;
+    StartupFail := FALSE;
+    ErrorId := 16#0000;
+END_IF;
+
+{endregion}
+
+{region &quot;§5 Sequence rearmement AU&quot;}
+// 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
+// 🩹 Une nouvelle tentative repart d&#x27;une Cause propre : si le probleme persiste, il sera
+// re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
+// TC-P01-009). Ceci prouve par le run reel que la cause a disparu, pas juste un Reset optimiste.
+IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed 
+   AND NOT EmergencyArmingLockoutActive 
+   AND NOT PowerContactorEngaged THEN
+    ArmingSeqStep := 1;
+    RedundancyTestFailedCause := FALSE;
+    EmergencyArmingFailedCause := FALSE;
+END_IF;
+
+// ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
+TonTestA(IN := (ArmingSeqStep = 1), PT := CST_TestDuration);
+IF ArmingSeqStep = 1 THEN
+    ForceTestA := TRUE;
+    IF TonTestA.Q THEN
+        ForceTestA := FALSE;
+        IF EmergencyChainClosed THEN
+            RedundancyTestFailedCause := TRUE;
+            ArmingSeqStep := 0;
+        ELSE
+            ArmingSeqStep := 2;
+        END_IF;
+    END_IF;
+ELSE
+    ForceTestA := FALSE;
+END_IF;
+
+// ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
+TonRestoreA(IN := (ArmingSeqStep = 2), PT := CST_TestDuration);
+IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
+    IF EmergencyChainClosed THEN
+        ArmingSeqStep := 3;
+    ELSE
+        ArmingSeqStep := 0;
+    END_IF;
+END_IF;
+
+// ⏱️ Étape 3 : Coupe canal B seul, vérifie que la boucle tombe
+TonTestB(IN := (ArmingSeqStep = 3), PT := CST_TestDuration);
+IF ArmingSeqStep = 3 THEN
+    ForceTestB := TRUE;
+    IF TonTestB.Q THEN
+        ForceTestB := FALSE;
+        IF EmergencyChainClosed THEN
+            RedundancyTestFailedCause := TRUE;
+            ArmingSeqStep := 0;
+        ELSE
+            ArmingSeqStep := 4;
+        END_IF;
+    END_IF;
+ELSE
+    ForceTestB := FALSE;
+END_IF;
+
+// ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
+TonRestoreB(IN := (ArmingSeqStep = 4), PT := CST_TestDuration);
+IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
+    IF EmergencyChainClosed THEN
+        ArmingSeqStep := 5;
+    ELSE
+        ArmingSeqStep := 0;
+    END_IF;
+END_IF;
+
+// ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
+TonArmingPulse(IN := (ArmingSeqStep = 5), PT := CST_ArmingPulseDuration);
+Cmd.ArmPulse_Cmd := (ArmingSeqStep = 5);
+IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
+    ArmingSeqStep := 6;
+END_IF;
+
+// ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
+TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := CST_ArmingConfirmTimeout);
+IF ArmingSeqStep = 6 THEN
+    IF PowerContactorEngaged THEN
+        ArmingSeqStep := 0;
+        EmergencyArmingLockoutActive := FALSE;
+    ELSIF TonArmingConfirm.Q THEN
+        EmergencyArmingFailedCause := TRUE;
+        ArmingSeqStep := 0;
+        EmergencyArmingLockoutActive := TRUE;
+    END_IF;
+END_IF;
+
+// ⏱️ Séquence de verrouillage temporel (5s)
+TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := CST_ArmingLockout);
+IF TonArmingLockout.Q THEN
+    EmergencyArmingLockoutActive := FALSE;
+END_IF;
+
+{endregion}
+
+{region &quot;§6 Gestion cause et acquittement&quot;}
+// 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+// L&#x27;interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
+// jamais l&#x27;Ack : l&#x27;acquittement opérateur n&#x27;ouvre jamais un interlock de sécurité.
+RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
+IF RedundancyCauseEdge.Q THEN
+    RedundancyTestFailedAck := FALSE; // nouvelle occurrence -&gt; ré-alarme, ré-acquittement requis
+END_IF;
+
+ArmingFailedCauseEdge(CLK := EmergencyArmingFailedCause);
+IF ArmingFailedCauseEdge.Q THEN
+    EmergencyArmingFailedAck := FALSE;
+END_IF;
+
+{endregion}
+
+{region &quot;§7 Commandes et etats publics&quot;}
+// 📤 5. GÉNÉRATION DES CONSIGNES LOGIQUES — basées sur la Cause brute (jamais sur l&#x27;Ack)
+Cmd.MaintainA_Cmd := NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
+Cmd.MaintainB_Cmd := NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
+// ArmPulse_Cmd déjà positionné à l&#x27;étape 5 ci-dessus (garder FALSE hors étape 5)
+IF ArmingSeqStep &lt;&gt; 5 THEN
+    Cmd.ArmPulse_Cmd := FALSE;
+END_IF;
+
+// 🚦 6. ÉTATS PUBLICS (repris par le composite dans State/Diag) — interlock sur Cause brute
+Armable := EmergencyChainClosed
+           AND (ArmingSeqStep = 0)
+           AND NOT EmergencyArmingLockoutActive
+           AND NOT RedundancyTestFailedCause
+           AND NOT PowerContactorEngaged;
+
+ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
+
+{endregion}
+
+{region &quot;§8 Affichage defauts IHM&quot;}
+// 📤 7. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
+// ⚠️ Uniquement pour l&#x27;affichage : l&#x27;action de sécurité ci-dessus (§5/§6) reste instantanée
+// sur la Cause brute, jamais retardée par ce debounce.
+TonRedundancyDisplay(IN := RedundancyTestFailedCause, PT := CST_FaultDisplayDebounce);
+RedundancyTestFailed := TonRedundancyDisplay.Q OR NOT RedundancyTestFailedAck;
+
+TonArmingFailedDisplay(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebounce);
+EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAck;
+
+{endregion}
+
+{region &quot;§9 Synthese ErrorId&quot;}
+// 📤 8. SYNTHÈSE DES ERREURS (bitfield affiché, basé sur RedundancyTestFailed/EmergencyArmingFailed affichés)
+ErrorId := 16#0000;
+IF RedundancyTestFailed THEN
+    ErrorId := ErrorId OR 16#0001;
+END_IF;
+IF EmergencyArmingFailed THEN
+    ErrorId := ErrorId OR 16#0002;
+END_IF;
+// bit3 (16#0008) = StartupFail, positionné au §2 si autotest échoué
+// — ne pas l&#x27;effacer ici (reset explicite requis)
+
+Error := (ErrorId &lt;&gt; 16#0000);
+
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagementOutput.st</code></summary>
+                <pre>(* =======================================================================
+   🔒 FB_Safety_EmergencyManagementOutput — Projection Physique Fail-Safe
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Enable gate + copie consignes logiques vers sorties physiques
+   🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
+   🔌 Architecture : Projection physique fail-safe
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput
+VAR_INPUT
+    // === CONSIGNES &amp; COMMANDES LOGIQUES ===
+    Enable                  : BOOL; // --&gt; [CMD]  Active le pilote (FALSE = toutes sorties a FALSE)
+    Cmd                     : ST_Safety_Emergency_InternalCmd; // --&gt; [CMD] Ordres logiques recus du bloc logique
+
+    // === RETOURS D&#x27;ETAT &amp; DIAGNOSTICS (MIROIRS) ===
+    ChainOk                 : BOOL; // --&gt; [HW]   Miroir EmergencyChainClosed (pour bus State)
+    ContactorOk             : BOOL; // --&gt; [HW]   Miroir PowerContactorEngaged (pour bus State)
+    ArmingStep              : INT;  // --&gt; [STAT] Miroir ArmingSeqStep (pour bus State)
+    Armable                 : BOOL; // --&gt; [STAT] Calcule par Logic (pour bus State)
+    ArmingBusy              : BOOL; // --&gt; [STAT] Calcule par Logic (pour bus State)
+    Error                   : BOOL; // --&gt; [DIAG] Miroir Error (pour bus Diag)
+    ErrorId                 : WORD; // --&gt; [DIAG] Miroir ErrorId (pour bus Diag)
+    RedundancyTestFailed    : BOOL; // --&gt; [DIAG] Miroir RedundancyTestFailed (pour bus Diag)
+    ArmFailed               : BOOL; // --&gt; [DIAG] Miroir ArmFailed (pour bus Diag)
+    LockoutActive           : BOOL; // --&gt; [DIAG] Miroir LockoutActive (pour bus Diag)
+END_VAR
+VAR_OUTPUT
+    // === SORTIES PHYSIQUES TERMINALES ===
+    MaintainA_RQ            : BOOL; // &lt;-- [ACT]  Vers relais maintien canal A (TRUE = voie maintenue)
+    MaintainB_RQ            : BOOL; // &lt;-- [ACT]  Vers relais maintien canal B (TRUE = voie maintenue)
+    ArmPulse_RQ             : BOOL; // &lt;-- [ACT]  Vers contacteur impulsion rearmement (TRUE = pulse actif)
+
+    // === BUS D&#x27;ETAT &amp; DIAGNOSTIC PUBLICS ===
+    State                   : ST_Safety_Emergency_State; // &lt;-- [STAT] Bus d&#x27;etat public
+    Diag                    : ST_Safety_Emergency_Diag;  // &lt;-- [DIAG] Bus diagnostic public
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Gate&quot;}
+IF NOT Enable THEN
+    MaintainA_RQ   := FALSE;
+    MaintainB_RQ   := FALSE;
+    ArmPulse_RQ    := FALSE;
+
+    State.ChainOk        := FALSE;
+    State.ContactorOk    := FALSE;
+    State.Step           := 0;
+    State.Armable        := FALSE;
+    State.ArmingBusy     := FALSE;
+
+    Diag.Error                := FALSE;
+    Diag.ErrorId              := 16#0000;
+    Diag.RedundancyTestFailed := FALSE;
+    Diag.ArmFailed            := FALSE;
+    Diag.LockoutActive        := FALSE;
+    RETURN;
+END_IF;
+{endregion}
+
+{region &quot;§2 Projection sorties et bus&quot;}
+// ⚡ Sorties physiques — écriture directe des ordres logiques
+MaintainA_RQ := Cmd.MaintainA_Cmd;
+MaintainB_RQ := Cmd.MaintainB_Cmd;
+ArmPulse_RQ  := Cmd.ArmPulse_Cmd;
+
+// 🚦 Bus d&#x27;état public
+State.ChainOk        := ChainOk;
+State.ContactorOk    := ContactorOk;
+State.Step           := ArmingStep;
+State.Armable        := Armable;
+State.ArmingBusy     := ArmingBusy;
+
+// 🛡️ Bus diagnostic public
+Diag.Error                := Error;
+Diag.ErrorId              := ErrorId;
+Diag.RedundancyTestFailed := RedundancyTestFailed;
+Diag.ArmFailed            := ArmFailed;
+Diag.LockoutActive        := LockoutActive;
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\B_AU_SECURITE\FB_Safety_EmergencyManagement.st</code></summary>
+                <pre>(* =======================================================================
+   🛡️ FB_Safety_EmergencyManagement — Composite &amp; Façade Publique
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Façade publique, instance unique ; câblage interne Logic/Output &amp; exposition des bus d&#x27;état
+   🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
+   🔌 Architecture : Composition interne Logic/Output
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagement
+VAR_INPUT
+    // === COMMANDES &amp; CONSIGNES ===
+    Enable                  : BOOL; // --&gt; [CMD]  Active la surveillance (TRUE = autorise)
+    Reset                   : BOOL; // --&gt; [CMD]  Front acquittement defauts
+    ArmRequest              : BOOL; // --&gt; [CMD]  Demande de rearmement (BtnEmergencyArming)
+    PowerCutOffRequest      : BOOL; // --&gt; [SAFE] Requete de coupure logique issue des metiers
+    BtnEmergencyCutOff      : BOOL; // --&gt; [CMD]  Commande d&#x27;ouverture d&#x27;urgence depuis l&#x27;IHM
+
+    // === RETOURS MATERIELS (HW) ===
+    EmergencyChainClosed    : BOOL; // --&gt; [HW]   Retour physique boucle d&#x27;urgence amont contacteur
+    PowerContactorEngaged   : BOOL; // --&gt; [HW]   Confirmation contacteur de puissance principal
+END_VAR
+VAR_OUTPUT
+    // === ETATS IEC &amp; SYNOPTIQUE ===
+    Ready                   : BOOL; // &lt;-- [STAT] FB pret a fonctionner
+    Busy                    : BOOL; // &lt;-- [STAT] Sequence ou lockout en cours
+    Done                    : BOOL; // &lt;-- [STAT] Contacteur puissance confirme engage
+
+    // === DIAGNOSTIQUES &amp; ERREURS ===
+    Error                   : BOOL; // &lt;-- [DIAG] Synthese defaut (TRUE = defaut actif)
+    ErrorId                 : WORD; // &lt;-- [DIAG] Bitfield erreurs (bit0:Redundancy, bit1:Arming, bit3:Startup)
+
+    // === SORTIES PHYSIQUES (FAIL-SAFE) ===
+    MaintainA_RQ            : BOOL; // &lt;-- [ACT]  Sortie pilotage canal A (TRUE = voie maintenue)
+    MaintainB_RQ            : BOOL; // &lt;-- [ACT]  Sortie pilotage canal B (TRUE = voie maintenue)
+    ArmPulse_RQ             : BOOL; // &lt;-- [ACT]  Impulsion rearmement physique (1s)
+
+    // === BUS D&#x27;ETAT &amp; DIAGNOSTIC ===
+    State                   : ST_Safety_Emergency_State; // &lt;-- [STAT] Bus d&#x27;etat public
+    Diag                    : ST_Safety_Emergency_Diag;  // &lt;-- [DIAG] Bus de diagnostic public
+
+    // === DIAGNOSTICS SCALAIRES (RETROCOMPATIBILITE) ===
+    ArmingSeqStep                : INT;  // &lt;-- [DIAG] Etape sequence rearmement (0=IDLE..6=Confirm)
+    RedundancyTestFailed         : BOOL; // &lt;-- [DIAG] Defaut auto-test canal A ou B reste colle
+    EmergencyArmingFailed        : BOOL; // &lt;-- [DIAG] Defaut rearmement contacteur puissance (timeout 2s)
+    EmergencyArmingLockoutActive : BOOL; // &lt;-- [DIAG] Verrouillage temporel 5s entre essais
+END_VAR
+VAR
+    // === SOUS-INSTANCES FB ===
+    Logic                   : FB_Safety_EmergencyManagementLogic;  // * [INST] Machinerie d&#x27;etat et decision AU
+    Output                  : FB_Safety_EmergencyManagementOutput; // * [INST] Projection fail-safe vers sorties physiques
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Appels instances internes&quot;}
+// 🛑 1. Appels des instances internes
+Logic(
+    Enable := Enable,
+    Reset := Reset,
+    ArmRequest := ArmRequest,
+    EmergencyChainClosed := EmergencyChainClosed,
+    PowerContactorEngaged := PowerContactorEngaged,
+    PowerCutOffRequest := PowerCutOffRequest,
+    BtnEmergencyCutOff := BtnEmergencyCutOff
+);
+
+Output(
+    Enable := Enable,
+    Cmd := Logic.Cmd,
+    ChainOk := EmergencyChainClosed,
+    ContactorOk := PowerContactorEngaged,
+    ArmingStep := Logic.ArmingSeqStep,
+    Armable := Logic.Armable,
+    ArmingBusy := Logic.ArmingBusy,
+    Error := Logic.Error,
+    ErrorId := Logic.ErrorId,
+    RedundancyTestFailed := Logic.RedundancyTestFailed,
+    ArmFailed := Logic.EmergencyArmingFailed,
+    LockoutActive := Logic.EmergencyArmingLockoutActive
+);
+{endregion}
+
+{region &quot;§2 Propagation sorties et bus&quot;}
+// 📤 2. Propagation des signaux vers les sorties du bloc parent
+Ready := Enable AND NOT Logic.StartupFail;
+Busy  := (Logic.ArmingSeqStep &lt;&gt; 0) OR Logic.EmergencyArmingLockoutActive;
+Done  := PowerContactorEngaged;
+Error := Logic.Error;
+ErrorId := Logic.ErrorId;
+
+// ⚡ Sorties physiques
+MaintainA_RQ   := Output.MaintainA_RQ;
+MaintainB_RQ   := Output.MaintainB_RQ;
+ArmPulse_RQ    := Output.ArmPulse_RQ;
+
+// 🚦 Bus publics
+State := Output.State;
+Diag  := Output.Diag;
+{endregion}
+
+{region &quot;§3 Diagnostics scalaires&quot;}
+// 🩺 Diagnostics scalaires (rétrocompatibilité)
+ArmingSeqStep                := Logic.ArmingSeqStep;
+RedundancyTestFailed         := Logic.RedundancyTestFailed;
+EmergencyArmingFailed        := Logic.EmergencyArmingFailed;
+EmergencyArmingLockoutActive := Logic.EmergencyArmingLockoutActive;
+{endregion}
+</pre>
+            </details>
+    </details>
+    <details>
+        <summary>Sortie brute strucpp</summary>
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_safety_emergency.st
+  [PASS] TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu
+  [PASS] TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -&gt; pulse 1s puis confirmation
+         ASSERT_FALSE failed: FB.MAINTAINA_RQ expected FALSE, got TRUE
+         at test_fb_safety_emergency.st:135
+         Message: TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF 3.4bis)
+  [FAIL] TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste
+  [PASS] TC-P01-006 canal colle bloque le reamement (echec auto-test)
+  [PASS] TC-P01-007 timeout confirmation contacteur -&gt; lockout 5s
+         ASSERT_FALSE failed: FB.ARMPULSE_RQ expected FALSE, got TRUE
+         at test_fb_safety_emergency.st:269
+         Message: BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)
+  [FAIL] TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien
+  [PASS] TC-P01-008 PowerCutOffRequest coupe A et B sans armer
+
+-----------------------------------------
+7 tests, 5 passed, 2 failed
+</pre>
+    </details>
+</div>
+<script>
+function copyPinExpr(el) {
+    var text = el.getAttribute('title') || el.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    el.classList.add('pin-copied');
+    setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('test_ci_theme', next); } catch (e) {}
+    updateThemeBtn(next);
+}
+
+function updateThemeBtn(theme) {
+    var btns = document.querySelectorAll('.theme-toggle-btn');
+    btns.forEach(function(b) {
+        b.innerHTML = theme === 'dark' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+    });
+}
+
+(function() {
+    try {
+        var saved = localStorage.getItem('test_ci_theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.addEventListener('DOMContentLoaded', function() { updateThemeBtn(saved); });
+        }
+    } catch (e) {}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport de test — PRG_06_Outputs [PASS]</title>
+<style>
+    :root {
+        --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
+        --accent: #818cf8; --green-bg: rgba(16, 185, 129, 0.15); --green-text: #34d399; --green-border: #059669;
+        --red-bg: rgba(239, 68, 68, 0.15); --red-text: #f87171; --red-border: #dc2626;
+        --warn-bg: rgba(245, 158, 11, 0.15); --warn-text: #fbbf24; --warn-border: #d97706;
+        --card-sub: #0f172a; --badge-prg-bg: rgba(59, 130, 246, 0.2); --badge-prg-txt: #93c5fd;
+        --badge-fb-bg: rgba(148, 163, 184, 0.15); --badge-fb-txt: #cbd5e1; --btn-bg: #1e293b; --btn-border: #334155;
+        --code-bg: #070a12; --code-border: #1e293b;
+        --neon-green-glow: 0 0 25px rgba(16, 185, 129, 0.65), 0 0 10px rgba(16, 185, 129, 0.4), inset 0 0 12px rgba(16, 185, 129, 0.15);
+        --neon-red-glow: 0 0 25px rgba(239, 68, 68, 0.65), 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 12px rgba(239, 68, 68, 0.15);
+        --neon-blue-glow: 0 0 25px rgba(99, 102, 241, 0.6), 0 0 10px rgba(99, 102, 241, 0.35);
+    }
+    [data-theme="light"] {
+        --bg: #f8fafc; --bg-grid: rgba(0, 0, 0, 0.03); --surface: #ffffff; --surface-card: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+        --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
+        --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
+        --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
+        --card-sub: #f8fafc; --badge-prg-bg: #dbeafe; --badge-prg-txt: #1e40af;
+        --badge-fb-bg: #f1f5f9; --badge-fb-txt: #475569; --btn-bg: #f8fafc; --btn-border: #cbd5e1;
+        --code-bg: #f1f5f9; --code-border: #e2e8f0;
+        --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
+    }
+    * { box-sizing: border-box; }
+    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
+        background-color: var(--bg);
+        background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-position: -1px -1px;
+        color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .header { display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .theme-toggle-btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
+        padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .theme-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.4px; color: #cbd5e1; }
+    .header .badge, .fb-section-title .badge { font-size: 16px; padding: 8px 22px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin: 4px 0 26px; }
+    .subtitle b { color: var(--text); font-weight: 700; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 8px; font-weight: 800;
+        font-size: 13.5px; letter-spacing: 0.8px; font-family: monospace; text-transform: uppercase; }
+    .badge-pass, .badge-pass.badge-strong { background: rgba(16, 185, 129, 0.22); color: #ffffff; border: 2px solid #34d399; box-shadow: 0 0 16px rgba(16, 185, 129, 0.45); }
+    .badge-fail, .badge-fail.badge-strong { background: rgba(244, 63, 94, 0.22); color: #ffffff; border: 2px solid #fb7185; box-shadow: 0 0 16px rgba(244, 63, 94, 0.45); }
+    
+    /* Cartes modernes avec effets Neon Glow */
+    .card-neon-ok { border: 1px solid var(--green-border) !important; box-shadow: var(--neon-green-glow) !important; }
+    .card-neon-fail { border: 1px solid var(--red-border) !important; box-shadow: var(--neon-red-glow) !important; }
+    .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
+
+    details { margin-bottom: 20px; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary:hover { color: var(--text); }
+    ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .test-card:hover { transform: translateY(-1px); }
+    .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    /* Style distinct pour les tests de contrat et d'interface socle */
+    .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
+    .test-card-contract header h3 { color: #818cf8; }
+    .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
+    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks { margin-top: 8px; }
+    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; }
+    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
+    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
+        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
+    .failure-head { color: var(--red-text); font-weight: 600; }
+    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
+    .failure-msg { color: #92400e; margin-top: 4px; }
+    .failure-diff { margin-top: 4px; }
+    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
+        overflow-x: auto; }
+    .chronogram-group { margin-top: 12px; }
+    .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 12px; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
+    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
+    .chrono-table .scan-t { color: var(--muted); }
+    .chrono-table td.changed { background: #fef9c3; }
+    .v-true { color: var(--green-text); font-weight: 600; }
+    .v-false { color: #cbd5e1; }
+    .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+    .waveform { display: block; }
+    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
+    .wf-line { fill: none; stroke-width: 2; }
+    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
+    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
+    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-chip { opacity: 0.95; }
+    .wf-legend { font-size: 10px; fill: var(--muted); }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
+    .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
+    .af-warning-banner ul { margin: 0; padding-left: 20px; }
+    .af-warning-banner li { margin: 3px 0; }
+    .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
+    .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
+    .encaps-table ul { margin: 0; padding-left: 16px; }
+    .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
+        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+    .wf-fail-band { fill: #fecaca; opacity: 0.45; }
+    .wf-fail-marker { font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }
+    tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
+    .chronogram-static { margin-top: 10px; }
+    .chronogram-static summary { font-size: 11px; }
+    .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
+    .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
+    .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
+    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; width: 100%; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 600px; overflow-y: auto; padding: 4px 8px;
+        scrollbar-width: none; -ms-overflow-style: none; }
+    .pin-col::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .pin-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+        background: var(--surface); min-width: 0; }
+    /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
+    .pin-col-in .pin-row { justify-content: space-between; text-align: right; }
+    /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
+    .pin-col-out .pin-row { justify-content: space-between; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f8fafc; }
+    .pin-type { color: var(--muted); font-weight: 500; font-size: 11px; margin-left: 4px; }
+    .pin-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; margin-left: 4px; font-weight: 700; white-space: nowrap; }
+    .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .pin-expr code { background: var(--code-bg); color: #93c5fd; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 11.5px;
+        cursor: pointer; font-family: monospace; }
+    .pin-expr code:hover { border-color: var(--accent); color: #ffffff; }
+    .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
+    .pin-missing { color: #fbbf24; font-style: italic; font-size: 12px; }
+    .pin-more { color: var(--muted); font-size: 11px; }
+    .pin-row-unwired { background: var(--card-sub); }
+    .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
+        font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 10px; }
+    .fb-section-title:first-of-type { margin-top: 6px; }
+    .toc-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin-bottom: 16px; }
+    .toc-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .toc-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; margin: 12px 0 4px; }
+    .toc-group-title:first-of-type { margin-top: 10px; }
+    .toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+    .toc-item { font-size: 12.5px; padding: 2px 0; break-inside: avoid; }
+    .toc-item a { text-decoration: none; color: var(--text); }
+    .toc-item a:hover { text-decoration: underline; }
+    .toc-item::before { content: "●"; font-size: 8px; margin-right: 6px; }
+    .toc-pass::before { color: var(--green-text); }
+    .toc-fail::before { color: var(--red-text); }
+    .toc-fail a { color: var(--red-text); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <div>
+            <h1>PRG_06_Outputs</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
+            <span class="badge badge-pass">PASS</span>
+        </div>
+    </div>
+    <div class="exec-time">2026-08-24 07:57:39</div>
+    
+    <details class="toc-details" open>
+        <summary>📋 Sommaire (3 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-06-outputs-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
+    </details>
+    
+    <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
+        <div>
+            <span style="font-size:14px;color:var(--text);font-weight:700;">📁 <code style="color:var(--accent);font-size:14px;">CODE/M_MAIN/FB_TestHarness_PRG_06.st</code></span>
+            <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);">
+            3/3 vérifications validées
+        </div>
+    </div>
+    
+    <details class="encaps-details" >
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 25 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <table class="encaps-table">
+            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
+            <tbody>
+            <tr class="compil-row-pass">
+                <td><code>DEVICE_STATE.st</code><span style="background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid #d97706;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">MOCK</span></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Simulé pour environnement CI (hors CODESYS)</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_State.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FbStatus.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FbCause.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_ContactorCheck.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FbStatus.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_WinchFinalInterlockState.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_WinchFinalInterlockReason.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_WinchOutputInterlock.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_TranslationFinalInterlockReason.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_TranslationOutputInterlock.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_BucketState.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_WinchFinalInterlockRequest.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_SafetyWinch.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_BucketHMIState.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_EncoderHMI.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_SyncState.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_WinchState.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_WinchInterPrg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_TranslationFinalInterlockRequest.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_SafetyTranslation.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_TranslationState.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_TranslationInterPrg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_OutputsInterPrg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_TestHarness_PRG_06.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    
+    <details class="pin-diagram-details" open>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_06_Outputs</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 82 flux entrants · 42 flux sortants)</span></summary>
+        <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
+            <b>Sous-instances actives intégrées :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instWinchOutputInterlockM1 <span style="color:var(--muted);font-weight:500;">(FB_WinchOutputInterlock)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instWinchOutputInterlockM2 <span style="color:var(--muted);font-weight:500;">(FB_WinchOutputInterlock)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instTranslationOutputInterlockM3 <span style="color:var(--muted);font-weight:500;">(FB_TranslationOutputInterlock)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSafetyEmergencyManagement <span style="color:var(--muted);font-weight:500;">(FB_Safety_EmergencyManagement)</span></span></div>
+        </div>
+        
+        <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+            <div class="pin-col pin-col-in">
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_IHM</span> <span style="font-size:11px;color:#38bdf8;">(2 signaux ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Lecture Globale</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Modes.Cmd.BtnEmergencyArming</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Modes.Cmd.BtnEmergencyCutOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_02_Acquisition</span> <span style="font-size:11px;color:#818cf8;">(2 retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_04_Treuils_Benne</span> <span style="font-size:11px;color:#818cf8;">(58 retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.BucketState.CoupledMotionBlockedByBucket</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.BucketState.Error</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.BrakeFeedback</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerContactorEngaged</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor1</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayRev</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.SafeStop</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.Error</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorEncoder</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaA</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaB</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaC</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaD</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorMecaE</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorNoMovement</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorOperatorComm</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorOppositeDir</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ErrorPhaseRotation</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.PowerCutOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.SafeStop</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM1Safety.ThermalFault</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.BrakeFeedback</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.Enable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerContactorEngaged</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor1</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor2</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor3</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor4</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayFwd</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayRev</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.SafeStop</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.Error</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorEncoder</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaA</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaB</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaC</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaD</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorMecaE</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorNoMovement</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorOperatorComm</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorOppositeDir</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ErrorPhaseRotation</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.PowerCutOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.SafeStop</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.SlackCable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2Safety.ThermalFault</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_05_Translation</span> <span style="font-size:11px;color:#818cf8;">(19 retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.Enable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.Error</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.ErrorBrakeThermal</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.ErrorDriveComm</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.ErrorLimitSwitch</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.ErrorMecaA</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.ErrorMecaB</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.ErrorOperatorComm</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.ErrorPhaseRotation</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.ErrorSensorIncoherent</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.PowerCutOff</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationSafety.SafeStop</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_07_Supervision</span> <span style="font-size:11px;color:#818cf8;">(1 retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_07_Supervision.FaultMachineReset_IHM</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div></div>
+        </details></div>
+            <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">PRG_06_Outputs</span>
+                
+                
+                <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
+                    <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">0</b></div>
+                    <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">2</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">80</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">25</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">18</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">82 IN</b> / <b style="color:#ffffff;">42 OUT</b></div>
+                </div>
+                
+    <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
+        <div style="font-weight:800;color:var(--accent);margin-bottom:4px;border-bottom:1px solid var(--border);padding-bottom:2px;font-size:11.5px;">📋 Structure ST :</div>
+        <div>✅ Cartouche En-tête <code>(* === *)</code></div>
+        <div>✅ Bannière <code>VAR_INPUT</code></div>
+        <div>✅ Bannière <code>VAR_OUTPUT</code></div>
+        <div>✅ Bannière <code>VAR</code> locale</div>
+    </div>
+            </div>
+            <div class="pin-col pin-col-out">
+            <details style="margin:4px 0;">
+                <summary style="list-style:none;cursor:pointer;">
+                    <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Data</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_OutputsInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(18 champs ▾)</span></div>
+                        <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
+                    </div>
+                </summary>
+                <div style="margin-top:2px;">
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.EmergencyArmingCmd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1BrakeCmd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1RelayFwd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1RelayRev</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1SpeedContactor1</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1SpeedContactor2</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1SpeedContactor3</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1SpeedContactor4</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2BrakeCmd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2RelayFwd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2RelayRev</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2SpeedContactor1</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2SpeedContactor2</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2SpeedContactor3</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2SpeedContactor4</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.PowerKeepAliveACmd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.PowerKeepAliveBCmd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.TranslationBrakeCmd</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_OutputsInterPrg</span></div>
+                </div></div>
+            </details>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>EmergencyArmingPulseActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>EmergencyArmingLockoutActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>ArmingSeqStep</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">INT</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>RedundancyTestFailed</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>EmergencyArmingFailed</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>EmergencyState</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Safety_Emergency_State</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>EmergencyDiag</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Safety_Emergency_Diag</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>PowerCutOffActive</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>SafetyStructureNotValidated</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL := FALSE</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M1InterlockEnable</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M2InterlockEnable</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M3InterlockEnable</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M1PowerCutOffSafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M1SafeStopSafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M1BlockedBySafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M2PowerCutOffSafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M2SafeStopSafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M2BlockedBySafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M3PowerCutOffSafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M3SafeStopSafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M3BlockedBySafetyInfo</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M3_DriveControlWord</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">WORD</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>M3_DriveFreqRefWord</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">WORD</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>KoboldContactorCmd</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div></div>
+        </div>
+    </details>
+    
+    
+    <details class="encaps-details" >
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 4 FB de la chaine, encapsulation propre (0 violation)</summary>
+        
+        <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+            <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
+                ℹ️ Guide d'Audit : Les 7 Invariants & Règles d'Encapsulation Automatisme (Cliquez pour afficher)
+            </summary>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: left;">
+                <thead>
+                    <tr style="background: var(--surface); color: var(--text);">
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">#</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Règle / Invariant POO</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Risque Machine Réel</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Contrôle Automatique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">1</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Écriture externe clandestine sur VAR locale</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Violation d'encapsulation (External Write)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">2</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Accès GVL direct sans passer par l'interface</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">FB non testable unitairement, couplage fort et masqué.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">3</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Référence VAR_IN_OUT orpheline</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Pointeur nul / crash automate lors de l'appel.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Invalidation appel de FB</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">4</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Reset sur front montant (R_TRIG)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Réarmement intempestif si le bouton reste coincé/actif.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🔒 Règle IEC Reset obligatoire</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">5</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Profils standards (Enable / Ready / Status)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Composant impossible à chaîner en sécurité AU.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Contrat AF03 §1bis</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">6</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Sorties VAR_OUTPUT orphelines</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Information calculée mais oubliée dans le câblage global.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">💡 Alerte Pinout non consommé</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">7</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Variables locales non initialisées</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Détection d'état initial indéfini</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+        <table class="encaps-table">
+            <thead><tr><th>Statut</th><th>Composant (FB)</th><th>VAR_IN</th><th>VAR_OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Analyse Invariants & Violations</th></tr></thead>
+            <tbody>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FbStatus</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_WinchOutputInterlock</code></td>
+                <td>13</td><td>20</td>
+                <td>0</td><td>14</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (14 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_TranslationOutputInterlock</code></td>
+                <td>8</td><td>9</td>
+                <td>0</td><td>11</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (11 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_TestHarness_PRG_06</code></td>
+                <td>3</td><td>4</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+        </div>
+    </details>
+    
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-prg-06-outputs-0" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
+            </header>
+            
+            <div class="checks"><span class="checks-label">Vérifié (4)</span><ul><li>Contacteur montee M1 active</li><li>Palier 1 M1 active</li><li>Commande desserrage frein M1 active</li><li>Commande desserrage frein M3 active</li></ul></div>
+            
+            
+        </article>
+        <article id="test-prg-06-outputs-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
+            </header>
+            
+            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>Contacteur montee M2 active</li><li>Palier 1 M2 active</li><li>Commande desserrage frein M2 active</li></ul></div>
+            
+            
+        </article>
+        <article id="test-prg-06-outputs-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
+            </header>
+            
+            <div class="checks"><span class="checks-label">Vérifié (3)</span><ul><li>Relais montee M1 coupe</li><li>Contacteurs vitesse M1 coupes</li><li>Frein M1 retombe</li></ul></div>
+            
+            
+        </article>
+        </div>
+    </details>
+    <details>
+        <summary>Fichiers source compilés (25)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/A_COMMUN/ST_FbCause.st</code></li><li><code>CODE/A_COMMUN/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FbStatus.st</code></li><li><code>CODE/H_TREUILS_BENNE/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/ST_BucketState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_06.st</code></li></ul>
+    </details>
+    <details>
+        <summary>Code source ST original (25)</summary>
+        
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
+                <pre>(* =======================================================================
+   📊 Type CODESYS système pour tests STruCpp
+   ======================================================================= *)
+TYPE DEVICE_STATE :
+(
+    UNKNOWN             := 0,
+    STOPPED             := 1,
+    CONFIG_ERROR        := 2,
+    BUS_ERROR           := 3,
+    DISABLED            := 4,
+    INITIALIZING        := 5,
+    RESET_ORIGIN        := 6,
+    RESET_COMMUNICATION := 7,
+    RESET_APPLICATION   := 8,
+    RUNNING             := 9,
+    LOGGER_ERROR        := 10
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des phases opérationnelles d&#x27;un FB métier
+   ⚙️ Machine d&#x27;état : Un seul état actif à la fois (orthogonal à Error)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   ======================================================================= *)
+
+TYPE E_State :
+ENUM
+    DISABLED := 0,   (* Enable faux, neutralisé *)
+    INIT     := 1,   (* Démarrage / vérifs *)
+    READY    := 2,   (* Prêt, attend ordre *)
+    BUSY     := 3,   (* Action en cours *)
+    DONE     := 4,   (* Action terminée *)
+    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
+      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
+      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
+   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+      rempli via le socle `FB_FbStatus` (même comportement partout).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ======================================================================= *)
+
+TYPE ST_FbStatus :
+STRUCT
+    (* ---- membres historiques (conservés) ---- *)
+    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
+    Done         : BOOL;    (* 1 = Action terminée avec succès *)
+    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
+    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
+    State        : E_State; (* État courant de la machine d&#x27;état *)
+    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
+    (* ---- membres ajoutés (forme cible enrichie) ---- *)
+    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
+    WarningId      : WORD;  (* Code warning courant (bitfield) *)
+    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
+    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
+    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
+      sans bitfield ni masque. Le FB métier remplit une liste de causes
+      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
+   🧬 Contrat : remplacer l&#x27;ancien couple WORD bitfield + tableaux de textes
+      indexés par bit par une liste lisible (maintenance, « avec une liste »).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
+      l&#x27;acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FbCause :
+STRUCT
+    Active     : BOOL;   (* 1 = cause présente (interlock sur la cause brute) *)
+    IsWarning  : BOOL;   (* 1 = warning auto-effacé ; 0 = défaut à acquitter *)
+    Texte      : STRING; (* libellé prêt IHM de la cause *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   ======================================================================= *)
+
+TYPE ST_ContactorCheck :
+STRUCT
+    Command     : BOOL;   // Ordre envoyé au contacteur (TRUE = fermé/actif)
+    Feedback    : BOOL;   // Retour d&#x27;état câblé (TRUE = effectivement fermé)
+    StuckClosed : BOOL;   // Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff
+    StuckOpen   : BOOL;   // Diag : commande ON mais retour OFF depuis trop longtemps
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
+      à partir d&#x27;une LISTE de causes claires (ARRAY[0..15] OF ST_FbCause).
+      Plus de bitfield WORD en entrée, plus de masque, plus de tableau de
+      textes indexé par bit — le FB métier exprime ses défauts en clair.
+   🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
+      rempli via UNE instance de ce socle → même comportement partout.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur l&#x27;acquittement.
+      - Reset TOUJOURS effectif (std §9), jamais conditionné.
+      - IsWarning=1 → warning AUTO-EFFACÉ (ne lève jamais Error) ; IsWarning=0 → fault à acquitter (laté).
+      - une cause fault réapparue se re-lathe automatiquement (ré-alarme).
+      - une cause reclassée warning purge son latch résiduel (pas de défaut fantôme).
+      - StateAtError : capture UNIQUE au premier défaut, gelé jusqu&#x27;au Reset.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FbStatus
+VAR_INPUT
+    // === PERMIS &amp; ACQUITTEMENT ===
+    Enable          : BOOL;    // --&gt; [CMD] Autorisation générale FB
+    Reset           : BOOL;    // --&gt; [CMD] Front acquittement défaut (jamais conditionné, §9)
+
+    // --- CAUSES (producteur = bloc métier, en clair) ---
+    Causes          : ARRAY[0..15] OF ST_FbCause;  // --&gt; [HW] Liste des causes (Active/IsWarning/Texte)
+END_VAR
+VAR_OUTPUT
+    // --- ÉTAT &amp; SYNOPTIQUE (forme cible) ---
+    Ready           : BOOL;    // &lt;-- [STAT] FB prêt (Enable)
+    Status          : ST_FbStatus; // &lt;-- [STAT] Statut complet (mappé 1:1 sur la sortie du bloc)
+END_VAR
+VAR
+    // --- SOUS-INSTANCES &amp; MEMOIRES ---
+    ResetEdge         : R_TRIG;              // * [INST] Front Reset
+    Latch             : ARRAY[0..15] OF BOOL;// . [LOC] Défaut laté par cause (jusqu&#x27;au Reset)
+    StateAtErrorArmed : BOOL;                // . [LOC] Flag : StateAtError capturé UNE fois
+    i                 : INT;                 // . [LOC] index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Gate neutralisation&quot;}
+// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr.
+//    ⚠️ Les latches de défaut sont CONSERVÉS (décision utilisateur) : un défaut
+//    non acquitté ne doit pas être effacé silencieusement par une bascule Enable
+//    OFF→ON sans Reset (jamais de redémarrage auto après défaut). Au ré-enable,
+//    §3 relatche naturellement toute cause encore active ; un défaut laté persistant
+//    redevient visible jusqu&#x27;au Reset.
+Ready := Enable;
+IF NOT Enable THEN
+    Status.Busy := FALSE; Status.Done := FALSE;
+    Status.Error := FALSE; Status.ErrorId := 0;
+    Status.Warning := FALSE; Status.WarningId := 0;
+    Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
+    Status.ResetRequested := FALSE;
+    Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
+    RETURN;
+END_IF;
+Status.State := E_State.READY;
+{endregion}
+
+{region &quot;=== §2 Reset (front, toujours effectif) ===&quot;}
+// 2. Front Reset : TOUJOURS effectif, jamais conditionné (std §9).
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+    StateAtErrorArmed := FALSE;
+END_IF;
+{endregion}
+
+{region &quot;=== §3 Classification + latch par cause ===&quot;}
+// 3. Parcours de la LISTE (source de vérité = cause brute Active).
+//    - IsWarning=TRUE  → warning : auto-effacé + purge d&#x27;un latch résiduel (reclassement, sans défaut fantôme).
+//    - IsWarning=FALSE → fault : laté dès qu&#x27;Active ; conservé après disparition ; re-laté s&#x27;il revient.
+FOR i := 0 TO 15 DO
+    IF Causes[i].IsWarning THEN
+        Latch[i] := FALSE;
+    ELSE
+        IF Causes[i].Active THEN Latch[i] := TRUE; END_IF;
+    END_IF;
+END_FOR;
+{endregion}
+
+{region &quot;=== §4 StateAtError — capture au premier défaut ===&quot;}
+// 4. État mémorisé au moment de l&#x27;apparition du défaut (gelé jusqu&#x27;au Reset).
+IF NOT StateAtErrorArmed THEN
+    FOR i := 0 TO 15 DO
+        IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+            Status.StateAtError := Status.State;   // State déjà READY (§1)
+            StateAtErrorArmed := TRUE;
+            EXIT;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;=== §5 Sorties Error / Warning / ResetRequested ===&quot;}
+// 5. Sorties : ErrorId réservé aux DÉFAUTS (à acquitter) ; les warnings sont
+//    séparés dans WarningId. Un warning ne lève JAMAIS Error ni ne pollue ErrorId
+//    (décision utilisateur : un IHM qui lit ErrorId ne voit pas de faux défaut).
+Status.ErrorId := 0; Status.WarningId := 0;
+Status.Error := FALSE; Status.Warning := FALSE; Status.ResetRequested := FALSE;
+FOR i := 0 TO 15 DO
+    // Défaut laté OU actif
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorId := Status.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Error := TRUE;
+        Status.ResetRequested := TRUE;
+    END_IF;
+    // Warning auto-effacé : uniquement dans WarningId (séparé de ErrorId)
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningId := Status.WarningId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Warning := TRUE;
+    END_IF;
+END_FOR;
+{endregion}
+
+{region &quot;=== §6 Textes IHM — parcours de liste ===&quot;}
+// 6. Sélection du texte par parcours de la LISTE (première cause active, index le plus bas).
+//    Plus de WHILE ni de masque. Hypothèse : `Causes[i].Texte` reste renseigné par l&#x27;appelant.
+Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
+FOR i := 0 TO 15 DO
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorIdTxt := Causes[i].Texte; EXIT;
+    END_IF;
+END_FOR;
+FOR i := 0 TO 15 DO
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningIdTxt := Causes[i].Texte; EXIT;
+    END_IF;
+END_FOR;
+{endregion}
+
+// Busy/Done : pilotés par le FB MÉTIER (cycle propre), pas par le socle.
+// Un conditionneur synchrone (joystick) les laisse à FALSE ; un organe à cycle les pilote lui-même.
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockState.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_WinchFinalInterlockState — États machine barrière finale treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des états opérationnels de l&#x27;interlock final
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   ======================================================================= *)
+{attribute &#x27;qualified_only&#x27;}
+TYPE E_WinchFinalInterlockState :
+(
+    DISABLED                        := 0,                             // Desactive / Hors service
+    READY                           := 1,                             // Pret / Etat nominal
+    WAIT_BRAKE_COMMAND_CONFIRMATION := 2,                             // Attente confirmation feedback frein
+    WAIT_STEP_DELAY                 := 3,                             // Temporisation changement de palier
+    WAIT_RESTART_DELAY              := 4,                             // Temporisation anti-court-cycle redemarrage
+    FAULT                           := 5                              // Etat de defaut
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\E_WinchFinalInterlockReason.st</code></summary>
+                <pre>(* =======================================================================
+   🔒 E_WinchFinalInterlockReason — Raisons de blocage barrière finale
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des causes de neutralisation/interlock final treuil
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   ======================================================================= *)
+{attribute &#x27;qualified_only&#x27;}
+TYPE E_WinchFinalInterlockReason :
+(
+    NONE                        := 0,                                 // Aucun blocage actif
+    BRAKE_COMMAND_NOT_CONFIRMED := 1,                                 // Absence confirmation ouverture frein &gt; 500ms
+    RESTART_INHIBITED           := 2                                  // Inhibition redemarrage actif
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\FB_WinchOutputInterlock.st</code></summary>
+                <pre>(* =======================================================================
+   🛡️ FB_WinchOutputInterlock — Barrière finale frein / puissance M1 ou M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Barrière de sécurité finale pour frein et contacteurs M1/M2
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs)
+   🔒 Sécurité : Surveillance feedback frein et temporisation d&#x27;inversion
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_WinchOutputInterlock
+VAR_INPUT
+    // === COMMANDES ET ETATS GENERAL ===
+    Enable                          : BOOL;                           // --&gt; [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset                           : BOOL;                           // --&gt; [CMD] Acquittement defaut sur front
+    SafeStop                        : BOOL;                           // --&gt; [SAFE] Entree securite pour interface standard
+
+    // === HARDWARE ET FEEDBACKS ===
+    PowerContactorEngaged           : BOOL;                           // --&gt; [SAFE] Chaine AU rearmee et puissance OK
+    BrakeFeedback                   : BOOL;                           // --&gt; [HW] Feedback physique ouverture frein (NC)
+    FwdRevSpeedFeedbackOff          : BOOL;                           // --&gt; [HW] Feedback retombe tous contacteurs sens/vitesse
+
+    // === DEMANDES DE COMMANDE AMONT ===
+    RequestedRelayFwd               : BOOL;                           // --&gt; [CMD] Demande contacteur sens montee
+    RequestedRelayRev               : BOOL;                           // --&gt; [CMD] Demande contacteur sens descente
+    RequestedContactor1             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 1
+    RequestedContactor2             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 2
+    RequestedContactor3             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 3
+    RequestedContactor4             : BOOL;                           // --&gt; [CMD] Demande contacteur vitesse palier 4
+    RequestedStep                   : INT;                            // --&gt; [CMD] Palier de vitesse demande
+END_VAR
+VAR_OUTPUT
+    // === ETATS IEC ET SYNOPTIQUE ===
+    Ready                           : BOOL;                           // &lt;-- [STAT] FB pret a fonctionner
+    Busy                            : BOOL;                           // &lt;-- [STAT] Interlock actif
+    Done                            : BOOL;                           // &lt;-- [STAT] Action terminee
+    Error                           : BOOL;                           // &lt;-- [STAT] Synthese defaut
+    ErrorId                         : WORD;                           // &lt;-- [DIAG] Code erreur (bit0: timeout frein)
+    State                           : E_WinchFinalInterlockState;     // &lt;-- [STAT] Etat courant machine d&#x27;etat interlock
+    StateAtError                    : E_WinchFinalInterlockState;     // &lt;-- [DIAG] Etat memorise lors du dernier defaut
+    Reason                          : E_WinchFinalInterlockReason;    // &lt;-- [DIAG] Cause de neutralisation ou blocage
+
+    // === ORDRES ACTIONNEURS VALIDES ===
+    AuthorizedStep                  : INT;                            // &lt;-- [ACT] Palier de vitesse autorise
+    RelayFwd                        : BOOL;                           // &lt;-- [ACT] Ordre contacteur sens montee valide
+    RelayRev                        : BOOL;                           // &lt;-- [ACT] Ordre contacteur sens descente valide
+    Contactor1                      : BOOL;                           // &lt;-- [ACT] Ordre contacteur vitesse palier 1 valide
+    Contactor2                      : BOOL;                           // &lt;-- [ACT] Ordre contacteur vitesse palier 2 valide
+    Contactor3                      : BOOL;                           // &lt;-- [ACT] Ordre contacteur vitesse palier 3 valide
+    Contactor4                      : BOOL;                           // &lt;-- [ACT] Ordre contacteur vitesse palier 4 valide
+    BrakeCmd                        : BOOL;                           // &lt;-- [ACT] Ordre ouverture frein valide
+
+    // === DIAGNOSTICS ET TEMPORISATIONS ===
+    BrakeTimeoutElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation watchdog frein
+    RestartInhibit                  : BOOL;                           // &lt;-- [DIAG] Inhibition redemarrage actif
+    RestartDelayElapsed             : TIME;                           // &lt;-- [DIAG] Ecoule temporisation anti-court-cycle
+    StepDelayElapsed                : TIME;                           // &lt;-- [DIAG] Ecoule temporisation palier
+END_VAR
+VAR
+    // === DETECTEURS ET TIMERS INTERNES ===
+    ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
+    ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
+    BrakeTimeoutCauseEdge           : R_TRIG;                         // . [LOC] Detecteur front cause timeout frein
+    BrakeTimeout                    : TON;                            // . [LOC] Temporisation watchdog frein
+    StepDelay                       : TON;                            // . [LOC] Temporisation changement de palier
+    RestartDelay                    : TON;                            // . [LOC] Temporisation anti-court-cycle redemarrage
+
+    // === VARIABLES LOCALES CALCULÉES ===
+    RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
+    ResetRequired                   : BOOL;                           // . [LOC] Exigence d&#x27;acquittement Reset conscient
+    NeutralRequestSeen              : BOOL;                           // . [LOC] Observation passage consigne au neutre
+    RequestedStepClamped            : INT;                            // . [LOC] Palier demande borne dans [0..5]
+    StepDelayTarget                 : INT;                            // . [LOC] Cible palier memorisee
+    MotorRequest                    : BOOL;                           // . [LOC] Demande mouvement moteur active
+    BrakeTimeoutCause               : BOOL;                           // . [LOC] Cause timeout frein presente
+    BrakeTimeoutAck                 : BOOL := TRUE;                  // . [LOC] Acquittement cause timeout frein
+END_VAR
+
+// ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
+// Le front est échantillonné même pendant Enable/AU faux : un Reset maintenu
+// pendant une gate ne devient jamais un faux acquittement au retour.
+ResetEdge(CLK := Reset);
+
+// ── 2. GATE : neutralisation sûre ───────────────────────────────────────
+// ErrorId, RestartInhibit et ResetRequired ne sont jamais effacés par une perte
+// Enable/AU : celle-ci coupe uniquement les sorties. Le retour exige toujours un
+// acquittement conscient puis une nouvelle demande opérateur.
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    BrakeTimeout(IN := FALSE, PT := T#500ms);
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    RestartDelay(IN := FALSE, PT := T#1000ms);
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    BrakeCmd := FALSE; AuthorizedStep := 0;
+    BrakeTimeoutElapsed := T#0ms; RestartDelayElapsed := T#0ms; StepDelayElapsed := T#0ms;
+    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Error := (ErrorId &lt;&gt; 16#0000);
+    State := E_WinchFinalInterlockState.DISABLED;
+    RestartRequired := TRUE;
+    RETURN;
+END_IF;
+
+RequestedStepClamped := LIMIT(0, RequestedStep, 5);
+// SafeStop reste une rampe rapide du FB_Winch (Enable maintenu, Partie 3 §1bis).
+// La demande métier reste donc autorisée ici pendant la décélération ; l&#x27;interlock
+// ne coupe qu&#x27;après sa retombée effective à zéro, sauf gate dur ou défaut final.
+MotorRequest := (RequestedStepClamped &gt; 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
+
+// ── 2bis. Arbitrage Error/ErrorId AVANT §3/§5 ────────────────────────────
+// ErrorId bit0 (défaut frein) est mis à jour en FIN de scan (§6bis, après BrakeCmd) —
+// la valeur lue ici est donc celle de la fin du scan PRÉCÉDENT (retard d&#x27;un scan sur une
+// nouvelle occurrence, ~10ms, négligeable face au budget 500ms du watchdog). Voir bandeau.
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+
+// ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
+// Après timeout : cause disparue + front Reset, puis demande moteur à zéro,
+// puis nouvelle demande distincte. La retombée + T#1000ms sera ensuite refaite.
+IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
+    IF NOT MotorRequest THEN
+        NeutralRequestSeen := TRUE;
+        RestartRequired := TRUE;
+    ELSIF NeutralRequestSeen AND MotorRequest THEN
+        RestartInhibit := FALSE;
+        NeutralRequestSeen := FALSE;
+        RestartRequired := TRUE;
+        Reason := E_WinchFinalInterlockReason.NONE;
+    END_IF;
+END_IF;
+
+// ── 4. Mémorisation de l&#x27;arrêt : temporisation d&#x27;anti-redémarrage chaud ──────────
+// La temporisation RestartDelay (1500ms) s&#x27;arme à l&#x27;arrêt du mouvement (NOT MotorRequest) et
+// s&#x27;écoule pendant la pause à l&#x27;arrêt (au lieu de repartir de zéro à chaque nouvel appui) —
+// permet un redémarrage instantané si la pause dépasse 1.5s. Le décompte ne démarre/continue que
+// si le moteur n&#x27;est plus demandé ET que le frein est physiquement confirmé fermé
+// (NOT BrakeFeedback = bobine retombée, mâchoires serrées). Garde le comportement &quot;purge pendant
+// la pause&quot; (RestartRequired ne s&#x27;arme qu&#x27;à NOT MotorRequest, indépendant de la tempo).
+IF NOT MotorRequest THEN
+    RestartRequired := TRUE;
+END_IF;
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
+RestartDelayElapsed := RestartDelay.ET;
+IF RestartDelay.Q THEN
+    RestartRequired := FALSE;
+END_IF;
+
+// ── 5. Autorisation moteur ────────────────────────────────────────────────
+RelayFwd := FALSE; RelayRev := FALSE;
+Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+Busy := FALSE; Done := FALSE; Ready := NOT Error;
+
+IF Error THEN
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    State := E_WinchFinalInterlockState.FAULT;
+ELSIF RestartInhibit THEN
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    Reason := E_WinchFinalInterlockReason.RESTART_INHIBITED;
+    State := E_WinchFinalInterlockState.FAULT;
+ELSIF NOT MotorRequest THEN
+    // Toute annulation de demande annule la temporisation de hausse en cours.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    State := E_WinchFinalInterlockState.READY;
+ELSIF RestartRequired THEN
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    State := E_WinchFinalInterlockState.WAIT_RESTART_DELAY;
+    Busy := TRUE;
+ELSE
+    // ⚡ Progression de palier directe : la temporisation (tempo palier) est gérée
+    // par le métier (FB_Winch). La barrière finale transmet directement la consigne
+    // sans micro-coupure des contacteurs.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := RequestedStepClamped;
+
+    IF (AuthorizedStep &gt; 0) OR (RequestedStepClamped &gt; 0) THEN
+        RelayFwd := RequestedRelayFwd;
+        RelayRev := RequestedRelayRev;
+        Contactor1 := RequestedContactor1;
+        Contactor2 := RequestedContactor2;
+        Contactor3 := RequestedContactor3;
+        Contactor4 := RequestedContactor4;
+    END_IF;
+
+    IF NOT BrakeFeedback THEN
+        State := E_WinchFinalInterlockState.WAIT_BRAKE_COMMAND_CONFIRMATION;
+        Busy := TRUE;
+    ELSE
+        State := E_WinchFinalInterlockState.READY;
+    END_IF;
+END_IF;
+
+// ── 6. Commande frein — couplage direct ────────────────────────────────
+// BrakeCmd suit STRUCTURELLEMENT RelayFwd/RelayRev, calculé APRÈS leur
+// finalisation ci-dessus (§5) : il hérite donc automatiquement de toutes leurs
+// conditions de sécurité (Error, RestartInhibit, RestartRequired, MotorRequest)
+// sans avoir à les répéter. Aucun risque d&#x27;écart frein/mouvement possible : le
+// frein ne PEUT pas être commandé ouvert sans qu&#x27;un des deux relais de sens le
+// soit aussi, puisque c&#x27;est la même expression. PRG_06_Outputs recalcule la
+// MÊME expression indépendamment sur les DQ finaux (M1RelayFwd OR M1RelayRev)
+// pour piloter physiquement la bobine — ce BrakeCmd ici sert de miroir/diagnostic
+// (State, IHM) mais n&#x27;est plus câblé sur la sortie physique (voir PRG_06 §2).
+BrakeCmd := RelayFwd OR RelayRev;
+
+// ── 6bis. Watchdog frein : uniquement sur la commande RÉELLEMENT FINALE ────
+// Watchdog armé sur BrakeCmd (fin §5/§6), JAMAIS sur RequestedRelayFwd/Rev (demande amont pas
+// encore autorisée par le state-machine §5 — RestartRequired peut la retenir jusqu&#x27;à T#1000ms,
+// largement &gt; le seuil 500ms ci-dessous, ce qui déclencherait un faux défaut à chaque redémarrage
+// normal).
+BrakeTimeout(IN := BrakeCmd AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#500ms);
+BrakeTimeoutElapsed := BrakeTimeout.ET;
+IF BrakeTimeout.Q THEN
+    BrakeTimeoutCause := TRUE;
+ELSIF BrakeFeedback THEN
+    BrakeTimeoutCause := FALSE;   // cause réellement disparue (retour desserrage confirmé)
+END_IF;
+BrakeTimeoutCauseEdge(CLK := BrakeTimeoutCause);
+IF BrakeTimeoutCauseEdge.Q THEN
+    BrakeTimeoutAck := FALSE;    // nouvelle occurrence -&gt; ré-alarme, ack remis à zéro
+    RestartInhibit := TRUE;
+    ResetRequired := TRUE;
+    NeutralRequestSeen := FALSE;
+    RestartRequired := TRUE;
+    Reason := E_WinchFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED;
+END_IF;
+IF ResetEdge.Q THEN
+    BrakeTimeoutAck := TRUE;     // toujours effectif, sans condition externe
+    ResetRequired := FALSE;
+END_IF;
+IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
+    ErrorId := ErrorId OR 16#0001;
+ELSE
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\E_TranslationFinalInterlockReason.st</code></summary>
+                <pre>(* =======================================================================
+   🛡️ E_TranslationFinalInterlockReason — Raisons d&#x27;interlock M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des raisons de blocage de la barrière finale M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   ======================================================================= *)
+{attribute &#x27;qualified_only&#x27;}
+TYPE E_TranslationFinalInterlockReason :
+(
+    NONE := 0,
+    BRAKE_COMMAND_NOT_CONFIRMED := 1,
+    RESTART_INHIBITED := 2
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\FB_TranslationOutputInterlock.st</code></summary>
+                <pre>(* =======================================================================
+   🛡️ FB_TranslationOutputInterlock — Barrière finale frein / AC600 M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Barrière de sécurité finale pour frein et variateur AC600 M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   🔌 Interface : Interlock de sortie (entre FB_Translation et PRG_06_Outputs)
+   🔒 Sécurité : Surveillance feedback frein et watchdog de desserrage
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_TranslationOutputInterlock
+VAR_INPUT
+    // === COMMANDES &amp; ETATS GENERAL ===
+    Enable                       : BOOL;   // --&gt; [CMD] Autorisation generale FB (TRUE=Autorise)
+    Reset                        : BOOL;   // --&gt; [CMD] Acquittement defaut sur front
+    SafeStop                     : BOOL;   // --&gt; [SAFE] Entree securite pour interface standard
+    PowerContactorEngaged              : BOOL;   // --&gt; [SAFE] Chaine AU rearmee et puissance OK
+
+    // === DEMANDES DE COMMANDE AMONT ===
+    BrakeReleaseRequest          : BOOL;   // --&gt; [CMD] Demande de desserrage frein
+    BrakeCommandOpenConfirmed    : BOOL;   // --&gt; [HW] Confirmation ouverture frein (contacteur/bobine)
+    RequestedDriveControlWord    : WORD;   // --&gt; [CMD] Mot de commande variateur (0=None, 1=Fwd, 2=Rev, 7=Reset)
+    RequestedDriveFreqHz         : REAL;   // --&gt; [CMD] Frequence de consigne variateur (Hz)
+END_VAR
+VAR_OUTPUT
+    // === ETATS IEC &amp; SYNOPTIQUE ===
+    Ready                        : BOOL;   // &lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: &quot;timeout desserrage frein&quot;.
+    Status                       : ST_FbStatus;
+    Reason                       : E_TranslationFinalInterlockReason;   // &lt;-- [DIAG] Cause de blocage
+
+    // === ORDRES ACTIONNEURS VALIDES ===
+    DriveControlWord             : WORD;   // &lt;-- [ACT] Mot de commande variateur valide
+    DriveFreqRefHz               : REAL;   // &lt;-- [ACT] Frequence de consigne variateur valide (Hz)
+    DriveFreqRefWord             : WORD;   // &lt;-- [ACT] Frequence mise a l&#x27;echelle registre PDO 0x3100
+    BrakeCmd                     : BOOL;   // &lt;-- [ACT] Ordre ouverture frein valide
+
+    // === DIAGNOSTICS &amp; TEMPORISATIONS ===
+    BrakeTimeoutElapsed          : TIME;   // &lt;-- [DIAG] Ecoule temporisation watchdog frein
+    RestartInhibit               : BOOL;   // &lt;-- [DIAG] Inhibition redemarrage actif
+END_VAR
+VAR
+    // === DETECTEURS DE FRONTS ===
+    ResetEdge                    : R_TRIG;   // . [LOC] Detecteur front montant Reset
+    ErrorEdge                    : R_TRIG;   // . [LOC] Detecteur front montant Erreur
+    BrakeTimeoutCauseEdge        : R_TRIG;   // . [LOC] Detecteur nouvelle occurrence cause timeout
+
+    // === TEMPORISATEURS INTERNES ===
+    BrakeTimeout                 : TON;   // . [LOC] Temporisateur watchdog desserrage frein
+
+    // === VARIABLES LOCALES INTERNES ===
+    MovementRequested            : BOOL;   // . [LOC] Demande de mouvement active
+    NeutralRequestSeen           : BOOL;   // . [LOC] Demande neutre (mot 0) observee
+    ResetRequired                : BOOL;   // . [LOC] Front Reset obligatoire avant nouvelle marche
+    BrakeTimeoutCause            : BOOL;   // . [LOC] Cause brute timeout desserrage frein
+    BrakeTimeoutAck              : BOOL := TRUE;   // . [LOC] Accuse operateur (TRUE = pas d&#x27;alarme)
+END_VAR
+VAR CONSTANT
+    // === ECHELLE &amp; BORNES REGISTRE PDO ===
+    DriveFreqWordScale            : REAL := 100.0;   // Echelle registre 0x3100 (WORD=5000 -&gt; 50,00 Hz)
+    DriveFreqWordMaxHz            : REAL := 600.0;   // Borne haute anti-debordement WORD (Hz)
+END_VAR
+
+// ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
+// Le front est échantillonné même pendant Enable/AU faux. Un Reset maintenu
+// durant une gate ne peut donc jamais devenir un faux acquittement au retour.
+ResetEdge(CLK := Reset);
+
+// RestartInhibit et ResetRequired sont volontairement conservés : un changement
+// Enable/AU ne doit jamais réautoriser automatiquement le mouvement après timeout.
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    BrakeTimeout(IN := FALSE, PT := T#500ms);
+    DriveControlWord := 0;
+    DriveFreqRefHz := 0.0;
+    DriveFreqRefWord := 0;
+    BrakeCmd := FALSE;
+    BrakeTimeoutElapsed := T#0ms;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    // ErrorId reste publiquement visible même hors Enable/AU : une retombée de gate
+    // ne doit jamais masquer un timeout mémorisé ni remplacer l&#x27;acquittement conscient.
+    Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+    Status.State := E_State.DISABLED;
+    Reason := E_TranslationFinalInterlockReason.NONE;
+    RETURN;
+END_IF;
+
+MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2);
+
+// ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
+// Pendant RestartInhibit, BrakeCmd reste coupé : l&#x27;ordre amont n&#x27;est donc plus
+// effectif et le watchdog ne doit pas créer une nouvelle faute en boucle.
+// Pattern Cause/Ack (CODE_QUALITY_STANDARDS §9) : le Reset est TOUJOURS effectif sur
+// l&#x27;acquittement (BrakeTimeoutAck), sans condition externe — un front Reset ne peut
+// jamais être perdu si la confirmation rebondit au même scan. L&#x27;interlock de sécurité
+// (RestartInhibit, §3) reste basé sur la cause brute (BrakeTimeoutCause / Error), jamais
+// sur l&#x27;acquittement seul — l&#x27;acquittement n&#x27;ouvre jamais l&#x27;interlock.
+BrakeTimeout(IN := BrakeReleaseRequest AND NOT BrakeCommandOpenConfirmed
+                   AND NOT RestartInhibit, PT := T#500ms);
+BrakeTimeoutElapsed := BrakeTimeout.ET;
+IF BrakeTimeout.Q THEN
+    BrakeTimeoutCause := TRUE;
+ELSIF BrakeCommandOpenConfirmed THEN
+    BrakeTimeoutCause := FALSE;   // cause réellement disparue (retour desserrage confirmé)
+END_IF;
+BrakeTimeoutCauseEdge(CLK := BrakeTimeoutCause);
+IF BrakeTimeoutCauseEdge.Q THEN
+    BrakeTimeoutAck := FALSE;    // nouvelle occurrence -&gt; ré-alarme, ack remis à zéro
+    RestartInhibit := TRUE;
+    ResetRequired := TRUE;
+    NeutralRequestSeen := FALSE;
+    Reason := E_TranslationFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED;
+END_IF;
+IF ResetEdge.Q THEN
+    BrakeTimeoutAck := TRUE;     // toujours effectif, sans condition externe
+    ResetRequired := FALSE;
+END_IF;
+IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
+    Status.ErrorId := Status.ErrorId OR 16#0001;
+ELSE
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
+END_IF;
+
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
+IF ErrorEdge.Q THEN
+    Status.StateAtError := Status.State;
+END_IF;
+
+// ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
+// Le mot 7 est un reset AC600, pas un neutre opérateur : il reste autorisé avec
+// fréquence nulle mais ne solde pas RestartInhibit. Seul le mot 0, vu APRÈS
+// disparition de la cause et front Reset, autorise ensuite une nouvelle demande.
+IF RestartInhibit AND NOT Status.Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
+    IF RequestedDriveControlWord = 0 THEN
+        NeutralRequestSeen := TRUE;
+    ELSIF NeutralRequestSeen AND MovementRequested THEN
+        RestartInhibit := FALSE;
+        NeutralRequestSeen := FALSE;
+    END_IF;
+END_IF;
+
+// ── 4. Décision finale : zéro couple utile sans confirmation frein ──────
+DriveControlWord := 0;
+DriveFreqRefHz := 0.0;
+DriveFreqRefWord := 0;
+// SafeStop est traité en amont par FB_Translation : rampe rapide avec Enable
+// maintenu. La commande/frein suivent cette rampe jusqu&#x27;à demande nulle ; seul
+// un gate dur, timeout ou défaut final impose ici la coupure immédiate.
+BrakeCmd := BrakeReleaseRequest AND NOT Status.Error AND NOT RestartInhibit;
+Ready := NOT Status.Error AND NOT RestartInhibit;
+Status.Busy := FALSE;
+Status.Done := FALSE;
+Status.State := E_State.READY;
+
+IF Status.Error THEN
+    BrakeCmd := FALSE;
+    Status.State := E_State.DISABLED;
+ELSIF RequestedDriveControlWord = 7 THEN
+    // Reset AC600 préservé, toujours sans consigne fréquence ni couple utile.
+    DriveControlWord := 7;
+ELSIF RestartInhibit THEN
+    Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
+    Status.State := E_State.INIT;
+ELSIF MovementRequested THEN
+    // Double condition obligatoire : ordre effectif de desserrage ET confirmation
+    // contacteur/bobine. Une confirmation résiduelle seule ne peut jamais autoriser
+    // couple ou fréquence AC600.
+    IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
+        DriveControlWord := RequestedDriveControlWord;
+        DriveFreqRefHz := MAX(0.0, RequestedDriveFreqHz);
+        Status.Busy := TRUE;
+        Status.State := E_State.BUSY;
+    ELSE
+        Status.Busy := TRUE;
+        Status.State := E_State.INIT;
+    END_IF;
+END_IF;
+
+// ── 5. Mise à l&#x27;échelle finale REAL Hz -&gt; WORD registre PDO 0x3100 ──────
+// Conversion unique en sortie de chaîne, quelle que soit la branche qui a fixé
+// DriveFreqRefHz ci-dessus — jamais recalculée ailleurs (producteur unique).
+DriveFreqRefWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqRefHz, DriveFreqWordMaxHz) * DriveFreqWordScale);
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketState.st</code></summary>
+                <pre>(* =======================================================================
+   🚦 ST_BucketState — État mémorisé et diagnostic du benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure d&#x27;état physique mémorisé et de diagnostic du benne
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   ======================================================================= *)
+TYPE ST_BucketState :
+STRUCT
+    IsOpen          : BOOL;                                           // Benne ouvert memorise
+    IsClosed        : BOOL;                                           // Benne ferme memorise
+    TooOpen         : BOOL;                                           // Depassement ouverture (Delta &lt; OffsetOpen - Tolerance)
+    TooClosed       : BOOL;                                           // Depassement fermeture (Delta &gt; OffsetClose + Tolerance)
+    IsIntermediate  : BOOL;                                           // Position intermediaire (entre Ouvert et Ferme)
+    LastPosM2Open   : REAL;                                           // Derniere position M2 memorisee ouvert (m)
+    LastPosM2Close  : REAL;                                           // Derniere position M2 memorisee ferme (m)
+    StateIncoherent : BOOL;                                           // Etat non sur (divergence boot/reel)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchFinalInterlockRequest.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🪝 ST_WinchFinalInterlockRequest — Demande brute vers frontière Q M1/M2
+   ───────────────────────────────────────────────────────────────
+   📤 Producteur unique : PRG_TREUILS_CFC (VAR_OUTPUT).
+   📥 Consommateur unique : PRG_10_Outputs_LD, avant FB_WinchOutputInterlock.
+   🔒 Ne contient jamais une sortie Q autorisée : les C1..C4 restent les
+      demandes exactes de FB_Winch / ST_SpeedStepTable.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_WinchFinalInterlockRequest :
+STRUCT
+    Enable                       : BOOL;
+    Reset                        : BOOL;
+    PowerContactorEngaged              : BOOL;
+    SafeStop                     : BOOL;
+    BrakeFeedback                 : BOOL; // (retrait FB_Brake) : retour PHYSIQUE brut du
+                                          // contacteur/bobine frein (TRUE = ouvert/relâché) — remplace
+                                          // BrakeReleaseRequest/BrakeCommandOpenConfirmed ; la barrière
+                                          // finale calcule elle-même BrakeCmd := RelayFwd OR RelayRev.
+    FwdRevSpeedFeedbackOff       : BOOL; // TRUE = relais sens + C1..C4 tous retombés
+    RequestedRelayFwd            : BOOL;
+    RequestedRelayRev            : BOOL;
+    RequestedContactor1          : BOOL;
+    RequestedContactor2          : BOOL;
+    RequestedContactor3          : BOOL;
+    RequestedContactor4          : BOOL;
+    RequestedStep                : INT;
+    PowerCutOff                  : BOOL; // : demande coupure puissance (FB_Safety_Winch), agrégée par PRG_06 (M5, A-04)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_SafetyWinch.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🛡️ ST_SafetyWinch — Diagnostics de sécurité pour un treuil
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à l&#x27;affichage des défauts de sécurité d&#x27;un treuil.
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_SafetyWinch :
+STRUCT
+    Error             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
+    ErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité *)
+    SafeStop          : BOOL;    (* 🟧 Arrêt rapide activé par la sécurité *)
+    DescendPermit     : BOOL;    (* 🟢 Descente autorisée (TRUE = OK | FALSE = mou de câble / limite basse) *)
+    AscentPermit      : BOOL;    (* 🟢 Montée autorisée (TRUE = OK | FALSE = fin de course haut) *)
+    SlackCable        : BOOL;    (* ⚠️ Mou de câble physiquement détecté *)
+    ThermalFault      : BOOL;    (* 🔥 Surchauffe thermique moteur *)
+    EncoderFault      : BOOL;    (* 🔌 Perte de liaison ou incohérence codeur *)
+    BypassActive      : BOOL;    (* Bypass codeur effectivement accepté, uniquement MAINT_N2 *)
+    CableLimitDescent : BOOL;    (* ⚠️ Longueur max de câble atteinte (limite basse physique) *)
+    CableLimitAscent  : BOOL;    (* ⚠️ Limite haute d&#x27;exploitation normale atteinte *)
+    MecaADrift_M      : REAL;    (* 📐 Dérive mesurée Méca A (m) *)
+    MecaCDrift_M      : REAL;    (* 📐 Dérive mesurée Méca C (m) *)
+    MecaBElapsedTime  : TIME;    (* ⏳ Temps écoulé confirmation contacteurs/frein *)
+    PowerCutOff       : BOOL;    (* 🧨 Coupure puissance amont activée *)
+    BlockedBySafety   : BOOL;    (* 🚫 Synthèse globale : actionneur bloqué par la sécurité (PowerCutOff OU SafeStop/Error) *)
+    PowerCutOffSafety : BOOL;    (* 🧨 Synthèse sécurités critiques entraînant une coupure puissance *)
+    SafeStopSafety    : BOOL;    (* 🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide *)
+    (* 🔍 Décomposition individuelle des défauts de sécurité (bits ErrorId) *)
+    ErrorOperatorComm : BOOL;    (* 🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0) *)
+    ErrorEncoder      : BOOL;    (* 🔌 Perte de liaison ou incohérence codeur (bit1) *)
+    ErrorPhaseRotation: BOOL;    (* ⚡ Mauvaise rotation de phases électriques (bit4) *)
+    ErrorBrakeThermal : BOOL;    (* 🌡️ Surchauffe thermique frein commun M1/M2/M3 (bit10) *)
+    ErrorMecaA        : BOOL;    (* 🔄 Mouvement non commandé / roue libre (Méca A - bit7) *)
+    ErrorMecaB        : BOOL;    (* 🛑 Absence confirmation arrêt sans commande (Méca B - bit8) *)
+    ErrorMecaC        : BOOL;    (* 🏋️ Glissement M1 pendant cycle benne (Méca C - bit9) *)
+    ErrorMecaD        : BOOL;    (* 🚧 Non-arrêt sur capteur haut (Méca D - bit11) *)
+    ErrorMecaE        : BOOL;    (* 🔄 Écart de synchronisation critique M1/M2 (Méca E - bit12/13) *)
+    ErrorOppositeDir  : BOOL;    (* 🧭 Sens réel opposé au sens commandé (bit14) *)
+    ErrorNoMovement   : BOOL;    (* ⏱️ Absence de mouvement malgré commande (bit15) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_BucketHMIState.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🚦 ST_BucketHMIState — États et diagnostics IHM de la benne (M2)
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_BucketHMIState :
+STRUCT
+    MechState           : ST_BucketState; (* 🚥 État mécanique mémorisé (IsOpen, IsClosed...) *)
+    FBState             : E_State;          (* 🤖 État de l&#x27;automate interne (FB_Bucket) *)
+    ActiveOffset_M        : REAL;             (* 📐 Offset actif injecté dans la synchro *)
+    M2StartStop         : BOOL;             (* 🛗 Commande Start/Stop forcée vers M2 *)
+    M2Direction         : INT;              (* 🛗 Commande direction forcée vers M2 *)
+    M2ForceSlowSpeed    : BOOL;             (* 🐢 Blocage vitesse rapide de M2 *)
+    Ready               : BOOL;             (* 🟢 Bloc opérationnel *)
+    Busy                : BOOL;             (* ⚙️ Mouvement d&#x27;ouverture/fermeture en cours *)
+    Done                : BOOL;             (* ✅ Mouvement terminé avec succès *)
+    Error               : BOOL;             (* Benne en défaut *)
+    ErrorId             : WORD;             (* ❌ Code bitfield du défaut benne *)
+    RemainingTravel_M     : REAL;             (* 📏 Distance restante avant cible (m) *)
+    DeltaPosition_M       : REAL;             (* 📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM *)
+    CloseActive            : BOOL;             (* Demande de fermeture active (image FB_Bucket) *)
+    OpenActive             : BOOL;             (* Demande d&#x27;ouverture active (image FB_Bucket) *)
+    M2PositionCorrected : REAL;             (* 📊 WinchM2.PositionM - ActiveOffset_M, affichage bargraphe *)
+    AutoBucketSeqActive : BOOL;             (* ⚙️ Séquencement automatique benne en cours (ouverture/fermeture auto) *)
+    CoupledDiveOpenArmed    : BOOL;         (* : Ouverture auto armée (descente couplée demandée, benne pas ouverte) *)
+    CoupledAscentCloseArmed : BOOL;         (* : Fermeture auto armée (montée couplée demandée, benne pas fermée) *)
+    ControlAscentActive     : BOOL;         (* : Phase vitesse contrôlée montée en cours (post-fermeture auto) *)
+    CoupledMotionBlockedByBucket : BOOL;    (* : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_EncoderHMI.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🧲 ST_EncoderHMI — Données d&#x27;échange IHM pour les codeurs absolus
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à l&#x27;affichage des informations et diagnostics des codeurs.
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_EncoderHMI :
+STRUCT
+    RawPos           : UDINT; (* 📊 Position brute lue sur le bus *)
+    Alarms           : UINT;  (* ⚠️ Code d&#x27;alarme brut du codeur *)
+    Warnings         : UINT;  (* 🟧 Code d&#x27;avertissement brut du codeur *)
+    SlaveOperational : BOOL;  (* 📡 Esclave EtherCAT opérationnel *)
+    PresetTriggerCmd : WORD;  (* 🎯 Commande de preset active *)
+    PresetValueOut   : UDINT; (* 📐 Valeur de preset envoyée au codeur *)
+    Error            : BOOL;  (* Codeur en défaut (liaison EtherCAT ou preset) *)
+    ErrorId          : WORD;  (* ❌ Code défaut codeur *)
+
+    (* 🎯 Homing — prise d&#x27;origine / référencement *)
+    Homed                   : BOOL;             (* 🎯 Prise d&#x27;origine (Homing) validée *)
+    HomingBusy              : BOOL;             (* ⏳ Référencement en cours *)
+    HomingDone              : BOOL;             (* ✅ Pulse de référencement réussi *)
+    HomingError             : BOOL;             (* Défaut de référencement *)
+    HomingErrorId           : WORD;             (* ❌ Bitfield défaut homing *)
+    HomingState             : E_State;          (* 🤖 État FB_Encoder_Homing *)
+    HomingStateAtError      : E_State;          (* 🧭 État lors du défaut *)
+    HomingSuspect           : BOOL;             (* ⚠️ Référence à confirmer *)
+    HomingRefRaw            : UDINT;            (* 📐 Référence brute appliquée *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\7_COMMUN_CONFIG\ST_SyncState.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🚦 ST_SyncState — États et diagnostics de la synchronisation M1/M2
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_SyncState :
+STRUCT
+    DeltaPos_M : REAL;    (* 📊 Écart de position réel mesuré (m) *)
+    SyncActive : BOOL;    (* ⚖️ Indicateur si surveillance active *)
+    SyncWarn   : BOOL;    (* ⚠️ LED d&#x27;alarme écart hors tolérance *)
+    SyncDeviationWarn : BOOL; (* 🐢 Écart modéré actif : limitation forcée au Palier 1 *)
+    Ready      : BOOL;    (* 🟢 Bloc de synchro prêt *)
+    Error      : BOOL;    (* Alarme synchro active *)
+    ErrorId    : WORD;    (* ❌ Code défaut synchro *)
+    FBState    : E_State; (* 🤖 État de l&#x27;automate interne (FB_WinchSync) *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchState.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🚦 ST_WinchState — États, mesures et diagnostics HMI pour un Treuil M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné aux retours d&#x27;informations et bargraphes HMI.
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_WinchState :
+STRUCT
+    (* 🚦 États &amp; Mesures (Lecture seule) *)
+    Position_M              : REAL;             (* 📊 Position actuelle du câble (mètres) *)
+    MeasuredSpeed_Mps       : REAL;             (* 📏 Vitesse linéaire mesurée du câble (m/s), valeur absolue *)
+    SpeedDelta_Mps          : REAL;             (* 🔍 Variation de vitesse entre deux scans (m/s) *)
+    SpeedVariationDetected  : BOOL;             (* 🔍 Seuil de variation dépassé sur le scan courant *)
+    SpeedVariationConfirmed : BOOL;             (* 🛡️ Variation confirmée pendant la durée paramétrée *)
+    SpeedStable             : BOOL;             (* 🟢 Vitesse stable pendant la durée paramétrée *)
+    SpeedMonitorError       : BOOL;             (* Défaut mémorisé du moniteur vitesse *)
+    SpeedMonitorErrorId     : WORD;             (* ❌ Bitfield du moniteur vitesse *)
+    EstimatedLoadPct        : REAL;             (* 📊 Estimation empirique, non certifiée *)
+    LoadEstimateConfigured  : BOOL;             (* 🟢 Table charge validée pour lecture *)
+    SpeedGuardLimited       : BOOL;             (* 🛡️ Palier limité par vitesse réelle *)
+    SpeedRef_Pct            : REAL;             (* 📈 Consigne de vitesse finale après rampe (%) *)
+    StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
+    FBState                 : E_State;          (* 🤖 État de l&#x27;automate interne (FB_Winch) *)
+    Ready                   : BOOL;             (* 🟢 Treuil prêt à fonctionner *)
+    Busy                    : BOOL;             (* ⚙️ Mouvement en cours *)
+    Done                    : BOOL;             (* ✅ Action terminée *)
+    Error                   : BOOL;             (* Treuil en défaut *)
+    ErrorId                 : WORD;             (* ❌ Code bitfield du défaut treuil *)
+
+    (* 🔌 Sorties Physiques / Indicateurs LEDs *)
+    RelayFwd                : BOOL;             (* 🛗 Relais Montée activé *)
+    RelayRev                : BOOL;             (* 🛗 Relais Descente activé *)
+    Contactor1              : BOOL;             (* 🔌 Contacteur vitesse palier 1 *)
+    Contactor2              : BOOL;             (* 🔌 Contacteur vitesse palier 2 *)
+    Contactor3              : BOOL;             (* 🔌 Contacteur vitesse palier 3 *)
+    Contactor4              : BOOL;             (* 🔌 Contacteur vitesse palier 4 *)
+    BrakeCmd                : BOOL;             (* 🔓 Commande frein (TRUE = desserré / libre) *)
+    FinalInterlockState     : E_WinchFinalInterlockState; (* 🛡️ État final _LD lecture seule *)
+    FinalInterlockReason    : E_WinchFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
+    FinalInterlockError     : BOOL;             (* 🛡️ Défaut final mémorisé *)
+    FinalInterlockErrorId   : WORD;             (* 🛡️ Bitfield final *)
+    FinalRestartInhibit     : BOOL;             (* 🔒 Reset + neutre + nouvelle demande obligatoires *)
+    BrakeCommandOpenConfirmed : BOOL;           (* 🔌 Contacteur/bobine desserrage confirmé, pas frein mécanique *)
+    FinalAuthorizedStep     : INT;              (* 🪜 Palier réellement autorisé *)
+    FinalBrakeTimeoutElapsed : TIME;            (* ⏱️ Écoulé watchdog 500ms *)
+    FinalRestartDelayElapsed : TIME;            (* ⏱️ Écoulé verrou redémarrage 900ms *)
+    FinalStepDelayElapsed    : TIME;            (* ⏱️ Écoulé entre paliers 1s250 *)
+
+    (* 🛡️ Sécurités &amp; Diagnostics *)
+    Encoder                 : ST_EncoderHMI;    (* 🧲 Données d&#x27;échange et diagnostic du codeur — porte aussi les 9 champs Homing* (voir ST_EncoderHMI) *)
+
+    (* 🔍 Diagnostics de cohérence contacteurs réutilisés *)
+    ContactorsCheck         : ST_ContactorCheck; (* 🔌 Coherence contacteurs sens+vitesse *)
+    BrakeContactorCheck     : ST_ContactorCheck; (* 🔌 Coherence retour frein *)
+    InhibitActive           : BOOL;             (* miroir lecture seule — inhibition arbitrée *)
+
+    (* 🐢 : ralentissement sur bordure — diagnostic zone/limite active *)
+    BottomLimitActiveM      : REAL;             (* 📏 Limite basse active (m) — câble physique OU légale, la plus restrictive *)
+    InTopSlowdownZone       : BOOL;             (* 🐢 Palier plafonné à 1 : approche limite haute *)
+    InBottomSlowdownZone    : BOOL;             (* 🐢 Palier plafonné à 1 : approche limite basse (câble ou légale) *)
+
+    (* 🩺 Diagnostic délai ressenti à la remontée *)
+    CommandedDirection        : INT;            (* 🩺 Sens interne mémorisé FB_Winch (-1/0/+1) *)
+    DirectionChangeDelayElapsed : TIME;         (* 🩺 Écoulé de l&#x27;interlock changement/reprise de sens *)
+    DirectionChangePending      : BOOL;         (* 🩺 TRUE tant que CommandedDirection n&#x27;a pas rejoint Direction *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_WinchInterPrg.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🪝 ST_WinchInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_04_Treuils_Benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les demandes finales M1/M2, les états publics
+      WinchM1/M2State, les sécurités WinchM1/M2Safety, l&#x27;état synchro et
+      l&#x27;état benne publiés par PRG_04_Treuils_Benne vers les consommateurs
+      (PRG_02/03/06/07).
+   📤 Producteur unique : PRG_04_Treuils_Benne (VAR_OUTPUT Data : ST_WinchInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_WinchInterPrg :
+STRUCT
+    // === ⚡ Demandes finales M1/M2 (interlocks &amp; consigne vitesse arbitrée) ===
+    WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M1
+    WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // 🪝 Demande finale et interlocks treuil M2
+    M1LogicRequestSpeedRef_Pct   : REAL; // 📈 Consigne vitesse M1 arbitree (%) — consommee par FB_SimBench (PRG_02)
+    M2LogicRequestSpeedRef_Pct   : REAL; // 📈 Consigne vitesse M2 arbitree (%) — consommee par FB_SimBench (PRG_02)
+    KoboldContactorCmdArbitrated : BOOL; // 🪝 Ordre contacteur capteur fond Kobold (consommé PRG_06)
+
+    // === 📊 États publics des treuils ===
+    WinchM1State                 : ST_WinchState; // 🚦 Etat public treuil Retenue M1
+    WinchM2State                 : ST_WinchState; // 🚦 Etat public treuil Benne M2
+
+    // === 🛡️ Sécurités des treuils ===
+    WinchM1Safety                : ST_SafetyWinch; // 🛡️ Diagnostic et securites treuil M1
+    WinchM2Safety                : ST_SafetyWinch; // 🛡️ Diagnostic et securites treuil M2
+
+    // === 🔄 État synchronisation ===
+    SyncState                    : ST_SyncState; // 🔄 Etat synchronisation treuils M1/M2
+
+    // === 🏗️ État benne ===
+    BucketState                  : ST_BucketHMIState; // 🏗️ Etat de fonctionnement benne
+    Benne_IsRoughlyClosed        : BOOL;               // 🏗️ Benne consideree fermee (tolerance matiere)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationFinalInterlockRequest.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ↔️ ST_TranslationFinalInterlockRequest — Demande brute vers PDO M3
+   ───────────────────────────────────────────────────────────────
+   📤 Producteur unique : PRG_05_Translation (VAR_OUTPUT).
+   📥 Consommateur unique : PRG_06_Outputs, avant
+      FB_TranslationOutputInterlock.
+   🔒 Ne contient jamais une commande PDO autorisée.
+   PowerCutOff : demande safety M3 (FB_Safety_Translation).
+      Consommée par PRG_06_Outputs comme SEULE cause de coupure
+      d&#x27;Enable (barrière finale). SafeStop est géré en amont
+      par FB_Translation (rampe rapide, Enable maintenu, AF06 §5).
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_TranslationFinalInterlockRequest :
+STRUCT
+    Enable                       : BOOL;
+    Reset                        : BOOL;
+    PowerContactorEngaged              : BOOL;
+    SafeStop                     : BOOL;
+    PowerCutOff                  : BOOL; // 🧨 Demande coupure puissance (FB_Safety_Translation) — consommée par PRG_06_Outputs (Enable)
+    BrakeReleaseRequest          : BOOL;
+    BrakeCommandOpenConfirmed    : BOOL; // TRUE = contacteur/bobine desserrage confirmé
+    RequestedDriveControlWord    : WORD; // 0=None, 1=Fwd, 2=Rev, 7=Reset AC600
+    RequestedDriveFreqHz         : REAL;
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_SafetyTranslation.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🛡️ ST_SafetyTranslation — Diagnostics de sécurité pour la Translation M3
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à l&#x27;affichage des défauts de sécurité du translation.
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_SafetyTranslation :
+STRUCT
+    Error             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
+    ErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité *)
+    ErrorOperatorComm : BOOL;    (* 🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0) *)
+    ErrorDriveComm    : BOOL;    (* 📡 Perte communication EtherCAT variateur (bit1) *)
+    ErrorPhaseRotation: BOOL;    (* ⚡ Mauvaise rotation de phases électriques (bit2) *)
+    ErrorBrakeThermal : BOOL;    (* 🌡️ Surchauffe thermique frein commun (bit3) *)
+    ErrorMecaB        : BOOL;    (* 🛑 Absence confirmation arrêt (Méca B - bit4) *)
+    ErrorMecaA        : BOOL;    (* 🔄 Mouvement non commandé (Méca A - bit5) *)
+    ErrorLimitSwitch  : BOOL;    (* 🚧 Limite extrême Translation atteinte (bit6) *)
+    ErrorSensorIncoherent : BOOL; (* 🧭 Mot capteurs M3 incohérent (bit7) *)
+    SafeStop          : BOOL;    (* 🛡️ Décélération de sécurité demandée *)
+    PowerCutOff       : BOOL;    (* 🧨 Coupure puissance demandée *)
+    BlockedBySafety   : BOOL;    (* 🚫 Synthèse globale : translation bloquée par la sécurité *)
+    PowerCutOffSafety : BOOL;    (* 🧨 Synthèse sécurités critiques entraînant une coupure puissance *)
+    SafeStopSafety    : BOOL;    (* 🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationState.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🚦 ST_TranslationState — États et retours IHM pour la Translation M3
+   ───────────────────────────────────────────────────────────────
+   🎨 Destiné à l&#x27;affichage des retours et mesures de la translation M3.
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_TranslationState :
+STRUCT
+    (* 🚦 États &amp; diagnostics FB_Translation *)
+    FBState                 : E_State; (* 🤖 État de l&#x27;automate interne (FB_Translation) *)
+    Ready                   : BOOL;    (* 🟢 Translation prêt à fonctionner *)
+    Busy                    : BOOL;    (* ⚙️ Mouvement en cours *)
+    Done                    : BOOL;    (* ✅ Mouvement terminé avec succès *)
+    Error                   : BOOL;    (* Translation en défaut *)
+    ErrorId                 : WORD;    (* ❌ Code du défaut actif *)
+    BrakeCmd                : BOOL;    (* 🔓 Commande de desserrage du frein (lecture seule, TRUE = desserré) *)
+    BrakeFeedback           : BOOL;    (* 🔌 Retour physique direct : TRUE = frein OUVERT (desserré) *)
+    PositionSensorTarget    : BOOL;    (* 🎯 Capteur de détection de la position cible atteint *)
+    PositionReached         : BOOL;    (* ✅ Positionneur : cible sélectionnée atteinte (non mémorisé) *)
+    JoystickDeflection_Pct  : REAL;    (* 🕹️ Axe X fonctionnel -100..+100 %, 0 = neutre ; animation IHM M3 *)
+    DriveActualFreq_Hz      : REAL;    (* 📈 Fréquence de sortie réelle du variateur (Hz) *)
+    DriveControlWord        : WORD;    (* ⚙️ Mot de commande AC600 réellement appliqué *)
+    DriveFreqRef_Hz         : REAL;    (* 🎯 Consigne fréquence réellement appliquée *)
+    ActiveDirection         : INT;     (* ↔️ Sens arbitré : -1 / 0 / +1 *)
+    ActiveSpeedRef_Pct      : REAL;    (* 📊 Consigne active après arbitrage *)
+    FinalInterlockState     : E_State; (* 🛡️ État final _LD lecture seule *)
+    FinalInterlockReason    : E_TranslationFinalInterlockReason; (* 🛡️ Cause finale mémorisée *)
+    FinalInterlockError     : BOOL;    (* 🛡️ Défaut final mémorisé *)
+    FinalInterlockErrorId   : WORD;    (* 🛡️ Bitfield final *)
+    BrakeCommandOpenConfirmed : BOOL;  (* 🔌 Contacteur/bobine desserrage confirmé, pas frein mécanique *)
+    FinalBrakeTimeoutElapsed : TIME;   (* ⏱️ Écoulé watchdog 500ms *)
+
+    (* 🔌 Diagnostic variateur EtherCAT (décodé — pas de bit-masking côté IHM) *)
+    DriveCommReady          : BOOL;    (* 📡 Variateur M3 : communication prête (StatusWord bit7) *)
+    DrivePowerReady         : BOOL;    (* ⚡ Variateur M3 : puissance prête (StatusWord bit0) *)
+
+    (* 📍 Mot capteurs et positions Translation M3 *)
+    PositionTremie          : BOOL;
+    PositionPV              : BOOL;
+    PositionP2              : BOOL;
+    PositionP1              : BOOL;
+    PositionMaintenance     : BOOL;
+    (* : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement) *)
+    AtTremie                : BOOL;
+    AtPV                    : BOOL;
+    AtP2                    : BOOL;
+    AtP1                    : BOOL;
+    AtMaintenance           : BOOL;
+    EstimatedPosM3_M        : REAL;    (* 📏 Position continue estimée en mètres (0.0 m Maint -&gt; +X m Trémie) — persistante, survit reboot *)
+    SensorsWord             : BYTE;    (* bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance *)
+    SensorWordIncoherent    : BOOL;
+    LimitSwitchFwd          : BOOL;
+    LimitSwitchRev          : BOOL;
+    DriveThermalOk          : BOOL;    (* Retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l&#x27;AC600 se protège lui-même *)
+    MaintenanceTargetEnable : BOOL;    (* 🔓 TRUE = Autorise le déplacement vers la cible 4 (Maintenance) ; actif uniquement en mode MAINT_N2 *)
+    SimulationModeActive    : BOOL;
+    HeightInterlockBlocking : BOOL;    (* : TRUE = translation bloquée, M1 ou M2 sous la hauteur mini requise *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TranslationInterPrg.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ↔️ ST_TranslationInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_05_Translation
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler la demande finale M3, l&#x27;état public TranslationState
+      et le diagnostic TranslationSafety publiés par PRG_05_Translation vers
+      les consommateurs (PRG_03/06/07).
+   📤 Producteur unique : PRG_05_Translation (VAR_OUTPUT Data : ST_TranslationInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_TranslationInterPrg :
+STRUCT
+    // === ⚡ Demande finale M3 ===
+    TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // ↔️ Demande finale et interlocks translation M3
+
+    // === 📊 État public translation ===
+    TranslationState                 : ST_TranslationState; // 🚦 Etat public translation M3
+
+    // === 🛡️ Sécurité translation ===
+    TranslationSafety                : ST_SafetyTranslation; // 🛡️ Diagnostic et securites translation M3
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_OutputsInterPrg.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   📤 ST_OutputsInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_06_Outputs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les ordres actionneurs finaux (M1/M2/M3, AU) produits
+      par PRG_06_Outputs et rebouclés par FB_SimBench (instancié dans
+      PRG_02_Acquisition) pour le banc de simulation intégré.
+   📤 Producteur unique : PRG_06_Outputs (VAR_OUTPUT Data : ST_OutputsInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §5
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_OutputsInterPrg :
+STRUCT
+    // === 🪝 Ordres actionneurs finaux treuil M1 ===
+    M1RelayFwd            : BOOL; // 🛗 Ordre contacteur montee treuil M1
+    M1RelayRev            : BOOL; // 🛗 Ordre contacteur descente treuil M1
+    M1SpeedContactor1     : BOOL; // 🔌 Ordre contacteur palier 1 treuil M1
+    M1SpeedContactor2     : BOOL; // 🔌 Ordre contacteur palier 2 treuil M1
+    M1SpeedContactor3     : BOOL; // 🔌 Ordre contacteur palier 3 treuil M1
+    M1SpeedContactor4     : BOOL; // 🔌 Ordre contacteur palier 4 treuil M1
+    M1BrakeCmd            : BOOL; // 🔓 Ordre desserrage frein M1 (1=Desserrer)
+
+    // === 🪝 Ordres actionneurs finaux treuil M2 ===
+    M2RelayFwd            : BOOL; // 🛗 Ordre contacteur montee/fermeture treuil M2
+    M2RelayRev            : BOOL; // 🛗 Ordre contacteur descente/ouverture treuil M2
+    M2SpeedContactor1     : BOOL; // 🔌 Ordre contacteur palier 1 treuil M2
+    M2SpeedContactor2     : BOOL; // 🔌 Ordre contacteur palier 2 treuil M2
+    M2SpeedContactor3     : BOOL; // 🔌 Ordre contacteur palier 3 treuil M2
+    M2SpeedContactor4     : BOOL; // 🔌 Ordre contacteur palier 4 treuil M2
+    M2BrakeCmd            : BOOL; // 🔓 Ordre desserrage frein M2 (1=Desserrer)
+
+    // === ↔️ Ordre actionneur final translation M3 ===
+    TranslationBrakeCmd   : BOOL; // 🔓 Demande frein M3 arbitree
+
+    // === 🚨 Chaîne réarmement puissance AU ===
+    PowerKeepAliveACmd    : BOOL; // 🔒 Maintien puissance voie A (1=Maintenu)
+    PowerKeepAliveBCmd    : BOOL; // 🔒 Maintien puissance voie B (1=Maintenu)
+    EmergencyArmingCmd    : BOOL; // 🎯 Impulsion rearmement puissance AU
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_06.st</code></summary>
+                <pre>(* =======================================================================
+   🧱 FB_TestHarness_PRG_06 : Banc d&#x27;essai unitaire pour PRG_06_Outputs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Isole PRG_06_Outputs, consomme les bus de données de
+             PRG_04 (ST_WinchInterPrg) et PRG_05 (ST_TranslationInterPrg),
+             exécute les barrières finales FB_WinchOutputInterlock (M1, M2)
+             et FB_TranslationOutputInterlock (M3), et publie ST_OutputsInterPrg.
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_TestHarness_PRG_06
+VAR_INPUT
+    // === 📥 Bus d&#x27;Entrée issus de PRG_04 (Treuils M1/M2) ===
+    WinchData                        : ST_WinchInterPrg;
+    
+    // === 📥 Bus d&#x27;Entrée issus de PRG_05 (Translation M3) ===
+    TranslationData                  : ST_TranslationInterPrg;
+    
+    // === 🛡️ Entrées Supervision / Reset ===
+    FaultReset                       : BOOL := FALSE;
+END_VAR
+
+VAR_OUTPUT
+    // === 🚌 Bus Inter-PRG produit vers PRG_02/SimBench ===
+    Data                             : ST_OutputsInterPrg;
+    
+    // Diagnostic
+    M1InterlockEnable                : BOOL;
+    M2InterlockEnable                : BOOL;
+    M3InterlockEnable                : BOOL;
+END_VAR
+
+VAR
+    instWinchOutputInterlockM1       : FB_WinchOutputInterlock;
+    instWinchOutputInterlockM2       : FB_WinchOutputInterlock;
+    instTranslationOutputInterlockM3 : FB_TranslationOutputInterlock;
+END_VAR
+
+{region &quot;Corps d&#x27;exécution PRG_06 encapsulé&quot;}
+// 1. Barrière M1
+M1InterlockEnable := WinchData.WinchM1FinalInterlockRequest.Enable
+                     AND NOT WinchData.WinchM1FinalInterlockRequest.PowerCutOff;
+
+instWinchOutputInterlockM1(
+    Enable                     := M1InterlockEnable,
+    Reset                      := FaultReset,
+    PowerContactorEngaged      := WinchData.WinchM1FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := WinchData.WinchM1FinalInterlockRequest.SafeStop,
+    BrakeFeedback              := WinchData.WinchM1FinalInterlockRequest.BrakeFeedback,
+    FwdRevSpeedFeedbackOff     := WinchData.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd          := WinchData.WinchM1FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev          := WinchData.WinchM1FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1        := WinchData.WinchM1FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2        := WinchData.WinchM1FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3        := WinchData.WinchM1FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4        := WinchData.WinchM1FinalInterlockRequest.RequestedContactor4,
+    RequestedStep              := WinchData.WinchM1FinalInterlockRequest.RequestedStep
+);
+
+Data.M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
+Data.M1RelayRev        := instWinchOutputInterlockM1.RelayRev;
+Data.M1SpeedContactor1 := instWinchOutputInterlockM1.Contactor1;
+Data.M1SpeedContactor2 := instWinchOutputInterlockM1.Contactor2;
+Data.M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
+Data.M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
+Data.M1BrakeCmd        := Data.M1RelayFwd OR Data.M1RelayRev;
+
+// 2. Barrière M2
+M2InterlockEnable := WinchData.WinchM2FinalInterlockRequest.Enable
+                     AND NOT WinchData.WinchM2FinalInterlockRequest.PowerCutOff;
+
+instWinchOutputInterlockM2(
+    Enable                     := M2InterlockEnable,
+    Reset                      := FaultReset,
+    PowerContactorEngaged      := WinchData.WinchM2FinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := WinchData.WinchM2FinalInterlockRequest.SafeStop,
+    BrakeFeedback              := WinchData.WinchM2FinalInterlockRequest.BrakeFeedback,
+    FwdRevSpeedFeedbackOff     := WinchData.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
+    RequestedRelayFwd          := WinchData.WinchM2FinalInterlockRequest.RequestedRelayFwd,
+    RequestedRelayRev          := WinchData.WinchM2FinalInterlockRequest.RequestedRelayRev,
+    RequestedContactor1        := WinchData.WinchM2FinalInterlockRequest.RequestedContactor1,
+    RequestedContactor2        := WinchData.WinchM2FinalInterlockRequest.RequestedContactor2,
+    RequestedContactor3        := WinchData.WinchM2FinalInterlockRequest.RequestedContactor3,
+    RequestedContactor4        := WinchData.WinchM2FinalInterlockRequest.RequestedContactor4,
+    RequestedStep              := WinchData.WinchM2FinalInterlockRequest.RequestedStep
+);
+
+Data.M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;
+Data.M2RelayRev        := instWinchOutputInterlockM2.RelayRev;
+Data.M2SpeedContactor1 := instWinchOutputInterlockM2.Contactor1;
+Data.M2SpeedContactor2 := instWinchOutputInterlockM2.Contactor2;
+Data.M2SpeedContactor3 := instWinchOutputInterlockM2.Contactor3;
+Data.M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
+Data.M2BrakeCmd        := Data.M2RelayFwd OR Data.M2RelayRev;
+
+// 3. Barrière M3
+M3InterlockEnable := TranslationData.TranslationFinalInterlockRequest.Enable
+                     AND NOT TranslationData.TranslationFinalInterlockRequest.PowerCutOff;
+
+instTranslationOutputInterlockM3(
+    Enable                     := M3InterlockEnable,
+    Reset                      := FaultReset,
+    PowerContactorEngaged      := TranslationData.TranslationFinalInterlockRequest.PowerContactorEngaged,
+    SafeStop                   := TranslationData.TranslationFinalInterlockRequest.SafeStop,
+    BrakeCommandOpenConfirmed  := TranslationData.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
+    BrakeReleaseRequest        := TranslationData.TranslationFinalInterlockRequest.BrakeReleaseRequest,
+    RequestedDriveControlWord  := TranslationData.TranslationFinalInterlockRequest.RequestedDriveControlWord,
+    RequestedDriveFreqHz       := TranslationData.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+);
+
+Data.TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
+
+{endregion}
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+    </details>
+    <details>
+        <summary>Sortie brute strucpp</summary>
+        <pre>STruC++ Test Runner v1.0
+
+test_prg_06_outputs.st
+  [PASS] PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale
+  [PASS] PRG_06_Outputs : Transmission Ordre M2 en Marche Normale
+  [PASS] PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1
+
+-----------------------------------------
+3 tests, 3 passed, 0 failed
+</pre>
+    </details>
+</div>
+<script>
+function copyPinExpr(el) {
+    var text = el.getAttribute('title') || el.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    el.classList.add('pin-copied');
+    setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('test_ci_theme', next); } catch (e) {}
+    updateThemeBtn(next);
+}
+
+function updateThemeBtn(theme) {
+    var btns = document.querySelectorAll('.theme-toggle-btn');
+    btns.forEach(function(b) {
+        b.innerHTML = theme === 'dark' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+    });
+}
+
+(function() {
+    try {
+        var saved = localStorage.getItem('test_ci_theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.addEventListener('DOMContentLoaded', function() { updateThemeBtn(saved); });
+        }
+    } catch (e) {}
+})();
+</script>
+</body>
+</html>
