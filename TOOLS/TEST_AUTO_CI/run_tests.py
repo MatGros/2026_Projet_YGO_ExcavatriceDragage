@@ -324,6 +324,19 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         else:
             base.with_suffix(".txt").write_text(text_report, encoding="utf-8")
             report_path = base.with_suffix(".txt")
+
+        # Contrôle de présence et d'intégrité des 3 artefacts de rapport
+        expected_artifacts = [
+            report_path,
+            reports_dir / f"{fb_name}_test.st"
+        ]
+        if json_data is not None:
+            expected_artifacts.append(base.with_suffix(".json"))
+
+        missing_artifacts = [p.name for p in expected_artifacts if not p.exists() or p.stat().st_size == 0]
+        if missing_artifacts:
+            _log(f"[ERREUR] Artefacts de rapport manquants ou vides pour {fb_name} : {missing_artifacts}")
+
         _log(f"Rapport : {report_path}")
         t_rep = _time.perf_counter() - t_rep_start
 
@@ -501,9 +514,17 @@ def main() -> int:
             print(f"    * Rapport HTML / JSON       : {timings['report_generation']:.2f}s")
             print(f"    * Total FB                  : {timings['total']:.2f}s")
         if res["report"] and not res.get("report_group"):
-            print(f"  Rapport : {res['report']}")
+            try:
+                uri = pathlib.Path(res["report"]).resolve().as_uri()
+            except Exception:
+                uri = str(res["report"])
+            print(f"  Rapport HTML : {uri}")
     for group_name, path in group_report_paths.items():
-        print(f"Rapport groupe {group_name} : {path}")
+        try:
+            uri = pathlib.Path(path).resolve().as_uri()
+        except Exception:
+            uri = str(path)
+        print(f"Rapport groupe {group_name} : {uri}")
 
     # Génération du dashboard index.html à la racine de TEST_AUTO_CI
     if len(results) > 1 or args.all or args.domain:
@@ -511,7 +532,11 @@ def main() -> int:
         index_html = render_index_dashboard(results, group_report_paths)
         index_path = TEST_AUTO_CI / "index.html"
         index_path.write_text(index_html, encoding="utf-8")
-        print(f"\n[DASHBOARD GLOBAL] : {index_path}")
+        try:
+            d_uri = index_path.resolve().as_uri()
+        except Exception:
+            d_uri = str(index_path)
+        print(f"\n[DASHBOARD GLOBAL] : {d_uri}")
 
     elapsed = _time.perf_counter() - start_time
     minutes = int(elapsed // 60)
