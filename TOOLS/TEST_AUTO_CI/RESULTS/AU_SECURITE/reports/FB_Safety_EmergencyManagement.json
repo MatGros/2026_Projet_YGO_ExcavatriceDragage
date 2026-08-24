@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "file": "test_fb_safety_emergency.st",
+  "results": [
+    {
+      "name": "TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -> pulse 1s puis confirmation",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_FALSE",
+        "detail": "FB.MAINTAINA_RQ expected FALSE, got TRUE",
+        "file": "test_fb_safety_emergency.st",
+        "line": 135,
+        "message": "TC-P01-004 : Reset seul ne doit PAS restaurer le maintien (interlock reste sur Cause, AF 3.4bis)"
+      }
+    },
+    {
+      "name": "TC-P01-006 canal colle bloque le reamement (echec auto-test)",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-007 timeout confirmation contacteur -> lockout 5s",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_FALSE",
+        "detail": "FB.ARMPULSE_RQ expected FALSE, got TRUE",
+        "file": "test_fb_safety_emergency.st",
+        "line": 269,
+        "message": "BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)"
+      }
+    },
+    {
+      "name": "TC-P01-008 PowerCutOffRequest coupe A et B sans armer",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 5,
+    "failed": 2
+  }
+}
