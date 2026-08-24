@@ -33,11 +33,11 @@
     { "group": "KNOW",     "id": "N0", "label": "Refinement obligatoire\n(NEW_INFORMATION uniquement)" },
     { "group": "KNOW",     "id": "N1", "label": "M1 -- PRISE DE CONNAISSANCE\nAF + etat d'ensemble du programme\nles incoherences PREEXISTENT" },
 
-    { "group": "QUALIFY",  "id": "Q1", "label": "AXE 1 -- CRITICITE C0 a C4\ncombien de ceremonie ?\nPi propose, humain valide" },
+    { "group": "QUALIFY",  "id": "Q1", "label": "AXE 1 -- CRITICITE C0 a C4\ncombien de ceremonie ?\nagent propose, humain valide" },
     { "group": "QUALIFY",  "id": "Q2", "label": "AXE 2 -- STRATEGIE\npatch ou rebuild ?\nquelle forme de travail ?" },
     { "group": "QUALIFY",  "id": "Q3", "label": "CONTRAT DE TACHE (des C2)\nobjectifs TESTABLES + perimetre\n+ modeles autorises + devoir d'alerte\ncheck_task_contract.py" },
 
-    { "group": "FAST",     "id": "F1", "label": "Plan -- Pi seul\npas de multi-modele" },
+    { "group": "FAST",     "id": "F1", "label": "Plan -- agent seul\npas de multi-modele" },
 
     { "group": "STANDARD", "id": "S1", "label": "REGISTRE + TASK_CONTEXT" },
     { "group": "STANDARD", "id": "S2", "label": "0 ou 1 avis read-only" },

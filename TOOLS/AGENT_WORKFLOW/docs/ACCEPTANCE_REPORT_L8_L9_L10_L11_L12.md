@@ -215,7 +215,7 @@ python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
 | Rôle | Validation | Date |
 |------|-----------|------|
 | **Orchestrateur (Claude)** | ✅ Tous critères satisfaits | 2026-01-XX |
-| **Workers (Pi subagents)** | ✅ Code livré & tests verts | Execution OK |
+| **Workers (sous-agents)** | ✅ Code livré & tests verts | Execution OK |
 
 **Status** : **READY FOR PRODUCTION** ✅
 

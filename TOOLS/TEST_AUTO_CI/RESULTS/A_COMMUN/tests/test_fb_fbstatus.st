@@ -161,3 +161,33 @@ TEST 'TC-P03-013 Texte vide si la cause active n a pas de texte configure (pas d
     ASSERT_TRUE(fb.STATUS.ERROR, 'cause9 active -> Error=TRUE meme sans texte configure');
     ASSERT_EQ(fb.STATUS.ERRORIDTXT, '', 'aucun texte configure -> chaine vide, pas de plantage');
 END_TEST
+
+TEST 'TC-P03-014 Reset MAINTENU + cause disparait pendant le maintien : PAS d acquittement silencieux (T148, verrou)'
+    (* T148 : verrou de non-regression — le latch est une VAR retenue entre scans, jamais remise a zero
+       implicitement. Si la cause disparait pendant que Reset reste maintenu (sans nouveau front), Error
+       doit RESTER TRUE (le latch garde sa valeur). Un futur refactor qui casserait la retention du latch
+       ferait echouer ce test. *)
+    causes[7].Active := TRUE;  causes[7].IsWarning := FALSE; causes[7].Texte := 'Fault cause7';
+    fb(ENABLE := TRUE, RESET := FALSE, CAUSES := causes);
+    ASSERT_TRUE(fb.STATUS.ERROR, 'precondition : fault actif');
+
+    (* Reset maintenu a TRUE sur 3 scans, cause TOUJOURS presente : re-latch immediat a chaque scan *)
+    fb(ENABLE := TRUE, RESET := TRUE, CAUSES := causes);
+    ASSERT_TRUE(fb.STATUS.ERROR, 'scan 1 Reset maintenu, cause presente : ne doit pas acquitter');
+    fb(ENABLE := TRUE, RESET := TRUE, CAUSES := causes);
+    ASSERT_TRUE(fb.STATUS.ERROR, 'scan 2 Reset maintenu, cause presente : toujours pas acquitte');
+    fb(ENABLE := TRUE, RESET := TRUE, CAUSES := causes);
+    ASSERT_TRUE(fb.STATUS.ERROR, 'scan 3 Reset maintenu, cause presente : toujours pas acquitte');
+
+    (* LA FAILLE T148 : cause disparait PENDANT que Reset reste maintenu (aucun nouveau front).
+       Le latch (VAR retenue) doit garder TRUE -> Error reste TRUE, PAS d acquittement silencieux. *)
+    causes[7].Active := FALSE;
+    fb(ENABLE := TRUE, RESET := TRUE, CAUSES := causes);
+    ASSERT_TRUE(fb.STATUS.ERROR, 'cause disparue pendant Reset maintenu : PAS d acquittement silencieux (latch retenu)');
+    ASSERT_EQ(fb.STATUS.ERRORID, 16#0080, 'cause7 toujours leve (latch retenu) apres disparition pendant Reset maintenu');
+
+    (* Seul un NOUVEAU front Reset (apres relachement) acquitte *)
+    fb(ENABLE := TRUE, RESET := FALSE, CAUSES := causes);
+    fb(ENABLE := TRUE, RESET := TRUE, CAUSES := causes);
+    ASSERT_FALSE(fb.STATUS.ERROR, 'cause disparue + nouveau front Reset -> acquitte enfin');
+END_TEST

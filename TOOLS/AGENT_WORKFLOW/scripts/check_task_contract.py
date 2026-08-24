@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate du contrat de tache : refuse les objectifs non testables.
 
-Classe de bug couverte (REX 2026-07-29) : sur 53 taches deleguees a Pi, les
+Classe de bug couverte (REX 2026-07-29) : sur 53 taches deleguees, les
 criteres d'acceptation etaient 3 phrases generiques reutilisees telles quelles
 ("implement the requested change without widening scope"). Un agent rendait donc
 un rapport « conforme » a rien. On peut rendre une verification obligatoire :
@@ -32,7 +32,7 @@ import re
 import sys
 from pathlib import Path
 
-# Formulations observees dans .pi-subagents/artifacts/ : elles ne disent rien
+# Formulations observees dans les artefacts de sous-agents : elles ne disent rien
 # de ce que le code doit FAIRE. Un critere qui ressemble a ca est refuse.
 GENERIC_PATTERNS = [
     r"without widening scope",

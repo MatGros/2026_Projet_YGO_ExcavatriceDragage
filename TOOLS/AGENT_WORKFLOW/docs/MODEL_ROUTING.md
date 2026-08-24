@@ -1,10 +1,11 @@
 # Routage des modèles
 
-> 🔧 **Révisé 2026-08-17.** Pi Subagents/Herdr abandonnés. Le gate `G220_check_model_routing.py`
-> lisait `.pi-subagents/artifacts/*_meta.json` (modèle réellement exécuté) — ce dossier n'existe
-> plus, et ni antigravity ni Codex ne déposent d'équivalent structuré dans le dépôt. Le gate est
-> archivé (`ARCHIVES/Tools/AGENT_WORKFLOW/scripts/README.md`) plutôt que laissé à faire semblant
-> de vérifier (même décision que l'abandon de `PLC_TESTS` le 2026-07-26, `docs/TASK_CONTEXT.md`).
+> 🔧 **Révisé 2026-08-17.** L'ancien environnement de sous-agents (Herdr) est abandonné. Le gate
+> `G220_check_model_routing.py` lisait un artefact structuré (modèle réellement exécuté) — ce
+> mécanisme n'existe plus, et ni antigravity ni Codex ne déposent d'équivalent structuré dans le
+> dépôt. Le gate est archivé (`ARCHIVES/Tools/AGENT_WORKFLOW/scripts/README.md`) plutôt que laissé
+> à faire semblant de vérifier (même décision que l'abandon de `PLC_TESTS` le 2026-07-26,
+> `docs/TASK_CONTEXT.md`).
 > Ce document garde les principes de choix de modèle (toujours valides) et documente franchement
 > que le respect de ces principes n'est **plus vérifié automatiquement** — seulement par la
 > validation humaine et la double revue A/B (`SAFETY_POLICY.md`).
@@ -75,8 +76,8 @@ Ponytail et famille rapide interdits sur toute analyse safety/normative/redondan
 
 ## ⚠️ Vérification — non automatique, tracée dans le contrat de tâche
 
-Sans artefact structuré équivalent à celui de Pi Subagents, le respect de ces règles **n'est plus
-contrôlé par un gate**. La garantie repose sur :
+Sans artefact structuré équivalent à celui de l'ancien environnement de sous-agents, le respect
+de ces règles **n'est plus contrôlé par un gate**. La garantie repose sur :
 
 - `models_allowed` déclaré dans le `TASK_CONTEXT` de la tâche (`templates/task_contract.yaml`) ;
 - `human_validation_required` — l'automaticien vérifie que la voie suivie (simple/double revue)
@@ -85,7 +86,8 @@ contrôlé par un gate**. La garantie repose sur :
 
 Si un futur outil de délégation dépose un artefact structuré (modèle/rôle réellement exécuté),
 `ARCHIVES/Tools/AGENT_WORKFLOW/scripts/G220_check_model_routing.py` est réutilisable comme base :
-seule sa source de données (`.pi-subagents/`) est morte, sa logique de détection reste valide.
+seule sa source de données (l'ancien répertoire d'artefacts) est morte, sa logique de détection
+reste valide.
 
 ## 🔌 Fournisseurs
 

@@ -1,6 +1,6 @@
 ---
 name: codesys-workflow
-description: Workflow obligatoire pour toute modification du programme automate CODESYS 3.5. Impose lecture des règles, analyse de l'existant, plan validé, code ST commenté FR, vérification mécanique de liaison, bundle PLCopenXML et REX versionné. Déclencher dès que l'utilisateur demande de modifier/créer/analyser un FB, un PRG, des variables, ou « le programme automate » — y compris quand le travail est délégué à un autre agent (Gemini/antigravity, Codex, sous-agent Pi).
+description: Workflow obligatoire pour toute modification du programme automate CODESYS 3.5. Impose lecture des règles, analyse de l'existant, plan validé, code ST commenté FR, vérification mécanique de liaison, bundle PLCopenXML et REX versionné. Déclencher dès que l'utilisateur demande de modifier/créer/analyser un FB, un PRG, des variables, ou « le programme automate » — y compris quand le travail est délégué à un autre agent (Gemini/antigravity, Codex).
 ---
 
 # 🏗️ Skill Codesys-Workflow (stub — déclencheur)

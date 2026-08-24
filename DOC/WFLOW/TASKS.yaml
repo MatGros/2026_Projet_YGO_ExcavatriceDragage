@@ -1359,19 +1359,18 @@ tasks:
   bloque_par: []
 - id: T148
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
   agent: DSH-02
-  date: '2026-08-24T05:15:00'
+  date: '2026-08-24T05:30:00'
   titre: 'FB_FbStatus : Reset simplement MAINTENU (san...'
   contexte: 'Intitulé complet : FB_FbStatus : Reset simplement MAINTENU (sans nouveau front) + disparition de la cause pendant
     ce maintien = acquittement silencieux | Découvert en écrivant les tests étendus test_fb_fbstatus.st (2026-08-22) — même
     famille que T147, faille distincte (pas de code touché, TOOLS/ uniquement). '
-  description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T148_FBFSTATUS_RESET_MAINTENU_v0.1.md`) : faille confirmée
-    — cause disparaît pendant Reset maintenu (pas de nouveau front) → Latch reste FALSE → Error retombe silencieusement. Correctif
-    : ne vider le latch au front Reset QUE si cause à 0. Tests TC-P03-014/015 à ajouter. ⏳ **Implémentation en attente** (code
-    + test, validation humaine C4).'
+  description: '✅ **Clôturé 2026-08-24 (revue experte)** : faille **NON REPRODUCTIBLE** — Latch est une VAR retenue entre scans,
+    Error reste TRUE (pas d''acquittement silencieux). Le correctif v0.1 était un no-op. Fiche `DESIGN_T148_FBFSTATUS_RESET_MAINTENU_v0.2.md`
+    : conclusion non reproductible + test de verrou TC-P03-014 à ajouter (devrait déjà passer). **Aucun code C4 à écrire.**'
   contrat: ''
   objectifs: []
   bloque_par: []
@@ -1542,16 +1541,18 @@ tasks:
   bloque_par: []
 - id: T151
   parent_id: ''
-  statut: 🔒
+  statut: ✅
   criticite: C1
   domaine: OUTILLAGE
-  agent: AGY-01
-  date: '2026-08-24T02:03:00'
+  agent: DSH-02
+  date: '2026-08-24T06:00:00'
   titre: Nettoyage et abandon définitif de Pi Coding
   contexte: Abandon complet de l'environnement Pi Coding / sous-agents Pi au profit des agents actifs Antigravity, Claude
     Code et Codex.
-  description: Purger les artéfacts .pi-subagents/, nettoyer les mentions textuelles dans AGENTS.md, DOC/STDS/CODE_QUALITY_STANDARDS.md,
-    .claude/skills/, TOOLS/AGENT_WORKFLOW/ et .vscode/sessions.json.
+  description: '✅ **Clôturé 2026-08-24 (DSH-02)** : .pi-subagents/ absent, 0 mention Pi Coding active dans le périmètre
+    (AGENTS.md, CLAUDE.md, CODE_QUALITY_STANDARDS, skills .claude/ et TOOLS/AGENT_WORKFLOW/, workflow_diagram.json,
+    tasks/*.yaml, REX). G440 PASS, G340 (seul lien mort pré-existant), scripts Python compilent, JSON valide. ⚠️ .vscode/sessions.json
+    non modifié (déjà propre).'
   contrat: TASK_CONTRACT_T151_NETTOYAGE_PI_CODING.yaml
   objectifs:
   - Archiver ou supprimer le répertoire d'artéfacts .pi-subagents/

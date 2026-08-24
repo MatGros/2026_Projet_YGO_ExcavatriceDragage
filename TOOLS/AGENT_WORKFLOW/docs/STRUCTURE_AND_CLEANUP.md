@@ -45,8 +45,9 @@ TOOLS/AGENT_WORKFLOW/
 `reports/` contient uniquement les sorties temporaires du workflow — **dossier optionnel, non créé
 tant qu'un script n'y écrit rien** ; ne pas le créer vide « au cas où ».
 
-📌 `extensions/` retiré le 2026-08-17 : c'était le dossier des extensions Pi Coding Agent
-(`.pi/agent/extensions/*.ts`, ex. `sound-notifier.ts`), workflow abandonné. Aucune extension
+📌 `extensions/` retiré le 2026-08-17 : c'était le dossier des extensions de l'ancien
+environnement de sous-agents (`.pi/agent/extensions/*.ts`, ex. `sound-notifier.ts`), workflow
+abandonné. Aucune extension
 `.ts` n'a de rôle dans ce projet — ne pas recréer ce dossier.
 
 ### Outil existant

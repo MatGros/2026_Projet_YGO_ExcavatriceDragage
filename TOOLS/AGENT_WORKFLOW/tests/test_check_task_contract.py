@@ -70,7 +70,7 @@ def test_t1_contrat_absent(tmp_path: Path) -> None:
 
 
 def test_t4_critere_generique_refuse(tmp_path: Path) -> None:
-    """Le boilerplate reellement observe dans les 53 taches Pi."""
+    """Le boilerplate reellement observe dans les 53 taches deleguees."""
     bad = VALID.replace(
         '"BrakeCmd reste FALSE tant que BrakeCommandOpenConfirmed est FALSE."',
         '"Implement the requested change without widening scope."',

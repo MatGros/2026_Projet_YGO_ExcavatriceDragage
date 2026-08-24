@@ -100,7 +100,7 @@ source canonique (cf. `check_skill_stubs.py`, T150-A).
 | `TOKEN_POLICY.md` | Gestion budget tokens |
 | `DOC_WRITING_POLICY.md` | Style docs projet |
 | `CODE_WRITING_POLICY.md` | Style ST (headers, naming, contrats FB) |
-| `MODEL_ROUTING.md` | Routage des modèles (Pi Subagents abandonnés 2026-08-17) |
+| `MODEL_ROUTING.md` | Routage des modèles (ancien environnement de sous-agents abandonné 2026-08-17) |
 | `DSH_PROVIDERS.md` | Provider `omniroute` + délégation multi-modèles |
 | `TASK_CONTEXT.md` | Contexte de tâche / contract |
 | `STRUCTURE_AND_CLEANUP.md` | Arborescence, archivage, nettoyage |
