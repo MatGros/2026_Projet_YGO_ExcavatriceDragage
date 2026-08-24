@@ -67,3 +67,18 @@ def test_G_CYCLE():
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
+
+@pytest.mark.ci_fb
+def test_FB_Cycle():
+    """Test CI automatisé pour FB_Cycle."""
+    _run_fb_test("FB_Cycle")
+
+@pytest.mark.ci_fb
+def test_FB_DiveSearch():
+    """Test CI automatisé pour FB_DiveSearch."""
+    _run_fb_test("FB_DiveSearch")
+
+@pytest.mark.ci_fb
+def test_FB_ExtractionSequence():
+    """Test CI automatisé pour FB_ExtractionSequence."""
+    _run_fb_test("FB_ExtractionSequence")

@@ -67,3 +67,8 @@ def test_E_CODEURS():
         error_msg += proc.stderr[-1000:] if proc.stderr else ""
         pytest.fail(error_msg)
     assert proc.returncode == 0
+
+@pytest.mark.ci_fb
+def test_FB_Encoder():
+    """Test CI automatisé pour FB_Encoder."""
+    _run_fb_test("FB_Encoder")
