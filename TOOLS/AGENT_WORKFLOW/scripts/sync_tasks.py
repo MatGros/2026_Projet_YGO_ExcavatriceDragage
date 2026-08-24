@@ -359,10 +359,10 @@ def save_tasks_html(tasks, output_path: Path):
     <div class="controls">
         <input type="text" id="search" class="search-box" placeholder="🔍 Rechercher (ID, Kobold, M3, Homed, Frein, AGY...)" oninput="filterTasks()">
         <select id="sort-select" class="sort-box" onchange="setSort(this.value)">
+            <option value="id-desc" selected>🏷️ ID (Décroissant)</option>
+            <option value="id-asc">🏷️ ID (Croissant)</option>
             <option value="date-desc">🕒 Date (Récentes en premier)</option>
             <option value="date-asc">🕒 Date (Anciennes en premier)</option>
-            <option value="id-desc">🏷️ ID (Décroissant)</option>
-            <option value="id-asc">🏷️ ID (Croissant)</option>
             <option value="crit-desc">🚨 Criticité (C4 → C1)</option>
         </select>
         <button class="filter-btn active" onclick="setFilter('ALL', this)">Tous</button>
@@ -728,7 +728,7 @@ def save_tasks_html(tasks, output_path: Path):
 
         let currentStatus = 'ALL';
         let currentDomain = 'ALL';
-        let sortKey = 'date';
+        let sortKey = 'id';
         let sortAsc = false;
         let expandedId = null;
 
