@@ -107,6 +107,8 @@ FB_Brake:
 FB_Safety_EmergencyManagement:
   domain: B_AU_SECURITE
   af_doc: DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.1.md
+  # TC-P01-005 est le séquencement de double action physique (acquittement IHM puis réarmement pupitre)
+  af_ignore: [TC-P01-005]
   prod_instance:
     file: CODE/M_MAIN/PRG_06_Outputs.st
     name: instSafetyEmergencyManagement

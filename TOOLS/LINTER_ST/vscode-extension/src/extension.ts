@@ -260,17 +260,18 @@ function toVscodeDiagnostic(d: LintDiagnostic, doc: vscode.TextDocument): vscode
  * sous le nom de PRG_02_Acquisition.st dans Problems -- totalement trompeur. */
 async function applyResult(targetUri: vscode.Uri, workspaceFolder: vscode.WorkspaceFolder, result: LintResult): Promise<void> {
     if (result.status === 'incomplete') {
-        // Priorite "zero faux positif" MAINTENUE : ceci n'est jamais une erreur (pas de
-        // vscode.DiagnosticSeverity.Error), juste un avertissement informatif -- le linter
-        // n'affirme rien sur un bug potentiel, il signale seulement qu'il n'a pas pu conclure
-        // (type externe hors CODE/, ex: DEVICE_STATE natif CODESYS/CANopen). Avant : silence
-        // total sauf Output, facile a manquer (demande utilisateur, session 2026-08-23).
-        const range = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 1));
+        const config = vscode.workspace.getConfiguration('linterSt');
+        const showIncomplete = config.get<boolean>('showIncompleteWarnings', false);
         const message = `Analyse incomplete -- type(s) hors CODE/ non resolu(s), verification partielle seulement : ${result.unresolved_types.join(', ')}`;
-        const diag = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-        diag.source = 'linter-st';
-        diagnosticCollection.set(targetUri, [diag]);
         outputChannel.appendLine(`[INCOMPLET] ${targetUri.fsPath} -- ${message}`);
+        if (showIncomplete) {
+            const range = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 1));
+            const diag = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+            diag.source = 'linter-st';
+            diagnosticCollection.set(targetUri, [diag]);
+        } else {
+            diagnosticCollection.delete(targetUri);
+        }
         return;
     }
 

@@ -181,8 +181,30 @@ def _merge_nested_arrays(text: str, source_name: str, warnings: list) -> str:
     return text
 
 
+BINARY_LITERAL_RE = re.compile(r"\b2#([01]+)\b")
+CASE_MULTI_LABEL_RE = re.compile(r"^\s*([0-9a-zA-Z_#]+(?:\s*,\s*[0-9a-zA-Z_#]+)+)\s*:", re.MULTILINE)
+
+
+def _convert_binary_literals(text: str, source_name: str, warnings: list) -> str:
+    """Convertit les littéraux binaires 2#11111 en décimal supporté par STruCpp."""
+    def _replace(match):
+        val = int(match.group(1), 2)
+        return str(val)
+    return BINARY_LITERAL_RE.sub(_replace, text)
+
+
+def _split_case_labels(text: str, source_name: str, warnings: list) -> str:
+    """Transforme les étiquettes CASE multiples (A, B, C:) en étiquettes empilées (A:\nB:\nC:)."""
+    def _replace(match):
+        labels = [l.strip() for l in match.group(1).split(",")]
+        return "\n".join(f"    {lbl}:" for lbl in labels)
+    return CASE_MULTI_LABEL_RE.sub(_replace, text)
+
+
 def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _convert_enum_blocks(text, source_name, warnings)
+    text = _convert_binary_literals(text, source_name, warnings)
+    text = _split_case_labels(text, source_name, warnings)
     text = _strip_pragmas(text)
     text = _strip_pou_qualifiers(text)
     text = _strip_gvl_qualifiers(text)

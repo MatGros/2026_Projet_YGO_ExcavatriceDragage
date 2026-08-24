@@ -37,33 +37,15 @@ DECL_RE = re.compile(
 # verifie empiriquement sur FB_Joystick.st, session 2026-08-23 -- 5 des 6 dependances reelles
 # passaient inapercues).
 REF_RE = re.compile(
-    r"\bOF\s+(?P<name_of>(?:ST_|E_|FB_)\w+)\b"
-    r"|:\s+(?P<name_colon>(?:ST_|E_|FB_)\w+)\b"
+    r"\bOF\s+(?P<name_of>(?:ST_|E_|FB_|DEVICE_STATE)\w*)\b"
+    r"|:\s*(?P<name_colon>(?:ST_|E_|FB_|DEVICE_STATE)\w*)\b"
     r"|\b(?P<name_call>(?:ST_|E_|FB_)\w+)\s*\("
     r"|\b(?P<name_gvl>GVL_\w+)\b"
+    r"|\b(?P<name_stub>DEVICE_STATE)\b"
 )
 
-# GVL_*.st n'ont AUCUN mot-cle de declaration (pas de TYPE/FUNCTION_BLOCK/PROGRAM) -- juste
-# `VAR_GLOBAL ... END_VAR`, le nom de la GVL est le nom du FICHIER (convention CODESYS : une GVL
-# est un objet a part entiere du projet, pas un POU). DECL_RE ne les detecte donc jamais.
-# Verifie sur GVL_Global.st / GVL_IHM.st (session 2026-08-23).
+STUBS_DIR = Path(__file__).parent / "stubs"
 GVL_STEM_RE = re.compile(r"^GVL_\w+$")
-
-# NB (session 2026-08-23) : detecter par regex QUELS identifiants referencent un membre GVL
-# accede sans prefixe (GVL_PERSISTENT en `_Xxx`, GVL_BypassRetain en PascalCase nu) s'est avere
-# non fiable dans les deux sens :
-#   - trop large (`_[A-Za-z]\w*` capturait aussi les variables LOCALES d'un FB qui n'ont besoin
-#     d'aucune resolution -- FB_SpeedStep.st se signalait lui-meme comme "incomplete") ;
-#   - trop etroit (aucun motif ne couvre un nom PascalCase sans prefixe comme
-#     `BypassTranslationGlobal`, sans risquer de capturer n'importe quel identifiant du langage).
-# Solution retenue : toutes les GVL_*.st du projet sont desormais INCLUSES SYSTEMATIQUEMENT dans
-# chaque compilation (voir lint.py, all_sources), qu'une reference explicite soit detectee ou
-# non. Le cout (compiler quelques GVL en plus a chaque fois) est negligeable, la fiabilite est
-# totale -- plus besoin de deviner un motif de nommage.
-
-# Mots-cles/valeurs ST qui matchent accidentellement le prefixe (aucun aujourd'hui, garde pour
-# durcir la regex sans casser silencieusement si un jour un mot-cle standard commence par ces
-# prefixes).
 IGNORE_NAMES: set[str] = set()
 
 
@@ -74,9 +56,13 @@ def _strip_comments(text: str) -> str:
 
 
 def build_declaration_index(code_root: Path) -> dict[str, Path]:
-    """Scan one-shot de CODE/ : nom declare -> fichier .st qui le declare."""
+    """Scan one-shot de CODE/ et TOOLS/LINTER_ST/stubs/ : nom declare -> fichier .st qui le declare."""
     index: dict[str, Path] = {}
-    for st_file in code_root.rglob("*.st"):
+    sources = list(code_root.rglob("*.st"))
+    if STUBS_DIR.is_dir():
+        sources.extend(STUBS_DIR.glob("*.st"))
+
+    for st_file in sources:
         if GVL_STEM_RE.match(st_file.stem):
             index[st_file.stem] = st_file
             continue
@@ -85,9 +71,6 @@ def build_declaration_index(code_root: Path) -> dict[str, Path]:
         for m in DECL_RE.finditer(text):
             name = m.group("name")
             if name in index and index[name] != st_file:
-                # Deux fichiers declarent le meme nom -- signale mais ne bloque pas
-                # (resolution du premier trouve, ordre non garanti : a corriger a la main si ca
-                # arrive un jour, pas un cas rencontre sur ce repo aujourd'hui).
                 continue
             index[name] = st_file
     return index
@@ -99,7 +82,7 @@ def find_references(st_file: Path) -> set[str]:
     for m in REF_RE.finditer(text):
         name = (
             m.group("name_of") or m.group("name_colon") or m.group("name_call")
-            or m.group("name_gvl")
+            or m.group("name_gvl") or m.group("name_stub")
         )
         if name and name not in IGNORE_NAMES:
             refs.add(name)
