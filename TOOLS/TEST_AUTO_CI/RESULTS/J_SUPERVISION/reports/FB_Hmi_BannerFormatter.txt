@@ -1,0 +1,10 @@
+Error compiling source files:
+
+FB_Hmi_BannerFormatter.st:72:28: error: Undefined type 'ST_HMIBANNER' in FUNCTION_BLOCK 'FB_HMI_BANNERFORMATTER'
+  72 |     Banner               : ST_HmiBanner;   // <-- [STAT] Bandeau IHM assemblé
+     |                            ^
+
+ST_CommunHMI.st:46:17: error: Undefined type 'ST_PREFLIGHTHMI' in STRUCT 'ST_COMMUNHMI'
+  46 |     Preflight : ST_PreflightHMI; (* 🩺 Verdict observateur à l'arrêt — jamais bloquant *)
+     |                 ^
+

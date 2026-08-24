@@ -1,0 +1,2625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport de test — PRG_03_Modes_Cycle [PASS]</title>
+<style>
+    :root {
+        --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
+        --accent: #818cf8; --green-bg: rgba(16, 185, 129, 0.15); --green-text: #34d399; --green-border: #059669;
+        --red-bg: rgba(239, 68, 68, 0.15); --red-text: #f87171; --red-border: #dc2626;
+        --warn-bg: rgba(245, 158, 11, 0.15); --warn-text: #fbbf24; --warn-border: #d97706;
+        --card-sub: #0f172a; --badge-prg-bg: rgba(59, 130, 246, 0.2); --badge-prg-txt: #93c5fd;
+        --badge-fb-bg: rgba(148, 163, 184, 0.15); --badge-fb-txt: #cbd5e1; --btn-bg: #1e293b; --btn-border: #334155;
+        --code-bg: #070a12; --code-border: #1e293b;
+        --neon-green-glow: 0 0 25px rgba(16, 185, 129, 0.65), 0 0 10px rgba(16, 185, 129, 0.4), inset 0 0 12px rgba(16, 185, 129, 0.15);
+        --neon-red-glow: 0 0 25px rgba(239, 68, 68, 0.65), 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 12px rgba(239, 68, 68, 0.15);
+        --neon-blue-glow: 0 0 25px rgba(99, 102, 241, 0.6), 0 0 10px rgba(99, 102, 241, 0.35);
+    }
+    [data-theme="light"] {
+        --bg: #f8fafc; --bg-grid: rgba(0, 0, 0, 0.03); --surface: #ffffff; --surface-card: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+        --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
+        --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
+        --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
+        --card-sub: #f8fafc; --badge-prg-bg: #dbeafe; --badge-prg-txt: #1e40af;
+        --badge-fb-bg: #f1f5f9; --badge-fb-txt: #475569; --btn-bg: #f8fafc; --btn-border: #cbd5e1;
+        --code-bg: #f1f5f9; --code-border: #e2e8f0;
+        --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
+    }
+    * { box-sizing: border-box; }
+    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
+        background-color: var(--bg);
+        background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-position: -1px -1px;
+        color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .header { display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .theme-toggle-btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
+        padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .theme-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.4px; color: #cbd5e1; }
+    .header .badge, .fb-section-title .badge { font-size: 16px; padding: 8px 22px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin: 4px 0 26px; }
+    .subtitle b { color: var(--text); font-weight: 700; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 8px; font-weight: 800;
+        font-size: 13.5px; letter-spacing: 0.8px; font-family: monospace; text-transform: uppercase; }
+    .badge-pass, .badge-pass.badge-strong { background: rgba(16, 185, 129, 0.22); color: #ffffff; border: 2px solid #34d399; box-shadow: 0 0 16px rgba(16, 185, 129, 0.45); }
+    .badge-fail, .badge-fail.badge-strong { background: rgba(244, 63, 94, 0.22); color: #ffffff; border: 2px solid #fb7185; box-shadow: 0 0 16px rgba(244, 63, 94, 0.45); }
+    
+    /* Cartes modernes avec effets Neon Glow */
+    .card-neon-ok { border: 1px solid var(--green-border) !important; box-shadow: var(--neon-green-glow) !important; }
+    .card-neon-fail { border: 1px solid var(--red-border) !important; box-shadow: var(--neon-red-glow) !important; }
+    .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
+
+    details { margin-bottom: 20px; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary:hover { color: var(--text); }
+    ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .test-card:hover { transform: translateY(-1px); }
+    .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    /* Style distinct pour les tests de contrat et d'interface socle */
+    .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
+    .test-card-contract header h3 { color: #818cf8; }
+    .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
+    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks { margin-top: 8px; }
+    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; }
+    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
+    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
+        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
+    .failure-head { color: var(--red-text); font-weight: 600; }
+    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
+    .failure-msg { color: #92400e; margin-top: 4px; }
+    .failure-diff { margin-top: 4px; }
+    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
+        overflow-x: auto; }
+    .chronogram-group { margin-top: 12px; }
+    .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 12px; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
+    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
+    .chrono-table .scan-t { color: var(--muted); }
+    .chrono-table td.changed { background: #fef9c3; }
+    .v-true { color: var(--green-text); font-weight: 600; }
+    .v-false { color: #cbd5e1; }
+    .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+    .waveform { display: block; }
+    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
+    .wf-line { fill: none; stroke-width: 2; }
+    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
+    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
+    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-chip { opacity: 0.95; }
+    .wf-legend { font-size: 10px; fill: var(--muted); }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
+    .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
+    .af-warning-banner ul { margin: 0; padding-left: 20px; }
+    .af-warning-banner li { margin: 3px 0; }
+    .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
+    .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
+    .encaps-table ul { margin: 0; padding-left: 16px; }
+    .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
+        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+    .wf-fail-band { fill: #fecaca; opacity: 0.45; }
+    .wf-fail-marker { font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }
+    tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
+    .chronogram-static { margin-top: 10px; }
+    .chronogram-static summary { font-size: 11px; }
+    .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
+    .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
+    .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
+    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; width: 100%; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 600px; overflow-y: auto; padding: 4px 8px;
+        scrollbar-width: none; -ms-overflow-style: none; }
+    .pin-col::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .pin-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+        background: var(--surface); min-width: 0; }
+    /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
+    .pin-col-in .pin-row { justify-content: space-between; text-align: right; }
+    /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
+    .pin-col-out .pin-row { justify-content: space-between; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f8fafc; }
+    .pin-type { color: var(--muted); font-weight: 500; font-size: 11px; margin-left: 4px; }
+    .pin-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; margin-left: 4px; font-weight: 700; white-space: nowrap; }
+    .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .pin-expr code { background: var(--code-bg); color: #93c5fd; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 11.5px;
+        cursor: pointer; font-family: monospace; }
+    .pin-expr code:hover { border-color: var(--accent); color: #ffffff; }
+    .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
+    .pin-missing { color: #fbbf24; font-style: italic; font-size: 12px; }
+    .pin-more { color: var(--muted); font-size: 11px; }
+    .pin-row-unwired { background: var(--card-sub); }
+    .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
+        font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 10px; }
+    .fb-section-title:first-of-type { margin-top: 6px; }
+    .toc-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin-bottom: 16px; }
+    .toc-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .toc-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; margin: 12px 0 4px; }
+    .toc-group-title:first-of-type { margin-top: 10px; }
+    .toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+    .toc-item { font-size: 12.5px; padding: 2px 0; break-inside: avoid; }
+    .toc-item a { text-decoration: none; color: var(--text); }
+    .toc-item a:hover { text-decoration: underline; }
+    .toc-item::before { content: "●"; font-size: 8px; margin-right: 6px; }
+    .toc-pass::before { color: var(--green-text); }
+    .toc-fail::before { color: var(--red-text); }
+    .toc-fail a { color: var(--red-text); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <div>
+            <h1>PRG_03_Modes_Cycle</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
+            <span class="badge badge-pass">PASS</span>
+        </div>
+    </div>
+    <div class="exec-time">2026-08-24 07:57:32</div>
+    
+    <details class="toc-details" open>
+        <summary>📋 Sommaire (2 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-0">PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth</a></li><li class="toc-item toc-pass"><a href="#test-prg-03-modes-cycle-1">PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)</a></li></ul>
+    </details>
+    
+    <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
+        <div>
+            <span style="font-size:14px;color:var(--text);font-weight:700;">📁 <code style="color:var(--accent);font-size:14px;">CODE/M_MAIN/FB_TestHarness_PRG_03.st</code></span>
+            <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);">
+            2/2 vérifications validées
+        </div>
+    </div>
+    
+    <details class="encaps-details" >
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 23 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <table class="encaps-table">
+            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
+            <tbody>
+            <tr class="compil-row-pass">
+                <td><code>DEVICE_STATE.st</code><span style="background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid #d97706;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">MOCK</span></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Simulé pour environnement CI (hors CODESYS)</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_State.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FbStatus.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_FbCause.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_ContactorCheck.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_CycleTime.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Ramp.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Acquisition_Preflight.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_FbStatus.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Filter.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_Mode.st</code></td>
+                <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Modes.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_CycleStep.st</code></td>
+                <td>DUT</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_DiveSearchState.st</code></td>
+                <td>DUT</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_ExtractionSequenceState.st</code></td>
+                <td>DUT</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_WinchCmdDemand.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_BucketCmdDemand.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_TranslationCmdDemand.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_DiveSearch.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_ExtractionSequence.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_Cycle.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_Modes_Autorisations.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>FB_TestHarness_PRG_03.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    
+    <details class="pin-diagram-details" open>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_03_Modes_Cycle</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 10 flux entrants · 2 flux sortants)</span></summary>
+        <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
+            <b>Sous-instances actives intégrées :</b><br>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instModes <span style="color:var(--muted);font-weight:500;">(FB_Modes)</span></span></div>
+        </div>
+        
+        <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+            <div class="pin-col pin-col-in">
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_IHM</span> <span style="font-size:11px;color:#38bdf8;">(6 signaux ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Lecture Globale</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Commun.Cfg.SelHomingApproachEnable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.M1M2Sync.Cmd.SelSyncEnable</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.M1TreuilRetenue.Cmd.BtnInhibit</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.M2TreuilBenne.Cmd.BtnInhibit</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Modes.Cmd.BtnModeReset</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_IHM.Modes.Cmd.SelMode</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_02_Acquisition</span> <span style="font-size:11px;color:#818cf8;">(2 retours ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div></div>
+        </details>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#e2e8f0;font-weight:700;font-size:12px;">🏷️ Énumérations Globales</span> <span style="font-size:11px;color:#94a3b8;">(2 constantes ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.3);color:#f1f5f9;">Type Global</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">DEVICE_STATE.RUNNING</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #64748b;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#cbd5e1;background:rgba(100,116,139,0.2);font-size:11px;">E_Mode.SEMI_AUTO</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(100,116,139,0.25);color:#e2e8f0;font-size:10px;">🏷️ Enum / Type</span></div>
+            </div></div>
+        </details></div>
+            <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">PRG_03_Modes_Cycle</span>
+                
+                
+                <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
+                    <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">0</b></div>
+                    <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">6</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">2</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">2</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">10 IN</b> / <b style="color:#ffffff;">2 OUT</b></div>
+                </div>
+                
+    <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
+        <div style="font-weight:800;color:var(--accent);margin-bottom:4px;border-bottom:1px solid var(--border);padding-bottom:2px;font-size:11.5px;">📋 Structure ST :</div>
+        <div>✅ Cartouche En-tête <code>(* === *)</code></div>
+        <div>✅ Bannière <code>VAR_INPUT</code></div>
+        <div>✅ Bannière <code>VAR_OUTPUT</code></div>
+        <div>✅ Bannière <code>VAR</code> locale</div>
+    </div>
+            </div>
+            <div class="pin-col pin-col-out">
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>Auth</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">ST_Modes_Autorisations</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>instCycleSemiAuto</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">FB_Cycle</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div></div>
+        </div>
+    </details>
+    
+    
+    <details class="encaps-details" >
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 10 FB de la chaine, encapsulation propre (0 violation)</summary>
+        
+        <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+            <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
+                ℹ️ Guide d'Audit : Les 7 Invariants & Règles d'Encapsulation Automatisme (Cliquez pour afficher)
+            </summary>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: left;">
+                <thead>
+                    <tr style="background: var(--surface); color: var(--text);">
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">#</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Règle / Invariant POO</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Risque Machine Réel</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Contrôle Automatique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">1</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Écriture externe clandestine sur VAR locale</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Violation d'encapsulation (External Write)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">2</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Accès GVL direct sans passer par l'interface</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">FB non testable unitairement, couplage fort et masqué.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">3</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Référence VAR_IN_OUT orpheline</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Pointeur nul / crash automate lors de l'appel.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Invalidation appel de FB</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">4</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Reset sur front montant (R_TRIG)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Réarmement intempestif si le bouton reste coincé/actif.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🔒 Règle IEC Reset obligatoire</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">5</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Profils standards (Enable / Ready / Status)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Composant impossible à chaîner en sécurité AU.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Contrat AF03 §1bis</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">6</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Sorties VAR_OUTPUT orphelines</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Information calculée mais oubliée dans le câblage global.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">💡 Alerte Pinout non consommé</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">7</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Variables locales non initialisées</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Détection d'état initial indéfini</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+        <table class="encaps-table">
+            <thead><tr><th>Statut</th><th>Composant (FB)</th><th>VAR_IN</th><th>VAR_OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Analyse Invariants & Violations</th></tr></thead>
+            <tbody>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_CycleTime</code></td>
+                <td>1</td><td>1</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Ramp</code></td>
+                <td>4</td><td>1</td>
+                <td>0</td><td>2</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Acquisition_Preflight</code></td>
+                <td>21</td><td>4</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_FbStatus</code></td>
+                <td>3</td><td>2</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Filter</code></td>
+                <td>3</td><td>1</td>
+                <td>0</td><td>2</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Modes</code></td>
+                <td>11</td><td>3</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_DiveSearch</code></td>
+                <td>15</td><td>8</td>
+                <td>0</td><td>5</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (5 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_ExtractionSequence</code></td>
+                <td>17</td><td>9</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Cycle</code></td>
+                <td>38</td><td>15</td>
+                <td>1</td><td>19</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_TestHarness_PRG_03</code></td>
+                <td>25</td><td>6</td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    <details class="encaps-details" style="margin-top: 16px; opacity: 0.95;">
+        <summary style="color:#94a3b8;font-size:13px;">🧬 Tests Socle & Contrat d'Interface AF03 <span style="color:#94a3b8;font-size:11.5px;font-weight:600;margin-left:6px;">(0 test dédié)</span></summary>
+        <div style="padding: 14px; font-size: 13px; color: #cbd5e1; background: var(--card-sub); border-radius: 6px; margin-top: 8px; border: 1px solid var(--border);">
+            ℹ️ Aucun test de cycle de vie socle direct déclaré dans cette suite (validé par composition ou profil spécifique).
+        </div>
+    </details>
+    
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-prg-03-modes-cycle-0" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-prg-03-modes-cycle-1" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        </div>
+    </details>
+    <details>
+        <summary>Fichiers source compilés (23)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/E_State.st</code></li><li><code>CODE/A_COMMUN/ST_FbStatus.st</code></li><li><code>CODE/A_COMMUN/ST_FbCause.st</code></li><li><code>CODE/A_COMMUN/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_FbStatus.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/F_MODES/FB_Modes.st</code></li><li><code>CODE/G_CYCLE/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/ST_WinchCmdDemand.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/ST_BucketCmdDemand.st</code></li><li><code>CODE/I_TRANSLATION/ST_TranslationCmdDemand.st</code></li><li><code>CODE/G_CYCLE/FB_DiveSearch.st</code></li><li><code>CODE/G_CYCLE/FB_ExtractionSequence.st</code></li><li><code>CODE/G_CYCLE/FB_Cycle.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st</code></li></ul>
+    </details>
+    <details>
+        <summary>Code source ST original (23)</summary>
+        
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
+                <pre>(* =======================================================================
+   📊 Type CODESYS système pour tests STruCpp
+   ======================================================================= *)
+TYPE DEVICE_STATE :
+(
+    UNKNOWN             := 0,
+    STOPPED             := 1,
+    CONFIG_ERROR        := 2,
+    BUS_ERROR           := 3,
+    DISABLED            := 4,
+    INITIALIZING        := 5,
+    RESET_ORIGIN        := 6,
+    RESET_COMMUNICATION := 7,
+    RESET_APPLICATION   := 8,
+    RUNNING             := 9,
+    LOGGER_ERROR        := 10
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\E_State.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des phases opérationnelles d&#x27;un FB métier
+   ⚙️ Machine d&#x27;état : Un seul état actif à la fois (orthogonal à Error)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §3
+   ======================================================================= *)
+
+TYPE E_State :
+ENUM
+    DISABLED := 0,   (* Enable faux, neutralisé *)
+    INIT     := 1,   (* Démarrage / vérifs *)
+    READY    := 2,   (* Prêt, attend ordre *)
+    BUSY     := 3,   (* Action en cours *)
+    DONE     := 4,   (* Action terminée *)
+    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbStatus.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FbStatus — Socle transverse de statut d&#x27;un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : regroupe l&#x27;état, le défaut et le warning d&#x27;un FB standard,
+      avec les textes prêts pour l&#x27;IHM (plus de conditions complexes
+      côté affichage). Évolution additive : les 6 membres d&#x27;origine sont conservés.
+   🧬 Forme cible : les FB standard exposent `Status : ST_FbStatus`
+      rempli via le socle `FB_FbStatus` (même comportement partout).
+   ⚠️ State/StateAtError : E_State (phases opérationnelles FB métier).
+      Un FB dont l&#x27;état est un énum domaine (E_Diag_State, CycleStep,
+      ST_Safety_Emergency_State…) garde sa sortie typée SÉPARÉE et ne
+      migre pas vers ST_FbStatus (exception documentée).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ======================================================================= *)
+
+TYPE ST_FbStatus :
+STRUCT
+    (* ---- membres historiques (conservés) ---- *)
+    Busy         : BOOL;    (* 1 = Bloc en cours d&#x27;exécution *)
+    Done         : BOOL;    (* 1 = Action terminée avec succès *)
+    Error        : BOOL;    (* 1 = Défaut à acquitter (laté jusqu&#x27;au Reset) *)
+    ErrorId      : WORD;    (* Code d&#x27;erreur bitfield / enum diagnostic *)
+    State        : E_State; (* État courant de la machine d&#x27;état *)
+    StateAtError : E_State; (* État mémorisé lors de l&#x27;apparition du défaut *)
+    (* ---- membres ajoutés (forme cible enrichie) ---- *)
+    Warning        : BOOL;  (* 1 = warning actif (auto-effacé, aucun acquittement) *)
+    WarningId      : WORD;  (* Code warning courant (bitfield) *)
+    WarningIdTxt   : STRING;(* Texte généré depuis WarningId (prêt IHM) *)
+    ErrorIdTxt     : STRING;(* Texte généré depuis ErrorId *)
+    ResetRequested : BOOL;  (* 1 = un Reset est nécessaire / en cours *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_FbCause.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 ST_FbCause — Cause élémentaire d&#x27;un FB standard (socle FB_FbStatus)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause de défaut/warning exprimée en CLAIR (BOOL + libellé),
+      sans bitfield ni masque. Le FB métier remplit une liste de causes
+      (ARRAY[0..15] OF ST_FbCause) ; le socle gère latch/reset/textes.
+   🧬 Contrat : remplacer l&#x27;ancien couple WORD bitfield + tableaux de textes
+      indexés par bit par une liste lisible (maintenance, « avec une liste »).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur
+      l&#x27;acquittement. IsWarning distingue warning (auto) / fault (à acquitter).
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+TYPE ST_FbCause :
+STRUCT
+    Active     : BOOL;   (* 1 = cause présente (interlock sur la cause brute) *)
+    IsWarning  : BOOL;   (* 1 = warning auto-effacé ; 0 = défaut à acquitter *)
+    Texte      : STRING; (* libellé prêt IHM de la cause *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\ST_ContactorCheck.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_ContactorCheck — Double vérification commande/retour contacteur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de diagnostic pour vérification commande vs retour
+   📊 Diagnostic : Détection des défauts contacteur (StuckClosed / StuckOpen)
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md §2
+   ======================================================================= *)
+
+TYPE ST_ContactorCheck :
+STRUCT
+    Command     : BOOL;   // Ordre envoyé au contacteur (TRUE = fermé/actif)
+    Feedback    : BOOL;   // Retour d&#x27;état câblé (TRUE = effectivement fermé)
+    StuckClosed : BOOL;   // Diag : commande OFF mais retour ON depuis trop longtemps → PowerCutOff
+    StuckOpen   : BOOL;   // Diag : commande ON mais retour OFF depuis trop longtemps
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   ======================================================================= *)
+FUNCTION_BLOCK FB_CycleTime
+VAR_INPUT
+    // === REGLAGES DE SECOURS ===
+    DefaultValueS           : REAL := 0.004;      // --&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)
+END_VAR
+VAR_OUTPUT
+    // === MESURE ET DIAGNOSTIC ===
+    CycleTimeS              : REAL;               // &lt;-- [DIAG] Temps ecoule reel calcule (secondes)
+END_VAR
+VAR
+    // === HORLOGE ET MEMOIRE TEMPORELLE ===
+    TimeCurrent             : TIME;               // . [LOC] Temps systeme actuel
+    TimeLast                : TIME;               // . [LOC] Empreinte de temps du cycle precedent
+    DeltaTimeMs             : UDINT;              // . [LOC] Ecart brut calcule (ms)
+    InitDone                : BOOL;               // . [LOC] Drapeau d&#x27;initialisation du premier cycle
+END_VAR
+
+{region &quot;§1 Acquisition temps&quot;}
+// 1. ACQUISITION DU TEMPS SYSTÈME
+TimeCurrent := TIME();
+{endregion}
+
+{region &quot;§2 Initialisation&quot;}
+// 2. INITIALISATION UNIQUE AU PREMIER CYCLE
+IF NOT InitDone THEN
+    TimeLast := TimeCurrent;
+    InitDone := TRUE;
+    CycleTimeS := DefaultValueS;
+    RETURN;
+END_IF;
+{endregion}
+
+{region &quot;§3 Calcul delta&quot;}
+// 3. CALCUL DU DELTA EN MILLISECONDES
+DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
+
+{region &quot;§4 Conversion et secours&quot;}
+// 4. CONVERSION ET CHARGE DE SECOURS
+IF DeltaTimeMs &gt; 0 THEN
+    CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
+ELSE
+    CycleTimeS := DefaultValueS;
+END_IF;
+{endregion}
+
+{region &quot;§5 Archivage&quot;}
+// 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
+TimeLast := TimeCurrent;
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Ramp.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_Ramp — Rampe d&#x27;accélération et décélération asymétrique
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Limitation de variation anti-à-coups (%/s) sur signal analogique
+   🔒 Polarité : Distingue l&#x27;éloignement de zéro (Accel) et le retour à zéro (Decel)
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.0.md §2
+   ======================================================================= *)
+FUNCTION_BLOCK FB_Ramp
+VAR_INPUT
+    // === CONSIGNES ET TAUX DE RAMPE ===
+    Target                  : REAL;               // --&gt; [CMD] Valeur cible visee (-100.0..+100.0 %)
+    AccelRate               : REAL;               // --&gt; [CFG] Taux d&#x27;acceleration (%/s)
+    DecelRate               : REAL;               // --&gt; [CFG] Taux de deceleration (%/s)
+    CycleTimeS              : REAL;               // --&gt; [CFG] Temps de cycle reel en secondes (dt)
+END_VAR
+VAR_OUTPUT
+    // === VALEUR RAMPEE ===
+    Current                 : REAL;               // &lt;-- [STAT] Valeur courante amortie (-100.0..+100.0 %)
+END_VAR
+VAR
+    // === CALCULS INTERNES ===
+    StepX                   : REAL;               // . [LOC] Pas de variation pour le cycle courant
+    TargetLimited           : REAL;               // . [LOC] Cible bornee a [-100.0, +100.0]
+END_VAR
+
+// Détection du comportement (Accélération vs Décélération)
+// Classification par CÔTÉ DE ZÉRO + sens de déplacement, plus par signe brut de Target seul
+// (robuste à une traversée de zéro rapide).
+// 🛡️ Garde-fou : la rampe ne sort jamais de la plage normalisée ±100 %.
+TargetLimited := LIMIT(-100.0, Target, 100.0);
+Current := LIMIT(-100.0, Current, 100.0);
+
+IF (Current &gt;= 0.0 AND TargetLimited &gt;= Current) OR (Current &lt;= 0.0 AND TargetLimited &lt;= Current) THEN
+    StepX := AccelRate * CycleTimeS; // S&#x27;éloigne du zéro (reste du même côté, va plus loin)
+ELSE
+    StepX := DecelRate * CycleTimeS; // Retourne vers zéro, ou le traverse vers l&#x27;autre signe
+END_IF;
+
+// Application de la rampe
+IF Current &lt; TargetLimited THEN
+    Current := Current + StepX;
+    IF Current &gt; TargetLimited THEN Current := TargetLimited; END_IF;
+ELSIF Current &gt; TargetLimited THEN
+    Current := Current - StepX;
+    IF Current &lt; TargetLimited THEN Current := TargetLimited; END_IF;
+END_IF;
+
+// 🛡️ Limitation finale : même une valeur d&#x27;état déjà corrompue reste bornée.
+Current := LIMIT(-100.0, Current, 100.0);
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Acquisition_Preflight.st</code></summary>
+                <pre>(* =======================================================================
+   📊 FB_Acquisition_Preflight — Verdict passif machine arrêtée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Verdict passif de qualification E/S machine arrêtée (16 contrôles)
+   🔒 Polarité : Observateur pur (aucun SafeStop, PowerCutOff ou ordre machine)
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.3.md §6
+   ======================================================================= *)
+FUNCTION_BLOCK FB_Acquisition_Preflight
+VAR_INPUT
+    // === COMMANDES &amp; ETATS MACHINE ===
+    Execute                 : BOOL; // --&gt; [CMD] Lancement du verdict (front montant)
+    MachineIsStill          : BOOL; // --&gt; [HW]  Machine a l&#x27;arret complet (vitesse nulle)
+
+    // === ETATS FREINS &amp; CONTACTEURS ===
+    M1BrakeApplied          : BOOL; // --&gt; [HW]  Frein M1 serre
+    M2BrakeApplied          : BOOL; // --&gt; [HW]  Frein M2 serre
+    M3BrakeApplied          : BOOL; // --&gt; [HW]  Frein M3 serre
+    M1ContactorsReleased    : BOOL; // --&gt; [HW]  Contacteurs M1 retombes
+    M2ContactorsReleased    : BOOL; // --&gt; [HW]  Contacteurs M2 retombes
+
+    // === PROTECTION THERMIQUE &amp; RESEAU ===
+    M1ThermalOk             : BOOL; // --&gt; [HW]  Thermique moteur M1 OK
+    M2ThermalOk             : BOOL; // --&gt; [HW]  Thermique moteur M2 OK
+    BrakeThermalOk          : BOOL; // --&gt; [HW]  Thermique freins OK
+    PhaseRotationOk         : BOOL; // --&gt; [HW]  Ordre des phases reseau OK
+
+    // === CAPTEURS &amp; CHAINE DE SECURITE ===
+    SlackCableTensioned     : BOOL; // --&gt; [HW]  Cable M2 tendu (anti-mou)
+    M3SensorWordIncoherent  : BOOL; // --&gt; [HW]  Incoherence mot capteurs M3
+    EmergencyChainClosed    : BOOL; // --&gt; [SAFE] Chaine d&#x27;arret d&#x27;urgence fermee
+    PowerContactorEngaged   : BOOL; // --&gt; [HW]  Contacteur de puissance enclenche
+
+    // === CODEURS &amp; HOMING ===
+    EncoderM1Operational    : BOOL; // --&gt; [HW]  Codeur M1 operationnel
+    EncoderM2Operational    : BOOL; // --&gt; [HW]  Codeur M2 operationnel
+    HomedM1                 : BOOL; // --&gt; [HW]  Homing M1 effectue
+    HomedM2                 : BOOL; // --&gt; [HW]  Homing M2 effectue
+    M1PositionInBounds      : BOOL; // --&gt; [HW]  Position M1 dans les bornes
+    M2PositionInBounds      : BOOL; // --&gt; [HW]  Position M2 dans les bornes
+END_VAR
+VAR_OUTPUT
+    // === ETATS ET DIAGNOSTIC ===
+    PreflightOk             : BOOL; // &lt;-- [STAT] Verdict preflight OK (aucun defaut)
+    PreflightDone           : BOOL; // &lt;-- [STAT] Verdict preflight termine
+    PreflightBusy           : BOOL; // &lt;-- [STAT] Diagnostic preflight en cours
+    PreflightErrorId        : WORD; // &lt;-- [DIAG] Masque de defauts preflight (16 bits)
+END_VAR
+VAR
+    // === TRIGGERS &amp; ETATS INTERNES ===
+    ExecuteEdge             : R_TRIG;       // . [LOC] Trigger front montant Execute
+    BootPending             : BOOL := TRUE; // . [LOC] Demande preflight initiale au demarrage
+    RequestPending          : BOOL;         // . [LOC] Demande de verdict en attente
+END_VAR
+
+{region &quot;§1 Gate et demande&quot;}
+ExecuteEdge(CLK := Execute);
+RequestPending := RequestPending OR ExecuteEdge.Q OR BootPending;
+PreflightBusy := RequestPending AND NOT MachineIsStill;
+IF NOT MachineIsStill THEN PreflightDone := FALSE; RETURN; END_IF;
+IF NOT RequestPending THEN RETURN; END_IF;
+{endregion}
+
+{region &quot;§2 Calcul verdict&quot;}
+PreflightErrorId := 0;
+(* bit0..2 frein M1/M2/M3 serré; bit3..4 contacteurs M1/M2 retombés;
+   bit5..6 thermique M1/M2 OK; bit7 thermique frein OK; bit8 phases OK;
+   bit9 câble M2 tendu; bit10 mot M3 cohérent; bit11 contacteur sans chaîne;
+   bit12..13 codeur M1/M2 opérationnel; bit14..15 homé et position bornée M1/M2. *)
+IF NOT M1BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0001; END_IF;
+IF NOT M2BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0002; END_IF;
+IF NOT M3BrakeApplied THEN PreflightErrorId := PreflightErrorId OR 16#0004; END_IF;
+IF NOT M1ContactorsReleased THEN PreflightErrorId := PreflightErrorId OR 16#0008; END_IF;
+IF NOT M2ContactorsReleased THEN PreflightErrorId := PreflightErrorId OR 16#0010; END_IF;
+IF NOT M1ThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0020; END_IF;
+IF NOT M2ThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0040; END_IF;
+IF NOT BrakeThermalOk THEN PreflightErrorId := PreflightErrorId OR 16#0080; END_IF;
+IF NOT PhaseRotationOk THEN PreflightErrorId := PreflightErrorId OR 16#0100; END_IF;
+IF NOT SlackCableTensioned THEN PreflightErrorId := PreflightErrorId OR 16#0200; END_IF;
+IF M3SensorWordIncoherent THEN PreflightErrorId := PreflightErrorId OR 16#0400; END_IF;
+IF PowerContactorEngaged AND NOT EmergencyChainClosed THEN PreflightErrorId := PreflightErrorId OR 16#0800; END_IF;
+IF NOT EncoderM1Operational THEN PreflightErrorId := PreflightErrorId OR 16#1000; END_IF;
+IF NOT EncoderM2Operational THEN PreflightErrorId := PreflightErrorId OR 16#2000; END_IF;
+IF NOT HomedM1 OR NOT M1PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#4000; END_IF;
+IF NOT HomedM2 OR NOT M2PositionInBounds THEN PreflightErrorId := PreflightErrorId OR 16#8000; END_IF;
+{endregion}
+
+{region &quot;§3 Sortie&quot;}
+PreflightOk := (PreflightErrorId = 0); PreflightDone := TRUE; BootPending := FALSE; RequestPending := FALSE;
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_FbStatus.st</code></summary>
+                <pre>(* =======================================================================
+   🧩 FB_FbStatus — Socle de statut standard d&#x27;un FB métier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : remplit de façon standardisée `Status : ST_FbStatus`
+      à partir d&#x27;une LISTE de causes claires (ARRAY[0..15] OF ST_FbCause).
+      Plus de bitfield WORD en entrée, plus de masque, plus de tableau de
+      textes indexé par bit — le FB métier exprime ses défauts en clair.
+   🧬 Contrat : tout FB `standard` expose `Status : ST_FbStatus`
+      rempli via UNE instance de ce socle → même comportement partout.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur l&#x27;acquittement.
+      - Reset TOUJOURS effectif (std §9), jamais conditionné.
+      - IsWarning=1 → warning AUTO-EFFACÉ (ne lève jamais Error) ; IsWarning=0 → fault à acquitter (laté).
+      - une cause fault réapparue se re-lathe automatiquement (ré-alarme).
+      - une cause reclassée warning purge son latch résiduel (pas de défaut fantôme).
+      - StateAtError : capture UNIQUE au premier défaut, gelé jusqu&#x27;au Reset.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_FbStatus
+VAR_INPUT
+    // === PERMIS &amp; ACQUITTEMENT ===
+    Enable          : BOOL;    // --&gt; [CMD] Autorisation générale FB
+    Reset           : BOOL;    // --&gt; [CMD] Front acquittement défaut (jamais conditionné, §9)
+
+    // --- CAUSES (producteur = bloc métier, en clair) ---
+    Causes          : ARRAY[0..15] OF ST_FbCause;  // --&gt; [HW] Liste des causes (Active/IsWarning/Texte)
+END_VAR
+VAR_OUTPUT
+    // --- ÉTAT &amp; SYNOPTIQUE (forme cible) ---
+    Ready           : BOOL;    // &lt;-- [STAT] FB prêt (Enable)
+    Status          : ST_FbStatus; // &lt;-- [STAT] Statut complet (mappé 1:1 sur la sortie du bloc)
+END_VAR
+VAR
+    // --- SOUS-INSTANCES &amp; MEMOIRES ---
+    ResetEdge         : R_TRIG;              // * [INST] Front Reset
+    Latch             : ARRAY[0..15] OF BOOL;// . [LOC] Défaut laté par cause (jusqu&#x27;au Reset)
+    StateAtErrorArmed : BOOL;                // . [LOC] Flag : StateAtError capturé UNE fois
+    i                 : INT;                 // . [LOC] index de parcours de la liste
+END_VAR
+
+{region &quot;§1 Gate neutralisation&quot;}
+// 🛑 1. GATE — Enable = FALSE → statut neutre/sûr.
+//    ⚠️ Les latches de défaut sont CONSERVÉS (décision utilisateur) : un défaut
+//    non acquitté ne doit pas être effacé silencieusement par une bascule Enable
+//    OFF→ON sans Reset (jamais de redémarrage auto après défaut). Au ré-enable,
+//    §3 relatche naturellement toute cause encore active ; un défaut laté persistant
+//    redevient visible jusqu&#x27;au Reset.
+Ready := Enable;
+IF NOT Enable THEN
+    Status.Busy := FALSE; Status.Done := FALSE;
+    Status.Error := FALSE; Status.ErrorId := 0;
+    Status.Warning := FALSE; Status.WarningId := 0;
+    Status.State := E_State.DISABLED; Status.StateAtError := E_State.DISABLED;
+    Status.ResetRequested := FALSE;
+    Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
+    RETURN;
+END_IF;
+Status.State := E_State.READY;
+{endregion}
+
+{region &quot;=== §2 Reset (front, toujours effectif) ===&quot;}
+// 2. Front Reset : TOUJOURS effectif, jamais conditionné (std §9).
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+    StateAtErrorArmed := FALSE;
+END_IF;
+{endregion}
+
+{region &quot;=== §3 Classification + latch par cause ===&quot;}
+// 3. Parcours de la LISTE (source de vérité = cause brute Active).
+//    - IsWarning=TRUE  → warning : auto-effacé + purge d&#x27;un latch résiduel (reclassement, sans défaut fantôme).
+//    - IsWarning=FALSE → fault : laté dès qu&#x27;Active ; conservé après disparition ; re-laté s&#x27;il revient.
+FOR i := 0 TO 15 DO
+    IF Causes[i].IsWarning THEN
+        Latch[i] := FALSE;
+    ELSE
+        IF Causes[i].Active THEN Latch[i] := TRUE; END_IF;
+    END_IF;
+END_FOR;
+{endregion}
+
+{region &quot;=== §4 StateAtError — capture au premier défaut ===&quot;}
+// 4. État mémorisé au moment de l&#x27;apparition du défaut (gelé jusqu&#x27;au Reset).
+IF NOT StateAtErrorArmed THEN
+    FOR i := 0 TO 15 DO
+        IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+            Status.StateAtError := Status.State;   // State déjà READY (§1)
+            StateAtErrorArmed := TRUE;
+            EXIT;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region &quot;=== §5 Sorties Error / Warning / ResetRequested ===&quot;}
+// 5. Sorties : ErrorId réservé aux DÉFAUTS (à acquitter) ; les warnings sont
+//    séparés dans WarningId. Un warning ne lève JAMAIS Error ni ne pollue ErrorId
+//    (décision utilisateur : un IHM qui lit ErrorId ne voit pas de faux défaut).
+Status.ErrorId := 0; Status.WarningId := 0;
+Status.Error := FALSE; Status.Warning := FALSE; Status.ResetRequested := FALSE;
+FOR i := 0 TO 15 DO
+    // Défaut laté OU actif
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorId := Status.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Error := TRUE;
+        Status.ResetRequested := TRUE;
+    END_IF;
+    // Warning auto-effacé : uniquement dans WarningId (séparé de ErrorId)
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningId := Status.WarningId OR SHL(WORD#1, INT_TO_DWORD(i));
+        Status.Warning := TRUE;
+    END_IF;
+END_FOR;
+{endregion}
+
+{region &quot;=== §6 Textes IHM — parcours de liste ===&quot;}
+// 6. Sélection du texte par parcours de la LISTE (première cause active, index le plus bas).
+//    Plus de WHILE ni de masque. Hypothèse : `Causes[i].Texte` reste renseigné par l&#x27;appelant.
+Status.ErrorIdTxt := &#x27;&#x27;; Status.WarningIdTxt := &#x27;&#x27;;
+FOR i := 0 TO 15 DO
+    IF Latch[i] OR (Causes[i].Active AND NOT Causes[i].IsWarning) THEN
+        Status.ErrorIdTxt := Causes[i].Texte; EXIT;
+    END_IF;
+END_FOR;
+FOR i := 0 TO 15 DO
+    IF Causes[i].Active AND Causes[i].IsWarning THEN
+        Status.WarningIdTxt := Causes[i].Texte; EXIT;
+    END_IF;
+END_FOR;
+{endregion}
+
+// Busy/Done : pilotés par le FB MÉTIER (cycle propre), pas par le socle.
+// Un conditionneur synchrone (joystick) les laisse à FALSE ; un organe à cycle les pilote lui-même.
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_Filter.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_Filter — Filtre passe-bas premier ordre (PT1 numérique)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Filtre exponentiel discret y[k] = a*x[k] + (1-a)*y[k-1]
+             avec a = CycleTimeS / (T + CycleTimeS). Pass-through si T=0 ou Cycle=0.
+   📄 Domaine : CODE/A_COMMUN (fonction de filtrage générale)
+   ======================================================================= *)
+
+FUNCTION_BLOCK FB_Filter
+VAR_INPUT
+    // === CONSIGNES DE PILOTAGE &amp; CONFIGURATION ===
+    ValueIn    : REAL;  // --&gt; [CMD] Valeur brute a filtrer
+    TimeConst  : TIME;  // --&gt; [CFG] Constante de temps du filtre (ex: T#200ms)
+    CycleTimeS : REAL;  // --&gt; [CFG] Temps de cycle reel de la tache en secondes (ex: 0.02)
+END_VAR
+VAR_OUTPUT
+    // === SORTIES LISSÉES ===
+    ValueOut   : REAL;  // &lt;-- [STAT] Valeur lissee par filtre PT1
+END_VAR
+VAR
+    // === VARIABLES LOCALES INTERNES ===
+    T          : REAL;  // . [LOC]  Constante de temps convertie en secondes
+    Alpha      : REAL;  // . [LOC]  Facteur d&#x27;attenuation du filtre exponentiel
+END_VAR
+
+T := TIME_TO_REAL(TimeConst) / 1000.0; // ms → s
+
+IF T &lt;= 0.0 OR CycleTimeS &lt;= 0.0 THEN
+    ValueOut := ValueIn;
+ELSE
+    Alpha    := CycleTimeS / (T + CycleTimeS);
+    ValueOut := Alpha * ValueIn + (1.0 - Alpha) * ValueOut;
+END_IF;
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\E_Mode.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_Mode — Modes de marche de la machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des modes d&#x27;exploitation et maintenance
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+   ======================================================================= *)
+TYPE E_Mode :
+ENUM
+    DISABLE     := 0,   (* Mode Désactivé / Veille de sécurité (sorties bloquées) *)
+    MAINT_N1    := 1,   (* Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives *)
+    MAINT_N2    := 2,   (* Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés) *)
+    SEMI_AUTO   := 3    (* Mode Semi-Automatique (séquenceur automatique) *)
+END_ENUM
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\F_MODES\FB_Modes.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_Modes — Arbitrage du mode machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Source unique du mode arbitré et calcul du bus d&#x27;autorisations
+   🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur
+   🔌 Interface : Standard composant d&#x27;arbitrage applicatif
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_Modes
+VAR_INPUT
+    // === GESTION FB &amp; AUTORISATIONS ===
+    Enable                  : BOOL;   // --&gt; [CMD] Autorisation generale FB (TRUE = active)
+    Reset                   : BOOL;   // --&gt; [CMD] Front acquittement defauts
+    PowerContactorEngaged   : BOOL;   // --&gt; [SAFE] Chaine AU OK (TRUE = armee)
+
+    // === SELECTIONS IHM &amp; COMMANDES MODES ===
+    SelMode                 : E_Mode; // --&gt; [CMD] Selecteur de mode IHM
+    SelSyncEnable           : BOOL;   // --&gt; [CMD] Selection synchro treuils IHM
+    InhibitM1Request        : BOOL;   // --&gt; [CMD] Demande inhibition treuil M1
+    InhibitM2Request        : BOOL;   // --&gt; [CMD] Demande inhibition treuil M2
+    SelHomingApproachEnable : BOOL;   // --&gt; [CMD] Selection approche homing IHM
+    JoystickWinchSelectRequest : INT; // --&gt; [CMD] Selection treuils joystick (0=Couple, 1=M1, 2=M2)
+    SelMaintenanceZoneAccess: BOOL;   // --&gt; [CMD] Autorisation acces zone maintenance M3
+
+    // === RETOURS CAPTEURS &amp; DIAGNOSTICS ===
+    EncoderFaultPresent     : BOOL;   // --&gt; [HW] Defaut codeur agrege (1 cycle retard)
+END_VAR
+VAR_OUTPUT
+    // === ETATS &amp; DIAGNOSTICS IEC ===
+    Ready                   : BOOL;   // &lt;-- [STAT] FB pret a fonctionner
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0: &quot;Semi-Auto refusé (défaut codeur)&quot;.
+    Status                  : ST_FbStatus;
+
+    // === BUS D&#x27;AUTORISATIONS ARBITREES ===
+    Auth                    : ST_Modes_Autorisations; // &lt;-- [STAT] Bus d&#x27;autorisations typees machine
+END_VAR
+VAR
+    // === SOUS-INSTANCES FB ===
+    ResetEdge               : R_TRIG; // * [INST] Detecteur front montant Reset
+    ErrorEdge               : R_TRIG; // * [INST] Detecteur front montant Error
+
+    // === VARIABLES LOCALES &amp; MEMOIRES ===
+    PrevInhibitM1           : BOOL;   // . [LOC] Memoire etat inhibition M1 (exclusion mutuelle)
+    PrevInhibitM2           : BOOL;   // . [LOC] Memoire etat inhibition M2 (exclusion mutuelle)
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Gate neutralisation&quot;}
+// 1. GATE — neutralisation si désactivé ou AU non armé
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Auth.Mode := E_Mode.DISABLE;
+    Auth.SyncEnable := TRUE;
+    Auth.InhibitM1 := FALSE;
+    Auth.InhibitM2 := FALSE;
+    Auth.HomingApproachEnable := FALSE;
+    Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
+    Auth.MaintenanceM3TargetEnable := FALSE;
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    Status.State := E_State.DISABLED;
+    PrevInhibitM1 := FALSE;
+    PrevInhibitM2 := FALSE;
+    RETURN;
+END_IF;
+
+Ready := TRUE;
+Status.State := E_State.READY;
+
+{endregion}
+
+{region &quot;§2 Reset et arbitrage mode&quot;}
+// 2. RESET FRONT (bit0 = défaut codeur)
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;  // Efface bit0 si front Reset
+END_IF;
+
+// 3. GARDE-FOU — refus SEMI_AUTO si défaut codeur
+IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+    Status.ErrorId := Status.ErrorId OR 16#0001;  // bit0 : défaut codeur
+ELSIF ResetEdge.Q THEN
+    Status.ErrorId := Status.ErrorId AND 16#FFFE;
+END_IF;
+
+// 4. ARBITRAGE DU MODE
+// MAINT_N2 accepté directement (authentification côté IHM).
+IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+    Auth.Mode := E_Mode.MAINT_N1;
+ELSE
+    Auth.Mode := SelMode;
+END_IF;
+
+{endregion}
+
+{region &quot;§3 Calcul autorisations machine&quot;}
+// 5. SYNC ENABLE — actionnable en MAINT_N1 ou MAINT_N2
+// FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
+Auth.SyncEnable := NOT ((Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
+
+// 5bis. EXCLUSION MUTUELLE INHIBITIONS + RESET SYNC ENABLE
+// Inhibition M1/M2 mutuellement exclusives (soit l&#x27;un, soit l&#x27;autre, jamais les deux).
+// Si les deux demandés simultanément : on garde celle déjà active, sinon on rejette les deux.
+// Reset SelSyncEnable si une inhibition devient active (synchro incompatible avec inhibit).
+// Mémorisation états précédents pour détection front montant.
+
+// Détection fronts montants inhibitions
+IF InhibitM1Request AND NOT PrevInhibitM1 THEN
+    // Front montant M1
+    IF PrevInhibitM2 THEN
+        // M2 déjà actif → rejette M1
+        Auth.InhibitM1 := FALSE;
+    ELSE
+        // M2 inactif → active M1, désactive M2
+        Auth.InhibitM1 := TRUE;
+        Auth.InhibitM2 := FALSE;
+        // Synchro incompatible avec inhibition → reset case IHM
+        SelSyncEnable := FALSE;
+    END_IF;
+ELSIF InhibitM2Request AND NOT PrevInhibitM2 THEN
+    // Front montant M2
+    IF PrevInhibitM1 THEN
+        // M1 déjà actif → rejette M2
+        Auth.InhibitM2 := FALSE;
+    ELSE
+        // M1 inactif → active M2, désactive M1
+        Auth.InhibitM2 := TRUE;
+        Auth.InhibitM1 := FALSE;
+        SelSyncEnable := FALSE;
+    END_IF;
+ELSE
+    // Pas de front montant → maintenir états actuels
+    // Mais si les deux demandes sont TRUE sans front (cas synchrone sans transition)
+    IF InhibitM1Request AND InhibitM2Request THEN
+        // Les deux demandées simultanément sans transition : repli sécurité
+        Auth.InhibitM1 := FALSE;
+        Auth.InhibitM2 := FALSE;
+    END_IF;
+END_IF;
+
+// Mise à jour mémoires pour prochaine détection front
+PrevInhibitM1 := InhibitM1Request;
+PrevInhibitM2 := InhibitM2Request;
+
+// 5bis-bis. Sortie inhibitions effectives (calculées ci-dessus)
+Auth.InhibitM1 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM1;
+Auth.InhibitM2 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM2;
+
+// 5ter. AUTORISATION ARRÊT HAUT (HomingApproach)
+// Uniquement actionnable en MAINT_N2.
+Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
+
+// 5quater. SÉLECTEUR JOYSTICK TREUIL
+// M1 seul ou M2 seul autorisé en MAINT_N1 et MAINT_N2. Forcé à Couplé (=0) sinon.
+IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
+    Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+ELSE
+    Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
+END_IF;
+
+// 5quinquies. CIBLE TRANSLATION MAINTENANCE
+// MAINT_N2 ou MAINT_N1 + bit IHM dédié (SelMaintenanceZoneAccess) exigé EN PLUS
+Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
+
+// GATE — désactivation inhibitions/sync si mode change (sortie N1/N2)
+IF (Auth.Mode &lt;&gt; E_Mode.MAINT_N2) AND (Auth.Mode &lt;&gt; E_Mode.MAINT_N1) THEN
+    Auth.InhibitM1 := FALSE;
+    Auth.InhibitM2 := FALSE;
+    Auth.HomingApproachEnable := FALSE;
+    Auth.MaintenanceM3TargetEnable := FALSE;
+    Auth.JoystickWinchSelectArbitrated := 0;
+END_IF;
+
+{endregion}
+
+{region &quot;§4 Etats et defauts&quot;}
+// 6. SORTIES ÉTAT
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Status.Error);
+IF ErrorEdge.Q THEN
+    Status.StateAtError := Status.State;
+END_IF;
+
+Status.Busy := FALSE;
+Status.Done := FALSE;
+
+{endregion}
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_CycleStep.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_CycleStep — Étapes de la machine d&#x27;état du cycle automatique
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des étapes du cycle automatique de dragage (X0 à X13 + STABILIZING)
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
+
+TYPE E_CycleStep :
+(
+  X0_PREPARATION      := 0,   (* Début de graphe : à la TRÉMIE, treuils en position HAUTE *)
+  X1_HOMING           := 1,   (* Vitesses lentes pour chercher capteur top + référencement *)
+  X2_WORK_POS_SELECT  := 2,   (* Sélection cible Trémie/P1/Maintenance + translation validée *)
+  X3_OPEN_BUCKET      := 3,   (* Ouverture benne (si déjà ouverte -&gt; passe vite) *)
+  X4_DESCEND_OPEN     := 4,   (* Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON *)
+  X5_BOTTOM_CONFIRMED := 5,   (* Fond validé (FB_DiveSearch) ; arrêt descente *)
+  X6_CLOSE_BUCKET     := 6,   (* Fermeture benne — tolérance « à peu près fermé » *)
+  X7_CTRL_ASCENT      := 7,   (* Remontée palier 1 de contrôle *)
+  X8_ASCENT_LOADED    := 8,   (* Remontée nominale jusqu&#x27;à limite haute *)
+  X9_DRAIN_PAUSE      := 9,   (* Égouttage temporisé — temps affiché IHM *)
+  X10_TRANSLATE_DUMP  := 10,  (* Translation vers trémie + avertissements IHM *)
+  X11_OPEN_DUMP       := 11,  (* Ouverture benne = vidage ; montée possible, descente ouvre *)
+  X13_DONE_SYNC       := 13,  (* Fin de cycle, synchronisation finale (R4) + compteur *)
+  STABILIZING         := 14   (* État d&#x27;attente/stabilisation — pas une erreur *)
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_DiveSearchState.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_DiveSearchState — Phases internes de recherche du fond Kobold
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des phases de détection et recherche du fond
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
+
+TYPE E_DiveSearchState :
+(
+    WAIT_PRECONDITIONS := 0, (* Attente benne ouverte, positions et Kobold au repos *)
+    READY_TO_DESCEND   := 1, (* Prêt à assister une demande de descente *)
+    SEARCHING_IMMERSION := 2, (* Descente : attente front 0-&gt;1 dans fenêtre eau *)
+    SEARCHING_BOTTOM    := 3, (* Immersion validée : attente front 1-&gt;0 au fond *)
+    BOTTOM_CONFIRMED    := 4, (* Fond validé ; extraction peut être demandée *)
+    ERROR_HOLD          := 5  (* Séquence invalide, descente assistée interdite *)
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\E_ExtractionSequenceState.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des phases de la séquence d&#x27;extraction assistée
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
+
+TYPE E_ExtractionSequenceState :
+(
+    WAIT_BOTTOM_CONFIRMATION := 0, (* Attente fond Kobold ou attestation opérateur *)
+    READY_TO_CLOSE            := 1, (* Prêt à fermer la benne *)
+    CLOSING_BUCKET            := 2, (* FB_Bucket ferme M2 seul *)
+    CONTROL_ASCENT            := 3, (* M1/M2 synchronisés au palier sans contacteur vitesse *)
+    NOMINAL_ASCENT            := 4, (* Montée couplée avec vitesse demandée opérateur *)
+    ERROR_HOLD                := 5  (* Défaut extraction, reprise interdite avant reset *)
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\ST_WinchCmdDemand.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_WinchCmdDemand — Structure de demande de commande treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupement des consignes de mouvement treuil (StartStop, Direction, Vitesse)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   ======================================================================= *)
+TYPE ST_WinchCmdDemand :
+STRUCT
+    StartStop : BOOL;                                                 // Ordre marche/arret mouvement (TRUE=Marche)
+    Direction : INT;                                                  // Sens de marche (-1: Descente, 0: Stop, 1: Montee)
+    SpeedPct  : REAL;                                                 // Consigne vitesse (0.0 a 100.0 %)
+END_STRUCT
+END_TYPE</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\BENNE\ST_BucketCmdDemand.st</code></summary>
+                <pre>(* =======================================================================
+   🪣 ST_BucketCmdDemand — Demande de commande benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de consigne de mouvement benne (Ouverture, Fermeture, Kobold)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.0.md
+   ======================================================================= *)
+TYPE ST_BucketCmdDemand :
+STRUCT
+    Open               : BOOL;                                        // Demande ouverture benne
+    Close              : BOOL;                                        // Demande fermeture benne
+    KoboldContactorCmd : BOOL;                                        // Commande contacteur puissance Kobold (recherche fond)
+END_STRUCT
+END_TYPE</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\ST_TranslationCmdDemand.st</code></summary>
+                <pre>(* =======================================================================
+   🎯 ST_TranslationCmdDemand — Demande de commande translation M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupement des consignes de mouvement translation M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.2.md
+   ======================================================================= *)
+TYPE ST_TranslationCmdDemand :
+STRUCT
+    Start   : BOOL;  // --&gt; [CMD] Demande de demarrage du mouvement
+    Target  : INT;   // --&gt; [CMD] Cible de position (1=Tremie, 2=P2, 3=P1, 4=Maintenance)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_DiveSearch.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_DiveSearch — Assistance plongée et recherche du fond Kobold
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Qualification du capteur Kobold et autorisation de descente
+   🛡️ Sécurité : Verrouillage si séquence d&#x27;immersion 0-&gt;1-&gt;0 invalide
+   🔌 Interface : Intention de descente et mesures vers permis de descente
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
+FUNCTION_BLOCK FB_DiveSearch
+VAR_INPUT
+    // === COMMANDES &amp; AUTORISATIONS ===
+    Enable                  : BOOL;         // --&gt; [CMD] Activation generale du FB (TRUE=Autorise)
+    Reset                   : BOOL;         // --&gt; [CMD] Acquittement defaut (front)
+    PowerContactorEngaged   : BOOL;         // --&gt; [SAFE] Chaine de securite OK
+    Mode                    : E_Mode;       // --&gt; [CMD] Mode de fonctionnement arbitre
+    MotionRequestActive     : BOOL;         // --&gt; [CMD] Intention de mouvement active
+    MotionDirection         : INT;          // --&gt; [CMD] Sens de mouvement (-1 = descente)
+
+    // === CAPTEURS &amp; ETATS BENNE ===
+    BucketIsOpen            : BOOL;         // --&gt; [HW] Benne ouverte confirmee
+    KoboldImmersed          : BOOL;         // --&gt; [HW] Capteur Kobold immerge (FALSE=hors eau, TRUE=immerge)
+    M1Position_M            : REAL;         // --&gt; [HW] Position codeur treuil M1 (m)
+    M2Position_M            : REAL;         // --&gt; [HW] Position codeur treuil M2 (m)
+    PositionsValid          : BOOL;         // --&gt; [HW] Validite des mesures de position
+
+    // === CONFIGURATION &amp; SEUILS ===
+    DiveStartMin_M          : REAL;         // --&gt; [CFG] Seuil position min pour debut plongee (m)
+    ImmersionUpper_M        : REAL;         // --&gt; [CFG] Borne haute fenetre d&#x27;immersion (m)
+    ImmersionLower_M        : REAL;         // --&gt; [CFG] Borne basse fenetre d&#x27;immersion (m)
+    BypassPreconditions     : BOOL := FALSE;// --&gt; [TST] Bypass preconditions et seuils (mode test)
+END_VAR
+VAR_OUTPUT
+    // === ETATS IEC &amp; DEFECTUOSITES ===
+    Ready                   : BOOL;         // &lt;-- [STAT] FB pret a fonctionner
+    // Status.ErrorId : bit0 precond, bit1 seq, bit2 cfg
+    Status                  : ST_FbStatus;  // &lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    DiveState               : E_DiveSearchState; // &lt;-- [STAT] Phase interne de recherche fond
+
+    // === PERMIS &amp; AUTORISATIONS ===
+    DescendPermit           : BOOL;         // &lt;-- [ACT] Autorisation de descente assistee
+    KoboldMeasureEnable     : BOOL;         // &lt;-- [ACT] Activation mesure/acquisition Kobold
+    BottomTouchConfirmed    : BOOL;         // &lt;-- [STAT] Contact fond valide et confirme
+
+    // === DIAGNOSTIC IHM ===
+    OperatorActionId        : WORD;         // &lt;-- [DIAG] ID action operateur requise
+    OperatorAction          : STRING(120);  // &lt;-- [DIAG] Message explicatif operateur
+END_VAR
+VAR
+    // === DETECTEURS DE FRONTS ===
+    ResetEdge               : R_TRIG;       // . [LOC] Detecteur front montant Reset
+    KoboldRiseEdge          : R_TRIG;       // . [LOC] Detecteur front entrant eau (0-&gt;1)
+    KoboldFallEdge          : F_TRIG;       // . [LOC] Detecteur front sortie eau / fond (1-&gt;0)
+
+    // === VARIABLES LOCALES INTERNES ===
+    ImmersionConfirmed      : BOOL;         // . [LOC] Immersion dans la fenetre d&#x27;eau validee
+    ErrorCausePresent       : BOOL;         // . [LOC] Presence d&#x27;une cause de defaut parametrage
+END_VAR
+
+{region &quot;§1 Gate desactivation&quot;}
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
+    BottomTouchConfirmed := FALSE;
+    Status.State := E_State.DISABLED;
+    Status.StateAtError := E_State.DISABLED;
+    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    OperatorActionId := 0; OperatorAction := &#x27;&#x27;;
+    ImmersionConfirmed := FALSE;
+    RETURN;
+END_IF;
+
+{endregion}
+
+{region &quot;§2 Preconditions fronts et rearmement&quot;}
+ResetEdge(CLK := Reset);
+KoboldRiseEdge(CLK := KoboldImmersed);
+KoboldFallEdge(CLK := KoboldImmersed);
+
+ErrorCausePresent := NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
+                  OR (ImmersionUpper_M &lt;= ImmersionLower_M));
+IF ErrorCausePresent THEN
+    Status.ErrorId := Status.ErrorId OR 16#0004;
+END_IF;
+
+(* Reset = front + causes disparues ; aucun redémarrage automatique. *)
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive THEN
+    Status.ErrorId := 16#0000;
+    ImmersionConfirmed := FALSE;
+    BottomTouchConfirmed := FALSE;
+    Status.StateAtError := E_State.DISABLED;
+    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
+END_IF;
+
+DescendPermit := FALSE; KoboldMeasureEnable := FALSE;
+Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+OperatorActionId := 0; OperatorAction := &#x27;&#x27;;
+
+{endregion}
+
+{region &quot;§3 Machine etat plongee recherche fond&quot;}
+IF Status.ErrorId &lt;&gt; 16#0000 THEN
+    Status.State := E_State.READY;
+    DiveState := E_DiveSearchState.ERROR_HOLD;
+    OperatorActionId := 16#0180;
+    OperatorAction := &#x27;Vérifier les conditions puis réarmer avant une nouvelle plongée.&#x27;;
+ELSE
+    CASE DiveState OF
+        E_DiveSearchState.WAIT_PRECONDITIONS:
+            Status.State := E_State.INIT;
+            IF NOT BypassPreconditions
+               AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
+                    OR (M1Position_M &lt; DiveStartMin_M) OR (M2Position_M &lt; DiveStartMin_M)) THEN
+                OperatorActionId := 16#0100;
+                OperatorAction := &#x27;Vérifier les conditions initiales de plongée.&#x27;;
+            ELSE
+                DiveState := E_DiveSearchState.READY_TO_DESCEND;
+            END_IF;
+
+        E_DiveSearchState.READY_TO_DESCEND:
+            Status.State := E_State.READY;
+            Ready := TRUE;
+            OperatorActionId := 16#0101;
+            OperatorAction := &#x27;Demander une descente pour rechercher le fond.&#x27;;
+            IF MotionRequestActive AND (MotionDirection = -1) THEN
+                DiveState := E_DiveSearchState.SEARCHING_IMMERSION;
+            END_IF;
+
+        E_DiveSearchState.SEARCHING_IMMERSION:
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
+            DescendPermit := MotionRequestActive AND (MotionDirection = -1);
+            KoboldMeasureEnable := TRUE;
+            OperatorActionId := 16#0102;
+            OperatorAction := &#x27;Maintenir la descente : recherche immersion Kobold.&#x27;;
+            IF KoboldRiseEdge.Q THEN
+                IF (M1Position_M &lt;= ImmersionUpper_M) AND (M1Position_M &gt;= ImmersionLower_M)
+                   AND (M2Position_M &lt;= ImmersionUpper_M) AND (M2Position_M &gt;= ImmersionLower_M) THEN
+                    ImmersionConfirmed := TRUE;
+                    DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
+                ELSE
+                    Status.ErrorId := Status.ErrorId OR 16#0002;
+                    Status.StateAtError := Status.State;
+                END_IF;
+            ELSIF (M1Position_M &lt; ImmersionLower_M) OR (M2Position_M &lt; ImmersionLower_M) THEN
+                Status.ErrorId := Status.ErrorId OR 16#0002;
+                Status.StateAtError := Status.State;
+            END_IF;
+
+        E_DiveSearchState.SEARCHING_BOTTOM:
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
+            DescendPermit := MotionRequestActive AND (MotionDirection = -1);
+            KoboldMeasureEnable := TRUE;
+            OperatorActionId := 16#0103;
+            OperatorAction := &#x27;Maintenir la descente : immersion validée, recherche du fond.&#x27;;
+            IF KoboldFallEdge.Q AND ImmersionConfirmed THEN
+                BottomTouchConfirmed := TRUE;
+                ImmersionConfirmed := FALSE;
+                DiveState := E_DiveSearchState.BOTTOM_CONFIRMED;
+            END_IF;
+
+        E_DiveSearchState.BOTTOM_CONFIRMED:
+            Status.State := E_State.DONE;
+            Status.Done := TRUE;
+            OperatorActionId := 16#0104;
+            OperatorAction := &#x27;Fond détecté : demander la fermeture ou l extraction.&#x27;;
+
+        E_DiveSearchState.ERROR_HOLD:
+            Status.State := E_State.READY;
+    END_CASE;
+END_IF;
+
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_ExtractionSequence.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_ExtractionSequence — Fermeture benne et remontée assistée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Séquence d&#x27;extraction (fermeture benne, remontée de contrôle, remontée nominale)
+   🛡️ Sécurité : Aucune remontée assistée sans fond confirmé, contrôle palier 1
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
+FUNCTION_BLOCK FB_ExtractionSequence
+VAR_INPUT
+    // === COMMANDES &amp; AUTORISATIONS ===
+    Enable                      : BOOL;     // --&gt; [CMD] Activation generale du FB (TRUE=Autorise)
+    Reset                       : BOOL;     // --&gt; [CMD] Acquittement defaut (front)
+    PowerContactorEngaged       : BOOL;     // --&gt; [SAFE] Chaine de securite OK
+    Mode                        : E_Mode;   // --&gt; [CMD] Mode de fonctionnement arbitre
+    MotionRequestActive         : BOOL;     // --&gt; [CMD] Intention de mouvement active
+    MotionDirection             : INT;      // --&gt; [CMD] Sens de mouvement (+1 = montee)
+    BottomPositionConfirmed     : BOOL;     // --&gt; [SAFE] Attestation fond confirme (Kobold ou op)
+
+    // === CAPTEURS &amp; ETATS MATERIELS ===
+    BucketIsClosed              : BOOL;     // --&gt; [HW] Benne fermee confirmee
+    BucketBusy                  : BOOL;     // --&gt; [HW] Mouvement benne en cours
+    BucketError                 : BOOL;     // --&gt; [SAFE] Defaut sur sous-systeme benne
+    WinchSyncError              : BOOL;     // --&gt; [SAFE] Defaut de desynchronisme treuils M1/M2
+    M1Position_M                : REAL;     // --&gt; [HW] Position codeur treuil M1 (m)
+    M2Position_M                : REAL;     // --&gt; [HW] Position codeur treuil M2 (m)
+    M1MeasuredSpeedValid        : BOOL;     // --&gt; [HW] Validite mesure vitesse M1
+    M2MeasuredSpeedValid        : BOOL;     // --&gt; [HW] Validite mesure vitesse M2
+    PositionsValid              : BOOL;     // --&gt; [HW] Validite des mesures de position
+
+    // === CONFIGURATION &amp; REGLAGES ===
+    ControlAscentDistance_M     : REAL;     // --&gt; [CFG] Distance palier 1 de controle remontee (m)
+END_VAR
+VAR_OUTPUT
+    // === ETATS IEC &amp; DEFECTUOSITES ===
+    Ready                       : BOOL;     // &lt;-- [STAT] FB pret a fonctionner (sortie libre, hors ST_FbStatus)
+    // 🧩 Statut transverse (forme cible) — regroupe Busy/Done/Error/ErrorId/State/StateAtError.
+    // ErrorId bit0:fond ; bit1:ferme ; bit2:ctrl ; bit3:cfg.
+    Status                      : ST_FbStatus; // &lt;-- [STAT] Etat global FB (Busy/Done/Error/ErrorId/State/StateAtError)
+    ExtractionState             : E_ExtractionSequenceState; // &lt;-- [STAT] Phase interne extraction
+
+    // === ORDRES &amp; AUTORISATIONS ===
+    BucketCloseRequest          : BOOL;     // &lt;-- [ACT] Demande de fermeture benne
+    AscentPermit                : BOOL;     // &lt;-- [ACT] Autorisation de remontee assistee
+    ForceMinSpeedStep           : BOOL;     // &lt;-- [ACT] Forcage vitesse minimale (palier de controle)
+    BottomConfirmationConsumed  : BOOL;     // &lt;-- [STAT] Signal confirmation fond consomme
+
+    // === DIAGNOSTIC IHM ===
+    OperatorActionId            : WORD;     // &lt;-- [DIAG] ID action operateur requise
+    OperatorAction              : STRING(120); // &lt;-- [DIAG] Message explicatif operateur
+END_VAR
+VAR
+    // === DETECTEURS DE FRONTS ===
+    ResetEdge                   : R_TRIG;   // . [LOC] Detecteur front montant Reset
+
+    // === MEMORISATIONS &amp; POSITIONS INTERNES ===
+    ControlStartM1Position_M    : REAL;     // . [LOC] Position M1 au debut du palier de controle (m)
+    ControlStartM2Position_M    : REAL;     // . [LOC] Position M2 au debut du palier de controle (m)
+
+    // === VARIABLES LOCALES INTERNES ===
+    ErrorCausePresent           : BOOL;     // . [LOC] Presence d&#x27;une cause de defaut parametrage
+END_VAR
+
+{region &quot;§1 Gate desactivation&quot;}
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+    BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
+    BottomConfirmationConsumed := FALSE;
+    Status.State := E_State.DISABLED;
+    Status.StateAtError := E_State.DISABLED;
+    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    OperatorActionId := 0; OperatorAction := &#x27;&#x27;;
+    RETURN;
+END_IF;
+
+{endregion}
+
+{region &quot;§2 Preconditions reset et initialisation sorties&quot;}
+ResetEdge(CLK := Reset);
+ErrorCausePresent := (ControlAscentDistance_M &lt;= 0.0);
+IF ErrorCausePresent THEN
+    Status.ErrorId := Status.ErrorId OR 16#0008;
+END_IF;
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
+    Status.ErrorId := 16#0000;
+    Status.StateAtError := E_State.DISABLED;
+    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+END_IF;
+
+Ready := FALSE; Status.Busy := FALSE; Status.Done := FALSE;
+BucketCloseRequest := FALSE; AscentPermit := FALSE; ForceMinSpeedStep := FALSE;
+BottomConfirmationConsumed := FALSE;
+OperatorActionId := 0; OperatorAction := &#x27;&#x27;;
+
+{endregion}
+
+{region &quot;§3 Machine etat fermeture remontee&quot;}
+IF Status.ErrorId &lt;&gt; 16#0000 THEN
+    Status.State := E_State.READY;
+    ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
+    OperatorActionId := 16#0280;
+    OperatorAction := &#x27;Vérifier la benne et les treuils puis réarmer avant de reprendre.&#x27;;
+ELSE
+    CASE ExtractionState OF
+        E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION:
+            Status.State := E_State.INIT;
+            IF BottomPositionConfirmed THEN
+                ExtractionState := E_ExtractionSequenceState.READY_TO_CLOSE;
+            ELSE
+                OperatorActionId := 16#0200;
+                OperatorAction := &#x27;Confirmer que la benne est posée au fond avant extraction.&#x27;;
+            END_IF;
+
+        E_ExtractionSequenceState.READY_TO_CLOSE:
+            Status.State := E_State.READY;
+            Ready := TRUE;
+            OperatorActionId := 16#0201;
+            OperatorAction := &#x27;Demander la montée pour fermer la benne.&#x27;;
+            IF MotionRequestActive AND (MotionDirection = 1) THEN
+                BottomConfirmationConsumed := TRUE;
+                ExtractionState := E_ExtractionSequenceState.CLOSING_BUCKET;
+            END_IF;
+
+        E_ExtractionSequenceState.CLOSING_BUCKET:
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
+            BucketCloseRequest := MotionRequestActive AND (MotionDirection = 1);
+            OperatorActionId := 16#0202;
+            OperatorAction := &#x27;Maintenir la montée : fermeture de la benne en cours.&#x27;;
+            IF BucketError THEN
+                Status.ErrorId := Status.ErrorId OR 16#0002;
+                Status.StateAtError := Status.State;
+            ELSIF BucketIsClosed AND NOT BucketBusy THEN
+                ControlStartM1Position_M := M1Position_M;
+                ControlStartM2Position_M := M2Position_M;
+                ExtractionState := E_ExtractionSequenceState.CONTROL_ASCENT;
+            END_IF;
+
+        E_ExtractionSequenceState.CONTROL_ASCENT:
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
+            AscentPermit := MotionRequestActive AND (MotionDirection = 1);
+            ForceMinSpeedStep := TRUE;
+            OperatorActionId := 16#0203;
+            OperatorAction := &#x27;Maintenir la montée : contrôle charge au palier minimal.&#x27;;
+            IF WinchSyncError OR NOT PositionsValid OR NOT M1MeasuredSpeedValid OR NOT M2MeasuredSpeedValid THEN
+                Status.ErrorId := Status.ErrorId OR 16#0004;
+                Status.StateAtError := Status.State;
+            ELSIF (M1Position_M &gt;= (ControlStartM1Position_M + ControlAscentDistance_M))
+               AND (M2Position_M &gt;= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
+                ExtractionState := E_ExtractionSequenceState.NOMINAL_ASCENT;
+            END_IF;
+
+        E_ExtractionSequenceState.NOMINAL_ASCENT:
+            Status.State := E_State.BUSY;
+            Status.Busy := TRUE;
+            AscentPermit := MotionRequestActive AND (MotionDirection = 1);
+            OperatorActionId := 16#0204;
+            OperatorAction := &#x27;Maintenir la montée : extraction en cours.&#x27;;
+            IF WinchSyncError OR NOT PositionsValid THEN
+                Status.ErrorId := Status.ErrorId OR 16#0004;
+                Status.StateAtError := Status.State;
+            END_IF;
+
+        E_ExtractionSequenceState.ERROR_HOLD:
+            Status.State := E_State.READY;
+    END_CASE;
+END_IF;
+
+Status.Error := (Status.ErrorId &lt;&gt; 16#0000);
+
+{endregion}
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\FB_Cycle.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_Cycle — Séquenceur du cycle automatique (Grafcet de dragage)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Automate de cycle automatique de dragage (X0 à X13 + STABILIZING)
+   🔒 Sécurité : Gating par mode et homme-mort, repli STABILIZING sur défaut
+   🔌 Interface : Demandes de mouvements (treuils, translation, benne)
+   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.1.md
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_Cycle
+VAR_INPUT
+    // === COMMANDES &amp; AUTORISATIONS ===
+    Enable                  : BOOL;         // --&gt; [CMD] Activation generale du sequenceur
+    Reset                   : BOOL;         // --&gt; [CMD] Acquittement defaut (front)
+    PowerContactorEngaged   : BOOL;         // --&gt; [SAFE] Chaine de securite OK
+    Mode                    : E_Mode;       // --&gt; [CMD] Mode arbitre (SEMI_AUTO pour instance cycle)
+    CycleMotionPermit       : BOOL;         // --&gt; [CMD] Manche deflecte (non centre)
+    DeadmanArmed            : BOOL;         // --&gt; [CMD] Appui homme-mort (fenetre 3 s)
+    HeartbeatIhmOk          : BOOL;         // --&gt; [SAFE] IHM&lt;-&gt;PLC valide
+
+    // === COMMANDES OPERATEUR ===
+    StartCycle              : BOOL;         // --&gt; [CMD] Demande lancement / reprise (IHM)
+    AbortCycle              : BOOL;         // --&gt; [CMD] Demande abandon (IHM)
+
+    // === CIBLES ET CONFIGURATION ===
+    SelTarget               : INT;          // --&gt; [CFG] Cible selectionnee (1=Tremie, 2=P2, 3=P1, 4=Maintenance)
+    SetDepthM               : REAL;         // --&gt; [CFG] Profondeur de consigne (negative)
+    SetOffsetM              : REAL;         // --&gt; [CFG] Ecart de fermeture benne cible
+
+    // === FEEDBACKS CAPTEURS &amp; MATERIEL ===
+    KoboldContactFond       : BOOL;         // --&gt; [HW] Retour dedie Kobold : TRUE = contact fond
+    LimitLegalReached       : BOOL;         // --&gt; [SAFE] Limite legale atteinte (descente interdite)
+    LimitLegalDepthM        : REAL;         // --&gt; [CFG] Profondeur legale minimale autorisee
+    WinchSyncError          : BOOL;         // --&gt; [SAFE] Desynchronisme bloquant M1/M2
+    WinchSyncDeltaM         : REAL;         // --&gt; [HW] Ecart codeurs M1/M2 pour diagnostic
+    M1_CablePosM            : REAL;         // --&gt; [HW] Position cable treuil M1 (recalee)
+    M2_CablePosM            : REAL;         // --&gt; [HW] Position cable treuil M2 (recalee)
+    M1_MeasuredSpeedMps     : REAL;         // --&gt; [HW] Vitesse lineaire mesuree M1 (m/s)
+    M2_MeasuredSpeedMps     : REAL;         // --&gt; [HW] Vitesse lineaire mesuree M2 (m/s)
+    SpeedMismatchThresholdMps : REAL;       // --&gt; [CFG] Seuil ecart vitesse ; 0 = controle desactive
+    SpeedMismatchTimeout    : TIME;         // --&gt; [CFG] Duree de confirmation ; 0 = controle desactive
+    CableLimitM1AscentM     : REAL;         // --&gt; [CFG] Limite haute d&#x27;exploitation M1
+
+    // === FEEDBACKS TRANSLATION M3 ===
+    Translation_At_P1           : BOOL;     // --&gt; [HW] Capteur position P1 (arret travail)
+    Translation_At_Tremie       : BOOL;     // --&gt; [HW] Capteur fin de course tremie
+    Translation_At_Maintenance : BOOL;     // --&gt; [HW] Capteur fin de course maintenance
+    Translation_Busy            : BOOL;     // --&gt; [HW] Mouvement translation en cours
+    Translation_Done            : BOOL;     // --&gt; [HW] Cible translation atteinte
+
+    // === FEEDBACKS BENNE ===
+    Benne_Busy              : BOOL;         // --&gt; [HW] Mouvement machoires benne en cours
+    Benne_Done              : BOOL;         // --&gt; [HW] Mouvement ouverture/fermeture termine
+    Benne_IsOpen            : BOOL;         // --&gt; [HW] Benne mecaniquement ouverte memorisee
+    Benne_IsClosed          : BOOL;         // --&gt; [HW] Benne mecaniquement fermee memorisee
+    Benne_IsRoughlyClosed   : BOOL;         // --&gt; [HW] Benne a peu pres fermee (tolerance matiere)
+
+    // === REFERENCEMENT CODEURS ===
+    HomedM1                 : BOOL;         // --&gt; [HW] Codeur M1 reference
+    HomedM2                 : BOOL;         // --&gt; [HW] Codeur M2 reference
+    TopPositionSensor       : BOOL;         // --&gt; [HW] Capteur position haute (referencement)
+    HomingRequest           : BOOL;         // --&gt; [CMD] Demande de referencement (front)
+END_VAR
+VAR_OUTPUT
+    // === ETATS IEC &amp; DEFECTUOSITES ===
+    Ready                   : BOOL;         // &lt;-- [STAT] Sequenceur disponible
+    Busy                    : BOOL;         // &lt;-- [STAT] Cycle automatique actif
+    Done                    : BOOL;         // &lt;-- [STAT] Cycle automatique complete
+    Error                   : BOOL;         // &lt;-- [STAT] Defaut cycle
+    ErrorId                 : WORD;         // &lt;-- [DIAG] Code erreur bitmask
+    SpeedMismatchMps        : REAL;         // &lt;-- [DIAG] Ecart absolu vitesse M1/M2 (m/s)
+    SpeedMismatchActive     : BOOL;         // &lt;-- [DIAG] Seuil vitesse depasse sur cycle courant
+    SpeedMismatchConfirmed  : BOOL;         // &lt;-- [DIAG] Ecart vitesse confirme pendant timeout
+
+    // === ORDRES ACTIONNEURS (COMMANDES STRUCTUREES) ===
+    WinchM1Cmd              : ST_WinchCmdDemand;        // &lt;-- [ACT] Demande treuil M1
+    WinchM2Cmd              : ST_WinchCmdDemand;        // &lt;-- [ACT] Demande treuil M2
+    TranslationCmd          : ST_TranslationCmdDemand;  // &lt;-- [ACT] Demande translation M3
+    BucketCmd               : ST_BucketCmdDemand;       // &lt;-- [ACT] Demande benne
+
+    // === METADONNEES &amp; SYNOPTIQUE ===
+    CycleStep               : E_CycleStep;  // &lt;-- [STAT] Etape active du Grafcet
+    CycleStateStr           : STRING(80);   // &lt;-- [STAT] Libelle en clair de l&#x27;etape
+    CycleStepAtError        : E_CycleStep;  // &lt;-- [DIAG] Etape specifique au moment du defaut
+END_VAR
+VAR_IN_OUT
+    // === STRUCTURES PARTAGEES &amp; COMPTEURS ===
+    SampleCount             : INT;          // &lt;-&gt; [BUS] Compteur de prelevements (RETAIN)
+END_VAR
+VAR
+    // === DETECTEURS DE FRONTS ===
+    ResetEdge               : R_TRIG;       // . [LOC] Detecteur front montant Reset
+    StartEdge               : R_TRIG;       // . [LOC] Detecteur front montant StartCycle
+    DeadmanArmedEdge        : R_TRIG;       // . [LOC] Detecteur front montant DeadmanArmed (demarrage joystick)
+    AbortEdge               : R_TRIG;       // . [LOC] Detecteur front montant AbortCycle
+    ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
+
+    // === ETATS INTERNES ===
+    State                   : E_CycleStep := E_CycleStep.X0_PREPARATION; // . [LOC] Etape courante machine d&#x27;etat
+    SavedState              : E_CycleStep := E_CycleStep.X0_PREPARATION; // . [LOC] Etape memorisee
+
+    // === MEMORISATIONS &amp; REGISTRES INTERNES ===
+    TouchPositionM          : REAL;         // . [LOC] Position M1 memorisee lors du contact fond
+    RaiseTargetM            : REAL;         // . [LOC] Profondeur de remontee memorisee
+    SelectedWorkTarget      : INT;          // . [LOC] Cible de travail memorisee
+
+    // === TEMPORISATEURS INTERNES ===
+    DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage)
+    StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
+    SpeedMismatchTimer      : TON;          // . [LOC] Confirmation temporelle ecart de vitesse
+    StepMaxTimer            : TON;          // . [LOC] Tempo max d&#x27;etape
+
+    // === CONSTANTES &amp; CONFIGURATIONS INTERNES ===
+    CtrlAscentDistM         : REAL := 2.0;      // . [LOC] Distance de remontee lente de controle
+    CtrlAscentToleranceM    : REAL := 0.25;     // . [LOC] Ecart maximal admis entre codeurs
+    CtrlAscentTimeout       : TIME := T#30s;    // . [LOC] Temps max pour zone de stabilisation
+    DrainingTime            : TIME := T#5s;     // . [LOC] Temps d&#x27;egouttage par defaut
+    StepMaxTimeout          : TIME := T#60s;    // . [LOC] Tempo max d&#x27;etape
+END_VAR
+
+// === IMPLEMENTATION ===
+
+{region &quot;§1 Gate securite&quot;}
+// 🛑 1. GATES DE SÉCURITÉ ET BLOCAGE (R8)
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    WinchM1Cmd.StartStop   := FALSE;
+    WinchM1Cmd.Direction   := 0;
+    WinchM1Cmd.SpeedPct    := 0.0;
+
+    WinchM2Cmd.StartStop   := FALSE;
+    WinchM2Cmd.Direction   := 0;
+    WinchM2Cmd.SpeedPct    := 0.0;
+
+    TranslationCmd.Start   := FALSE;
+    TranslationCmd.Target  := 0;
+
+    BucketCmd.Open         := FALSE;
+    BucketCmd.Close        := FALSE;
+    BucketCmd.KoboldContactorCmd := FALSE;
+
+    State                := E_CycleStep.X0_PREPARATION;   // retour à la PREMIÈRE étape (R8)
+    CycleStep            := E_CycleStep.X0_PREPARATION;
+    CycleStateStr        := &#x27;X0 - Désactivé : sécurité absente ou auto désactivé&#x27;;
+    Ready                := FALSE;
+    Busy                 := FALSE;
+    Done                 := FALSE;
+    RETURN;
+END_IF;
+{endregion}
+
+{region &quot;§2 Preparation surveillance et commandes cycle&quot;}
+Ready := TRUE;
+ResetEdge(CLK := Reset);
+StartEdge(CLK := StartCycle);
+DeadmanArmedEdge(CLK := DeadmanArmed);
+AbortEdge(CLK := AbortCycle);
+ErrorEdge(CLK := Error);
+
+// 🧊 R9 — capture l&#x27;étape spécifique AVANT la bascule vers STABILIZING
+IF ErrorEdge.Q THEN
+    CycleStepAtError := State;
+END_IF;
+
+// ⏱️ Surveillance indépendante de la remontée lente
+StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentTimeout);
+
+// 📏 Comparaison vitesse réelle M1/M2
+SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
+SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
+                       AND CycleMotionPermit
+                       AND (SpeedMismatchThresholdMps &gt; 0.0)
+                       AND (SpeedMismatchTimeout &gt; T#0ms)
+                       AND (SpeedMismatchMps &gt; SpeedMismatchThresholdMps);
+SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
+SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
+
+// Tempo max d&#x27;étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
+StepMaxTimer(IN := CycleMotionPermit AND (State &lt;&gt; E_CycleStep.X0_PREPARATION)
+                  AND (State &lt;&gt; E_CycleStep.X13_DONE_SYNC)
+                  AND (State &lt;&gt; E_CycleStep.STABILIZING),
+             PT := StepMaxTimeout);
+
+IF ResetEdge.Q THEN
+    Error := FALSE;
+    ErrorId := 16#0000;
+    SavedState := E_CycleStep.X0_PREPARATION;
+    IF State = E_CycleStep.STABILIZING THEN
+        State := E_CycleStep.X0_PREPARATION;
+    END_IF;
+END_IF;
+
+// 💓 Perte IHM : repli mémorisé. La reconnexion seule ne relance jamais le cycle.
+IF NOT HeartbeatIhmOk AND State &lt;&gt; E_CycleStep.STABILIZING THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0020;
+    State := E_CycleStep.STABILIZING;
+END_IF;
+
+// Défaut de synchronisme : arrêt sûr et acquittement obligatoire.
+IF WinchSyncError AND State &lt;&gt; E_CycleStep.STABILIZING THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0002;
+    State := E_CycleStep.STABILIZING;
+END_IF;
+
+// 🛡️ Écart de vitesse confirmé : arrêt du cycle et STABILIZING.
+IF SpeedMismatchConfirmed AND State &lt;&gt; E_CycleStep.STABILIZING THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0010;
+    State := E_CycleStep.STABILIZING;
+END_IF;
+
+// Tempo max d&#x27;étape dépassée (blocage probable) → défaut
+IF StepMaxTimer.Q AND State &lt;&gt; E_CycleStep.STABILIZING THEN
+    Error := TRUE;
+    ErrorId := ErrorId OR 16#0040;
+    State := E_CycleStep.STABILIZING;
+END_IF;
+
+// Gestion de l&#x27;Abandon (D3 — pas de Pause)
+IF AbortEdge.Q THEN
+    State := E_CycleStep.X0_PREPARATION;
+END_IF;
+{endregion}
+
+{region &quot;§3 Machine etat cycle automatique&quot;}
+// 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d&#x27;état) — CASE sur enum unique (R1)
+CASE State OF
+
+    E_CycleStep.X0_PREPARATION:
+        CycleStep := E_CycleStep.X0_PREPARATION;
+        CycleStateStr := &#x27;X0 - Vérification cohérence système&#x27;;
+        WinchM1Cmd.StartStop := FALSE; WinchM1Cmd.Direction := 0; WinchM1Cmd.SpeedPct := 0.0;
+        WinchM2Cmd.StartStop := FALSE; WinchM2Cmd.Direction := 0; WinchM2Cmd.SpeedPct := 0.0;
+        TranslationCmd.Start := FALSE; TranslationCmd.Target := 0;
+        BucketCmd.Open := FALSE; BucketCmd.Close := FALSE; BucketCmd.KoboldContactorCmd := FALSE;
+        Busy := FALSE; Done := FALSE;
+
+        // Transition si système sain et réarmé (front reset ou démarrage).
+        // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
+        // (DeadmanArmedEdge) — l&#x27;opérateur peut lancer depuis l&#x27;IHM ou le joystick.
+        // La continuité des mouvements ne dépend que de CycleMotionPermit (manche défléchi).
+        IF StartEdge.Q OR DeadmanArmedEdge.Q THEN
+            State := E_CycleStep.X1_HOMING;
+        END_IF;
+
+    E_CycleStep.X1_HOMING:
+        CycleStep := E_CycleStep.X1_HOMING;
+        CycleStateStr := &#x27;X1 - Référencement codeurs (vitesses lentes)&#x27;;
+        Busy := TRUE;
+
+        // Vitesses lentes pour chercher capteur top + référencement
+        IF NOT HomedM1 OR NOT HomedM2 THEN
+            WinchM1Cmd.StartStop := CycleMotionPermit;
+            WinchM1Cmd.Direction := 1;   // montée lente vers capteur top
+            WinchM1Cmd.SpeedPct := 10.0;
+            WinchM2Cmd.StartStop := CycleMotionPermit;
+            WinchM2Cmd.Direction := 1;
+            WinchM2Cmd.SpeedPct := 10.0;
+            IF HomingRequest THEN
+                // déclenche le référencement (via FB_Encoder_Homing en aval)
+                State := E_CycleStep.X2_WORK_POS_SELECT;
+            END_IF;
+        ELSE
+            // déjà homé → passe vite
+            State := E_CycleStep.X2_WORK_POS_SELECT;
+        END_IF;
+
+    E_CycleStep.X2_WORK_POS_SELECT:
+        CycleStep := E_CycleStep.X2_WORK_POS_SELECT;
+        CycleStateStr := &#x27;X2 - Sélection position travail&#x27;;
+        Busy := TRUE;
+
+        // Destinations sélectionnables : Trémie(1), P1(3), Maintenance(4).
+        // P2(2) n&#x27;est PAS une destination — capteur de passage en petite vitesse (PV).
+        // Si aucune cible valide n&#x27;est sélectionnée, on ATTEND à X2 (pas de défaut) :
+        // l&#x27;opérateur choisit la position de travail via l&#x27;IHM (SelTarget).
+        IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
+            SelectedWorkTarget := SelTarget;
+            TranslationCmd.Target := SelTarget;
+            TranslationCmd.Start := CycleMotionPermit;
+            // Arrivée à la cible (Trémie/P1/Maintenance) — capteurs PV/PVP2/P2 = ralentissement
+            IF CycleMotionPermit AND (
+                (SelTarget = 1 AND Translation_At_Tremie) OR
+                (SelTarget = 3 AND Translation_At_P1) OR
+                (SelTarget = 4 AND Translation_At_Maintenance)) THEN
+                TranslationCmd.Start := FALSE;
+                State := E_CycleStep.X3_OPEN_BUCKET;
+            END_IF;
+        END_IF;
+
+    E_CycleStep.X3_OPEN_BUCKET:
+        CycleStep := E_CycleStep.X3_OPEN_BUCKET;
+        CycleStateStr := &#x27;X3 - Ouverture benne&#x27;;
+        Busy := TRUE;
+
+        // Ouverture benne ; si déjà ouverte → passe vite
+        IF Benne_IsOpen THEN
+            State := E_CycleStep.X4_DESCEND_OPEN;
+        ELSE
+            BucketCmd.Open := CycleMotionPermit;
+            IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
+                BucketCmd.Open := FALSE;
+                State := E_CycleStep.X4_DESCEND_OPEN;
+            END_IF;
+        END_IF;
+
+    E_CycleStep.X4_DESCEND_OPEN:
+        CycleStep := E_CycleStep.X4_DESCEND_OPEN;
+        CycleStateStr := &#x27;X4 - Plongée benne ouverte (synchro)&#x27;;
+
+        // M1 et M2 descendent ensemble (synchro gérée en aval)
+        WinchM1Cmd.StartStop := CycleMotionPermit;
+        WinchM1Cmd.Direction := -1;
+        WinchM1Cmd.SpeedPct  := 50.0;
+        WinchM2Cmd.StartStop := CycleMotionPermit;
+        WinchM2Cmd.Direction := -1;
+        WinchM2Cmd.SpeedPct  := 50.0;
+        BucketCmd.KoboldContactorCmd := TRUE;
+
+        // Transition uniquement sur le retour dédié Kobold.
+        IF CycleMotionPermit AND KoboldContactFond THEN
+            WinchM1Cmd.StartStop := FALSE;
+            WinchM2Cmd.StartStop := FALSE;
+            BucketCmd.KoboldContactorCmd := FALSE;
+            TouchPositionM := M1_CablePosM;
+            IF LimitLegalDepthM &lt; -0.01 THEN
+                RaiseTargetM := MAX(TouchPositionM + 0.5, LimitLegalDepthM + 0.5);
+            ELSE
+                RaiseTargetM := TouchPositionM + 0.5;
+            END_IF;
+            State := E_CycleStep.X5_BOTTOM_CONFIRMED;
+        ELSIF LimitLegalReached THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0001;
+            WinchM1Cmd.StartStop := FALSE;
+            WinchM2Cmd.StartStop := FALSE;
+            BucketCmd.KoboldContactorCmd := FALSE;
+            State := E_CycleStep.STABILIZING;
+        END_IF;
+
+    E_CycleStep.X5_BOTTOM_CONFIRMED:
+        CycleStep := E_CycleStep.X5_BOTTOM_CONFIRMED;
+        CycleStateStr := &#x27;X5 - Fond confirmé : remontée sécurisée&#x27;;
+
+        WinchM1Cmd.StartStop := CycleMotionPermit;
+        WinchM1Cmd.Direction := 1;
+        WinchM1Cmd.SpeedPct := 20.0;
+        WinchM2Cmd.StartStop := CycleMotionPermit;
+        WinchM2Cmd.Direction := 1;
+        WinchM2Cmd.SpeedPct := 20.0;
+
+        // Les deux treuils restent synchronisés jusqu&#x27;au-dessus de la limite légale.
+        IF CycleMotionPermit AND (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
+            WinchM1Cmd.StartStop := FALSE;
+            WinchM2Cmd.StartStop := FALSE;
+            State := E_CycleStep.X6_CLOSE_BUCKET;
+        END_IF;
+
+    E_CycleStep.X6_CLOSE_BUCKET:
+        CycleStep := E_CycleStep.X6_CLOSE_BUCKET;
+        CycleStateStr := &#x27;X6 - Fermeture benne (tolérance à peu près fermé)&#x27;;
+
+        WinchM1Cmd.StartStop := FALSE;
+        BucketCmd.Close := TRUE;
+
+        // Tolérance : si benne « à peu près fermée » (matière/objet), on remonte et on contrôle
+        IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
+            BucketCmd.Close := FALSE;
+            State := E_CycleStep.X7_CTRL_ASCENT;
+        END_IF;
+
+    E_CycleStep.X7_CTRL_ASCENT:
+        CycleStep := E_CycleStep.X7_CTRL_ASCENT;
+        CycleStateStr := &#x27;X7 - Remontée lente de contrôle&#x27;;
+
+        WinchM1Cmd.StartStop := CycleMotionPermit;
+        WinchM1Cmd.Direction := 1;
+        WinchM1Cmd.SpeedPct  := 20.0;
+        WinchM2Cmd.StartStop := CycleMotionPermit;
+        WinchM2Cmd.Direction := 1;
+        WinchM2Cmd.SpeedPct  := 20.0;
+
+        // Contrôle des deux codeurs
+        IF WinchSyncError OR (ABS(M1_CablePosM - M2_CablePosM) &gt; CtrlAscentToleranceM) THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0008;
+            State := E_CycleStep.STABILIZING;
+        ELSIF CycleMotionPermit
+           AND (M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
+           AND (M2_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
+           AND (ABS(M1_CablePosM - M2_CablePosM) &lt;= CtrlAscentToleranceM) THEN
+            State := E_CycleStep.X8_ASCENT_LOADED;
+        ELSIF StabilizationTimer.Q THEN
+            Error := TRUE;
+            ErrorId := ErrorId OR 16#0008;
+            State := E_CycleStep.STABILIZING;
+        END_IF;
+
+    E_CycleStep.X8_ASCENT_LOADED:
+        CycleStep := E_CycleStep.X8_ASCENT_LOADED;
+        CycleStateStr := &#x27;X8 - Remontée en charge&#x27;;
+
+        WinchM1Cmd.StartStop := CycleMotionPermit;
+        WinchM1Cmd.Direction := 1;
+        WinchM1Cmd.SpeedPct  := 70.0;
+        WinchM2Cmd.StartStop := CycleMotionPermit;
+        WinchM2Cmd.Direction := 1;
+        WinchM2Cmd.SpeedPct  := 70.0;
+
+        // Transition alignée sur la limite haute d&#x27;exploitation
+        IF CycleMotionPermit AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
+            WinchM1Cmd.StartStop := FALSE;
+            WinchM2Cmd.StartStop := FALSE;
+            State := E_CycleStep.X9_DRAIN_PAUSE;
+        END_IF;
+
+    E_CycleStep.X9_DRAIN_PAUSE:
+        CycleStep := E_CycleStep.X9_DRAIN_PAUSE;
+        CycleStateStr := &#x27;X9 - Égouttage du godet en cours&#x27;;
+        WinchM1Cmd.StartStop := FALSE;
+        WinchM2Cmd.StartStop := FALSE;
+
+        DrainingTimer(IN := TRUE, PT := DrainingTime);
+        // Temps écoulé affiché IHM (CycleStateStr + champ dédié)
+        IF CycleMotionPermit AND DrainingTimer.Q THEN
+            DrainingTimer(IN := FALSE);
+            State := E_CycleStep.X10_TRANSLATE_DUMP;
+        END_IF;
+
+    E_CycleStep.X10_TRANSLATE_DUMP:
+        CycleStep := E_CycleStep.X10_TRANSLATE_DUMP;
+        CycleStateStr := &#x27;X10 - Déplacement vers trémie (grille/crible libres)&#x27;;
+
+        TranslationCmd.Target := 1; // Trémie
+        TranslationCmd.Start := CycleMotionPermit;
+
+        // Avertissement IHM : grille abaissée/libre, crible libre pour réceptionner la charge
+        // (porté par CycleStateStr + OperatorAction côté supervision)
+
+        // Transition si translation arrivé à la trémie
+        IF CycleMotionPermit AND Translation_At_Tremie THEN
+            TranslationCmd.Start := FALSE;
+            State := E_CycleStep.X11_OPEN_DUMP;
+        END_IF;
+
+    E_CycleStep.X11_OPEN_DUMP:
+        CycleStep := E_CycleStep.X11_OPEN_DUMP;
+        CycleStateStr := &#x27;X11 - Vidange / ouverture du godet (montée possible, descente ouvre)&#x27;;
+
+        // Montée possible (treuils vers le haut) ; descente fait ouvrir la benne.
+        // Montée : on laisse l&#x27;opérateur remonter les 2 treuils en synchro si besoin.
+        WinchM1Cmd.StartStop := CycleMotionPermit AND (WinchM1Cmd.Direction = 1);
+        WinchM1Cmd.Direction := 1;
+        WinchM1Cmd.SpeedPct  := 20.0;
+        WinchM2Cmd.StartStop := CycleMotionPermit AND (WinchM2Cmd.Direction = 1);
+        WinchM2Cmd.Direction := 1;
+        WinchM2Cmd.SpeedPct  := 20.0;
+
+        // Descente → ouverture benne (vidage)
+        BucketCmd.Open := CycleMotionPermit AND (WinchM1Cmd.Direction = -1);
+
+        // Contrôle convoyeurs par MESSAGE utilisateur (pas encore câblé) :
+        // CycleStateStr + OperatorAction côté supervision demandent de vérifier
+        // que les convoyeurs sont en route avant/au lâcher.
+        IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
+            BucketCmd.Open := FALSE;
+            State := E_CycleStep.X13_DONE_SYNC;
+        END_IF;
+
+    E_CycleStep.X13_DONE_SYNC:
+        CycleStep := E_CycleStep.X13_DONE_SYNC;
+        CycleStateStr := &#x27;X13 - Cycle automatique complété - prêt&#x27;;
+        WinchM1Cmd.StartStop := FALSE;
+        WinchM2Cmd.StartStop := FALSE;
+        TranslationCmd.Start := FALSE;
+        Done := TRUE;
+        Busy := FALSE;
+
+        // Compteur de prélèvements (RETAIN, Q3bis) — compte inconditionnellement
+        SampleCount := SampleCount + 1;
+
+        // Rebouclage sur X0_PREPARATION (trémie, treuils hauts) — pas de retour P1
+        IF StartEdge.Q THEN
+            Done := FALSE;
+            State := E_CycleStep.X0_PREPARATION;
+        END_IF;
+
+    E_CycleStep.STABILIZING:
+        CycleStep := E_CycleStep.STABILIZING;
+        CycleStateStr := &#x27;X14 - Cycle en attente / stabilisation (STAB)&#x27;;
+        WinchM1Cmd.StartStop := FALSE;
+        WinchM2Cmd.StartStop := FALSE;
+        TranslationCmd.Start := FALSE;
+        BucketCmd.Open := FALSE;
+        BucketCmd.Close := FALSE;
+
+END_CASE;
+{endregion}
+
+{region &quot;§4 Repli homme mort&quot;}
+// 🛑 Relâchement du manche (retour au centre) : aucune demande d&#x27;actionneur ne reste active.
+// L&#x27;étape est mémorisée et reprend au prochain appui valide (D2).
+IF Busy AND NOT CycleMotionPermit THEN
+    WinchM1Cmd.StartStop := FALSE;
+    WinchM2Cmd.StartStop := FALSE;
+    TranslationCmd.Start := FALSE;
+    BucketCmd.Open := FALSE;
+    BucketCmd.Close := FALSE;
+    BucketCmd.KoboldContactorCmd := FALSE;
+END_IF;
+{endregion}
+
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_Modes_Autorisations.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🎚️ ST_Modes_Autorisations — Bus d&#x27;autorisations du mode machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.0.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.1.md §2
+   🎯 Produit par FB_Modes (via PRG_MODES_CFC)
+      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   🎯 Producteur unique : FB_Modes (via PRG_MODES_CFC)
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_Modes_Autorisations :
+STRUCT
+    Mode                        : E_Mode;     // Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)
+    SyncEnable                  : BOOL;       // Synchro M1/M2 (logique positive)
+    InhibitM1                   : BOOL;       // Inhibition M1 (MAINT_N2 only)
+    InhibitM2                   : BOOL;       // Inhibition M2 (MAINT_N2 only)
+    JoystickWinchSelectArbitrated : INT;      // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)
+    HomingApproachEnable        : BOOL;       // Dépassement butée haut (N2)
+    MaintenanceM3TargetEnable   : BOOL;       // Cible Translation Maintenance (N2 only)
+END_STRUCT
+END_TYPE</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\RESULTS\M_MAIN\FB_TestHarness_PRG_03.st</code></summary>
+                <pre>(* =======================================================================
+   🧱 FB_TestHarness_PRG_03 : Banc d&#x27;essai unitaire pour PRG_03_Modes_Cycle
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Isole PRG_03, injecte les sélections de modes et commandes cycle,
+             exécute FB_Modes et FB_Cycle, et expose le bus ST_Modes_Autorisations.
+   ======================================================================= *)
+
+FUNCTION_BLOCK PUBLIC FB_TestHarness_PRG_03
+VAR_INPUT
+    // === 🎚️ Sélections IHM Modes ===
+    SelMode                 : E_Mode := E_Mode.MAINT_N1;
+    BtnModeReset            : BOOL;
+    SelSyncEnable           : BOOL := TRUE;
+    InhibitM1Request        : BOOL := FALSE;
+    InhibitM2Request        : BOOL := FALSE;
+    SelHomingApproachEnable : BOOL := FALSE;
+    SelJoystickWinch        : INT := 1; // 1 = M1, 2 = M2, 0 = Both
+    TglMaintenanceZoneAccess: BOOL := FALSE;
+    
+    // === 🛡️ Sécurités Machine ===
+    PowerContactorEngaged   : BOOL := TRUE;
+    EncoderFaultPresent     : BOOL := FALSE;
+    
+    // === 🔄 Commandes Cycle Semi-Auto ===
+    BtnStartCycle           : BOOL;
+    BtnAbortCycle           : BOOL;
+    BtnCycleReset           : BOOL;
+    DeadmanArmed            : BOOL := TRUE;
+    JoystickDeflected       : BOOL := TRUE;
+    HeartbeatIhmOk          : BOOL := TRUE;
+    
+    // === 📏 Données mesurées / retours treuils ===
+    M1_CablePosM            : REAL := 5.0;
+    M2_CablePosM            : REAL := 5.0;
+    M1_SpeedMps             : REAL := 0.0;
+    M2_SpeedMps             : REAL := 0.0;
+    Benne_IsClosed          : BOOL := TRUE;
+    Benne_IsOpen            : BOOL := FALSE;
+    Benne_IsRoughlyClosed   : BOOL := TRUE;
+    HomedM1                 : BOOL := TRUE;
+    HomedM2                 : BOOL := TRUE;
+END_VAR
+
+VAR_OUTPUT
+    // === 🎚️ Bus d&#x27;Autorisations Produit vers PRG_04/05/06/07 ===
+    Auth                    : ST_Modes_Autorisations;
+    
+    // === 🔄 Séquenceur de Cycle Semi-Auto ===
+    CycleStep               : E_CycleStep;
+    CycleBusy               : BOOL;
+    CycleDone               : BOOL;
+    CycleError              : BOOL;
+    CycleStateStr           : STRING(80);
+END_VAR
+
+VAR
+    instModes               : FB_Modes;
+    instCycleSemiAuto       : FB_Cycle;
+    countMem                : INT := 0;
+END_VAR
+
+{region &quot;Corps d&#x27;exécution PRG_03 encapsulé&quot;}
+// 1. Arbitrage des Modes Machine
+instModes(
+    Enable                  := TRUE,
+    Reset                   := BtnModeReset,
+    PowerContactorEngaged   := PowerContactorEngaged,
+    SelMode                 := SelMode,
+    SelSyncEnable           := SelSyncEnable,
+    InhibitM1Request        := InhibitM1Request,
+    InhibitM2Request        := InhibitM2Request,
+    SelHomingApproachEnable := SelHomingApproachEnable,
+    EncoderFaultPresent     := EncoderFaultPresent,
+    JoystickWinchSelectRequest := SelJoystickWinch,
+    SelMaintenanceZoneAccess := TglMaintenanceZoneAccess
+);
+
+Auth := instModes.Auth;
+
+// 2. Séquenceur de Cycle Semi-Automatique
+instCycleSemiAuto(
+    Enable                  := (Auth.Mode = E_Mode.SEMI_AUTO),
+    Reset                   := BtnCycleReset,
+    PowerContactorEngaged   := PowerContactorEngaged,
+    Mode                    := Auth.Mode,
+    CycleMotionPermit       := JoystickDeflected,
+    DeadmanArmed            := DeadmanArmed,
+    HeartbeatIhmOk          := HeartbeatIhmOk,
+    StartCycle              := BtnStartCycle,
+    AbortCycle              := BtnAbortCycle,
+    SelTarget               := 1,
+    SetDepthM               := -12.0,
+    SetOffsetM              := 1.5,
+    KoboldContactFond       := FALSE,
+    LimitLegalReached       := FALSE,
+    LimitLegalDepthM        := -15.0,
+    WinchSyncError          := FALSE,
+    WinchSyncDeltaM         := 0.0,
+    M1_CablePosM            := M1_CablePosM,
+    M2_CablePosM            := M2_CablePosM,
+    M1_MeasuredSpeedMps     := M1_SpeedMps,
+    M2_MeasuredSpeedMps     := M2_SpeedMps,
+    SpeedMismatchThresholdMps := 1.5,
+    SpeedMismatchTimeout    := T#500ms,
+    CableLimitM1AscentM     := 7.5,
+    Translation_At_P1       := FALSE,
+    Translation_At_Tremie   := TRUE,
+    Translation_At_Maintenance := FALSE,
+    Translation_Busy        := FALSE,
+    Translation_Done        := TRUE,
+    Benne_Busy              := FALSE,
+    Benne_Done              := TRUE,
+    Benne_IsOpen            := Benne_IsOpen,
+    Benne_IsClosed          := Benne_IsClosed,
+    Benne_IsRoughlyClosed   := Benne_IsRoughlyClosed,
+    HomedM1                 := HomedM1,
+    HomedM2                 := HomedM2,
+    TopPositionSensor       := FALSE,
+    HomingRequest           := FALSE,
+    SampleCount             := countMem
+);
+
+CycleStep     := instCycleSemiAuto.CycleStep;
+CycleBusy     := instCycleSemiAuto.Busy;
+CycleDone     := instCycleSemiAuto.Done;
+CycleError    := instCycleSemiAuto.Error;
+CycleStateStr := instCycleSemiAuto.CycleStateStr;
+
+{endregion}
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+    </details>
+    <details>
+        <summary>Sortie brute strucpp</summary>
+        <pre>STruC++ Test Runner v1.0
+
+test_prg_03_modes_cycle.st
+  [PASS] PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)
+  [PASS] PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)
+  [PASS] PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)
+  [PASS] PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -&gt; MAINT_N1
+  [PASS] PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)
+
+-----------------------------------------
+5 tests, 5 passed, 0 failed
+</pre>
+    </details>
+</div>
+<script>
+function copyPinExpr(el) {
+    var text = el.getAttribute('title') || el.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    el.classList.add('pin-copied');
+    setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('test_ci_theme', next); } catch (e) {}
+    updateThemeBtn(next);
+}
+
+function updateThemeBtn(theme) {
+    var btns = document.querySelectorAll('.theme-toggle-btn');
+    btns.forEach(function(b) {
+        b.innerHTML = theme === 'dark' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+    });
+}
+
+(function() {
+    try {
+        var saved = localStorage.getItem('test_ci_theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.addEventListener('DOMContentLoaded', function() { updateThemeBtn(saved); });
+        }
+    } catch (e) {}
+})();
+</script>
+</body>
+</html>

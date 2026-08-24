@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport de test — FB_CycleTime [PASS]</title>
+<style>
+    :root {
+        --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
+        --accent: #818cf8; --green-bg: rgba(16, 185, 129, 0.15); --green-text: #34d399; --green-border: #059669;
+        --red-bg: rgba(239, 68, 68, 0.15); --red-text: #f87171; --red-border: #dc2626;
+        --warn-bg: rgba(245, 158, 11, 0.15); --warn-text: #fbbf24; --warn-border: #d97706;
+        --card-sub: #0f172a; --badge-prg-bg: rgba(59, 130, 246, 0.2); --badge-prg-txt: #93c5fd;
+        --badge-fb-bg: rgba(148, 163, 184, 0.15); --badge-fb-txt: #cbd5e1; --btn-bg: #1e293b; --btn-border: #334155;
+        --code-bg: #070a12; --code-border: #1e293b;
+        --neon-green-glow: 0 0 25px rgba(16, 185, 129, 0.65), 0 0 10px rgba(16, 185, 129, 0.4), inset 0 0 12px rgba(16, 185, 129, 0.15);
+        --neon-red-glow: 0 0 25px rgba(239, 68, 68, 0.65), 0 0 10px rgba(239, 68, 68, 0.4), inset 0 0 12px rgba(239, 68, 68, 0.15);
+        --neon-blue-glow: 0 0 25px rgba(99, 102, 241, 0.6), 0 0 10px rgba(99, 102, 241, 0.35);
+    }
+    [data-theme="light"] {
+        --bg: #f8fafc; --bg-grid: rgba(0, 0, 0, 0.03); --surface: #ffffff; --surface-card: #ffffff; --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+        --accent: #4f46e5; --green-bg: #ecfdf5; --green-text: #059669; --green-border: #a7f3d0;
+        --red-bg: #fef2f2; --red-text: #dc2626; --red-border: #fecaca;
+        --warn-bg: #fffbeb; --warn-text: #b45309; --warn-border: #fde68a;
+        --card-sub: #f8fafc; --badge-prg-bg: #dbeafe; --badge-prg-txt: #1e40af;
+        --badge-fb-bg: #f1f5f9; --badge-fb-txt: #475569; --btn-bg: #f8fafc; --btn-border: #cbd5e1;
+        --code-bg: #f1f5f9; --code-border: #e2e8f0;
+        --neon-green-glow: none; --neon-red-glow: none; --neon-blue-glow: none;
+    }
+    * { box-sizing: border-box; }
+    /* Masquer les barres de défilement (chariots) tout en conservant le scroll molette fluide */
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0;
+        background-color: var(--bg);
+        background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-position: -1px -1px;
+        color: var(--text); font-size: 15px; line-height: 1.6; transition: background 0.2s, color 0.2s; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 36px 28px 72px; }
+    .header { display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 8px; gap: 16px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 20px 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .theme-toggle-btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text);
+        padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .theme-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    h1 { font-size: 26px; margin: 0; font-weight: 800; letter-spacing: -0.4px; color: #cbd5e1; }
+    .header .badge, .fb-section-title .badge { font-size: 16px; padding: 8px 22px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin: 4px 0 26px; }
+    .subtitle b { color: var(--text); font-weight: 700; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 8px; font-weight: 800;
+        font-size: 13.5px; letter-spacing: 0.8px; font-family: monospace; text-transform: uppercase; }
+    .badge-pass, .badge-pass.badge-strong { background: rgba(16, 185, 129, 0.22); color: #ffffff; border: 2px solid #34d399; box-shadow: 0 0 16px rgba(16, 185, 129, 0.45); }
+    .badge-fail, .badge-fail.badge-strong { background: rgba(244, 63, 94, 0.22); color: #ffffff; border: 2px solid #fb7185; box-shadow: 0 0 16px rgba(244, 63, 94, 0.45); }
+    
+    /* Cartes modernes avec effets Neon Glow */
+    .card-neon-ok { border: 1px solid var(--green-border) !important; box-shadow: var(--neon-green-glow) !important; }
+    .card-neon-fail { border: 1px solid var(--red-border) !important; box-shadow: var(--neon-red-glow) !important; }
+    .card-neon-blue { border: 1px solid #4f46e5 !important; box-shadow: var(--neon-blue-glow) !important; }
+
+    details { margin-bottom: 20px; }
+    summary { cursor: pointer; color: var(--muted); font-size: 12px; user-select: none; }
+    summary:hover { color: var(--text); }
+    ul { font-size: 12px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+    .test-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px 18px; margin-bottom: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .test-card:hover { transform: translateY(-1px); }
+    .test-card-fail { border-color: var(--red-border); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+    /* Style distinct pour les tests de contrat et d'interface socle */
+    .test-card-contract { background: var(--card-sub); border-left: 5px solid #818cf8; border-color: var(--border) var(--border) var(--border) #818cf8; }
+    .test-card-contract header h3 { color: #818cf8; }
+    .test-card header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .test-card h3 { font-size: 14px; margin: 0; font-weight: 600; }
+    .comment { font-size: 12.5px; color: var(--muted); margin: 6px 0; font-style: italic; }
+    .checks { margin-top: 8px; }
+    .checks-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; }
+    .checks ul { list-style: none; padding-left: 0; margin-top: 6px; }
+    .checks li { font-size: 13px; color: var(--text); padding: 3px 0 3px 20px; position: relative; }
+    .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--green-text); font-weight: bold; }
+    .failure { margin-top: 10px; padding: 10px 12px; background: var(--red-bg);
+        border-left: 3px solid var(--red-text); border-radius: 4px; font-size: 12.5px; }
+    .failure-head { color: var(--red-text); font-weight: 600; }
+    .failure-loc { color: var(--muted); margin-top: 2px; font-size: 11px; }
+    .failure-msg { color: #92400e; margin-top: 4px; }
+    .failure-diff { margin-top: 4px; }
+    .failure-diff code { background: #ffffff; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+    pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; font-size: 11px;
+        overflow-x: auto; }
+    .chronogram-group { margin-top: 12px; }
+    .chronogram-group details { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 8px 12px; }
+    .chronogram-group summary { font-size: 12px; font-weight: 600; color: var(--text); }
+    .chrono-scroll { overflow-x: auto; margin-top: 8px; }
+    .chrono-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+    .chrono-table th, .chrono-table td { padding: 4px 8px; border: 1px solid var(--border); text-align: center; }
+    .chrono-table th { background: #f1f5f9; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+    .chrono-table .scan-idx { color: var(--muted); font-weight: 600; }
+    .chrono-table .scan-t { color: var(--muted); }
+    .chrono-table td.changed { background: #fef9c3; }
+    .v-true { color: var(--green-text); font-weight: 600; }
+    .v-false { color: #cbd5e1; }
+    .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; margin-top: 8px; padding: 4px 0; }
+    .waveform { display: block; }
+    .wf-grid { stroke: #f1f5f9; stroke-width: 1; }
+    .wf-time { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+    .wf-scan { font-size: 9px; fill: #cbd5e1; text-anchor: middle; }
+    .wf-label { font-size: 11px; fill: var(--text); font-family: monospace; text-anchor: end; }
+    .wf-line { fill: none; stroke-width: 2; }
+    .wf-num-line { stroke: #e2e8f0; stroke-width: 1; }
+    .wf-num { font-size: 10px; fill: var(--muted); text-anchor: middle; }
+    .wf-num-changed { font-size: 10px; fill: #ffffff; font-weight: 700; text-anchor: middle; }
+    .wf-chip { opacity: 0.95; }
+    .wf-legend { font-size: 10px; fill: var(--muted); }
+    .wf-scale { font-size: 9px; fill: #cbd5e1; text-anchor: end; }
+    .af-warning-banner { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);
+        border-radius: 10px; padding: 12px 18px; margin: 14px 0; font-size: 13px; }
+    .af-warning-banner .af-warning-title { font-weight: 600; margin-bottom: 6px; }
+    .af-warning-banner ul { margin: 0; padding-left: 20px; }
+    .af-warning-banner li { margin: 3px 0; }
+    .encaps-details, .pin-diagram-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
+    .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: none; }
+    .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
+    .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
+    .encaps-table tr.encaps-row-fail { background: var(--red-bg); }
+    .encaps-table ul { margin: 0; padding-left: 16px; }
+    .chrono-fail-note { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border);
+        border-radius: 6px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+    .wf-fail-band { fill: #fecaca; opacity: 0.45; }
+    .wf-fail-marker { font-size: 11px; fill: #dc2626; font-weight: 700; text-anchor: middle; }
+    tr.row-fail-scan { background: var(--red-bg); outline: 2px solid var(--red-text); outline-offset: -2px; }
+    .chronogram-static { margin-top: 10px; }
+    .chronogram-static summary { font-size: 11px; }
+    .chrono-single-scan-note { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0 4px; }
+    .static-table { font-size: 12px; margin-top: 6px; border-collapse: collapse; }
+    .static-table td { padding: 3px 10px; border-bottom: 1px solid var(--border); }
+    .pin-diagram { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; font-size: 12px; width: 100%; }
+    .pin-col { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; max-height: 600px; overflow-y: auto; padding: 4px 8px;
+        scrollbar-width: none; -ms-overflow-style: none; }
+    .pin-col::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .pin-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px;
+        background: var(--surface); min-width: 0; }
+    /* Entrees : texte colle au bloc -> justifie a droite (flux entrant vers le bloc) */
+    .pin-col-in .pin-row { justify-content: space-between; text-align: right; }
+    /* Sorties : texte colle au bloc -> justifie a gauche (flux sortant du bloc) */
+    .pin-col-out .pin-row { justify-content: space-between; text-align: left; }
+    .pin-name { font-family: monospace; font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f8fafc; }
+    .pin-type { color: var(--muted); font-weight: 500; font-size: 11px; margin-left: 4px; }
+    .pin-tag { font-size: 10px; border-radius: 4px; padding: 2px 6px; margin-left: 4px; font-weight: 700; white-space: nowrap; }
+    .pin-expr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .pin-expr code { background: var(--code-bg); color: #93c5fd; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 11.5px;
+        cursor: pointer; font-family: monospace; }
+    .pin-expr code:hover { border-color: var(--accent); color: #ffffff; }
+    .pin-expr code.pin-copied { background: var(--green-bg); color: var(--green-text); }
+    .pin-missing { color: #fbbf24; font-style: italic; font-size: 12px; }
+    .pin-more { color: var(--muted); font-size: 11px; }
+    .pin-row-unwired { background: var(--card-sub); }
+    .fb-section-title { display: flex; align-items: center; gap: 10px; font-size: 17px;
+        font-weight: 600; margin: 30px 0 10px; padding: 12px 18px; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 10px; }
+    .fb-section-title:first-of-type { margin-top: 6px; }
+    .toc-details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 18px; margin-bottom: 16px; }
+    .toc-details summary { font-weight: 600; color: var(--text); font-size: 13px; }
+    .toc-group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+        color: var(--muted); font-weight: 600; margin: 12px 0 4px; }
+    .toc-group-title:first-of-type { margin-top: 10px; }
+    .toc-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+    .toc-item { font-size: 12.5px; padding: 2px 0; break-inside: avoid; }
+    .toc-item a { text-decoration: none; color: var(--text); }
+    .toc-item a:hover { text-decoration: underline; }
+    .toc-item::before { content: "●"; font-size: 8px; margin-right: 6px; }
+    .toc-pass::before { color: var(--green-text); }
+    .toc-fail::before { color: var(--red-text); }
+    .toc-fail a { color: var(--red-text); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <div>
+            <h1>FB_CycleTime</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
+            <span class="badge badge-pass">PASS</span>
+        </div>
+    </div>
+    <div class="exec-time">2026-08-24 07:57:16</div>
+    
+    <details class="toc-details" open>
+        <summary>📋 Sommaire (11 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-cycletime-0">TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-1">Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-2">TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour)</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-3">TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-4">TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-5">TC-P08-005 Changement de mode desarme le geste, nouvel appui exige</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-6">TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-7">TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur)</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-8">TC-P08-011 Fin de cycle benne desarme le geste par defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-9">TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE</a></li><li class="toc-item toc-pass"><a href="#test-fb-cycletime-10">TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes</a></li></ul>
+    </details>
+    
+    <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
+        <div>
+            <span style="font-size:14px;color:var(--text);font-weight:700;">📁 <code style="color:var(--accent);font-size:14px;">CODE/A_COMMUN/FB_CycleTime.st</code></span>
+            <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);">
+            11/11 vérifications validées
+        </div>
+    </div>
+    
+    <details class="encaps-details" >
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <table class="encaps-table">
+            <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
+            <tbody>
+            <tr class="compil-row-pass">
+                <td><code>FB_CycleTime.st</code></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    
+    <details class="pin-diagram-details" open>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_CycleTime</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 3 flux entrants · 1 flux sortants)</span></summary>
+        <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
+            <b>Sous-instances actives intégrées :</b><br>
+            <div style="margin-top:4px;">(aucune)</div>
+        </div>
+        
+        <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DefaultValueS <span class="pin-type" style="color:var(--muted);">REAL := 0.004</span></div></div>
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#fecdd3;font-weight:700;font-size:12px;">❓ Inconnues / Non Déclarées</span> <span style="font-size:11px;color:#fda4af;">(2 identifiants ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.3);color:#ffe4e6;">Alerte</span></div>
+                </div>
+            </summary>
+            <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">TIME</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">TIME_TO_UDINT</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
+            </div></div>
+        </details></div>
+            <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+                <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_CycleTime</span>
+                
+        <div style="margin: 8px 0 4px 0;"><span style="background:var(--card-sub);color:var(--text);border:1px solid var(--border);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;">PROFIL TECHNIQUE SPÉCIFIQUE</span></div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 500;">Brique utilitaire / Interface sur-mesure</div>
+                
+                <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
+                    <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">1</b></div>
+                    <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">1</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">0</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">3 IN</b> / <b style="color:#ffffff;">1 OUT</b></div>
+                </div>
+                
+    <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
+        <div style="font-weight:800;color:var(--accent);margin-bottom:4px;border-bottom:1px solid var(--border);padding-bottom:2px;font-size:11.5px;">📋 Structure ST :</div>
+        <div>✅ Cartouche En-tête <code>(* === *)</code></div>
+        <div>✅ Bannière <code>VAR_INPUT</code></div>
+        <div>✅ Bannière <code>VAR_OUTPUT</code></div>
+        <div>✅ Bannière <code>VAR</code> locale</div>
+    </div>
+            </div>
+            <div class="pin-col pin-col-out">
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>CycleTimeS</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">REAL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div></div>
+        </div>
+    </details>
+    
+    
+    <details class="encaps-details" >
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 1 FB de la chaine, encapsulation propre (0 violation)</summary>
+        
+        <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+            <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
+                ℹ️ Guide d'Audit : Les 7 Invariants & Règles d'Encapsulation Automatisme (Cliquez pour afficher)
+            </summary>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: left;">
+                <thead>
+                    <tr style="background: var(--surface); color: var(--text);">
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">#</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Règle / Invariant POO</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Risque Machine Réel</th>
+                        <th style="padding: 6px 8px; border-bottom: 1px solid var(--border);">Contrôle Automatique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">1</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Écriture externe clandestine sur VAR locale</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Écrasement d'un filtre, timer ou état interne par un autre bloc.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Violation d'encapsulation (External Write)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">2</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Accès GVL direct sans passer par l'interface</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">FB non testable unitairement, couplage fort et masqué.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Effet de bord Global (Hidden GVL Dependency)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">3</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Référence VAR_IN_OUT orpheline</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Pointeur nul / crash automate lors de l'appel.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🚨 Invalidation appel de FB</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">4</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Reset sur front montant (R_TRIG)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Réarmement intempestif si le bouton reste coincé/actif.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">🔒 Règle IEC Reset obligatoire</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">5</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Profils standards (Enable / Ready / Status)</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Composant impossible à chaîner en sécurité AU.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Contrat AF03 §1bis</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">6</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Sorties VAR_OUTPUT orphelines</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Information calculée mais oubliée dans le câblage global.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">💡 Alerte Pinout non consommé</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; font-weight: bold; color: var(--accent);">7</td>
+                        <td style="padding: 6px 8px; color: var(--text);"><b>Variables locales non initialisées</b></td>
+                        <td style="padding: 6px 8px; color: #f87171;">Comportement aléatoire lors d'un redémarrage à chaud.</td>
+                        <td style="padding: 6px 8px; color: #34d399;">⚠️ Détection d'état initial indéfini</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+        <table class="encaps-table">
+            <thead><tr><th>Statut</th><th>Composant (FB)</th><th>VAR_IN</th><th>VAR_OUT</th><th>IN_OUT</th><th>LOCAL</th><th>Analyse Invariants & Violations</th></tr></thead>
+            <tbody>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_CycleTime</code></td>
+                <td>1</td><td>1</td>
+                <td>0</td><td>4</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (4 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr></tbody>
+        </table>
+    </details>
+    
+    <details class="encaps-details" style="margin-top: 16px;">
+        <summary>🧬 Tests Socle & Contrat d'Interface AF03 <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 2 validation(s) (Enable/Reset/Ready/Status & Invariants)</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-cycletime-0" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P03-001 Enable=FALSE neutralise les commandes et le statut (gate) <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-1" class="test-card test-card-pass test-card-contract">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>Nominal : Enable=TRUE au neutre -&gt; Ready, aucun defaut <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        </div>
+    </details>
+    
+    <details class="encaps-details" open style="margin-top: 16px;">
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 9 scénario(s) métier & sécurité machine</summary>
+        <div style="margin-top: 12px;">
+            
+        <article id="test-fb-cycletime-2" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-001 Perte bus CAN pendant un mouvement arme neutralise, desarme et leve Error (auto-efface au retour) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-3" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-002 Maintien DeadmanArmHoldTime : arme si tenu 100ms, annule si relache avant </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-4" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-004 Delai de grace protege l armement au neutre, puis le neutre prolonge desarme apres la grace </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-5" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-005 Changement de mode desarme le geste, nouvel appui exige </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-6" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-006 Reset acquitte une erreur de calibration seulement si la cause a disparu </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-7" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominale (defaut capteur) </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-8" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-011 Fin de cycle benne desarme le geste par defaut </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-9" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-012 Permission maintenue (ex. exception CLOSING Extraction) : l armement est conserve tant que ArmingPermit=TRUE </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        <article id="test-fb-cycletime-10" class="test-card test-card-pass">
+            <header>
+                <span class="badge badge-pass">PASS</span>
+                <h3>TC-P08-014 Mise a l echelle lineaire (proportionnelle) sur valeurs intermediaires, pas seulement aux bornes </h3>
+            </header>
+            
+            
+            
+            
+        </article>
+        </div>
+    </details>
+    <details>
+        <summary>Fichiers source compilés (1)</summary>
+        <ul><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li></ul>
+    </details>
+    <details>
+        <summary>Code source ST original (1)</summary>
+        
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\FB_CycleTime.st</code></summary>
+                <pre>(* =======================================================================
+   ⚙️ FB_CycleTime — Mesure du temps de cycle réel de la tâche
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Calcul du dt réel entre deux exécutions successives
+   ⚙️ Calcul : Delta horloge système TIME() converti en secondes
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.1.md
+   ======================================================================= *)
+FUNCTION_BLOCK FB_CycleTime
+VAR_INPUT
+    // === REGLAGES DE SECOURS ===
+    DefaultValueS           : REAL := 0.004;      // --&gt; [CFG] Valeur de secours par defaut (ex: 4ms = 0.004s)
+END_VAR
+VAR_OUTPUT
+    // === MESURE ET DIAGNOSTIC ===
+    CycleTimeS              : REAL;               // &lt;-- [DIAG] Temps ecoule reel calcule (secondes)
+END_VAR
+VAR
+    // === HORLOGE ET MEMOIRE TEMPORELLE ===
+    TimeCurrent             : TIME;               // . [LOC] Temps systeme actuel
+    TimeLast                : TIME;               // . [LOC] Empreinte de temps du cycle precedent
+    DeltaTimeMs             : UDINT;              // . [LOC] Ecart brut calcule (ms)
+    InitDone                : BOOL;               // . [LOC] Drapeau d&#x27;initialisation du premier cycle
+END_VAR
+
+{region &quot;§1 Acquisition temps&quot;}
+// 1. ACQUISITION DU TEMPS SYSTÈME
+TimeCurrent := TIME();
+{endregion}
+
+{region &quot;§2 Initialisation&quot;}
+// 2. INITIALISATION UNIQUE AU PREMIER CYCLE
+IF NOT InitDone THEN
+    TimeLast := TimeCurrent;
+    InitDone := TRUE;
+    CycleTimeS := DefaultValueS;
+    RETURN;
+END_IF;
+{endregion}
+
+{region &quot;§3 Calcul delta&quot;}
+// 3. CALCUL DU DELTA EN MILLISECONDES
+DeltaTimeMs := TIME_TO_UDINT(TimeCurrent - TimeLast);
+{endregion}
+
+{region &quot;§4 Conversion et secours&quot;}
+// 4. CONVERSION ET CHARGE DE SECOURS
+IF DeltaTimeMs &gt; 0 THEN
+    CycleTimeS := UDINT_TO_REAL(DeltaTimeMs) / 1000.0;
+ELSE
+    CycleTimeS := DefaultValueS;
+END_IF;
+{endregion}
+
+{region &quot;§5 Archivage&quot;}
+// 5. ARCHIVAGE POUR LE PROCHAIN CYCLE
+TimeLast := TimeCurrent;
+{endregion}
+</pre>
+            </details>
+    </details>
+    <details>
+        <summary>Sortie brute strucpp</summary>
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_cycletime.st
+  [PASS] Premier cycle retourne la valeur de secours (pas de dt mesurable)
+  [PASS] Cycle suivant calcule le dt reel ecoule (ms-&gt;s)
+
+-----------------------------------------
+2 tests, 2 passed, 0 failed
+</pre>
+    </details>
+</div>
+<script>
+function copyPinExpr(el) {
+    var text = el.getAttribute('title') || el.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    el.classList.add('pin-copied');
+    setTimeout(function () { el.classList.remove('pin-copied'); }, 500);
+}
+
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('test_ci_theme', next); } catch (e) {}
+    updateThemeBtn(next);
+}
+
+function updateThemeBtn(theme) {
+    var btns = document.querySelectorAll('.theme-toggle-btn');
+    btns.forEach(function(b) {
+        b.innerHTML = theme === 'dark' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+    });
+}
+
+(function() {
+    try {
+        var saved = localStorage.getItem('test_ci_theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.addEventListener('DOMContentLoaded', function() { updateThemeBtn(saved); });
+        }
+    } catch (e) {}
+})();
+</script>
+</body>
+</html>
