@@ -109,6 +109,9 @@ def load_config() -> dict:
     return yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
 
 
+import threading
+
+
 def _archive_previous(reports_dir: pathlib.Path, fb_name: str) -> None:
     """Deplace le dernier rapport (html/json) + le .st de test qui l'a produit vers
     reports/archive/, horodates ensemble -- pour que la racine reports/ ne contienne toujours
@@ -122,7 +125,15 @@ def _archive_previous(reports_dir: pathlib.Path, fb_name: str) -> None:
     archive_dir.mkdir(parents=True, exist_ok=True)
     timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
     for p in existing:
-        p.rename(archive_dir / f"{timestamp}_{p.name}")
+        try:
+            p.rename(archive_dir / f"{timestamp}_{p.name}")
+        except Exception:
+            pass
+
+
+def _archive_previous_async(reports_dir: pathlib.Path, fb_name: str) -> None:
+    """Lance l'archivage disque en arrière-plan sans bloquer la compilation CPU."""
+    threading.Thread(target=_archive_previous, args=(reports_dir, fb_name), daemon=True).start()
 
 
 def _find_strucpp_temp_dir(before: set, tmp_root: pathlib.Path) -> pathlib.Path | None:
@@ -142,14 +153,15 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
     Le detail par test (pas seulement le statut global du FB) permet a un agent de lire le
     resultat complet depuis le seul stdout, sans devoir ouvrir le rapport HTML. En mode normal
     (debug=False), aucun log intermediaire n'est imprime -- seul le resume final compte."""
+    t_start_total = _time.perf_counter()
     domain = entry["domain"]
     sources = [REPO_ROOT / p for p in entry["sources"]]
     test_file = REPO_ROOT / entry["test"]
 
-    # Archivage immédiat au tout début pour libérer la place avant de lancer la compilation
+    # Archivage asynchrone immédiat : tourne en tâche de fond pendant que le CPU compile
     reports_dir = TEST_AUTO_CI / "RESULTS" / domain / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
-    _archive_previous(reports_dir, fb_name)
+    _archive_previous_async(reports_dir, fb_name)
 
     def _log(*a):
         if debug:
@@ -172,6 +184,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         print(_progress_line("conversion"), flush=True)
     _log(f"\n=== {fb_name} (domaine {domain}) ===")
 
+    t_conv_start = _time.perf_counter()
     with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_") as tmp:
         converted_dir = pathlib.Path(tmp)
         # Flag de priorité basse sous Windows pour préserver 100% de la réactivité du PC
@@ -181,11 +194,13 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         result = subprocess.run(convert_cmd, capture_output=True, text=True, encoding="utf-8",
                                 creationflags=subproc_flags)
         _log(result.stdout)
+        t_conv = _time.perf_counter() - t_conv_start
+
         if result.returncode != 0:
             if debug:
                 print(f"[ERREUR] Conversion echouee pour {fb_name}")
                 print(result.stderr, file=sys.stderr)
-            return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}], "report": None}
+            return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}], "report": None, "timings": {"conversion": t_conv}}
 
         converted_files = [str(converted_dir / s.name) for s in sources]
         out_cpp = converted_dir / f"{fb_name}.cpp"
@@ -194,12 +209,14 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
         if debug:
             print(_progress_line("compilation"), flush=True)
+        t_comp_start = _time.perf_counter()
         strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "--test", str(test_file)]
         proc = subprocess.Popen(strucpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                  text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1,
                                  creationflags=subproc_flags)
         lines = list(proc.stdout)
         proc.wait()
+        t_comp = _time.perf_counter() - t_comp_start
         result = subprocess.CompletedProcess(strucpp_cmd, proc.returncode, "".join(lines), "")
         text_report = result.stdout + result.stderr
         _log(text_report)
@@ -208,11 +225,15 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         json_data = None
         trace_entries = []
         field_types = {}
+        t_exec = 0.0
+        t_chrono = 0.0
         if strucpp_temp_dir is not None:
             test_runner = strucpp_temp_dir / "test_runner.exe"
             if test_runner.exists():
+                t_exec_start = _time.perf_counter()
                 json_result = subprocess.run([str(test_runner), "--json"], capture_output=True, text=True, encoding="utf-8",
                                              creationflags=subproc_flags)
+                t_exec = _time.perf_counter() - t_exec_start
                 try:
                     json_data = json.loads(json_result.stdout)
                 except json.JSONDecodeError:
@@ -220,12 +241,14 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             if enable_chronogram:
                 if debug:
                     print(_progress_line("chronogramme"), flush=True)
+                t_chrono_start = _time.perf_counter()
                 try:
                     trace_entries, field_types = chronogram.build_and_run_traced(
                         strucpp_temp_dir, RUNTIME_INCLUDE, RUNTIME_TEST, fb_name.upper())
                 except Exception as exc:  # chronogramme = bonus, ne doit jamais casser le run
                     _log(f"[chronogram] indisponible pour {fb_name} : {exc}")
                     trace_entries, field_types = [], {}
+                t_chrono = _time.perf_counter() - t_chrono_start
 
         # prod_instances (liste) : plusieurs instances production du meme FB (ex: instEncoderM1/
         # instEncoderM2, un FB par treuil). prod_instance (singulier) reste supporte pour les FB
@@ -240,6 +263,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         else:
             prod_instances = [dict(pi, label=pi.get("label", pi.get("name"))) for pi in prod_instances]
 
+        t_wiring_start = _time.perf_counter()
         wirings = []
         if strucpp_temp_dir is not None:
             # Extraction des pins (verite compilateur) toujours tentee, meme sans prod_instances :
@@ -260,9 +284,11 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                 wirings.append({"label": pi.get("label"), "wiring": w})
         else:
             wirings = [{"label": pi.get("label"), "wiring": None} for pi in prod_instances]
+        t_wiring = _time.perf_counter() - t_wiring_start
 
         print(f"\r{_progress_line('rapport')}", end="", flush=True)
 
+        t_af_start = _time.perf_counter()
         af_warnings = []
         extra_test_warnings = []
         af_doc = entry.get("af_doc")
@@ -275,7 +301,9 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         except Exception as exc:  # bonus, ne doit jamais casser le run
             _log(f"[encapsulation_check] indisponible pour {fb_name} : {exc}")
             encapsulation_report = []
+        t_af = _time.perf_counter() - t_af_start
 
+        t_rep_start = _time.perf_counter()
         base = reports_dir / fb_name
         shutil.copyfile(test_file, reports_dir / f"{fb_name}_test.st")
         report_path = None
@@ -299,6 +327,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             base.with_suffix(".txt").write_text(text_report, encoding="utf-8")
             report_path = base.with_suffix(".txt")
         _log(f"Rapport : {report_path}")
+        t_rep = _time.perf_counter() - t_rep_start
 
         tests = []
         for r in (json_data or {}).get("results", []):
@@ -312,6 +341,19 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         if not tests:
             tests = [{"name": "(pas de resultat JSON)", "passed": result.returncode == 0, "detail": ""}]
 
+        t_total = _time.perf_counter() - t_start_total
+
+        timings = {
+            "conversion": t_conv,
+            "compilation": t_comp,
+            "execution": t_exec,
+            "chronogram": t_chrono,
+            "wiring": t_wiring,
+            "af_encapsulation": t_af,
+            "report_generation": t_rep,
+            "total": t_total,
+        }
+
         n_pass = sum(1 for t in tests if t["passed"])
         counter = f" {n_pass}/{len(tests)}" if n_tests_declared else ""
         print(f"\r{f'-> {fb_name} ({domain})...{counter}'.ljust(70)}")
@@ -319,7 +361,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         return {"ok": result.returncode == 0, "tests": tests, "report": report_path,
                 "af_warnings": af_warnings, "extra_test_warnings": extra_test_warnings,
                 "encapsulation_report": encapsulation_report,
-                "report_group": report_group, "section_kwargs": section_kwargs}
+                "report_group": report_group, "section_kwargs": section_kwargs,
+                "timings": timings}
 
 
 def main() -> int:
@@ -448,6 +491,17 @@ def main() -> int:
                     print(f"        ecriture externe non declaree : {w}")
                 for g in e["gvl_refs"]:
                     print(f"        acces GVL direct (bypass interface) : {g}")
+        timings = res.get("timings")
+        if timings:
+            print("  -- ⏱️ Profiling des étapes --")
+            print(f"    • Conversion ST->IEC        : {timings['conversion']:.2f}s")
+            print(f"    • Compilation STruCpp/g++   : {timings['compilation']:.2f}s (CPU)")
+            print(f"    • Exécution binaire ASSERTs : {timings['execution']:.2f}s")
+            if timings['chronogram'] > 0:
+                print(f"    • Chronogramme (recomp g++) : {timings['chronogram']:.2f}s")
+            print(f"    • Câblage production        : {timings['wiring']:.2f}s")
+            print(f"    • Rapport HTML / JSON       : {timings['report_generation']:.2f}s")
+            print(f"    • Total FB                  : {timings['total']:.2f}s")
         if res["report"] and not res.get("report_group"):
             print(f"  Rapport : {res['report']}")
     for group_name, path in group_report_paths.items():

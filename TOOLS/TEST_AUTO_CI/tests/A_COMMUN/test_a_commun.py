@@ -10,7 +10,7 @@ RUN_TESTS_PY = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI" / "run_tests.py"
 
 
 def _run_fb_test(fb_name: str):
-    cmd = [sys.executable, str(RUN_TESTS_PY), "--fb", fb_name]
+    cmd = [sys.executable, str(RUN_TESTS_PY), "--fb", fb_name, "--fast"]
     proc = subprocess.run(
         cmd,
         capture_output=True,
