@@ -39,7 +39,7 @@ excavatrice-dragage/
 │   ├── AF_Partie-09_Fonction_Encoder/    (fiches FB : Abs, Homing, Scale, Safety, SpeedMeasure, SpeedMonitor)
 │   ├── AF_Partie-10_Fonction_Winch/      (fiches FB : Winch, Safety, Sync, OutputInterlock, Bucket, …)
 │   ├── AF_Partie-11_Fonction_Translation/ (fiches FB : Translation, Safety, PositionDecoder, OutputInterlock)
-│   ├── AUDITS/ · CHECKLISTS/ · DIAGRAMS/
+│   ├── AUDITS/ · CHECKLISTS/ · DIA/
 │   └── PLAN_TASK_v1.0.md       (pilotage : jalons, tâches, TBD/questions client)
 │
 ├── CODE/                       # 🔧 Fichiers ST à importer dans CODESYS
