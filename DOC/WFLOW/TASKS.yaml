@@ -327,20 +327,6 @@ tasks:
     objectifs: []
     bloque_par: []
 
-  - id: "T021"
-    parent_id: ""
-    statut: "⏳"
-    criticite: "C2"
-    domaine: "TREUILS"
-    agent: "HUM"
-    date: "2026-07-20T08:00:00"
-    titre: "Checklist validation Winch v1.7 terrain"
-    contexte: ""
-    description: "AF_Partie-09 §8"
-    contrat: ""
-    objectifs: []
-    bloque_par: []
-
   - id: "T022"
     parent_id: ""
     statut: "⏳"
@@ -351,20 +337,6 @@ tasks:
     titre: "Tolérance de calibration TopSensorPositionM à fixer sur site"
     contexte: ""
     description: "AF_Partie-10 §7bis"
-    contrat: ""
-    objectifs: []
-    bloque_par: []
-
-  - id: "T025"
-    parent_id: ""
-    statut: "⏳"
-    criticite: "C2"
-    domaine: "CODEURS"
-    agent: "HUM"
-    date: "2026-07-20T08:00:00"
-    titre: "Suite Encoder/Homing : essais CODESYS bornage/redémar..."
-    contexte: "Intitulé complet : Suite Encoder/Homing : essais CODESYS bornage/redémarrage"
-    description: "AF_Partie-10 §10"
     contrat: ""
     objectifs: []
     bloque_par: []
@@ -754,8 +726,8 @@ tasks:
     domaine: "SÉCURITÉ"
     agent: "DSH-02"
     date: "2026-08-24T04:50:00"
-    titre: "Clarifier sémantique DriveStatusWord.0 AC600 (\"Power Ready\" vs..."
-    contexte: "Intitulé complet : Clarifier sémantique DriveStatusWord.0 AC600 (\"Power Ready\" vs \"Mouvement\" Méca B)"
+    titre: "Clarifier sémantique DriveStatusWord.0 AC600 (\\\"Power Ready\\\" vs..."
+    contexte: "Intitulé complet : Clarifier sémantique DriveStatusWord.0 AC600 (\\\"Power Ready\\\" vs \\\"Mouvement\\\" Méca B)"
     description: "✅ **Fiche de clarification livrée** (`DOC/WFLOW/AUDITS/CLARIFICATION_T110_DRIVESTATUSWORD_v0.1.md`) : DriveStatusWord.0 utilisé comme preuve de mouvement (Méca B, FB_Safety_Translation L180-182) mais sémantique AC600 ambiguë (Power Ready vs mouvement). Proposition : baser Méca B sur ABS(DriveActualFreqHz)>0.5 (meilleure preuve). ⏳ **Résolution en attente** : doc AC600 du bit 0 + validation humaine (C4)."
     contrat: ""
     objectifs: []
@@ -1133,7 +1105,7 @@ tasks:
     agent: "AGY-01"
     date: "2026-08-19T12:00:00"
     titre: "Standardisation globale des 7 PRG : ordre strict des blocs de ..."
-    contexte: "Intitulé complet : Standardisation globale des 7 PRG : ordre strict des blocs de déclaration (VAR_INPUT $\\rightarrow$ VAR_OUTPUT $\\rightarrow$ VAR), bannières ASCII, tags CQS §2 et purge intégrale des commentaires REX / vestiges historiques"
+    contexte: "Intitulé complet : Standardisation globale des 7 PRG : ordre strict des blocs de déclaration (VAR_INPUT $\\\\rightarrow$ VAR_OUTPUT $\\\\rightarrow$ VAR), bannières ASCII, tags CQS §2 et purge intégrale des commentaires REX / vestiges historiques"
     description: "**Validé et commité (2026-08-19)** : PRG_02 à PRG_07 réordonnés et formatés selon CQS §2, Palier C PASS"
     contrat: ""
     objectifs: []
@@ -1230,7 +1202,7 @@ tasks:
     date: "2026-08-24T05:15:00"
     titre: "FB_FbStatus : fault latché perdu (silencieus..."
     contexte: "Intitulé complet : FB_FbStatus : fault latché perdu (silencieusement) sur un cycle Enable=FALSE→TRUE sans Reset | Audit indépendant 2026-08-22 (test_auto_ci + revue sécurité machine, sur CODE/A_COMMUN/FB_FbStatus.st, en cours de développement par un autre agent — pas de code touché ici). "
-    description: "**Constat** : le gate IF NOT Enable THEN ... ErrorIdLatched := 0; ... END_IF; (§1, ~ligne 55) remet la mémoire de défaut latché à zéro dès que Enable repasse à FALSE, **sans passer par un front Reset explicite**. Ça viole l'esprit \"Reset = front conscient, jamais de réarmement/acquittement accidentel\" (AGENTS.md). Scénario concret : un fault latché sur un FB standard (ex. futur treuil) ; l'opérateur change de mode ou un re-init logiciel fait retomber Enable un cycle puis remonter ; le fault disparaît de l'IHM sans qu'aucun Reset n'ait été appuyé → perte de traçabilité d'un défaut réel, l'opérateur croit la machine saine. <br>**Décision utilisateur (2026-08-22)** : la mémoire du dernier défaut latché **ne doit pas** être remise à zéro par Enable=FALSE — seul un front Reset explicite doit acquitter. <br>**Correctif proposé** : retirer ErrorIdLatched := 0; de la branche IF NOT Enable THEN dans FB_FbStatus.st §1 — le reste du gate neutre (façade Status.Error/ErrorId à 0 tant que Enable=FALSE) peut rester tel quel, seule la mémoire interne doit survivre au cycle désactivé. <br>**Doc à mettre à jour en parallèle** (DOC/STDS/CODE_QUALITY_STANDARDS.md §3bis) : documenter explicitement ce comportement (Enable=FALSE ne doit pas acquitter, seul Reset le fait) — actuellement non écrit nulle part (ni code ni standard) : trou d'audit distinct de l'ambiguïté elle-même. <br>**Autres trous identifiés dans le même audit (non bloquants, à trier séparément si besoin)** : cumul de 2 bits latchés jamais testé, priorité d'affichage texte fault vs warning simultanés non tranchée, standard CODE_QUALITY_STANDARDS.md décrit une \"rotation d'affichage 1s\" que le code n'implémente pas (§3bis, à corriger ou implémenter), Busy/Done \"hors socle\" non documenté dans le standard, WarningIdCause cité dans le standard mais absent de l'interface réelle (coquille)."
+    description: "**Constat** : le gate IF NOT Enable THEN ... ErrorIdLatched := 0; ... END_IF; (§1, ~ligne 55) remet la mémoire de défaut latché à zéro dès que Enable repasse à FALSE, **sans passer par un front Reset explicite**. Ça viole l'esprit \\\"Reset = front conscient, jamais de réarmement/acquittement accidentel\\\" (AGENTS.md). Scénario concret : un fault latché sur un FB standard (ex. futur treuil) ; l'opérateur change de mode ou un re-init logiciel fait retomber Enable un cycle puis remonter ; le fault disparaît de l'IHM sans qu'aucun Reset n'ait été appuyé → perte de traçabilité d'un défaut réel, l'opérateur croit la machine saine. <br>**Décision utilisateur (2026-08-22)** : la mémoire du dernier défaut latché **ne doit pas** être remise à zéro par Enable=FALSE — seul un front Reset explicite doit acquitter. <br>**Correctif proposé** : retirer ErrorIdLatched := 0; de la branche IF NOT Enable THEN dans FB_FbStatus.st §1 — le reste du gate neutre (façade Status.Error/ErrorId à 0 tant que Enable=FALSE) peut rester tel quel, seule la mémoire interne doit survivre au cycle désactivé. <br>**Doc à mettre à jour en parallèle** (DOC/STDS/CODE_QUALITY_STANDARDS.md §3bis) : documenter explicitement ce comportement (Enable=FALSE ne doit pas acquitter, seul Reset le fait) — actuellement non écrit nulle part (ni code ni standard) : trou d'audit distinct de l'ambiguïté elle-même. <br>**Autres trous identifiés dans le même audit (non bloquants, à trier séparément si besoin)** : cumul de 2 bits latchés jamais testé, priorité d'affichage texte fault vs warning simultanés non tranchée, standard CODE_QUALITY_STANDARDS.md décrit une \\\"rotation d'affichage 1s\\\" que le code n'implémente pas (§3bis, à corriger ou implémenter), Busy/Done \\\"hors socle\\\" non documenté dans le standard, WarningIdCause cité dans le standard mais absent de l'interface réelle (coquille)."
     contrat: ""
     objectifs: []
     bloque_par: []
