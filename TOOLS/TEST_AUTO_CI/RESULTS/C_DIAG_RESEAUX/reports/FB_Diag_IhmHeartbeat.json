@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "file": "test_fb_diag_ihmheartbeat.st",
+  "file": "test_fb_diag_ethercat.st",
   "results": [
     {
-      "name": "IhmHeartbeat : Enable=FALSE desactive la surveillance",
+      "name": "Ethercat : Enable=FALSE desactive le diagnostic",
       "passed": true
     },
     {
-      "name": "IhmHeartbeat : Front recu -> HeartbeatIhmOk=TRUE",
+      "name": "Ethercat : Enable=TRUE et Esclaves OK -> Ready et State=READY",
       "passed": true
     }
   ],
