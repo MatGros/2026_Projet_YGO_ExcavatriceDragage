@@ -4,7 +4,7 @@
    🎯 Rôle : Enable gate + copie consignes logiques vers sorties physiques
    🔒 Polarité : MaintainA/B_RQ en maintien (TRUE = voie saine)
    🔌 Architecture : Projection physique fail-safe
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagementOutput

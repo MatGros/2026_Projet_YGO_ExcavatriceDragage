@@ -4,7 +4,7 @@
    🎯 Rôle : Normalise une valeur brute (0..10000) selon le neutre calibré
              et applique une zone morte en unités brutes (compte ADC).
    🛡️ Garde-fou : Saturation stricte de la consigne à +/-100.0 %.
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.2.md (F08.02)
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.3.md (F08.02)
    ======================================================================= *)
 
 FUNCTION_BLOCK FB_AxisScale

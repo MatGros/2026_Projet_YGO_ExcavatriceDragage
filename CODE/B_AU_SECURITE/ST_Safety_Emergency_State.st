@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.0.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
 TYPE ST_Safety_Emergency_State :

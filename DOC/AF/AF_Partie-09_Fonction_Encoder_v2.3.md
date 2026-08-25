@@ -104,6 +104,18 @@ flowchart TD
     class Scale,Speed cmd
     class Safety,Rel safe
     class Out outp
+
+    linkStyle 0 stroke:#38bdf8,stroke-width:3px
+    linkStyle 1 stroke:#38bdf8,stroke-width:3px
+    linkStyle 2 stroke:#a78bfa,stroke-width:3px
+    linkStyle 3 stroke:#fbbf24,stroke-width:3px
+    linkStyle 4 stroke:#f43f5e,stroke-width:3px
+    linkStyle 5 stroke:#38bdf8,stroke-width:2px
+    linkStyle 6 stroke:#a78bfa,stroke-width:2px
+    linkStyle 7 stroke:#f43f5e,stroke-width:3px
+    linkStyle 8 stroke:#f43f5e,stroke-width:2px
+    linkStyle 9 stroke:#fbbf24,stroke-width:3px
+    linkStyle 10 stroke:#f43f5e,stroke-width:3px
 ```
 
 Trait plein = donnée transformée · pointillé = fait consommé sans transformation (gate). Couleurs :

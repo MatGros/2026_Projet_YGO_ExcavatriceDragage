@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-24T13:33:38.341997" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-24T13:33:38.341997">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-25T20:37:25.642690" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-25T20:37:25.642690">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -97,7 +97,7 @@
    🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
    🔒 Polarité : CablePosM signée (+ enroulé, - sous l'eau)
    🔌 Architecture : Convertisseur de mesure unitaire par treuil
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
    =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===</xhtml>
           </documentation>
